@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{seller/layout/layout_main}">
+	
+	<head>
+		<meta name="description" content="한국스마트정보교육원 ksmybatis" />
+	</head>
+	
+	<!-- 추가할 js file -->
+	<th:block layout:fragment="jsFile">
+	</th:block>
+	
+	<!-- 추가할 script -->
+	<th:block layout:fragment="jsScript">
+	</th:block>
+	
+	<!-- 추가할 페이지 contents -->
+	<th:block layout:fragment="contents">
+		<div class="content-header">
+            <div>
+                <h2 class="content-title card-title th:text=${title}">판매처목록조회</h2>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row gx-3">
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <input type="text" placeholder="Search..." class="form-control" />
+                    </div>
+                    <div class="col-lg-2 col-6 col-md-3">
+                        <select class="form-select">
+                            <option>Status</option>
+                            <option>Active</option>
+                            <option>Disabled</option>
+                            <option>Show all</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-6 col-md-3">
+                        <select class="form-select">
+                            <option>Show 20</option>
+                            <option>Show 30</option>
+                            <option>Show 40</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+            <!-- card-header end// -->
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="text-center">
+                                <th scope="col">
+                                	<div class="form-check align-middle">
+                                		<input type="checkbox" class="form-check-input" id="allCheck"/>
+                                	</div>
+								</th>
+                                <th scope="col">거래처코드</th>
+                                <th scope="col">거래처아이디</th>
+                                <th scope="col">거래처사업자등록번호</th>
+                                <th scope="col">거래처명</th>
+                                <th scope="col">거래처주소</th>
+                                <th scope="col">거래처상세주소</th>
+                                <th scope="col">거래처우편번호</th>
+                                <th scope="col">거래처연락처</th>
+                                <th scope="col">수정/삭제</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+                            <tr th:if="${not #lists.isEmpty(vendorList)}"
+                            	th:each="l : ${vendorList}">
+                                <td>
+                                	<div class="form-check align-middle">
+                                		<input type="checkbox" class="form-check-input checkId" th:value="${l.vendorCd}"/>
+                                	</div>
+                                </td>
+                                <td th:text="${l.vendorCd}">거래처코드</td>
+                                <td th:text="${l.vendorMbrId}">거래처아이디</td>
+                                <td th:text="${l.vendorBrno}">거래처사업자등록번호</td>
+                                <td th:text="${l.vendorName}">거래처명</td>
+                                <td th:text="${l.vendorAddr}"><b>거래처주소</b></td>
+                                <td th:text="${l.vendorDAddr}"><b>거래처상세주소</b></td>
+                                <td th:text="${l.vendorZip}"><b>거래처우편번호</b></td>
+                                <td th:text="${l.vendorTelNo}"><b>거래처연락처</b></td>
+                                <td class="text-center">
+                                    <a href="#" class="btn btn-warning font-sm text-white">수정</a>
+                                    <a href="#" class="btn btn-danger font-sm text-white">삭제</a>         
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- table-responsive //end -->
+            </div>
+            <!-- card-body end// -->
+        </div>
+        <!-- card end// -->
+        <div class="pagination-area mt-15 mb-50 d-flex justify-content-center">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-start">
+                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                    <li class="page-item"><a class="page-link" href="#">02</a></li>
+                    <li class="page-item"><a class="page-link" href="#">03</a></li>
+                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                    <li class="page-item"><a class="page-link" href="#">16</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+	</th:block>
+	
+
+</html>

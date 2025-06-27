@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title th:text="${product?.gdsNm ?: 'Molla - Bootstrap eCommerce Template'}"></title>
+    <meta name="keywords" content="HTML5 Template">
+    <meta name="description" th:content="${product?.gdsExpln ?: '상품 상세 정보'}">
+    <meta name="author" content="p-themes">
+
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/maincss/assets/images/icons/apple-touch-icon.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/maincss/assets/images/icons/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/maincss/assets/images/icons/favicon-16x16.png}">
+    <link rel="manifest" th:href="@{/maincss/assets/images/icons/site.webmanifest}">
+    <link rel="mask-icon" th:href="@{/maincss/assets/images/icons/safari-pinned-tab.svg}" color="#666666">
+    <link rel="shortcut icon" th:href="@{/maincss/assets/images/icons/favicon.ico}">
+    <meta name="apple-mobile-web-app-title" content="Molla">
+    <meta name="application-name" content="Molla">
+    <meta name="msapplication-TileColor" content="#cc9999">
+    <meta name="msapplication-config" th:content="@{/maincss/assets/images/icons/browserconfig.xml}">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/magnific-popup/magnific-popup.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/nouislider/nouislider.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/productDetail/productDetail.css}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"/>
+</head>
+
+<body>
+	<header th:replace="~{customer/fragments/header :: header}"></header>
+
+    <div class="page-wrapper">
+        <main class="main">
+            <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+			    <div class="container d-flex align-items-center">
+			        <ol class="breadcrumb">
+			            <li class="breadcrumb-item"><a th:href="@{/}">홈</a></li>
+			            <li class="breadcrumb-item"><a th:href="@{/customer/products}">상품</a></li>
+			            <li class="breadcrumb-item active" aria-current="page" th:text="${product?.gdsNm ?: '상세 보기'}"></li>
+			        </ol>
+			    </div>
+        	</nav>
+            
+            <div class="page-content">
+                <div class="container">
+                    <div class="product-details-top">
+                        <div class="row">
+                            <!-- 대표이미지 왼쪽 -->
+                           <div class="col-md-6">
+							    <div class="product-gallery product-gallery-vertical">
+							        <div class="row">
+							
+							            <figure class="product-main-image">
+							                <img id="product-zoom"
+							                     th:if="${thumbnailImage != null}"
+							                     th:src="@{${thumbnailImage.imgFilePathNm}}"   th:data-zoom-image="@{${thumbnailImage.imgFilePathNm}}"   alt="product image">
+							                <img id="product-zoom"
+							                     th:unless="${thumbnailImage != null}"
+							                     th:src="@{/maincss/assets/images/no_image.jpg}"   th:data-zoom-image="@{/maincss/assets/images/no_image.jpg}"   alt="No product image">
+							                <a href="#" id="btn-product-gallery" class="btn-product-gallery">
+							                    <i class="icon-arrows"></i>
+							                </a>
+							            </figure>
+							
+							            <div id="product-zoom-gallery" class="product-image-gallery owl-carousel owl-full-width">
+							                <a th:each="img : ${mainGalleryImages}"
+							                   class="product-gallery-item"
+							                   href="#"
+							                   th:classappend="${imgStat.first ? 'active' : ''}"
+							                   th:data-image="@{${img.imgFilePathNm}}"   th:data-zoom-image="@{${img.imgFilePathNm}}">   <img th:src="@{${img.imgFilePathNm}}" alt="product cross-thumbnail">   </a>
+							                <div th:if="${thumbnailImage == null and mainGalleryImages.isEmpty()}">
+							                    <img th:src="@{/maincss/assets/images/no_image_small.jpg}" alt="No images available">   </div>
+							            </div>
+							
+							        </div>
+							    </div>
+							</div>
+							
+                            <!-- 상품정보 오른쪽 -->
+                            <!-- 이 HTML 구조를 그대로 사용합니다. -->
+							<div class="col-md-6">
+							    <div class="product-details">
+							        <!-- 1. 브랜드 정보 -->
+							        <a href="#" style="text-decoration: none; color: inherit;">
+							            <div class="product-brand-info">
+							                <div class="product-brand-icon">M</div> 
+							                <div class="product-brand-name">MOLLA BRAND</div>
+							            </div>
+							        </a>
+							        
+							        <!-- 2. 카테고리 -->
+							        <div class="product-details-top">
+							            <div class="product-cat">
+							                <!-- 참고: 이 부분은 백엔드 데이터 구조에 따라 완전한 경로(예: 여성 > 신발)로 수정이 필요할 수 있습니다. -->
+							                <a href="#" th:text="${product?.productCategory?.categoryName ?: '카테고리 없음'}">카테고리</a>
+							            </div>
+							        </div>
+							
+							        <!-- 3. 상품명 -->
+							        <h1 class="product-title" th:text="${product?.gdsNm ?: '상품명 없음'}">옐로우 타이 스트랩 블록 힐 샌들</h1>
+							        
+							        <!-- 4. 리뷰/평점 -->
+							        <div class="ratings-container">
+							            <div class="ratings">
+							                <div class="ratings-val" style="width: 80%;"></div>
+							            </div>
+							            <a class="ratings-text" href="#product-review-link" id="review-link">( 2 리뷰 )</a>
+							        </div>
+							        
+							        <!-- 5. 가격 -->
+							        <div class="product-price" th:data-price="${product?.basPrc ?: 0}">
+							            <span th:text="${#numbers.formatDecimal(product?.basPrc ?: 0, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+							        </div>
+							        
+							        <!-- 6. 상품 설명 -->
+							        <div class="product-content">
+							            <p th:text="${product?.gdsExpln ?: '상품 설명이 없습니다.'}">Sed egestas, ante et vulputate volutpat, eros pede semper est, vitae luctus metus libero eu augue.</p>
+							        </div>
+							
+							        <!-- 7. 옵션 선택 -->
+							        <div th:each="option : ${product?.productOptions}">
+									    <div th:if="${option.actvtnYn}" class="details-filter-row"
+									         th:classappend="${option.optNm == '색상' ? 'details-row-color' : (option.optNm == '사이즈' ? 'details-row-size' : '')}">
+									        <label th:for="${'option-select-' + option.optNo}" th:text="${option.optNm} + ':'"></label>
+									        <div class="select-custom">
+									            <select th:name="${option.optNm}" th:id="${'option-select-' + option.optNo}" class="form-control product-option-select">
+									                <option value="" selected disabled th:text="${option.optNm + ' 선택'}"></option>
+									                <option th:each="optionValue : ${option.optionValues}"
+									                        th:if="${optionValue.actvtnYn}"
+									                        th:value="${optionValue.optVlNo}"
+									                        th:data-color="${option.optNm == '색상' and optionValue.clrCd != null ? optionValue.clrCd : ''}"
+									                        th:text="${optionValue.vlNm}">
+									                    옵션 값 이름
+									                </option>
+									            </select>
+									        </div>
+									    </div>
+									</div>
+							
+							        <!-- 8. 선택된 옵션 요약 및 총 가격 (JavaScript로 제어) -->
+							        <div class="product-selection-summary" id="selectionSummary" style="display: none;">
+									    <div class="product-option-price-preview" style="margin-top: 10px;">
+									        <span>선택 옵션 가격: </span>
+									        <span id="selectedOptionCurrentPrice">옵션을 모두 선택해주세요.</span>
+									    </div>
+									
+									    <div class="selected-options-container" id="selectedOptionsContainer">
+									        </div>
+									
+									    <div class="summary-divider"></div>
+									    <div class="summary-total-price-area">
+									        <div class="total-price-label">
+									            <h5 class="total-price-heading">총 상품금액</h5>
+									        </div>
+									        <div class="total-price-display">
+									            <span class="final-total-price" id="totalPrice">0원</span>
+									        </div>
+									    </div>
+									</div>
+							        
+							        <!-- 9. 액션 버튼 (위시리스트, 장바구니, 구매) -->
+							        <div class="product-details-action">
+							            <div class="wishlist-section">
+							                <button class="btn-product btn-wishlist" title="위시리스트"></button>
+							                <span class="likes-count">216</span>
+							            </div>
+							            <div class="product-main-buttons">
+							                <a href="#" class="btn-product btn-cart"><span>장바구니</span></a>
+							                <a href="#" class="btn-product btn-buy-now"><span>구매하기</span></a>
+							                <button class="btn-product btn-share" data-toggle="modal" data-target="#shareModal" title="공유하기">
+							                    <i class="icon-share-alt"></i> <span>공유</span>
+							                </button>
+							            </div>
+							        </div>
+							    </div>
+							</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 수정 x -->
+                <div class="product-details-tab product-details-extended">
+                    <div class="container">
+                        <ul class="nav nav-pills justify-content-center" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="product-desc-link" data-toggle="tab" href="#product-desc-tab" role="tab" aria-controls="product-desc-tab" aria-selected="true">상세설명</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="product-info-link" data-toggle="tab" href="#product-info-tab" role="tab" aria-controls="product-info-tab" aria-selected="false">추가 정보</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="product-shipping-link" data-toggle="tab" href="#product-shipping-tab" role="tab" aria-controls="product-shipping-tab" aria-selected="false">배송 및 반품</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="product-review-link" data-toggle="tab" href="#product-review-tab" role="tab" aria-controls="product-review-tab" aria-selected="false">리뷰 (2)</a>
+                            </li>
+                        </ul>
+                    </div><div class="tab-content">
+                        <div class="tab-pane fade show active" id="product-desc-tab" role="tabpanel" aria-labelledby="product-desc-link">
+                            <div class="product-desc-content">
+                                <div class="product-desc-row bg-image"  style="background-image: url('assets/images/products/single/extended/bg-1.jpg')">
+                                    <div class="container">
+                                        <div class="row justify-content-end">
+                                            <div class="col-sm-6 col-lg-4">
+                                                <h2>제품 정보</h2>
+                                                <ul>
+                                                    <li>인조 스웨이드 원단 갑피</li>
+                                                    <li>타이 스트랩 버클 디테일</li>
+                                                    <li>블록 힐</li>
+                                                    <li>오픈 토</li>
+                                                    <li>힐 높이: 7cm / 2.5인치</li>
+                                                </ul>
+                                            </div></div></div></div><div class="product-desc-row bg-image text-white"  style="background-image: url('assets/images/products/single/extended/bg-2.jpg')">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h2>디자인</h2>
+                                                <p>여름에 완벽한 선택입니다. 이 웨지는 두꺼운 크로스오버 스트랩 디자인과 조절 가능한 버클 잠금 힐 스트랩으로 휴가 및 가정용으로 완벽합니다. 에스파드리유 및 코르크 스타일 웨지가 있는 두툼한 밑창이 특징입니다. </p>
+                                            </div><div class="col-md-6">
+                                                <h2>원단 및 관리</h2>
+                                                <p>Forever Comfort 컬렉션의 일부로, 이 웨지는 부드러운 패딩과 유연한 밑창으로 최고의 쿠셔닝을 제공합니다. 휴가 중 오래된 마을로 산책하거나 마을을 캐주얼하게 돌아다니기에 완벽합니다.</p>
+                                            </div></div><div class="mb-5"></div><img src="assets/images/products/single/extended/sign.png" alt="" class="ml-auto mr-auto">
+                                    </div></div><div class="product-desc-row bg-image"  style="background-image: url('assets/images/products/single/extended/bg-3.jpg')">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <blockquote>
+                                                    <p>“ 모든 것이 중요합니다 - <br>성공은 디테일에 있습니다. ”</p>
+
+                                                    <cite>– 스티브 잡스</cite>
+                                                </blockquote>
+                                                <p>Nullam mollis. Ut justo. Suspendisse potenti. Sed egestas, ante et vulputate volutpat, eros pede semper est, vitae luctus metus libero eu augue. </p>
+                                            </div></div></div></div></div></div><div class="tab-pane fade" id="product-info-tab" role="tabpanel" aria-labelledby="product-info-link">
+                            <div class="product-desc-content">
+                                <div class="container">
+                                    <h3>정보</h3>
+                                    <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna viverra non, semper suscipit, posuere a, pede. Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. </p>
+
+                                    <h3>원단 및 관리</h3>
+                                    <ul>
+                                        <li>인조 스웨이드 원단</li>
+                                        <li>골드 톤 금속 후프 손잡이.</li>
+                                        <li>RI 브랜딩</li>
+                                        <li>뱀 패턴 트림 내부 </li>
+                                        <li>조절 가능한 크로스 바디 스트랩</li>
+                                        <li> 높이: 31cm; 너비: 32cm; 깊이: 12cm; 손잡이 길이: 61cm</li>
+                                    </ul>
+
+                                    <h3>사이즈</h3>
+                                    <p>원 사이즈</p>
+                                </div></div></div><div class="tab-pane fade" id="product-shipping-tab" role="tabpanel" aria-labelledby="product-shipping-link">
+                            <div class="product-desc-content">
+                                <div class="container">
+                                    <h3>배송 및 반품</h3>
+                                    <p>저희는 전 세계 100개국 이상으로 배송합니다. 제공하는 배송 옵션에 대한 자세한 내용은 <a href="#">배송 정보</a>를 참조하십시오.<br>
+                                    모든 구매를 만족하시기를 바라지만, 만약 상품을 반품해야 할 경우 수령 후 한 달 이내에 가능합니다. 반품 방법에 대한 자세한 내용은 <a href="#">반품 정보</a>를 참조하십시오.</p>
+                                </div></div></div><div class="tab-pane fade" id="product-review-tab" role="tabpanel" aria-labelledby="product-review-link">
+                            <div class="reviews">
+                                <div class="container">
+                                    <h3>리뷰 (2)</h3>
+                                    <div class="review">
+                                        <div class="row no-gutters">
+                                            <div class="col-auto">
+                                                <h4><a href="#">Samanta J.</a></h4>
+                                                <div class="ratings-container">
+                                                    <div class="ratings">
+                                                        <div class="ratings-val" style="width: 80%;"></div></div></div><span class="review-date">6일 전</span>
+                                            </div><div class="col">
+                                                <h4>좋아요, 완벽한 사이즈</h4>
+
+                                                <div class="review-content">
+                                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ducimus cum dolores assumenda asperiores facilis porro reprehenderit animi culpa atque blanditiis commodi perspiciatis doloremque, possimus, explicabo, autem fugit beatae quae voluptas!</p>
+                                                </div><div class="review-action">
+                                                    <a href="#"><i class="icon-thumbs-up"></i>도움이 됨 (2)</a>
+                                                    <a href="#"><i class="icon-thumbs-down"></i>도움이 안 됨 (0)</a>
+                                                </div></div></div></div><div class="review">
+                                        <div class="row no-gutters">
+                                            <div class="col-auto">
+                                                <h4><a href="#">John Doe</a></h4>
+                                                <div class="ratings-container">
+                                                    <div class="ratings">
+                                                        <div class="ratings-val" style="width: 100%;"></div></div></div><span class="review-date">5일 전</span>
+                                            </div><div class="col">
+                                                <h4>매우 좋음</h4>
+
+                                                <div class="review-content">
+                                                    <p>Sed, molestias, tempore? Ex dolor esse iure hic veniam laborum blanditiis laudantium iste amet. Cum non voluptate eos enim, ab cumque nam, modi, quas iure illum repellendus, blanditiis perspiciatis beatae!</p>
+                                                </div><div class="review-action">
+                                                    <a href="#"><i class="icon-thumbs-up"></i>도움이 됨 (0)</a>
+                                                    <a href="#"><i class="icon-thumbs-down"></i>도움이 안 됨 (0)</a>
+                                                </div></div></div></div><div class="add-review">
+                                        <h3>리뷰 작성</h3>
+                                        <form action="#">
+                                            <div class="form-group">
+                                                <label for="review-name">이름 *</label>
+                                                <input type="text" class="form-control" id="review-name" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="review-email">이메일 *</label>
+                                                <input type="email" class="form-control" id="review-email" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="review-rating">평점 *</label>
+                                                <div class="ratings-container">
+                                                    <div class="ratings">
+                                                        <div class="ratings-val" style="width: 0%;"></div>
+                                                        <span class="tooltip-text"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="review-title">제목 *</label>
+                                                <input type="text" class="form-control" id="review-title" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="review-content">내용 *</label>
+                                                <textarea class="form-control" id="review-content" cols="30" rows="10" required></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-outline-primary-2">
+                                                <span>리뷰 제출</span>
+                                                <i class="icon-long-arrow-right"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    </div></div></div></div></div><div class="container">
+                    <h2 class="title text-center mb-4">비슷한 상품</h2><div class="owl-carousel owl-simple carousel-equal-height carousel-with-shadow" data-toggle="owl" 
+                        data-owl-options='{
+                            "nav": false, 
+                            "dots": true,
+                            "margin": 20,
+                            "loop": false,
+                            "responsive": {
+                                "0": {
+                                    "items":1
+                                },
+                                "480": {
+                                    "items":2
+                                },
+                                "768": {
+                                    "items":3
+                                },
+                                "992": {
+                                    "items":4
+                                },
+                                "1200": {
+                                    "items":4,
+                                    "nav": true,
+                                    "dots": false
+                                }
+                            }
+                        }'>
+                        <div class="product product-7">
+                            <figure class="product-media">
+                                <span class="product-label label-new">신상품</span>
+                                <a href="product.html">
+                                    <img src="assets/images/products/product-4.jpg" alt="Product image" class="product-image">
+                                </a>
+
+                                <div class="product-action-vertical">
+                                    <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>위시리스트에 추가</span></a>
+                                    <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="빠른 보기"><span>빠른 보기</span></a>
+                                    <a href="#" class="btn-product-icon btn-compare" title="비교"><span>비교</span></a>
+                                </div><div class="product-action">
+                                    <a href="#" class="btn-product btn-cart"><span>장바구니에 추가</span></a>
+                                </div></figure><div class="product-body">
+                                <div class="product-cat">
+                                    <a href="#">여성</a>
+                                </div><h3 class="product-title"><a href="product.html">브라운 페이퍼백 허리 <br>펜슬 스커트</a></h3><div class="product-price">
+                                    $60.00
+                                </div><div class="ratings-container">
+                                    <div class="ratings">
+                                        <div class="ratings-val" style="width: 20%;"></div></div><span class="ratings-text">( 2 리뷰 )</span>
+                                </div><div class="product-nav product-nav-dots">
+                                    <a href="#" class="active" style="background: #cc9966;"><span class="sr-only">색상 이름</span></a>
+                                    <a href="#" style="background: #7fc5ed;"><span class="sr-only">색상 이름</span></a>
+                                    <a href="#" style="background: #e8c97a;"><span class="sr-only">색상 이름</span></a>
+                                </div></div></div><div class="product product-7">
+                            <figure class="product-media">
+                                <span class="product-label label-out">품절</span>
+                                <a href="product.html">
+                                    <img src="assets/images/products/product-6.jpg" alt="Product image" class="product-image">
+                                </a>
+
+                                <div class="product-action-vertical">
+                                    <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>위시리스트에 추가</span></a>
+                                    <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="빠른 보기"><span>빠른 보기</span></a>
+                                    <a href="#" class="btn-product-icon btn-compare" title="비교"><span>비교</span></a>
+                                </div><div class="product-action">
+                                    <a href="#" class="btn-product btn-cart"><span>장바구니에 추가</span></a>
+                                </div></figure><div class="product-body">
+                                <div class="product-cat">
+                                    <a href="#">자켓</a>
+                                </div><h3 class="product-title"><a href="product.html">카키 유틸리티 보일러 점프수트</a></h3><div class="product-price">
+                                    <span class="out-price">$120.00</span>
+                                </div><div class="ratings-container">
+                                    <div class="ratings">
+                                        <div class="ratings-val" style="width: 80%;"></div></div><span class="ratings-text">( 6 리뷰 )</span>
+                                </div></div></div><div class="product product-7">
+                            <figure class="product-media">
+                                <span class="product-label label-top">인기</span>
+                                <a href="product.html">
+                                    <img src="assets/images/products/product-11.jpg" alt="Product image" class="product-image">
+                                </a>
+
+                                <div class="product-action-vertical">
+                                    <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>위시리스트에 추가</span></a>
+                                    <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="빠른 보기"><span>빠른 보기</span></a>
+                                    <a href="#" class="btn-product-icon btn-compare" title="비교"><span>비교</span></a>
+                                </div><div class="product-action">
+                                    <a href="#" class="btn-product btn-cart"><span>장바구니에 추가</span></a>
+                                </div></figure><div class="product-body">
+                                <div class="product-cat">
+                                    <a href="#">신발</a>
+                                </div><h3 class="product-title"><a href="product.html">라이트 브라운 스터드 와이드 핏 웨지</a></h3><div class="product-price">
+                                    $110.00
+                                </div><div class="ratings-container">
+                                    <div class="ratings">
+                                        <div class="ratings-val" style="width: 80%;"></div></div><span class="ratings-text">( 1 리뷰 )</span>
+                                </div><div class="product-nav product-nav-dots">
+                                    <a href="#" class="active" style="background: #8b513d;"><span class="sr-only">색상 이름</span></a>
+                                    <a href="#" style="background: #333333;"><span class="sr-only">색상 이름</span></a>
+                                    <a href="#" style="background: #d2b99a;"><span class="sr-only">색상 이름</span></a>
+                                </div></div></div><div class="product product-7">
+                            <figure class="product-media">
+                                <a href="product.html">
+                                    <img src="assets/images/products/product-10.jpg" alt="Product image" class="product-image">
+                                </a>
+
+                                <div class="product-action-vertical">
+                                    <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>위시리스트에 추가</span></a>
+                                    <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="빠른 보기"><span>빠른 보기</span></a>
+                                    <a href="#" class="btn-product-icon btn-compare" title="비교"><span>비교</span></a>
+                                </div><div class="product-action">
+                                    <a href="#" class="btn-product btn-cart"><span>장바구니에 추가</span></a>
+                                </div></figure><div class="product-body">
+                                <div class="product-cat">
+                                    <a href="#">점퍼</a>
+                                </div><h3 class="product-title"><a href="product.html">옐로우 버튼 프론트 티 탑</a></h3><div class="product-price">
+                                    $56.00
+                                </div><div class="ratings-container">
+                                    <div class="ratings">
+                                        <div class="ratings-val" style="width: 0%;"></div></div><span class="ratings-text">( 0 리뷰 )</span>
+                                </div></div></div><div class="product product-7">
+                            <figure class="product-media">
+                                <a href="product.html">
+                                    <img src="assets/images/products/product-7.jpg" alt="Product image" class="product-image">
+                                </a>
+
+                                <div class="product-action-vertical">
+                                    <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>위시리스트에 추가</span></a>
+                                    <a href="popup/quickView.html" class="btn-product-icon btn-quickview" title="빠른 보기"><span>빠른 보기</span></a>
+                                    <a href="#" class="btn-product-icon btn-compare" title="비교"><span>비교</span></a>
+                                </div><div class="product-action">
+                                    <a href="#" class="btn-product btn-cart"><span>장바구니에 추가</span></a>
+                                </div></figure><div class="product-body">
+                                <div class="product-cat">
+                                    <a href="#">청바지</a>
+                                </div><h3 class="product-title"><a href="product.html">블루 유틸리티 피나포어 데님 드레스</a></h3><div class="product-price">
+                                    $76.00
+                                </div><div class="ratings-container">
+                                    <div class="ratings">
+                                        <div class="ratings-val" style="width: 20%;"></div></div><span class="ratings-text">( 2 리뷰 )</span>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+		<footer th:replace="~{customer/fragments/footer :: footer}"></footer>
+		
+        <!-- 푸터끝 -->
+        <!-- 모달 -->
+        <div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shareModalLabel">공유하기</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="social-share-buttons d-flex justify-content-around mb-4">
+                        <a href="#" class="share-icon-btn d-flex flex-column align-items-center">
+                            <span class="share-icon circle instagram-bg"><i class="icon-instagram"></i></span>
+                            <span class="share-text mt-2">인스타그램</span>
+                        </a>
+                        <a href="#" class="share-icon-btn d-flex flex-column align-items-center">
+                            <span class="share-icon circle kakao-bg"><img src="#" alt="KakaoTalk" style="width: 24px; height: 24px;"></span>
+                            <span class="share-text mt-2">카카오톡</span>
+                        </a>
+                        <a href="#" class="share-icon-btn d-flex flex-column align-items-center">
+                            <span class="share-icon circle facebook-bg"><i class="icon-facebook"></i></span>
+                            <span class="share-text mt-2">페이스북</span>
+                        </a>
+                        <a href="#" class="share-icon-btn d-flex flex-column align-items-center" onclick="copyShareLink(); return false;">
+                            <span class="share-icon circle url-bg"><i class="icon-link"></i></span>
+                            <span class="share-text mt-2">URL 복사하기</span>
+                        </a>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+    
+	<script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.waypoints.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/superfish.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/owl.carousel.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/bootstrap-input-spinner.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.elevateZoom.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/main.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.waypoints.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/superfish.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/owl.carousel.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/bootstrap-input-spinner.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.elevateZoom.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/main.js}"></script>
+	<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
+	<script>
+	    function copyShareLink() {
+	        const el = document.createElement('textarea');
+	        el.value = window.location.href;
+	        document.body.appendChild(el);
+	        el.select();
+	        document.execCommand('copy');
+	        document.body.removeChild(el);
+	        alert('링크가 복사되었습니다!');
+	    }
+	</script>
+</body>
+
+</body>
+
+
+</html>
