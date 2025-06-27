@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>상품 등록</title>
+    <meta name="keywords" content="상품 등록, eCommerce">
+    <meta name="description" content="Molla eCommerce 상품 등록 페이지">
+    <meta name="author" content="Your Name">
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/maincss/assets/images/icons/apple-touch-icon.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/maincss/assets/images/icons/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/maincss/assets/images/icons/favicon-16x16.png}">
+    <link rel="manifest" th:href="@{/maincss/assets/images/icons/site.webmanifest}">
+    <link rel="mask-icon" th:href="@{/maincss/assets/images/icons/safari-pinned-tab.svg}" color="#666666">
+    <link rel="shortcut icon" th:href="@{/maincss/assets/images/icons/favicon.ico}">
+    <meta name="apple-mobile-web-app-title" content="Molla">
+    <meta name="application-name" content="Molla">
+    <meta name="msapplication-TileColor" content="#cc9966">
+    <meta name="msapplication-config" th:content="@{/maincss/assets/images/icons/browserconfig.xml}">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" th:href="@{/maincss/assets/vendor/line-awesome/line-awesome/line-awesome/css/line-awesome.min.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/magnific-popup/magnific-popup.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/jquery.countdown.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/skins/skin-demo-2.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/demos/demo-2.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/sellerProductRegistration/sellerProductRegistration.css}">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+ 
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="header">
+            <div class="header-top">
+                <div class="container">
+                    <div class="header-left">
+                        <span class="kmon-logo-text">LookOn</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="page-content">
+                <div class="container product-reg-container">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-4">
+                            <aside class="sidebar">
+                                <nav class="nav flex-column" id="productRegMenu">
+                                    <a class="nav-link active" href="#basicInfo" data-section="basicInfo">
+                                        <span class="step-number">1</span> 기본 정보
+                                    </a>
+                                    <a class="nav-link" href="#mediaUpload" data-section="mediaUpload">
+                                        <span class="step-number">2</span> 미디어 업로드
+                                    </a>
+                                    <a class="nav-link" href="#priceStock" data-section="priceStock">
+                                        <span class="step-number">3</span> 가격 및 재고
+                                    </a>
+                                    <a class="nav-link" href="#optionSetting" data-section="optionSetting">
+                                        <span class="step-number">4</span> 옵션 설정
+                                    </a>
+                                    <a class="nav-link" href="#otherSettings" data-section="otherSettings">
+                                        <span class="step-number">5</span> 기타 설정
+                                    </a>
+                                </nav>
+                            </aside>
+                        </div>
+
+                        <div class="col-lg-9 col-md-8">
+                            <div class="content-area">
+                                <form id="productRegistrationForm" action="/seller/products/register" method="POST" enctype="multipart/form-data" novalidate>
+                                    <section id="basicInfo" class="content-section active">
+                                        <div class="form-group styled-input-new">
+                                            <div class="form-control-with-labels">
+                                                <div class="input-segment label-segment">
+                                                   제목&nbsp;<span class="text-danger">*</span>
+                                                </div>
+                                                <div class="input-segment input-segment-full">
+                                                    <input type="text" class="form-control" id="productName" name="productName" placeholder="판매상품 제목 입력" required maxlength="20">
+                                                </div>
+                                                <div class="input-segment char-counter-segment">
+                                                    <span id="productNameCounter">0</span>/20
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+										<div class="form-group category-group">
+										    <label for="productCategory1">1차 카테고리&nbsp;<span class="text-danger">*</span></label>
+										    <select class="form-control" id="productCategory1" name="productCategory1" required>
+										        <option value="">1차 카테고리 선택</option>
+										        <option th:each="category : ${primaryProductCategories}"
+										                th:value="${category.categoryId}"
+										                th:text="${category.categoryName}"></option>
+										    </select>
+										</div>
+										
+										<div class="form-group category-group" id="productCategory2Group" style="display: none;">
+										    <label for="productCategory2">2차 카테고리&nbsp;<span class="text-danger">*</span></label>
+										    <select class="form-control" id="productCategory2" name="productCategory2" required>
+										        <option value="">2차 카테고리 선택</option>
+										        </select>
+										</div>
+                                        <div class="form-group styled-input-new product-description-group">
+                                            <div class="form-control-with-labels textarea-type" style="flex-direction: column;">
+                                                <div class="input-segment label-segment" style="border-right: none; width: 100%; border-bottom: 1px solid #ebebeb; border-radius: 6px 6px 0 0; min-width: auto; justify-content: flex-start;">
+                                                    상품 설명&nbsp;<span class="text-danger">*</span>
+                                                </div>
+                                                <div class="input-segment input-segment-full" style="width: 100%; border-top: none;">
+                                                    <textarea class="form-control wysiwyg-editor" id="productDescription" name="productDescription" rows="10" placeholder="상품 특징, 용도, 장점 등을 상세하게 입력" required maxlength="2000"></textarea>
+                                                </div>
+                                                <div class="input-segment char-counter-segment">
+                                                    <span id="productDescriptionCounter">0</span>/2000
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section id="mediaUpload" class="content-section">
+                                        <div class="form-group">
+                                            <div class="custom-file mb-2">
+                                                <input type="file" class="custom-file-input" id="thumbnailImageUpload" name="thumbnailImage" accept="image/*" required>
+                                                <label class="custom-file-label" for="thumbnailImageUpload">
+                                                    <span class="file-name">상품 썸네일 업로드 (1장)<span class="text-danger"> *</span></span>
+                                                </label>
+                                            </div>
+                                            <div id="thumbnailImagePreview" class="image-upload-preview">
+                                                <p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>
+                                            </div>
+                                            <small class="form-text text-muted">상품 목록에 보여질 대표 이미지를 1장 업로드 해주세요. (권장 596px*719px, 20MB 이하)</small>
+                                        </div>
+                                        <div class="form-group">
+                                            
+                                            <div class="custom-file mb-2">
+                                                <input type="file" class="custom-file-input" id="mainImageUpload" name="mainImage" multiple accept="image/*" required>
+                                                <label class="custom-file-label" for="mainImageUpload">
+                                                    <span class="file-name">대표 이미지 업로드 (최소 1장, 최대 15장)<span class="text-danger"> *</span></span>
+                                                </label>
+                                            </div>
+                                            <div id="mainImagePreview" class="image-upload-preview">
+                                                <p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>
+                                            </div>
+                                            <small class="form-text text-muted">첫 번째 이미지가 대표 이미지로 설정됩니다. 드래그하여 순서 변경 가능. (권장 596px*719px, 20MB 이하)</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="custom-file mb-2">
+                                                <input type="file" class="custom-file-input" id="detailImageUpload" name="detailImage" multiple accept="image/*">
+                                                <label class="custom-file-label" for="detailImageUpload">
+                                                    <span class="file-name">상세 페이지 이미지 업로드 (최소 1장, 최대 20장)<span class="text-danger"> *</span></span>
+                                                </label>
+                                            </div>
+                                            <div id="detailImagePreview" class="image-upload-preview">
+                                                <p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>
+                                            </div>
+                                            <small class="form-text text-muted">상세 설명에 사용될 이미지를 업로드하세요. (권장 860px*2500px, 20MB 이하)</small>
+                                        </div>
+                                        <div class="form-group styled-input-new">
+                                            <div class="form-control-with-labels">
+                                                <div class="input-segment label-segment">
+                                                    동영상 첨부
+                                                </div>
+                                                <div class="input-segment input-segment-full">
+                                                    <input type="text" class="form-control" id="videoUrl" name="videoUrl" placeholder="YouTube 또는 Vimeo 동영상 URL 입력" maxlength="200">
+                                                </div>
+                                                <div class="input-segment char-counter-segment">
+                                                    <span id="videoUrlCounter">0</span>/200
+                                                </div>
+                                            </div>
+                                            <small class="form-text text-muted">동영상 파일 업로드 기능은 추가 개발이 필요합니다.</small>
+                                        </div>
+                                    </section>
+
+                                    <section id="priceStock" class="content-section">
+                                        <div class="form-group styled-input-new">
+                                            <div class="form-control-with-labels">
+                                                <div class="input-segment label-segment">
+                                                    기본 판매 가격&nbsp;<span class="text-danger">*</span>
+                                                </div>
+                                                <div class="input-segment input-segment-full">
+                                                    <input type="text" class="form-control text-right" id="basePrice" name="basePrice" placeholder="숫자만 입력" required>
+                                                </div>
+                                                <div class="input-segment char-counter-segment">
+                                                    원
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group styled-input-new">
+                                            <div class="form-control-with-labels">
+                                                <div class="input-segment label-segment">
+                                                    할인율 / 할인가
+                                                </div>
+                                                <div class="input-segment input-segment-full">
+                                                    <input type="number" class="form-control" id="discountRate" name="discountRate" placeholder="할인율 (예: 10)" min="0" max="100">
+                                                </div>
+                                                <div class="input-segment char-counter-segment">
+                                                    %
+                                                </div>
+                                            </div>
+                                            <small class="form-text text-muted">할인율을 입력하면 최종 판매 가격이 자동 계산됩니다.</small>
+                                        </div>
+                                        <div class="form-group styled-input-new">
+                                            <div class="form-control-with-labels">
+                                                <div class="input-segment label-segment">
+                                                    최종 판매 가격
+                                                </div>
+                                                <div class="input-segment input-segment-full">
+                                                    <input type="text" class="form-control text-right" id="finalPrice" readonly>
+                                                </div>
+                                                <div class="input-segment char-counter-segment">
+                                                    원
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="stockQuantity">판매가능 수량&nbsp;<span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" placeholder="숫자만 입력" required min="0">
+                                            <small class="form-text text-muted">재고가 없으면 자동으로 품절 처리됩니다.</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>최소/최대 구매 수량</label>
+                                            <div class="form-row">
+                                                <div class="col">
+                                                    <input type="number" class="form-control" id="minPurchase" name="minPurchase" value="1" min="1" readonly required>
+                                                    <small class="form-text text-muted text-center">최소 구매 수량 (고정)</small>
+                                                </div>
+                                                <div class="col">
+                                                    <input type="number" class="form-control" id="maxPurchase" name="maxPurchase" placeholder="최대 구매 수량" min="1">
+                                                    <small class="form-text text-muted text-center">최대 구매 수량 (선택)</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section id="optionSetting" class="content-section">
+                                        <div class="form-group styled-input-new">
+                                            <div class="form-control-with-labels">
+                                                <div class="input-segment label-segment">
+                                                    제품명&nbsp;<span class="text-danger">*</span>
+                                                </div>
+                                                <div class="input-segment input-segment-full">
+                                                    <input type="text" class="form-control" id="optionProductName" name="optionProductName" placeholder="옵션 조합에 사용될 제품명 입력" required maxlength="100">
+                                                </div>
+                                                <div class="input-segment char-counter-segment">
+                                                    <span id="optionProductNameCounter">0</span>/100
+                                                </div>
+                                            </div>
+                                            <small class="form-text text-muted">옵션 조합 이름의 기본이 되는 제품명입니다.</small>
+                                        </div>
+
+                                        <div id="fixedOptionGroupsContainer">
+                                            <div class="option-group-item mb-4">
+                                                <h5>옵션 설정 - 성별&nbsp;<span class="text-danger">*</span></h5>
+                                                <div class="form-group" id="genderOptionGroup">
+                                                    <div>
+                                                        <button type="button" class="btn btn-outline-secondary option-gender-btn" data-value="남성">남성</button>
+                                                        <button type="button" class="btn btn-outline-secondary option-gender-btn" data-value="여성">여성</button>
+                                                        <button type="button" class="btn btn-outline-secondary option-gender-btn" data-value="공용">공용</button>
+                                                    </div>
+                                                    <input type="hidden" id="genderOption" name="genderOption" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="option-group-item mb-4">
+                                                <h5>옵션 설정 - 색상&nbsp;<span class="text-danger">*</span></h5>
+                                                <div class="form-group">
+                                                    <label>색상값</label>
+                                                    <div id="colorOptionValues" class="option-value-buttons">
+                                                        </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="option-group-item mb-4">
+                                                <h5>옵션 설정 - 사이즈&nbsp;<span class="text-danger">*</span></h5>
+                                                <div class="form-group">
+                                                    <div class="form-group select-type-styled"> <label for="sizeOptionType">유형 선택&nbsp;<span class="text-danger">*</span></label>
+                                                        <select class="form-control" id="sizeOptionType" required>
+                                                            <option value="none">사이즈 유형을 선택하세요</option>
+                                                            <option value="size_apparel">의류 사이즈 (XS~3XL)</option>
+                                                            <option value="size_fashion_acc">패션소품 사이즈 (FREE)</option>
+                                                            <option value="size_shoes">신발 사이즈 (210~300)</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>사이즈값</label>
+                                                    <div id="sizeOptionValues" class="option-value-buttons">
+                                                        <p class="text-muted">사이즈 유형을 선택하면 값이 표시됩니다.</p>
+                                                        </div>
+                                                </div>
+                                            </div>
+
+                                            <hr>
+                                            <h6>옵션 조합별 재고 설정</h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered table-striped option-combination-table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>옵션 조합 (제품명 + 색상 + 사이즈)</th>
+                                                            <th>옵션별 재고 수량</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="optionCombinationsTableBody">
+                                                        <tr><td colspan="2" class="text-center text-muted">색상 및 사이즈 옵션을 선택하면 조합이 생성됩니다.</td></tr>
+                                                        </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <section id="deliveryReturn" class="content-section">
+                                        </section>
+
+                                    <section id="otherSettings" class="content-section">
+                                        <div class="form-group styled-input-new mt-4">
+                                            <div class="form-control-with-labels">
+                                                <div class="input-segment label-segment">
+                                                    태그 / 키워드
+                                                </div>
+                                                <div class="input-segment input-segment-full">
+                                                    <input type="text" class="form-control" id="productTags" name="productTags" placeholder="쉼표(,)로 구분하여 입력" maxlength="200">
+                                                </div>
+                                                <div class="input-segment char-counter-segment">
+                                                    <span id="productTagsCounter">0</span>/200
+                                                </div>
+                                            </div>
+                                            <small class="form-text text-muted">상품 검색에 활용될 키워드를 입력하세요.</small>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="form-group product-status-group"> <label for="productStatus">상품 상태</label>
+                                                <select class="form-control" id="productStatus" name="productStatus" disabled>
+                                                    <option value="suspended">승인대기</option>
+                                                    <option value="selling">판매</option>
+                                                    <option value="sold_out">품절</option>
+                                                    <option value="hidden">숨김</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="fixed-bottom-bar">
+            <div class="container">
+                <button type="button" class="btn btn-light" id="cancelBtn">취소</button>
+                <button type="button" class="btn btn-secondary" id="previewBtn">미리보기</button>
+                <button type="button" class="btn btn-primary" id="tempSaveBtn">저장</button>
+                <button type="submit" class="btn btn-primary" form="productRegistrationForm" id="registerBtn">제출</button>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.waypoints.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/superfish.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/owl.carousel.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.plugin.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.countdown.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/main.js}"></script>
+	<script th:src="@{/maincss/assets/js/demos/demo-2.js}"></script>
+	
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+
+	<script th:src="@{/maincss/assets/sellerProductRegistration/sellerProductRegistration.js}"></script>
+	
+</body>
+</html>

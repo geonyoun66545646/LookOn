@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<div class="container">
+         <div class="product-details-top">
+             <div class="row">
+                 <!-- 대표이미지 왼쪽 -->
+                 <div class="col-md-6">
+                     <div class="product-gallery">
+                         <figure class="product-main-image">
+                             <img id="product-zoom" src="assets/images/products/single/extended/3.jpg" data-zoom-image="assets/images/products/single/extended/3-big.jpg" alt="product image">
+                             <a href="#" id="btn-product-gallery" class="btn-product-gallery">
+                                 <i class="icon-arrows"></i>
+                             </a>
+                         </figure>
+                         <div id="product-zoom-gallery" class="product-image-gallery">
+                             <a class="product-gallery-item" href="#" data-image="assets/images/products/single/extended/1.jpg" data-zoom-image="assets/images/products/single/extended/1-big.jpg">
+                                 <img src="assets/images/products/single/extended/1-small.jpg" alt="product side">
+                             </a>
+
+                             <a class="product-gallery-item" href="#" data-image="assets/images/products/single/extended/2.jpg" data-zoom-image="assets/images/products/single/extended/2-big.jpg">
+                                 <img src="assets/images/products/single/extended/2-small.jpg" alt="product cross">
+                             </a>
+
+                             <a class="product-gallery-item active" href="#" data-image="assets/images/products/single/extended/3.jpg" data-zoom-image="assets/images/products/single/extended/3-big.jpg">
+                                 <img src="assets/images/products/single/extended/3-small.jpg" alt="product with model">
+                             </a>
+                             <a class="product-gallery-item" href="#" data-image="assets/images/products/single/extended/4.jpg" data-zoom-image="assets/images/products/single/extended/4-big.jpg">
+                                 <img src="assets/images/products/single/extended/4-small.jpg" alt="product back">
+                             </a>
+                         </div>
+                     </div>
+                 </div>
+                 <!-- 상품정보 오른쪽 -->
+                 <div class="col-md-6">
+                     <!-- 브랜드 정보 추가 -->
+                     <div class="product-details">
+                         <a href="#" style="text-decoration: none; color: inherit;">
+                             <div class="product-brand-info">
+                                 <div class="product-brand-icon">M</div>
+                                 <div class="product-brand-name">MOLLA BRAND</div>
+                             </div>
+                         </a>
+                         <div class="product-details-top">
+                             <div class="product-cat">
+                                 <a href="#">여성</a> >
+                                 <a href="#">신발</a> >
+                                 <a href="#">샌들</a>
+                             </div>
+                         </div>
+                         <h1 class="product-title">옐로우 타이 스트랩 블록 힐 샌들</h1>
+                         <div class="ratings-container">
+                             <div class="ratings">
+                                 <div class="ratings-val" style="width: 80%;"></div>
+                             </div><a class="ratings-text" href="#product-review-link" id="review-link">( 2 리뷰 )</a>
+                         </div>
+                         <div class="product-price">
+                             $70.00
+                         </div>
+                         <div class="product-content">
+                             <p>Sed egestas, ante et vulputate volutpat, eros pede semper est, vitae luctus metus libero eu augue. Morbi purus libero, faucibus adipiscing. Sed lectus. </p>
+                         </div>
+                         <!-- 컬러/사이즈 선택 영역 수정 -->
+                         <div class="details-filter-row details-row-color">
+                             <div class="select-custom">
+                                 <select name="color" id="color-select" class="form-control">
+                                     <option value="" selected disabled>색상 선택</option>
+                                     <option value="yellow" data-color="#eab656">옐로우</option>
+                                     <option value="black" data-color="#333333">블랙</option>
+                                     <option value="blue" data-color="#3a588b">블루</option>
+                                     <option value="beige" data-color="#caab97">베이지</option>
+                                 </select>
+                             </div>
+                         </div>
+                         <div class="details-filter-row details-row-size">
+                             <div class="select-custom">
+                                 <select name="size" id="size-select" class="form-control">
+                                     <option value="" selected disabled>사이즈 선택</option>
+                                     <option value="s">Small</option>
+                                     <option value="m">Medium</option>
+                                     <option value="l">Large</option>
+                                     <option value="xl">Extra Large</option>
+                                 </select>
+                             </div>
+                         </div>
+                         <!-- 선택 요약 및 가격 표시 영역 추가 -->
+                         <div class="product-selection-summary" id="selectionSummary" style="display: none;">
+                             <div class="selected-options-container" id="selectedOptionsContainer"></div>
+
+                             <div class="summary-divider"></div>
+                             <div class="summary-total-price-area">
+                                 <div class="total-price-label">
+                                     <h5 class="total-price-heading">총 가격</h5>
+                                 </div>
+                                 <div class="total-price-display">
+                                     <span class="final-total-price" id="totalPrice">0원</span>
+                                 </div>
+                             </div>
+                         </div>
+                         <div class="product-details-action">
+                             <div class="wishlist-section">
+                                 <button class="btn-product btn-wishlist" title="위시리스트"></button>
+                                 <span class="likes-count">216</span>
+                             </div>
+                             <div class="product-main-buttons">
+                                 <a href="#" class="btn-product btn-cart"><span>장바구니</span></a>
+                                 <a href="#" class="btn-product btn-buy-now"><span>구매하기</span></a>
+
+                                 <button class="btn-product btn-share" data-toggle="modal" data-target="#shareModal" title="공유하기">
+                                     <i class="icon-share-alt"></i> <span>공유</span>
+                                 </button>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     </div>
+</html>

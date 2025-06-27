@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<head>
+		<meta charset="utf-8" />
+        <title th:text="${title}">Nest Dashboard</title>
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        
+        <!-- Favicon -->
+        <link rel="shortcut icon" type="image/x-icon" th:href="@{/manage/assets/imgs/theme/favicon.svg}" /><!-- 여기 수정했음 th:hr="@{/경로}"  -->
+        <!-- Template CSS -->
+        <link href="/manage/assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+	</head>
+	<body>
+		<div class="screen-overlay"></div>
+		<!-- 
+		
+			~{논리경로}: prefix: /src/main/resources/templates/   subfix: .html	
+			/src/main/resources/templates/admin/fragments/aside.html	
+		-->
+		<!-- aside start -->
+		<aside th:replace="~{admin/fragments/aside :: asideFragment}"></aside>
+		<!-- aside end -->
+		<!-- main start -->
+		<main class="main-wrap">
+			<!-- header start -->
+			<header th:replace="~{admin/fragments/header :: headerFragment}">
+			</header>
+			<!-- header end -->
+			<!-- section start -->
+			<section class="content-main">
+				<!-- content start  -->
+				<!-- 삽입할 부분을 선언 -->
+				<th:block layout:fragment="content"></th:block>
+				<!-- content end  -->
+			</section>
+			<!-- section end  -->
+			<!-- footer start -->
+			<footer th:replace="~{admin/fragments/footer :: footerFragment2}">
+			</footer>
+			<!-- footer end -->
+		</main>
+		<!-- main end -->
+		<script th:src="@{manage/assets/js/vendors/jquery-3.6.0.min.js}"></script>
+        <script th:src="@{manage/assets/js/vendors/bootstrap.bundle.min.js}"></script>
+        <script th:src="@{manage/assets/js/vendors/select2.min.js}"></script>
+        <script th:src="@{manage/assets/js/vendors/perfect-scrollbar.js}"></script>
+        <script th:src="@{manage/assets/js/vendors/jquery.fullscreen.min.js}"></script>
+        
+        <!-- 개발시 추가할 스크립트 파일 영역 정의 -->
+        <th:block layout:fragment="jsFile"></th:block>
+        <!-- Main Script -->
+        <script src="assets/js/main.js?v=1.1" type="text/javascript"></script>
+		<!-- 개발시 추가할 스크립트 영역 정의 -->
+        <th:block layout:fragment="jsScript"></th:block>
+		
+		
+		
+		
+	</body>
+</html>

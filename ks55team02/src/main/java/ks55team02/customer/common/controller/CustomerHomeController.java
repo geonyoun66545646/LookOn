@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class CustomerHomeController {
-	
 	// 이 필드는 그대로 유지합니다.
 	@Value("${toss.client-key}")
     private String tossClientKey;

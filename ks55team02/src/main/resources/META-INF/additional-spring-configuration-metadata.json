@@ -1,17 +1,5 @@
-{"properties": [
-  {
-    "name": "toss.api-url",
-    "type": "java.lang.String",
-    "description": "A description for 'toss.api-url'"
-  },
-  {
-    "name": "toss.client-key",
-    "type": "java.lang.String",
-    "description": "A description for 'toss.client-key'"
-  },
-  {
-    "name": "toss.secret-key",
-    "type": "java.lang.String",
-    "description": "A description for 'toss.secret-key'"
-  }
-]}
+{"properties": [{
+  "name": "product.upload.dir",
+  "type": "java.lang.String",
+  "description": "A description for 'product.upload.dir'"
+}]}

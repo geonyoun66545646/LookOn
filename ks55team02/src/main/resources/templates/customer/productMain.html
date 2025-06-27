@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutProductAll}"> <head>
+    <meta charset="UTF-8">
+    <th:block layout:fragment="cssFile">    </th:block>
+</head>
+<body>
+    <th:block layout:fragment="content">
+        <div th:replace="~{customer/fragments/products :: productsFragment}"></div>
+    </th:block>
+
+    <th:block layout:fragment="jsFile">     </th:block>
+
+    <th:block layout:fragment="jsScript">     </th:block>
+</body>
+</html>
