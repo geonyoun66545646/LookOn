@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{seller/layout/layout_main}">
+	
+	<head>
+		<meta name="description" content="한국스마트정보교육원 ksmybatis" />
+	</head>
+	
+	<th:block layout:fragment="jsFile">
+		</th:block>
+	
+	<th:block layout:fragment="jsScript">
+		<script>
+			$(document).ready(function() {
+				// 제품 코드는 서버에서 자동 생성되므로, 초기 폼 필드 비활성화 로직은 더 이상 필요 없습니다.
+				// 모든 필드는 기본적으로 활성화된 상태로 시작합니다.
+			});
+
+			// 등록 취소 버튼 클릭 이벤트
+			$('button[type="reset"]').click(function() {
+				$('#addProductForm')[0].reset(); // 폼 필드 모두 초기화
+				// productCode는 readonly이므로 reset 후에도 값이 비워지거나 변경되지 않습니다.
+				// 실제 사용 시에는 이 필드를 비워두거나, 폼 제출 후 페이지 리로드를 통해 초기화됩니다.
+			});
+
+			// 상품 등록 버튼 클릭 이벤트
+			$('#addProductBtn').click(e => {
+				e.preventDefault(); // 폼 기본 제출 동작 방지
+
+				let isSubmit = true; // 폼 제출 가능 여부 플래그
+
+				// 필수 입력 항목 유효성 검사
+				// readonly인 productCode 필드는 유효성 검사 목록에서 제외합니다.
+				$('#addProductForm').find('input[name]:not([readonly]), select[name], textarea[name]')
+				.each((idx, element) => {
+					const $element = $(element);
+					const value = $element.val();
+					const elementId = $element.attr('id');
+					// 레이블 텍스트를 찾을 때, 현재 요소의 이전 형제 (label) 또는 가장 가까운 mb-4 클래스의 label을 찾습니다.
+					const labelText = $element.prev('label').text().trim() || $element.closest('.mb-4').find('label').first().text().trim();
+
+					// 거래처 코드 (vendorCode): 선택 여부 검사
+					if (elementId === 'vendorCode' && value === '') {
+						alert('제품 거래처코드를 선택해주세요.');
+						isSubmit = false;
+						$element.focus();
+						return false; // each 루프 종료
+					}
+					
+					// 제품명 (productName): 입력 여부 검사
+					if (elementId === 'productName' && (!value || value.trim() === '')) {
+						alert('제품명을 입력해주세요.');
+						isSubmit = false;
+						$element.focus();
+						return false;
+					}
+
+					// 제품 가격 (productUnitPrice): 숫자인지, 양수인지 검사
+					if (elementId === 'productUnitPrice') {
+						if (isNaN(value) || parseFloat(value) <= 0) { // 숫자가 아니거나 0 이하인 경우
+							alert('제품 가격은 0보다 큰 숫자로 입력해주세요.');
+							isSubmit = false;
+							$element.focus();
+							return false;
+						}
+					}
+				});
+
+				// 모든 유효성 검증을 통과한 경우에만 폼 제출
+				if (isSubmit) {
+					$('#addProductForm').submit();
+				}
+			});
+		</script>
+	</th:block>
+	
+	<th:block layout:fragment="contents">
+		<div class="content-header">
+            <div>
+                <h2 class="content-title card-title">상품등록</h2>
+            </div>
+        </div>
+        <div class="card mb-4 row col-lg-10">
+        	<form id="addProductForm" th:action="@{/seller/products/addProduct}" method="post">
+	            <header class="card-header">
+	                <div class="row gx-3 justify-content-end">
+	                    <div class="col-lg-2 ms-auto d-flex justify-content-between">
+	                        <button type="submit" id="addProductBtn" class="btn btn-success text-white">상품등록</button>
+	                        <button type="reset" id="resetBtn" class="btn btn-warning text-white">등록취소</button>
+	                    </div>
+	                </div>
+	            </header>
+	            <div class="card-body">
+	                <div class="row">
+	                    <div class="col-md-2">
+	                        <h6 class="fs-5">1. 필수입력항목</h6>
+	                    </div>
+	                    <div class="col-md-10">
+	                    	<div class="row">	                    	
+		                        <div class="mb-4 col-md-6">
+		                        	<div class="row align-items-end">
+		                        		<div class="col-md-12"> <label class="form-label fs-6 fw-bold">제품코드</label>
+					                        <input type="text" placeholder="자동 생성될 제품코드" class="form-control"
+					                        	   id="productCode" name="productCode" readonly="readonly">
+		                        		</div>		                        	
+		                        	</div>
+		                        </div>
+	                    	</div>
+	                    	<div class="row">	                    	
+		                        <div class="mb-4 col-lg-6">
+		                            <label class="form-label fs-6 fw-bold">제품 거래처코드</label>
+		                            <select class="form-select text-center" id="vendorCode" name="vendorCode">
+									    <option value=""> === 거래처코드를 선택해주세요 === </option>
+									    <option value="vend_1"> 담당자1 :: 거래처1 </option>
+									    <option value="vend_2"> 담당자2 :: 거래처2 </option>
+									    <option value="vend_3"> 담당자3 :: 거래처3 </option>
+									    <option value="vend_4"> 담당자4 :: 거래처4 </option>
+									</select>
+		                        </div>
+	                    	</div>
+	                    	<div class="row">	                    	
+		                        <div class="mb-4 col-lg-6">
+		                        	<div class="row align-items-end">
+		                        		<div class="col-md-12">		                        		
+				                            <label class="form-label fs-6 fw-bold">제품명</label>
+					                        <input type="text" placeholder="제품명을 입력해주세요" class="form-control"
+					                        	   id="productName" name="productName">
+		                        		</div>
+		                        	</div>
+		                        </div>
+	                    	</div>
+	                    	<div class="row">	                    	
+		                        <div class="mb-4 col-lg-6">
+		                            <label class="form-label fs-6 fw-bold">제품가격</label>
+		                            <input type="number" placeholder="제품가격을 입력해주세요" class="form-control"
+		                            	   id="productUnitPrice" name="productUnitPrice">
+		                        </div>
+	                    	</div>
+	                    </div> </div>
+	            </div>
+        	</form>
+            </div>
+	</th:block>
+	
+	
+</html>
