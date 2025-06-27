@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+<head>
+    <title>홈 페이지</title>
+</head>
+<body>
+    <th:block layout:fragment="contents">
+		 <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title">F.A.Q<span>자주 묻는 질문</span></h1>
+        		</div></div><nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">FAQ</li>
+                    </ol>
+                </div></nav><div class="page-content">
+                <div class="container">
+                	<h2 class="title text-center mb-3">배송관련</h2><div class="accordion accordion-rounded" id="accordion-1">
+					    <div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading-1">
+					            <h2 class="card-title">
+					                <a role="button" data-toggle="collapse" href="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
+					                    소포는 어떤 방식으로 배송되나요?
+					                </a>
+					            </h2>
+					        </div><div id="collapse-1" class="collapse show" aria-labelledby="heading-1" data-parent="#accordion-1">
+					            <div class="card-body">
+					                고객님의 소포는 주문하신 상품의 종류와 지역에 따라 CJ대한통운, 우체국 택배 등 국내 주요 택배사를 통해 배송됩니다. 배송은 보통 영업일 기준 2~3일 소요되며, 제주 및 도서산간 지역은 추가 기간이 소요될 수 있습니다. 자세한 배송 상황은 [마이 페이지 > 주문/배송 조회]에서 운송장 번호로 확인하실 수 있습니다.
+					            </div></div></div><div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading-2">
+					            <h2 class="card-title">
+					                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
+					                    배송비는 제가 부담하나요?
+					                </a>
+					            </h2>
+					        </div><div id="collapse-2" class="collapse" aria-labelledby="heading-2" data-parent="#accordion-1">
+					            <div class="card-body">
+					                'lookon'는 5만원 이상 구매 시 무료 배송을 제공합니다. 5만원 미만 구매 시에는 3,000원의 배송비가 부과됩니다. (도서산간 지역은 추가 배송비가 발생할 수 있습니다.)
+					            </div></div></div><div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading-3">
+					            <h2 class="card-title">
+					                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
+					                    해외 배송도 가능한가요? 관세가 부과되나요?
+					                </a>
+					            </h2>
+					        </div><div id="collapse-3" class="collapse" aria-labelledby="heading-3" data-parent="#accordion-1">
+					            <div class="card-body">
+					                네, 'lookon'는 해외 배송도 지원합니다. 해외 배송 시에는 상품의 종류, 금액, 수령 국가에 따라 관세 및 통관 수수료가 부과될 수 있으며, 이는 고객님께서 부담하셔야 합니다. 자세한 내용은 해당 국가의 관세 정책을 확인해 주시거나, 고객센터로 문의해 주세요.
+					            </div></div></div><div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading-4">
+					            <h2 class="card-title">
+					                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-4" aria-expanded="false" aria-controls="collapse-4">
+					                    받은 상품에 하자가 있어요. 어떻게 해야 하나요?
+					                </a>
+					            </h2>
+					        </div><div id="collapse-4" class="collapse" aria-labelledby="heading-4" data-parent="#accordion-1">
+					            <div class="card-body">
+					                상품 수령 후 7일 이내에 하자를 발견하셨다면, [마이 페이지 > 1:1 문의] 또는 고객센터(1588-XXXX)로 사진과 함께 접수해 주세요. 상품 확인 후 교환 또는 환불 절차를 신속하게 도와드리겠습니다. 고객님의 부주의로 인한 파손은 반품 및 교환이 어려울 수 있습니다.
+					            </div></div></div></div><h2 class="title text-center mb-3">주문과 반품</h2><div class="accordion accordion-rounded" id="accordion-2">
+					    <div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading2-1">
+					            <h2 class="card-title">
+					                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse2-1" aria-expanded="false" aria-controls="collapse2-1">
+					                    주문한 상품은 어떻게 추적하나요?
+					                </a>
+					            </h2>
+					        </div><div id="collapse2-1" class="collapse" aria-labelledby="heading2-1" data-parent="#accordion-2">
+					            <div class="card-body">
+					                주문하신 상품의 배송 현황은 [마이 페이지 > 주문/배송 조회]에서 확인하실 수 있습니다. 주문 번호를 클릭하시면 상세 페이지에서 운송장 번호를 확인하고, 해당 택배사 홈페이지를 통해 실시간 배송 조회를 하실 수 있습니다.
+					            </div></div></div><div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading2-2">
+					            <h2 class="card-title">
+					                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse2-2" aria-expanded="false" aria-controls="collapse2-2">
+					                    주문한 상품을 받지 못했어요.
+					                </a>
+					            </h2>
+					        </div><div id="collapse2-2" class="collapse" aria-labelledby="heading2-2" data-parent="#accordion-2">
+					            <div class="card-body">
+					                배송 지연이 예상되거나 상품을 받지 못하신 경우, 먼저 [마이 페이지 > 주문/배송 조회]에서 배송 상태를 확인해 주세요. 운송장 조회 시 '배송 완료'로 뜨는데 상품을 받지 못하셨다면, 택배사 고객센터에 문의하시거나 'lookon' 고객센터(1588-XXXX)로 연락 주시면 신속히 확인해 드리겠습니다.
+					            </div></div></div><div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading2-3">
+					            <h2 class="card-title">
+					                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse2-3" aria-expanded="false" aria-controls="collapse2-3">
+					                    상품을 어떻게 반품할 수 있나요?
+					                </a>
+					            </h2>
+					        </div><div id="collapse2-3" class="collapse" aria-labelledby="heading2-3" data-parent="#accordion-2">
+					            <div class="card-body">
+					                상품 수령 후 7일 이내에 [마이 페이지 > 주문/배송 조회]에서 반품 신청을 해주세요. 단순 변심으로 인한 반품은 왕복 배송비(6,000원)가 부과되며, 상품의 Tag 손상, 착용 흔적, 세탁 등으로 상품 가치가 훼손된 경우에는 반품이 불가능합니다.
+					            </div></div></div></div><h2 class="title text-center mb-3">결제</h2><div class="accordion accordion-rounded" id="accordion-3">
+					    <div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading3-1">
+					            <h2 class="card-title">
+					                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse3-1" aria-expanded="false" aria-controls="collapse3-1">
+					                    어떤 결제 수단을 사용할 수 있나요?
+					                </a>
+					            </h2>
+					        </div><div id="collapse3-1" class="collapse" aria-labelledby="heading3-1" data-parent="#accordion-3">
+					            <div class="card-body">
+					  	             신용카드(국내 모든 카드사), 네이버페이, 카카오페이, 페이코 등 간편 결제, 무통장 입금 등 다양한 결제 수단을 이용하실 수 있습니다. 자세한 내용은 결제 페이지에서 확인해 주세요.
+					            </div></div></div><div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading3-2">
+					            <h2 class="card-title">
+					                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse3-2" aria-expanded="false" aria-controls="collapse3-2">
+					                    기프트 카드나 상품권으로 결제할 수 있나요?
+					                </a>
+					            </h2>
+					        </div><div id="collapse3-2" class="collapse" aria-labelledby="heading3-2" data-parent="#accordion-3">
+					            <div class="card-body">
+					                현재 'lookon' 자체 발행 기프트 카드나 상품권으로는 직접 결제가 어렵습니다. 다만, 제휴된 외부 결제 플랫폼(예: 네이버페이 포인트, 컬쳐랜드 상품권 등)을 통해 간접적으로 사용하실 수 있는 방법이 있는지 확인해 보시기 바랍니다.
+					            </div></div></div><div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading3-3">
+					            <h2 class="card-title">
+					                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse3-3" aria-expanded="false" aria-controls="collapse3-3">
+					                    결제가 제대로 되지 않아요.
+					                </a>
+					            </h2>
+					        </div><div id="collapse3-3" class="collapse" aria-labelledby="heading3-3" data-3="accordion-3">
+					            <div class="card-body">
+					                결제 오류가 발생할 경우, 카드 정보나 결제 수단 정보를 다시 한번 확인해 주세요. 또한, 인터넷 브라우저의 캐시나 쿠키를 삭제한 후 다시 시도해 보시거나, 다른 브라우저를 사용해 보세요. 문제가 지속된다면 사용하시는 결제 수단의 고객센터 또는 'lookon' 고객센터(1588-XXXX)로 문의해 주시기 바랍니다.
+					            </div></div></div><div class="card card-box card-sm bg-light">
+					        <div class="card-header" id="heading3-4">
+					            <h2 class="card-title">
+					                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse3-4" aria-expanded="false" aria-controls="collapse3-4">
+					                    결제가 완료되었는지 어떻게 알 수 있나요?
+					                </a>
+					            </h2>
+					        </div><div id="collapse3-4" class="collapse" aria-labelledby="heading3-4" data-parent="#accordion-3">
+					            <div class="card-body">
+					                결제가 완료되면 고객님의 이메일로 주문 확인 메일이 발송됩니다. 또한, [마이 페이지 > 주문/배송 조회]에서도 주문 상태가 '결제 완료'로 변경된 것을 확인하실 수 있습니다. 만약 30분 이내에 확인이 되지 않는다면 고객센터로 문의해 주세요.
+					            </div></div></div></div></div></div><div class="cta cta-display bg-image pt-4 pb-4" style="background-image: url(assets/images/backgrounds/cta/bg-7.jpg);">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-md-10 col-lg-9 col-xl-7">
+                            <div class="row no-gutters flex-column flex-sm-row align-items-sm-center">
+                                <div class="col">
+                                    <h3 class="cta-title text-black">더 궁금한 점이 있으신가요?</h3><p class="cta-desc text-black">언제든지 문의해 주세요!</p></div><div class="col-auto">
+                                    <a href="contact.html" class="btn btn-outline-black"><span>문의하기</span><i class="icon-long-arrow-right"></i></a>
+                                </div></div></div></div></div></div></main></th:block>
+
+    <th:block layout:fragment="jsFile">
+        <script th:src="@{/maincss/assets/js/home_specific.js}"></script>
+    </th:block>
+
+    <th:block layout:fragment="jsScript">
+        <script>
+            // 홈 페이지 전용 JavaScript 코드
+            console.log("홈 페이지 스크립트 실행!");
+        </script>
+    </th:block>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace= "ks55team02.customer.inquiry.mapper.InquiryMapper">
+	<resultMap type="inquiry" 					id= "inquiryResultMap">
+	  	<id 	column ="inqry_id"           	property="inqryId"/> 			<!-- 문의 ID -->
+		<result column ="inqry_type_cd"      	property="inqryTypeCd"/> 		<!-- 문의 타입 코드 -->
+		<result column ="inqry_trgt_type_cd"  	property="inqryTrgtTypeCd"/> 	<!-- 문의 대상 유형 코드 -->
+		<result column ="wrtr_id"             	property="wrtrId"/> 			<!-- 작성자 ID -->
+		<result column ="inqry_store_id"      	property="inqryStoreId"/> 		<!-- 문의 받은 스토어 ID -->
+		<result column ="inqry_ttl"           	property="inqryTtl"/> 			<!-- 문의 제목 -->
+		<result column ="inqry_cn"            	property="inqryCn"/> 			<!-- 문의 본문 -->
+		<result column ="prvt_yn"             	property="prvtYn"/> 			<!-- 비공개 여부 -->
+		<result column ="prcs_stts"           	property="prcsStts"/>			<!-- 처리 상태 코드 -->
+		<result column ="prcs_user_no"        	property="prcsUserNo"/> 		<!-- 처리 담당자 사용자 번호 -->
+		<result column ="reg_ymd"             	property="regYmd"/> 			<!-- 등록일 -->
+		<result column ="mdfcn_ymd"           	property="mdfcnYmd"/> 			<!-- 수정일 -->
+		<result column ="del_dt"              	property="delDt"/> 				<!-- 삭제(비활성)일시 -->
+		<result column ="del_user_no"        	property="delUserNo"/> 			<!-- 삭제(비활성)한 관리자 번호 -->
+		<result column ="del_actvtn_yn"       	property="delActvtnYn"/> 		<!-- 삭제 활성 여부 -->
+	</resultMap>
+		<select id= "getInquiryDetail" resultMap="inquiryResultMap"> 
+		SELECT 
+			inqry_id, 
+			inqry_type_cd, 
+			inqry_trgt_type_cd, 
+			wrtr_id, 
+			inqry_store_id, 
+			inqry_ttl, 
+			inqry_cn, 
+			prvt_yn, 
+			prcs_stts, 
+			prcs_user_no, 
+			reg_ymd, 
+			mdfcn_ymd, 
+			del_dt, 
+			del_user_no, 
+			del_actvtn_yn
+		FROM 
+			inquiries;
+		</select>
+		
+		<select id= "getInquiryList" resultMap="inquiryResultMap">
+			SELECT 
+				CAST(REGEXP_REPLACE(inqry_id, '[^0-9]', '') AS UNSIGNED) AS inqry_id,
+				inqry_type_cd, 
+				inqry_trgt_type_cd, 
+				wrtr_id, 
+				inqry_store_id, 
+				inqry_ttl, 
+				inqry_cn, 
+				prvt_yn, 
+				prcs_stts, 
+				prcs_user_no, 
+				reg_ymd, 
+				mdfcn_ymd, 
+				del_dt, 
+				del_user_no, 
+				del_actvtn_yn
+			FROM 
+				inquiries
+			ORDER BY 
+				cast(REGEXP_REPLACE(inqry_id, '[^0-9]', '') as UNSIGNED) desc,
+				reg_ymd asc
+				limit 15;
+		</select>
+		
+		<insert id="addInquiry" parameterType="Inquiry">
+			INSERT INTO inquiries
+				(inqry_id, inqry_type_cd, inqry_trgt_type_cd, wrtr_id, inqry_store_id, inqry_ttl, inqry_cn, prvt_yn, prcs_stts, prcs_user_no, reg_ymd, mdfcn_ymd, del_dt, del_user_no, del_actvtn_yn)
+			VALUES
+			(#{inqryId}, 
+			#{inqryTypeCd}, 
+			#{inqryTrgtTypeCd}, 
+			#{wrtrId}, 
+			#{inqryStoreId}, 
+			#{inqryTtl}, 
+			#{inqryCn}, 
+			#{prvtYn}, 
+			#{prcsStts}, 
+			#{prcsUserNo}, 
+			CURDATE(), 
+			#{mdfcnYmd}, 
+			#{delDt}, 
+			#{delUserNo}, 
+			#{delActvtnYn});
+		</insert>
+		
+		<select id="getMaxInquiryId" resultType="string">
+		    SELECT
+		        MAX(CAST(SUBSTRING(inqry_id, 5) AS UNSIGNED)) AS maxId  FROM
+		        inquiries
+		    WHERE
+		        inqry_id LIKE 'inq_%' AND 
+		        SUBSTRING(inqry_id, 5) 
+		        REGEXP '^[0-9]+$'; 
+        </select>
+    
+
+ 	 </mapper>

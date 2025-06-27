@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+<head>
+    <title>문의 등록</title>
+    <th:block layout:fragment="customCss">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/addInquiryView.css}">
+    </th:block>
+</head>
+<body>
+    <th:block layout:fragment="contents">
+        <main class="main">
+            <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+                <div class="container">
+                    <h1 class="page-title">INQUIRY REGISTRATION<span>문의 등록</span></h1>
+                </div>
+            </div>
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item">
+                        <a th:href="@{/customer/inquiry/inquiryList}">INQUIRYLIST</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">문의 등록</li>
+                    </ol>
+                </div>
+            </nav>
+            <div class="page-content">
+                <div class="container">
+                	<div class="inquiryTable">
+                    <form id="inquiryForm" th:action="@{/customer/inquiry/addInquiry}" method="post">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr class="inquiry-row">
+                                    <th scope="row">문의 유형</th>
+                                    <td class="type-column">
+                                        <select name="inqryTypeCd" class="form-control" required>
+										    <option value="">선택하세요</option>
+										    <option th:each="option : ${inquiryType}"
+										            th:value="${option.inquiryOption}"     
+										            th:text="${option.inquiryOption}"></option>
+										</select>
+                                    </td>
+                                    <th scope="row" class="no-shade">첨부파일</th> <td class="file-column">
+                                        <input type="file" class="form-control-file" name="attachedFile">
+                                        <small class="form-text text-muted mt-1">최대 5MB까지 업로드 가능합니다.</small>
+                                    </td>
+                                </tr>
+
+                                <tr class="inquiry-row title-row">
+                                    <th scope="row">제목</th>
+                                    <td colspan="3">
+                                        <div class="title-input-group">
+                                            <input type="text" class="form-control" name="inqryTtl" placeholder="제목을 입력하세요" required>
+                                            <div class="custom-control custom-checkbox ml-3">
+                                                <input type="checkbox" class="custom-control-input" id="privateInquiry" name="prvtYn" value="true">
+                                                <input type="hidden" name="_prvtYn" value="on">
+                                                <label class="custom-control-label" for="privateInquiry">비밀글 설정</label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr class="inquiry-row">
+                                    <th scope="row">내용</th>
+                                    <td colspan="3">
+                                        <textarea class="form-control" name="inqryCn" rows="8" placeholder="내용을 입력하세요" required></textarea>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="form-group d-flex justify-content-end mt-4 mb-3">
+	   					    <button type="submit" class="btn btn-primary btn-rounded">문의 등록</button>
+                            <a th:href="@{/customer/inquiry/inquiryList}" class="btn btn-outline-secondary btn-rounded ml-2">목록으로</a>
+                        </div>
+                    </form>
+                    </div>
+                    </div>
+            </div>
+        </main>
+    </th:block>
+
+    <th:block layout:fragment="jsScript">
+        <script>
+            console.log("문의 등록 스크립트 실행!");
+
+            // 폼 제출 이벤트 리스너
+            document.getElementById('inquiryForm').addEventListener('submit', function(event) {
+				event.preventDefault();
+				
+				const form =event.target;
+				const formData = new FormData(form);
+				
+				// 클라이언트 사이드 유효성 검사 예시
+                const inquiryType = this.elements['inqryTypeCd'].value;
+                const inquiryTitle = this.elements['inqryTtl'].value; // 변경된 name 사용
+                const inquiryContent = this.elements['inqryCn'].value; // 변경된 name 사용
+
+                if (!inquiryType || inquiryType === "") {
+                    alert("문의 유형을 선택해주세요."); 
+                    return;
+                }
+                if (!inquiryTitle.trim()) {
+                    alert("제목을 입력해주세요.");
+                    return;
+                }
+                if (!inquiryContent.trim()) {
+                    alert("내용을 입력해주세요.");
+                    return;
+                }
+                // --- 유효성 검사 끝 --
+               //ajax 요청 시작
+               fetch(form.action, {
+                method : form.method,
+                body : formData
+               }) 
+               .then(response =>{
+            	   console.log("1단계: 응답 받음. response.ok:", response.ok);
+					if(!response.ok){
+						console.log("2단계 (오류): 응답이 OK가 아님. JSON 파싱 시도.");
+						return response.json().then(err=>{
+							console.error("2.1단계 (오류): 서버에서 받은 오류 응답:", err);
+							throw new Error(err.message || `HTTP error! status: ${response.status}`);
+						});
+					}
+					 console.log("2단계 (성공): 응답이 OK. JSON 파싱 시도.");
+					return response.json();
+            })
+				.then(data=>{
+					 console.log("3단계: JSON 데이터 파싱 완료:", data);
+					if(data.status ==='success'){
+						console.log("4단계 (성공): data.status === 'success'");
+						alert(data.message);
+						window.location.href = '/customer/inquiry/inquiryList';
+					}else{
+						console.log("4단계 (실패): data.status !== 'success'");
+						alert('문의 등록 실패'+(data.message || '오류발생'));
+					}
+				})
+				.catch(error => {
+					console.error('오류 발생',error);
+					alert('오류! 잠시 후 다시 시도해주세요.');
+            });
+            });
+        </script>
+    </th:block>
+</body>
+</html>

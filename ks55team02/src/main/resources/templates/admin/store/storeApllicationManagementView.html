@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{seller/layout/storeMangeLayoutMain}">
+	
+	<head>
+		<meta name="description" content="한국스마트정보교육원 팀프로젝트"/>
+	</head>
+	
+	<!-- 추가할 js file -->
+	<th:block layout:fragment="jsFile">
+	  <script src="/admincss/assets/js/vendors/chart.js"></script>
+	</th:block>
+	
+	<!-- 추가할 script -->
+	<th:block layout:fragment="jsScript">
+		<script>
+			console.log('ksmart');
+		</script>
+	</th:block>	
+	
+	
+	
+	<!-- 추가할 페이지 contents -->
+	<th:block layout:fragment="contents">
+		
+	</th:block>
+	
+	
+	
+</html>
