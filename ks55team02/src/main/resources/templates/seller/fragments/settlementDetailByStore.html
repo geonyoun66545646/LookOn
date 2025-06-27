@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 정산 관리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="maincss/assets/customcustomercss/settlementDetailByStore.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<th:block layout:fragment="contents">
+    <div class="page-container">
+        <h1 class="page-title">정산 관리</h1>
+        <p class="page-subtitle">상점들의 판매 수수료를 정산하고 내역을 관리합니다.</p>
+
+        <div class="content-wrapper">
+            <div class="settlement-panel">
+                <h2 class="panel-title">정산 대상 상점 목록</h2>
+                
+                <div class="settlement-list-header">
+                    <span class="header-item shop-name">상점명</span>
+                    <span class="header-item sales-amount">총 판매액</span>
+                    <span class="header-item commission-amount">수수료</span>
+                    <span class="header-item payable-amount">정산 예정액</span>
+                    <span class="header-item last-settlement-date">최근 정산일</span>
+                    <span class="header-item status">상태</span>
+                    <span class="header-item action">정산</span>
+                </div>
+
+                <div id="shop-settlement-list" class="shop-settlement-list">
+                    </div>
+
+                <div class="no-data" id="no-settlement-data-message" style="display: none;">
+                    <p>정산할 상점 데이터가 없습니다.</p>
+                </div>
+
+                <div class="settlement-summary">
+                    <span class="summary-label">총 정산 예정액:</span>
+                    <span class="summary-value" id="total-payable-amount">0원</span>
+                    <button class="batch-settle-button" id="batch-settle-button">선택 정산하기</button>
+                </div>
+            </div>
+
+            <div class="settlement-history-panel" id="settlement-history-panel" style="display:none;">
+                <h2 class="panel-title">
+                    <span id="history-shop-name"></span> 정산 내역 
+                    <button class="close-history-button" id="close-history-button"><i class="fas fa-times"></i></button>
+                </h2>
+                <div class="history-list-header">
+                    <span class="header-item history-date">정산일</span>
+                    <span class="header-item history-amount">정산 금액</span>
+                    <span class="header-item history-status">상태</span>
+                </div>
+                <div id="settlement-history-detail-list" class="settlement-history-detail-list">
+                    </div>
+                <div class="no-history" id="no-individual-history-message" style="display: none;">
+                    <p>해당 상점의 정산 내역이 없습니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const shopSettlementList = document.getElementById('shop-settlement-list');
+            const totalPayableAmountElement = document.getElementById('total-payable-amount');
+            const batchSettleButton = document.getElementById('batch-settle-button');
+            const noSettlementDataMessage = document.getElementById('no-settlement-data-message');
+            
+            const settlementHistoryPanel = document.getElementById('settlement-history-panel');
+            const historyShopName = document.getElementById('history-shop-name');
+            const settlementHistoryDetailList = document.getElementById('settlement-history-detail-list');
+            const closeHistoryButton = document.getElementById('close-history-button');
+            const noIndividualHistoryMessage = document.getElementById('no-individual-history-message');
+
+            // 가상의 상점 데이터 (실제로는 DB에서 가져옴)
+            // status: '정산대기', '정산완료'
+            const shopsData = [
+                { id: 'shop001', name: 'ABC 스토어', totalSales: 15000000, commissionRate: 0.15, lastSettlement: '2025.06.10', status: '정산대기', history: [] },
+                { id: 'shop002', name: 'XYZ 마켓', totalSales: 8000000, commissionRate: 0.10, lastSettlement: '2025.06.15', status: '정산대기', history: [] },
+                { id: 'shop003', name: '베스트셀러샵', totalSales: 22000000, commissionRate: 0.12, lastSettlement: '2025.05.20', status: '정산대기', history: [] },
+                { id: 'shop004', name: '패션로드', totalSales: 5000000, commissionRate: 0.18, lastSettlement: '2025.06.20', status: '정산대기', history: [] },
+                { id: 'shop005', name: '데일리굿즈', totalSales: 10000000, commissionRate: 0.15, lastSettlement: '2025.06.22', status: '정산완료', history: [
+                    { date: '2025.06.22', amount: 8500000, status: '완료' },
+                    { date: '2025.05.22', amount: 9000000, status: '완료' }
+                ]}
+            ];
+
+            function formatCurrency(number) {
+                return number.toLocaleString('ko-KR') + '원';
+            }
+
+            function calculatePayableAmount(sales, rate) {
+                return sales * (1 - rate);
+            }
+
+            // 상점 목록 렌더링
+            function renderShopList() {
+                shopSettlementList.innerHTML = ''; // 기존 목록 초기화
+                let totalPayable = 0;
+
+                if (shopsData.length === 0) {
+                    noSettlementDataMessage.style.display = 'block';
+                    batchSettleButton.disabled = true;
+                    totalPayableAmountElement.textContent = formatCurrency(0);
+                    return;
+                } else {
+                    noSettlementDataMessage.style.display = 'none';
+                    batchSettleButton.disabled = false;
+                }
+
+                shopsData.forEach(shop => {
+                    const commissionAmount = shop.totalSales * shop.commissionRate;
+                    const payableAmount = calculatePayableAmount(shop.totalSales, shop.commissionRate);
+                    
+                    if (shop.status === '정산대기') {
+                        totalPayable += payableAmount;
+                    }
+
+                    const shopItem = document.createElement('div');
+                    shopItem.classList.add('shop-settlement-item');
+                    shopItem.setAttribute('data-shop-id', shop.id); // 상점 ID 저장
+                    shopItem.innerHTML = `
+                        <input type="checkbox" class="settle-checkbox" data-shop-id="${shop.id}" ${shop.status === '정산완료' ? 'disabled' : ''}>
+                        <span class="item-cell shop-name">${shop.name}</span>
+                        <span class="item-cell sales-amount">${formatCurrency(shop.totalSales)}</span>
+                        <span class="item-cell commission-amount">${formatCurrency(commissionAmount)}</span>
+                        <span class="item-cell payable-amount">${formatCurrency(payableAmount)}</span>
+                        <span class="item-cell last-settlement-date">${shop.lastSettlement || '없음'}</span>
+                        <span class="item-cell status ${shop.status === '정산대기' ? 'pending' : 'completed'}">${shop.status}</span>
+                        <span class="item-cell action">
+                            <button class="settle-single-button" data-shop-id="${shop.id}" ${shop.status === '정산완료' ? 'disabled' : ''}>
+                                ${shop.status === '정산대기' ? '정산하기' : '정산완료'}
+                            </button>
+                            <button class="view-history-button" data-shop-id="${shop.id}">내역보기</button>
+                        </span>
+                    `;
+                    shopSettlementList.appendChild(shopItem);
+                });
+
+                totalPayableAmountElement.textContent = formatCurrency(totalPayable);
+            }
+
+            // 개별 정산 버튼 클릭 이벤트
+            shopSettlementList.addEventListener('click', (event) => {
+                if (event.target.classList.contains('settle-single-button')) {
+                    const shopId = event.target.dataset.shopId;
+                    settleShop(shopId);
+                } else if (event.target.classList.contains('view-history-button')) {
+                    const shopId = event.target.dataset.shopId;
+                    viewSettlementHistory(shopId);
+                }
+            });
+
+            // 선택 정산 버튼 클릭 이벤트
+            batchSettleButton.addEventListener('click', () => {
+                const selectedCheckboxes = document.querySelectorAll('.settle-checkbox:checked:not(:disabled)');
+                if (selectedCheckboxes.length === 0) {
+                    alert('정산할 상점을 선택해주세요.');
+                    return;
+                }
+                const selectedShopIds = Array.from(selectedCheckboxes).map(cb => cb.dataset.shopId);
+                selectedShopIds.forEach(shopId => settleShop(shopId));
+            });
+
+            // 개별 상점 정산 처리 함수 (가상)
+            function settleShop(shopId) {
+                const shopIndex = shopsData.findIndex(shop => shop.id === shopId);
+                if (shopIndex > -1 && shopsData[shopIndex].status === '정산대기') {
+                    const settledAmount = calculatePayableAmount(shopsData[shopIndex].totalSales, shopsData[shopIndex].commissionRate);
+                    shopsData[shopIndex].status = '정산완료';
+                    shopsData[shopIndex].lastSettlement = new Date().toISOString().slice(0, 10).replace(/-/g, '.'); // 오늘 날짜
+                    
+                    // 정산 내역에 추가 (가상)
+                    shopsData[shopIndex].history.push({
+                        date: shopsData[shopIndex].lastSettlement,
+                        amount: settledAmount,
+                        status: '완료'
+                    });
+
+                    alert(`${shopsData[shopIndex].name} 상점 ${formatCurrency(settledAmount)} 정산이 완료되었습니다!`);
+                    renderShopList(); // 목록 새로고침
+                    // 만약 정산 내역 패널이 열려있고 해당 상점의 내역을 보고 있다면 업데이트
+                    if (settlementHistoryPanel.style.display === 'block' && historyShopName.dataset.shopId === shopId) {
+                        viewSettlementHistory(shopId); // 내역 다시 불러오기
+                    }
+                } else if (shopIndex > -1 && shopsData[shopIndex].status === '정산완료') {
+                    alert(`${shopsData[shopIndex].name} 상점은 이미 정산 완료되었습니다.`);
+                }
+            }
+
+            // 정산 내역 보기 함수
+            function viewSettlementHistory(shopId) {
+                const shop = shopsData.find(s => s.id === shopId);
+                if (!shop) return;
+
+                historyShopName.textContent = `${shop.name}`;
+                historyShopName.setAttribute('data-shop-id', shop.id); // 현재 보고 있는 상점 ID 저장
+                settlementHistoryDetailList.innerHTML = ''; // 기존 내역 초기화
+                settlementHistoryPanel.style.display = 'block'; // 패널 보이기
+
+                if (shop.history.length === 0) {
+                    noIndividualHistoryMessage.style.display = 'block';
+                } else {
+                    noIndividualHistoryMessage.style.display = 'none';
+                    shop.history.forEach(historyItem => {
+                        const historyRow = document.createElement('div');
+                        historyRow.classList.add('history-item');
+                        historyRow.innerHTML = `
+                            <span class="item-cell history-date">${historyItem.date}</span>
+                            <span class="item-cell history-amount">${formatCurrency(historyItem.amount)}</span>
+                            <span class="item-cell history-status ${historyItem.status === '완료' ? 'completed' : ''}">${historyItem.status}</span>
+                        `;
+                        settlementHistoryDetailList.appendChild(historyRow);
+                    });
+                }
+            }
+
+            // 정산 내역 패널 닫기 버튼
+            closeHistoryButton.addEventListener('click', () => {
+                settlementHistoryPanel.style.display = 'none';
+            });
+
+            // 초기 렌더링
+            renderShopList();
+        });
+    </script>
+</th:block>
+</body>
+</html>

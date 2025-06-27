@@ -1,0 +1,262 @@
+/* admin_add_subscription.css */
+
+/* 기본 스타일 초기화 */
+/* body, h1, h2, h3, p, div, span, button, ul, li, label, input, textarea {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #333;
+} */
+
+/* body {
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 60px 20px; 헤더/푸터 간격
+    margin: 0 auto; 중앙 정렬
+} */
+
+.page-container {
+    width: 100%;
+    max-width: 800px; /* 관리자 페이지는 적당한 너비 */
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 40px;
+    margin: 0 auto; /* 중앙 정렬 */
+}
+
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5em;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+    font-size: 1em;
+    color: #777;
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 400;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.subscription-form-panel {
+    background-color: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 30px;
+}
+
+.panel-title {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #444;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    color: #333;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="number"]:focus,
+.form-group textarea:focus {
+    border-color: #a38b5d;
+    box-shadow: 0 0 0 3px rgba(163, 139, 93, 0.2);
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical; /* 세로 크기 조절 가능 */
+    min-height: 80px;
+}
+
+/* 혜택 목록 관련 스타일 */
+.feature-list-group {
+    border: 1px dashed #eee;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #fcfcfc;
+}
+
+#features-container {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.feature-input-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.feature-input-item input {
+    flex-grow: 1;
+    margin-right: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.95em;
+}
+
+.remove-feature-button {
+    background: none;
+    border: none;
+    color: #F44336; /* 삭제 아이콘 색상 */
+    cursor: pointer;
+    font-size: 1.5em;
+    padding: 5px;
+    transition: color 0.2s ease;
+}
+
+.remove-feature-button:hover {
+    color: #D32F2F;
+}
+
+.add-feature-button {
+    background-color: #607d8b; /* 추가 버튼 색상 */
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-feature-button:hover {
+    background-color: #546E7A;
+    transform: translateY(-1px);
+}
+
+.add-feature-button i {
+    color: #fff;
+}
+
+/* 제출 버튼 */
+.submit-button {
+    background: linear-gradient(45deg, #a38b5d, #bda67f);
+    color: #fff;
+    padding: 15px 25px;
+    font-size: 1.2em;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(163, 139, 93, 0.2);
+    width: 100%;
+    margin-top: 30px;
+}
+
+.submit-button:hover {
+    background: linear-gradient(45deg, #bda67f, #a38b5d);
+    box-shadow: 0 6px 15px rgba(163, 139, 93, 0.3);
+    transform: translateY(-2px);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .page-container {
+        padding: 30px 20px;
+    }
+    .page-title {
+        font-size: 2em;
+    }
+    .panel-title {
+        font-size: 1.4em;
+    }
+    .form-group label {
+        font-size: 1em;
+    }
+    .form-group input, .form-group textarea {
+        padding: 10px;
+        font-size: 0.95em;
+    }
+    .feature-input-item input {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+    .remove-feature-button {
+        font-size: 1.3em;
+    }
+    .add-feature-button {
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+    .submit-button {
+        font-size: 1.1em;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 500px) {
+    .page-container {
+        padding: 20px 15px;
+    }
+    .page-title {
+        font-size: 1.8em;
+    }
+    .panel-title {
+        font-size: 1.3em;
+    }
+    .form-group label {
+        font-size: 0.95em;
+    }
+    .form-group input, .form-group textarea {
+        font-size: 0.9em;
+    }
+    .feature-input-item {
+        flex-wrap: wrap; /* 혜택 입력 필드 줄바꿈 */
+    }
+    .feature-input-item input {
+        width: calc(100% - 30px); /* 아이콘 공간 제외 */
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+    .remove-feature-button {
+        width: 30px; /* 버튼 고정 너비 */
+    }
+    .add-feature-button {
+        width: 100%; /* 버튼 전체 너비 */
+        justify-content: center;
+        font-size: 0.8em;
+    }
+}

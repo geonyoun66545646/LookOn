@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+        <meta charset="utf-8" />
+        <title th:text="${title}">LOOK ON</title>
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="description" content="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta property="og:title" content="" />
+        <meta property="og:type" content="" />
+        <meta property="og:url" content="" />
+        <meta property="og:image" content="" />
+        
+        
+        <!-- Favicon -->
+        <link rel="shortcut icon" type="image/x-icon" href="@{/manage/assets/imgs/theme/favicon.svg}" />
+        <!-- Template CSS -->
+        <link href="/manage/assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+    </head>
+    
+	<body>
+		<main class="main-wrap">
+		 	<!-- header start -->
+		 	<header th:replace="~{manage/fragments/header :: headerFragment}"></header>
+		 	<!-- header end -->
+		 	
+		 	<section class="content-main">
+		 		<!-- contents start -->
+		 		<!-- 삽입할 부분을 선언 -->
+		 		<th:block layout:fragment="contents"></th:block>
+		 		<!-- contents end -->
+		 	</section>
+		 	<!-- footer start -->
+		 	<footer th:replace="~{manage/fragments/footer :: footerFragment2}"></footer>		
+		 	<!-- footer end -->
+		 </main>
+	</body>
+</html>

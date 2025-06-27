@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+	 <header class="header header-6" th:fragment="headerFragment">
+            <div class="header-middle">
+                <div class="container">
+                    <div class="header-left">
+                        <div class="header-search header-search-extended header-search-visible d-none d-lg-block">
+                            <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
+                            <form action="#" method="get">
+                                <div class="header-search-wrapper search-wrapper-wide">
+                                    <label for="q" class="sr-only">Search</label>
+                                    <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
+                                    <input type="search" class="form-control" name="q" id="q" placeholder="Search product ..." required>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="header-center">
+                        <a href="index.html" class="logo">
+                            <img src="/maincss/assets/images/demos/demo-6/logo.png" alt="Molla Logo" width="82" height="20">
+                        </a>
+                    </div>
+                    </div>
+            </div><div class="header-bottom sticky-header">
+                <div class="container">
+                    <div class="header-left">
+                        <nav class="main-nav">
+                            <ul class="menu"> 
+                                <li class="active"> <a th:href="@{/best}">베스트</a> </li>
+                                <li> <a th:href="@{/sale}">세일</a> </li>
+                                <li> <a th:href="@{/new-products}">신상</a> </li>
+                                <li> <a th:href="@{/community}">커뮤니티</a> </li>
+                                <li> <a th:href="@{/feed}">피드</a> </li>
+                            </ul>
+                        </nav>
+                        <button class="mobile-menu-toggler">
+                            <span class="sr-only">Toggle mobile menu</span>
+                            <i class="icon-bars"></i>
+                        </button>
+                    </div><div class="header-right header-bottom-icons"> <a href="#signin-modal" data-toggle="modal" class="header-bottom-icon-link">
+                            <i class="icon-user"></i>
+                            <span class="sr-only">Login</span>
+                        </a>
+
+                        <a th:href="@{/wishlist.html}" class="wishlist-link header-bottom-icon-link">
+                            <i class="icon-heart-o"></i>
+                            <span class="wishlist-count">3</span>
+                            <span class="sr-only">My Wishlist</span>
+                        </a>
+
+                        <div class="dropdown cart-dropdown header-bottom-icon-link">
+                            <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                                <i class="icon-shopping-cart"></i>
+                                <span class="cart-count">2</span>
+                                <span class="sr-only">Cart</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <div class="dropdown-cart-products">
+                                    <div class="product">
+                                        <div class="product-cart-details">
+                                            <h4 class="product-title">
+                                                <a href="product.html">Beige knitted elastic runner shoes</a>
+                                            </h4>
+                                            <span class="cart-product-info">
+                                                <span class="cart-product-qty">1</span> x $84.00
+                                            </span>
+                                        </div><figure class="product-image-container">
+                                            <a href="product.html" class="product-image">
+                                                <img src="/maincss/assets/images/products/cart/product-1.jpg" alt="product">
+                                            </a>
+                                        </figure>
+                                        <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
+                                    </div><div class="product">
+                                        <div class="product-cart-details">
+                                            <h4 class="product-title">
+                                                <a href="product.html">Blue utility pinafore denim dress</a>
+                                            </h4>
+                                            <span class="cart-product-info">
+                                                <span class="cart-product-qty">1</span> x $76.00
+                                            </span>
+                                        </div><figure class="product-image-container">
+                                            <a href="product.html" class="product-image">
+                                                <img src="/maincss/assets/images/products/cart/product-2.jpg" alt="product">
+                                            </a>
+                                        </figure>
+                                        <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
+                                    </div></div><div class="dropdown-cart-total">
+                                    <span>Total</span>
+                                    <span class="cart-total-price">$160.00</span>
+                                </div><div class="dropdown-cart-action">
+                                    <a href="cart.html" class="btn btn-primary">View Cart</a>
+                                    <a href="checkout.html" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div></div></div></header></html>

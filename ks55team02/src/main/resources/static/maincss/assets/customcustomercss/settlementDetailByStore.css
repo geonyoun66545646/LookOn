@@ -1,0 +1,582 @@
+/* admin_settlement_management.css */
+
+/* 기본 스타일 초기화 */
+/* body, h1, h2, h3, p, div, span, button, ul, li, label, input, textarea {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #333;
+} */
+
+/* body {
+	background-color: #f8f8f8;
+	display: flex;
+	justify-content: center;
+	min-height: 100vh;
+	padding: 60px 20px;
+	헤더/푸터 간격
+} */
+
+.page-container {
+	width: 100%;
+	max-width: 1100px;
+	/* 더 넓은 폭으로 설정 */
+	background-color: #fff;
+	border-radius: 8px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+	padding: 40px;
+	margin: 0 auto;
+	/* 중앙 정렬 */
+}
+
+.page-title {
+	font-family: 'Playfair Display', serif;
+	font-size: 2.5em;
+	font-weight: 700;
+	color: #333;
+	text-align: center;
+	margin-bottom: 10px;
+	letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+	font-size: 1em;
+	color: #777;
+	text-align: center;
+	margin-bottom: 30px;
+	font-weight: 400;
+}
+
+.content-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+}
+
+.settlement-panel,
+.settlement-history-panel {
+	background-color: #fdfdfd;
+	border: 1px solid #eee;
+	border-radius: 8px;
+	padding: 30px;
+}
+
+.panel-title {
+	font-size: 1.6em;
+	font-weight: 700;
+	color: #444;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #eee;
+	margin-bottom: 25px;
+	position: relative;
+	/* 닫기 버튼 위치 지정을 위해 */
+}
+
+/* 정산 내역 패널의 닫기 버튼 */
+.close-history-button {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	background: none;
+	border: none;
+	font-size: 1.5em;
+	color: #999;
+	cursor: pointer;
+	transition: color 0.2s ease;
+}
+
+.close-history-button:hover {
+	color: #666;
+}
+
+
+/* 목록 헤더 */
+.settlement-list-header,
+.history-list-header {
+	display: flex;
+	justify-content: space-between;
+	padding: 15px 10px;
+	font-weight: 700;
+	color: #555;
+	border-bottom: 2px solid #ddd;
+	margin-bottom: 15px;
+	background-color: #f5f5f5;
+	border-radius: 5px;
+	font-size: 0.95em;
+}
+
+.header-item {
+	flex: 1;
+	text-align: center;
+	white-space: nowrap;
+}
+
+.header-item.shop-name {
+	flex: 1.5;
+	text-align: left;
+	padding-left: 30px;
+}
+
+/* 체크박스 공간 확보 */
+.header-item.sales-amount {
+	flex: 1.2;
+}
+
+.header-item.commission-amount {
+	flex: 1.2;
+}
+
+.header-item.payable-amount {
+	flex: 1.2;
+}
+
+.header-item.last-settlement-date {
+	flex: 1;
+}
+
+.header-item.status {
+	flex: 0.8;
+}
+
+.header-item.action {
+	flex: 1.8;
+}
+
+/* 버튼 공간 */
+
+/* 각 상점 정산 항목 */
+.shop-settlement-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.shop-settlement-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px 10px;
+	border-bottom: 1px dashed #eee;
+	font-size: 0.9em;
+	color: #666;
+	transition: background-color 0.2s ease;
+}
+
+.shop-settlement-item:hover {
+	background-color: #fafafa;
+}
+
+.shop-settlement-item:last-child {
+	border-bottom: none;
+}
+
+.item-cell {
+	flex: 1;
+	text-align: center;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.item-cell.shop-name {
+	flex: 1.5;
+	text-align: left;
+	padding-left: 10px;
+	font-weight: 500;
+	color: #444;
+}
+
+.item-cell.sales-amount,
+.item-cell.commission-amount,
+.item-cell.payable-amount {
+	flex: 1.2;
+	font-weight: 500;
+	color: #a38b5d;
+}
+
+.item-cell.last-settlement-date {
+	flex: 1;
+	font-size: 0.85em;
+	color: #888;
+}
+
+.item-cell.status {
+	flex: 0.8;
+	font-weight: 500;
+}
+
+.item-cell.action {
+	flex: 1.8;
+	display: flex;
+	justify-content: center;
+	gap: 8px;
+}
+
+.item-cell .settle-checkbox {
+	margin-right: 10px;
+	transform: scale(1.2);
+	/* 체크박스 크기 키우기 */
+	accent-color: #a38b5d;
+	/* 체크박스 색상 */
+}
+
+.item-cell .settle-single-button,
+.item-cell .view-history-button {
+	padding: 8px 12px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 0.8em;
+	font-weight: 500;
+	transition: background-color 0.2s ease, transform 0.2s ease;
+	white-space: nowrap;
+}
+
+.settle-single-button {
+	background-color: #607d8b;
+	/* 정산 버튼 색상 */
+	color: #fff;
+}
+
+.settle-single-button:hover:not(:disabled) {
+	background-color: #546E7A;
+	transform: translateY(-1px);
+}
+
+.settle-single-button:disabled {
+	background-color: #cccccc;
+	cursor: not-allowed;
+}
+
+.view-history-button {
+	background-color: #f0f0f0;
+	/* 내역보기 버튼 색상 */
+	color: #555;
+	border: 1px solid #ddd;
+}
+
+.view-history-button:hover {
+	background-color: #e0e0e0;
+	transform: translateY(-1px);
+}
+
+.status.pending {
+	color: #FF9800;
+}
+
+/* 정산대기: 주황색 */
+.status.completed {
+	color: #4CAF50;
+}
+
+/* 정산완료: 녹색 */
+
+/* 데이터 없음 메시지 */
+.no-data,
+.no-history {
+	text-align: center;
+	padding: 50px 20px;
+	font-size: 1.1em;
+	color: #777;
+	background-color: #fcfcfc;
+	border: 1px dashed #ddd;
+	border-radius: 8px;
+	margin-top: 30px;
+}
+
+/* 정산 요약 및 일괄 정산 버튼 */
+.settlement-summary {
+	display: flex;
+	justify-content: flex-end;
+	/* 오른쪽 정렬 */
+	align-items: center;
+	margin-top: 30px;
+	padding-top: 20px;
+	border-top: 1px solid #eee;
+	gap: 20px;
+}
+
+.summary-label {
+	font-size: 1.2em;
+	font-weight: 700;
+	color: #555;
+}
+
+.summary-value {
+	font-size: 1.8em;
+	font-weight: 700;
+	color: #a38b5d;
+	/* 강조 색상 */
+	letter-spacing: -0.5px;
+}
+
+.batch-settle-button {
+	background: linear-gradient(45deg, #a38b5d, #bda67f);
+	color: #fff;
+	padding: 12px 25px;
+	font-size: 1.1em;
+	font-weight: 500;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 10px rgba(163, 139, 93, 0.2);
+	margin-left: 20px;
+}
+
+.batch-settle-button:hover:not(:disabled) {
+	background: linear-gradient(45deg, #bda67f, #a38b5d);
+	box-shadow: 0 6px 15px rgba(163, 139, 93, 0.3);
+	transform: translateY(-2px);
+}
+
+.batch-settle-button:disabled {
+	background-color: #cccccc;
+	cursor: not-allowed;
+}
+
+/* 정산 내역 상세 목록 */
+.history-list-header {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	background-color: #f9f9f9;
+}
+
+.history-list-header .header-item.history-date {
+	flex: 1.5;
+}
+
+.history-list-header .header-item.history-amount {
+	flex: 2;
+}
+
+.history-list-header .header-item.history-status {
+	flex: 1;
+}
+
+.settlement-history-detail-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.history-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 10px;
+	border-bottom: 1px dashed #f0f0f0;
+	font-size: 0.9em;
+	color: #666;
+}
+
+.history-item:last-child {
+	border-bottom: none;
+}
+
+.history-item .item-cell {
+	flex: 1;
+	text-align: center;
+}
+
+.history-item .item-cell.history-date {
+	flex: 1.5;
+	font-size: 0.85em;
+	color: #888;
+}
+
+.history-item .item-cell.history-amount {
+	flex: 2;
+	font-weight: 500;
+	color: #607d8b;
+}
+
+.history-item .item-cell.history-status {
+	flex: 1;
+	font-weight: 500;
+}
+
+.history-item .item-cell.history-status.completed {
+	color: #4CAF50;
+}
+
+
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+	.page-container {
+		padding: 30px 20px;
+		max-width: 900px;
+	}
+
+	.settlement-list-header,
+	.shop-settlement-item {
+		font-size: 0.85em;
+		padding: 12px 5px;
+	}
+
+	.header-item.action,
+	.item-cell.action {
+		flex: 2;
+		gap: 5px;
+	}
+
+	/* 버튼 공간 좀 더 확보 */
+	.item-cell .settle-single-button,
+	.item-cell .view-history-button {
+		padding: 6px 10px;
+		font-size: 0.75em;
+	}
+}
+
+@media (max-width: 768px) {
+	.page-container {
+		padding: 25px 15px;
+		max-width: 600px;
+	}
+
+	.page-title {
+		font-size: 2.2em;
+	}
+
+	.panel-title {
+		font-size: 1.4em;
+	}
+
+	.settlement-list-header,
+	.shop-settlement-item {
+		flex-wrap: wrap;
+		/* 항목들이 줄바꿈되도록 허용 */
+		font-size: 0.8em;
+		padding: 10px;
+		align-items: flex-start;
+		/* 상단 정렬 */
+	}
+
+	.header-item,
+	.item-cell {
+		flex: none;
+		/* flexgrow 초기화 */
+		width: 50%;
+		/* 두 줄로 표시 */
+		text-align: left;
+		margin-bottom: 5px;
+		padding: 2px 0;
+		/* 내부 패딩 줄이기 */
+	}
+
+	.header-item.shop-name,
+	.item-cell.shop-name {
+		width: 100%;
+		text-align: center;
+		font-size: 1.1em;
+		margin-bottom: 10px;
+	}
+
+	.item-cell .settle-checkbox {
+		width: auto;
+		margin-right: 5px;
+		transform: scale(1);
+	}
+
+	/* 체크박스 다시 작게 */
+
+	/* 특정 셀 너비 조정 */
+	.header-item.sales-amount,
+	.item-cell.sales-amount {
+		width: 50%;
+	}
+
+	.header-item.commission-amount,
+	.item-cell.commission-amount {
+		width: 50%;
+		text-align: right;
+	}
+
+	.header-item.payable-amount,
+	.item-cell.payable-amount {
+		width: 50%;
+	}
+
+	.header-item.last-settlement-date,
+	.item-cell.last-settlement-date {
+		width: 50%;
+		text-align: right;
+	}
+
+	.header-item.status,
+	.item-cell.status {
+		width: 30%;
+	}
+
+	.header-item.action,
+	.item-cell.action {
+		width: 70%;
+		justify-content: flex-end;
+		gap: 5px;
+	}
+
+	.settlement-summary {
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 10px;
+	}
+
+	.summary-value {
+		font-size: 1.5em;
+	}
+
+	.batch-settle-button {
+		width: 100%;
+		margin-left: 0;
+		padding: 10px 15px;
+		font-size: 1em;
+	}
+
+	/* 정산 내역 상세 패널 반응형 */
+	.history-list-header,
+	.history-item {
+		flex-wrap: wrap;
+		font-size: 0.8em;
+	}
+
+	.history-list-header .header-item,
+	.history-item .item-cell {
+		width: 50%;
+		text-align: left;
+	}
+
+	.history-list-header .header-item.history-amount,
+	.history-item .item-cell.history-amount {
+		text-align: right;
+	}
+
+	.history-list-header .header-item.history-status,
+	.history-item .item-cell.history-status {
+		text-align: right;
+	}
+
+}
+
+@media (max-width: 480px) {
+	.page-title {
+		font-size: 2em;
+	}
+
+	.panel-title {
+		font-size: 1.2em;
+	}
+
+	.settlement-list-header,
+	.shop-settlement-item {
+		font-size: 0.75em;
+	}
+
+	.item-cell .settle-single-button,
+	.item-cell .view-history-button {
+		padding: 5px 8px;
+		font-size: 0.7em;
+	}
+
+	.settlement-summary .summary-value {
+		font-size: 1.3em;
+	}
+}

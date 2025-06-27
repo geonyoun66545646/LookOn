@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{seller/layout/layoutMain}"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프리미엄 멤버십 결제</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="maincss/assets/customcustomercss/premiumCheckout.css"> 
+    
+</head>
+<body>
+<th:block layout:fragment="contents">
+    <div class="page-container">
+        <h1 class="page-title">결제하기</h1>
+        <p class="page-subtitle">프리미엄 멤버십 결제를 완료해주세요.</p>
+
+        <div class="content-wrapper">
+            <div class="checkout-details-panel">
+                <h2 class="panel-title">주문 정보</h2>
+                <div class="order-item-display"> <span class="item-name">프리미엄 구독 코인</span>
+                    <span class="item-quantity-display" id="checkout-quantity">1개</span> </div>
+                <div class="order-summary-box">
+                    <div class="summary-line">
+                        <span class="label">상품 금액</span>
+                        <span class="value" id="checkout-product-amount">2,990,000원</span>
+                    </div>
+                    <div class="summary-line">
+                        <span class="label">할인 금액</span>
+                        <span class="value">-0원</span>
+                    </div>
+                    <div class="summary-line total">
+                        <span class="label">총 결제 금액</span>
+                        <span class="value highlight" id="checkout-final-amount">2,990,000원</span> </div>
+                </div>
+                
+                <div class="payment-methods-section">
+                    <h3 class="section-heading">결제 수단</h3>
+                    <div class="payment-options">
+                        <label class="payment-option">
+                            <input type="radio" name="payment-method" value="credit-card" checked>
+                            신용/체크카드
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment-method" value="bank-transfer">
+                            계좌이체
+                        </label>
+                        <label class="payment-option">
+                            <input type="radio" name="payment-method" value="mobile-pay">
+                            휴대폰 결제
+                        </label>
+                    </div>
+                </div>
+
+                <div class="terms-agreement-section">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="agree-terms">
+                        <span class="checkmark"></span>
+                        <p>서비스 약관 및 결제 내용에 동의합니다. <a href="#" class="link-text">(필수)</a></p>
+                    </label>
+                </div>
+                
+                <button class="confirm-button">결제하기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // URL 쿼리 파라미터에서 데이터 가져오기
+            const params = new URLSearchParams(window.location.search);
+            const quantity = params.get('qty'); // 'qty' 파라미터 값
+            const amount = params.get('amount'); // 'amount' 파라미터 값
+
+            // 데이터를 표시할 HTML 요소 가져오기
+            const checkoutQuantityElement = document.getElementById('checkout-quantity');
+            const checkoutProductAmountElement = document.getElementById('checkout-product-amount');
+            const checkoutFinalAmountElement = document.getElementById('checkout-final-amount');
+
+            // 숫자를 통화 형식으로 변환하는 함수
+            function formatCurrency(number) {
+                // amount는 숫자 문자열로 넘어오므로 parseInt로 숫자로 변환 후 포맷
+                return parseInt(number).toLocaleString('ko-KR') + '원';
+            }
+
+            // URL에서 데이터가 올바르게 전달되었는지 확인 후 표시
+            if (quantity && amount) {
+                checkoutQuantityElement.textContent = `${quantity}개`;
+                checkoutProductAmountElement.textContent = formatCurrency(amount);
+                checkoutFinalAmountElement.textContent = formatCurrency(amount);
+            } else {
+                // 데이터가 없을 경우 기본값 설정 (에러 방지)
+                checkoutQuantityElement.textContent = '정보 없음'; 
+                checkoutProductAmountElement.textContent = '정보 없음';
+                checkoutFinalAmountElement.textContent = '정보 없음';
+                console.warn("수량 또는 금액 데이터가 URL에 없습니다. 기본값을 표시합니다.");
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>

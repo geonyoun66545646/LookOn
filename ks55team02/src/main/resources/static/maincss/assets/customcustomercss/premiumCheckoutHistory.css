@@ -1,0 +1,253 @@
+/* my_subscriptions.css */
+
+/* 기본 스타일 초기화 (기존 페이지들과 동일하게 유지) */
+/* body, h1, h2, h3, p, div, span, button, ul, li {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #333;
+}
+
+body {
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 60px 20px; 헤더/푸터 간격
+} */
+
+.page-container {
+    width: 100%;
+    max-width: 1000px; /* 구독권 판매 화면과 유사한 너비 */
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 40px;
+    margin: 0 auto; /* 중앙 정렬 */
+}
+
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8em;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+    font-size: 1.1em;
+    color: #777;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 400;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column; /* 단일 패널이므로 세로 정렬 */
+    gap: 30px;
+}
+
+.purchase-history-panel {
+    background-color: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 30px;
+}
+
+.panel-title {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #444;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 25px;
+}
+
+/* 구독권 목록 헤더 */
+.subscription-list-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    font-weight: 700;
+    color: #555;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 15px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    padding-left: 10px; /* 좌우 여백 */
+    padding-right: 10px;
+}
+
+.header-item {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+.header-item.product { flex: 2; text-align: left; } /* 구독권명은 더 넓게 */
+.header-item.qty { flex: 0.8; }
+.header-item.amount { flex: 1.5; }
+.header-item.date { flex: 1.2; }
+.header-item.status { flex: 1; }
+
+
+/* 각 구독권 항목 */
+.subscription-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.subscription-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 10px;
+    border-bottom: 1px dashed #eee;
+    font-size: 0.95em;
+    color: #666;
+    transition: background-color 0.2s ease;
+}
+
+.subscription-item:hover {
+    background-color: #fafafa;
+}
+
+.subscription-item:last-child {
+    border-bottom: none;
+}
+
+.item-cell {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden; /* 넘치는 텍스트 숨김 */
+    text-overflow: ellipsis; /* ... 표시 */
+}
+.item-cell.product { flex: 2; text-align: left; font-weight: 500; color: #444; }
+.item-cell.qty { flex: 0.8; }
+.item-cell.amount { flex: 1.5; font-weight: 500; color: #a38b5d; } /* 금액 강조 */
+.item-cell.date { flex: 1.2; font-size: 0.9em; color: #888; }
+.item-cell.status { flex: 1; font-weight: 500; }
+
+.item-cell.status.active { color: #4CAF50; } /* 활성 상태 색상 (녹색) */
+.item-cell.status.expired { color: #F44336; } /* 만료 상태 색상 (빨간색) */
+
+/* 구매 내역 없음 메시지 */
+.no-history {
+    text-align: center;
+    padding: 50px 20px;
+    font-size: 1.1em;
+    color: #777;
+    background-color: #fcfcfc;
+    border: 1px dashed #ddd;
+    border-radius: 8px;
+    margin-top: 30px;
+}
+
+.no-history p {
+    margin-bottom: 25px;
+}
+
+.no-history .go-to-purchase-button {
+    background: linear-gradient(45deg, #607d8b, #78909C); /* 구매 버튼 색상 변경 (기존 구독권 구매 버튼과 다르게) */
+    color: #fff;
+    padding: 12px 25px;
+    font-size: 1em;
+    font-weight: 500;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.no-history .go-to-purchase-button:hover {
+    background: linear-gradient(45deg, #78909C, #607d8b);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+/* 페이징 (기본 스타일, 실제 기능은 JS 필요) */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    gap: 10px;
+}
+
+.page-link {
+    display: inline-block;
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.page-link:hover {
+    background-color: #f0f0f0;
+}
+
+.page-link.active {
+    background-color: #a38b5d;
+    color: #fff;
+    border-color: #a38b5d;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 900px) {
+    .page-container {
+        padding: 30px 20px;
+    }
+    .page-title {
+        font-size: 2.2em;
+    }
+    .page-subtitle {
+        font-size: 1em;
+        margin-bottom: 30px;
+    }
+    .panel-title {
+        font-size: 1.4em;
+    }
+    .subscription-list-header, .subscription-item {
+        font-size: 0.9em;
+        padding: 12px 5px;
+    }
+    .header-item.product, .item-cell.product { flex: 1.5; } /* 작은 화면에서 Product 영역 줄임 */
+    .header-item.amount, .item-cell.amount { flex: 1.3; } /* 금액 영역 줄임 */
+    .header-item.date, .item-cell.date { flex: 1.1; } /* 날짜 영역 줄임 */
+}
+
+@media (max-width: 500px) {
+    .page-container {
+        padding: 20px 15px;
+    }
+    .page-title {
+        font-size: 1.8em;
+    }
+    .panel-title {
+        font-size: 1.3em;
+    }
+    /* 더 작은 화면에서는 일부 항목 숨기기 또는 세로 정렬 고려 */
+    .subscription-list-header, .subscription-item {
+        flex-wrap: wrap; /* 항목들이 줄바꿈되도록 허용 */
+        font-size: 0.85em;
+        padding: 10px;
+    }
+    .header-item, .item-cell {
+        flex: 1 1 auto; /* 기본적으로 너비를 유동적으로 설정 */
+        width: 50%; /* 각 항목이 절반 너비를 차지하도록 (두 줄로 표시) */
+        text-align: left; /* 작은 화면에서는 왼쪽 정렬이 보기 편함 */
+        margin-bottom: 5px; /* 항목별 간격 */
+    }
+    .header-item.product, .item-cell.product { width: 100%; text-align: center; font-size: 1.1em; margin-bottom: 10px; } /* 구독권명은 한 줄로 */
+    .header-item.qty, .item-cell.qty { width: 30%; }
+    .header-item.amount, .item-cell.amount { width: 70%; text-align: right; }
+    .header-item.date, .item-cell.date { width: 50%; }
+    .header-item.status, .item-cell.status { width: 50%; text-align: right; }
+}

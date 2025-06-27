@@ -1,0 +1,356 @@
+/* 기본 스타일 초기화 */
+/* body, h1, h2, h3, p, div, span, button, ul, li, label, input {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #333;
+} */
+
+/* body {
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 20px;
+} */
+
+/* body {
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;  ⭐ 이 부분을 제거합니다 (margin: auto로 중앙 정렬)
+    min-height: 100vh;
+    padding: 60px 20px; ⭐ 상단/하단 패딩을 늘려 헤더/푸터와의 간격 확보 ⭐
+} */
+
+.page-container {
+    width: 100%;
+    max-width: 1000px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 40px;
+    margin: 0 auto; /* ⭐ 좌우 여백을 자동으로 설정하여 중앙 정렬 ⭐ */
+}
+/* 
+.page-container {
+    width: 100%;
+    max-width: 700px; 결제 페이지는 구독권 페이지보다 약간 좁게
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 40px;
+}
+ */
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5em;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    font-size: 1em;
+    color: #777;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column; /* 결제 페이지는 보통 세로 정렬 */
+    gap: 30px;
+}
+
+/* 결제 상세 패널 */
+.checkout-details-panel {
+    background-color: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 30px;
+}
+
+.panel-title {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #444;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 25px;
+}
+
+/* ⭐ 주문 정보 표시 섹션 스타일 ⭐ */
+.order-item-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline; /* 텍스트 베이스라인 정렬 */
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #eee;
+}
+
+.order-item-display .item-name {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #333;
+}
+
+.order-item-display .item-quantity-display {
+    font-size: 1.2em;
+    font-weight: 500;
+    color: #a38b5d; /* 강조 색상 */
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+/* ⭐ 주문 정보 표시 섹션 스타일 끝 ⭐ */
+
+
+.order-summary-box {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 1.05em;
+}
+
+.summary-line:last-child {
+    margin-bottom: 0;
+}
+
+.summary-line .label {
+    color: #555;
+}
+
+.summary-line .value {
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+.summary-line.total {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #ddd;
+}
+
+.summary-line.total .label {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #444;
+}
+
+.summary-line.total .highlight {
+    font-size: 1.6em; /* 최종 금액 크게 */
+    font-weight: 700;
+    color: #a38b5d; /* 강조 색상 */
+    letter-spacing: -0.5px;
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+/* 결제 수단 섹션 */
+.payment-methods-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed #eee;
+}
+
+.section-heading {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.payment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+    color: #666;
+    cursor: pointer;
+}
+
+.payment-option input[type="radio"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    accent-color: #a38b5d; /* 라디오 버튼 강조 색상 */
+}
+
+/* 약관 동의 섹션 */
+.terms-agreement-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed #eee;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #666;
+}
+
+.checkbox-container input[type="checkbox"] {
+    position: absolute; /* 기본 체크박스 숨김 */
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkbox-container .checkmark {
+    height: 20px;
+    width: 20px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+    flex-shrink: 0;
+    position: relative;
+    top: 2px; /* 텍스트와 세로 정렬 */
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: #a38b5d; /* 체크 시 색상 */
+    border-color: #a38b5d;
+}
+
+.checkbox-container .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-container p {
+    margin: 0;
+}
+
+.checkbox-container .link-text {
+    color: #3f51b5;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.checkbox-container .link-text:hover {
+    text-decoration: underline;
+}
+
+/* 결제 버튼 */
+.confirm-button {
+    background: linear-gradient(45deg, #a38b5d, #bda67f);
+    color: #fff;
+    padding: 18px 25px;
+    font-size: 1.4em;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(163, 139, 93, 0.2);
+    width: 100%;
+    margin-top: 40px;
+}
+
+.confirm-button:hover {
+    background: linear-gradient(45deg, #bda67f, #a38b5d);
+    box-shadow: 0 6px 15px rgba(163, 139, 93, 0.3);
+    transform: translateY(-2px);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+	
+	.page-container {
+        padding: 30px 20px;
+        margin: 0 auto; /* ⭐ 반응형에서도 중앙 정렬 유지 ⭐ */
+    }
+
+    .page-title {
+        font-size: 2em;
+    }
+    .panel-title {
+        font-size: 1.4em;
+    }
+    .summary-line .label,
+    .summary-line .value {
+        font-size: 0.95em;
+    }
+    .summary-line.total .label {
+        font-size: 1.1em;
+    }
+    .summary-line.total .highlight {
+        font-size: 1.4em;
+    }
+    .confirm-button {
+        font-size: 1.2em;
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 500px) {
+	
+    .page-container {
+        padding: 20px 15px;
+        margin: 0 auto; /* ⭐ 반응형에서도 중앙 정렬 유지 ⭐ */
+    }
+    .page-title {
+        font-size: 1.8em;
+    }
+    .panel-title {
+        font-size: 1.3em;
+    }
+    .order-item-display .item-name {
+        font-size: 1.2em;
+    }
+    .order-item-display .item-quantity-display {
+        font-size: 1.1em;
+    }
+    .summary-line .label,
+    .summary-line .value {
+        font-size: 0.9em;
+    }
+    .summary-line.total .label {
+        font-size: 1em;
+    }
+    .summary-line.total .highlight {
+        font-size: 1.2em;
+    }
+    .section-heading {
+        font-size: 1.2em;
+    }
+    .payment-option,
+    .checkbox-container {
+        font-size: 0.9em;
+    }
+    .confirm-button {
+        font-size: 1.1em;
+    }
+}

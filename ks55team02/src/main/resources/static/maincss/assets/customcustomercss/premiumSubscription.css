@@ -1,0 +1,412 @@
+/* 기본 스타일 초기화 */
+/* body, h1, h2, h3, p, div, span, button, ul, li {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif; 기본 폰트
+    color: #333;
+}
+
+body {
+    background-color: #f8f8f8; 배경 이미지와 유사한 밝은 회색 톤
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; 상단 정렬
+    min-height: 100vh;
+    padding: 40px 20px; 상단 및 전체 패딩
+}
+ */
+.page-container {
+    width: 100%;
+    max-width: 1000px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    padding: 40px;
+    margin: 0 auto; /* ⭐ 좌우 여백을 자동으로 설정하여 중앙 정렬 ⭐ */
+}
+
+.page-title {
+    font-family: 'Playfair Display', serif; /* 제목 폰트 */
+    font-size: 2.8em;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+    font-size: 1.1em;
+    color: #777;
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 400;
+}
+
+.content-wrapper {
+    display: flex;
+    gap: 30px; /* 두 패널 사이 간격 */
+    flex-wrap: wrap; /* 반응형을 위해 줄바꿈 허용 */
+}
+
+/* 왼쪽 패널: 구독권 상세 정보 */
+.subscription-details-panel {
+    flex: 3; /* 더 넓은 공간 차지 */
+    min-width: 400px; /* 최소 너비 */
+    background-color: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 30px;
+}
+
+.panel-title {
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #444;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 25px;
+}
+
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #eee; /* 점선 구분선 */
+}
+
+.item-info {
+    text-align: left;
+}
+
+.item-name {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #333;
+    display: block; /* 한 줄 차지 */
+    margin-bottom: 5px;
+}
+
+.item-duration {
+    font-size: 1.1em;
+    color: #777;
+    font-weight: 400;
+}
+
+.item-description {
+    font-size: 0.95em;
+    color: #888;
+    margin-top: 10px;
+    line-height: 1.4;
+}
+
+/* 상품 가격 부분 - 줄바꿈 방지 및 폰트 설정 */
+.item-price {
+    font-size: 1.8em; /* 크기 조절 */
+    font-weight: 700;
+    color: #333;
+    white-space: nowrap; /* ⭐ 여기에서 줄바꿈 방지 */
+}
+
+.price-value {
+    font-family: 'Noto Sans KR', sans-serif; /* 가격 폰트는 Noto Sans KR 유지 */
+    font-weight: 700;
+    color: #a38b5d; /* 강조 색상: 골드 톤 */
+    letter-spacing: -0.5px;
+}
+
+/* ⭐ 새로 추가된 수량 조절 섹션 스타일 ⭐ */
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #eee;
+}
+
+.quantity-control label {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #555;
+    margin-right: 15px;
+}
+
+.quantity-input-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden; /* 버튼과 인풋 필드의 모서리를 둥글게 처리 */
+}
+
+.quantity-input-group button {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: #555;
+    transition: background-color 0.2s ease;
+}
+
+.quantity-input-group button:hover {
+    background-color: #e0e0e0;
+}
+
+.quantity-input-group input[type="number"] {
+    width: 60px; /* 입력 필드 너비 */
+    padding: 10px 5px;
+    text-align: center;
+    font-size: 1.1em;
+    border: none;
+    -moz-appearance: textfield; /* Firefox에서 스핀 버튼 숨김 */
+}
+
+/* Chrome, Safari, Edge에서 input number의 스핀 버튼 숨김 */
+.quantity-input-group input[type="number"]::-webkit-outer-spin-button,
+.quantity-input-group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* ⭐ 수량 조절 섹션 스타일 끝 ⭐ */
+
+
+.feature-section {
+    margin-top: 30px;
+}
+
+.section-heading {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.features-list {
+    list-style: none; /* 기본 리스트 스타일 제거 */
+    padding: 0;
+    margin: 0;
+}
+
+.features-list li {
+    display: flex;
+    align-items: flex-start; /* 텍스트가 여러 줄일 때 아이콘과 정렬 */
+    margin-bottom: 12px;
+    font-size: 1em;
+    color: #666;
+    line-height: 1.5;
+}
+
+.features-list li:last-child {
+    margin-bottom: 0;
+}
+
+.feature-icon {
+    font-size: 1.2em;
+    color: #607d8b; /* 아이콘 색상 */
+    margin-right: 10px;
+    flex-shrink: 0; /* 아이콘이 줄어들지 않도록 */
+}
+
+.features-list strong {
+    font-weight: 500;
+    color: #333;
+}
+
+.additional-info {
+    margin-top: 40px;
+    padding-top: 25px;
+    border-top: 1px dashed #eee;
+    font-size: 0.9em;
+    color: #888;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.additional-info .link-text {
+    color: #3f51b5; /* 링크 색상 */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.additional-info .link-text:hover {
+    text-decoration: underline;
+}
+
+/* 오른쪽 패널: 결제 요약 */
+.order-summary-panel {
+    flex: 1; /* 남은 공간 차지 */
+    min-width: 300px; /* 최소 너비 */
+    background-color: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 내용 분배 */
+    height: fit-content; /* 내용에 맞춰 높이 조절 */
+    position: sticky; /* 스크롤 시 고정 (필요하다면) */
+    top: 40px; /* 상단 여백 (sticky 사용 시) */
+}
+
+.order-summary-panel .panel-title {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.summary-item .label {
+    color: #555;
+}
+
+/* 일반 금액 값 (상품 금액, 할인 금액) - 줄바꿈 방지 */
+.summary-item .value {
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap; /* ⭐ 여기에서 줄바꿈 방지 */
+}
+
+.summary-item.total {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd; /* 총 금액 위에 굵은 선 */
+    font-size: 1.3em;
+    font-weight: 700;
+}
+
+/* 최종 결제 금액 (가장 중요한 부분!) - 줄바꿈 방지 및 크기 조절 */
+.summary-item.total .highlight {
+    font-size: 1.6em; /* 기본 크기 설정 */
+    font-weight: 700;
+    color: #a38b5d; /* 강조 색상 (골드 톤) */
+    letter-spacing: -0.5px; /* 글자 간격 조절 */
+    white-space: nowrap; /* ⭐ 필수: 줄바꿈 방지 */
+}
+
+.proceed-button {
+    background: linear-gradient(45deg, #a38b5d, #bda67f); /* 골드/브론즈 그라데이션 */
+    color: #fff;
+    padding: 18px 25px;
+    font-size: 1.3em;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(163, 139, 93, 0.2);
+    width: 100%;
+    margin-top: 30px; /* 요약 내용과의 간격 */
+}
+
+.proceed-button:hover {
+    background: linear-gradient(45deg, #bda67f, #a38b5d);
+    box-shadow: 0 6px 15px rgba(163, 139, 93, 0.3);
+    transform: translateY(-2px);
+}
+
+
+/* 반응형 디자인 */
+@media (max-width: 900px) {
+    .content-wrapper {
+        flex-direction: column; /* 화면이 작아지면 세로로 정렬 */
+    }
+    .subscription-details-panel,
+    .order-summary-panel {
+        min-width: unset; /* 최소 너비 제한 해제 */
+        width: 100%; /* 너비를 100%로 채움 */
+    }
+    .order-summary-panel {
+        position: static; /* sticky 해제 */
+        margin-top: 30px;
+    }
+    .page-container {
+        padding: 30px 20px;
+    }
+    .page-title {
+        font-size: 2.2em;
+    }
+    .page-subtitle {
+        font-size: 1em;
+        margin-bottom: 30px;
+    }
+    .panel-title {
+        font-size: 1.4em;
+    }
+    .product-item {
+        flex-direction: column; /* 상품 정보 세로 정렬 */
+        align-items: flex-start;
+        gap: 10px;
+    }
+    /* item-price의 폰트 크기는 이미 white-space:nowrap;과 함께 상위에서 정의됨 */
+    .proceed-button {
+        font-size: 1.1em;
+        padding: 15px 20px;
+    }
+    /* 수량 조절 섹션의 반응형 */
+    .quantity-control {
+        justify-content: flex-start; /* 작은 화면에서는 왼쪽 정렬 */
+    }
+}
+
+@media (max-width: 500px) {
+    .page-container {
+        padding: 20px 15px;
+    }
+    .page-title {
+        font-size: 1.8em;
+    }
+    .panel-title {
+        font-size: 1.3em;
+    }
+    .item-name {
+        font-size: 1.3em;
+    }
+    .item-duration {
+        font-size: 1em;
+    }
+    .item-description,
+    .features-list li,
+    .additional-info {
+        font-size: 0.85em;
+    }
+    
+    /* 최종 결제 금액: 작은 화면에서 글씨 크기 줄이기 */
+    .summary-item.total .highlight {
+        font-size: 1.4em; /* 500px 이하일 때 폰트 크기 줄임 */
+    }
+    /* 상품 금액: 작은 화면에서 글씨 크기 줄이기 */
+    .item-price {
+        font-size: 1.6em; /* 500px 이하일 때 폰트 크기 줄임 */
+    }
+    /* 수량 조절 섹션의 반응형 */
+    .quantity-control {
+        flex-direction: column; /* 더 작은 화면에서는 세로 정렬 */
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .quantity-control label {
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 370px) {
+    /* 더 작은 모바일 화면에서 최종 결제 금액 더 줄이기 */
+    .summary-item.total .highlight {
+        font-size: 1.2em; /* 370px 이하일 때 폰트 크기 더 줄임 */
+    }
+    .item-price {
+        font-size: 1.4em; /* 370px 이하일 때 폰트 크기 더 줄임 */
+    }
+}

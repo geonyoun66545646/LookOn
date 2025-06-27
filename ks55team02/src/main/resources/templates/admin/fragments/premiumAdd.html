@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 구독권 등록</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admincss/assets/customadmincss/premiumAdd.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="page-container">
+        <h1 class="page-title">구독권 등록</h1>
+        <p class="page-subtitle">판매자가 구매할 수 있는 새로운 구독권을 등록합니다.</p>
+
+        <div class="content-wrapper">
+            <div class="subscription-form-panel">
+                <h2 class="panel-title">새 구독권 정보</h2>
+                
+                <form id="add-subscription-form">
+                    <div class="form-group">
+                        <label for="subscription-name">구독권명</label>
+                        <input type="text" id="subscription-name" name="subscriptionName" placeholder="예: 프리미엄 구독 코인" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subscription-duration">구독 기간 (일)</label>
+                        <input type="number" id="subscription-duration" name="subscriptionDuration" min="1" value="30" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subscription-price">가격 (원)</label>
+                        <input type="number" id="subscription-price" name="subscriptionPrice" min="0" value="2990000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subscription-description">설명</label>
+                        <textarea id="subscription-description" name="subscriptionDescription" rows="4" placeholder="구독권에 대한 자세한 설명을 입력하세요." required></textarea>
+                    </div>
+
+                    <div class="form-group feature-list-group">
+                        <label>주요 혜택</label>
+                        <div id="features-container">
+                            <div class="feature-input-item">
+                                <input type="text" class="subscription-feature" name="subscriptionFeatures" placeholder="예: 수수료 14% 우대 적용" required>
+                                <button type="button" class="remove-feature-button"><i class="fas fa-minus-circle"></i></button>
+                            </div>
+                        </div>
+                        <button type="button" id="add-feature-button" class="add-feature-button"><i class="fas fa-plus-circle"></i> 혜택 추가</button>
+                    </div>
+
+                    <button type="submit" class="submit-button">구독권 등록하기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('add-subscription-form');
+            const featuresContainer = document.getElementById('features-container');
+            const addFeatureButton = document.getElementById('add-feature-button');
+
+            // 혜택 추가 버튼 클릭 이벤트
+            addFeatureButton.addEventListener('click', () => {
+                addFeatureInput();
+            });
+
+            // 초기 로드시 이미 있는 삭제 버튼에 이벤트 리스너 추가 (첫 번째 혜택 필드)
+            featuresContainer.addEventListener('click', (event) => {
+                if (event.target.closest('.remove-feature-button')) {
+                    const featureItem = event.target.closest('.feature-input-item');
+                    if (featuresContainer.children.length > 1) { // 최소 1개는 유지
+                        featuresContainer.removeChild(featureItem);
+                    } else {
+                        // 마지막 하나는 삭제하지 않고 내용만 지우기
+                        featureItem.querySelector('.subscription-feature').value = '';
+                    }
+                }
+            });
+
+            function addFeatureInput(value = '') {
+                const featureItem = document.createElement('div');
+                featureItem.classList.add('feature-input-item');
+                featureItem.innerHTML = `
+                    <input type="text" class="subscription-feature" name="subscriptionFeatures" placeholder="예: 수수료 14% 우대 적용" value="${value}" required>
+                    <button type="button" class="remove-feature-button"><i class="fas fa-minus-circle"></i></button>
+                `;
+                featuresContainer.appendChild(featureItem);
+            }
+
+            // 폼 제출 이벤트
+            form.addEventListener('submit', (event) => {
+                event.preventDefault(); // 폼 기본 제출 동작 방지
+
+                const subscriptionName = document.getElementById('subscription-name').value;
+                const subscriptionDuration = document.getElementById('subscription-duration').value;
+                const subscriptionPrice = document.getElementById('subscription-price').value;
+                const subscriptionDescription = document.getElementById('subscription-description').value;
+                const subscriptionFeatures = Array.from(document.querySelectorAll('.subscription-feature'))
+                                                  .map(input => input.value.trim())
+                                                  .filter(value => value !== ''); // 빈 문자열 제거
+
+                if (!subscriptionName || !subscriptionDuration || !subscriptionPrice || !subscriptionDescription || subscriptionFeatures.length === 0) {
+                    alert('모든 필드를 입력하고, 최소 하나 이상의 혜택을 추가해주세요.');
+                    return;
+                }
+
+                const newSubscription = {
+                    name: subscriptionName,
+                    duration: parseInt(subscriptionDuration),
+                    price: parseInt(subscriptionPrice),
+                    description: subscriptionDescription,
+                    features: subscriptionFeatures
+                };
+
+                console.log('새 구독권 등록 요청:', newSubscription);
+                alert(`"${newSubscription.name}" 구독권이 성공적으로 등록되었습니다! (실제 저장되지 않음)`);
+                
+                // 폼 초기화
+                form.reset();
+                // 혜택 필드는 첫 번째 필드만 남기고 모두 삭제
+                while (featuresContainer.children.length > 1) {
+                    featuresContainer.removeChild(featuresContainer.lastChild);
+                }
+                featuresContainer.querySelector('.subscription-feature').value = ''; // 첫 번째 필드 내용 지우기
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>결제 페이지</title>
+    <!-- 토스페이먼츠 SDK 로드 -->
+    <script src="https://js.tosspayments.com/v1"></script>
+</head>
+<body>
+    <h1>Toss Payments AJAX 결제 테스트</h1>
+    <div>
+        <p>상품명: 멋진 자켓</p>
+        <p>가격: 50000원</p>
+        <button id="payment-button">50,000원 결제하기</button>
+    </div>
+
+    <script th:inline="javascript">
+        // 1. 컨트롤러로부터 전달받은 클라이언트 키
+        // th:inline="javascript"를 사용하면 자바스크립트 내에서 타임리프 변수를 안전하게 사용할 수 있습니다.
+        const clientKey = /*[[${tossClientKey}]]*/ 'test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eun';
+        const tossPayments = TossPayments(clientKey);
+
+        const button = document.getElementById('payment-button');
+
+        button.addEventListener('click', function () {
+            // 주문 ID는 매번 고유한 값으로 생성해야 합니다.
+            // 실제 서비스에서는 서버에서 주문번호를 미리 생성하여 전달받는 것이 좋습니다.
+            const orderId = 'order_' + new Date().getTime();
+            const amount = 50000;
+
+            // 2. 토스 결제창 호출
+            tossPayments.requestPayment('카드', { // '카드', '가상계좌', '계좌이체' 등 결제 수단 선택
+                amount: amount,
+                orderId: orderId,
+                orderName: '멋진 자켓 외 1건',
+                customerName: '김토스', // 실제 고객 이름으로 교체
+            })
+            // 결제창이 성공적으로 열리고 사용자가 결제를 완료하면 .then() 블록이 실행됩니다.
+            .then(function (data) {
+                // 3. 결제 승인 요청 (우리 서버로 AJAX 요청)
+                // fetch API를 사용해 백엔드 Controller의 /api/v1/payments/confirm 경로로 POST 요청을 보냅니다.
+                return fetch('/api/v1/payments/confirm', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        paymentKey: data.paymentKey,
+                        orderId: data.orderId,
+                        amount: data.amount,
+                    }),
+                });
+            })
+            // 서버의 응답을 처리합니다.
+            .then(async function (response) {
+                const json = await response.json();
+                if (response.ok) {
+                    // 4. 최종 결과 처리
+                    // 서버에서 받은 응답의 status가 'success'이면 성공
+                    if (json.status === 'success') {
+                        alert('결제와 DB 저장이 성공적으로 완료되었습니다.');
+                        // 성공 페이지로 이동하거나, 현재 페이지에서 UI를 업데이트합니다.
+                        // 예: window.location.href = '/payment/success?orderId=' + json.payment.ordrNo;
+                    } else {
+                        // 서버 처리 중 오류가 발생한 경우
+                        alert('서버 처리 중 오류가 발생했습니다: ' + json.message);
+                    }
+                } else {
+                    // HTTP 상태 코드가 2xx가 아닌 경우 (예: 400, 500)
+                    alert('결제 승인에 실패했습니다: ' + json.message);
+                }
+            })
+            // 사용자가 결제를 취소하거나 결제창을 닫는 등 예외 상황을 처리합니다.
+            .catch(function (error) {
+                if (error.code === 'USER_CANCEL') {
+                    alert('결제를 취소하셨습니다.');
+                } else {
+                    alert('결제 실패: ' + error.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

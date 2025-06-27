@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+
+<head>
+    <!-- 기존 head 내용 유지 -->
+    <style>
+        /* 모달 애니메이션 추가 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); }
+            to { transform: translateY(0); }
+        }
+        
+        .modal-overlay.show {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .modal-overlay.show .modal-content {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        
+        /* 반응형 추가 */
+        @media (max-width: 576px) {
+            .modal-content {
+                width: 95%;
+                padding: 30px 15px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <th:block layout:fragment="contents">
+        <!-- 기존 모달 구조 유지 -->
+       <!-- 기존 모달 코드 유지 -->
+	<div th:if="${isSuccess}">
+	    <h2>🎉 결제가 성공적으로 완료되었습니다!</h2>
+	    <p><strong>결제 ID:</strong> <span th:text="${payment.paymentKey}"></span></p>
+	    <p><strong>주문 번호:</strong> <span th:text="${payment.orderId}"></span></p>
+	    <p><strong>결제 금액:</strong> <span th:text="${#numbers.formatCurrency(payment.amount)}"></span></p>
+	    <div class="button-group">
+	        <a href="/" class="btn-primary-molla">메인 페이지</a>
+	        <a th:href="@{/customer/orders}" class="btn-outline-molla">주문 내역 보기</a>
+	    </div>
+	</div>
+	<div th:unless="${isSuccess}">
+	    <h2>❌ 결제가 실패했습니다.</h2>
+	    <p><strong>오류 코드:</strong> <span th:text="${errorCode}"></span></p>
+	    <p><strong>오류 메시지:</strong> <span th:text="${errorMessage}"></span></p>
+	    <div class="button-group">
+	        <a href="/" class="btn-primary-molla">메인 페이지</a>
+	        <a th:href="@{/customer/checkout}" class="btn-outline-molla">다시 결제 시도</a>
+	    </div>
+	</div>
+    </th:block>
+
+    <script>
+        // 모달 닫기 함수 개선
+        function closeModal(redirectUrl) {
+            const modal = document.getElementById('paymentResultModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            
+            if (redirectUrl) {
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 300);
+            }
+        }
+
+        // ESC 키로 모달 닫기
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // 모달 닫기 후 리다이렉트 예시
+        function redirectAfterClose(url) {
+            closeModal(url);
+        }
+    </script>
+</body>
+</html>

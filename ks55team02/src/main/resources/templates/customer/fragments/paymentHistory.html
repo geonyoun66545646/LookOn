@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>결제내역 확인</title>
+    <meta name="keywords" content="HTML5 템플릿">
+    <meta name="description" content="Molla - 주문 확인 페이지">
+    <meta name="author" content="p-themes">
+    <link rel="apple-touch-icon" sizes="180x180" href="maincss/assets/images/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="maincss/assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="maincss/assets/images/icons/favicon-16x16.png">
+    <link rel="manifest" href="maincss/assets/images/icons/site.html">
+    <link rel="mask-icon" href="maincss/assets/images/icons/safari-pinned-tab.svg" color="#666666">
+    <link rel="shortcut icon" href="maincss/assets/images/icons/favicon.ico">
+    <meta name="apple-mobile-web-app-title" content="Molla">
+    <meta name="application-name" content="Molla">
+    <meta name="msapplication-TileColor" content="#cc9966">
+    <meta name="msapplication-config" content="maincss/assets/images/icons/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="maincss/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="maincss/assets/css/style.css">
+    <link rel="stylesheet" href="maincss/assets/css/plugins/owl-carousel/owl.carousel.css">
+    <link rel="stylesheet" href="maincss/assets/css/plugins/magnific-popup/magnific-popup.css">
+    <link rel="stylesheet" href="maincss/assets/css/plugins/jquery.countdown.css">
+</head>
+
+<body>
+<th:block layout:fragment="contents">
+    <div class="page-wrapper">
+        <main class="main">
+            <div class="page-header text-center" style="background-image: url('maincss/assets/images/page-header-bg.jpg')">
+                <div class="container">
+                    <h1 class="page-title">주문 확인<span>쇼핑</span></h1>
+                </div></div><nav aria-label="경로" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">홈</a></li>
+                        <li class="breadcrumb-item"><a href="checkout.html">결제</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">주문 확인</li>
+                    </ol>
+                </div></nav><div class="page-content">
+                <div class="checkout">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-10">
+                                <div class="order-confirmation-message text-center mb-4">
+                                    <i class="icon-check-circle text-success" style="font-size: 3rem;"></i>
+                                    <h2 class="mt-2">주문해 주셔서 감사합니다!</h2>
+                                    <p class="lead">주문 번호 #12345가 성공적으로 완료되었습니다.</p>
+                                    <p>주문 상세 정보가 **your_email@example.com** (으)로 전송되었습니다.</p>
+                                </div><div class="row">
+                                    <div class="col-lg-8">
+                                        <h3 class="checkout-title">주문 상세 정보</h3><div class="row">
+                                            <div class="col-sm-6">
+                                                <h4 class="mb-2">배송 정보</h4>
+                                                <address>
+                                                    <strong>홍길동</strong><br>
+                                                    서울특별시 강남구 테헤란로 123<br>
+                                                    어떤동, 어떤시 12345<br>
+                                                    대한민국<br>
+                                                    전화: (010) 1234-5678<br>
+                                                    이메일: hong.gildong@example.com
+                                                </address>
+                                            </div><div class="col-sm-6">
+                                                <h4 class="mb-2">청구 정보</h4>
+                                                <address>
+                                                    <strong>홍길동</strong><br>
+                                                    서울특별시 강남구 테헤란로 123<br>
+                                                    어떤동, 어떤시 12345<br>
+                                                    대한민국<br>
+                                                    전화: (010) 1234-5678<br>
+                                                    이메일: hong.gildong@example.com
+                                                </address>
+                                            </div></div><h4 class="mt-4 mb-2">주문 상품</h4>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-hover table-summary">
+                                                <thead>
+                                                    <tr>
+                                                        <th>상품</th>
+                                                        <th class="text-center">수량</th>
+                                                        <th class="text-right">가격</th>
+                                                        <th class="text-right">총액</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><a href="#">베이지 니트 엘라스틱 런닝화</a></td>
+                                                        <td class="text-center">1</td>
+                                                        <td class="text-right">$84.00</td>
+                                                        <td class="text-right">$84.00</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><a href="#">블루 유틸리티 멜빵 데님 원피스</a></td>
+                                                        <td class="text-center">1</td>
+                                                        <td class="text-right">$76.00</td>
+                                                        <td class="text-right">$76.00</td>
+                                                    </tr>
+                                                    </tbody>
+                                            </table>
+                                        </div></div><aside class="col-lg-4">
+                                        <div class="summary summary-checkout">
+                                            <h3 class="summary-title">주문 요약</h3><table class="table table-summary">
+                                                <tbody>
+                                                    <tr class="summary-subtotal">
+                                                        <td>소계:</td>
+                                                        <td>$160.00</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>배송비:</td>
+                                                        <td>무료 배송</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>결제 방법:</td>
+                                                        <td>직접 은행 송금</td>
+                                                    </tr>
+                                                    <tr class="summary-total">
+                                                        <td>총액:</td>
+                                                        <td>$160.00</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table><div class="order-actions text-center mt-4">
+                                                <a href="index.html" class="btn btn-outline-primary-2 btn-block mb-2">
+                                                    <span>쇼핑 계속하기</span><i class="icon-long-arrow-right"></i>
+                                                </a>
+                                                <a href="#" class="btn btn-outline-darker btn-block">
+                                                    <span>영수증 다운로드</span><i class="icon-download"></i>
+                                                </a>
+                                            </div></div></aside></div></div></div></div></div></div></main></div><script src="maincss/assets/js/jquery.min.js"></script>
+    <script src="maincss/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="maincss/assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="maincss/assets/js/jquery.waypoints.min.js"></script>
+    <script src="maincss/assets/js/superfish.min.js"></script>
+    <script src="maincss/assets/js/owl.carousel.min.js"></script>
+    <script src="maincss/assets/js/main.js"></script>
+</th:block>
+</body>
+
+</html>

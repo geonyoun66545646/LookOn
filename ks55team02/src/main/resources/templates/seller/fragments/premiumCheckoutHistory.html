@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 구독권 구매 내역</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="maincss/assets/customcustomercss/premiumCheckoutHistory.css">
+</head>
+<body>
+<th:block layout:fragment="contents">
+    <div class="page-container">
+        <h1 class="page-title">내 구독권 구매 내역</h1>
+        <p class="page-subtitle">회원님의 프리미엄 멤버십 구매 및 사용 내역입니다.</p>
+
+        <div class="content-wrapper">
+            <div class="purchase-history-panel">
+                <h2 class="panel-title">구매 내역</h2>
+                
+                <div class="subscription-list-header">
+                    <span class="header-item product">구독권명</span>
+                    <span class="header-item qty">수량</span>
+                    <span class="header-item amount">결제 금액</span>
+                    <span class="header-item date">구매일</span>
+                    <span class="header-item status">상태</span>
+                </div>
+
+                <div id="subscription-list" class="subscription-list">
+                    </div>
+
+                <div class="no-history" id="no-history-message" style="display: none;">
+                    <p>아직 구매 내역이 없습니다.</p>
+                    <button class="go-to-purchase-button" onclick="location.href='/premium-subscription'">구독권 구매하러 가기</button>
+                </div>
+
+                <div class="pagination">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const subscriptionList = document.getElementById('subscription-list');
+            const noHistoryMessage = document.getElementById('no-history-message');
+
+            // 가상의 구매 내역 데이터
+            const purchaseHistory = [
+                {
+                    name: '프리미엄 구독 코인',
+                    quantity: 1,
+                    amount: 2990000,
+                    date: '2024.06.20',
+                    status: '활성' // '활성' 또는 '만료'
+                },
+                {
+                    name: '프리미엄 구독 코인',
+                    quantity: 2,
+                    amount: 5980000,
+                    date: '2024.05.10',
+                    status: '활성'
+                },
+                {
+                    name: '프리미엄 구독 코인',
+                    quantity: 1,
+                    amount: 2990000,
+                    date: '2023.11.01',
+                    status: '만료'
+                }
+            ];
+
+            // 숫자를 통화 형식으로 변환하는 함수
+            function formatCurrency(number) {
+                return number.toLocaleString('ko-KR') + '원';
+            }
+
+            if (purchaseHistory.length === 0) {
+                subscriptionList.style.display = 'none';
+                noHistoryMessage.style.display = 'block';
+            } else {
+                noHistoryMessage.style.display = 'none';
+                purchaseHistory.forEach(item => {
+                    const subscriptionItem = document.createElement('div');
+                    subscriptionItem.classList.add('subscription-item');
+
+                    const statusClass = item.status === '활성' ? 'active' : 'expired';
+
+                    subscriptionItem.innerHTML = `
+                        <span class="item-cell product">${item.name}</span>
+                        <span class="item-cell qty">${item.quantity}개</span>
+                        <span class="item-cell amount">${formatCurrency(item.amount)}</span>
+                        <span class="item-cell date">${item.date}</span>
+                        <span class="item-cell status ${statusClass}">${item.status}</span>
+                    `;
+                    subscriptionList.appendChild(subscriptionItem);
+                });
+            }
+        });
+    </script>
+</th:block>
+</body>
+</html>
