@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{admin/layout/layout_main}">
+		
+	 <head>
+	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />	
+	 	<link rel="stylesheet" th:href="@{/admincss/assets/customadminpagecss/userList.css}">
+	 </head>
+	 
+	 <!-- 추가할 페이지 contents -->
+	 <th:block layout:fragment="contents">
+		<main class="main-content">
+		    <section class="content-header">
+		        <h2 class="content-title">회원 목록</h2>
+		    </section>	
+		    <!-- 1. 검색 필터 카드 -->
+		    <div class="card mb-4">
+		        <div class="card-body">
+		            <form id="searchForm">
+		                <div class="row gx-3">
+		                    <div class="col-lg-12">
+		                    	<!-- 회원 상태 분류 -->
+		                        <label class="form-label">분류</label>
+		                        <div class="d-flex align-items-center">
+		                            <div class="form-check me-4">
+		                                <input class="form-check-input status-check" type="checkbox" 
+		                                	   name="statusList" value="활동" checked>
+		                                <label class="form-check-label">활동 계정</label>
+		                            </div>
+		                            <div class="form-check me-4">
+		                                <input class="form-check-input status-check" type="checkbox" 
+		                                	   name="statusList" value="휴면" checked>
+		                                <label class="form-check-label">휴면 계정</label>
+		                            </div>
+		                            <div class="form-check me-4">
+		                                <input class="form-check-input status-check" type="checkbox" 
+		                                	   name="statusList" value="탈퇴" checked>
+		                                <label class="form-check-label">탈퇴 계정</label>
+		                            </div>
+		                            <input class="form-check-input" type="checkbox" id="filterCheckAll" checked>
+		                        </div>
+		                    </div>
+		                </div>
+		                <hr>
+		                <div class="row gx-3 align-items-end">
+		                    <div class="col-lg-4">
+		                        <label class="form-label">기간</label>
+		                        <div class="d-flex">
+		                            <input type="date" class="form-control" name="startDate" value="2020-03-16">
+		                            <span class="mx-2 d-flex align-items-center">-</span>
+		                            <input type="date" class="form-control" name="endDate" value="2025-06-16">
+		                        </div>
+		                    </div>
+		                    <div class="col-lg-4">
+		                        <label class="form-label">검색 키워드</label>
+		                        <div class="input-group">
+		                            <select class="form-select" name="searchKey" style="max-width: 120px; background-color: #fff;">
+		                                <option value="all" selected>전체</option>
+		                                <option value="userLgnId">ID</option>
+		                                <option value="userNm">이름</option>
+		                                <option value="emlAddr">이메일</option>
+		                            </select>
+		                            <input type="text" class="form-control" name="searchValue" placeholder="검색어를 입력하세요">
+		                        </div>
+		                    </div>
+		                    <div class="col-lg-2">
+		                        <button class="btn btn-primary btn-block" type="button" id="searchBtn">검색</button>
+		                    </div>
+		                </div>
+		            </form>
+		        </div>
+		    </div> <!-- card end// -->
+		
+		    <!-- 2. 회원 목록 테이블 카드 -->
+		    <div class="card" id="userListContainer" th:fragment="userListFragment">
+		        <div class="card-body">
+		            <div class="row gx-3 align-items-center mb-4">
+		                <div class="col-md-6">
+		                	<!-- 조회된 회원 검색수 -->
+		                    <div class="search-result-info">
+		                        총 <b class="text-brand" th:text="${totalCount}"></b> 건의 회원이 검색되었습니다.
+		                    </div>
+		                </div>
+		                <div class="col-md-6 text-md-end">
+		                	<!-- 회원 상태 변경 -->
+		                    <div class="btn-group me-2">
+		                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+		                            선택한 회원 상태 변경
+		                        </button>
+		                        <div class="dropdown-menu dropdown-menu-end">
+		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="활동">
+		                            	<span class="badge-dot bg-success"></span>활동
+		                            </a>
+		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="휴면">
+		                            	<span class="badge-dot bg-warning"></span>휴면
+		                            </a>
+		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="탈퇴">
+		                            	<span class="badge-dot bg-danger"></span>탈퇴
+		                            </a>
+		                        </div>
+		                    </div>
+		                    <!-- 회원 조회 분류 키워드 -->
+		                    <div class="d-inline-block">
+		                        <select class="form-select d-inline-block" id="sortOrder" name="sortOrder" style="width: auto;">
+								    <option value="joinDtDesc" th:selected="${searchCriteria.sortOrder == 'joinDtDesc'}">최신 가입일순</option>
+								    <option value="joinDtAsc" th:selected="${searchCriteria.sortOrder == 'joinDtAsc'}">오래된 가입일순</option>
+								</select>
+		                        <select class="form-select d-inline-block" id="pageSize" name="pageSize" style="width: auto;">
+		                            <option value="10" th:selected="${searchCriteria.pageSize == 10}">10개씩 보기</option>
+		                            <option value="30" th:selected="${searchCriteria.pageSize == 30}">30개씩 보기</option>
+		                            <option value="50" th:selected="${searchCriteria.pageSize == 50}">50개씩 보기</option>
+		                        </select>
+		                    </div>
+		                </div>
+		            </div> <!-- row end// -->
+		
+		            <div class="table-responsive">
+				    <table class="table table-hover member-table">
+				        <thead>
+				            <tr class="text-center">
+				                <th scope="col" class="col-checkbox">
+				                	<input class="form-check-input" type="checkbox" id="checkAll">
+				                </th>
+				                <th scope="col" class="col-id">ID</th>
+				                <th scope="col" class="col-name">이름</th>
+				                <th scope="col" class="col-gender">성별</th>
+				                <th scope="col" class="col-email">이메일</th>
+				                <th scope="col" class="col-phone">휴대폰 번호</th>
+				                <th scope="col" class="col-address">주소</th>
+				                <th scope="col" class="col-status">상태</th>
+				                <th scope="col" class="col-joindate">가입 일자</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				            <tr th:if="${#lists.isEmpty(userList)}">
+				                <td colspan="9" class="text-center py-5">조회된 회원이 없습니다.</td>
+				            </tr>
+				            <tr th:unless="${#lists.isEmpty(userList)}" th:each="user : ${userList}">
+				                <td>
+				                	<input class="form-check-input member-check" type="checkbox" th:value="${user.userNo}">
+				                </td>
+				                <td class="ellipsis text-left" th:text="${user.userLgnId}" th:title="${user.userLgnId}"></td>
+				                <td class="text-left" th:text="${user.userNm}"></td>
+				                <td th:text="${user.getGenderText()}"></td>
+				                <td class="ellipsis text-left" th:text="${user.emlAddr}" th:title="${user.emlAddr}"></td>
+				                <td th:text="${user.telno}"></td>
+				                <td class="ellipsis text-left" th:text="${user.getFullAddress()}" th:title="${user.getFullAddress()}"></td>
+				                <td>
+				                    <span class="badge custom-badge"
+				                          th:text="${user.userStatus}"
+				                          th:classappend="${user.userStatus == '활동'} ? 'bg-success' : 
+				                                         (${user.userStatus == '휴면'} ? 'bg-warning text-dark' : 
+				                                         (${user.userStatus == '탈퇴'} ? 'bg-danger' : 'bg-secondary'))">
+				                    </span>
+				                </td>
+				                <td th:text="${#temporals.format(user.joinDt, 'yyyy-MM-dd')}"></td>
+				            </tr>
+				        </tbody>
+				    </table>
+				</div>
+		            <!-- 페이지네이션 -->
+		            <nav class="mt-4" aria-label="Page navigation" th:if="${totalCount > 0}">
+					    <ul class="pagination justify-content-center">
+					        <li class="page-item" th:if="${pagination.currentPage > 1}">
+					            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage - 1}">이전</a>
+					        </li>
+					        
+					        <li class="page-item" th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+					            th:classappend="${page == pagination.currentPage} ? 'active' : ''">
+					            <a class="page-link page-num" href="#" th:text="${page}" th:data-page="${page}"></a>
+					        </li>
+					        
+					        <li class="page-item" th:if="${pagination.currentPage < pagination.totalPageCount}">
+					            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage + 1}">다음</a>
+					        </li>
+					    </ul>
+					</nav>
+		        </div> <!-- card-body end// -->
+		    </div> <!-- card end// -->
+		</main>
+	 </th:block>
+	 <!--/* 개발시 추가할 jsfile 영역 정의 */-->
+<th:block layout:fragment="jsFile">
+</th:block>
+
+<!--/* 개발시 추가할 스크립트 */-->
+<th:block layout:fragment="jsScript">
+    <script>
+    $(document).ready(function() {
+    	// =================================================================
+		// 기능 1: 회원 목록 조회 (검색, 정렬, 페이징) - 공통 함수
+		// =================================================================
+		function searchAndReloadList(currentPage) {
+		
+		    // 1. currentPage 값이 없으면 1로 설정 (기본값)
+		    currentPage = currentPage || 1; 
+		
+		    // 2. 기본 검색 폼 데이터 직렬화
+		    let searchData = $('#searchForm').serialize();
+		
+		    // 3. 정렬, N개씩 보기 값을 URL 파라미터에 추가
+		    const sortOrder = $('#sortOrder').val();
+		    const pageSize = $('#pageSize').val();
+		    
+		    // searchData 문자열에 정렬, 페이지 크기, 그리고 '현재 페이지 번호' 정보를 덧붙입니다.
+		    searchData += `&sortOrder=${sortOrder}&pageSize=${pageSize}&currentPage=${currentPage}`;
+		    
+		    $.ajax({
+		        url: '/adminpage/useradmin/userstatussearch', 
+		        type: 'GET',
+		        data: searchData,
+		        success: function(fragment) {
+		            console.log("AJAX 요청 성공! 목록을 갱신합니다.");
+		            // 성공 시, 서버로부터 받은 HTML 조각으로 목록 영역을 교체
+		            $('#userListContainer').replaceWith(fragment);
+		        },
+		        error: function(xhr, status, error) {
+		            console.error("목록 조회 실패:", error);
+		            alert("회원 목록을 불러오는 데 실패했습니다.");
+		        }
+		    });
+		}
+
+        // --- 이벤트 핸들러 연결 ---
+        // 1. '검색' 버튼 클릭 시
+        $('#searchBtn').on('click', function(e) {
+            e.preventDefault(); // 안전을 위해 preventDefault()를 유지합니다.
+            searchAndReloadList(1);
+        });
+
+        // 2. '정렬' 또는 'N개씩 보기' 변경 시
+        $('#sortOrder, #pageSize').on('change', function() {
+            searchAndReloadList(1);
+        });
+	     // 3. [추가] 페이지 번호 클릭 시 -> 해당 페이지로 조회
+	     $(document).on('click', '.page-num', function(e) {
+	         e.preventDefault();
+	         const page = $(this).data('page'); 
+	         searchAndReloadList(page);
+	     });
+
+        // 4. '분류(상태)' 체크박스 전체 선택/해제
+        $('#filterCheckAll').on('click', function() {
+            const isChecked = $(this).is(':checked');
+            $('.status-check').prop('checked', isChecked);
+        });
+
+
+        // =================================================================
+        // 기능 2: 테이블의 체크박스 전체 선택/해제
+        // =================================================================
+        $(document).on('click', '#checkAll', function() {
+            // 이 코드는 #userListContainer가 교체되어도 #checkAll에 대한 이벤트를 보장합니다.
+            const isChecked = $(this).is(':checked');
+            $('.member-check').prop('checked', isChecked);
+        });
+
+        $(document).on('click', '.member-check', function() {
+            const totalChecks = $('.member-check').length;
+            const checkedChecks = $('.member-check:checked').length;
+            $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
+        });
+
+
+        // =================================================================
+        // 기능 3: 선택한 회원 상태 일괄 변경
+        // =================================================================
+        $(document).on('click', '.change-status-btn', function(e) {
+            e.preventDefault();
+
+            let selectedUserNos = [];
+            $('.member-check:checked').each(function() {
+                selectedUserNos.push($(this).val());
+            });
+
+            if (selectedUserNos.length === 0) {
+                alert('상태를 변경할 회원을 먼저 선택해주세요.');
+                return;
+            }
+
+            const targetStatus = $(this).data('status');
+            
+            if (confirm(selectedUserNos.length + "명의 회원을 '" + targetStatus + "' 상태로 변경하시겠습니까?")) {
+                $.ajax({
+                    url: '/adminpage/useradmin/updateUserStatus',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        userNos: selectedUserNos,
+                        status: targetStatus
+                    },
+                    success: function(response) {
+                        if (response.result === 'success') {
+                            alert(response.message);
+                            searchAndReloadList(); 
+                        } else {
+                            alert('오류: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('서버와 통신 중 오류가 발생했습니다.');
+                    }
+                });
+            }
+        });
+
+    }); // $(document).ready 끝
+    </script> 
+</th:block>    
+</html>

@@ -1,0 +1,193 @@
+@charset "UTF-8";
+/* 기본 폰트 및 공통 스타일 */
+.mypage-w-style {
+    font-family: '돋움', Dotum, sans-serif;
+    color: #555;
+    background-color: #fff;
+}
+.mypage-w-style .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+/* 수정: .mypage-w-style 로 범위를 한정하여 헤더에 영향이 가지 않도록 합니다. */
+.mypage-w-style a { text-decoration: none; color: inherit; }
+.mypage-w-style ul { list-style: none; padding: 0; margin: 0; }
+
+/* 1. 페이지 상단 타이틀 */
+.mypage-w-style .page-title-area {
+    text-align: center;
+    padding: 50px 0;
+}
+.mypage-w-style .page-title-area h2 {
+    font-size: 36px;
+    font-weight: 500;
+    letter-spacing: 5px;
+    color: #333;
+    margin: 0 0 10px 0;
+}
+.mypage-w-style .page-title-area .breadcrumbs {
+    font-size: 11px;
+    color: #999;
+}
+
+/* 2. 마이페이지 네비게이션 메뉴 */
+.mypage-w-style .mypage-nav-container {
+    border-top: 2px solid #333;
+    border-bottom: 1px solid #e9e9e9;
+    margin-bottom: 50px;
+}
+.mypage-w-style .main-nav {
+    display: flex;
+    background-color: #f7f7f7;
+}
+.mypage-w-style .main-nav li {
+    flex: 1;
+    text-align: center;
+}
+/* 수정: .main-nav li a 로 범위를 더 명확하게 지정 */
+.mypage-w-style .main-nav li a {
+    display: block;
+    padding: 15px 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+.mypage-w-style .mypage-nav-details {
+    display: flex;
+    padding: 25px 0;
+}
+.mypage-w-style .nav-column {
+    flex: 1;
+    padding: 0 20px;
+    border-right: 1px solid #e9e9e9;
+}
+.mypage-w-style .nav-column:last-child {
+    border-right: none;
+}
+/* 수정: .nav-column ul li a 로 범위를 더 명확하게 지정 */
+.mypage-w-style .nav-column ul li a {
+    display: block;
+    font-size: 12px;
+    padding: 5px 0;
+}
+.mypage-w-style .nav-column ul li a:hover {
+    text-decoration: underline;
+}
+
+/* 3. 회원 정보 요약 박스 */
+.mypage-w-style .user-summary-box {
+    display: flex;
+    align-items: center;
+    background-color: #f7f7f7;
+    padding: 30px;
+    margin-bottom: 60px;
+}
+.mypage-w-style .user-greeting {
+    flex: 3;
+    display: flex;
+    align-items: center;
+}
+.mypage-w-style .w-people-logo {
+    width: 90px;
+    height: 90px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #777;
+    margin-right: 30px;
+    flex-shrink: 0;
+}
+.mypage-w-style .welcome-msg {
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+}
+.mypage-w-style .welcome-msg strong {
+    font-size: 18px;
+    color: #000;
+}
+.mypage-w-style .btn-member-benefit {
+    border: 1px solid #ccc;
+    font-size: 11px;
+    padding: 4px 8px;
+    margin-left: 10px;
+}
+.mypage-w-style .membership-status, .mypage-w-style .order-date-info {
+    font-size: 12px;
+    margin: 5px 0;
+}
+.mypage-w-style .order-date-info { color: #999; }
+
+.mypage-w-style .user-coupon, .mypage-w-style .user-point {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+.mypage-w-style .user-coupon::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60px;
+    border-left: 1px dotted #ccc;
+}
+.mypage-w-style .user-coupon span, .mypage-w-style .user-point span {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+.mypage-w-style .user-coupon strong, .mypage-w-style .user-point strong {
+    font-size: 32px;
+    font-weight: 500;
+    color: #000;
+}
+.mypage-w-style .user-coupon strong small, .mypage-w-style .user-point strong small {
+    font-size: 16px;
+    font-weight: normal;
+}
+
+/* 4. 최근 주문내역 */
+.mypage-w-style .recent-orders-section {
+    margin-bottom: 100px;
+}
+.mypage-w-style .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+}
+.mypage-w-style .section-header h3 {
+    font-size: 20px;
+    margin: 0;
+    color: #000;
+}
+.mypage-w-style .more-link {
+    font-size: 12px;
+}
+.mypage-w-style .order-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.mypage-w-style .order-table th, .mypage-w-style .order-table td {
+    padding: 15px 10px;
+    text-align: center;
+    border-bottom: 1px solid #e9e9e9;
+}
+.mypage-w-style .order-table th {
+    background-color: #f7f7f7;
+    font-weight: normal;
+}
+.mypage-w-style .order-table td[colspan="7"] {
+    padding: 50px 0;
+    color: #999;
+}
