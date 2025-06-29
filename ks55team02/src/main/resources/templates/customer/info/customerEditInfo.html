@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+<head>
+    <title>회원정보 관리</title>
+
+	<link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/customerEditInfo.css}" />
+    
+</head>
+<body>
+    <th:block layout:fragment="contents">
+        <main class="main profile-management-page">
+            <div class="container">
+                <!-- 1. 페이지 상단 타이틀 -->
+                <div class="page-title-area">
+                    <h2>회원정보 관리</h2>
+                    <p class="breadcrumbs">HOME > MY PAGE > 회원정보 관리</p>
+                </div>
+
+                <!-- 2. 메인 컨텐츠 영역 (사이드바 + 컨텐츠) -->
+                <div class="profile-container">
+                    
+                    <!-- 2-1. 왼쪽 사이드 메뉴 -->
+                    <aside class="profile-sidebar">
+                        <ul>
+                            <li class="active"><a href="#edit-info">회원정보 수정</a></li>
+                            <li><a href="#manage-profile">프로필 관리</a></li>
+                            <li><a href="#security-settings">보안 설정</a></li>
+                        </ul>
+                    </aside>
+
+                    <!-- 2-2. 오른쪽 컨텐츠 영역 -->
+                    <div class="profile-content">
+
+                        <!-- [탭 1] 회원정보 수정 (기본으로 보임) -->
+                        <div id="edit-info" class="tab-pane active">
+                            <h3>회원정보 수정</h3>
+                            <form class="profile-form">
+                                <div class="form-group">
+                                    <label>아이디</label>
+                                    <input type="text" value="user_id" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>이름</label>
+                                    <input type="text" value="이*영">
+                                </div>
+                                <div class="form-group">
+                                    <label>이메일</label>
+                                    <input type="email" value="user@example.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>주소</label>
+                                    <div class="address-group">
+                                        <input type="text" placeholder="우편번호" readonly>
+                                        <button type="button">우편번호 찾기</button>
+                                    </div>
+                                    <input type="text" placeholder="기본 주소" readonly>
+                                    <input type="text" placeholder="상세 주소를 입력하세요">
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">수정하기</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- [탭 2] 프로필 관리 -->
+                        <div id="manage-profile" class="tab-pane">
+                            <h3>프로필 관리</h3>
+                            <form class="profile-form">
+                                <div class="form-group">
+                                    <label>프로필 사진</label>
+                                    <input type="file">
+                                    <small>10MB 이하의 JPG, PNG 파일만 업로드 가능합니다.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>닉네임</label>
+                                    <input type="text" placeholder="사용할 닉네임을 입력하세요">
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">저장하기</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- [탭 3] 보안 설정 -->
+                        <div id="security-settings" class="tab-pane">
+                            <h3>보안 설정</h3>
+                            <form class="profile-form">
+                                <div class="form-group">
+                                    <label>현재 비밀번호</label>
+                                    <input type="password">
+                                </div>
+                                <div class="form-group">
+                                    <label>새 비밀번호</label>
+                                    <input type="password">
+                                </div>
+                                <div class="form-group">
+                                    <label>새 비밀번호 확인</label>
+                                    <input type="password">
+                                </div>
+                                <hr>
+                                <div class="form-group">
+                                    <label>2단계 인증</label>
+                                    <label class="switch">
+                                        <input type="checkbox">
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="switch-label">2단계 인증 사용</span>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">변경사항 저장</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </th:block>
+
+    <!-- ======================================================== -->
+    <!--            ↓↓↓ editProfile.html 맨 아래 ↓↓↓           -->
+    <!-- ======================================================== -->
+    
+    <!-- 1. 이 페이지에서만 필요한 추가 JS 파일 (우편번호 찾기 API) -->
+    <th:block layout:fragment="jsFile">
+        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    </th:block>
+
+    <!-- 2. 이 페이지에서만 실행될 직접 작성한 스크립트 -->
+    <th:block layout:fragment="jsScript">
+        <script>
+        $(document).ready(function() {
+            
+            // 페이지 로드 시 URL을 확인하여 올바른 탭 열기
+            function activateTabFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const tab = urlParams.get('tab');
+
+                let targetHref = '#edit-info'; // 기본 탭
+
+                if (tab === 'profile') {
+                    targetHref = '#manage-profile';
+                } else if (tab === 'security') {
+                    targetHref = '#security-settings';
+                }
+                
+                const targetLink = $('.profile-sidebar a[href="' + targetHref + '"]');
+                
+                if (targetLink.length > 0) {
+                    targetLink.click();
+                } else {
+                    $('.profile-sidebar a[href="#edit-info"]').click();
+                }
+            }
+            
+            // 사이드바 메뉴 클릭 이벤트
+            $('.profile-sidebar a').on('click', function(e) {
+                e.preventDefault(); 
+
+                $('.profile-sidebar li').removeClass('active');
+                $('.tab-pane').removeClass('active');
+
+                $(this).parent('li').addClass('active');
+                $($(this).attr('href')).addClass('active'); 
+            });
+
+            // 페이지 로드 시 탭 활성화 함수 실행
+            activateTabFromUrl();
+        });
+        </script>
+    </th:block>
+</body>
+</html>
