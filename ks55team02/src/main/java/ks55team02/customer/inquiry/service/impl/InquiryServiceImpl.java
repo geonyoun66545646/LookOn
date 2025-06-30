@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// import org.springframework.beans.factory.annotation.Autowired; // 이 import는 이제 필요 없습니다.
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ks55team02.customer.inquiry.domain.Inquiry;
+import ks55team02.customer.inquiry.domain.InquiryImage; // InquiryImage 도메인 import 추가
 import ks55team02.customer.inquiry.mapper.InquiryImageMapper;
 import ks55team02.customer.inquiry.mapper.InquiryMapper;
 import ks55team02.customer.inquiry.service.InquiryService;
@@ -17,12 +19,13 @@ import lombok.extern.log4j.Log4j2;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
+@RequiredArgsConstructor // 생성자 주입은 Lombok이 처리합니다.
 @Log4j2
 public class InquiryServiceImpl implements InquiryService {
 
 	private final InquiryMapper inquiryMapper;
-	private final InquiryImageMapper inquiryImageMapper;
+	private final InquiryImageMapper inquiryImageMapper; // 이 매퍼가 정확히 주입되고 있는지 확인
+
 
 	// 질문 목록
 	@Override
@@ -30,11 +33,19 @@ public class InquiryServiceImpl implements InquiryService {
 		List<Inquiry> inquiryList = inquiryMapper.getInquiryList();
 		return inquiryList;
 	}
+
 	// 질문 세부
 	@Override
 	public Inquiry getInquiryById(String inquiryId) {
-		// TODO Auto-generated method stub
-		return inquiryMapper.getInquiryById(inquiryId);
+		// 1. 기본 문의 정보 조회
+		Inquiry inquiry = inquiryMapper.getInquiryById(inquiryId);
+
+		// 2. 문의 정보가 있을 경우에만 이미지 목록 조회하여 설정
+		if (inquiry != null) {
+			List<InquiryImage> inquiryImages = inquiryImageMapper.getInquiryImagesByInquiryId(inquiryId);
+			inquiry.setInquiryImages(inquiryImages); // Inquiry 객체에 이미지 목록 설정
+		}
+		return inquiry;
 	}
 
 	// 질문 등록
@@ -100,4 +111,3 @@ public class InquiryServiceImpl implements InquiryService {
 				return resultMap;
 			}
 	}
-	
