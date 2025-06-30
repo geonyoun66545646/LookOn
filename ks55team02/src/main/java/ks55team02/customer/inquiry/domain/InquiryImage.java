@@ -8,5 +8,5 @@ public class InquiryImage {
 	private String inqryImgId;
 	private String inqryId;
 	private String imgId;
-	private String ord;
+	private Integer ord;
 }

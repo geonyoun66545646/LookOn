@@ -82,7 +82,7 @@
 			#{prvtYn}, 
 			#{prcsStts}, 
 			#{prcsUserNo}, 
-			CURDATE(), 
+			NOW(), 
 			#{mdfcnYmd}, 
 			#{delDt}, 
 			#{delUserNo}, 

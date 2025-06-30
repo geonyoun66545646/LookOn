@@ -29,5 +29,9 @@ public interface InquiryMapper {
 
     // 페이징 처리된 문의 목록 조회
     List<Inquiry> getInquiryListPaging(@Param("startRow") int startRow, @Param("pageSize") int pageSize);
+    
+    // 문의 상세조회시 이미지 정보 조회
+    Inquiry getInquiryByIdWithImages(String inquiryId);
 }
+
 

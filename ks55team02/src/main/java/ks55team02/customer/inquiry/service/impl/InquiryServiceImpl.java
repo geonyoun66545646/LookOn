@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ks55team02.customer.inquiry.domain.Inquiry;
+import ks55team02.customer.inquiry.mapper.InquiryImageMapper;
 import ks55team02.customer.inquiry.mapper.InquiryMapper;
 import ks55team02.customer.inquiry.service.InquiryService;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,7 @@ import lombok.extern.log4j.Log4j2;
 public class InquiryServiceImpl implements InquiryService {
 
 	private final InquiryMapper inquiryMapper;
-	
-	
+	private final InquiryImageMapper inquiryImageMapper;
 
 	// 질문 목록
 	@Override
