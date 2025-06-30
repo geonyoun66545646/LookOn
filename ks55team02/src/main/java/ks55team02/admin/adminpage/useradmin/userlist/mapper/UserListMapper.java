@@ -18,4 +18,8 @@ public interface UserListMapper {
 		
 		// 회원 상태 일괄 변경
 		int updateUserStatus(Map<String, Object> paramMap);
+		
+		// 여러 회원의 로그인 기록을 일괄적으로 생성
+	    void insertLoginHistoryForActivatedUsers(List<String> userNos);
 }
+
