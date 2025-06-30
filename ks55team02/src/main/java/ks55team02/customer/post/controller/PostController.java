@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import ks55team02.customer.post.domain.Post;
 import ks55team02.customer.post.service.PostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequestMapping("/customer/post")
 @RequiredArgsConstructor
+@Slf4j
 public class PostController {
 
 	private final PostService postService;
@@ -35,6 +37,61 @@ public class PostController {
 	    }
 	}
 
+	// 게시글 수정
+	@PostMapping("/postUpdate")
+	@ResponseBody // Ajax 요청에 '데이터'를 직접 응답하기 위한 필수 어노테이션
+	public String processUpdateForm(Post post) { // 수정된 폼 데이터가 자동으로 Post 객체에 담깁니다.
+	    
+	    // try-catch로 예외 상황을 처리하는 것이 안전합니다.
+	    try {
+	        // "수정" 서비스 메소드를 호출합니다.
+	        postService.updatePost(post);
+	        
+	        // 성공했을 때, Ajax의 .done() 부분으로 전달될 성공 메시지입니다.
+	        return "수정 성공";
+	        
+	    } catch (Exception e) {
+	        
+	        // 만약 Service나 Mapper에서 오류가 발생하면, 콘솔에 에러 로그를 출력합니다.
+	        // 이렇게 하면 디버깅할 때 원인을 찾기 매우 쉽습니다.
+	        log.error("글 수정 처리 중 오류 발생: {}", e.getMessage());
+	        e.printStackTrace(); // 전체 에러 스택을 출력해서 더 자세히 볼 수 있습니다.
+	        
+	        // 실패했을 때, Ajax의 .fail() 부분으로 전달될 실패 메시지입니다.
+	        // 이 경우, Ajax는 성공으로 착각할 수 있으므로 상태 코드를 보내주는 것이 더 좋지만,
+	        // 일단은 이렇게 문자열로 구분하는 것도 가능합니다.
+	        return "수정 실패";
+	    }
+	}	
+	
+	// 게시글 수정 정보
+	@GetMapping("/postEdit/{pstSn}")
+	public String showEditForm(@PathVariable String pstSn, Model model) {
+	    // 1. pstSn을 사용해서 DB에서 수정할 게시글의 정보를 가져옵니다.
+	    Post postToEdit = postService.selectPostDetailByPostSn(pstSn);
+	    
+	    // 2. 가져온 게시글 정보를 Model에 담아서 뷰로 전달합니다.
+	    model.addAttribute("post", postToEdit);
+	    
+	    // 3. '글 작성'에 사용했던 그 폼 페이지를 그대로 재사용합니다.
+	    return "customer/post/postWrite"; 
+	}
+	
+	// 게시글 작성 POST 요청 처리 (AJAX 또는 일반 폼 제출)
+	@PostMapping("/postWrite")
+	public String submitPost(
+			Post post, // 폼 데이터가 Post 객체로 자동 바인딩됩니다.
+			Model model) {
+
+			// 새 글 작성
+			postService.insertPost(post);
+
+
+		// 저장 후 목록 페이지로 리다이렉트
+		return "redirect:/customer/post/postList";
+	}
+	
+	// 게시글 작성
 	@GetMapping("/postWrite")
 	public String postWrite(
 	        @RequestParam(required = false) String pstSn,
@@ -49,32 +106,8 @@ public class PostController {
 	    return "customer/post/postWrite";
 	}
 	
-	// 게시글 작성/수정 POST 요청 처리 (AJAX 또는 일반 폼 제출)
-	@PostMapping("/postWrite")
-	public String submitPost(
-			Post post, // 폼 데이터가 Post 객체로 자동 바인딩됩니다.
-			Model model) {
-		
-		// 여기서 post 객체에는 사용자가 입력한 title, content, category (bbsClsfCd) 등이 담겨 옵니다.
-		// 만약 수정 모드라면, post.getPstSn() 값도 있을 것입니다.
-		
-		// Post 클래스에 category 필드가 없으므로, HTML의 name="category"로 받은 값을
-		// Controller에서 Post 객체의 bbsClsfCd 필드로 설정해주는 로직이 필요합니다.
-		// 하지만 지금은 Post post 파라미터만 받으므로,
-		// html의 select name을 bbsClsfCd로 변경해야 이 바인딩이 직접적으로 이루어집니다.
-		// 즉, HTML의 <select id="postCategory" name="bbsClsfCd" ...> 와 같이 되어야 합니다.
-
-		// 작성 또는 수정 로직 수행 (postService를 통해)
-		if (post.getPstSn() == null || post.getPstSn().isEmpty()) {
-			// 새 글 작성
-			postService.insertPost(post);
-		}
-
-		// 저장 후 목록 페이지로 리다이렉트
-		return "redirect:/customer/post/postList";
-	}
 	
-	
+
 
 	// 게시글 조회
 	@GetMapping("/postView")

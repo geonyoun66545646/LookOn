@@ -21,6 +21,10 @@ public interface PostService {
 	// 게시글 등록
 	void insertPost(Post post);
 
+	// 게시글 수정
+	void updatePost(Post post);
+	
 	// 게시글 삭제
 	void deletePost(String pstSn);
+
 }

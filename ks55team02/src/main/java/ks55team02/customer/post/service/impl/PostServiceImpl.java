@@ -49,6 +49,16 @@ public class PostServiceImpl implements PostService {
 		log.info(insertResult);
 	};
 	
+	// 게시글 수정
+	@Override
+	public void updatePost(Post post) {
+		int result = postMapper.updatePost(post);
+		String updateResult = "게시글 수정 실패";
+		if(result > 0) updateResult = "게시글 수정 성공";
+		
+		log.info(updateResult);
+	}
+	
 	// 게시글 삭제
 	@Override
 	public void deletePost(String pstSn) {

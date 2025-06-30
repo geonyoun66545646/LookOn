@@ -19,126 +19,101 @@
 	<!-- 추가할 script -->
 	<th:block layout:fragment="jsScript">
 		<script th:inline="javascript">
-			/*<![CDATA[*/
-			document.addEventListener('DOMContentLoaded', function() {
-				const postForm = document.getElementById('postForm');
-				const postTitleInput = document.getElementById('postTitle');       
-				const postContentTextarea = document.getElementById('postContent'); 
-				const postCategorySelect = document.getElementById('postCategory'); // ID는 postCategory로 유지
-                const submitButton = postForm.querySelector('button[type="submit"]');
+		    /*<![CDATA[*/
+		    document.addEventListener('DOMContentLoaded', function() {
+		        const postForm = document.getElementById('postForm');
+		
+		        // 폼이 존재하는지 먼저 확인하는 것이 안전합니다.
+		        if (postForm) {
+		            // 핵심: 'submit' 이벤트가 발생했을 때(즉, '글 작성' 버튼을 눌렀을 때)만
+		            // 아래의 함수를 실행하도록 이벤트 리스너를 추가합니다.
+		            postForm.addEventListener('submit', function(event) {
+		                
+		                // 브라우저의 기본 동작(페이지 새로고침)을 막습니다.
+		                event.preventDefault(); 
+		
+		                // --- 이제부터 Ajax 코드가 시작됩니다 ---
+		                if (typeof jQuery !== 'undefined') {
+		                    const request = $.ajax({
+		                        url: postForm.getAttribute('action'),
+		                        method: postForm.getAttribute('method'),
+		                        data: $(postForm).serialize()
 
-				if (postForm) {
-					postForm.addEventListener('submit', function(event) {
-						// 유효성 검사
-						if (postTitleInput.value.trim() === '') {
-							alert('제목을 입력해주세요.');
-							event.preventDefault();
-							postTitleInput.focus();
-							return;
-						}
-						if (postContentTextarea.value.trim() === '') {
-							alert('내용을 입력해주세요.');
-							event.preventDefault();
-							postContentTextarea.focus();
-							return;
-						}
-						// 카테고리 선택 유효성 검사 (name="bbsClsfCd" 사용)
-						if (postCategorySelect && postCategorySelect.value === '') {
-							 alert('카테고리를 선택해주세요.');
-							 event.preventDefault();
-							 postCategorySelect.focus();
-							 return;
-						}
-
-						// AJAX 사용 (jQuery 필요)
-						if (typeof jQuery !== 'undefined') {
-							event.preventDefault(); // 기본 폼 제출 방지
-
-							const request = $.ajax({
-								url: postForm.getAttribute('action'),
-								method: postForm.getAttribute('method'),
-								data: $(postForm).serialize(),
-								dataType: 'json'
-							});
-
-							request.done(result => {
-								console.log('AJAX 성공:', result);
-								alert('글이 성공적으로 저장되었습니다.');
-								window.location.href = '/customer/post/postList';
-							});
-
-							request.fail(error => {
-								console.error('AJAX 실패:', error);
-								alert('글 저장 중 오류가 발생했습니다.');
-							});
-						} else {
-							console.error("jQuery is not loaded. Cannot use AJAX. Submitting form normally.");
-						}
-					});
-				}
-			});
-			/*]]>*/
+		                    });
+		
+		                    request.done(result => {
+		                        console.log('AJAX 성공:', result);
+		                        alert('글이 성공적으로 작성되었습니다.');
+		                        // 성공 후, 목록 페이지로 이동합니다.
+		                        window.location.href = '/customer/post/postList'; 
+		                    });
+		
+		                    request.fail(error => {
+		                        console.error('AJAX 실패:', error);
+		                        alert('글 작성 중 오류가 발생했습니다.');
+		                    });
+		                } else {
+		                    console.error("jQuery is not loaded. Cannot use AJAX.");
+		                }
+		            });
+		        }
+		    });
+		    /*]]>*/
 		</script>
 	</th:block>
 
-	<th:block layout:fragment="contents">
-		<div class="page-title-section">
-			<h2 class="page-main-title" th:text="${pageTitle}">새 글 작성</h2>
-			<h5 class="page-subtitle" th:text="${post.pstSn != null && !post.pstSn.isEmpty()} ? '게시글을 수정합니다.' : '게시판에 새로운 글을 작성합니다.'"></h5>
-		</div>
+<th:block layout:fragment="contents"> <!-- 1. "이것이 사진입니다" 라는 라벨 (절대 지우면 안 됨) -->
 
-		<div class="write-form-container">
-			<!-- 
-			    th:object="${post}" : Controller에서 Model에 담은 Post 객체의 이름을 'post'로 지정합니다.
-			    이것이 없으면 th:field는 작동하지 않습니다.
-			    name="bbsClsfCd" 와 th:field="*{bbsClsfCd}" 를 사용하여 Post 객체의 bbsClsfCd 필드와 연결합니다.
-			-->
-			<form id="postForm" th:action="@{/customer/post/postWrite}" method="post" th:object="${post}">
+    <!-- 2. 그 '안에' 변수를 만드는 투명 스티커를 붙입니다. -->
+    <th:block th:with="updateUrl=@{/customer/post/postUpdate}, writeUrl=@{/customer/post/postWrite}">
 
-				<!-- 게시글 번호 (수정 시에만 필요) -->
-				<!-- th:field="*{pstSn}" 은 Post 객체의 pstSn 필드와 자동으로 매핑됩니다. -->
-				<input type="hidden" id="pstSn" th:field="*{pstSn}">
+        <div class="write-form-container ">
+        
+            <div class="page-title-section ">
+                <h2 class="page-main-title" th:text="${post.pstSn != null ? '글 수정' : '글 작성'}"></h2>
+            </div>
+            
+            <!-- 3. 이제 폼에서는 미리 만든 변수를 안전하게 사용합니다. -->
+            <form id="postForm"
+                  th:action="${post.pstSn != null ? updateUrl : writeUrl}"
+                  method="post" 
+                  th:object="${post}">
 
-				<!-- 제목 -->
-				<div class="form-group">
-					<label for="postTitle">제목</label>
-					<!-- th:field="*{pstTtl}" 은 Post 객체의 pstTtl 필드와 매핑됩니다. -->
-					<input type="text" id="postTitle" class="form-control" placeholder="제목을 입력하세요" th:field="*{pstTtl}" required>
-				</div>
+                <!-- 게시글 번호 (수정 시에만 필요) -->
+                <input type="hidden" id="pstSn" th:field="*{pstSn}">
 
-				<!-- 내용 -->
-				<div class="form-group">
-					<label for="postContent">내용</label>
-					<!-- th:field="*{pstCn}" 은 Post 객체의 pstCn 필드와 매핑됩니다. -->
-					<textarea id="postContent" class="form-control" placeholder="내용을 입력하세요" rows="10" required th:field="*{pstCn}"></textarea>
-				</div>
+                <!-- 제목 -->
+                <div class="form-group">
+                    <label for="postTitle">제목</label>
+                    <input type="text" id="postTitle" class="form-control" placeholder="제목을 입력하세요" th:field="*{pstTtl}" required>
+                </div>
 
-				<!-- 카테고리 선택 -->
-				<div class="form-group">
-					<label for="postCategory">카테고리</label>
-					<!-- 
-					    Post 클래스에 'category' 필드는 없지만, 'bbsClsfCd' 필드가 있습니다.
-					    따라서 th:field="*{bbsClsfCd}" 를 사용합니다.
-					    name="bbsClsfCd" 로 변경하여 Controller에서 Post 객체의 bbsClsfCd 필드와 바인딩되도록 합니다.
-					    id는 JavaScript에서 찾기 위해 그대로 postCategory를 사용해도 됩니다.
-					    th:selected도 post.bbsClsfCd 값을 기준으로 처리해야 합니다.
-					-->
-					<select id="postCategory" name="bbsClsfCd" class="form-control" required th:field="*{bbsClsfCd}">
-						<option value="">-- 선택하세요 --</option>
-						<!-- Controller에서 Post 객체의 bbsClsfCd 값을 가지고 selected 처리 -->
-						<option value="freeBoard" th:selected="${post.bbsClsfCd == 'freeBoard'}">자유 게시판</option>
-						<option value="notice" th:selected="${post.bbsClsfCd == 'notice'}">공지 사항</option>
-						<option value="review" th:selected="${post.bbsClsfCd == 'review'}">후기</option>
-					</select>
-				</div>
+                <!-- 내용 -->
+                <div class="form-group">
+                    <label for="postContent">내용</label>
+                    <textarea id="postContent" class="form-control" placeholder="내용을 입력하세요" rows="10" required th:field="*{pstCn}"></textarea>
+                </div>
 
-				<!-- 버튼 영역 -->
-				<div class="form-actions">
-					<button type="submit" class="btn btn-primary">글 작성</button>
-					<button type="button" class="btn btn-secondary" onclick="history.back()">취소</button>
-				</div>
+                <!-- 카테고리 선택 -->
+                <div class="form-group">
+                    <label for="postCategory">카테고리</label>
+                    <select id="postCategory" name="bbsClsfCd" class="form-control" required th:field="*{bbsClsfCd}">
+                        <option value="">-- 선택하세요 --</option>
+                        <option value="freeBoard">자유 게시판</option>
+                        <option value="notice">공지 사항</option>
+                    </select>
+                </div>
 
-			</form>
-		</div>
-	</th:block>
+                <!-- 버튼 영역 -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" th:text="${post.pstSn != null ? '글 수정' : '글 작성'}"></button>
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">취소</button>
+                </div>
+
+            </form>
+        </div>
+        
+    </th:block> <!-- th:with 블록 끝 -->
+
+</th:block> <!-- layout:fragment="contents" 블록 끝 -->
 </html>

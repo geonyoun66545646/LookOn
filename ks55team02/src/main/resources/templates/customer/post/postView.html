@@ -74,8 +74,8 @@
             <a th:href="@{/customer/post/postList(bbsClsfCd=${bbsClsfCd}, page=${currentPage}, size=${size})}" class="btn btn-secondary">목록</a>
             <!-- 수정, 삭제 버튼은 작성자 본인만 보이도록 권한 체크 필요 -->
             <!-- 예시: th:if="${session.loginUser.userId == postDetail.wrtrUserNo}" -->
-            <button type="button" class="btn btn-primary"
-                    th:onclick="'location.href=\'' + @{/customer/post/postEdit/{pstSn}(pstSn=${postDetail.pstSn})} + '\''">수정</button>
+            <a th:href="@{/customer/post/postEdit/{pstSn}(pstSn=${postDetail.pstSn})}"
+  				 class="btn btn-primary">수정</a>
             <button type="button" id="del_btn" class="btn btn-danger"
        				 th:data-delete-url="@{/customer/post/postDelete/{pstSn}(pstSn=${postDetail.pstSn})}">삭제</button>
         </div>

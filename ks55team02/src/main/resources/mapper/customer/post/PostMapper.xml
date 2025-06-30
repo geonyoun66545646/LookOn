@@ -106,6 +106,19 @@
 		)
 	</insert>
 	
+	<update id="updatePost" parameterType="Post">
+		/* 게시글 수정 */
+		UPDATE
+			posts p
+		SET
+			p.bbs_clsf_cd = #{bbsClsfCd},
+			p.pst_ttl = #{pstTtl},
+			p.pst_cn = #{pstCn},
+			p.mdfcn_dt = NOW()
+		WHERE
+			p.pst_sn = #{pstSn}
+	</update>
+	
 	<update id="deletePost" parameterType="String">
 		/* 특정 게시글 삭제 */
 		UPDATE
