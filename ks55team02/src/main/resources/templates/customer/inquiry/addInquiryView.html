@@ -43,11 +43,11 @@
 										            th:value="${option.inquiryOption}"     
 										            th:text="${option.inquiryOption}"></option>
 										</select>
-                                    </td>
-                                    <th scope="row" class="no-shade">첨부파일</th> <td class="file-column">
-                                        <input type="file" class="form-control-file" name="attachedFile">
-                                        <small class="form-text text-muted mt-1">최대 5MB까지 업로드 가능합니다.</small>
-                                    </td>
+                                    <th scope="row" class="no-shade">첨부파일</th>
+<td class="file-column">
+    <input type="file" class="form-control-file" name="attachedFiles" multiple id="attachedFilesInput">
+    <small class="form-text text-muted mt-1">최대 5MB까지 업로드 가능하며, 여러 개 파일 첨부 가능합니다.</small>
+    <div id="filePreviewContainer" class="mt-2"></div> </td>
                                 </tr>
 
                                 <tr class="inquiry-row title-row">
