@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+
+<head>
+    <meta name="description" content="한국스마트정보교육원 ksmybatis" />
+    <title>게시글 목록</title>
+    <!-- CSS 파일 링크는 layoutMain에서 제공될 가능성이 높으므로, 여기에 다시 명시하지 않겠습니다. -->
+    <!-- 만약 layoutMain에서 CSS를 동적으로 추가하지 않는다면, 여기에 추가해야 합니다. -->
+    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postList.css}">
+</head>
+
+<!-- 추가할 js file -->
+<th:block layout:fragment="jsFile">
+    <!-- 필요한 js 파일이 있다면 여기에 추가 -->
+</th:block>
+
+
+<!-- 추가할 script -->
+<th:block layout:fragment="jsScript">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('input[placeholder="검색어를 입력하세요"]');
+            const pageSizeSelect = document.getElementById('pageSizeSelectForm');
+            const bbsClsfCd = /*[[${bbsClsfCd != null ? bbsClsfCd : ''}]]*/ '';
+            const currentPage = /*[[${currentPage}]]*/ 1;
+            const size = /*[[${size}]]*/ 10;
+            const searchKeyword = /*[[${searchKeyword != null ? searchKeyword : ''}]]*/ '';
+            // totalPage 변수도 Controller에서 전달되어야 합니다.
+            const totalPage = /*[[${totalPage}]]*/ 1; // totalPage 값을 가져옵니다.
+
+            // 초기 검색어 값 설정
+            if (searchInput) {
+                searchInput.value = searchKeyword;
+            }
+
+            // Enter 키로 검색 시
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        const searchTerm = searchInput.value.trim();
+                        // 페이지 사이즈 셀렉터가 존재하면 값을 사용하고, 없으면 기본값 사용
+                        const currentSize = pageSizeSelect ? pageSizeSelect.value : size;
+
+                        window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=1&size=${currentSize}&searchKeyword=${searchTerm}`;
+                    }
+                });
+            }
+
+            // 페이지 사이즈 변경 시
+            if (pageSizeSelect) {
+                pageSizeSelect.addEventListener('change', function() {
+                    // 현재 검색어가 있다면 사용하고, 없다면 기본값 사용
+                    const searchTerm = searchInput ? searchInput.value.trim() : searchKeyword;
+                    const currentSize = this.value;
+
+                    // 페이지 사이즈 변경 시 첫 페이지로 이동하며 검색어 유지
+                    window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=1&size=${currentSize}&searchKeyword=${searchTerm}`;
+                });
+            }
+
+            // 페이지네이션 링크 클릭 이벤트
+            document.querySelectorAll('.pagination .page-link').forEach(link => {
+                // '이전', '다음' 버튼의 href를 파싱하는 것보다, 직접 currentPage와 totalPage를 사용하는 것이 더 안전합니다.
+                // 만약 '이전', '다음' 버튼이 <a> 태그에 직접적인 href를 가지고 있다면, 해당 href를 그대로 사용해도 됩니다.
+                // 하지만 여기서는 JS에서 제어하기 위해 currentPage, totalPage 변수를 활용하는 예시를 보여드리겠습니다.
+
+                link.addEventListener('click', function(event) {
+                    // '이전' 버튼인지 확인
+                    if (this.querySelector('.md-chevron_left')) {
+                        const prevPage = currentPage - 1;
+                        if (prevPage >= 1) { // 이전 페이지가 유효한 경우
+                            event.preventDefault(); // 기본 링크 동작 방지
+                            // 검색어, 페이지 사이즈 유지하며 이전 페이지로 이동
+                            window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=${prevPage}&size=${size}&searchKeyword=${searchKeyword}`;
+                        } else {
+                            // 이전 페이지가 유효하지 않은 경우 (disabled 상태여야 함)
+                            event.preventDefault(); // 클릭 방지
+                        }
+                        return; // 이후 이벤트 중단
+                    }
+
+                    // '다음' 버튼인지 확인
+                    if (this.querySelector('.md-chevron_right')) {
+                        const nextPage = currentPage + 1;
+                        if (nextPage <= totalPage) { // 다음 페이지가 유효한 경우
+                            event.preventDefault(); // 기본 링크 동작 방지
+                            // 검색어, 페이지 사이즈 유지하며 다음 페이지로 이동
+                            window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=${nextPage}&size=${size}&searchKeyword=${searchKeyword}`;
+                        } else {
+                            // 다음 페이지가 유효하지 않은 경우 (disabled 상태여야 함)
+                            event.preventDefault(); // 클릭 방지
+                        }
+                        return; // 이후 이벤트 중단
+                    }
+
+                    // 일반 페이지 번호 링크인 경우
+                    const targetPage = this.getAttribute('href').split('page=')[1].split('&')[0];
+                    if (targetPage && !isNaN(targetPage)) { // 페이지 번호가 유효하면
+                        event.preventDefault(); // 기본 링크 동작 방지
+                        // 검색어, 페이지 사이즈 유지하며 해당 페이지로 이동
+                        window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=${targetPage}&size=${size}&searchKeyword=${searchKeyword}`;
+                    }
+                    // 만약 targetPage를 파싱할 수 없으면 기본 링크 동작을 허용할 수도 있음
+                });
+            });
+        });
+        /*]]>*/
+    </script>
+</th:block>
+
+<!-- 추가할 페이지 contents -->
+<th:block layout:fragment="contents">
+    <!-- 사진 2처럼 페이지 타이틀이 나오는 부분을 가정하고 div로 감쌌습니다 -->
+	<div class="container">
+	    <div class="page-title-section">
+	        <h2 th:text="${board != null ? board.bbsNm : '전체게시판'}" class="page-main-title">전체게시판</h2>
+	        <h5 class="page-subtitle">게시판의 모든 게시글</h5>
+	    </div>
+	
+	    <div class="card mb-4">
+	        <!-- card-header end// -->
+	        <div class="card-body">
+	            <div class="table-responsive">
+	                <table class="table table-hover">
+	                    <thead>
+	                        <tr>
+	                            <th scope="col">게시글일련번호</th>
+	                            <th scope="col">게시글제목</th>
+	                            <th scope="col">작성자</th> <!-- 작성자사용자번호 대신 '작성자'로 표시 -->
+	                            <th scope="col">조회수</th>
+	                            <th scope="col">생성일시</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                        <th:block th:if="${!#lists.isEmpty(postList)}">
+	                            <tr th:each="p : ${postList}">
+	                                <td th:text="${p.pstSn}">게시글일련번호</td>
+	                                <td class="post-title-cell"> <!-- 제목 셀에 클래스 추가 -->
+	                                    <a th:text="${p.pstTtl}"
+	                                       th:href="@{/customer/post/postView(pstSn=${p.pstSn}, bbsClsfCd=${bbsClsfCd}, page=${currentPage}, size=${size})}"
+	                                       class="post-title-link">게시글제목</a>
+	                                </td>
+	                                <td th:text="${p.wrtrUserNo}">작성자사용자번호</td>
+	                                <td th:text="${p.inqCnt}">조회수</td>
+	                                <td th:text="${p.crtDt}">생성일시</td>
+	                            </tr>
+	                        </th:block>
+	                        <tr th:unless="${!#lists.isEmpty(postList)}">
+	                            <td colspan="5">게시글이 존재하지 않습니다.</td> <!-- colspan은 테이블 헤더 개수에 맞게 조정 -->
+	                        </tr>
+	                    </tbody>
+	                </table>
+	            </div>
+	            <!-- table-responsive //end -->
+	        </div>
+	        <!-- card-body end// -->
+	
+	        <div class="content-footer-action">
+	            <button type="button" class="btn-write-post" th:onclick="location.href='/customer/post/postWrite'">글 작성</button>
+	        </div>
+	    </div>
+	    <!-- card end// -->
+	
+	    <!-- 페이지네이션 영역 -->
+	    <div class="pagination-area">
+	        <nav aria-label="Page navigation">
+	            <ul class="pagination justify-content-center"> <!-- 중앙 정렬 -->
+	                <!-- 이전 페이지 버튼 -->
+	                <li class="page-item" th:classappend="${currentPage <= 1 ? 'disabled' : ''}">
+	                    <a class="page-link"
+	                       th:href="${currentPage <= 1} ? '#' : @{/customer/post/postList(bbsClsfCd=${bbsClsfCd != null ? bbsClsfCd : ''}, page=${currentPage - 1}, size=${size})}"
+	                       tabindex="-1"
+	                       aria-disabled="${currentPage <= 1}">
+	                        <i class="material-icons md-chevron_left"></i> 이전
+	                    </a>
+	                </li>
+	
+	                <!-- 페이지 번호 링크 -->
+	                <th:block th:each="pageNumber : ${#numbers.sequence(1, totalPage)}">
+	                    <li class="page-item" th:classappend="${pageNumber == currentPage ? 'active' : ''}">
+	                        <a class="page-link"
+	                           th:href="@{/customer/post/postList(bbsClsfCd=${bbsClsfCd != null ? bbsClsfCd : ''}, page=${pageNumber}, size=${size})}"
+	                           th:text="${pageNumber}">
+	                        </a>
+	                    </li>
+	                </th:block>
+	
+	                <!-- 다음 페이지 버튼 -->
+	                <li class="page-item" th:classappend="${currentPage >= totalPage ? 'disabled' : ''}">
+	                    <a class="page-link"
+	                       th:href="${currentPage >= totalPage} ? '#' : @{/customer/post/postList(bbsClsfCd=${bbsClsfCd != null ? bbsClsfCd : ''}, page=${currentPage + 1}, size=${size})}"
+	                       aria-disabled="${currentPage >= totalPage}">
+	                        다음 <i class="material-icons md-chevron_right"></i>
+	                    </a>
+	                </li>
+	            </ul>
+	        </nav>
+	    </div>
+	    
+		<!-- 페이지네이션 하단에 검색창과 페이지 사이즈 선택기를 배치 -->
+		<div class="lower-controls-container">
+			<div class="search-container col-lg-6 col-md-8"> <!-- col-lg-6, col-md-8 등 너비 조정 -->
+				<input type="text" placeholder="검색어를 입력하세요" class="form-control search-input" />
+			</div>
+			
+			<!-- 페이지 사이즈 선택 폼 (이것이 실제로 작동하도록 유지) -->
+			<div class="pagesize-container col-lg-2 col-6 col-md-3">
+				<label for="pageSizeSelectForm" class="form-label me-2">페이지당:</label>
+				<select id="pageSizeSelectForm" name="size" class="form-select form-select-sm me-2" onchange="this.form.submit()">
+					<option value="10" th:selected="${size == 10}">10개</option>
+					<option value="15" th:selected="${size == 15}">15개</option>
+					<option value="20" th:selected="${size == 20}">20개</option>
+				</select>
+				<label>개</label>
+			</div>
+		</div>
+	    
+	</div>
+</th:block>
+
+</html>
