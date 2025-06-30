@@ -28,9 +28,9 @@ public class InquiryServiceImpl implements InquiryService {
 	}
 	// 질문 세부
 	@Override
-	public List<Inquiry> getInquiryDetail() {
-		List<Inquiry> inquiryDetail= inquiryMapper.getInquiryDetail();
-		return inquiryDetail;
+	public Inquiry getInquiryById(String inquiryId) {
+		// TODO Auto-generated method stub
+		return inquiryMapper.getInquiryById(inquiryId);
 	}
 
 	// 질문 등록

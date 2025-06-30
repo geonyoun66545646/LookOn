@@ -20,7 +20,7 @@
 		<result column ="del_user_no"        	property="delUserNo"/> 			<!-- 삭제(비활성)한 관리자 번호 -->
 		<result column ="del_actvtn_yn"       	property="delActvtnYn"/> 		<!-- 삭제 활성 여부 -->
 	</resultMap>
-		<select id= "getInquiryDetail" resultMap="inquiryResultMap"> 
+		<select id= "getInquiryById" resultMap="inquiryResultMap"> 
 		SELECT 
 			inqry_id, 
 			inqry_type_cd, 
@@ -38,12 +38,14 @@
 			del_user_no, 
 			del_actvtn_yn
 		FROM 
-			inquiries;
+			inquiries
+		where
+			inqry_id = #{inquiryId}
 		</select>
 		
 		<select id= "getInquiryList" resultMap="inquiryResultMap">
 			SELECT 
-				CAST(REGEXP_REPLACE(inqry_id, '[^0-9]', '') AS UNSIGNED) AS inqry_id,
+				inqry_id,
 				inqry_type_cd, 
 				inqry_trgt_type_cd, 
 				wrtr_id, 

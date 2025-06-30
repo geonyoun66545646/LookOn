@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import ks55team02.customer.inquiry.domain.Inquiry;
 import ks55team02.customer.inquiry.domain.InquiryOption;
@@ -34,12 +36,12 @@ public class InquiryController {
 	
 	// 문의 상세
 	@GetMapping("/inquiryDetail")
-	public String inquiryView(Model model) {
+	public String getInquiryDetail(@RequestParam("inquiryId")String inquiryId, Model model) {
 		
-		List<Inquiry> inquiryDetail = inquiryService.getInquiryDetail();
+		Inquiry inquiry = inquiryService.getInquiryById(inquiryId);
 		
 		model.addAttribute("title","특정 문의 조회");
-		model.addAttribute("inquiryDetail", inquiryDetail);
+		model.addAttribute("inquiry", inquiry);
 
 		return "customer/inquiry/inquiryDetailView";
 	}
@@ -55,6 +57,7 @@ public class InquiryController {
 
 		// 문의 등록 POST 요청
 		// "/addInquiry" 폼의 th:action 과 일치
+	@ResponseBody
 	@PostMapping("/addInquiry")
 	public ResponseEntity<Map<String, Object>> addInquiry(Inquiry inquiry) {
 		log.info("AJAX 요청 수신된 문의 정보 (전체): {}", inquiry);

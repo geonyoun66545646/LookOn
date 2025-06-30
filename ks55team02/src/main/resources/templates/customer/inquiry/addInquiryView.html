@@ -118,30 +118,22 @@
                 body : formData
                }) 
                .then(response =>{
-            	   console.log("1단계: 응답 받음. response.ok:", response.ok);
 					if(!response.ok){
-						console.log("2단계 (오류): 응답이 OK가 아님. JSON 파싱 시도.");
 						return response.json().then(err=>{
-							console.error("2.1단계 (오류): 서버에서 받은 오류 응답:", err);
 							throw new Error(err.message || `HTTP error! status: ${response.status}`);
 						});
 					}
-					 console.log("2단계 (성공): 응답이 OK. JSON 파싱 시도.");
 					return response.json();
             })
 				.then(data=>{
-					 console.log("3단계: JSON 데이터 파싱 완료:", data);
 					if(data.status ==='success'){
-						console.log("4단계 (성공): data.status === 'success'");
 						alert(data.message);
 						window.location.href = '/customer/inquiry/inquiryList';
 					}else{
-						console.log("4단계 (실패): data.status !== 'success'");
 						alert('문의 등록 실패'+(data.message || '오류발생'));
 					}
 				})
 				.catch(error => {
-					console.error('오류 발생',error);
 					alert('오류! 잠시 후 다시 시도해주세요.');
             });
             });

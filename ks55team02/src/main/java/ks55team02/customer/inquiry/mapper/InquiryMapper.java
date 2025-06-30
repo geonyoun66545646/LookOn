@@ -15,7 +15,7 @@ public interface InquiryMapper {
 	int getInquiryCount();
 		
 	// 문의 상세 
-	List<Inquiry> getInquiryDetail();
+	Inquiry getInquiryById(String inquiryId);
 	
 	// 문의 등록
 	int addInquiry(Inquiry inquiry); 

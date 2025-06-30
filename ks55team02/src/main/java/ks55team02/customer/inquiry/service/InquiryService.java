@@ -12,7 +12,7 @@ public interface InquiryService {
 	List<Inquiry> getInquiryList();
 	
 	// 문의 상세 
-	List<Inquiry> getInquiryDetail();
+	Inquiry getInquiryById(String inquiryId);
 	
 	//문의 등록
 	void addInquiry(Inquiry inquiry);

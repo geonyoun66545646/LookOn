@@ -22,4 +22,15 @@ public class Inquiry {
 	private Date 	delDt;
 	private String 	delUserNo;
 	private boolean delActvtnYn;
+
+
+	   // ----- 추가할 메서드 (inq_ 제거) -----
+    public String getInqryIdNum() {
+        if (this.inqryId == null) {
+            return null;
+        }
+        // 'inq_' 접두사를 제거하고 숫자 부분만 반환
+        return this.inqryId.replaceFirst("inq_", "");
+    }
+    // -----------------------
 }

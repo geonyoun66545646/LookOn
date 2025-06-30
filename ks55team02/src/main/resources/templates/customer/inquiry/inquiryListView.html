@@ -43,9 +43,11 @@
                         <tbody>
                             <tr th:if="${not #lists.isEmpty(inquiryList)}"
                                 th:each="l:${inquiryList}">
-                                <td th:text="${l.inqryId}"></td>
+                                <td th:text="${l.InqryIdNum}"></td>
                                 <td th:text="${l.prvtYn ? '🔒' : ''}"></td>
-                                <td th:text="${l.inqryTtl}"></td>
+                                <td>
+                                <a th:href="@{/customer/inquiry/inquiryDetail(inquiryId=${l.inqryId})}" th:text="${l.inqryTtl}"></a>
+                                 </td>
                                 <td th:text="${l.inqryTypeCd}"></td>
                                 <td th:text="${l.prcsStts}"></td>
                                 <td th:text="${l.wrtrId}"></td>
