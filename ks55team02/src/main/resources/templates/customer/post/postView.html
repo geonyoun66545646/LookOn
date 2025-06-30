@@ -19,10 +19,9 @@
 <th:block layout:fragment="jsScript">
     <script>
 		// 게시글 삭제
-
 		$(document).ready(function() {
 		    $('#del_btn').on('click', function(e) {
-		        e.preventDefault(); // <button>의 기본 동작을 막습니다.
+		        e.preventDefault();
 		
 		        // data-delete-url 속성에 저장해둔 URL을 가져옵니다.
 		        const deleteUrl = $(this).data('delete-url');
