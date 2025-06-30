@@ -1,6 +1,8 @@
 package ks55team02.customer.inquiry.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,8 @@ import lombok.extern.log4j.Log4j2;
 public class InquiryServiceImpl implements InquiryService {
 
 	private final InquiryMapper inquiryMapper;
+	
+	
 
 	// 질문 목록
 	@Override
@@ -67,4 +71,33 @@ public class InquiryServiceImpl implements InquiryService {
 			throw new RuntimeException("문의 등록 중 알 수 없는 오류가 발생했습니다.");
 		}
 	}
-}
+	
+	@Override
+	public Map<String, Object> getInquiryList(int currentPage, int pageSize) {
+		// 1. 전체 문의 개수 조회
+				int totalRows = inquiryMapper.getTotalInquiryCount();
+				log.info("총 문의 개수: {}", totalRows);
+
+				// 2. 시작 인덱스 계산
+				int startRow = (currentPage - 1) * pageSize;
+				if (startRow < 0) { // 혹시 모를 음수 방지
+				    startRow = 0;
+				}
+				log.info("시작 행 (startRow): {}", startRow);
+
+				// 3. 페이징된 문의 목록 조회
+				List<Inquiry> inquiryList = inquiryMapper.getInquiryListPaging(startRow, pageSize);
+				log.info("조회된 문의 목록 항목 수: {}", inquiryList.size());
+
+
+				// 4. 반환할 데이터 Map 생성
+				Map<String, Object> resultMap = new HashMap<>();
+				resultMap.put("inquiryList", inquiryList);
+				resultMap.put("totalRows", totalRows);
+				resultMap.put("currentPage", currentPage);
+				resultMap.put("pageSize", pageSize);
+
+				return resultMap;
+			}
+	}
+	

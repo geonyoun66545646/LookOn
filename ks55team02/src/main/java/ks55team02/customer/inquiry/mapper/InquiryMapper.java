@@ -3,6 +3,7 @@ package ks55team02.customer.inquiry.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import ks55team02.customer.inquiry.domain.Inquiry;
 
@@ -22,5 +23,11 @@ public interface InquiryMapper {
 	
 	// 조회 아이디중 가장 큰 값
 	String getMaxInquiryId(); 
+	
+	// 전체 문의 개수 조회
+    int getTotalInquiryCount();
 
+    // 페이징 처리된 문의 목록 조회
+    List<Inquiry> getInquiryListPaging(@Param("startRow") int startRow, @Param("pageSize") int pageSize);
 }
+

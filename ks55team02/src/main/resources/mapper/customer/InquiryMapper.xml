@@ -65,7 +65,7 @@
 			ORDER BY 
 				cast(REGEXP_REPLACE(inqry_id, '[^0-9]', '') as UNSIGNED) desc,
 				reg_ymd asc
-				limit 15;
+				LIMIT #{pageSize} OFFSET #{startRow};
 		</select>
 		
 		<insert id="addInquiry" parameterType="Inquiry">
@@ -98,6 +98,26 @@
 		        SUBSTRING(inqry_id, 5) 
 		        REGEXP '^[0-9]+$'; 
         </select>
+        <select id="getTotalInquiryCount" resultType="int">
+        SELECT COUNT(*) FROM inquiries
+    </select>
+
+    <select id="getInquiryListPaging" resultType="ks55team02.customer.inquiry.domain.Inquiry">
+        SELECT
+            inqry_id AS inqryId,
+            inqry_type_cd AS inqryTypeCd,
+            prvt_yn AS prvtYn,
+            inqry_ttl AS inqryTtl,
+            prcs_stts AS prcsStts,
+            wrtr_id AS wrtrId,
+            reg_ymd AS regYmd,
+            -- 추가로 필요한 컬럼이 있다면 여기에 추가
+            (SELECT COUNT(*) FROM inquiries WHERE inqry_id &lt;= i.inqry_id) AS InqryIdNum
+        FROM inquiries i
+        ORDER BY reg_ymd DESC, inqry_id DESC
+        LIMIT #{pageSize} OFFSET #{startRow}
+    </select>
+        
     
 
  	 </mapper>
