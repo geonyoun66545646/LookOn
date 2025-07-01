@@ -19,46 +19,28 @@
 	<!-- 추가할 script -->
 	<th:block layout:fragment="jsScript">
 		<script th:inline="javascript">
-		    /*<![CDATA[*/
-		    document.addEventListener('DOMContentLoaded', function() {
-		        const postForm = document.getElementById('postForm');
-		
-		        // 폼이 존재하는지 먼저 확인하는 것이 안전합니다.
-		        if (postForm) {
-		            // 핵심: 'submit' 이벤트가 발생했을 때(즉, '글 작성' 버튼을 눌렀을 때)만
-		            // 아래의 함수를 실행하도록 이벤트 리스너를 추가합니다.
-		            postForm.addEventListener('submit', function(event) {
-		                
-		                // 브라우저의 기본 동작(페이지 새로고침)을 막습니다.
-		                event.preventDefault(); 
-		
-		                // --- 이제부터 Ajax 코드가 시작됩니다 ---
-		                if (typeof jQuery !== 'undefined') {
-		                    const request = $.ajax({
-		                        url: postForm.getAttribute('action'),
-		                        method: postForm.getAttribute('method'),
-		                        data: $(postForm).serialize()
-
-		                    });
-		
-		                    request.done(result => {
-		                        console.log('AJAX 성공:', result);
-		                        alert('글이 성공적으로 작성되었습니다.');
-		                        // 성공 후, 목록 페이지로 이동합니다.
-		                        window.location.href = '/customer/post/postList'; 
-		                    });
-		
-		                    request.fail(error => {
-		                        console.error('AJAX 실패:', error);
-		                        alert('글 작성 중 오류가 발생했습니다.');
-		                    });
-		                } else {
-		                    console.error("jQuery is not loaded. Cannot use AJAX.");
-		                }
-		            });
-		        }
-		    });
-		    /*]]>*/
+			// 게시글 작성 ajax 스크립트
+			$(() => {
+			    const $postForm = $('#postForm');
+			
+			    if ($postForm.length) {
+			        $postForm.on('submit', e => {
+			            e.preventDefault();
+			
+			            $.ajax({
+			                url: $postForm.attr('action'),
+			                method: $postForm.attr('method'),
+			                data: $postForm.serialize()
+			            }).done(result => {
+			                alert('글이 성공적으로 작성되었습니다.');
+			                window.location.href = '/customer/post/postList';
+			            }).fail(error => {
+			                console.error('AJAX 실패:', error);
+			                alert('글 작성 중 오류가 발생했습니다.');
+			            });
+			        });
+			    }
+			});
 		</script>
 	</th:block>
 
@@ -98,9 +80,10 @@
                 <div class="form-group">
                     <label for="postCategory">카테고리</label>
                     <select id="postCategory" name="bbsClsfCd" class="form-control" required th:field="*{bbsClsfCd}">
-                        <option value="">-- 선택하세요 --</option>
-                        <option value="freeBoard">자유 게시판</option>
-                        <option value="notice">공지 사항</option>
+                    	<option value="">---게시판 선택---</option>
+ 						<option th:each="b : ${boardList}"
+ 								th:value="${b.bbsClsfCd}"
+ 								th:text="${b.bbsNm}"></option>
                     </select>
                 </div>
 

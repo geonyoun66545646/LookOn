@@ -22,6 +22,9 @@ public interface PostMapper {
 	// 특정 게시글 상세 조회
 	Post selectPostDetailByPostSn(String pstSn);
 	
+	// 게시글 일련번호 생성
+	Integer selectMaxPostNumber();
+	
 	// 게시글 등록
 	int insertPost(Post post);
 	

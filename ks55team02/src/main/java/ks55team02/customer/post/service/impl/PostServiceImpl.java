@@ -42,6 +42,11 @@ public class PostServiceImpl implements PostService {
 	// 게시글 등록
 	@Override
 	public void insertPost(Post post) {
+		Integer postMaxNum = postMapper.selectMaxPostNumber();
+		int nextNum = postMaxNum + 1;
+		String newPostNum = String.format("post_%d", nextNum);
+		post.setPstSn(newPostNum);
+		
 		int result = postMapper.insertPost(post);
 		String insertResult = "게시글 등록 실패";
 		if(result > 0) insertResult = "게시글 등록 성공";

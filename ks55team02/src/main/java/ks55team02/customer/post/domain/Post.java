@@ -1,5 +1,8 @@
 package ks55team02.customer.post.domain;
 
+import java.time.LocalDateTime;
+
+import ks55team02.admin.adminpage.useradmin.userlist.domain.UserList;
 import lombok.Data;
 
 @Data
@@ -11,7 +14,9 @@ public class Post {
 	private String pstCn;
 	private String inqCnt;
 	private String ntcPstYn;
-	private String crtDt;
-	private String mdfcnDt;
-	private String delDt;
+	private LocalDateTime crtDt;
+	private LocalDateTime mdfcnDt;
+	private LocalDateTime delDt;
+	
+	private UserList userInfo;
 }

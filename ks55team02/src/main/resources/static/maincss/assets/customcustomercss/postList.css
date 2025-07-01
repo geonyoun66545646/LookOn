@@ -12,6 +12,25 @@ body {
     max-width: 900px; /* 컨텐츠 영역을 조금 좁혀서 집중도 높임 */
 }
 
+.board-tabs-container {
+	overflow-x: auto;
+	cursor: grab;
+	user-select: none;
+	&::-webkit-scrollbar {
+	    display: none;
+	}
+}
+
+.nav-tabs {
+	flex-wrap: nowrap;
+    white-space: nowrap;
+    border-bottom: none;
+}
+
+.board-tabs-container .nav-tabs .nav-link {
+	-webkit-user-drag: none;
+}
+
 /* 2. 불필요한 요소 숨기기 */
 .page-subtitle,                 /* "게시판의 모든 게시글" 부제목 숨기기 */
 .lower-controls-container {     /* 하단 검색창 및 페이지 선택기 숨기기 */
@@ -22,6 +41,8 @@ body {
 .page-title-section {
     border-bottom: none;
     padding: 20px 0 10px 0;
+    text-align: center;
+    margin: 15px;
 }
 .page-main-title {
     font-size: 22px;

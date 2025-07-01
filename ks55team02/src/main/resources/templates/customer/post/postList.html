@@ -19,97 +19,60 @@
 
 <!-- 추가할 script -->
 <th:block layout:fragment="jsScript">
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.querySelector('input[placeholder="검색어를 입력하세요"]');
-            const pageSizeSelect = document.getElementById('pageSizeSelectForm');
-            const bbsClsfCd = /*[[${bbsClsfCd != null ? bbsClsfCd : ''}]]*/ '';
-            const currentPage = /*[[${currentPage}]]*/ 1;
-            const size = /*[[${size}]]*/ 10;
-            const searchKeyword = /*[[${searchKeyword != null ? searchKeyword : ''}]]*/ '';
-            // totalPage 변수도 Controller에서 전달되어야 합니다.
-            const totalPage = /*[[${totalPage}]]*/ 1; // totalPage 값을 가져옵니다.
-
-            // 초기 검색어 값 설정
-            if (searchInput) {
-                searchInput.value = searchKeyword;
-            }
-
-            // Enter 키로 검색 시
-            if (searchInput) {
-                searchInput.addEventListener('keypress', function(event) {
-                    if (event.key === 'Enter') {
-                        event.preventDefault();
-                        const searchTerm = searchInput.value.trim();
-                        // 페이지 사이즈 셀렉터가 존재하면 값을 사용하고, 없으면 기본값 사용
-                        const currentSize = pageSizeSelect ? pageSizeSelect.value : size;
-
-                        window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=1&size=${currentSize}&searchKeyword=${searchTerm}`;
-                    }
-                });
-            }
-
-            // 페이지 사이즈 변경 시
-            if (pageSizeSelect) {
-                pageSizeSelect.addEventListener('change', function() {
-                    // 현재 검색어가 있다면 사용하고, 없다면 기본값 사용
-                    const searchTerm = searchInput ? searchInput.value.trim() : searchKeyword;
-                    const currentSize = this.value;
-
-                    // 페이지 사이즈 변경 시 첫 페이지로 이동하며 검색어 유지
-                    window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=1&size=${currentSize}&searchKeyword=${searchTerm}`;
-                });
-            }
-
-            // 페이지네이션 링크 클릭 이벤트
-            document.querySelectorAll('.pagination .page-link').forEach(link => {
-                // '이전', '다음' 버튼의 href를 파싱하는 것보다, 직접 currentPage와 totalPage를 사용하는 것이 더 안전합니다.
-                // 만약 '이전', '다음' 버튼이 <a> 태그에 직접적인 href를 가지고 있다면, 해당 href를 그대로 사용해도 됩니다.
-                // 하지만 여기서는 JS에서 제어하기 위해 currentPage, totalPage 변수를 활용하는 예시를 보여드리겠습니다.
-
-                link.addEventListener('click', function(event) {
-                    // '이전' 버튼인지 확인
-                    if (this.querySelector('.md-chevron_left')) {
-                        const prevPage = currentPage - 1;
-                        if (prevPage >= 1) { // 이전 페이지가 유효한 경우
-                            event.preventDefault(); // 기본 링크 동작 방지
-                            // 검색어, 페이지 사이즈 유지하며 이전 페이지로 이동
-                            window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=${prevPage}&size=${size}&searchKeyword=${searchKeyword}`;
-                        } else {
-                            // 이전 페이지가 유효하지 않은 경우 (disabled 상태여야 함)
-                            event.preventDefault(); // 클릭 방지
-                        }
-                        return; // 이후 이벤트 중단
-                    }
-
-                    // '다음' 버튼인지 확인
-                    if (this.querySelector('.md-chevron_right')) {
-                        const nextPage = currentPage + 1;
-                        if (nextPage <= totalPage) { // 다음 페이지가 유효한 경우
-                            event.preventDefault(); // 기본 링크 동작 방지
-                            // 검색어, 페이지 사이즈 유지하며 다음 페이지로 이동
-                            window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=${nextPage}&size=${size}&searchKeyword=${searchKeyword}`;
-                        } else {
-                            // 다음 페이지가 유효하지 않은 경우 (disabled 상태여야 함)
-                            event.preventDefault(); // 클릭 방지
-                        }
-                        return; // 이후 이벤트 중단
-                    }
-
-                    // 일반 페이지 번호 링크인 경우
-                    const targetPage = this.getAttribute('href').split('page=')[1].split('&')[0];
-                    if (targetPage && !isNaN(targetPage)) { // 페이지 번호가 유효하면
-                        event.preventDefault(); // 기본 링크 동작 방지
-                        // 검색어, 페이지 사이즈 유지하며 해당 페이지로 이동
-                        window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=${targetPage}&size=${size}&searchKeyword=${searchKeyword}`;
-                    }
-                    // 만약 targetPage를 파싱할 수 없으면 기본 링크 동작을 허용할 수도 있음
-                });
-            });
-        });
-        /*]]>*/
-    </script>
+	<script th:inline="javascript">
+		$(() => {
+		
+		    // --- 상수 선언 ---
+		    const $searchInput = $('input[placeholder="검색어를 입력하세요"]');
+		    const $pageSizeSelect = $('#pageSizeSelectForm');
+		    const $tabsContainer = $('.board-tabs-container');
+		    const bbsClsfCd = '';
+		    const size = 10;
+		    const searchKeyword = '';
+		
+		    // --- 검색 기능 초기화 ---
+		    if($searchInput.length) {
+		        $searchInput.val(searchKeyword);
+		        $searchInput.on('keypress', e => {
+		            if(e.key === 'Enter') {
+		                e.preventDefault();
+		                const searchTerm = $searchInput.val().trim();
+		                const currentSize = $pageSizeSelect.length ? $pageSizeSelect.val() : size;
+		                window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=1&size=${currentSize}&searchKeyword=${searchTerm}`;
+		            }
+		        });
+		    }
+		
+		    // --- 페이지 사이즈 변경 기능 ---
+		    if($pageSizeSelect.length) {
+		        $pageSizeSelect.on('change', e => {
+		            const searchTerm = $searchInput.length ? $searchInput.val().trim() : searchKeyword;
+		            window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=1&size=${$(e.target).val()}&searchKeyword=${searchTerm}`;
+		        });
+		    }
+		
+		    // --- 탭 드래그 스크롤 기능 ---
+		    if($tabsContainer.length) {
+		        let isDown = false, startX, scrollLeft;
+		
+		        $tabsContainer.on('mousedown', e => {
+		            isDown = true;
+		            $tabsContainer.addClass('active');
+		            startX = e.pageX - $tabsContainer.offset().left;
+		            scrollLeft = $tabsContainer.scrollLeft();
+		        }).on('mouseleave mouseup', () => {
+		            isDown = false;
+		            $tabsContainer.removeClass('active');
+		        }).on('mousemove', e => {
+		            if(!isDown) return;
+		            e.preventDefault();
+		            const x = e.pageX - $tabsContainer.offset().left;
+		            const walk = (x - startX) * 2.5;
+		            $tabsContainer.scrollLeft(scrollLeft - walk);
+		        });
+		    }
+		});
+	</script>
 </th:block>
 
 <!-- 추가할 페이지 contents -->
@@ -117,10 +80,28 @@
     <!-- 사진 2처럼 페이지 타이틀이 나오는 부분을 가정하고 div로 감쌌습니다 -->
 	<div class="container">
 	    <div class="page-title-section">
-	        <h2 th:text="${board != null ? board.bbsNm : '전체게시판'}" class="page-main-title">전체게시판</h2>
+	        <h2 th:text="${boardName}" class="page-main-title">게시판 이름</h2>
 	        <h5 class="page-subtitle">게시판의 모든 게시글</h5>
 	    </div>
 	
+		<!-- 카테고리 탭 -->
+		<div class="board-tabs-container"  id="tabsContainer">
+			<ul class="nav nav-tabs">
+				<li class="nav-item">
+					<a	class="nav-link"
+						th:href="@{/customer/post/postList}"
+						th:classappend="${bbsClsfCd == null || bbsClsfCd == '' ? 'active' : ''}">전체</a>
+				</li>
+
+				<li class="nav-item" th:each="b : ${boardList}">
+					<a	class="nav-link"
+						th:href="@{/customer/post/postList(bbsClsfCd=${b.bbsClsfCd})}"
+						th:text="${b.bbsNm}"
+						th:classappend="${bbsClsfCd == b.bbsClsfCd ? 'active' : ''}">게시판 이름</a>
+				</li>
+			</ul>
+		</div>
+		
 	    <div class="card mb-4">
 	        <!-- card-header end// -->
 	        <div class="card-body">
@@ -144,9 +125,11 @@
 	                                       th:href="@{/customer/post/postView(pstSn=${p.pstSn}, bbsClsfCd=${bbsClsfCd}, page=${currentPage}, size=${size})}"
 	                                       class="post-title-link">게시글제목</a>
 	                                </td>
-	                                <td th:text="${p.wrtrUserNo}">작성자사용자번호</td>
+	                                <td th:text="${p.userInfo.userNcnm}">작성자</td>
 	                                <td th:text="${p.inqCnt}">조회수</td>
-	                                <td th:text="${p.crtDt}">생성일시</td>
+	                                <td th:text="${ #temporals.format(p.crtDt, 'yyyy-MM-dd') == #temporals.format(#temporals.createNow(), 'yyyy-MM-dd') 
+												? #temporals.format(p.crtDt, 'HH:mm:ss') 
+												: #temporals.format(p.crtDt, 'yy-MM-dd') }">생성일시</td>
 	                            </tr>
 	                        </th:block>
 	                        <tr th:unless="${!#lists.isEmpty(postList)}">

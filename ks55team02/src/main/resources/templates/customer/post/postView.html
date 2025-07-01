@@ -17,34 +17,31 @@
 
 <!-- 추가할 script -->
 <th:block layout:fragment="jsScript">
-    <script>
+	<script>
 		// 게시글 삭제
-		$(document).ready(function() {
-		    $('#del_btn').on('click', function(e) {
+		$(() => {
+		    $('#del_btn').on('click', e => {
 		        e.preventDefault();
-		
-		        // data-delete-url 속성에 저장해둔 URL을 가져옵니다.
-		        const deleteUrl = $(this).data('delete-url');
-		
-		        if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+		        
+		        if(!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
 		            return;
 		        }
 		
+		        const deleteUrl = $(e.currentTarget).data('delete-url');
+		
 		        $.ajax({
 		            url: deleteUrl,
-		            type: 'DELETE', // method: 'DELETE' 라고 써도 됩니다.
-		            success: function(result) {
-		                alert('게시글이 삭제되었습니다.');
-		                location.href = '/customer/post/postList'; // 목록 페이지로 이동
-		            },
-		            error: function(xhr, status, error) {
-		                console.error("삭제 실패: ", error);
-		                alert('삭제에 실패했습니다.');
-		            }
+		            type: 'DELETE'
+		        }).done(result => {
+		            alert('게시글이 삭제되었습니다.');
+		            location.href = '/customer/post/postList';
+		        }).fail(error => {
+		            console.error("삭제 실패: ", error);
+		            alert('삭제에 실패했습니다.');
 		        });
 		    });
 		});
-    </script>
+	</script>
 </th:block>
 
 <th:block layout:fragment="contents">

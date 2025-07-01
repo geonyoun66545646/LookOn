@@ -1,5 +1,7 @@
 package ks55team02.customer.post.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import ks55team02.customer.board.domain.Board;
+import ks55team02.customer.board.service.BoardService;
 import ks55team02.customer.post.domain.Post;
 import ks55team02.customer.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 public class PostController {
 
 	private final PostService postService;
+	private final BoardService boardService;
 	
+	// 게시글 삭제
 	@DeleteMapping("/postDelete/{pstSn}")
 	@ResponseBody
 	public String postDelete(@PathVariable String pstSn) {
@@ -68,9 +74,11 @@ public class PostController {
 	@GetMapping("/postEdit/{pstSn}")
 	public String showEditForm(@PathVariable String pstSn, Model model) {
 	    // 1. pstSn을 사용해서 DB에서 수정할 게시글의 정보를 가져옵니다.
+		List<Board> boardList = boardService.selectBoardName();
 	    Post postToEdit = postService.selectPostDetailByPostSn(pstSn);
 	    
 	    // 2. 가져온 게시글 정보를 Model에 담아서 뷰로 전달합니다.
+		model.addAttribute("boardList", boardList);
 	    model.addAttribute("post", postToEdit);
 	    
 	    // 3. '글 작성'에 사용했던 그 폼 페이지를 그대로 재사용합니다.
@@ -96,11 +104,13 @@ public class PostController {
 	public String postWrite(
 	        @RequestParam(required = false) String pstSn,
 	        Model model) {
+		List<Board> boardList = boardService.selectBoardName();
 	    Post post = new Post();
 	    if (pstSn != null && !pstSn.isEmpty()) {
 	        post = postService.selectPostDetailByPostSn(pstSn); // 여기서 post 객체가 제대로 채워져야 함
 	    }
 	    // Model에 'post'라는 이름으로 Post 객체를 담는 것이 필수입니다.
+	    model.addAttribute("boardList", boardList);
 	    model.addAttribute("post", post);
 	    // ...
 	    return "customer/post/postWrite";
@@ -128,6 +138,16 @@ public class PostController {
 			@RequestParam(defaultValue = "#{paginationProperties.defaultSize}") int size,
 			Model model) {
 
+		List<Board> boardList = boardService.selectBoardName();
+		String boardName = "전체게시판";
+		if(bbsClsfCd != null) {
+			for(Board b : boardList) {
+				if(bbsClsfCd.equals(b.getBbsClsfCd())) {
+					boardName = b.getBbsNm();
+				}
+			}
+		}
+		
 		int totalPostNum = postService.selectPostListNumByBoardCd(bbsClsfCd);
 		int totalPage = 0;
 		if(totalPostNum > 0) {
@@ -145,6 +165,8 @@ public class PostController {
 
 		var postList = postService.selectPostListByBoardCd(bbsClsfCd, offset, size);
 
+		model.addAttribute("boardList", boardList);
+		model.addAttribute("boardName", boardName);
 		model.addAttribute("postList", postList);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("size", size);

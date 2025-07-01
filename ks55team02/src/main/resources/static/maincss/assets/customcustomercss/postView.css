@@ -37,14 +37,14 @@ body {
 }
 
 .post-detail-header h2 {
-    font-size: 2.2rem; /* 제목 글자 크기 */
+    font-size: 22px; /* 제목 글자 크기 */
     font-weight: 700; /* 제목 굵기 */
     color: #212529; /* 제목 색상 */
     margin-bottom: 1rem; /* 제목 아래 여백 */
 }
 
 .post-detail-info {
-    font-size: 0.9rem; /* 정보 글자 크기 */
+    font-size: 14px; /* 정보 글자 크기 */
     color: #6c757d; /* 정보 글씨 색상 */
 }
 
@@ -60,9 +60,9 @@ body {
    Post Content
    ========================================================================== */
 
-.post-content {
+.post-content p {
     margin-bottom: 30px; /* 내용 아래 여백 */
-    font-size: 1.05rem; /* 본문 글자 크기 */
+    font-size: 18px; /* 본문 글자 크기 */
     color: #333; /* 본문 글씨 색상 */
     word-wrap: break-word; /* 긴 단어 줄바꿈 */
 }
@@ -90,7 +90,7 @@ body {
 .post-actions .btn {
     margin-left: 10px; /* 버튼 간 간격 */
     padding: 0.6rem 1.2rem; /* 버튼 안쪽 여백 */
-    font-size: 0.95rem; /* 버튼 글자 크기 */
+    font-size: 15px; /* 버튼 글자 크기 */
     font-weight: 500; /* 버튼 글씨 두께 */
     border-radius: 0.25rem; /* 버튼 모서리 둥글게 */
     transition: background-color 0.2s ease, color 0.2s ease; /* 부드러운 효과 */
@@ -181,7 +181,7 @@ body {
 }
 
 .comments-section h3 {
-    font-size: 1.5rem;
+    font-size: 20px;
     font-weight: 700;
     color: #212529;
     margin-bottom: 20px;
@@ -202,7 +202,7 @@ body {
     padding: 10px 15px;
     border: 1px solid #ced4da;
     border-radius: 0.25rem;
-    font-size: 0.95rem;
+    font-size: 14px;
     margin-bottom: 10px;
     box-sizing: border-box; /* 패딩, 테두리가 너비에 포함되도록 */
     resize: vertical; /* 세로 크기 조절만 가능하게 */
@@ -210,7 +210,7 @@ body {
 
 .comment-form .btn-primary {
     padding: 0.6rem 1.5rem;
-    font-size: 1rem;
+    font-size: 14px;
     font-weight: 500;
 }
 

@@ -21,7 +21,7 @@ body {
 }
 
 .page-main-title {
-    font-size: 2.5rem;
+    font-size: 25px;
     font-weight: 700;
     color: #212529;
     margin-bottom: 0.5rem;
@@ -54,7 +54,7 @@ body {
 
 .form-group label {
     display: block; /* 라벨을 블록 요소로 만들어 별도 줄에 표시 */
-    font-size: 1rem;
+    font-size: 24px;
     font-weight: 600; /* 라벨 글씨 두께 */
     color: #212529;
     margin-bottom: 0.75rem; /* 라벨 아래 여백 */
@@ -62,7 +62,7 @@ body {
 
 .form-control { /* 공통 입력 필드 스타일 */
     padding: 0.6rem 1rem;
-    font-size: 0.95rem;
+    font-size: 14px;
     border: 1px solid #ced4da;
     border-radius: 0.25rem;
     box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
@@ -108,7 +108,7 @@ body {
 
 .form-actions .btn {
     padding: 0.7rem 1.5rem;
-    font-size: 1rem;
+    font-size: 14px;
     font-weight: 500;
     border-radius: 0.25rem;
     transition: background-color 0.2s ease, color 0.2s ease;
