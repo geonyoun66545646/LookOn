@@ -8,16 +8,13 @@ $(document).ready(function() {
         var targetSectionId = $(this).data('section');
         $('.content-section').removeClass('active');
         $('#' + targetSectionId).addClass('active');
-
-        // Scroll to top of content area when section changes
-        // $('.content-area').scrollTop(0);
     });
 
     // Initial section activation
     $('.content-section:first').addClass('active');
     $('#productRegMenu .nav-link:first').addClass('active');
 
-    // --- 카테고리 2차 동적 로드 (AJAX 기반으로 수정) ---
+    // --- 카테고리 2차 동적 로드 (AJAX 기반) ---
     $('#productCategory1').on('change', function() {
         var selectedPrimaryCategoryId = $(this).val();
         var $productCategory2 = $('#productCategory2');
@@ -52,13 +49,13 @@ $(document).ready(function() {
 
     // --- 가격 입력 시 원화 포맷팅 및 할인율/할인가 계산 ---
     function formatCurrency(number) {
-        if (isNaN(number) || number === null) return ''; // 숫자가 아니거나 null이면 빈 문자열 반환
+        if (isNaN(number) || number === null || number === '') return '';
         return new Intl.NumberFormat('ko-KR').format(number);
     }
 
     function parseCurrency(str) {
-        if (typeof str !== 'string' || str.trim() === '') return 0; // 문자열이 아니거나 비어있으면 0 반환
-        return parseInt(str.replace(/[^0-9]/g, '')) || 0; // 숫자와 쉼표를 제외한 모든 문자 제거 후 파싱
+        if (typeof str !== 'string' || str.trim() === '') return 0;
+        return parseInt(str.replace(/[^0-9]/g, '')) || 0;
     }
 
     $('#basePrice').on('input', function() {
@@ -71,19 +68,6 @@ $(document).ready(function() {
         calculateFinalPrice();
     });
 
-    // 재고 수량 입력 시에도 쉼표 제거 및 숫자만 입력되도록 처리
-    $('#stockQuantity').on('input', function() {
-        var value = parseCurrency($(this).val());
-        $(this).val(formatCurrency(value)); // 재고도 쉼표 포맷팅을 원한다면 유지, 아니라면 제거
-    });
-
-    // 최대 구매 수량 입력 시에도 쉼표 제거 및 숫자만 입력되도록 처리 (옵션)
-    $('#maxPurchase').on('input', function() {
-        var value = parseCurrency($(this).val());
-        $(this).val(formatCurrency(value)); // 최대 구매 수량도 쉼표 포맷팅을 원한다면 유지, 아니라면 제거
-    });
-
-
     function calculateFinalPrice() {
         var basePrice = parseCurrency($('#basePrice').val());
         var discountRate = parseFloat($('#discountRate').val()) || 0;
@@ -92,22 +76,11 @@ $(document).ready(function() {
     }
     calculateFinalPrice();
 
-    // --- 배송비 설정 토글 ---
-    $('#shippingType').on('change', function() {
-        if ($(this).val() === 'fixed' || $(this).val() === 'conditional') {
-            $('#shippingFeeGroup').show();
-            $('#shippingFee').prop('required', true);
-        } else {
-            $('#shippingFeeGroup').hide();
-            $('#shippingFee').prop('required', false);
-        }
-    }).trigger('change');
-
     // 성별 옵션 버튼 클릭 이벤트
     $(document).on('click', '.option-gender-btn', function() {
         $('.option-gender-btn').removeClass('active');
         $(this).addClass('active');
-        $('#genderOption').val($(this).data('value')).trigger('input'); // hidden input 값 설정 및 트리거
+        $('#genderOption').val($(this).data('value')).trigger('input');
         updateOptionCombinations();
     });
 
@@ -161,26 +134,19 @@ $(document).ready(function() {
     function updateOptionCombinations() {
         var productName = $('#optionProductName').val().trim();
         var selectedGender = $('#genderOption').val();
-
         var selectedColors = [];
+        var selectedSizes = [];
+
         $('#colorOptionValues .option-value-btn.active').each(function() {
             selectedColors.push($(this).data('value'));
         });
 
-        var selectedSizes = [];
         $('#sizeOptionValues .option-value-btn.active').each(function() {
             selectedSizes.push($(this).data('value'));
         });
 
-        // --- 여기부터 DTO 바인딩을 위한 숨겨진 input 필드 생성/관리 ---
-
-        // 기존에 생성된 숨겨진 옵션 필드들을 제거합니다. (중복 방지)
-        // 폼 제출 시마다 새로운 조합으로 업데이트 되므로, 이전 값을 지우고 새로 추가
-        $('#productRegistrationForm input[name="colorOptions"]').remove();
-        $('#productRegistrationForm input[name="sizeOptions"]').remove();
-        $('#productRegistrationForm input[name="optionCombinationNames"]').remove();
-        $('#productRegistrationForm input[name="optionCombinationStocks"]').remove();
-
+        // 기존에 생성된 숨겨진 옵션 필드 제거 (중복 방지)
+        $('#productRegistrationForm input[name^="productOptionDetails"]').remove();
 
         // 선택된 색상 옵션을 숨겨진 input 필드로 추가
         selectedColors.forEach(function(color) {
@@ -199,21 +165,20 @@ $(document).ready(function() {
                 value: size
             }).appendTo('#productRegistrationForm');
         });
-        // --- 여기까지 DTO 바인딩을 위한 숨겨진 input 필드 생성/관리 ---
-
 
         var $combinationTableBody = $('#optionCombinationsTableBody');
         $combinationTableBody.empty();
 
         // 필수 입력 항목 유효성 검사 (조합 생성 전)
         if (!selectedGender && selectedColors.length === 0 && selectedSizes.length === 0) {
-             $combinationTableBody.append('<tr><td colspan="2" class="text-center text-muted">성별, 색상, 사이즈 옵션을 선택하면 조합이 생성됩니다.</td></tr>');
+            $combinationTableBody.append('<tr><td colspan="2" class="text-center text-muted">성별, 색상, 사이즈 옵션을 선택하면 조합이 생성됩니다.</td></tr>');
             return;
         }
-         if (!productName) {
+        
+        if (!productName) {
             $combinationTableBody.append('<tr><td colspan="2" class="text-center text-muted">옵션 조합에 사용될 제품명을 입력해주세요.</td></tr>');
             return;
-         }
+        }
 
         // 조합 테이블 생성을 위한 임시 배열
         var combinationsForTable = [];
@@ -225,15 +190,9 @@ $(document).ready(function() {
         tempColors.forEach(function(color) {
             tempSizes.forEach(function(size) {
                 let combinationName = productName;
-                if (tempGender) {
-                    combinationName += ' ' + tempGender;
-                }
-                if (color !== '') {
-                    combinationName += ' ' + color;
-                }
-                if (size !== '') {
-                    combinationName += ' ' + size;
-                }
+                if (tempGender) combinationName += ' ' + tempGender;
+                if (color !== '') combinationName += ' ' + color;
+                if (size !== '') combinationName += ' ' + size;
                 combinationsForTable.push(combinationName.trim());
             });
         });
@@ -244,15 +203,27 @@ $(document).ready(function() {
 
         // 옵션 조합별 재고 입력 필드 생성
         combinationsForTable.forEach(function(combination, index) {
-            // 이전에 입력된 재고 값을 유지하기 위한 로직 추가 (필요시)
-            // 현재는 새롭게 생성되므로 초기값은 빈칸 또는 0
+            const colorIndex = index % tempColors.length;
+            const sizeIndex = Math.floor(index / tempColors.length);
+            const colorValue = tempColors[colorIndex] || '';
+            const sizeValue = tempSizes[sizeIndex] || '';
+
             var rowHtml = `
                 <tr>
                     <td>${combination}
-                        <input type="hidden" name="optionCombinationNames" value="${combination}">
+                        <input type="hidden" name="productOptionCombinations[${index}].combNm" value="${combination}">
+                        <input type="hidden" name="productOptionCombinations[${index}].optVlNo1" value="${selectedGender || ''}">
+                        <input type="hidden" name="productOptionCombinations[${index}].optVlNo2" value="${colorValue}">
+                        <input type="hidden" name="productOptionCombinations[${index}].optVlNo3" value="${sizeValue}">
                     </td>
                     <td>
-                        <input type="number" class="form-control form-control-sm" name="optionCombinationStocks" placeholder="수량" min="0" required>
+                        <input type="number" 
+                               class="form-control form-control-sm" 
+                               name="productOptionCombinations[${index}].quantity" 
+                               placeholder="수량" 
+                               min="0" 
+                               required
+                               value="0">
                     </td>
                 </tr>
             `;
@@ -269,7 +240,9 @@ $(document).ready(function() {
 
         var files = inputElement.files;
         if (files.length === 0) {
-            $fileInputLabel.text(isThumbnail ? '상품 썸네일 업로드 (1장)' : (maxImages === 15 ? '대표 이미지 업로드 (최소 1장, 최대 15장)' : '상세 페이지 이미지 업로드 (최소 1장, 최대 20장)'));
+            $fileInputLabel.text(isThumbnail ? '상품 썸네일 업로드 (1장)' : 
+                             (maxImages === 15 ? '대표 이미지 업로드 (최소 1장, 최대 15장)' : 
+                              '상세 페이지 이미지 업로드 (최소 1장, 최대 20장)'));
             $previewContainer.append('<p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>');
             return;
         }
@@ -280,7 +253,6 @@ $(document).ready(function() {
         // Update file input label
         var fileNames = Array.from(files).map(file => file.name).join(', ');
         $fileInputLabel.text(fileNames.length > 50 ? fileNames.substring(0, 50) + '...' : fileNames);
-
 
         filesToProcess.forEach((file, index) => {
             if (file.type.startsWith('image/')) {
@@ -299,8 +271,8 @@ $(document).ready(function() {
             }
         });
     }
-	
-	// --- 이미지 업로드 change 이벤트 리스너 ---
+    
+    // --- 이미지 업로드 change 이벤트 리스너 ---
     $('#thumbnailImageUpload').on('change', function() {
         handleImageUpload(this, '#thumbnailImagePreview', 1, true);
     });
@@ -331,41 +303,33 @@ $(document).ready(function() {
         var inputId = $(this).prev('.custom-file').find('input[type="file"]').attr('id');
         var inputElement = document.getElementById(inputId);
 
-        // Assign files to the input element
-        inputElement.files = files;
-
-        // Trigger change event manually to update preview
-        $(inputElement).trigger('change');
+        if (files && files.length > 0) {
+            inputElement.files = files;
+            $(inputElement).trigger('change');
+        }
     });
 
-
-    // 이미지 미리보기 삭제 버튼 (공통)
+    // 이미지 미리보기 삭제 버튼
     $(document).on('click', '.image-upload-item .remove-btn', function() {
         var $itemToRemove = $(this).closest('.image-upload-item');
         var inputId = $(this).data('target-input');
         var fileIndex = $(this).data('file-index');
         var inputElement = document.getElementById(inputId);
-        var dataTransfer = new DataTransfer();
-        var currentFiles = Array.from(inputElement.files);
+        
+        const currentFiles = Array.from(inputElement.files);
+        const newFiles = currentFiles.filter((file, i) => i !== fileIndex);
 
-        // Remove the file at the specified index
-        currentFiles.splice(fileIndex, 1);
+        const dataTransfer = new DataTransfer();
+        newFiles.forEach(file => dataTransfer.items.add(file));
 
-        // Add remaining files to DataTransfer object
-        currentFiles.forEach(file => dataTransfer.items.add(file));
-
-        // Update the input's files
         inputElement.files = dataTransfer.files;
-
         $itemToRemove.remove();
 
-        // If no images left, show placeholder text
         var $previewContainer = $(inputElement).closest('.form-group').find('.image-upload-preview');
         if ($previewContainer.children('.image-upload-item').length === 0) {
             $previewContainer.removeClass('has-images').append('<p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>');
         }
 
-        // Update custom file input label
         var $fileInputLabel = $(inputElement).next('.custom-file-label').find('.file-name');
         if (inputElement.files.length > 0) {
             var fileNames = Array.from(inputElement.files).map(file => file.name).join(', ');
@@ -377,36 +341,24 @@ $(document).ready(function() {
                   '상세 페이지 이미지 업로드 (최소 1장, 최대 20장)'))
             );
         }
+
+        $previewContainer.find('.image-upload-item').each(function(idx) {
+            $(this).find('.remove-btn').data('file-index', idx);
+        });
     });
 
-
-    // WYSIWYG 에디터 초기화 (외부 라이브러리 필요)
-    // if (typeof ClassicEditor !== 'undefined') { // 예: CKEditor 5
-    //     ClassicEditor
-    //         .create(document.querySelector('#productDescription'))
-    //         .catch(error => {
-    //             console.error(error);
-    //         });
-    // } else if (typeof tinymce !== 'undefined') { // 예: TinyMCE
-    //     tinymce.init({
-    //         selector: '#productDescription'
-    //     });
-    // }
-
-    // 하단 버튼 액션 (예시)
+    // 하단 버튼 액션
     $('#previewBtn').on('click', function() {
         alert('상품 미리보기 기능 (구현 필요)');
     });
+    
     $('#tempSaveBtn').on('click', function() {
         alert('상품 임시 저장 기능 (구현 필요)');
-        // 폼 데이터를 AJAX로 전송하여 임시 저장
     });
-    // '등록하기' 버튼은 form="productRegistrationForm" 속성으로 폼 제출
 
-    // ⭐⭐ 수정된 취소 버튼 클릭 이벤트 ⭐⭐
+    // 취소 버튼 클릭 이벤트
     $('#cancelBtn').on('click', function() {
         if (confirm('작성 중인 내용을 취소하고 목록으로 돌아가시겠습니까?')) {
-            // 컨트롤러의 취소 URL로 리다이렉션
             window.location.href = '/seller/products/cancelRegistration';
         }
     });
@@ -422,73 +374,109 @@ $(document).ready(function() {
                 const currentLength = $(this).val().length;
                 $counter.text(currentLength);
             });
-            // Initial count
-            $input.trigger('input');
+            $input.trigger('input'); // Initial count
         }
     }
 
     setupCharCounter('productName', 'productNameCounter');
     setupCharCounter('productDescription', 'productDescriptionCounter');
-    // 'productBrand', 'productOrigin', 'certificationInfo'는 HTML에 input 필드가 없어서 주석 처리
-    // setupCharCounter('productBrand', 'productBrandCounter');
-    // setupCharCounter('productOrigin', 'productOriginCounter');
-    // setupCharCounter('certificationInfo', 'certificationInfoCounter');
     setupCharCounter('videoUrl', 'videoUrlCounter');
-    // 'deliveryPeriod', 'returnPolicy'는 HTML에 input 필드가 없어서 주석 처리
-    // setupCharCounter('deliveryPeriod', 'deliveryPeriodCounter');
-    // setupCharCounter('returnPolicy', 'returnPolicyCounter');
     setupCharCounter('productTags', 'productTagsCounter');
     setupCharCounter('optionProductName', 'optionProductNameCounter');
 
-    // Initial calls to populate options and combinations if needed
+    // Initial calls to populate options and combinations
     populateColorOptions();
-    // 옵션 설정 항목들이 항상 노출되므로, 초기화 시 조합을 업데이트
+    $('#sizeOptionType').trigger('change'); 
     updateOptionCombinations();
 
+    // 입력 시 에러 표시 제거
+    $('input, select, textarea, .option-gender-btn, .option-value-btn').on('input change click', function() {
+        if ($('#productRegistrationForm').hasClass('submitted')) {
+            const $this = $(this);
+            
+            if ($this.is('input') || $this.is('select') || $this.is('textarea')) {
+                $this.removeClass('is-invalid');
+            }
+            
+            if ($this.is('input[type="file"]')) {
+                $this.next('.custom-file-label').removeClass('error-border');
+            }
+            
+            const $parentOptionGroup = $this.closest('.option-group-item.mb-4'); 
+            if ($parentOptionGroup.length) {
+                let groupHasError = false;
 
-    // --- 폼 제출 시 숫자 필드에서 쉼표 제거 및 유효성 검사 통합 ---
+                if ($parentOptionGroup.find('#genderOptionGroup').length) {
+                    if ($('#genderOption').val() === '') {
+                        groupHasError = true;
+                    }
+                }
+                
+                $parentOptionGroup.find('input[required]:not([type="hidden"]), textarea[required]').each(function() {
+                    if (!$(this).val() || $(this).val().trim() === '') {
+                        $(this).removeClass('is-invalid'); 
+                        groupHasError = true;
+                        return false; 
+                    }
+                });
+
+                $parentOptionGroup.find('input[name="optionCombinationStocks"]').each(function() {
+                    if (!$(this).val() || parseInt($(this).val()) < 0) {
+                        $(this).removeClass('is-invalid');
+                        groupHasError = true; 
+                        return false; 
+                    }
+                });
+
+                if (!groupHasError) {
+                    $parentOptionGroup.removeClass('error-border');
+                }
+            } else {
+                const $parent = $this.closest('.form-control-with-labels, .form-group, .category-group');
+                if ($parent.length && !$parent.closest('.option-group-item.mb-4').length) { 
+                    $parent.removeClass('error-border');
+                }
+            }
+        }
+    });
+
+    // --- 폼 제출 시 숫자 필드에서 쉼표 제거 및 유효성 검사 ---
     $('#productRegistrationForm').on('submit', function(event) {
-        // 모든 숫자 필드의 쉼표를 먼저 제거
+        event.preventDefault(); 
+        $(this).addClass('submitted');
+        
+        $('.is-invalid').removeClass('is-invalid');
+        $('.error-border').removeClass('error-border');
+        
+        // 숫자 필드의 쉼표 제거
         const basePriceInput = document.getElementById('basePrice');
-        if (basePriceInput) {
-            basePriceInput.value = basePriceInput.value.replace(/,/g, '');
-        }
-        const stockQuantityInput = document.getElementById('stockQuantity');
-        if (stockQuantityInput) {
-            stockQuantityInput.value = stockQuantityInput.value.replace(/,/g, '');
-        }
+        if (basePriceInput) basePriceInput.value = basePriceInput.value.replace(/,/g, '');
+        
         const maxPurchaseInput = document.getElementById('maxPurchase');
-        if (maxPurchaseInput) {
-            maxPurchaseInput.value = maxPurchaseInput.value.replace(/,/g, '');
-        }
+        if (maxPurchaseInput) maxPurchaseInput.value = maxPurchaseInput.value.replace(/,/g, '');
+        
         $('input[name="optionCombinationStocks"]').each(function() {
             $(this).val($(this).val().replace(/,/g, ''));
         });
 
-        // ⭐ 유효성 검사 시작 ⭐
+        // 유효성 검사
         let isValid = true;
-        let errorMessage = "다음 항목들을 입력해주세요:<br>";
-        // let hasErrorInCurrentSection = false; // 이 변수는 현재 로직에서 굳이 필요하지 않아 제거
+        let errorMessage = "다음 필수 항목들을 입력하거나 선택해주세요:<br>";
+        let errorFields = [];
 
-        // 현재 활성화된 섹션을 찾음
-        const $activeSection = $('.content-section.active');
-        
-        // 1. 필수 입력 필드 검사 (현재 활성화된 섹션 내)
-        $activeSection.find('input[required], select[required], textarea[required]').each(function() {
+        // 1. 모든 섹션의 필수 입력 필드 검사
+        $('input[required]:not(#genderOption), select[required]:not(#sizeOptionType), textarea[required]').each(function() {
             const $input = $(this);
             const value = $input.val();
             
-            // 파일 입력 필드인 경우 files 속성을 확인 (썸네일, 메인, 상세 이미지)
             if ($input.is('input[type="file"]')) {
-                // thumbnailImageUpload의 경우 required지만 1장 이상이 없으면 안됨
-                // mainImageUpload의 경우 required지만 1장 이상이 없으면 안됨
-                // detailImageUpload의 경우 required인데, 파일이 없는 경우 체크
-                if ($input.attr('id') === 'thumbnailImageUpload' || $input.attr('id') === 'mainImageUpload' || $input.attr('id') === 'detailImageUpload') {
-                    if ($input[0].files.length === 0) {
-                        let fieldName = $input.next('label').find('.file-name').text().replace(/\s*(\(\s*(최소)?\d+장,\s*(최대)?\d+장\))?\s*(\(\d+장\))?\s*\*\s*$/, '').trim();
-                        // 파일명에서 "(최소 n장, 최대 n장)" 또는 "(n장)"과 "*" 제거
-                        errorMessage += `- ${fieldName}<br>`;
-                        isValid = false;
+                const $fileInputLabel = $input.closest('.custom-file').find('.custom-file-label'); 
+                if ($input[0].files.length === 0) {
+                    let fieldName = $input.next('label').find('.file-name').text().replace(/\s*(\(\s*(최소)?\d+장,\s*(최대)?\d+장\))?\s*(\(\d+장\))?\s*\*\s*$/, '').trim();
+                    errorMessage += `- ${fieldName}<br>`;
+                    isValid = false;
+                    if ($fileInputLabel.length && !errorFields.includes($fileInputLabel[0])) { 
+                        errorFields.push($fileInputLabel[0]); 
                     }
                 }
             } else if (!value || (typeof value === 'string' && value.trim() === '')) {
@@ -506,52 +494,105 @@ $(document).ready(function() {
                 }
                 errorMessage += `- ${fieldName}<br>`;
                 isValid = false;
+                if (!errorFields.includes($input[0])) { 
+                    errorFields.push($input[0]);
+                }
             }
         });
 
-        // 2. 특정 조건부 필수 필드 검사 (예: 옵션 설정 섹션)
-        if ($activeSection.attr('id') === 'optionSetting') {
-            const $genderOption = $('#genderOption');
-            const $selectedColors = $('#colorOptionValues .option-value-btn.active');
-            const $selectedSizes = $('#sizeOptionValues .option-value-btn.active');
-            const $optionProductName = $('#optionProductName');
-
-            if ($optionProductName.val().trim() === '') {
-                errorMessage += `- 옵션 조합 제품명<br>`;
-                isValid = false;
+        // 2. 카테고리 2차 선택 검사
+        if ($('#productCategory2Group').is(':visible') && $('#productCategory2').val() === '') {
+            errorMessage += `- 2차 카테고리<br>`;
+            isValid = false;
+            if (!errorFields.includes($('#productCategory2')[0])) { 
+                errorFields.push($('#productCategory2')[0]);
             }
-            // 성별, 색상, 사이즈 옵션은 필수이므로 선택 안하면 오류
-            if ($genderOption.val() === '') {
-                errorMessage += `- 성별 옵션<br>`;
-                isValid = false;
-            }
-            if ($selectedColors.length === 0) {
-                errorMessage += `- 색상 옵션<br>`;
-                isValid = false;
-            }
-            if ($selectedSizes.length === 0) {
-                errorMessage += `- 사이즈 옵션<br>`;
-                isValid = false;
-            }
-            
-            // 옵션 조합별 재고 수량 검사
-            $('input[name="optionCombinationStocks"]').each(function() {
-                if (!$(this).val() || parseInt($(this).val()) < 0) {
-                    errorMessage += `- 옵션 조합 재고 수량<br>`;
-                    isValid = false;
-                    return false; // 첫 번째 빈 재고 발견 시 루프 중단
-                }
-            });
         }
 
+        // 3. 옵션 설정 섹션 검사
+        const $genderOption = $('#genderOption');
+        const $selectedColors = $('#colorOptionValues .option-value-btn.active');
+        const $selectedSizes = $('#sizeOptionValues .option-value-btn.active');
+        const $optionProductName = $('#optionProductName');
+        const $sizeOptionType = $('#sizeOptionType');
 
-        // 3. 최종 유효성 검사 결과 처리
+        // 옵션 조합 제품명
+        if ($optionProductName.val().trim() === '') {
+            errorMessage += `- 옵션 조합 제품명<br>`;
+            isValid = false;
+            if (!errorFields.includes($optionProductName[0])) { 
+                errorFields.push($optionProductName[0]); 
+            }
+        }
+        
+        // 성별 옵션 그룹 유효성 검사
+        if ($genderOption.val() === '') {
+            errorMessage += `- 성별 옵션<br>`;
+            isValid = false;
+            const $genderGroupParent = $('#genderOptionGroup').closest('.option-group-item.mb-4');
+            if ($genderGroupParent.length && !errorFields.includes($genderGroupParent[0])) {
+                errorFields.push($genderGroupParent[0]); 
+            }
+        }
+        
+        // 색상 옵션 그룹 유효성 검사
+        if ($selectedColors.length === 0) {
+            errorMessage += `- 색상 옵션<br>`;
+            isValid = false;
+            const $colorGroupParent = $('#colorOptionValues').closest('.option-group-item.mb-4');
+            if ($colorGroupParent.length && !errorFields.includes($colorGroupParent[0])) {
+                errorFields.push($colorGroupParent[0]); 
+            }
+        }
+
+        // 사이즈 유형 및 사이즈 옵션 그룹 유효성 검사
+        let sizeOptionGroupError = false;
+        if ($sizeOptionType.val() === 'none') {
+            errorMessage += `- 사이즈 유형<br>`;
+            isValid = false;
+            sizeOptionGroupError = true;
+            if (!errorFields.includes($sizeOptionType[0])) {
+                errorFields.push($sizeOptionType[0]);
+            }
+        }
+        
+        if ($sizeOptionType.val() !== 'none' && $selectedSizes.length === 0) {
+            errorMessage += `- 사이즈 옵션<br>`;
+            isValid = false;
+            sizeOptionGroupError = true;
+        }
+
+        if (sizeOptionGroupError) {
+            const $sizeOptionGroupParent = $('#sizeOptionValues').closest('.option-group-item.mb-4');
+            if ($sizeOptionGroupParent.length && !errorFields.includes($sizeOptionGroupParent[0])) { 
+                errorFields.push($sizeOptionGroupParent[0]);
+            }
+        }
+        
+        // 옵션 조합별 재고 수량 검사
+        const $optionCombinationStocks = $('input[name="optionCombinationStocks"]');
+        if ($optionCombinationStocks.length > 0) {
+            let hasEmptyStock = false;
+            $optionCombinationStocks.each(function() {
+                if (!$(this).val() || parseInt($(this).val()) < 0) {
+                    hasEmptyStock = true;
+                    if (!errorFields.includes($(this)[0])) { 
+                        errorFields.push($(this)[0]); 
+                    }
+                }
+            });
+            if(hasEmptyStock) {
+                errorMessage += `- 옵션 조합 재고 수량<br>`;
+                isValid = false;
+            }
+        }
+
+        // 4. 최종 유효성 검사 결과 처리
         if (!isValid) {
-            event.preventDefault(); // 폼 제출 중단
             Swal.fire({
                 icon: "error",
                 title: "입력 오류!",
-                html: errorMessage + "<br>모든 필수 항목을 올바르게 채워주세요.", // html 사용 시 <br> 태그 적용
+                html: errorMessage + "<br>모든 필수 항목을 올바르게 채워주세요.",
                 confirmButtonText: "확인",
                 customClass: {
                     container: 'my-swal-container',
@@ -561,18 +602,59 @@ $(document).ready(function() {
                     content: 'my-swal-content',
                     confirmButton: 'my-swal-confirm-button'
                 }
-            });
-            // 에러가 발생한 섹션으로 스크롤 이동 (선택 사항)
-            // $('html, body').animate({
-            //     scrollTop: $activeSection.offset().top - 100 // 상단 여백 조절
-            // }, 500);
+            }).then(() => {
+                errorFields.forEach(fieldElement => {
+                    const $field = $(fieldElement);
 
-            return false; // 폼 제출 중단
+                    if ($field.is('input') || $field.is('select') || $field.is('textarea')) {
+                        $field.addClass('is-invalid');
+                        const $parentFormGroup = $field.closest('.form-control-with-labels, .form-group, .category-group');
+                        if ($parentFormGroup.length && !$parentFormGroup.closest('.option-group-item.mb-4').length) {
+                            $parentFormGroup.addClass('error-border');
+                        }
+                    }
+                    else if ($field.is('.custom-file-label')) {
+                        $field.addClass('error-border');
+                    }
+                    else if ($field.is('.option-group-item.mb-4')) {
+                        $field.addClass('error-border');
+                    }
+                });
+
+                if (errorFields.length > 0) {
+                    const $firstErrorField = $(errorFields[0]);
+                    const $targetSection = $firstErrorField.closest('.content-section');
+                    if ($targetSection.length > 0) {
+                        const targetSectionId = $targetSection.attr('id');
+                        $('#productRegMenu .nav-link').removeClass('active');
+                        $(`[data-section="${targetSectionId}"]`).addClass('active');
+                        $('.content-section').removeClass('active');
+                        $('#' + targetSectionId).addClass('active');
+                        
+                        let $scrollToElement = $firstErrorField;
+                        if ($firstErrorField.is('input[type="hidden"]')) {
+                            if ($firstErrorField.attr('id') === 'genderOption') {
+                                $scrollToElement = $('#genderOptionGroup');
+                            } else {
+                                const $relatedVisible = $firstErrorField.closest('.form-group').find('input:not([type="hidden"]), select, textarea, .image-upload-preview, .option-gender-btn, .option-value-buttons').first();
+                                if ($relatedVisible.length > 0) {
+                                    $scrollToElement = $relatedVisible;
+                                }
+                            }
+                        }
+
+                        if ($scrollToElement.length > 0) {
+                            $('html, body').animate({
+                                scrollTop: $scrollToElement.offset().top - ($(window).height() / 4)
+                            }, 500);
+                        }
+                    }
+                }
+            });
+            return false;
         }
 
-        // 유효성 검사를 모두 통과하면 폼 제출을 허용
         console.log("폼 제출: 모든 유효성 검사 통과");
-        // 이 시점에서 폼은 정상적으로 제출됩니다.
+        this.submit();
     });
-
 });
