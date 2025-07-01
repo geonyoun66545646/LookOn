@@ -545,6 +545,10 @@
             background-color: #fff; /* 배경색 흰색 통일 */
             font-weight: normal;
             color: #333;
+            
+        }
+        #discountRate{
+        	text-align: right;
         }
 
         .form-control-with-labels .input-segment.char-counter-segment {
@@ -830,10 +834,58 @@
             padding-right: 0;
         }
 
+
+		
         .mt-4, .my-4 {
 		    margin-top: 0rem !important;
 		}
 		.mt-4 {
 		    margin-top: 0rem !important;
 		}
-        
+		
+		/* 기존 에러 스타일 제거 또는 수정 */
+		.error-border {
+		    border: none !important; /* 기본적으로 보더 없음 */
+		}
+		
+		/* 제출 시 유효성 검사 실패한 요소에만 적용될 스타일 */
+		.submitted .error-border {
+		    border: 2px solid #dc3545 !important;
+		    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+		}
+		
+		/* 부모 요소에 테두리 적용 */
+		.submitted .form-group.error-border,
+		.submitted .form-control-with-labels.error-border,
+		.submitted .category-group.error-border,
+		.submitted .option-group-item.error-border {
+		    border: 2px solid #dc3545 !important;
+		    border-radius: 6px !important;
+		    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+		}
+		
+		.swal2-html-container {
+		    font-size: 1.3em !important;
+		    /* font-size: 16px; */
+		    /* font-size: 18px; */
+		}
+				
+		.swal2-confirm.swal2-styled {
+		    font-size: 1.3em !important;
+		    padding: 0.625em 1.25em !important;
+		}
+		.form-control {
+			height: 40px;
+			padding: .85rem 2rem;
+			font-size: 1.4rem;
+			line-height: 1.5;
+			font-weight: 300;
+			color: #777;
+			background-color: #fafafa;
+			border: 1px solid #ebebeb;
+			border-radius: 0;
+			margin-bottom: 0rem;
+			transition: all 0.3s;
+			box-shadow: none;
+		}
+		

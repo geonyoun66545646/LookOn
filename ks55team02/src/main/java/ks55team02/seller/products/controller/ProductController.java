@@ -4,17 +4,15 @@ import ks55team02.seller.products.domain.ProductRegistrationRequest;
 import ks55team02.seller.products.service.ProductsService;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.service.ProductCategoryService;
-// ⭐⭐⭐ Products 도메인만 추가 ⭐⭐⭐
 import ks55team02.seller.products.domain.Products; // 판매자 리스트에서 사용할 Products 도메인 임포트
-// ⭐⭐⭐ 여기까지 추가 ⭐⭐⭐
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 @Controller

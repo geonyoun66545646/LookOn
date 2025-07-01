@@ -1,4 +1,4 @@
-package ks55team02.seller.products.service.impl; // <<--- .impl을 추가하여 수정
+package ks55team02.seller.products.service.impl;
 
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.mapper.ProductCategoryMapper;
@@ -7,11 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
-@Service // 스프링 서비스 빈으로 등록
-@RequiredArgsConstructor // Lombok으로 final 필드 자동 주입
+@Service
+@RequiredArgsConstructor
 public class ProductCategoryServiceImpl implements ProductCategoryService {
 
-    private final ProductCategoryMapper productCategoryMapper; // ProductCategoryMapper 주입
+    private final ProductCategoryMapper productCategoryMapper;
 
     @Override
     public List<ProductCategory> getAllProductCategories() {
