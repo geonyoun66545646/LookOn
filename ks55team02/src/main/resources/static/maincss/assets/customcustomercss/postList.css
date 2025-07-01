@@ -1,0 +1,169 @@
+/* ==========================================================================
+   CSS-Only Redesign (HTML 구조 변경 없음)
+   ========================================================================== */
+
+/* 1. 기본 배경 및 폰트 설정 */
+body {
+    background-color: #fff !important; /* 배경을 흰색으로 강제 */
+    font-family: 'Spoqa Han Sans Neo', 'Malgun Gothic', sans-serif;
+    font-size: 14px; /* 기본 폰트 크기 조정 */
+}
+.container {
+    max-width: 900px; /* 컨텐츠 영역을 조금 좁혀서 집중도 높임 */
+}
+
+.board-tabs-container {
+	overflow-x: auto;
+	cursor: grab;
+	user-select: none;
+	&::-webkit-scrollbar {
+	    display: none;
+	}
+}
+
+.nav-tabs {
+	flex-wrap: nowrap;
+    white-space: nowrap;
+    border-bottom: none;
+}
+
+.board-tabs-container .nav-tabs .nav-link {
+	-webkit-user-drag: none;
+}
+
+/* 2. 불필요한 요소 숨기기 */
+.page-subtitle,                 /* "게시판의 모든 게시글" 부제목 숨기기 */
+.lower-controls-container {     /* 하단 검색창 및 페이지 선택기 숨기기 */
+    display: none !important;
+}
+
+/* 3. 페이지 타이틀 스타일 변경 */
+.page-title-section {
+    border-bottom: none;
+    padding: 20px 0 10px 0;
+    text-align: center;
+    margin: 15px;
+}
+.page-main-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #000;
+}
+
+/* 4. 카드(Card) 스타일 제거 및 테이블 영역 재구성 */
+.card {
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    background-color: transparent;
+}
+.card-body {
+    padding: 0; /* 카드 내부 여백 제거 */
+}
+
+/* 5. 테이블(Table) 스타일을 목표 디자인에 맞게 변경 */
+.table-responsive {
+    overflow-x: initial; /* 가로 스크롤 제거 */
+}
+.table {
+    border-top: 2px solid #000;
+    border-bottom: 1px solid #ddd;
+}
+/* 테이블 헤더 */
+.table thead th {
+    border-bottom: 1px solid #ddd;
+    background-color: #f9f9f9;
+    padding: 12px;
+    text-align: center;
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+    vertical-align: middle;
+}
+/* 테이블 바디 */
+.table tbody td {
+    padding: 15px 10px;
+    border-bottom: 1px solid #f1f1f1;
+    text-align: center;
+    vertical-align: middle;
+    color: #555;
+    font-size: 14px;
+}
+.table tbody tr:nth-of-type(odd) {
+    background-color: transparent; /* 줄무늬 배경 제거 */
+}
+.table tbody tr:hover {
+    background-color: #f8f8f8;
+}
+
+/* 제목 셀(TD) 스타일 */
+.post-title-cell {
+    text-align: left; /* 제목만 왼쪽 정렬 */
+    max-width: 450px; /* 제목이 너무 길 경우 대비 */
+}
+/* 제목 링크(A) 스타일 */
+.post-title-link {
+    color: #333;
+    text-decoration: none;
+    font-weight: 400; /* 일반 굵기 */
+}
+.post-title-link:hover {
+    text-decoration: underline;
+}
+
+/* 6. 글쓰기 버튼 스타일 및 위치 변경 */
+.content-footer-action {
+    padding: 20px 0;
+    text-align: right; /* 오른쪽 정렬 유지 */
+}
+.btn-write-post {
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+.btn-write-post:hover {
+    background-color: #222;
+}
+
+/* 7. 페이지네이션(Pagination) 스타일 변경 */
+.pagination-area {
+    margin-top: 25px;
+}
+.pagination .page-link {
+    color: #555;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin: 0 3px;
+    padding: 8px 14px;
+}
+.pagination .page-item.active .page-link {
+    background-color: #333;
+    border-color: #333;
+    color: #fff;
+    font-weight: bold;
+}
+.pagination .page-item.disabled .page-link {
+    color: #aaa;
+}
+.pagination .page-link:hover {
+    background-color: #f1f1f1;
+}
+
+/* 반응형 스타일 - 작은 화면에서는 폰트 크기 살짝 줄임 */
+@media (max-width: 768px) {
+    .page-main-title {
+        font-size: 20px;
+    }
+    .table thead th, .table tbody td, .btn-write-post {
+        font-size: 13px;
+    }
+}
+
+/* 폰트 import는 맨 아래에 둡니다 */
+@import url(//spoqa.github.io/spoqa-han-sans/stylesheets/SpoqaHanSansNeo.css);

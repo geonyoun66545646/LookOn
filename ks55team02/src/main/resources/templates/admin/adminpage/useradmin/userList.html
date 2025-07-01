@@ -17,7 +17,6 @@
 		    <!-- 1. 검색 필터 카드 -->
 		    <div class="card mb-4">
 		        <div class="card-body">
-		            <form id="searchForm">
 		                <div class="row gx-3">
 		                    <div class="col-lg-12">
 		                    	<!-- 회원 상태 분류 -->
@@ -38,7 +37,11 @@
 		                                	   name="statusList" value="탈퇴" checked>
 		                                <label class="form-check-label">탈퇴 계정</label>
 		                            </div>
-		                            <input class="form-check-input" type="checkbox" id="filterCheckAll" checked>
+		                            <div class="form-check me-4">
+		                            <input class="form-check-input" type="checkbox"
+		                            	   id="filterCheckAll" checked>
+		                            <label class="form-check-label">전체선택</label>
+		                            </div>
 		                        </div>
 		                    </div>
 		                </div>
@@ -68,7 +71,6 @@
 		                        <button class="btn btn-primary btn-block" type="button" id="searchBtn">검색</button>
 		                    </div>
 		                </div>
-		            </form>
 		        </div>
 		    </div> <!-- card end// -->
 		
@@ -122,17 +124,17 @@
 				                <th scope="col" class="col-checkbox">
 				                	<input class="form-check-input" type="checkbox" id="checkAll">
 				                </th>
-				                <th scope="col" class="col-id">ID</th>
-				                <th scope="col" class="col-name">이름</th>
-				                <th scope="col" class="col-gender">성별</th>
-				                <th scope="col" class="col-email">이메일</th>
-				                <th scope="col" class="col-phone">휴대폰 번호</th>
-				                <th scope="col" class="col-address">주소</th>
-				                <th scope="col" class="col-status">상태</th>
-				                <th scope="col" class="col-joindate">가입 일자</th>
+				                <th scope="col">ID</th>
+				                <th scope="col">이름</th>
+				                <th scope="col">성별</th>
+				                <th scope="col">이메일</th>
+				                <th scope="col">휴대폰 번호</th>
+				                <th scope="col">주소</th>
+				                <th scope="col">상태</th>
+				                <th scope="col">가입 일자</th>
 				            </tr>
 				        </thead>
-				        <tbody>
+				        <tbody class="text-center">
 				            <tr th:if="${#lists.isEmpty(userList)}">
 				                <td colspan="9" class="text-center py-5">조회된 회원이 없습니다.</td>
 				            </tr>
@@ -195,25 +197,56 @@
 		
 		    // 1. currentPage 값이 없으면 1로 설정 (기본값)
 		    currentPage = currentPage || 1; 
-		
-		    // 2. 기본 검색 폼 데이터 직렬화
-		    let searchData = $('#searchForm').serialize();
-		
-		    // 3. 정렬, N개씩 보기 값을 URL 파라미터에 추가
+		    
+		 // 1. AJAX 요청 전에 현재 검색 조건들을 변수에 미리 저장합니다.
+		    const statusList = $('input[name="statusList"]:checked').map(function() { return $(this).val(); }).get();
+		    const startDate = $('input[name="startDate"]').val();
+		    const endDate = $('input[name="endDate"]').val();
+		    const searchKey = $('select[name="searchKey"]').val();
+		    const searchValue = $('input[name="searchValue"]').val();
 		    const sortOrder = $('#sortOrder').val();
 		    const pageSize = $('#pageSize').val();
 		    
-		    // searchData 문자열에 정렬, 페이지 크기, 그리고 '현재 페이지 번호' 정보를 덧붙입니다.
-		    searchData += `&sortOrder=${sortOrder}&pageSize=${pageSize}&currentPage=${currentPage}`;
-		    
+		    // 2. 서버로 보낼 데이터를 만듭니다.
+		    //    기존의 serialize() 방식 대신, 저장된 변수를 사용합니다.
+		    let searchData = {
+		        statusList: statusList,
+		        startDate: startDate,
+		        endDate: endDate,
+		        searchKey: searchKey,
+		        searchValue: searchValue,
+		        sortOrder: sortOrder,
+		        pageSize: pageSize,
+		        currentPage: currentPage
+		    };
+
 		    $.ajax({
 		        url: '/adminpage/useradmin/userstatussearch', 
 		        type: 'GET',
-		        data: searchData,
+		        // $.param을 사용하여 객체를 URL 파라미터 문자열로 변환합니다.
+		        // true 옵션은 statusList 같은 배열을 올바르게 처리해줍니다.
+		        data: $.param(searchData, true),
 		        success: function(fragment) {
 		            console.log("AJAX 요청 성공! 목록을 갱신합니다.");
-		            // 성공 시, 서버로부터 받은 HTML 조각으로 목록 영역을 교체
+		            
+		            // 3. 테이블 영역을 새로운 HTML로 교체합니다. (기존과 동일)
 		            $('#userListContainer').replaceWith(fragment);
+
+		            // 4. ★★★★★ AJAX 성공 후, 저장해둔 변수로 폼의 값들을 복원합니다. ★★★★★
+		            
+		            // 4-1. 기간, 검색 키워드, 검색어 복원
+		            $('input[name="startDate"]').val(startDate);
+		            $('input[name="endDate"]').val(endDate);
+		            $('select[name="searchKey"]').val(searchKey);
+		            $('input[name="searchValue"]').val(searchValue);
+		            
+		            // 4-2. 분류 체크박스 복원
+		            $('.status-check').prop('checked', false);
+		            if (statusList && statusList.length > 0) {
+		                statusList.forEach(function(status) {
+		                    $(`.status-check[value="${status}"]`).prop('checked', true);
+		                });
+		            }
 		        },
 		        error: function(xhr, status, error) {
 		            console.error("목록 조회 실패:", error);
@@ -226,6 +259,7 @@
         // 1. '검색' 버튼 클릭 시
         $('#searchBtn').on('click', function(e) {
             e.preventDefault(); // 안전을 위해 preventDefault()를 유지합니다.
+            e.stopImmediatePropagation();
             searchAndReloadList(1);
         });
 
@@ -263,8 +297,8 @@
         });
 
 
-        // =================================================================
-        // 기능 3: 선택한 회원 상태 일괄 변경
+     	// =================================================================
+        // 기능 3: 선택한 유저의 상태 변환
         // =================================================================
         $(document).on('click', '.change-status-btn', function(e) {
             e.preventDefault();
@@ -281,25 +315,42 @@
 
             const targetStatus = $(this).data('status');
             
+            // 1. 서버로 보낼 데이터를 JavaScript 객체로 만듭니다.
+            const requestData = {
+                userNos: selectedUserNos,
+                status: targetStatus
+            };
+
             if (confirm(selectedUserNos.length + "명의 회원을 '" + targetStatus + "' 상태로 변경하시겠습니까?")) {
                 $.ajax({
                     url: '/adminpage/useradmin/updateUserStatus',
                     type: 'POST',
-                    dataType: 'json',
-                    data: {
+                    // 2. ★★★ 핵심: 데이터를 JSON 문자열로 변환하고, 데이터 타입을 명시합니다.
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({ // 데이터를 JSON 문자열로 변환
                         userNos: selectedUserNos,
                         status: targetStatus
-                    },
+                    }),
+                    dataType: 'json', 
+
                     success: function(response) {
                         if (response.result === 'success') {
                             alert(response.message);
-                            searchAndReloadList(); 
+                            
+                            // 3. ★★★ 성공 후, 현재 페이지 번호를 유지하며 목록을 다시 로드합니다.
+                            const currentPage = $('.pagination .page-item.active .page-link').data('page') || 1;
+                            searchAndReloadList(currentPage);
                         } else {
                             alert('오류: ' + response.message);
                         }
                     },
                     error: function(xhr, status, error) {
-                        alert('서버와 통신 중 오류가 발생했습니다.');
+                        // 4. 400 에러의 경우, 서버가 보낸 에러 메시지를 보여줄 수 있습니다.
+                        let errorMsg = '서버와 통신 중 오류가 발생했습니다.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        alert(errorMsg);
                     }
                 });
             }
