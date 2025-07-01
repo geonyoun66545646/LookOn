@@ -5,6 +5,32 @@
 
 <head>
     <meta name="description" content="한국스마트정보교육원 ksmybatis" />
+    <style>
+        /* 상품 썸네일 이미지 스타일 */
+        .product-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* 상품 이미지 셀 스타일 (테이블 헤더/바디) */
+        .table-responsive .table thead th:nth-child(2),
+        .table-responsive .table tbody td:nth-child(2) {
+            min-width: 200px;
+            width: 200px;
+            text-align: center;
+            vertical-align: middle;
+            box-sizing: border-box;
+        }
+
+        /* 테이블 반응형 스크롤바 */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
 </head>
 
 <th:block layout:fragment="jsFile">

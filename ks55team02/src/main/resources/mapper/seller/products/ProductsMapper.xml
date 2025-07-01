@@ -73,7 +73,9 @@
         <result column="p_inactvtn_dt" 	property="inactvtnDt" />
         <result column="p_expsr_yn" 		property="expsrYn" />
         <result column="p_actvtn_yn" 		property="actvtnYn" />
-
+        <result column="p_min_purchase_qty" property="minPurchaseQty" />
+        <result column="p_max_purchase_qty" property="maxPurchaseQty" />
+        
         <association property="productCategory" javaType="ks55team02.seller.products.domain.ProductCategory">
             <id property="categoryId" column="pc_ctgry_no"/>
             <result property="parentCategoryId" column="pc_up_ctgry_no"/>
@@ -109,6 +111,8 @@
         <result column="inactvtn_dt" 	property="inactvtnDt" />
         <result column="expsr_yn" 		property="expsrYn" />
         <result column="actvtn_yn" 		property="actvtnYn" />
+        <result column="min_purchase_qty" property="minPurchaseQty" />
+        <result column="max_purchase_qty" property="maxPurchaseQty" />
         <result column="thumbnail_image_path" property="thumbnailImagePath" /> 
 
         <association property="productCategory" javaType="ks55team02.seller.products.domain.ProductCategory">
@@ -135,7 +139,8 @@
             p.inactvtn_dt AS p_inactvtn_dt,
             p.expsr_yn AS p_expsr_yn,
             p.actvtn_yn AS p_actvtn_yn,
-            
+            p.min_purchase_qty AS p_min_purchase_qty,
+            p.max_purchase_qty AS p_max_purchase_qty,
             pc.ctgry_no AS pc_ctgry_no,
             pc.up_ctgry_no AS pc_up_ctgry_no,
             pc.creatr_no AS pc_creatr_no,
@@ -259,6 +264,8 @@
             p.inactvtn_dt,
             p.expsr_yn,
             p.actvtn_yn,
+            p.min_purchase_qty,
+            p.max_purchase_qty,
             (
                 SELECT pi.img_file_path_nm
                 FROM ks55team02db.product_images pi
@@ -297,6 +304,8 @@
             p.inactvtn_dt,
             p.expsr_yn,
             p.actvtn_yn,
+            p.min_purchase_qty,
+            p.max_purchase_qty,
             (
                 SELECT pi.img_file_path_nm
                 FROM ks55team02db.product_images pi
@@ -331,6 +340,8 @@
             p.inactvtn_dt,
             p.expsr_yn,
             p.actvtn_yn,
+            p.min_purchase_qty,
+            p.max_purchase_qty,
             (
                 SELECT pi.img_file_path_nm
                 FROM ks55team02db.product_images pi
@@ -351,11 +362,11 @@
     <insert id="addProduct" parameterType="ks55team02.seller.products.domain.Products">
         INSERT INTO ks55team02db.products (
             gds_no, store_id, ctgry_no, sel_user_no, mdfr_no, del_user_no, gds_nm, gds_expln, bas_prc, dscnt_rt,
-            last_sel_prc, reg_dt, mdfcn_dt, inactvtn_dt, expsr_yn, actvtn_yn
-        ) VALUES (
+            last_sel_prc, reg_dt, mdfcn_dt, inactvtn_dt, expsr_yn, actvtn_yn,
+            min_purchase_qty, max_purchase_qty  ) VALUES (
             #{gdsNo}, #{storeId}, #{ctgryNo}, #{selUserNo}, #{mdfrNo}, #{delUserNo}, #{gdsNm}, #{gdsExpln}, #{basPrc},
-            #{dscntRt}, #{lastSelPrc}, CURRENT_TIMESTAMP, NULL, NULL, #{expsrYn}, #{actvtnYn}
-        )
+            #{dscntRt}, #{lastSelPrc}, CURRENT_TIMESTAMP, NULL, NULL, #{expsrYn}, #{actvtnYn},
+            #{minPurchaseQty}, #{maxPurchaseQty}  )
     </insert>
 
     <select id="countProductCode" parameterType="string" resultType="int">
@@ -464,10 +475,10 @@
         VALUES(#{gdsSttsNo}, #{gdsNo}, #{creatrNo}, #{mdfrNo}, #{delUserNo}, #{selPsbltyQntty}, CURRENT_TIMESTAMP, #{mdfcnDt}, #{inactvtnDt}, #{sldoutYn}, #{actvtnYn})
     </insert>
 
-    <insert id="insertStatusOptionMapping" parameterType="map">
+    <insert id="insertStatusOptionMapping" parameterType="ks55team02.seller.products.domain.StatusOptionMapping">
         INSERT INTO ks55team02db.status_option_mappings
         (gds_stts_no, opt_vl_no, creatr_no, del_user_no, crt_ymd, inactvtn_dt, actvtn_yn)
-        VALUES(#{gds_stts_no}, #{opt_vl_no}, #{creatr_no}, #{del_user_no}, CURRENT_TIMESTAMP, #{inactvtn_dt}, #{actvtn_yn})
+        VALUES(#{gdsSttsNo}, #{optVlNo}, #{creatrNo}, #{delUserNo}, CURRENT_TIMESTAMP, #{inactvtnDt}, #{actvtnYn})
     </insert>
 
 </mapper>

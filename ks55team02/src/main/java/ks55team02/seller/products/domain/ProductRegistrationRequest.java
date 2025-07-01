@@ -12,7 +12,8 @@ public class ProductRegistrationRequest {
  private String productCategory1; // ctgry_no (1차 카테고리)
  private String productCategory2; // ctgry_no (2차 카테고리)
  private String productDescription; // gds_expln
-
+ private String gdsNo;
+ 
  // 미디어 업로드
  private List<MultipartFile> thumbnailImage; // 상품 썸네일 (1장)
  private List<MultipartFile> mainImage;      // 대표 이미지 (최소 1장, 최대 15장)
@@ -23,7 +24,7 @@ public class ProductRegistrationRequest {
  private Long basePrice;       // bas_prc
  private Double discountRate;  // dscnt_rt
  private Long finalPrice;      // last_sel_prc (계산될 값)
- private Integer stockQuantity; // sel_psblty_qntty (product_status)
+ private Integer stockQuantity = 0; // sel_psblty_qntty (product_status)
  private Integer minPurchase;   // 최소 구매 수량 (DB에 직접 매핑되는 필드는 아닐 수 있으나, 일단 받음)
  private Integer maxPurchase;   // 최대 구매 수량 (DB에 직접 매핑되는 필드는 아닐 수 있으나, 일단 받음)
 
@@ -48,7 +49,23 @@ public class ProductRegistrationRequest {
  private String selUserNo; // ⭐⭐⭐ 이 부분도 String으로 변경합니다. ⭐⭐⭐
 
  // 이외에 DB에 필요한 필드 중 DTO에 없는 것은 서비스/매퍼 단에서 처리 (예: reg_dt, actvtn_yn 등)
+ 
+ // 또는 setter 메서드에서 null 체크
+ public void setStockQuantity(Integer stockQuantity) {
+     this.stockQuantity = (stockQuantity != null) ? stockQuantity : 0;
+ }
+ 
+ private List<ProductCombinationData> productOptionCombinations;
 
+ @Data // 내부 클래스에도 @Data 어노테이션을 붙여 Getter/Setter 등을 자동 생성
+ public static class ProductCombinationData {
+     private String combNm; // 조합 이름 (예: "제품명 + 성별 + 색상 + 사이즈")
+     private String optVlNo1; // 옵션 값 No.1 (성별 ID)
+     private String optVlNo2; // 옵션 값 No.2 (색상 ID)
+     private String optVlNo3; // 옵션 값 No.3 (사이즈 ID)
+     private int quantity;   // 재고 수량
+ }
+ 
  // 편의 메서드 (finalPrice 계산)
  public void calculateFinalPrice() {
      if (basePrice != null && discountRate != null) {
