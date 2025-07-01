@@ -21,7 +21,7 @@
 	    <result column="last_login_dt"      property="lastLoginDt"/>
 	</resultMap>
 	
-	<!-- 1. 회원 목록 조회 (getUserList) -->
+	<!-- 회원 목록 조회 (페이징, 정렬, 검색 포함) -->
 	<select id="getUserList" parameterType="UserList" resultMap="userResultMap">
 	    SELECT
 	        u.user_no, 
@@ -100,7 +100,7 @@
 	    </if>
 	</select>
 	
-	<!-- 2. 전체 회원 수 조회 (getUserCount) -->
+	<!-- 검색 조건에 맞는 전체 회원 수 조회 (페이징 계산용) -->
 	<select id="getUserCount" parameterType="UserList" resultType="int">
 	    SELECT 
 	        COUNT(*)
@@ -149,7 +149,7 @@
 	    </trim>
 	</select>
 	
-	<!-- 3. 회원 상태 변경 (updateUserStatus) -->
+	<!-- 회원 상태 일괄 변경 -->
 	<update id="updateUserStatus" parameterType="map">
         UPDATE
             users
@@ -161,7 +161,7 @@
                 #{userNo}
             </foreach>
     </update>
-    
+    <!-- '활동' 상태로 변경된 회원들의 로그인 기록을 일괄 추가 -->
     <insert id="insertLoginHistoryForActivatedUsers" parameterType="list">
 	    INSERT INTO login_history 
 	        (user_no, lgn_use_id, lgn_dt, lgn_fail_nmtm, lgn_ip_addr)
