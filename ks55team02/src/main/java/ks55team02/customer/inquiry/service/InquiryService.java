@@ -5,6 +5,8 @@ package ks55team02.customer.inquiry.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import ks55team02.customer.inquiry.domain.Inquiry;
 
 public interface InquiryService {
@@ -16,10 +18,12 @@ public interface InquiryService {
 	Inquiry getInquiryById(String inquiryId);
 	
 	//문의 등록
-	void addInquiry(Inquiry inquiry);
+	void addInquiry(Inquiry inquiry, List<MultipartFile> attachedFiles); // 이 부분을 수정해야 합니다!
 	
 	//문의 목록 페이징
 	Map<String, Object> getInquiryList(int currentPage, int pageSize);
+	
+	
 	
 	
 }

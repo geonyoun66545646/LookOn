@@ -155,12 +155,9 @@
                 if (files.length > 0) {
                     Array.from(files).forEach(file => {
                         const fileItem = document.createElement('div');
-                        // d-flex align-items-center는 부트스트랩 클래스이며, 
-                        // .file-preview-item CSS에도 flexbox 속성이 정의되어 있어 중복될 수 있습니다.
-                        // 하지만 현재 HTML에서 사용하고 있으니 유지하겠습니다.
                         fileItem.className = 'file-preview-item d-flex align-items-center mt-2'; 
-                        fileItem.style.marginBottom = '5px'; // 파일 간격 추가
-
+                        fileItem.style.marginBottom = '5px'; 
+                        
                         // 파일 이름과 아이콘/이미지를 감싸는 래퍼
                         const fileNameWrapper = document.createElement('div');
                         fileNameWrapper.className = 'file-name-wrapper';
@@ -169,7 +166,6 @@
                         fileNameSpan.className = 'file-name-text';
                         fileNameSpan.textContent = file.name;
 
-                        // 파일 크기 제한 (5MB)
                         const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
                         if (file.size > MAX_FILE_SIZE) {
                             const sizeWarning = document.createElement('span');
@@ -184,33 +180,28 @@
                             reader.onload = function(e) {
                                 const img = document.createElement('img');
                                 img.src = e.target.result;
-                                img.style.maxWidth = '100px'; // 미리보기 이미지 크기 조정
+                                img.style.maxWidth = '100px'; 
                                 img.style.maxHeight = '100px';
-                                // img.style.marginRight = '10px'; // CSS의 gap으로 처리 예정
                                 fileNameWrapper.prepend(img); 
                             };
                             reader.readAsDataURL(file);
                         } else {
-                            // 이미지 파일이 아닌 경우 아이콘 표시
                             const fileIcon = document.createElement('i');
                             fileIcon.className = 'fa fa-file-alt'; 
                             fileIcon.style.fontSize = '24px';
-                            // fileIcon.style.marginRight = '10px'; // CSS의 gap으로 처리 예정
                             fileNameWrapper.prepend(fileIcon);
                         }
 
                         fileNameWrapper.appendChild(fileNameSpan); 
                         fileItem.appendChild(fileNameWrapper); 
 
-                        // 파일 삭제 버튼 컨테이너
                         const deleteButtonContainer = document.createElement('div');
                         deleteButtonContainer.className = 'file-delete-button-container';
 
                         const deleteButton = document.createElement('button');
                         deleteButton.type = 'button';
-                        deleteButton.className = 'btn btn-danger btn-extra-small'; // 커스텀 클래스 적용
-                        deleteButton.textContent = 'x'; // 텍스트 'x'로 변경
-                        // deleteButton.style.marginLeft = '10px'; // CSS 클래스에서 처리
+                        deleteButton.className = 'btn btn-danger btn-extra-small'; 
+                        deleteButton.textContent = 'x'; 
 
                         deleteButton.addEventListener('click', function() {
                             fileItem.remove();

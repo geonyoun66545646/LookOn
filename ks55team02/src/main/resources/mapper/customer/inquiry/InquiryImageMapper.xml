@@ -16,7 +16,10 @@
             img_id, 
             ord
         ) VALUES (
-            #{inqryImgId}, #{inqryId}, #{imgId}, #{ord}
+            #{inqryImgId}, 
+            #{inqryId}, 
+            #{imgId}, 
+            #{ord}
         )
     </insert>
 

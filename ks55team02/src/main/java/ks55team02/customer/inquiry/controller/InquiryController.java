@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import ks55team02.customer.inquiry.domain.Inquiry;
 import ks55team02.customer.inquiry.domain.InquiryOption;
@@ -59,14 +60,17 @@ public class InquiryController {
     // 문의 등록 POST 요청
     @ResponseBody
     @PostMapping("/addInquiry")
-    public ResponseEntity<Map<String, Object>> addInquiry(Inquiry inquiry) {
+    public ResponseEntity<Map<String, Object>> addInquiry(Inquiry inquiry,
+    		@RequestParam(name="attachedFiles", required=false)List<MultipartFile>attachedFiles) {
         log.info("AJAX 요청 수신된 문의 정보 (전체): {}", inquiry);
         log.info("AJAX 요청 수신된 문의 prvtYn 값: {}", inquiry.isPrvtYn());
         log.info("AJAX 요청 수신된 문의 inqryTypeCd 값: {}", inquiry.getInqryTypeCd());
+        log.info("수신된 첨부 파일 개수: {}", attachedFiles != null ? attachedFiles.size() : 0); // 파일 수신 확인 로그
+
 
         Map<String, Object> response = new HashMap<>();
         try {
-            inquiryService.addInquiry(inquiry);
+            inquiryService.addInquiry(inquiry, attachedFiles);
 
             response.put("status", "success");
             response.put("message", "등록 성공");
