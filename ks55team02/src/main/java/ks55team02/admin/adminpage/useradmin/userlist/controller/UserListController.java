@@ -28,13 +28,19 @@ public class UserListController {
 	
 	private final UserListService userListService;
 
+	/**
+	 * 회원 목록 페이지의 최초 로딩을 처리하는 핸들러
+	 * @param searchCriteria 검색 조건
+	 * @param model 뷰에 전달할 데이터를 담는 모델
+	 * @return 회원 목록 페이지 뷰 경로
+	 */
 	@GetMapping("/userList")
 	public String useradminUserListController(@ModelAttribute UserList searchCriteria, Model model) {
 
 		// 1. 검색 조건에 맞는 전체 회원 수를 조회
 		int totalCount = userListService.getUserCount(searchCriteria);
 
-		// 2. 전체 회원 수와 검색 조건을 기반으로 Pagination 객체를 생성
+		// 2. 전체 회원 수와 검색 조건을 기반으로 SearchPagination 객체를 생성
 		Pagination pagination = new Pagination(totalCount, searchCriteria);
 
 		// 3. 페이징 처리를 위해 DB 쿼리에 필요한 'offset'을 설정
@@ -52,7 +58,12 @@ public class UserListController {
 
 		return "admin/adminpage/useradmin/userList";
 	}
-
+	
+	/**
+	 * 여러 회원의 상태를 일괄적으로 변경하는 API (AJAX 호출용)
+	 * @param requestData 변경할 회원 번호 목록(userNos)과 상태(status)를 담은 객체
+	 * @return 처리 결과 (성공/실패 메시지)
+	 */
 	// 회원 상태 변경
 	@PostMapping("/updateUserStatus")
 	@ResponseBody
@@ -62,43 +73,48 @@ public class UserListController {
 		String status = (String) requestData.get("status");
         
         try {
-            // 2. Map에서 직접 값을 꺼내서 사용합니다.
-            //    userNos는 List<String> 형태로 들어오므로 캐스팅이 필요합니다.
-
             userListService.updateUserStatus(userNos, status);
             return ResponseEntity.ok(Map.of("result", "success", "message", "회원 상태가 성공적으로 변경되었습니다."));
-
+        
         } catch (Exception e) {
             log.error("상태 변경 중 서버 오류 발생", e);
-            return ResponseEntity.badRequest().body(Map.of("result", "fail", "message", "상태 변경 중 오류가 발생했습니다."));
+            return ResponseEntity.status(500).body(Map.of("result", "fail", "message", "상태 변경 중 오류가 발생했습니다."));
         }
     }
 
 
-	// 회원 목록 조회
+	/**
+	 * 검색, 정렬, 페이징 등 조건에 맞는 회원 목록을 비동기(AJAX)로 조회하는 핸들러
+	 * @param searchCriteria 검색 조건
+	 * @param model 뷰에 전달할 데이터를 담는 모델
+	 * @return 갱신될 뷰의 경로
+	 */
 	@GetMapping("/userstatussearch")
 	public String searchUserList(@ModelAttribute UserList searchCriteria, Model model) {
-
-		// 1. 검색 조건에 맞는 전체 회원 수를 조회
-	    int totalCount = userListService.getUserCount(searchCriteria);
-
-		// 2. Pagination 객체를 생성하여 페이징 정보를 계산
-	    Pagination pagination = new Pagination(totalCount, searchCriteria);
-
-	    // 3. DB 쿼리를 위한 offset 설정
-	    searchCriteria.setOffset(pagination.getLimitStart());
-
-        // 4. 페이지에 해당하는 회원 목록 조회
-	    List<UserList> userList = userListService.getUserList(searchCriteria);
-	    log.info("현재 페이지에 표시될 회원 수: {}", userList.size());
-
-	    // 5. Model에 데이터 추가
-	    model.addAttribute("userList", userList);
-	    model.addAttribute("totalCount", totalCount);
-	    model.addAttribute("pagination", pagination);
-	    model.addAttribute("searchCriteria", searchCriteria);
-
-
+		loadUserListData(searchCriteria, model); // 공통 로직 호출
 	    return "admin/adminpage/useradmin/userList :: userListFragment";
+	}
+	
+	/**
+	 * [공통 메서드] 회원 목록 데이터 조회 및 페이징 처리를 위한 중복 로직
+	 * @param searchCriteria 검색 조건
+	 * @param model 뷰에 전달할 데이터를 담는 모델
+	 */
+	private void loadUserListData(UserList searchCriteria, Model model) {
+		// 1. 조건에 맞는 전체 회원 수 조회
+		int totalCount = userListService.getUserCount(searchCriteria);
+		
+		// 2. 페이징 정보 계산
+		Pagination pagination = new Pagination(totalCount, searchCriteria);
+		searchCriteria.setOffset(pagination.getLimitStart());
+		
+		// 3. 현재 페이지에 해당하는 회원 목록 조회
+		List<UserList> userList = userListService.getUserList(searchCriteria);
+		
+		// 4. 뷰(Model)에 데이터 추가
+		model.addAttribute("userList", userList);
+		model.addAttribute("totalCount", totalCount);
+		model.addAttribute("pagination", pagination);
+		model.addAttribute("searchCriteria", searchCriteria);
 	}
 }

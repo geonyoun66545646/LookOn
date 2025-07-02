@@ -2,90 +2,104 @@
 <html xmlns:th="http://www.thymeleaf.org/"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{customer/layout/layoutMain}">
-<head>
-    <title>문의 게시판</title> 
-    <th:block layout:fragment="customCss">
-        <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/inquiryListView.css}">
-    </th:block>
-</head>
-<body>
-    <th:block layout:fragment="contents">
-        <main class="main">
-            <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
-                <div class="container">
-                    <h1 class="page-title">INQUIRYES<span>문의 & 답변</span></h1>
-                </div>
-            </div>
-            <nav aria-label="breadcrumb" class="breadcrumb-nav">
-                <div class="container">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item">
-                        <a th:href="@{/customer/inquiry/inquiryList}">INQUIRYLIST</a>
-                        </li>
-                    </ol>
-                </div>
-            </nav>
-            <div class="page-content">
-                <div class="container">
-                    <table class="table table-wishlist table-mobile">
-                        <thead>
-                            <tr class="center">
-                                <th scope="col">번호</th> 
-                                <th scope="col">비밀글</th>       
-                                <th scope="col">제목</th>       
-                                <th scope="col">질문유형</th>   
-                                <th scope="col">상태</th>   
-                                <th scope="col">작성자</th> 
-                                <th scope="col">작성일</th> 
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:if="${not #lists.isEmpty(inquiryList)}"
-                                th:each="l:${inquiryList}">
-                                <td th:text="${l.inqryId}"></td>
-                                <td th:text="${l.prvtYn ? '🔒' : ''}"></td>
-                                <td th:text="${l.inqryTtl}"></td>
-                                <td th:text="${l.inqryTypeCd}"></td>
-                                <td th:text="${l.prcsStts}"></td>
-                                <td th:text="${l.wrtrId}"></td>
-                                <td th:text="${#dates.format(l.regYmd, 'yyyy-MM-dd')}"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link page-link-prev" href="#" aria-label="Previous" tabindex="-1" aria-disabled="true">
-                                    <span aria-hidden="true"><i class="icon-angle-left"></i></span>
-                                    <span class="sr-only">Previous</span>
-                                </a>
-                            </li>
-                            <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link page-link-next" href="#" aria-label="Next">
-                                    <span class="sr-only">Next</span>
-                                    <span aria-hidden="true"><i class="icon-angle-right"></i></span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                        <div class="d-flex justify-content-end mt-4 mb-3 hidden-element">
-                         <a th:href="@{/customer/inquiry/addInquiry}" class="btn btn-primary btn-rounded">문의 하기</a> 
+    <head>
+        <title>문의 게시판</title>
+        <th:block layout:fragment="customCss">
+            <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/inquiryListView.css}">
+        </th:block>
+    </head>
+    <body>
+        <th:block layout:fragment="contents">
+            <main class="main">
+                <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+                    <div class="container">
+                        <h1 class="page-title">INQUIRYES<span>문의 & 답변</span></h1>
                     </div>
                 </div>
-            </div>
-        </main>
-    </th:block>
+                <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                    <div class="container">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                            <li class="breadcrumb-item">
+                                <a th:href="@{/customer/inquiry/inquiryList}">INQUIRYLIST</a>
+                            </li>
+                        </ol>
+                    </div>
+                </nav>
+                <div class="page-content">
+                    <div class="container">
+                        <table class="table table-wishlist table-mobile">
+                            <thead>
+                                <tr class="center">
+                                    <th scope="col">번호</th>
+                                    <th scope="col">비밀글</th>
+                                    <th scope="col">제목</th>
+                                    <th scope="col">질문유형</th>
+                                    <th scope="col">상태</th>
+                                    <th scope="col">작성자</th>
+                                    <th scope="col">작성일</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${#lists.isEmpty(inquiryList)}">
+                                    <td colspan="7" class="text-center">등록된 문의가 없습니다.</td>
+                                </tr>
+                                <tr th:unless="${#lists.isEmpty(inquiryList)}"
+                                    th:each="l, i : ${inquiryList}">
+                                    <td th:text="${totalRows - ((currentPage - 1) * pageSize + i.index)}"></td>
+                                    <td th:text="${l.prvtYn ? '🔒' : ''}"></td>
+                                    <td>
+                                        <a th:href="@{/customer/inquiry/inquiryDetail(inquiryId=${l.inqryId})}" th:text="${l.inqryTtl}"></a>
+                                    </td>
+                                    <td th:text="${l.inqryTypeCd}"></td>
+                                    <td th:text="${l.prcsStts}"></td>
+                                    <td th:text="${l.wrtrId}"></td>
+                                    <td th:text="${#temporals.format(l.regYmd, 'yyyy-MM-dd')}" th:if="${l.regYmd != null}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-    <th:block layout:fragment="jsScript">
-        <script>
-            // 이 페이지 전용 JavaScript 코드
-            console.log("문의 게시판 스크립트 실행!");
-        </script>
-    </th:block>
-</body>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item" th:classappend="${currentPage <= 1 ? 'disabled' : ''}">
+                                    <a class="page-link page-link-prev"
+                                       th:href="@{/customer/inquiry/inquiryList(page=${currentPage - 1}, size=${pageSize})}"
+                                       aria-label="Previous" th:tabindex="${currentPage <= 1 ? -1 : null}" th:aria-disabled="${currentPage <= 1 ? 'true' : 'false'}">
+                                        <span aria-hidden="true"><i class="icon-angle-left"></i></span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+
+                                <li class="page-item" th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}"
+                                    th:classappend="${pageNumber == currentPage ? 'active' : ''}"
+                                    th:aria-current="${pageNumber == currentPage ? 'page' : null}">
+                                    <a class="page-link" th:href="@{/customer/inquiry/inquiryList(page=${pageNumber}, size=${pageSize})}"
+                                       th:text="${pageNumber}">1</a>
+                                </li>
+
+                                <li class="page-item" th:classappend="${currentPage >= totalPages ? 'disabled' : ''}">
+                                    <a class="page-link page-link-next"
+                                       th:href="@{/customer/inquiry/inquiryList(page=${currentPage + 1}, size=${pageSize})}"
+                                       aria-label="Next" th:tabindex="${currentPage >= totalPages ? -1 : null}" th:aria-disabled="${currentPage >= totalPages ? 'true' : 'false'}">
+                                        <span class="sr-only">Next</span>
+                                        <span aria-hidden="true"><i class="icon-angle-right"></i></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                        <div class="d-flex justify-content-end mt-4 mb-3 hidden-element">
+                            <a th:href="@{/customer/inquiry/addInquiry}" class="btn btn-primary btn-rounded">문의 하기</a>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </th:block>
+
+        <th:block layout:fragment="jsScript">
+            <script>
+                // 이 페이지 전용 JavaScript 코드
+                console.log("문의 게시판 스크립트 실행!");
+            </script>
+        </th:block>
+    </body>
 </html>

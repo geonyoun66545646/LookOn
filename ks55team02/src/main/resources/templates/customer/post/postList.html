@@ -124,12 +124,15 @@
 	                                    <a th:text="${p.pstTtl}"
 	                                       th:href="@{/customer/post/postView(pstSn=${p.pstSn}, bbsClsfCd=${bbsClsfCd}, page=${currentPage}, size=${size})}"
 	                                       class="post-title-link">게시글제목</a>
+	                                    <span th:if="${p.cmntCnt > 0}">
+	                                    	[<span th:text="${p.cmntCnt}"></span>]
+	                                    </span>
 	                                </td>
 	                                <td th:text="${p.userInfo.userNcnm}">작성자</td>
-	                                <td th:text="${p.inqCnt}">조회수</td>
+	                                <td th:text="${p.viewCnt}">조회수</td>
 	                                <td th:text="${ #temporals.format(p.crtDt, 'yyyy-MM-dd') == #temporals.format(#temporals.createNow(), 'yyyy-MM-dd') 
-												? #temporals.format(p.crtDt, 'HH:mm:ss') 
-												: #temporals.format(p.crtDt, 'yy-MM-dd') }">생성일시</td>
+												? #temporals.format(p.crtDt, 'HH:mm') 
+												: #temporals.format(p.crtDt, 'MM-dd') }">생성일시</td>
 	                            </tr>
 	                        </th:block>
 	                        <tr th:unless="${!#lists.isEmpty(postList)}">

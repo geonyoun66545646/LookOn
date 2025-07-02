@@ -1,1 +1,100 @@
-	
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+<head>
+    <title>문의 상세</title>
+    <th:block layout:fragment="customCss">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/inquiryDetailView.css}">
+    </th:block>
+</head>
+<body>
+    <th:block layout:fragment="contents">
+        <main class="main">
+            <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+                <div class="container">
+                    <h1 class="page-title">INQUIRY DETAIL<span>문의 상세</span></h1>
+                </div>
+            </div>
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item">
+                        <a th:href="@{/customer/inquiry/inquiryList}">INQUIRYLIST</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">INQUIRY DETAIL</li>
+                    </ol>
+                </div>
+            </nav>
+            <div class="page-content">
+                <div class="container">
+                	<div class="inquiryTable">
+                    <form id="inquiryDetailForm">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr class="inquiry-row">
+                                    <td th:text="${inquiry.inqryTtl}" colspan="4" scope="row"></td>
+                                </tr>
+
+                                <tr class="inquiry-row title-row">
+                                    <td>
+                                        <div class="lock-status-box">
+                                        	<span>비밀글 &nbsp;&nbsp;:</span>
+                                            <span th:text="${inquiry.prvtYn ? '🔒':'🔓'}"></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                    <span>문의유형 &nbsp;&nbsp;:</span>&nbsp;
+                                    <span th:text="${inquiry.inqryTypeCd}" scope="row">문의 유형></span>
+                                    </td>
+                                    <td>
+                                    <span>작성자 &nbsp;&nbsp;: </span>
+                                    <span th:text="${inquiry.wrtrId}">작성자</span>
+                                    </td>
+                                    <td>
+                                    <span>작성일&nbsp;&nbsp;: </span>
+                                    <span th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}" th:if="${inquiry.regYmd != null}"></span>
+                                    </td>
+                                </tr>
+                                <tr class="inquiry-row content-row">
+                                    <td colspan="4">
+                                        <div class="inquiry-content-box">
+                                            <p class="inquiry-content-text" th:utext="${#strings.replace(inquiry.inqryCn, '\n', '<br>') ?: '내용 없음'}"></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                    </form>
+                    </div>
+
+                    <div class="inquiry-images-section mt-4">
+    <h4>첨부 이미지</h4>
+    <div class="row">
+        <div class="col-md-4 mb-3" th:each="image : ${inquiry.inquiryImages}">
+            <img th:src="@{${image.imgAddr}}" alt="첨부 이미지" class="img-fluid rounded shadow-sm">
+        </div>
+        <div th:if="${inquiry.inquiryImages == null || inquiry.inquiryImages.isEmpty()}" class="col-12">
+            <p>첨부된 이미지가 없습니다.</p>
+        </div>
+    </div>
+</div>
+                    <div class="form-group d-flex justify-content-end mt-4 mb-3">
+	   					    <button type="submit" class="btn btn-primary btn-rounded">문의 수정</button>
+                            <a th:href="@{/customer/inquiry/inquiryList}" class="btn btn-outline-secondary btn-rounded ml-2">목록으로</a>
+                        </div>
+                    </div>
+            </div>
+        </main>
+    </th:block>
+
+    <th:block layout:fragment="jsScript">
+        <script>
+   
+        </script>
+    </th:block>
+</body>
+</html>
