@@ -1,0 +1,121 @@
+/* --- 모달 스타일 --- */
+.lookon-modal-container { /* 변경 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+.lookon-modal-container.show { opacity: 1; visibility: visible; } /* 변경 */
+
+.lookon-modal-content { /* 변경 */
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 850px;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s;
+}
+.lookon-modal-container.show .lookon-modal-content { transform: scale(1); } /* 변경 */
+
+.lookon-close-button { /* 변경 */
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    color: #888;
+    line-height: 1;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    outline: none;
+}
+.lookon-close-button:hover {
+    color: #333;
+}
+
+.lookon-category-header { /* 변경 */
+    padding: 20px 25px 15px;
+    border-bottom: 1px solid #eee;
+}
+.lookon-main-tabs { display: flex; list-style: none; gap: 20px; } /* 변경 */
+.lookon-main-tabs li a { color: #888; font-size: 18px; padding-bottom: 15px; display: block; } /* 변경 */
+.lookon-main-tabs li.active a { color: #000; font-weight: 700; border-bottom: 2px solid #000; } /* 변경 */
+
+/* 모바일용 메뉴 - 평소엔 숨김 */
+.lookon-mobile-nav-links { /* 변경 */
+    display: none;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+.lookon-mobile-nav-links a { /* 변경 */
+    font-size: 14px;
+    color: #555;
+    background-color: #f0f0f0;
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+.lookon-mobile-nav-links a:hover { /* 변경 */
+    background-color: #e0e0e0;
+}
+
+.lookon-category-body { display: flex; height: 550px; } /* 변경 */
+
+.lookon-main-category-list { /* 변경 */
+    flex: 0 0 180px;
+    background-color: #f9f9f9;
+    padding: 15px 0;
+    overflow-y: auto;
+}
+.lookon-main-category-list li a { display: block; padding: 12px 25px; color: #333; font-size: 15px; } /* 변경 */
+.lookon-main-category-list li.active { background-color: white; font-weight: 700; } /* 변경 */
+.lookon-main-category-list li:not(.active) a:hover { background-color: #f0f0f0; } /* 변경 */
+
+.lookon-sub-category-grid { flex: 1; padding: 20px 25px; overflow-y: auto; } /* 변경 */
+.lookon-sub-category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; } /* 변경 */
+.lookon-sub-category-header h2 { margin: 0; font-size: 18px; display: flex; align-items: center; gap: 8px; } /* 변경 */
+.lookon-new-badge { background-color: #ff4d4d; color: white; font-size: 10px; padding: 2px 5px; border-radius: 3px; font-weight: bold; } /* 변경 */
+.lookon-store-link { font-size: 14px; color: #777; } /* 변경 */
+
+.lookon-grid-items { /* 변경 */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 20px;
+}
+.lookon-grid-item { text-align: center; cursor: pointer; } /* 변경 */
+.lookon-grid-item span { display: block; margin-top: 8px; font-size: 13px; color: #333; } /* 변경 */
+
+.lookon-icon-placeholder { /* 변경 */
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    border-radius: 12px;
+    background-color: #e9e9e9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #555;
+    transition: transform 0.2s;
+}
+.lookon-grid-item:hover .lookon-icon-placeholder { /* 변경 */
+    transform: scale(1.05);
+}
+
+@media (max-width: 480px) {
+    .lookon-main-category-list { /* 변경 */
+        flex-basis: 140px;
+    }
+}

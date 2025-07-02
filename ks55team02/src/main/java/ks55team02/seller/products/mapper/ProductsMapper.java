@@ -24,6 +24,9 @@ public interface ProductsMapper {
     // 고객용: 활성화되고 노출되는 상품 목록 조회
     List<Products> getAllActiveProductsForCustomer();
     
+    // 고객용: 카테고리별 활성화 및 노출 상품 목록 조회
+    List<Products> getActiveProductsForCustomerByCategory(@Param("categoryId") String categoryId);
+    
     // 판매자 번호와 스토어 ID로 상품 목록 조회 메서드를 추가합니다.
     List<Products> getProductsBySellerAndStore(Map<String, Object> paramMap);
     
