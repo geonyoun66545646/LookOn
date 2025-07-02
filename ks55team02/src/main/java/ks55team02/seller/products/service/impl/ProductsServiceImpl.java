@@ -31,13 +31,7 @@ public class ProductsServiceImpl implements ProductsService {
     @Value("${product.upload.dir}")
     private String uploadDir;
 
-    /**
-     * 판매자 번호(selUserNo)와 스토어 ID(storeId)에 해당하는 상품 목록을 조회합니다.
-     *
-     * @param selUserNo 판매자 번호
-     * @param storeId 스토어 ID
-     * @return 조건에 맞는 상품 목록 (List<Products>)
-     */
+    // 판매자 번호(selUserNo)와 스토어 ID(storeId)에 해당하는 상품 목록을 조회합니다.
     @Override
     public List<Products> getProductsBySellerAndStore(String selUserNo, String storeId) {
         Map<String, Object> paramMap = new HashMap<>();
@@ -46,13 +40,7 @@ public class ProductsServiceImpl implements ProductsService {
         return productsMapper.getProductsBySellerAndStore(paramMap);
     }
 
-    /**
-     * 새로운 상품을 등록하고 관련 이미지, 옵션, 옵션 조합별 재고 정보를 처리합니다.
-     * 이 메서드 내에서 여러 Mapper 메서드를 호출하며, 전체 작업이 하나의 트랜잭션으로 관리됩니다.
-     * 도중에 예외 발생 시 모든 변경 사항은 롤백됩니다.
-     *
-     * @param request 상품 등록에 필요한 모든 정보를 담은 요청 객체 (ProductRegistrationRequest DTO)
-     */
+    // 새로운 상품을 등록하고 관련 이미지, 옵션, 옵션 조합별 재고 정보를 처리합니다.
     @Override
     @Transactional // 트랜잭션 관리 어노테이션: 메서드 실행 중 오류 발생 시 모든 DB 작업 롤백
     public void addProduct(ProductRegistrationRequest request) {
@@ -60,12 +48,7 @@ public class ProductsServiceImpl implements ProductsService {
         String storeId = request.getStoreId(); // 스토어 ID
 
         // 1. 상품 번호(gdsNo) 생성
-        // productsMapper.getMaxProductCode()는 DB에서 다음 상품 번호를 가져오는 매퍼 메서드입니다.
-        // 예를 들어, "GDS00001", "GDS00002"와 같은 형태의 고유한 상품 번호를 생성합니다.
-        // 만약 UUID 형태의 완전한 고유값을 원한다면 `UUID.randomUUID().toString()`을 사용할 수도 있습니다.
         String gdsNo = productsMapper.getMaxProductCode();
-        // ProductRegistrationRequest DTO에 `gdsNo` 필드를 설정합니다.
-        // 이 `gdsNo`는 이후 상품 이미지, 옵션, 재고 상태 등을 연결하는 외래 키로 사용됩니다.
         request.setGdsNo(gdsNo);
 
         // 2. 기본 상품 정보 설정 및 PRODUCTS 테이블에 저장
@@ -154,13 +137,9 @@ public class ProductsServiceImpl implements ProductsService {
             sizeOptionValueMap = insertOptionAndValue(gdsNo, selUserNo, "사이즈", "S", optOrder++, sizeOptNo, request.getSizeOptions());
         }
 
-        // ⭐⭐⭐ 5. 옵션 조합별 재고 수량 및 매핑 정보 저장 ⭐⭐⭐
-        // `ProductRegistrationRequest` DTO의 `productOptionCombinations` 리스트를 처리합니다.
-        // 이 리스트의 각 요소(ProductCombinationData)는 프론트엔드에서 넘어온 특정 옵션 조합의 데이터입니다.
+        // 5. 옵션 조합별 재고 수량 및 매핑 정보 저장
         if (request.getProductOptionCombinations() != null && !request.getProductOptionCombinations().isEmpty()) {
             for (ProductCombinationData combinationData : request.getProductOptionCombinations()) {
-                // 각 옵션 조합에 대해 `PRODUCT_STATUS` 테이블에 새로운 레코드를 생성합니다.
-                // `PRODUCT_STATUS`는 이 특정 옵션 조합에 대한 재고 상태를 나타냅니다.
                 String gdsSttsNo = productsMapper.getMaxStatusNo(); // 새로운 상품 상태 번호 생성
 
                 ProductStatus productStatus = new ProductStatus();
@@ -175,9 +154,6 @@ public class ProductsServiceImpl implements ProductsService {
 
                 productsMapper.insertProductStatus(productStatus); // `PRODUCT_STATUS` 테이블에 데이터 삽입
 
-                // `ProductCombinationData`의 `optVlNo1`, `optVlNo2`, `optVlNo3` 필드가
-                // 실제로는 옵션 값의 *이름* (예: "남성", "빨강", "M")을 담고 있다고 가정하고,
-                // 이를 사용하여 위에서 생성된 `optVlNo` (옵션 값 번호)를 찾아 매핑합니다.
                 String finalOptVlNo1 = null;
                 if (StringUtils.hasText(combinationData.getOptVlNo1())) {
                     finalOptVlNo1 = genderOptionValueMap.get(combinationData.getOptVlNo1());
@@ -193,7 +169,7 @@ public class ProductsServiceImpl implements ProductsService {
                     finalOptVlNo3 = sizeOptionValueMap.get(combinationData.getOptVlNo3());
                 }
 
-                // **디버깅을 위해 이 부분에 로그를 추가하여 actual opt_vl_no가 올바르게 매핑되는지 확인하세요.**
+                // 디버깅을 위해 이 부분에 로그를 추가하여 actual opt_vl_no가 올바르게 매핑되는지 확인하세요.
                 System.out.println("CombinationData optVlNo1 (from frontend, assumed name): " + combinationData.getOptVlNo1() + ", Mapped finalOptVlNo1: " + finalOptVlNo1);
                 System.out.println("CombinationData optVlNo2 (from frontend, assumed name): " + combinationData.getOptVlNo2() + ", Mapped finalOptVlNo2: " + finalOptVlNo2);
                 System.out.println("CombinationData optVlNo3 (from frontend, assumed name): " + combinationData.getOptVlNo3() + ", Mapped finalOptVlNo3: " + finalOptVlNo3);
@@ -234,9 +210,9 @@ public class ProductsServiceImpl implements ProductsService {
                 }
             }
         } else {
-             // 만약 옵션 조합이 하나도 넘어오지 않은 경우 (예: 옵션 없는 단일 상품),
-             // `ProductRegistrationRequest`의 `stockQuantity` 필드에 있는 총 재고 수량을 기반으로
-             // 단일 `ProductStatus` 레코드를 생성하여 저장합니다.
+              // 만약 옵션 조합이 하나도 넘어오지 않은 경우 (예: 옵션 없는 단일 상품),
+              // `ProductRegistrationRequest`의 `stockQuantity` 필드에 있는 총 재고 수량을 기반으로
+              // 단일 `ProductStatus` 레코드를 생성하여 저장합니다.
             String gdsSttsNo = productsMapper.getMaxStatusNo(); // 새로운 상품 상태 번호 생성
             ProductStatus productStatus = new ProductStatus();
             productStatus.setGdsSttsNo(gdsSttsNo);
@@ -256,16 +232,7 @@ public class ProductsServiceImpl implements ProductsService {
         // if (StringUtils.hasText(request.getVideoUrl())) { /* 동영상 URL 저장 로직 */ }
     }
 
-    /**
-     * 이미지 파일을 지정된 경로에 저장하고, 해당 이미지 정보를 DB(`PRODUCT_IMAGE` 테이블)에 삽입하는 헬퍼 메서드입니다.
-     *
-     * @param file 멀티파트 파일 객체 (업로드된 이미지 파일)
-     * @param gdsNo 상품 번호 (이미지가 속한 상품)
-     * @param creatorNo 생성자(판매자) 번호
-     * @param imgNo 이미지 번호 (DB에서 새로 생성된 고유 번호)
-     * @param imgIndctSn 이미지 표시 순서
-     * @param imageType 이미지 유형 (예: THUMBNAIL, MAIN, DETAIL)
-     */
+    // 이미지 파일을 지정된 경로에 저장하고, 해당 이미지 정보를 DB(`PRODUCT_IMAGE` 테이블)에 삽입하는 헬퍼 메서드입니다.
     private void saveAndInsertImage(MultipartFile file, String gdsNo, String creatorNo, String imgNo, int imgIndctSn, ProductImageType imageType) {
         if (file.isEmpty()) return; // 파일이 비어있으면 더 이상 처리하지 않고 반환
 
@@ -316,19 +283,7 @@ public class ProductsServiceImpl implements ProductsService {
         }
     }
 
-    /**
-     * 상품 옵션(`PRODUCT_OPTION` 테이블)과 해당 옵션의 값들(`PRODUCT_OPTION_VALUE` 테이블)을 DB에 삽입하는 헬퍼 메서드입니다.
-     * 이 함수는 새로운 옵션(예: "성별")과 그에 대한 새로운 옵션 값들(예: "남성", "여성")을 등록하는 데 사용됩니다.
-     *
-     * @param gdsNo 상품 번호 (옵션이 속한 상품)
-     * @param userNo 생성자(판매자) 번호
-     * @param optionName 옵션 이름 (예: "색상", "사이즈", "성별")
-     * @param choiceType 선택 유형 코드 (예: "S": 단일 선택, "M": 복수 선택)
-     * @param order 옵션 표시 순서
-     * @param optNo 생성된 옵션 번호 (DB에서 부여된 고유 번호)
-     * @param values 옵션 값 이름 목록 (예: ["빨강", "파랑"], ["S", "M", "L"])
-     * @return `Map<String, String>` - 옵션 값 이름(key)과 해당 옵션 값 번호(value)의 매핑
-     */
+    // 상품 옵션(`PRODUCT_OPTION` 테이블)과 해당 옵션의 값들(`PRODUCT_OPTION_VALUE` 테이블)을 DB에 삽입하는 헬퍼 메서드입니다.
     private Map<String, String> insertOptionAndValue(String gdsNo, String userNo, String optionName, String choiceType, int order, String optNo, List<String> values) {
         Map<String, String> generatedOptionValueIds = new HashMap<>(); // To store vlNm -> optVlNo mapping
 
@@ -366,44 +321,31 @@ public class ProductsServiceImpl implements ProductsService {
         return generatedOptionValueIds; // 생성된 옵션 값 ID 맵 반환
     }
 
-    /**
-     * 특정 상품 코드가 데이터베이스에 이미 존재하는지 확인합니다.
-     *
-     * @param productCode 확인할 상품 코드
-     * @return true면 중복, false면 중복 아님
-     */
+    // 특정 상품 코드가 데이터베이스에 이미 존재하는지 확인합니다.
     @Override
     public boolean isProductCodeDuplicated(String productCode) {
         return productsMapper.countProductCode(productCode) > 0;
     }
 
-    /**
-     * 판매자/관리자용: 모든 상품 목록을 조회합니다. (필요 시 사용)
-     * 이 메서드는 현재 `getProductsBySellerAndStore`로 대체될 수 있습니다.
-     *
-     * @return 모든 상품 목록 (List<Products>)
-     */
+    // 판매자/관리자용: 모든 상품 목록을 조회합니다. (필요 시 사용)
     @Override
     public List<Products> getProductList() {
         return productsMapper.getProductList();
     }
 
-    /**
-     * 고객용: 활성화되고 노출되는 상품 목록을 조회합니다.
-     *
-     * @return 활성화되고 노출되는 상품 목록 (List<Products>)
-     */
+    // 고객용: 활성화되고 노출되는 상품 목록을 조회합니다.
     @Override
     public List<Products> getAllActiveProductsForCustomer() {
         return productsMapper.getAllActiveProductsForCustomer();
     }
 
-    /**
-     * 특정 상품의 상세 정보를 조회하고, 연관된 이미지 리스트를 함께 반환합니다.
-     *
-     * @param gdsNo 조회할 상품 번호
-     * @return 상세 정보와 이미지 리스트가 담긴 Products 객체
-     */
+    // 고객용: 특정 카테고리에 속하는 활성화 및 노출 상품 목록을 조회합니다.
+    @Override
+    public List<Products> getActiveProductsForCustomerByCategory(String categoryId) {
+        return productsMapper.getActiveProductsForCustomerByCategory(categoryId);
+    }
+
+    // 특정 상품의 상세 정보를 조회하고, 연관된 이미지 리스트를 함께 반환합니다.
     @Override
     public Products getProductDetailWithImages(String gdsNo) {
         // ProductsMapper의 getProductDetailWithImages 메서드를 호출하여
