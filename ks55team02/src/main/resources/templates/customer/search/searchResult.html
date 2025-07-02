@@ -344,32 +344,53 @@
     });
 
 
-    // --- 기존 render 함수들은 일부 수정이 필요합니다 ---
-
     /**
-     * 1. 상품 목록을 그리는 함수 (페이지네이션 컨테이너 추가)
+     * 1. 상품 목록을 그리는 함수 (HTML 구조 통일 버전)
      */
     function renderProducts(container, products) {
+        // 검색 결과가 없는 경우 처리
         if (!products || products.length === 0) {
-            container.innerHTML = '<div class="text-center p-5">검색된 상품이 없습니다.</div>';
+            // '전체' 탭과 동일한 구조로 '결과 없음' 메시지를 표시합니다.
+            container.innerHTML = `
+                <div class="card shadow-sm search-results-card">
+                    <div class="card-body py-4 px-4">
+                        <p class="text-center w-100">검색된 상품이 없습니다.</p>
+                    </div>
+                </div>`;
             return;
         }
 
-        let html = '<div class="product-grid-container">';
+        // ★★★ '전체' 탭과 동일한 카드/카드바디 구조를 추가합니다 ★★★
+        let html = `
+            <div class="card shadow-sm search-results-card">
+                <div class="card-body py-4 px-4">
+                    <div class="product-grid-container">
+        `;
+
+        // 상품 카드 목록 생성 (기존과 동일)
         products.forEach(product => {
             html += `
-                <div class="card product-card">
+                <div class="card h-100 product-card">
                     <a href="/customer/products/${product.gdsNo}">
-                        <img src="${product.imgFilePathNm}" class="card-img-top" alt="${product.gdsNm}"
+                        <img src="${product.imgFilePathNm}" 
+                             class="card-img-top" 
+                             alt="${product.gdsNm}"
                              onerror="this.onerror=null; this.src='/maincss/assets/images/sellerUploads/default_product.png';">
                     </a>
                     <div class="card-body">
-                        <h6 class="card-title text-truncate"><a href="/customer/products/${product.gdsNo}">${product.gdsNm}</a></h6>
+                        <h6 class="card-title text-truncate">
+                            <a href="/customer/products/${product.gdsNo}">${product.gdsNm}</a>
+                        </h6>
                         <p class="card-text text-muted">₩ ${product.lastSelPrc.toLocaleString()}</p>
                     </div>
                 </div>`;
         });
-        html += '</div>';
+
+        html += `
+                    </div>
+                </div>
+            </div>
+        `;
         
         // 페이지네이션 버튼이 들어갈 컨테이너 추가
         html += '<div class="pagination-container mt-5"></div>';
@@ -404,30 +425,49 @@
     }
     
     /**
-     * 3. 사용자 목록을 그리는 함수 (페이지네이션 컨테이너 추가)
+     * 3. 사용자 목록을 그리는 함수 (HTML 구조 통일 버전)
      */
     function renderUsers(container, users) {
         if (!users || users.length === 0) {
-            container.innerHTML = '<div class="text-center p-5">검색된 사용자가 없습니다.</div>';
+            container.innerHTML = `
+                <div class="card shadow-sm search-results-card">
+                    <div class="card-body py-4 px-4">
+                        <p class="text-center w-100">검색된 사용자가 없습니다.</p>
+                    </div>
+                </div>`;
             return;
         }
-        let html = '<div class="product-grid-container">';
+
+        // ★★★ '전체' 탭과 동일한 카드/카드바디 구조를 추가합니다 ★★★
+        let html = `
+            <div class="card shadow-sm search-results-card">
+                <div class="card-body py-4 px-4">
+                    <div class="product-grid-container">
+        `;
+
         users.forEach(user => {
-            const profileImagePath = user.prflImg && user.prflImg.trim() !== ""
+            const profileImagePath = user.prflImg && user.prflImg.trim() !== "" 
                 ? user.prflImg : '/maincss/assets/images/default_user.png';
             html += `
-                <div class="card search-result-user-card">
+                <div class="card h-100 search-result-user-card">
                     <a href="/customer/users/${user.userNcnm}">
                        <img src="${profileImagePath}" class="rounded-circle mx-auto mt-3 search-profile-img" alt="프로필" style="width: 80px; height: 80px; object-fit: cover;"
                             onerror="this.onerror=null; this.src='/maincss/assets/images/default_user.png';">
                     </a>
                     <div class="card-body text-center">
-                        <h6 class="card-title mb-0 text-truncate"><a href="/customer/users/${user.userNcnm}">${user.userNcnm}</a></h6>
+                        <h6 class="card-title mb-0 text-truncate">
+                            <a href="/customer/users/${user.userNcnm}">${user.userNcnm}</a>
+                        </h6>
                         <small class="text-muted">${user.userNm}</small>
                     </div>
                 </div>`;
         });
-        html += '</div>';
+        
+        html += `
+                    </div>
+                </div>
+            </div>
+        `;
 
         // 페이지네이션 버튼이 들어갈 컨테이너 추가
         html += '<div class="pagination-container mt-5"></div>';
