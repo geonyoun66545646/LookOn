@@ -1,0 +1,119 @@
+/* 기존 reports.css에서 body { ... } 부분을 완전히 제거합니다. */
+
+/* .report-container 에 너비 제한을 걸어야 한다면 여기에 추가합니다. */
+.report-container {
+    background-color: #ffffff;
+    padding: 40px; /* 기존 패딩 값 */
+    margin-top: 20px;    /* 상단 외부 여백 20px 추가 */
+    margin-bottom: 20px; /* 하단 외부 여백 20px 추가 */
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px; /* 중앙 정렬을 위한 max-width 예시 (필요시 조절) */
+    margin-left: auto; /* margin-top, margin-bottom 적용 후 margin: 0 auto;를 쓰면 */
+    margin-right: auto; /* 상하 마진이 덮어씌워지므로 개별 지정 */
+    box-sizing: border-box;
+}
+
+h2 {
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+p.description {
+    color: #666;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.form-field {
+   flex: 1;
+   min-width: calc(50% - 10px);
+    box-sizing: border-box;
+}
+
+.form-field.full-width {
+    flex: 0 0 100%;
+    min-width: 100%;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #ff9900;
+    outline: none;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.submit-btn {
+    background-color: #ff9900;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.submit-btn:hover {
+    background-color: #e68a00;
+}
+
+.info-message {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #e9f5ee;
+    border-left: 5px solid #4CAF50;
+    color: #333;
+    border-radius: 5px;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.info-message.warning {
+    background-color: #fff3cd;
+    border-left-color: #ffc107;
+}
+
+.required::after {
+    content: ' *';
+    color: #ff0000;
+}

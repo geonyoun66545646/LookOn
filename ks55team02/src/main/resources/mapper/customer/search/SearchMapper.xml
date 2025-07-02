@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ks55team02.customer.search.mapper.SearchMapper">
+
+	<resultMap type="ks55team02.customer.search.domain.ProductsSearch" id="productsSearchMap">
+		<result column="gds_no" property="gdsNo" />
+		<result column="gds_nm" property="gdsNm" />
+		<result column="last_sel_prc" property="lastSelPrc" />
+		<result column="img_file_path_nm" property="imgFilePathNm" />
+	</resultMap>
+
+	<select id="searchProducts" parameterType="map" resultMap="productsSearchMap">
+		<bind name="pattern" value="'%' + _parameter.get('keyword') + '%'" />
+		SELECT
+			p.gds_no,
+			p.gds_nm,
+			p.last_sel_prc,
+			img.img_file_path_nm
+		FROM
+			products p
+		LEFT JOIN
+			product_images img ON p.gds_no = img.gds_no AND img.rprs_img_yn = 'Y'
+		WHERE
+			p.gds_nm LIKE #{pattern}
+		ORDER BY
+			p.reg_dt DESC
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id="getProductsCount" parameterType="string" resultType="int">
+		<bind name="pattern" value="'%' + _parameter + '%'" />
+		SELECT
+			COUNT(*)
+		FROM
+			products p
+		WHERE
+			p.gds_nm LIKE #{pattern}
+	</select>
+
+	<resultMap type="ks55team02.customer.search.domain.PostsSearch" id="postsSearchMap">
+		<result column="pst_sn" property="pstSn" />
+		<result column="pst_ttl" property="pstTtl" />
+		<result column="pst_cn" property="pstCn" />
+		<result column="user_ncnm" property="userNcnm" />
+		<result column="crt_dt" property="crtDt" />
+	</resultMap>
+
+	<select id="searchPosts" parameterType="map" resultMap="postsSearchMap">
+		<bind name="pattern" value="'%' + _parameter.get('keyword') + '%'" />
+		SELECT
+			p.pst_sn,
+			p.pst_ttl,
+			LEFT(p.pst_cn, 100) AS pst_cn,
+			p.crt_dt,
+			u.user_ncnm
+		FROM
+			posts p
+		JOIN
+			users u ON p.wrtr_user_no = u.user_no
+		WHERE
+			p.pst_ttl LIKE #{pattern}
+		ORDER BY
+			p.crt_dt DESC
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id="getPostsCount" parameterType="string" resultType="int">
+		<bind name="pattern" value="'%' + _parameter + '%'" />
+		SELECT
+			COUNT(*)
+		FROM
+			posts p
+		WHERE
+			p.pst_ttl LIKE #{pattern}
+	</select>
+
+	<resultMap type="ks55team02.customer.search.domain.UsersSearch" id="usersSearchMap">
+		<result column="user_ncnm" property="userNcnm" />
+		<result column="user_nm" property="userNm" />
+		<result column="prfl_img" property="prflImg" />
+	</resultMap>
+
+	<select id="searchUsers" parameterType="map" resultMap="usersSearchMap">
+		<bind name="pattern" value="'%' + _parameter.get('keyword') + '%'" />
+		SELECT
+			u.user_ncnm,
+			u.user_nm,
+			pro.prfl_img
+		FROM
+			users u
+		LEFT JOIN
+			user_profiles pro ON u.user_no = pro.user_no
+		WHERE
+			u.user_nm LIKE #{pattern}
+			AND u.user_ncnm IS NOT NULL
+			AND u.user_nm IS NOT NULL
+		ORDER BY
+			u.join_dt DESC
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
+	
+	<select id="getUsersCount" parameterType="string" resultType="int">
+		<bind name="pattern" value="'%' + _parameter + '%'" />
+		SELECT
+			COUNT(*)
+		FROM
+			users u
+		WHERE
+			u.user_nm LIKE #{pattern}
+			AND u.user_ncnm IS NOT NULL
+			AND u.user_nm IS NOT NULL
+	</select>
+
+</mapper>

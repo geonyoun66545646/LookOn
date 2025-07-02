@@ -1,0 +1,111 @@
+
+/* myReports.css */
+
+/* myReports.css */
+
+/* card-body 내부 폼의 좌우 정렬을 보정 */
+.card-body > form.row { /* Bootstrap row 클래스를 사용한다면 */
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%; /* 부모에 맞춰 너비 설정 */
+}
+
+.card-body {
+    padding: 20px; /* card-body 기본 패딩을 명시적으로 설정하거나, 필요시 조정 */
+}
+/* 폼 드롭다운 메뉴, 검색창, 검색 버튼의 높이 통일 */
+.myReports-container .form-select,
+.myReports-container .form-control,
+.myReports-container .input-group .btn { /* input-group 내부의 버튼을 정확히 지정 */
+    height: 38px; /* 통일하고자 하는 높이 값 (Bootstrap 기본 높이) */
+    /* 또는 보다 동적인 Bootstrap 높이 계산식 사용: */
+    /* height: calc(1.5em + .75rem + 2px); */
+}
+
+/* input-group 내부 요소들의 세로 정렬 보장 (필요시 추가) */
+.myReports-container .input-group {
+    align-items: stretch; /* input-group 내부 아이템들이 컨테이너 높이에 맞춰 늘어나도록 */
+}
+
+/* 각 필드 묶음 내 라벨과 폼 요소의 세로 정렬 및 간격 */
+.myReports-container .d-flex.flex-column {
+    /* 이전에 mb-3을 라벨에 추가했다면, 여기서는 추가적인 조정이 필요 없을 수 있습니다. */
+    /* 필요하다면 여기에서 라벨의 margin-bottom을 더 세밀하게 조정할 수 있습니다. */
+}
+
+
+/* 기존 myReports-container 스타일은 유지 */
+.myReports-container {
+    max-width: 1000px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 0 15px;
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 폼 컨테이너 (검색 필터 부분) */
+.my-report-search-form {
+    display: flex; /* 자식 요소들을 가로로 배치 */
+    flex-wrap: wrap; /* 화면이 좁아지면 줄 바꿈 허용 */
+    gap: 15px; /* 각 폼 그룹 아이템 사이의 간격 */
+    align-items: flex-end; /* 모든 아이템을 하단으로 정렬 (버튼 높이 맞추기 위함) */
+}
+
+/* 각 폼 그룹 아이템 (신고 대상 유형, 처리 상태, 검색어) */
+.my-report-search-form .form-group-item {
+    display: flex; /* 라벨과 입력 필드를 세로로 배치 */
+    flex-direction: column;
+    flex: 1; /* 가용한 공간을 균등하게 차지하도록 (혹은 min-width로 제어) */
+    min-width: 200px; /* 각 필드의 최소 너비 설정 (반응형 대응) */
+    /* col-md-3, col-md-4, col-md-2 역할을 직접 정의 */
+    /* 예시: */
+    /* flex: 0 0 calc(25% - 15px); /* 4개 아이템이 있다고 가정하고 25% 너비 */
+    /* flex: 0 0 calc(33.333% - 10px); /* 3개 아이템이 있다고 가정하고 33% 너비 */
+}
+
+/* 검색어 필드는 다른 필드보다 넓게 만들고 싶을 경우 */
+.my-report-search-form .form-group-search-keyword {
+    flex: 2; /* 두 배 넓게 */
+    min-width: 300px; /* 최소 너비 조정 */
+}
+
+/* 버튼 묶음 */
+.my-report-search-form .form-group-button {
+    display: flex;
+    align-items: flex-end; /* 버튼만 따로 하단 정렬 */
+    /* flex-grow: 0; flex-shrink: 0; flex-basis: auto; */
+    /* 또는 특정 너비 설정: width: 150px; */
+}
+
+/* 라벨과 폼 드롭다운 메뉴/입력 필드의 간격 조정 */
+.my-report-search-form .form-label {
+    margin-bottom: 8px; /* 라벨 아래 간격 (원하는 값으로 조정) */
+    font-weight: bold; /* 필요시 추가 */
+}
+
+/* 폼 드롭다운, 입력 필드, 버튼의 높이 통일 */
+.my-report-search-form .form-select,
+.my-report-search-form .form-control,
+.my-report-search-form .btn-primary {
+    height: 38px; /* 원하는 정확한 높이 값으로 설정 (예: 38px) */
+    /* input, select, button 요소에 padding과 border가 포함되도록 box-sizing: border-box;가 전역적으로 적용되어 있거나, 이 요소들에 직접 적용되어야 합니다. */
+}
+
+.table .btn-outline-primary {
+    text-align: center;
+    /* 만약 아이콘이 있다면 아이콘과 텍스트가 함께 정렬됩니다. */
+    /* 버튼 내부의 텍스트가 가운데 오도록 display 속성도 필요할 수 있습니다. */
+    /* display: flex; /* Flexbox로 만들어서 내부 요소를 정렬할 수도 있습니다. */
+    /* justify-content: center; */
+    /* align-items: center; */
+}
+
+/* Bootstrap의 .w-100 (width: 100%)을 살리려면 버튼 div에는 별도의 너비를 주지 않고,
+   버튼 자체에 w-100을 유지하는 것이 좋습니다.
+   .form-group-button의 align-items: flex-end만으로 충분할 수 있습니다. */
+
+/* 추가적으로 필요한 스타일 (선택 사항) */
+/* .card 에도 필요한 경우 패딩이나 마진을 추가할 수 있습니다. */
+/* 부트스트랩 클래스를 사용하고 있으니, 부트스트랩의 여백 유틸리티 클래스 (mt-x, mb-x, py-x 등)도 활용할 수 있습니다. */
