@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.inquiry.mapper.InquiryMapper">
+
+    <resultMap id="inquiryResultMap" type="ks55team02.customer.inquiry.domain.Inquiry">
+        <id property="inqryId" column="inqry_id"/>
+        <result property="inqryTypeCd" column="inqry_type_cd"/>
+        <result property="inqryTrgtTypeCd" column="inqry_trgt_type_cd"/>
+        <result property="wrtrId" column="wrtr_id"/>
+        <result property="inqryStoreId" column="inqry_store_id"/>
+        <result property="inqryTtl" column="inqry_ttl"/>
+        <result property="inqryCn" column="inqry_cn"/>
+        <result property="prvtYn" column="prvt_yn"/>
+        <result property="prcsStts" column="prcs_stts"/>
+        <result property="prcsUserNo" column="prcs_user_no"/>
+        <result property="regYmd" column="reg_ymd"/>
+        <result property="mdfcnYmd" column="mdfcn_ymd"/>
+        <result property="delDt" column="del_dt"/>
+        <result property="delUserNo" column="del_user_no"/>
+        <result property="delActvtnYn" column="del_actvtn_yn"/>
+        <!-- InquiryImage 리스트 매핑 (1:N 관계) -->
+        <collection property="inquiryImages" ofType="ks55team02.customer.inquiry.domain.InquiryImage"
+                    select="ks55team02.customer.inquiry.mapper.InquiryImageMapper.getInquiryImagesByInquiryId"
+                    column="inqry_id"/>
+    </resultMap>
+
+    <insert id="addInquiry" parameterType="ks55team02.customer.inquiry.domain.Inquiry">
+        INSERT INTO inquiries
+        (inqry_id, inqry_type_cd, inqry_trgt_type_cd, wrtr_id, inqry_store_id, inqry_ttl, inqry_cn, prvt_yn, prcs_stts, prcs_user_no, mdfcn_ymd, del_dt, del_user_no, del_actvtn_yn)
+        VALUES
+        (#{inqryId},
+        #{inqryTypeCd},
+        #{inqryTrgtTypeCd},
+        #{wrtrId},
+        #{inqryStoreId},
+        #{inqryTtl},
+        #{inqryCn},
+        #{prvtYn},
+        #{prcsStts},
+        #{prcsUserNo},
+        #{mdfcnYmd},  <!-- mdfcnYmd는 DDL에 ON UPDATE CURRENT_TIMESTAMP이므로, null로 두면 자동 업데이트됨 -->
+        #{delDt},
+        #{delUserNo},
+        #{delActvtnYn})
+    </insert>
+
+    <select id="getInquiryList" resultMap="inquiryResultMap">
+        SELECT
+            inqry_id, inqry_type_cd, inqry_trgt_type_cd, wrtr_id, inqry_store_id, inqry_ttl, inqry_cn, prvt_yn, prcs_stts, prcs_user_no, reg_ymd, mdfcn_ymd, del_dt, del_user_no, del_actvtn_yn
+        FROM
+            inquiries
+        ORDER BY
+            reg_ymd DESC
+    </select>
+
+    <select id="getInquiryById" parameterType="String" resultMap="inquiryResultMap">
+        SELECT
+            inqry_id, inqry_type_cd, inqry_trgt_type_cd, wrtr_id, inqry_store_id, inqry_ttl, inqry_cn, prvt_yn, prcs_stts, prcs_user_no, reg_ymd, mdfcn_ymd, del_dt, del_user_no, del_actvtn_yn
+        FROM
+            inquiries
+        WHERE
+            inqry_id = #{inquiryId}
+    </select>
+    
+    <!-- 이미지 정보와 함께 문의를 조회하는 메서드 -->
+    <select id="getInquiryByIdWithImages" parameterType="String" resultMap="inquiryResultMap">
+        SELECT
+            i.inqry_id, i.inqry_type_cd, i.inqry_trgt_type_cd, i.wrtr_id, i.inqry_store_id, i.inqry_ttl, i.inqry_cn, i.prvt_yn, i.prcs_stts, i.prcs_user_no, i.reg_ymd, i.mdfcn_ymd, i.del_dt, i.del_user_no, i.del_actvtn_yn
+        FROM
+            inquiries i
+        WHERE
+            i.inqry_id = #{inquiryId}
+    </select>
+
+    <select id="getMaxInquiryId" resultType="string">
+        SELECT
+            MAX(CAST(SUBSTRING(inqry_id, 5) AS UNSIGNED)) AS maxId
+        FROM
+            inquiries
+        WHERE
+            inqry_id LIKE 'inq_%' AND
+            SUBSTRING(inqry_id, 5) REGEXP '^[0-9]+$';
+    </select>
+
+    <select id="getTotalInquiryCount" resultType="int">
+        SELECT COUNT(*) FROM inquiries
+    </select>
+
+    <select id="getInquiryListPaging" resultMap="inquiryResultMap">
+        SELECT
+            inqry_id,
+            inqry_type_cd,
+            inqry_trgt_type_cd,
+            wrtr_id,
+            inqry_store_id,
+            inqry_ttl,
+            inqry_cn,
+            prvt_yn,
+            prcs_stts,
+            prcs_user_no,
+            reg_ymd,
+            mdfcn_ymd,
+            del_dt,
+            del_user_no,
+            del_actvtn_yn
+        FROM inquiries
+        ORDER BY reg_ymd DESC, inqry_id DESC
+        LIMIT #{pageSize} OFFSET #{startRow}
+    </select>
+
+</mapper>
