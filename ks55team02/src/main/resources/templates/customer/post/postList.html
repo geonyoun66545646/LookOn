@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+
+<head>
+    <meta name="description" content="한국스마트정보교육원 ksmybatis" />
+    <title>게시글 목록</title>
+    <!-- CSS 파일 링크는 layoutMain에서 제공될 가능성이 높으므로, 여기에 다시 명시하지 않겠습니다. -->
+    <!-- 만약 layoutMain에서 CSS를 동적으로 추가하지 않는다면, 여기에 추가해야 합니다. -->
+    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postList.css}">
+</head>
+
+<!-- 추가할 js file -->
+<th:block layout:fragment="jsFile">
+    <!-- 필요한 js 파일이 있다면 여기에 추가 -->
+</th:block>
+
+
+<!-- 추가할 script -->
+<th:block layout:fragment="jsScript">
+	<script th:inline="javascript">
+		$(() => {
+		
+		    // --- 상수 선언 ---
+		    const $searchInput = $('input[placeholder="검색어를 입력하세요"]');
+		    const $pageSizeSelect = $('#pageSizeSelectForm');
+		    const $tabsContainer = $('.board-tabs-container');
+		    const bbsClsfCd = '';
+		    const size = 10;
+		    const searchKeyword = '';
+		
+		    // --- 검색 기능 초기화 ---
+		    if($searchInput.length) {
+		        $searchInput.val(searchKeyword);
+		        $searchInput.on('keypress', e => {
+		            if(e.key === 'Enter') {
+		                e.preventDefault();
+		                const searchTerm = $searchInput.val().trim();
+		                const currentSize = $pageSizeSelect.length ? $pageSizeSelect.val() : size;
+		                window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=1&size=${currentSize}&searchKeyword=${searchTerm}`;
+		            }
+		        });
+		    }
+		
+		    // --- 페이지 사이즈 변경 기능 ---
+		    if($pageSizeSelect.length) {
+		        $pageSizeSelect.on('change', e => {
+		            const searchTerm = $searchInput.length ? $searchInput.val().trim() : searchKeyword;
+		            window.location.href = `/customer/post/postList?bbsClsfCd=${bbsClsfCd}&page=1&size=${$(e.target).val()}&searchKeyword=${searchTerm}`;
+		        });
+		    }
+		
+		    // --- 탭 드래그 스크롤 기능 ---
+		    if($tabsContainer.length) {
+		        let isDown = false, startX, scrollLeft;
+		
+		        $tabsContainer.on('mousedown', e => {
+		            isDown = true;
+		            $tabsContainer.addClass('active');
+		            startX = e.pageX - $tabsContainer.offset().left;
+		            scrollLeft = $tabsContainer.scrollLeft();
+		        }).on('mouseleave mouseup', () => {
+		            isDown = false;
+		            $tabsContainer.removeClass('active');
+		        }).on('mousemove', e => {
+		            if(!isDown) return;
+		            e.preventDefault();
+		            const x = e.pageX - $tabsContainer.offset().left;
+		            const walk = (x - startX) * 2.5;
+		            $tabsContainer.scrollLeft(scrollLeft - walk);
+		        });
+		    }
+		});
+	</script>
+</th:block>
+
+<!-- 추가할 페이지 contents -->
+<th:block layout:fragment="contents">
+    <!-- 사진 2처럼 페이지 타이틀이 나오는 부분을 가정하고 div로 감쌌습니다 -->
+	<div class="container">
+	    <div class="page-title-section">
+	        <h2 th:text="${boardName}" class="page-main-title">게시판 이름</h2>
+	        <h5 class="page-subtitle">게시판의 모든 게시글</h5>
+	    </div>
+	
+		<!-- 카테고리 탭 -->
+		<div class="board-tabs-container"  id="tabsContainer">
+			<ul class="nav nav-tabs">
+				<li class="nav-item">
+					<a	class="nav-link"
+						th:href="@{/customer/post/postList}"
+						th:classappend="${bbsClsfCd == null || bbsClsfCd == '' ? 'active' : ''}">전체</a>
+				</li>
+
+				<li class="nav-item" th:each="b : ${boardList}">
+					<a	class="nav-link"
+						th:href="@{/customer/post/postList(bbsClsfCd=${b.bbsClsfCd})}"
+						th:text="${b.bbsNm}"
+						th:classappend="${bbsClsfCd == b.bbsClsfCd ? 'active' : ''}">게시판 이름</a>
+				</li>
+			</ul>
+		</div>
+		
+	    <div class="card mb-4">
+	        <!-- card-header end// -->
+	        <div class="card-body">
+	            <div class="table-responsive">
+	                <table class="table table-hover">
+	                    <thead>
+	                        <tr>
+	                            <th scope="col">게시글일련번호</th>
+	                            <th scope="col">게시글제목</th>
+	                            <th scope="col">작성자</th> <!-- 작성자사용자번호 대신 '작성자'로 표시 -->
+	                            <th scope="col">조회수</th>
+	                            <th scope="col">생성일시</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                        <th:block th:if="${!#lists.isEmpty(postList)}">
+	                            <tr th:each="p : ${postList}">
+	                                <td th:text="${p.pstSn}">게시글일련번호</td>
+	                                <td class="post-title-cell"> <!-- 제목 셀에 클래스 추가 -->
+	                                    <a th:text="${p.pstTtl}"
+	                                       th:href="@{/customer/post/postView(pstSn=${p.pstSn}, bbsClsfCd=${bbsClsfCd}, page=${currentPage}, size=${size})}"
+	                                       class="post-title-link">게시글제목</a>
+	                                    <span th:if="${p.cmntCnt > 0}">
+	                                    	[<span th:text="${p.cmntCnt}"></span>]
+	                                    </span>
+	                                </td>
+	                                <td th:text="${p.userInfo.userNcnm}">작성자</td>
+	                                <td th:text="${p.viewCnt}">조회수</td>
+	                                <td th:text="${ #temporals.format(p.crtDt, 'yyyy-MM-dd') == #temporals.format(#temporals.createNow(), 'yyyy-MM-dd') 
+												? #temporals.format(p.crtDt, 'HH:mm') 
+												: #temporals.format(p.crtDt, 'MM-dd') }">생성일시</td>
+	                            </tr>
+	                        </th:block>
+	                        <tr th:unless="${!#lists.isEmpty(postList)}">
+	                            <td colspan="5">게시글이 존재하지 않습니다.</td> <!-- colspan은 테이블 헤더 개수에 맞게 조정 -->
+	                        </tr>
+	                    </tbody>
+	                </table>
+	            </div>
+	            <!-- table-responsive //end -->
+	        </div>
+	        <!-- card-body end// -->
+	
+	        <div class="content-footer-action">
+	            <button type="button" class="btn-write-post" th:onclick="location.href='/customer/post/postWrite'">글 작성</button>
+	        </div>
+	    </div>
+	    <!-- card end// -->
+	
+	    <!-- 페이지네이션 영역 -->
+	    <div class="pagination-area">
+	        <nav aria-label="Page navigation">
+	            <ul class="pagination justify-content-center"> <!-- 중앙 정렬 -->
+	                <!-- 이전 페이지 버튼 -->
+	                <li class="page-item" th:classappend="${currentPage <= 1 ? 'disabled' : ''}">
+	                    <a class="page-link"
+	                       th:href="${currentPage <= 1} ? '#' : @{/customer/post/postList(bbsClsfCd=${bbsClsfCd != null ? bbsClsfCd : ''}, page=${currentPage - 1}, size=${size})}"
+	                       tabindex="-1"
+	                       aria-disabled="${currentPage <= 1}">
+	                        <i class="material-icons md-chevron_left"></i> 이전
+	                    </a>
+	                </li>
+	
+	                <!-- 페이지 번호 링크 -->
+	                <th:block th:each="pageNumber : ${#numbers.sequence(1, totalPage)}">
+	                    <li class="page-item" th:classappend="${pageNumber == currentPage ? 'active' : ''}">
+	                        <a class="page-link"
+	                           th:href="@{/customer/post/postList(bbsClsfCd=${bbsClsfCd != null ? bbsClsfCd : ''}, page=${pageNumber}, size=${size})}"
+	                           th:text="${pageNumber}">
+	                        </a>
+	                    </li>
+	                </th:block>
+	
+	                <!-- 다음 페이지 버튼 -->
+	                <li class="page-item" th:classappend="${currentPage >= totalPage ? 'disabled' : ''}">
+	                    <a class="page-link"
+	                       th:href="${currentPage >= totalPage} ? '#' : @{/customer/post/postList(bbsClsfCd=${bbsClsfCd != null ? bbsClsfCd : ''}, page=${currentPage + 1}, size=${size})}"
+	                       aria-disabled="${currentPage >= totalPage}">
+	                        다음 <i class="material-icons md-chevron_right"></i>
+	                    </a>
+	                </li>
+	            </ul>
+	        </nav>
+	    </div>
+	    
+		<!-- 페이지네이션 하단에 검색창과 페이지 사이즈 선택기를 배치 -->
+		<div class="lower-controls-container">
+			<div class="search-container col-lg-6 col-md-8"> <!-- col-lg-6, col-md-8 등 너비 조정 -->
+				<input type="text" placeholder="검색어를 입력하세요" class="form-control search-input" />
+			</div>
+			
+			<!-- 페이지 사이즈 선택 폼 (이것이 실제로 작동하도록 유지) -->
+			<div class="pagesize-container col-lg-2 col-6 col-md-3">
+				<label for="pageSizeSelectForm" class="form-label me-2">페이지당:</label>
+				<select id="pageSizeSelectForm" name="size" class="form-select form-select-sm me-2" onchange="this.form.submit()">
+					<option value="10" th:selected="${size == 10}">10개</option>
+					<option value="15" th:selected="${size == 15}">15개</option>
+					<option value="20" th:selected="${size == 20}">20개</option>
+				</select>
+				<label>개</label>
+			</div>
+		</div>
+	    
+	</div>
+</th:block>
+
+</html>

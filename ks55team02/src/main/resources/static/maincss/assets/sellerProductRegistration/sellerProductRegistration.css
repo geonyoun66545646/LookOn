@@ -1,0 +1,891 @@
+        body {
+            background-color: #f8f8f8; /* style.css 참조하여 변경: 원래 #f0f2f5 */
+            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Dotum', sans-serif; /* General font update */
+            color: #666; /* style.css 참조하여 변경: 기본 텍스트 색상 */
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            min-width: 1000px; /* 웹 폭 고정 */
+        }
+
+        /* [추가] 루트 요소 높이 설정 */
+        html, body, .page-wrapper {
+            height: 100%;
+            margin: 0;
+        }
+
+        .page-wrapper {
+            background-color: #f8f8f8; /* style.css 참조하여 변경: 원래 #f0f2f5 */
+            /* min-width: 1000px; */ /* 레이아웃 고정 제거 */
+        }
+
+        .product-reg-container {
+            padding-top: 30px;
+            margin-bottom: 50px;
+            width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+
+        /* [수정] 메인 컨테이너 높이 조정 */
+        .main .page-content {
+            min-height: calc(100vh - 120px); /* 헤더+하단바 높이 고려 */
+        }
+
+        /* [수정] product-reg-container의 row 설정 */
+        .product-reg-container .row {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: stretch; /* 자식 요소 높이 통일 */
+            height: 100%;
+            margin-left: 0;
+            margin-right: 0;
+            gap: 10px; /* 간격 유지 */
+        }
+
+        /* [수정] 사이드바 컬럼 고정 */
+        .product-reg-container .col-lg-3.col-md-4 {
+            flex: 0 0 calc(25% - 5px); /* 3열 너비에서 gap 절반 차감 */
+            max-width: calc(25% - 5px);
+            position: sticky;
+            top: 80px; /* 헤더 아래에 고정 */
+            height: calc(100vh - 140px); /* 헤더+하단바+여백 고려 */
+            overflow-y: auto; /* 스크롤 허용 */
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+        }
+
+        /* [수정] 메인 컨텐츠 컬럼 */
+        .product-reg-container .col-lg-9.col-md-8 {
+            flex: 0 0 calc(75% - 5px); /* 9열 너비에서 gap 절반 차감 */
+            max-width: calc(75% - 5px);
+            height: 100%;
+            box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+        }
+
+        /* Adjusting the column structure to match the screenshot */
+        .main .page-content .container.product-reg-container > .row {
+            display: flex;
+        }
+
+        .main .page-content .container.product-reg-container > .row > .col-lg-9,
+        .main .page-content .container.product-reg-container > .row > .col-md-8 {
+            flex-grow: 1;
+        }
+
+        /* Bootstrap default column paddings removed */
+        .col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto,
+        .col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto,
+        .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto,
+        .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto,
+        .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+            padding-right: 0;
+            padding-left: 0;
+        }
+
+        /* [추가] 사이드바 내부 스크롤 처리 */
+        @media screen and (min-width: 992px) {
+            .sidebar {
+                margin-top: 0;
+            }
+        }
+        .sidebar {
+            margin-top: 0;
+        }
+        .sidebar {
+            background-color: #fff; /* 사이드바 배경색 흰색 통일 */
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,.05);
+            box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 */
+            display: flex;
+            flex-direction: column;
+        }
+        
+
+        .sidebar .nav-link {
+            color: #4a4a4a;
+            padding: 15px 20px;
+            box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 */
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* 사이드바 메뉴 중앙 정렬 */
+            padding-left: calc(20px + 3px); /* 보더 제거 후 패딩 조정 */
+            border-left: none; /* 기본 보더 제거 */
+        }
+
+        /* 사이드바 메뉴 클릭시 배경색 바뀌는 것 제거 */
+        .sidebar .nav-link:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+            color: #333; /* style.css 참조하여 변경: 원래 #000 */
+            font-weight: 700;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: rgba(204, 153, 102, 0.15); /* style.css 참조하여 변경: 원래 rgba(108, 92, 231, 0.15) */
+            border-left: none; /* 활성화 시 보더 제거 */
+        }
+
+        .sidebar .nav-link .step-number {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            color: #555;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            font-weight: 600;
+            margin-right: 10px;
+            flex-shrink: 0;
+            line-height: 20px; /* 사이드바 동그라미 숫자 중앙 정렬 */
+            text-align: center; /* 사이드바 메뉴 숫자 중앙 정렬 */
+        }
+
+        .sidebar .nav-link.active .step-number {
+            background-color: #c96; /* style.css 참조하여 변경: 원래 #6c5ce7 */
+            color: #fff;
+        }
+
+        #productRegMenu {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .content-area {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.05);
+            min-height: 100%; /* 사이드바와 높이 일직선 */
+            box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 */
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: flex; /* 플렉스 배치 */
+            flex-direction: column; /* 세로로 정렬 */
+            gap: 30px; /* 요소 간격 30px */
+        }
+
+        .section-title {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ebebeb; /* style.css 참조하여 변경: 원래 #eee */
+            color: #333; /* style.css 참조하여 변경: 원래 #333 */
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 0; /* gap으로 간격 조정 */
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+        }
+
+        .form-control {
+            border-radius: 6px; /* border-radius 통일 */
+            border: 1px solid #ebebeb; /* style.css 참조하여 변경: 원래 #ddd */
+            padding: 8px 12px;
+            box-shadow: none;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            background-color: #fff;
+            height: 38px; /* 입력폼과 옵션폼의 높이 통일 */
+        }
+
+        .form-control:focus {
+            border-color: #c96; /* style.css 참조하여 변경: 원래 #6c5ce7 */
+            box-shadow: 0 0 0 0.2rem rgba(204, 153, 102, 0.25); /* style.css 참조하여 변경: 원래 rgba(108, 92, 231, 0.25) */
+        }
+
+        .fixed-bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff;
+            padding: 15px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,.05);
+            z-index: 1000;
+            border-top: 1px solid #ebebeb; /* style.css 참조하여 변경: 원래 #eee */
+            display: flex;
+            justify-content: center; /* 버튼 중앙 정렬 */
+            box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 */
+        }
+
+        .fixed-bottom-bar .container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            max-width: 1000px; /* 폼의 오른쪽 선과 일치하도록 조정 */
+            box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 */
+        }
+
+        .fixed-bottom-bar .btn {
+            margin-left: 10px;
+            padding: 8px 20px;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            border-radius: 6px; /* border-radius 통일 */
+            background-color: #c96; /* 저장/제출 버튼 색상 변경 */
+            border-color: #c96; /* 저장/제출 버튼 색상 변경 */
+        }
+
+        .fixed-bottom-bar .btn-light {
+            background-color: #f8f9fa; /* 취소 버튼 색상 유지 */
+            border-color: #dee2e6; /* 취소 버튼 테두리 색상 유지 */
+            color: #495057; /* 취소 버튼 글자 색상 유지 */
+        }
+
+        .fixed-bottom-bar .btn-light:hover {
+            background-color: #e2e6ea;
+            border-color: #dae0e5;
+        }
+
+        .image-upload-preview {
+            border: 1px dashed #ced4da;
+            padding: 15px;
+            min-height: 100px;
+            background-color: #fcfcfc;
+            border-radius: 6px; /* border-radius 통일 */
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            color: #6c757d;
+        }
+
+        .image-upload-preview p {
+            color: #888;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+        }
+
+        .image-upload-preview.has-images p {
+            display: none;
+        }
+
+        .image-upload-item {
+            position: relative;
+            margin: 5px;
+            border: 1px solid #ebebeb; /* style.css 참조하여 변경: 원래 #eee */
+            border-radius: 6px; /* border-radius 통일 */
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-upload-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-upload-item .remove-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: rgba(204, 153, 102, 0.7); /* style.css 참조하여 변경: 원래 rgba(220, 53, 69, 0.7) */
+            color: #fff;
+            border: none;
+            border-radius: 0 0 0 6px; /* border-radius 통일 */
+            font-size: 0.7rem;
+            padding: 2px 5px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .image-upload-item.main-image:before {
+            content: '대표';
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: rgba(204, 153, 102, 0.8); /* style.css 참조하여 변경: 원래 rgba(108, 92, 231, 0.8) */
+            color: #fff;
+            font-size: 0.6rem;
+            padding: 2px 5px;
+            border-radius: 6px 0 6px 0; /* border-radius 통일 */
+        }
+
+        .wysiwyg-editor {
+            min-height: 200px;
+            border: 1px solid #ebebeb; /* style.css 참조하여 변경: 원래 #ddd */
+            border-radius: 6px; /* border-radius 통일 */
+            padding: 10px;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+        }
+
+        .option-table th,
+        .option-table td {
+            vertical-align: middle;
+            padding: 10px;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+        }
+
+        .option-group-item {
+            border: 1px solid #e9ecef;
+            border-radius: 6px; /* border-radius 통일 */
+            padding: 15px;
+            margin-bottom: 0; /* gap으로 간격 조정 */
+            background-color: #f8f9fa;
+            display: flex; /* 플렉스 요소로 변경 */
+            flex-direction: column; /* 세로 정렬 */
+            gap: 10px; /* 내부 자식들 gap 10px로 변경 */
+        }
+
+        .option-value-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: space-between; /* justify-content: space-between으로 배치 */
+            padding: 0;
+        }
+
+        .option-value-buttons .btn {
+            margin: 0;
+            border: 1px solid #ccc;
+            color: #555;
+            background-color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px; /* border-radius 통일 */
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            display: inline-flex; /* 버튼 크기 조정 */
+            align-items: center; /* 버튼 크기 조정 */
+            justify-content: center; /* 버튼 크기 조정 */
+            height: 38px; /* 입력폼과 옵션폼의 높이 통일 */
+        }
+
+        .option-value-buttons .btn.active {
+            background-color: #c96; /* style.css 참조하여 변경: 원래 #6c5ce7 */
+            color: #fff;
+            border-color: #c96; /* style.css 참조하여 변경: 원래 #6c5ce7 */
+        }
+
+        .form-check-label {
+            margin-left: .5rem;
+            font-weight: 400;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+        }
+
+        .form-group small.form-text {
+            margin-top: .5rem;
+            color: #888;
+            font-size: 10px; /* 폼태그 아래 설명 문구는 모두 10px고정 */
+        }
+
+        .form-group small.form-text:before {
+            content: "※ "; /* 폼태그 아래 설명 문구 왼쪽에 ※삽입 */
+        }
+
+        /* 상단 UI 변경 */
+        .header-top {
+            background-color: #ffffff;
+            border-bottom: 1px solid #ebebeb; /* style.css 참조하여 변경: 원래 #eee */
+            padding: 15px 0;
+            min-width: 1000px; /* 레이아웃 고정 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-top .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            width: 100%; /* 부모에 flex-direction: row;가 적용되어 있으므로 width 100% 필요 */
+        }
+
+        .header-top .logo-container {
+            padding: 0;
+            text-align: left;
+            width: auto;
+        }
+
+        .header-top .logo-container img {
+            max-height: 60px; /* 로고 크기 2배 확대 */
+            filter: brightness(0.5);
+        }
+
+        .header-top .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-top .top-menu {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: flex;
+        }
+
+        .header-top .top-menu > li {
+            margin-left: 10px;
+        }
+
+        .header-top .top-menu > li > a.btn-primary {
+            display: none; /* 상단 제출하기 버튼 삭제 */
+        }
+
+        .header-top .top-menu > li > a.btn-primary:hover {
+            background-color: #bf8040; /* style.css 참조하여 변경: 원래 #5b4ddb */
+            border-color: #bf8040; /* style.css 참조하여 변경: 원래 #5b4ddb */
+        }
+
+        .header-middle {
+            display: none;
+        }
+
+        /* Adjusting for the 'Logo' layout */
+        .kmon-logo-text {
+            font-size: 1.8rem; /* 로고 텍스트 크기 확대 */
+            font-weight: 700;
+            color: #333;
+            margin-right: 30px; /* 로고 공간 확대 */
+        }
+
+        .header-top .header-left {
+            display: flex;
+            align-items: center;
+            width: auto;
+        }
+
+        .header-top .header-right {
+            display: flex;
+            align-items: baseline;
+        }
+
+        .header-top .logo {
+            display: none;
+        }
+
+        .header-top .top-menu {
+            margin-top: 0;
+        }
+
+        .header-top .top-menu li:first-child {
+            margin-right: 15px;
+        }
+
+        /* .header-top .container:after, .header-top .container-fluid:after 컬러 없게 변경 */
+        .header-top .container::after,
+        .header-top .container-fluid::after {
+            background-color: transparent;
+        }
+
+        /* 폼 입력창 양식 변경: (제목 / 상품명 / 글자수) */
+        .form-control-with-labels {
+            display: flex;
+            border: 1px solid #ebebeb; /* style.css 참조하여 변경: 원래 #ddd */
+            border-radius: 6px; /* border-radius 통일 */
+            padding: 0;
+            background-color: #fff;
+            align-items: stretch;
+            height: 38px; /* 입력폼과 옵션폼의 높이 통일 */
+        }
+
+        .form-control-with-labels.textarea-type {
+            height: auto; /* 텍스트 에어리어 타입은 높이 자동 */
+        }
+
+        .form-control-with-labels .input-segment {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            box-sizing: border-box;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            background-color: #fff; /* 배경색 흰색 통일 */
+        }
+
+        .form-control-with-labels .input-segment.label-segment {
+            background-color: #fff; /* 배경색 흰색 통일 */
+            font-weight: 500;
+            color: #333;
+            border-right: 1px solid #ebebeb; /* 구분선 */
+            min-width: 150px; /* 제목 폼 라벨 너비 */
+            justify-content: flex-start;
+        }
+
+        /* 상품 설명 제외하고 제목/내용/글자수 영역 넓이 통일 */
+        .form-group:not(.product-description-group) .form-control-with-labels .input-segment.label-segment {
+            min-width: 150px; /* 통일된 넓이 */
+        }
+
+        .form-group:not(.product-description-group) .form-control-with-labels .input-segment.char-counter-segment {
+            min-width: 60px; /* 통일된 넓이 */
+        }
+
+        .form-control-with-labels .input-segment.input-segment-full {
+            flex-grow: 1;
+            padding: 0;
+        }
+
+        .form-control-with-labels .input-segment.input-segment-full input,
+        .form-control-with-labels .input-segment.input-segment-full textarea {
+            flex-grow: 1;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 0;
+            box-shadow: none;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            height: 100%; /* 입력폼과 옵션폼의 높이 통일 */
+            resize: none;
+            background-color: #fff; /* 배경색 흰색 통일 */
+            font-weight: normal;
+            color: #333;
+            
+        }
+        #discountRate{
+        	text-align: right;
+        }
+
+        .form-control-with-labels .input-segment.char-counter-segment {
+            border-left: 1px solid #ebebeb; /* 구분선 */
+            color: #888;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            white-space: nowrap;
+            background-color: #fff; /* 배경색 흰색 통일 */
+            padding-left: 8px;
+            padding-right: 8px;
+            min-width: 60px; /* 글자수 영역 넓이 통일 */
+            justify-content: center; /* 중앙 정렬 */
+        }
+
+        /* 첫 번째 섹션의 라벨 스타일 조정 (제목 / 상품명 / 글자수) */
+        .form-group.styled-input-new .form-control-with-labels {
+            border-radius: 6px; /* border-radius 통일 */
+            overflow: hidden;
+        }
+
+        .form-group.styled-input-new .form-control-with-labels .input-segment.label-segment {
+            border-top-left-radius: 6px; /* border-radius 통일 */
+            border-bottom-left-radius: 6px; /* border-radius 통일 */
+        }
+
+        .form-group.styled-input-new .form-control-with-labels .input-segment.char-counter-segment {
+            border-top-right-radius: 6px; /* border-radius 통일 */
+            border-bottom-right-radius: 6px; /* border-radius 통일 */
+        }
+
+        /* 카테고리 폼 스타일 (원본 유지) */
+        .form-group.category-group {
+            display: flex;
+            align-items: stretch; /* 세로 정렬 상단 맞춤 */
+            margin-bottom: 0; /* gap으로 간격 조정 */
+            border: 1px solid #ebebeb; /* 입력 폼과 동일한 테두리 */
+            border-radius: 6px; /* 입력 폼과 동일한 라운드 */
+            overflow: hidden; /* 내부 요소 라운드 처리 */
+            height: 38px; /* 입력 폼과 동일한 높이 */
+        }
+
+        .form-group.category-group > label {
+            flex-basis: 150px; /* 제목 너비 고정 (제목 입력폼과 유사하게) */
+            margin-right: 0; /* 플렉스 아이템이므로 margin-right 제거 */
+            margin-bottom: 0;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            height: auto; /* 부모 flex 높이 상속 */
+            display: flex;
+            align-items: center;
+            padding: 8px 12px; /* 입력 폼 라벨과 동일한 패딩 */
+            background-color: #fff; /* 배경 흰색 */
+            border-right: 1px solid #ebebeb; /* 구분선 */
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group.category-group > select.form-control {
+            flex-grow: 1;
+            border-radius: 0; /* 부모가 라운드 처리하므로 자식은 0 */
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            background-color: #f8f9fa; /* 배경색 변경 */
+            border: none; /* 부모가 테두리 있으므로 자식은 제거 */
+            padding: 8px 12px;
+            height: 100%; /* 부모 flex 높이 상속 */
+            -webkit-appearance: none; /* 기본 화살표 제거 */
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%23333333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 18px center; /* 화살표 위치 및 오른쪽 여백 30% 늘림 (12px * 1.3 = 15.6px + 휠크기 24px) */
+            background-size: 16px;
+        }
+
+        /* ----------------------------------------------------- */
+        /* 요청하신 select 폼 디자인 통일 (1차 카테고리 폼 디자인 복사) */
+        /* ----------------------------------------------------- */
+        .form-group.select-type-styled,
+        .form-group.delivery-settings-group,
+        .form-group.product-status-group {
+            display: flex;
+            align-items: stretch;
+            margin-bottom: 0;
+            border: 1px solid #ebebeb;
+            border-radius: 6px;
+            overflow: hidden;
+            height: 38px;
+        }
+
+        .form-group.select-type-styled > label,
+        .form-group.delivery-settings-group > label,
+        .form-group.product-status-group > label {
+            flex-basis: 150px; /* 제목 너비 고정 */
+            margin-right: 0;
+            margin-bottom: 0;
+            font-size: 13px;
+            height: auto;
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: #fff;
+            border-right: 1px solid #ebebeb;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group.select-type-styled > select.form-control,
+        .form-group.delivery-settings-group > select.form-control,
+        .form-group.product-status-group > select.form-control {
+            flex-grow: 1;
+            border-radius: 0;
+            font-size: 13px;
+            background-color: #f8f9fa;
+            border: none;
+            padding: 8px 12px;
+            height: 100%;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%23333333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            background-size: 16px;
+        }
+
+        /* 옵션 조합별 재고 수량 입력 필드 여백 조정 및 중앙 정렬 */
+        .table-responsive .form-control.form-control-sm {
+            padding-top: 6px;
+            padding-bottom: 6px;
+            border-radius: 6px; /* border-radius 통일 */
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            height: 38px; /* 입력폼과 옵션폼의 높이 통일 */
+            min-height: 38px; /* 최소 높이 설정 (기본 폼 컨트롤과 유사하게) */
+            display: flex; /* 내부 텍스트 중앙 정렬을 위해 flex 사용 */
+            align-items: center; /* 내부 텍스트 세로 중앙 정렬 */
+            justify-content: center; /* 내부 텍스트 가로 중앙 정렬 */
+            box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 */
+        }
+
+        /* fixedOptionGroupsContainer 내부 요소 좌우 여백 */
+        #fixedOptionGroupsContainer {
+            padding-left: 15px; /* content-area의 좌우 패딩과 동일하게 */
+            padding-right: 15px; /* content-area의 좌우 패딩과 동일하게 */
+            margin-left: -15px; /* content-area의 패딩을 상쇄하여 정렬 */
+            margin-right: -15px; /* content-area의 패딩을 상쇄하여 정렬 */
+            margin-bottom: 30px; /* content-section의 gap에 의해 margin-bottom이 제거되므로 직접 설정 */
+        }
+
+        #fixedOptionGroupsContainer .option-group-item {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        #fixedOptionGroupsContainer h5 {
+            font-size: 15px; /* h5 폰트 크기 15px로 변경 */
+            margin-bottom: 15px !important;
+        }
+
+        #fixedOptionGroupsContainer .form-group label {
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+        }
+
+        .input-group-append .input-group-text,
+        .input-group-prepend .input-group-text {
+            border: 1px solid #ebebeb; /* style.css 참조하여 변경: 원래 #ddd */
+            border-left: none;
+            background-color: #f8f9fa;
+            color: #555;
+            border-radius: 0 6px 6px 0; /* border-radius 통일 */
+            padding: 8px 12px;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+            height: 38px; /* 입력폼과 옵션폼의 높이 통일 */
+        }
+
+        .input-group .form-control {
+            border-right: none;
+        }
+
+        .input-group .form-control:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .input-group .form-control:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .custom-file-label {
+            border: 1px solid #ebebeb; /* style.css 참조하여 변경: 원래 #ddd */
+            border-radius: 6px; /* border-radius 통일 */
+            padding: 8px 12px;
+            background-color: #fff;
+            color: #555;
+            height: 38px; /* 입력폼과 옵션폼의 높이 통일 */
+            align-items: center;
+            display: flex;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+        }
+
+        .custom-file-label::after {
+            content: "파일 선택";
+            height: 100%;
+            padding: 8px 12px;
+            background-color: #e9ecef;
+            border-left: 1px solid #ebebeb; /* style.css 참조하여 변경: 원래 #ddd */
+            border-radius: 0 6px 6px 0; /* border-radius 통일 */
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-file-input:lang(ko) ~ .custom-file-label::after {
+            content: "파일 선택";
+        }
+
+        .custom-file-input:focus ~ .custom-file-label {
+            border-color: #c96; /* style.css 참조하여 변경: 원래 #6c5ce7 */
+            box-shadow: 0 0 0 0.2rem rgba(204, 153, 102, 0.25); /* style.css 참조하여 변경: 원래 rgba(108, 92, 231, 0.25) */
+        }
+
+        .btn-outline-secondary {
+            border-color: #ccc;
+            color: #555;
+            background-color: #fff;
+            border-radius: 6px; /* border-radius 통일 */
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #e9ecef;
+            border-color: #bbb;
+            color: #333;
+        }
+
+        .option-gender-btn.active {
+            background-color: #c96; /* style.css 참조하여 변경: 원래 #6c5ce7 */
+            border-color: #c96; /* style.css 참조하여 변경: 원래 #6c5ce7 */
+            color: #fff;
+        }
+
+        /* form-group의 genderOptionGroup의 div에도 justify-content: space-between; 적용 */
+        .option-group-item .form-group > div { /* 이 선택자로 genderOptionGroup div도 커버합니다. */
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .table-bordered th,
+        .table-bordered td {
+            border: 1px solid #e9ecef;
+            padding: 10px;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #fcfcfc;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 600;
+            color: #444;
+            font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
+        }
+
+        .form-row {
+            margin-right: 0;
+            margin-left: 0;
+        }
+
+        .form-row .col {
+            padding: 0 5px;
+        }
+
+        .form-row .col:first-child {
+            padding-left: 0;
+        }
+
+        .form-row .col:last-child {
+            padding-right: 0;
+        }
+
+
+		
+        .mt-4, .my-4 {
+		    margin-top: 0rem !important;
+		}
+		.mt-4 {
+		    margin-top: 0rem !important;
+		}
+		
+		/* 기존 에러 스타일 제거 또는 수정 */
+		.error-border {
+		    border: none !important; /* 기본적으로 보더 없음 */
+		}
+		
+		/* 제출 시 유효성 검사 실패한 요소에만 적용될 스타일 */
+		.submitted .error-border {
+		    border: 2px solid #dc3545 !important;
+		    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+		}
+		
+		/* 부모 요소에 테두리 적용 */
+		.submitted .form-group.error-border,
+		.submitted .form-control-with-labels.error-border,
+		.submitted .category-group.error-border,
+		.submitted .option-group-item.error-border {
+		    border: 2px solid #dc3545 !important;
+		    border-radius: 6px !important;
+		    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+		}
+		
+		.swal2-html-container {
+		    font-size: 1.3em !important;
+		    /* font-size: 16px; */
+		    /* font-size: 18px; */
+		}
+				
+		.swal2-confirm.swal2-styled {
+		    font-size: 1.3em !important;
+		    padding: 0.625em 1.25em !important;
+		}
+		.form-control {
+			height: 40px;
+			padding: .85rem 2rem;
+			font-size: 1.4rem;
+			line-height: 1.5;
+			font-weight: 300;
+			color: #777;
+			background-color: #fafafa;
+			border: 1px solid #ebebeb;
+			border-radius: 0;
+			margin-bottom: 0rem;
+			transition: all 0.3s;
+			box-shadow: none;
+		}
+		

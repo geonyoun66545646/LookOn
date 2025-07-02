@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{customer/layout/layoutMain}">
+	
+	<head>
+		<meta name="description" content="한국스마트정보교육원 ksmybatis" />
+		<title>글 작성</title>
+		<!-- postWrite.css 파일 로드 -->
+		<link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postWrite.css}">
+	</head>
+	
+	<!-- 추가할 js file -->
+	<th:block layout:fragment="jsFile">
+        <!-- jQuery 라이브러리가 layoutMain에서 로드되지 않았다면 여기에 추가해야 합니다. -->
+        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+	</th:block>
+	
+	<!-- 추가할 script -->
+	<th:block layout:fragment="jsScript">
+		<script th:inline="javascript">
+			$(() => {
+				// 게시글 작성 ajax 스크립트
+			    const $postForm = $('#postForm');
+			
+			    if($postForm.length) {
+			        $postForm.on('submit', e => {
+			            e.preventDefault();
+			
+			            $.ajax({
+			                url: $postForm.attr('action'),
+			                method: $postForm.attr('method'),
+			                data: $postForm.serialize()
+			            }).done(result => {
+			                window.location.href = '/customer/post/postList';
+			            }).fail(error => {
+			                console.error('AJAX 실패:', error);
+			                alert('글 작성중 오류 발생');
+			            });
+			        });
+			    }
+			});
+		</script>
+	</th:block>
+
+	<th:block layout:fragment="contents"> <!-- 1. "이것이 사진입니다" 라는 라벨 (절대 지우면 안 됨) -->
+	
+	    <!-- 2. 그 '안에' 변수를 만드는 투명 스티커를 붙입니다. -->
+	    <th:block th:with="updateUrl=@{/customer/post/postUpdate}, writeUrl=@{/customer/post/postWrite}">
+	
+	        <div class="write-form-container ">
+	        
+	            <div class="page-title-section ">
+	                <h2 class="page-main-title" th:text="${post.pstSn != null ? '글 수정' : '글 작성'}"></h2>
+	            </div>
+	            
+	            <!-- 3. 이제 폼에서는 미리 만든 변수를 안전하게 사용합니다. -->
+	            <form id="postForm"
+	                  th:action="${post.pstSn != null ? updateUrl : writeUrl}"
+	                  method="post" 
+	                  th:object="${post}">
+	
+	                <!-- 게시글 번호 (수정 시에만 필요) -->
+	                <input type="hidden" id="pstSn" th:field="*{pstSn}">
+	
+	                <!-- 제목 -->
+	                <div class="form-group">
+	                    <label for="postTitle">제목</label>
+	                    <input type="text" id="postTitle" class="form-control" placeholder="제목을 입력하세요" th:field="*{pstTtl}" required>
+	                </div>
+	
+	                <!-- 내용 -->
+	                <div class="form-group">
+	                    <label for="postContent">내용</label>
+	                    <textarea id="postContent" class="form-control" placeholder="내용을 입력하세요" rows="10" required th:field="*{pstCn}"></textarea>
+	                </div>
+	
+	                <!-- 카테고리 선택 -->
+	                <div class="form-group">
+	                    <label for="postCategory">카테고리</label>
+	                    <select id="postCategory" name="bbsClsfCd" class="form-control" required th:field="*{bbsClsfCd}">
+	                    	<option value="">---게시판 선택---</option>
+	 						<option th:each="b : ${boardList}"
+	 								th:value="${b.bbsClsfCd}"
+	 								th:text="${b.bbsNm}"></option>
+	                    </select>
+	                </div>
+	
+	                <!-- 버튼 영역 -->
+	                <div class="form-actions">
+	                    <button type="submit" class="btn btn-primary" th:text="${post.pstSn != null ? '글 수정' : '글 작성'}"></button>
+	                    <button type="button" class="btn btn-secondary" onclick="history.back()">취소</button>
+	                </div>
+	
+	            </form>
+	        </div>
+	        
+	    </th:block> <!-- th:with 블록 끝 -->
+	
+	</th:block> <!-- layout:fragment="contents" 블록 끝 -->
+</html>

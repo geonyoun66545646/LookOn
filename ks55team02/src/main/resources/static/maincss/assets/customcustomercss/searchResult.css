@@ -1,0 +1,275 @@
+/* 기본 변수: 문서 전체에서 사용할 색상 등을 정의합니다. */
+:root {
+	--molla-main-color: #D2B48C;
+	--molla-darker-color: #A98B6D;
+	--molla-light-color: #F0E6D8;
+	--molla-lighter-color: #F8F4EF;
+	--card-border-color: #e9ecef;
+	--text-dark: #343a40;
+	--text-muted: #6c757d;
+}
+
+/* 포커스 아웃라인 제거: 클릭 시 생기는 파란색 테두리를 없애 깔끔하게 보입니다. */
+button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
+.page-link:focus {
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+/* =================================================================== */
+/* 페이지 공통 레이아웃 및 컴포넌트 */
+/* =================================================================== */
+
+/* 전체 레이아웃 컨테이너 */
+.integrated-search-container {
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 3.5rem 1.5rem;
+}
+
+/* 페이지 제목 스타일 (h2 태그용) */
+.integrated-search-container .h2 {
+	margin-bottom: 3.5rem !important;
+	font-size: 2.5rem;
+	color: var(--text-dark);
+	letter-spacing: -0.05rem;
+}
+
+/* 검색 입력 영역 */
+.card-body form .input-group {
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+	border-radius: 0.75rem;
+	overflow: hidden;
+	border: 1px solid var(--molla-light-color);
+}
+
+.input-group .form-control {
+	height: 56px;
+	border: none;
+	font-size: 1.1rem;
+	padding: 0.75rem 1.25rem;
+}
+
+.input-group .btn {
+	height: 56px;
+	background-color: var(--molla-main-color);
+	border-color: var(--molla-main-color);
+	color: #fff;
+	font-weight: 600;
+	padding: 0 2rem;
+	font-size: 1.1rem;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.input-group .btn:hover {
+	background-color: var(--molla-darker-color);
+	border-color: var(--molla-darker-color);
+}
+
+/* 탭 메뉴 스타일 */
+.nav-pills {
+	margin-bottom: 4rem !important;
+}
+
+.nav-pills .nav-item {
+	margin: 0 10px;
+}
+
+.nav-pills .nav-link {
+	padding: 0.9rem 2.2rem;
+	border-radius: 50px;
+	font-weight: 600;
+	color: var(--text-muted);
+	background-color: var(--molla-lighter-color);
+	transition: all 0.3s ease;
+	min-width: 120px;
+	text-align: center;
+}
+
+.nav-pills .nav-link.active {
+	background-color: var(--molla-main-color);
+	color: #fff;
+	box-shadow: 0 5px 15px rgba(210, 180, 140, 0.3);
+}
+
+.nav-pills .nav-link:hover:not(.active) {
+	background-color: var(--molla-light-color);
+	color: var(--text-dark);
+}
+
+/* 각 검색 결과 섹션의 제목 스타일 (h5 태그용) */
+.section-title {
+	font-size: 1.8rem;
+	color: var(--text-dark);
+	margin-bottom: 1.5rem;
+	text-align: center;
+	width: 100%;
+	padding-top: 1.5rem;
+}
+
+/* '더보기' 버튼 및 푸터 */
+.view-more-btn-lg {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.8rem 2.5rem;
+	border-radius: 50px;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var(--molla-main-color);
+	border: 2px solid var(--molla-main-color);
+	background-color: transparent;
+	transition: all 0.3s ease;
+	text-decoration: none;
+}
+
+.view-more-btn-lg:hover {
+	background-color: var(--molla-main-color);
+	color: #fff;
+	box-shadow: 0 4px 10px rgba(210, 180, 140, 0.4);
+	text-decoration: none;
+}
+
+.search-etc {
+	border-top: none;
+	margin-top: 15px;
+}
+
+
+/* =================================================================== */
+/* 상품/사용자/게시글 그리드 및 리스트 */
+/* =================================================================== */
+
+/* --- 1. 카드 그리드 컨테이너 (CSS Grid) --- */
+.product-grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 1.5rem 0;
+    max-width: 1150px; 
+    margin: 0 auto;
+}
+
+/* --- 2. 카드 공통 스타일 (디자인 통일) --- */
+.product-grid-container .product-card,
+.product-grid-container .search-result-user-card {
+    display: flex;
+    flex-direction: column; /* ★★★ 아이템을 세로로 쌓도록 변경 (가장 중요) ★★★ */
+    align-items: center;   /* 내부 아이템들을 수평 중앙 정렬 */
+    width: 220px;
+    flex-shrink: 0;
+    height: auto;
+    margin: 0;
+    border: 1px solid var(--card-border-color);
+    border-radius: 0.75rem;
+    background-color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.product-grid-container .product-card:hover,
+.product-grid-container .search-result-user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* --- 3. 카드 이미지 공통 스타일 (높이 통일) --- */
+.product-card .card-img-top,
+.search-result-user-card .search-profile-img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin-top: 1.5rem;
+}
+
+.search-result-user-card .search-profile-img {
+    border-radius: 50%;
+    border: 3px solid var(--molla-main-color);
+}
+
+/* --- 4. 카드 본문 공통 스타일 (높이 통일) --- */
+.product-card .card-body,
+.search-result-user-card .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    flex-grow: 1;
+    padding: 1rem;
+    width: 100%;
+}
+
+.product-card .card-title,
+.search-result-user-card .card-title {
+    margin-bottom: 0.25rem !important;
+}
+
+.product-card .card-text,
+.search-result-user-card .small {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* --- 5. 카드 제목 링크 관련 스타일 --- */
+.card-title a::before {
+  content: none !important;
+  text-align: center;
+}
+
+.search-result-user-card .card-title a {
+	font-size : 14pt;
+    display: block;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+}
+
+/* --- 6. 게시글 리스트 스타일 --- */
+.post-item {
+	padding: 1.25rem 0.5rem;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+.post-item:last-of-type {
+	border-bottom: none;
+}
+
+.post-item a {
+	color: var(--text-dark);
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.post-item a:hover {
+	color: var(--molla-darker-color);
+}
+
+.post-item .small {
+	font-size: 0.85rem;
+	margin-bottom: 0.5rem;
+	display: block;
+}
+
+
+/* 검색 결과가 없을 때 메시지가 그리드 전체를 차지하도록 설정 */
+.product-grid-container .no-results {
+    /* 이 아이템이 그리드의 1번 줄에서부터 맨 끝(-1) 줄까지 공간을 모두 차지하도록 설정 */
+    grid-column: 1 / -1;
+}
+.card-title a {
+    text-align: center;
+    padding: 0;
+}
+
+.shadow-sm {
+    box-shadow: none !important;
+}
+
+.card {
+    border-top: none;
+}
+
+.form-control {
+    font-size: 16px !important;
+}

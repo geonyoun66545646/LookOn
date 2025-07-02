@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<div class="products" th:fragment="productsFragment">
+        <div class="row justify-content-center">
+            <div class="col-6 col-md-4 col-lg-4 col-xl-3" th:each="product : ${productList}">
+                <div class="product product-7 text-center">
+                    <figure class="product-media">
+                        <a th:href="@{/products/detail/{gdsNo}(gdsNo=${product.gdsNo})}">
+                            <img th:src="@{${product.thumbnailImagePath}}" alt="Product image" class="product-image">
+                        </a>
+
+                        <span class="product-label label-sale" th:if="${product.dscntRt gt 0}" th:text="${#numbers.formatDecimal(product.dscntRt, 0, 0) + '% off'}"></span>
+                        
+                        <div class="product-action-vertical">
+                            <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                        </div>
+
+                        <div class="product-action action-icon-top">
+                            <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+                            <a href="#" class="btn-product btn-quickview" title="Quick view"><span>quick view</span></a>
+                            <a href="#" class="btn-product btn-compare" title="Compare"><span>compare</span></a>
+                        </div>
+                    </figure>
+
+                    <div class="product-body">
+                        <div class="product-cat">
+                            <a th:href="@{/products(category=${product.ctgryNo})}" th:text="${product.productCategory?.categoryName}">Category</a>
+                        </div>
+                        <h3 class="product-title">
+                            <a th:href="@{/products/detail/{gdsNo}(gdsNo=${product.gdsNo})}" th:text="${product.gdsNm}">Product Name</a>
+                        </h3>
+                        <div class="product-price">
+                            <span th:if="${product.dscntRt gt 0}" class="new-price" th:text="${#numbers.formatCurrency(product.lastSelPrc)}"></span>
+                            <span th:if="${product.dscntRt gt 0}" class="old-price" th:text="${#numbers.formatCurrency(product.basPrc)}"></span>
+                            <span th:unless="${product.dscntRt gt 0}" class="price" th:text="${#numbers.formatCurrency(product.basPrc)}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div th:if="${productList.isEmpty()}" class="col-12 text-center mt-4">
+                <p>현재 판매 중인 상품이 없습니다.</p>
+            </div>
+        </div>
+
+        <div class="load-more-container text-center">
+            <a href="#" class="btn btn-outline-darker btn-load-more">More Products <i class="icon-refresh"></i></a>
+        </div>
+    </div>
+</html>

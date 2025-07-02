@@ -7,46 +7,49 @@
                     <div class="header-left">
                         <div class="header-search header-search-extended header-search-visible d-none d-lg-block">
                             <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
-                            <form action="#" method="get">
+                            <form th:action="@{/customer/searchResult}" method="get">
                                 <div class="header-search-wrapper search-wrapper-wide">
                                     <label for="q" class="sr-only">Search</label>
                                     <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
-                                    <input type="search" class="form-control" name="q" id="q" placeholder="Search product ..." required>
+                                   <input type="search" class="form-control" name="keyword" id="q" placeholder="Search product ..." required>
                                 </div>
                             </form>
                         </div>
                     </div>
                     <div class="header-center">
-                        <a href="index.html" class="logo">
-                            <img src="/maincss/assets/images/demos/demo-6/logo.png" alt="Molla Logo" width="82" height="20">
-                        </a>
+                        <a th:href="@{/customer}" class="logo">
+                        	<img src="/maincss/assets/images/demos/demo-6/logo.png" alt="Molla Logo" width="82" height="20">
+						</a>
                     </div>
                     </div>
-            </div><div class="header-bottom sticky-header">
+            </div>
+            <div class="header-bottom sticky-header">
                 <div class="container">
                     <div class="header-left">
                         <nav class="main-nav">
-                            <ul class="menu"> 
-                                <li class="active"> <a th:href="@{/best}">베스트</a> </li>
-                                <li> <a th:href="@{/sale}">세일</a> </li>
-                                <li> <a th:href="@{/new-products}">신상</a> </li>
-                                <li> <a th:href="@{/community}">커뮤니티</a> </li>
-                                <li> <a th:href="@{/feed}">피드</a> </li>
-                            </ul>
-                        </nav>
+						    <ul class="menu">
+							    <li> <a th:href="@{/customer/products(category='best')}">베스트</a> </li>
+							    <li> <a th:href="@{/customer/products(category='sale')}">세일</a> </li>
+							    <li> <a th:href="@{/customer/products(category='new-products')}">신상</a> </li>
+							    <li> <a th:href="@{/customer/post/postList}">커뮤니티</a> </li>
+							    <li> <a th:href="@{/feed}">피드</a> </li>
+						    </ul>
+						</nav>
                         <button class="mobile-menu-toggler">
                             <span class="sr-only">Toggle mobile menu</span>
                             <i class="icon-bars"></i>
                         </button>
-                    </div><div class="header-right header-bottom-icons"> <a href="#signin-modal" data-toggle="modal" class="header-bottom-icon-link">
+                    </div>
+                    <div class="header-right header-bottom-icons">
+                    <a th:href="@{/mypage}">
                             <i class="icon-user"></i>
                             <span class="sr-only">Login</span>
                         </a>
 
-                        <a th:href="@{/wishlist.html}" class="wishlist-link header-bottom-icon-link">
+                        <a class="wishlist-link header-bottom-icon-link" href="#" data-toggle="modal" data-target="#signin-modal">
                             <i class="icon-heart-o"></i>
                             <span class="wishlist-count">3</span>
-                            <span class="sr-only">My Wishlist</span>
+                            <span class="sr-only">My page</span>
                         </a>
 
                         <div class="dropdown cart-dropdown header-bottom-icon-link">
@@ -94,4 +97,245 @@
                                 </div>
                             </div>
                         </div>
-                    </div></div></div></header></html>
+                    </div>
+				</div>
+			</div>
+			<!-- Sign in / Register Modal -->
+			 <div class="modal fade" id="signin-modal" tabindex="-1" role="dialog" aria-hidden="true">
+			    <div class="modal-dialog modal-dialog-centered" role="document">
+			        <div class="modal-content">
+			            <div class="modal-body">
+			                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			                    <span aria-hidden="true"><i class="icon-close"></i></span>
+			                </button>
+			
+			                <div class="form-box">
+			                    <div class="form-tab">
+			                        <ul class="nav nav-pills nav-fill" role="tablist">
+			                            <li class="nav-item">
+			                                <a class="nav-link active" id="signin-tab" data-toggle="tab" href="#signin" role="tab" aria-controls="signin" aria-selected="true">로그인</a>
+			                            </li>
+			                            <li class="nav-item">
+			                                <a class="nav-link" id="register-tab" data-toggle="tab" href="#register" role="tab" aria-controls="register" aria-selected="false">회원가입</a>
+			                            </li>
+			                        </ul>
+			                        <div class="tab-content" id="tab-content-5">
+			                            <!-- 로그인 탭 -->
+			                            <div class="tab-pane fade show active" id="signin" role="tabpanel" aria-labelledby="signin-tab">
+			                                <form action="#">
+			                                    <div class="form-group">
+			                                        <label for="singin-email">ID를 입력 해주세요.</label>
+			                                        <input type="text" class="form-control" id="singin-email" name="singin-email" required>
+			                                    </div>
+			                                    <div class="form-group">
+			                                        <label for="singin-password">비밀번호를 입력 해주세요.</label>
+			                                        <input type="password" class="form-control" id="singin-password" name="singin-password" required>
+			                                    </div>
+			                                    <div class="form-footer">
+			                                        <button type="submit" class="btn btn-outline-primary-2">
+			                                            <span>로그인</span>
+			                                            <i class="icon-long-arrow-right"></i>
+			                                        </button>
+			                                        <a href="#" class="forgot-link">비밀번호를 잊으셨습니까?</a>
+			                                    </div>
+			                                </form>
+			                            </div>
+			
+			                            <!-- ================= 회원가입 탭 김성주 할일(유효성검사 및 ajax 진행 안함) ================= -->
+			                            <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+			                                <form id="register-form" novalidate>
+			                                    
+			                                    <!-- 아이디 입력 그룹 -->
+			                                    <div class="form-group">
+			                                        <label for="register-id">아이디</label>
+			                                        <input type="text" class="form-control" id="register-id" name="loginId" autocomplete="off" placeholder="필수 입력항목입니다">
+			                                        <p id="id-check-message" class="form-text" style="height: 1.2em; margin-top: 5px;"></p>
+			                                    </div>
+			                                    
+			                                    <!-- 비활성화될 필드들 -->
+			                                    <div class="form-group">
+			                                        <label for="register-password">비밀번호</label>
+			                                        <input type="password" class="form-control register-details-input" id="register-password" name="password" disabled>
+			                                    </div>
+			                                    <div class="form-group">
+			                                        <label for="register-name">이름</label>
+			                                        <input type="text" class="form-control register-details-input" id="register-name" name="name" disabled>
+			                                    </div>
+			                                    <div class="form-group">
+			                                        <label for="register-email">이메일</label>
+			                                        <input type="email" class="form-control register-details-input" id="register-email" name="email" disabled>
+			                                    </div>
+			                                    
+			                                    <!-- 주소 입력 영역 -->
+			                                    <div class="form-group">
+			                                        <label>회원우편번호</label>
+			                                        <div class="d-flex">
+			                                            <input type="text" class="form-control register-details-input" id="postcode" name="postcode" placeholder="우편번호" readonly disabled>
+			                                            <button type="button" class="btn btn-info register-details-input" id="btn-find-postcode" disabled style="margin-left: 10px; white-space: nowrap;">우편번호찾기</button>
+			                                        </div>
+			                                    </div>
+			                                    <div class="form-group">
+			                                        <label for="address">회원주소</label>
+			                                        <input type="text" class="form-control register-details-input" id="address" name="address" placeholder="주소" readonly disabled>
+			                                    </div>
+			                                    <div class="form-group">
+			                                        <label for="detailAddress">회원상세주소</label>
+			                                        <input type="text" class="form-control register-details-input" id="detailAddress" name="detailAddress" placeholder="상세주소를 입력해주세요" disabled>
+			                                    </div>
+			                                    <!-- 알림 및 보안 설정 그룹 -->
+												<div class="form-group">
+												    <label>알림 및 보안 설정</label>
+												    
+												    <!-- 푸시 알림 수신 동의 -->
+												    <div class="custom-control custom-checkbox">
+												      	  <input type="checkbox" class="custom-control-input register-details-input" id="register-push" name="pushAgreement" value="Y" disabled>
+												        <label class="custom-control-label" for="register-push">푸시 알림 수신에 동의합니다. (선택)</label>
+												    </div>
+												    
+												    <!-- 이메일 수신 동의 -->
+												    <div class="custom-control custom-checkbox">
+												        <input type="checkbox" class="custom-control-input register-details-input" id="register-email-agree" name="emailAgreement" value="Y" disabled>
+												        <label class="custom-control-label" for="register-email-agree">이메일 수신에 동의합니다. (선택)</label>
+												    </div>
+												</div>
+			
+			                                    <!-- 회원가입 결과 메시지를 표시할 영역 -->
+			                                    <div id="register-result-message" class="text-center" style="margin-top: 15px;"></div>
+			
+			                                    <div class="form-footer">
+			                                        <!-- type="button"과 id 추가 -->
+			                                        <button type="button" id="btn-register-submit" class="btn btn-outline-primary-2">
+			                                            <span>SIGN UP</span>
+			                                            <i class="icon-long-arrow-right"></i>
+			                                        </button>
+			                                    </div>
+			                                </form>
+			                            </div>
+			                        </div>
+			                    </div>
+			                </div>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+			<!-- Plugins JS File -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/jquery.hoverIntent.min.js"></script>
+    <script src="assets/js/jquery.waypoints.min.js"></script>
+    <script src="assets/js/superfish.min.js"></script>
+    <script src="assets/js/owl.carousel.min.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <!-- Main JS File -->
+    <script src="assets/js/main.js"></script>
+    <!-- 예시를 위해 하드코딩함 수정예정 -->
+    <script>
+		$(document).ready(function() {
+		
+		    // ================== 공통 변수 선언 (오류 없는 최종 버전) ==================
+		    const duplicatedIds = ['admin', 'test', 'root', 'ks55'];
+		    const idInput = $('#register-id');
+		    const idMessage = $('#id-check-message');
+		    const detailInputs = $('.register-details-input');
+		    const registerForm = $('#register-form');
+		    const registerResultMessage = $('#register-result-message');
+		    const registerSubmitButton = $('#btn-register-submit');
+		    const findPostcodeButton = $('#btn-find-postcode');
+		    
+		 // ==========================================================
+		//  1. 아이디 중복 확인 기능 (메시지 표시 문제 해결 버전)
+		// ==========================================================
+		    
+		// 아이디 중복을 실제로 확인하는 함수
+		function checkIdDuplication() {
+		    const enteredId = idInput.val().trim();
+		    if (enteredId.length === 0) {
+		        idMessage.text('');
+		        detailInputs.prop('disabled', true);
+		        return;
+		    }
+		    if (duplicatedIds.includes(enteredId)) {
+		        // [수정 포인트 1] 메시지를 표시하고,
+		        idMessage.text('이미 사용 중인 아이디입니다.').css('color', 'red');
+		        detailInputs.prop('disabled', true);
+		        
+		        // [수정 포인트 2] 포커스를 다시 주기 전에, 잠깐의 시간(1ms)을 줍니다.
+		        // 이렇게 하면 focus 이벤트가 메시지를 바로 지우는 것을 방지할 수 있습니다.
+		        setTimeout(function() {
+		            idInput.focus();
+		        }, 1);
+		
+		    } else {
+		        idMessage.text('사용 가능한 아이디입니다.').css('color', 'green');
+		        detailInputs.prop('disabled', false);
+		        $('#register-password').focus();
+		    }
+		}
+		
+		// [이벤트] 아이디 입력창에서 포커스를 잃었을 때
+		idInput.on('blur', checkIdDuplication);
+		
+		// [이벤트] 아이디 입력창에서 엔터 키를 눌렀을 때
+		idInput.on('keyup', function(event) {
+		    if (event.key === "Enter" || event.keyCode === 13) {
+		        $(this).trigger('blur');
+		    }
+		});
+		
+		// [이벤트] 아이디 입력창에 다시 포커스를 맞췄을 때
+		idInput.on('focus', function() {
+		    // [수정 포인트 3] 메시지를 바로 지우는 대신, 사용자가 키보드를 입력 시작할 때 지우도록 변경
+		    detailInputs.prop('disabled', true);
+		    
+		    // 사용자가 새로운 입력을 시작하면 메시지를 지우도록 keydown 이벤트를 한 번만 실행
+		    idInput.one('keydown', function() {
+		        idMessage.text('');
+		    });
+		});
+		
+		    // ==========================================================
+		    //  2. 주소 찾기 API 기능
+		    // ==========================================================
+		    findPostcodeButton.on('click', function() {
+		        new daum.Postcode({
+		            oncomplete: function(data) {
+		                let addr = (data.userSelectedType === 'R') ? data.roadAddress : data.jibunAddress;
+		                $('#postcode').val(data.zonecode);
+		                $('#address').val(addr);
+		                $('#detailAddress').focus();
+		            }
+		        }).open();
+		    });
+		
+		    // ==========================================================
+		    //  3. 회원가입 버튼 클릭 이벤트
+		    // ==========================================================
+		    registerSubmitButton.on('click', function() {
+		        if ($('#register-id').val().trim() === '' || $('#register-password').val().trim() === '' || $('#register-name').val().trim() === '' || $('#register-email').val().trim() === '') {
+		            alert('필수 항목을 모두 입력해주세요.');
+		            return;
+		        }
+		        
+		        const formData = registerForm.serialize();
+		        console.log('회원가입 폼 데이터:', formData);
+		        
+		        registerResultMessage.html('<p style="color:blue;">회원가입 처리 중...</p>');
+		        
+		        setTimeout(function() {
+		            registerResultMessage.html('<p style="color:green;"><b>회원가입이 완료되었습니다!</b></p>');
+		            
+		            setTimeout(function() {
+		                $('#signin-tab').tab('show');
+		                registerForm[0].reset();
+		                idMessage.text('');
+		                registerResultMessage.text('');
+		                detailInputs.prop('disabled', true);
+		            }, 1500);
+		
+		        }, 1000);
+		    });
+		});
+		</script>		    	
+	</header>
+</html>
