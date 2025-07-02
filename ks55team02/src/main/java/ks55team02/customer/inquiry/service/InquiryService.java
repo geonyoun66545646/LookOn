@@ -14,7 +14,7 @@ public interface InquiryService {
      * @param inquiry 등록할 Inquiry 객체
      * @param attachedFiles 첨부된 파일 배열
      */
-    void addInquiry(Inquiry inquiry, MultipartFile[] attachedFiles); // MultipartFile[] 버전만 유지
+    void addInquiry(Inquiry inquiry, MultipartFile[] attachedFiles, String currentUserId); // MultipartFile[] 버전만 유지
 
     /**
      * 문의 유형 옵션 리스트를 조회합니다.
@@ -33,7 +33,8 @@ public interface InquiryService {
      * @param inquiryId 문의 ID
      * @return 조회된 Inquiry 객체
      */
-    Inquiry getInquiryById(String inquiryId);
+    Inquiry getInquiryById(String inquiryId,  String currentUserId);
+    
 
     /**
      * 페이징 처리된 문의 목록을 조회합니다.
@@ -42,4 +43,7 @@ public interface InquiryService {
      * @return 문의 목록 및 페이징 정보를 담은 Map
      */
     Map<String, Object> getInquiryList(int currentPage, int pageSize); // 페이징 메서드 시그니처 유지
+    
+    
+    
 }
