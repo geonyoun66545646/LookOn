@@ -6,6 +6,5 @@ import java.util.List;
 public interface ProductCategoryService {
     List<ProductCategory> getAllProductCategories();
     List<ProductCategory> getPrimaryProductCategories();
-    // ⭐ 이 부분을 Long -> String으로 변경합니다. ⭐
-    List<ProductCategory> getProductCategoriesByParentId(String parentCategoryId); // 또는 primaryCategoryId
+    List<ProductCategory> getProductCategoriesByParentId(String parentCategoryId);
 }

@@ -1,0 +1,293 @@
+@charset "UTF-8";
+/* ==========================================================================
+   Base styles for the post detail page
+   ========================================================================== */
+
+body {
+    font-family: 'Spoqa Han Sans Neo', sans-serif; /* 메인 글꼴 */
+    background-color: #f8f9fa; /* 약간의 배경색 */
+    color: #333;
+    line-height: 1.6;
+    padding-top: 60px; /* 네비게이션 바 높이에 맞춰 상단 패딩 추가 */
+}
+
+/* ==========================================================================
+   Post Detail Container
+   ========================================================================== */
+
+.post-detail-area {
+    max-width: 800px; /* 게시글 내용 최대 너비 */
+    margin: 30px auto; /* 상하 30px, 좌우 자동 중앙 정렬 */
+    padding: 30px; /* 내부 여백 */
+    background-color: #fff; /* 흰색 배경 */
+    border: 1px solid #dee2e6; /* 테두리 */
+    border-radius: 0.5rem; /* 모서리 둥글게 */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05); /* 그림자 효과 */
+}
+
+/* ==========================================================================
+   Post Detail Header
+   ========================================================================== */
+
+.post-detail-header {
+    border-bottom: 1px solid #e0e0e0; /* 하단 구분선 */
+    padding-bottom: 20px; /* 구분선 아래 여백 */
+    margin-bottom: 30px; /* 내용 영역 위 여백 */
+    text-align: left; /* 왼쪽 정렬 */
+}
+
+.post-detail-header h2 {
+    font-size: 22px; /* 제목 글자 크기 */
+    font-weight: 700; /* 제목 굵기 */
+    color: #212529; /* 제목 색상 */
+    margin-bottom: 1rem; /* 제목 아래 여백 */
+}
+
+.post-detail-info {
+    font-size: 14px; /* 정보 글자 크기 */
+    color: #6c757d; /* 정보 글씨 색상 */
+}
+
+.post-detail-info span {
+    margin-right: 20px; /* 정보 요소 간 간격 */
+}
+
+.post-detail-info span:last-child {
+    margin-right: 0; /* 마지막 요소 오른쪽 마진 없음 */
+}
+
+/* ==========================================================================
+   Post Content
+   ========================================================================== */
+
+.post-content p {
+    margin-bottom: 30px; /* 내용 아래 여백 */
+    font-size: 18px; /* 본문 글자 크기 */
+    color: #333; /* 본문 글씨 색상 */
+    word-wrap: break-word; /* 긴 단어 줄바꿈 */
+}
+
+/* 이미지 스타일링 (필요시) */
+.post-content img {
+    max-width: 100%; /* 이미지 너비를 컨테이너에 맞춤 */
+    height: auto; /* 이미지 높이 자동 조절 */
+    display: block; /* 이미지 블록 요소로 만들어 여백 제거 */
+    margin: 20px auto; /* 이미지 가운데 정렬 */
+    border-radius: 0.3rem; /* 이미지 모서리 둥글게 */
+}
+
+/* ==========================================================================
+   Post Actions
+   ========================================================================== */
+
+.post-actions {
+    text-align: right; /* 버튼 오른쪽 정렬 */
+    margin-top: 30px; /* 버튼 위 여백 */
+    border-top: 1px solid #e0e0e0; /* 상단 구분선 */
+    padding-top: 20px; /* 구분선 위 여백 */
+}
+
+.post-actions .btn {
+    margin-left: 10px; /* 버튼 간 간격 */
+    padding: 0.6rem 1.2rem; /* 버튼 안쪽 여백 */
+    font-size: 15px; /* 버튼 글자 크기 */
+    font-weight: 500; /* 버튼 글씨 두께 */
+    border-radius: 0.25rem; /* 버튼 모서리 둥글게 */
+    transition: background-color 0.2s ease, color 0.2s ease; /* 부드러운 효과 */
+}
+
+.post-actions .btn-secondary {
+    background-color: #6c757d; /* 보조 버튼 배경색 */
+    color: #fff; /* 보조 버튼 글씨 색상 */
+    border: none;
+}
+
+.post-actions .btn-secondary:hover {
+    background-color: #5a6268; /* 보조 버튼 호버 배경색 */
+}
+
+.post-actions .btn-primary {
+    background-color: #007bff; /* 기본 버튼 배경색 */
+    color: #fff; /* 기본 버튼 글씨 색상 */
+    border: none;
+}
+
+.post-actions .btn-primary:hover {
+    background-color: #0056b3; /* 기본 버튼 호버 배경색 */
+}
+
+.post-actions .btn-danger {
+    background-color: #dc3545; /* 삭제 버튼 배경색 */
+    color: #fff; /* 삭제 버튼 글씨 색상 */
+    border: none;
+}
+
+.post-actions .btn-danger:hover {
+    background-color: #c82333; /* 삭제 버튼 호버 배경색 */
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .post-detail-area {
+        margin: 20px 15px; /* 작은 화면에서 마진 조절 */
+        padding: 20px; /* 내부 패딩 조절 */
+    }
+
+    .post-detail-header h2 {
+        font-size: 1.8rem; /* 작은 화면 제목 크기 */
+    }
+
+    .post-detail-info span {
+        margin-right: 10px; /* 작은 화면 정보 간격 조절 */
+        display: block; /* 정보 요소들을 세로로 쌓기 */
+        margin-bottom: 5px;
+    }
+
+    .post-content {
+        font-size: 0.95rem; /* 작은 화면 본문 글자 크기 */
+    }
+
+    .post-actions {
+        text-align: center; /* 버튼 가운데 정렬 */
+        flex-direction: column; /* 버튼들을 세로로 쌓기 */
+    }
+
+    .post-actions .btn {
+        width: 100%; /* 버튼 전체 너비 */
+        margin-left: 0; /* 왼쪽 마진 제거 */
+        margin-bottom: 10px; /* 버튼 아래 마진 */
+    }
+
+    .post-actions .btn:last-child {
+        margin-bottom: 0; /* 마지막 버튼 하단 마진 없음 */
+    }
+}
+
+/* ==========================================================================
+   Custom Font Import (Spoqa Han Sans Neo)
+   ========================================================================== */
+   
+  .comments-section {
+    max-width: 800px; /* 게시글 영역과 동일한 최대 너비 */
+    margin: 30px auto 0 auto; /* 게시글 영역 하단에 붙이고 중앙 정렬 */
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+}
+
+.comments-section h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+/* 댓글 작성 폼 */
+.comment-form {
+    display: flex;
+    flex-direction: column; /* textarea와 버튼을 세로로 배치 */
+    align-items: flex-end; /* 버튼을 오른쪽 정렬 */
+    margin-bottom: 30px;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    font-size: 14px;
+    margin-bottom: 10px;
+    box-sizing: border-box; /* 패딩, 테두리가 너비에 포함되도록 */
+    resize: vertical; /* 세로 크기 조절만 가능하게 */
+}
+
+.comment-form .btn-primary {
+    padding: 0.6rem 1.5rem;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* 댓글 목록 */
+.comment-list {
+    margin-top: 20px;
+}
+
+.comment-item {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+    margin-bottom: 15px;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.comment-author {
+    font-weight: 700;
+    color: #333;
+    font-size: 1rem;
+}
+
+.comment-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.comment-body p {
+    margin-bottom: 0;
+    line-height: 1.7;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.comment-actions {
+    text-align: right;
+    margin-top: 5px;
+}
+
+.comment-actions .btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* ==========================================================================
+   Responsive Adjustments for Comments
+   ========================================================================== */
+@media (max-width: 768px) {
+    .comments-section {
+        margin: 20px 15px 0 15px; /* 모바일에서 여백 조절 */
+    }
+
+    .comment-form {
+        align-items: center; /* 모바일에서는 폼 요소들을 가운데 정렬 */
+    }
+
+    .comment-form textarea {
+        margin-bottom: 15px;
+    }
+
+    .comment-header {
+        flex-direction: column; /* 작성자와 날짜를 세로로 */
+        align-items: flex-start;
+    }
+
+    .comment-author {
+        margin-bottom: 5px;
+    }
+}
+@import url(//spoqa.github.io/spoqa-han-sans/stylesheets/SpoqaHanSansNeo.css);

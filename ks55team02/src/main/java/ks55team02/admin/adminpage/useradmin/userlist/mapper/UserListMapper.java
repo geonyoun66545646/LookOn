@@ -10,7 +10,7 @@ import ks55team02.admin.adminpage.useradmin.userlist.domain.UserList;
 @Mapper
 public interface UserListMapper {
 
-	// 검색 조건에 맞는 회원 목록 조회
+		// 검색 조건에 맞는 회원 목록 조회
 		List<UserList> getUserList(UserList user);
 		
 		// 검색 조건에 맞는 전체 회원 수 조회
