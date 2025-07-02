@@ -240,18 +240,18 @@ body {
 .comment-author {
     font-weight: 700;
     color: #333;
-    font-size: 1rem;
+    font-size: 14px;
 }
 
 .comment-date {
-    font-size: 0.85rem;
+    font-size: 11px;
     color: #6c757d;
 }
 
 .comment-body p {
     margin-bottom: 0;
     line-height: 1.7;
-    font-size: 0.95rem;
+    font-size: 15px;
     color: #333;
 }
 
@@ -262,7 +262,7 @@ body {
 
 .comment-actions .btn-sm {
     padding: 0.25rem 0.75rem;
-    font-size: 0.875rem;
+    font-size: 14px;
 }
 
 /* ==========================================================================
