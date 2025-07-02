@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>결제 완료</title>
+    
+    <!-- 이 페이지를 위한 전용 스타일 -->
+    <style>
+        .order-success-container {
+            max-width: 700px;
+            margin: 4rem auto;
+            padding: 4rem;
+            text-align: center;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .success-icon {
+            font-size: 6rem;
+            color: #28a745; /* 성공을 의미하는 초록색 */
+            margin-bottom: 2rem;
+            /* Font Awesome 아이콘을 사용하려면 해당 CSS가 로드되어야 합니다. */
+            /* Molla 템플릿은 자체 아이콘 폰트를 사용하므로, 아래는 예시입니다. */
+        }
+        .success-title {
+            font-size: 2.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .success-message {
+            font-size: 1.6rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+        .order-summary-table {
+            width: 100%;
+            margin: 2.5rem 0;
+            text-align: left;
+            border-top: 2px solid #333;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .order-summary-table th, .order-summary-table td {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 1.5rem;
+        }
+        .order-summary-table th {
+            width: 30%;
+            background-color: #f8f9fa;
+            font-weight: 500;
+            color: #495057;
+        }
+        .order-summary-table td {
+            color: #212529;
+            font-weight: 500;
+        }
+        .action-buttons {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+        .action-buttons .btn {
+            min-width: 180px;
+            padding: 1.2rem 2rem;
+            font-size: 1.6rem;
+        }
+    </style>
+</head>
+
+<body>
+<th:block layout:fragment="contents">
+    <div class="page-content">
+    <div class="container">
+        <div class="order-success-container">
+            <!-- 성공 아이콘, 제목, 메시지는 그대로 유지 -->
+            <i class="icon-check-circle success-icon"></i>
+            <h2 class="success-title">결제가 성공적으로 완료되었습니다.</h2>
+            <p class="success-message">저희 서비스를 이용해 주셔서 감사합니다. 주문 내역은 아래와 같습니다.</p>
+            
+            <!-- ================================================== -->
+            <!--   ↓↓↓ 이 부분을 통째로 수정 또는 교체하세요 ↓↓↓   -->
+            <!-- ================================================== -->
+            
+            <!-- 주문 상품 목록 테이블 (동적 생성) -->
+            <table class="order-summary-table" th:if="${orderedProducts != null and not #lists.isEmpty(orderedProducts)}">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">상품명</th>
+                        <th style="width: 20%; text-align: right;">수량</th>
+                        <th style="width: 30%; text-align: right;">가격</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- th:each를 사용해 상품 목록 반복 -->
+                    <tr th:each="product : ${orderedProducts}">
+                        <td th:text="${product.name}">Beige knitted elastic runner shoes</td>
+                        <td style="text-align: right;" th:text="${product.quantity}">2</td>
+                        <!-- toFixed(2)와 유사한 포맷팅, 필요에 따라 수정 -->
+                        <td style="text-align: right;" th:text="${'$' + #numbers.formatDecimal(product.total, 1, 2)}">$168.00</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- 결제 정보 요약 테이블 -->
+            <table class="order-summary-table">
+                <tbody>
+                    <tr>
+                        <th>주문 번호</th>
+                        <td th:text="${payment.orderId}">order_20231027123456</td>
+                    </tr>
+                    <!-- 주문명은 상품 목록이 있으므로 생략하거나 유지할 수 있습니다.
+                    <tr>
+                        <th>주문명</th>
+                        <td th:text="${payment.orderName}">상품명 외 1건</td>
+                    </tr>
+                    -->
+                    <tr>
+					    <th>총 결제 금액</th>
+					    <!-- [최종 수정] payment.amount -> payment.totalAmount 로 변경합니다. -->
+					    <td th:text="${#numbers.formatInteger(payment.totalAmount, 0, 'COMMA') + '원'}">50,000원</td>
+					</tr>
+                    <tr>
+                        <th>결제 수단</th>
+                        <td th:text="${payment.method}">신용카드</td>
+                    </tr>
+                    <tr>
+                        <th>결제 승인일시</th>
+                        <td th:text="${#temporals.format(payment.approvedAt, 'yyyy-MM-dd HH:mm:ss')}">2023-10-27 12:35:00</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- ================================================== -->
+            <!--   ↑↑↑ 여기까지 수정 또는 교체 ↑↑↑   -->
+            <!-- ================================================== -->
+            
+            <!-- 다음 행동을 유도하는 버튼 -->
+            <div class="action-buttons">
+                <a th:href="@{/my-page/orders}" class="btn btn-primary">주문 내역 확인</a>
+                <a th:href="@{/}" class="btn btn-outline-primary-2">쇼핑 계속하기</a>
+            </div>
+        </div>
+    </div>
+</div>
+</th:block>
+</body>
+</html>
