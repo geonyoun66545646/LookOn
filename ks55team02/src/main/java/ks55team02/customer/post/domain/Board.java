@@ -1,4 +1,4 @@
-package ks55team02.customer.board.domain;
+package ks55team02.customer.post.domain;
 
 import lombok.Data;
 

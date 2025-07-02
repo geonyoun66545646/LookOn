@@ -1,10 +1,10 @@
-package ks55team02.customer.board.service;
+package ks55team02.customer.post.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import ks55team02.customer.board.domain.Board;
+import ks55team02.customer.post.domain.Board;
 
 @Service
 public interface BoardService {

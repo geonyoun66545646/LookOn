@@ -1,12 +1,12 @@
-package ks55team02.customer.board.service.impl;
+package ks55team02.customer.post.service.impl;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import ks55team02.customer.board.domain.Board;
-import ks55team02.customer.board.mapper.BoardMapper;
-import ks55team02.customer.board.service.BoardService;
+import ks55team02.customer.post.domain.Board;
+import ks55team02.customer.post.mapper.BoardMapper;
+import ks55team02.customer.post.service.BoardService;
 import lombok.RequiredArgsConstructor;
 
 @Service

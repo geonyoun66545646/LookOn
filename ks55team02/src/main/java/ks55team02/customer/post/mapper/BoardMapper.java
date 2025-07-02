@@ -1,10 +1,10 @@
-package ks55team02.customer.board.mapper;
+package ks55team02.customer.post.mapper;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import ks55team02.customer.board.domain.Board;
+import ks55team02.customer.post.domain.Board;
 
 @Mapper
 public interface BoardMapper {
