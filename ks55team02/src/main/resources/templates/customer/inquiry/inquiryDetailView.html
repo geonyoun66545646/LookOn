@@ -53,7 +53,6 @@
                                     <span>작성자 &nbsp;&nbsp;: </span>
                                     <span th:text="${inquiry.wrtrId}">작성자</span>
                                     </td>
-                                    </td>
                                     <td>
                                     <span>작성일&nbsp;&nbsp;: </span>
                                     <span th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}" th:if="${inquiry.regYmd != null}"></span>
@@ -76,9 +75,9 @@
     <h4>첨부 이미지</h4>
     <div class="row">
         <div class="col-md-4 mb-3" th:each="image : ${inquiry.inquiryImages}">
-            <img th:src="@{'/uploads/' + ${image.imgId}}" alt="첨부 이미지" class="img-fluid rounded shadow-sm">
+            <img th:src="@{${image.imgAddr}}" alt="첨부 이미지" class="img-fluid rounded shadow-sm">
         </div>
-        <div th:if="${inquiry.inquiryImages.isEmpty()}" class="col-12">
+        <div th:if="${inquiry.inquiryImages == null || inquiry.inquiryImages.isEmpty()}" class="col-12">
             <p>첨부된 이미지가 없습니다.</p>
         </div>
     </div>

@@ -1,9 +1,16 @@
 package ks55team02.customer.store.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime; // DDL의 datetime에 맞춰 LocalDateTime 사용
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class StoreImage {
     private String 			imgId;
     private String 			imgAddr;      // 이미지 경로
