@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.inquiry.mapper.InquiryImageMapper">
+
+    <resultMap id="inquiryImageResultMap" 	type="ks55team02.customer.inquiry.domain.InquiryImage">
+        <id property="inqryImgId" 			column="inqry_img_id"/>
+        <result property="inqryId" 			column="inqry_id"/>
+        <result property="imgId" 			column="img_id"/>
+        <result property="ord" 				column="ord"/>
+        <result property="imgAddr"          column="img_addr"/> <!-- imgAddr 매핑: 조인된 결과에서 가져옴 -->
+    </resultMap>
+
+    <insert id="addInquiryImage" parameterType="ks55team02.customer.inquiry.domain.InquiryImage">
+        INSERT INTO inquiry_images (
+            inqry_img_id, 
+            inqry_id, 
+            img_id, 
+            ord
+        ) VALUES (
+            #{inqryImgId}, 
+            #{inqryId}, 
+            #{imgId}, 
+            #{ord}
+        )
+    </insert>
+    
+    <insert id="addInquiryImages" parameterType="java.util.List">
+        INSERT INTO inquiry_images (
+            inqry_img_id, 
+            inqry_id, 
+            img_id, 
+            ord
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.inqryImgId}, #{item.inqryId}, #{item.imgId}, #{item.ord})
+        </foreach>
+    </insert>
+
+    <!-- getInquiryImagesByInquiryId 쿼리: store_images와 조인하여 img_addr 가져옴 -->
+    <select id="getInquiryImagesByInquiryId" parameterType="string" resultMap="inquiryImageResultMap">
+        SELECT
+            ii.inqry_img_id, 
+            ii.inqry_id, 
+            ii.img_id, 
+            ii.ord,
+            si.img_addr  <!-- store_images 테이블의 img_addr 컬럼을 가져옵니다. -->
+        FROM inquiry_images ii
+        JOIN store_images si ON ii.img_id = si.img_id
+        WHERE ii.inqry_id = #{inqryId}
+        ORDER BY ii.ord ASC
+    </select>
+
+</mapper>
