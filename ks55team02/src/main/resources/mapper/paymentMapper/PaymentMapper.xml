@@ -49,15 +49,17 @@
 	</select>
 	
     <!-- [추가] 주문 정보 저장 쿼리 / 주문 정보를 미리 등록 / 고객이 최종 결제를 하기 전에, "누가, 어떤 상품을, 어디로 받을지"에 대한 정보를 주문서(orders 테이블)에 '결제 대기중' 상태로 임시 저장-->
-    <insert id="insertOrder" parameterType="ks55team02.tossApi.domain.OrderDTO">
-        INSERT INTO orders (
-            ordr_no, user_no, ordr_dt, gds_tot_amt, ordr_stts_cd,
-            rcvr_nm, rcvr_telno, dlvy_addr, dlvy_daddr, zip, dlvy_memo_cn
-        ) VALUES (
-            #{ordrNo}, #{userNo}, #{ordrDt}, #{gdsTotAmt}, #{ordrSttsCd},
-            #{rcvrNm}, #{rcvrTelno}, #{dlvyAddr}, #{dlvyDaddr}, #{zip}, #{dlvyMemoCn}
-        )
-    </insert>
+	<insert id="insertOrder" parameterType="ks55team02.tossApi.domain.OrderDTO">
+	    INSERT INTO orders (
+	        ordr_no, user_no, ordr_dt, gds_tot_amt, dlvy_fee_amt, pblcn_cpn_id,
+	        user_cpn_id, apld_cpn_dscnt_amt, last_stlm_amt, ordr_stts_cd,
+	        rcvr_nm, rcvr_telno, dlvy_addr, dlvy_daddr, zip, dlvy_memo_cn, user_name
+	    ) VALUES (
+	        #{ordrNo}, #{userNo}, #{ordrDt}, #{gdsTotAmt}, #{dlvyFeeAmt}, #{pblcnCpnId},
+	        #{userCpnId}, #{apldCpnDscntAmt}, #{lastStlmAmt}, #{ordrSttsCd},
+	        #{rcvrNm}, #{rcvrTelno}, #{dlvyAddr}, #{dlvyDaddr}, #{zip}, #{dlvyMemoCn}, #{userName}
+	    )
+	</insert>
     
     <!-- 새로운 결제 관리 ID 생성 / 결제가 성공했을 때, 해당 결제를 시스템 내부에서 식별하기 위한 고유 ID 생성  151 부터 올라가니깐 이거 나중에 지우기-->
     <select id="selectNextPaymentId" resultType="String">
