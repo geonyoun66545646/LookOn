@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Molla - 통합 헤더</title>
+</head>
+<body>
+    <header class="lookon-main-header" th:fragment="mainHeaderFragment">
+        <div class="lookon-header-upper-bar">
+            <div class="lookon-header-content-wrapper">
+                <a th:href="@{/customer}" class="lookon-brand-logo">LookOn</a>
+                <form action="/search" class="lookon-search-input-area">
+                    <i class="fas fa-search lookon-search-icon"></i>
+                    <input type="text" class="lookon-search-input-field" placeholder="여기에 검색어를 입력해주세요">
+                </form>
+            </div>
+        </div>
+
+        <div class="lookon-header-lower-bar">
+            <div class="lookon-header-content-wrapper">
+                <div class="lookon-navigation-group">
+                    <button class="lookon-category-menu-button" id="open-category-modal" aria-label="카테고리 메뉴 열기">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <nav class="lookon-primary-navigation">
+                        <ul class="lookon-nav-list">
+                            <li> <a th:href="@{/customer/products(category='best')}" class="lookon-nav-link">베스트</a> </li>
+						    <li> <a th:href="@{/customer/products(category='sale')}" class="lookon-nav-link">세일</a> </li>
+						    <li> <a th:href="@{/customer/products(category='new-products')}" class="lookon-nav-link">신상</a> </li>
+                            <li><a href="#" class="lookon-nav-link">커뮤니티</a></li>
+                            <li><a href="#" class="lookon-nav-link">피드</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="lookon-user-action-menu">
+                    <a href="#" class="lookon-action-link" data-toggle="modal" data-target="#signin-modal"><i class="far fa-user"></i></a>
+                    <a href="#" class="lookon-action-link" data-toggle="modal" data-target="#signin-modal">
+                        <i class="far fa-heart"></i>
+                        <span class="lookon-badge">3</span>
+                    </a>
+                    <a href="cart.html" class="lookon-action-link">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="lookon-badge">2</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sign in / Register Modal -->
+		 <div class="modal fade" id="signin-modal" tabindex="-1" role="dialog" aria-hidden="true">
+		    <div class="modal-dialog modal-dialog-centered" role="document">
+		        <div class="modal-content">
+		            <div class="modal-body">
+		                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		                    <span aria-hidden="true"><i class="icon-close"></i></span>
+		                </button>
+		
+		                <div class="form-box">
+		                    <div class="form-tab">
+		                        <ul class="nav nav-pills nav-fill" role="tablist">
+		                            <li class="nav-item">
+		                                <a class="nav-link active" id="signin-tab" data-toggle="tab" href="#signin" role="tab" aria-controls="signin" aria-selected="true">로그인</a>
+		                            </li>
+		                            <li class="nav-item">
+		                                <a class="nav-link" id="register-tab" data-toggle="tab" href="#register" role="tab" aria-controls="register" aria-selected="false">회원가입</a>
+		                            </li>
+		                        </ul>
+		                        <div class="tab-content" id="tab-content-5">
+		                            <!-- 로그인 탭 -->
+		                            <div class="tab-pane fade show active" id="signin" role="tabpanel" aria-labelledby="signin-tab">
+		                                <form action="#">
+		                                    <div class="form-group">
+		                                        <label for="singin-email">ID를 입력 해주세요.</label>
+		                                        <input type="text" class="form-control" id="singin-email" name="singin-email" required>
+		                                    </div>
+		                                    <div class="form-group">
+		                                        <label for="singin-password">비밀번호를 입력 해주세요.</label>
+		                                        <input type="password" class="form-control" id="singin-password" name="singin-password" required>
+		                                    </div>
+		                                    <div class="form-footer">
+		                                        <button type="submit" class="btn btn-outline-primary-2">
+		                                            <span>로그인</span>
+		                                            <i class="icon-long-arrow-right"></i>
+		                                        </button>
+		                                        <a href="#" class="forgot-link">비밀번호를 잊으셨습니까?</a>
+		                                    </div>
+		                                </form>
+		                            </div>
+		
+		                            <!-- ================= 회원가입 탭 김성주 할일(유효성검사 및 ajax 진행 안함) ================= -->
+		                            <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+		                                <form id="register-form" novalidate>
+		                                    
+		                                    <!-- 아이디 입력 그룹 -->
+		                                    <div class="form-group">
+		                                        <label for="register-id">아이디</label>
+		                                        <input type="text" class="form-control" id="register-id" name="loginId" autocomplete="off" placeholder="필수 입력항목입니다">
+		                                        <p id="id-check-message" class="form-text" style="height: 1.2em; margin-top: 5px;"></p>
+		                                    </div>
+		                                    
+		                                    <!-- 비활성화될 필드들 -->
+		                                    <div class="form-group">
+		                                        <label for="register-password">비밀번호</label>
+		                                        <input type="password" class="form-control register-details-input" id="register-password" name="password" disabled>
+		                                    </div>
+		                                    <div class="form-group">
+		                                        <label for="register-name">이름</label>
+		                                        <input type="text" class="form-control register-details-input" id="register-name" name="name" disabled>
+		                                    </div>
+		                                    <div class="form-group">
+		                                        <label for="register-email">이메일</label>
+		                                        <input type="email" class="form-control register-details-input" id="register-email" name="email" disabled>
+		                                    </div>
+		                                    
+		                                    <!-- 주소 입력 영역 -->
+		                                    <div class="form-group">
+		                                        <label>회원우편번호</label>
+		                                        <div class="d-flex">
+		                                            <input type="text" class="form-control register-details-input" id="postcode" name="postcode" placeholder="우편번호" readonly disabled>
+		                                            <button type="button" class="btn btn-info register-details-input" id="btn-find-postcode" disabled style="margin-left: 10px; white-space: nowrap;">우편번호찾기</button>
+		                                        </div>
+		                                    </div>
+		                                    <div class="form-group">
+		                                        <label for="address">회원주소</label>
+		                                        <input type="text" class="form-control register-details-input" id="address" name="address" placeholder="주소" readonly disabled>
+		                                    </div>
+		                                    <div class="form-group">
+		                                        <label for="detailAddress">회원상세주소</label>
+		                                        <input type="text" class="form-control register-details-input" id="detailAddress" name="detailAddress" placeholder="상세주소를 입력해주세요" disabled>
+		                                    </div>
+		                                    <!-- 알림 및 보안 설정 그룹 -->
+											<div class="form-group">
+											    <label>알림 및 보안 설정</label>
+											    
+											    <!-- 푸시 알림 수신 동의 -->
+											    <div class="custom-control custom-checkbox">
+											      	  <input type="checkbox" class="custom-control-input register-details-input" id="register-push" name="pushAgreement" value="Y" disabled>
+											        <label class="custom-control-label" for="register-push">푸시 알림 수신에 동의합니다. (선택)</label>
+											    </div>
+											    
+											    <!-- 이메일 수신 동의 -->
+											    <div class="custom-control custom-checkbox">
+											        <input type="checkbox" class="custom-control-input register-details-input" id="register-email-agree" name="emailAgreement" value="Y" disabled>
+											        <label class="custom-control-label" for="register-email-agree">이메일 수신에 동의합니다. (선택)</label>
+											    </div>
+											</div>
+		
+		                                    <!-- 회원가입 결과 메시지를 표시할 영역 -->
+		                                    <div id="register-result-message" class="text-center" style="margin-top: 15px;"></div>
+		
+		                                    <div class="form-footer">
+		                                        <!-- type="button"과 id 추가 -->
+		                                        <button type="button" id="btn-register-submit" class="btn btn-outline-primary-2">
+		                                            <span>SIGN UP</span>
+		                                            <i class="icon-long-arrow-right"></i>
+		                                        </button>
+		                                    </div>
+		                                </form>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+    </header>
+</body>
+</html>
