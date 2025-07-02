@@ -13,11 +13,11 @@ import java.util.ArrayList; // ArrayList를 사용하기 위해 import
 
 @Controller
 @RequestMapping("/customer")
-public class SearchController {
+public class SearchResultController {
 
     private final SearchService searchService;
 
-    public SearchController(SearchService searchService) {
+    public SearchResultController(SearchService searchService) {
         this.searchService = searchService;
     }
 

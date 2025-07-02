@@ -142,7 +142,8 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 
 /* --- 1. 카드 그리드 컨테이너 (CSS Grid) --- */
 .product-grid-container {
-    display: grid;
+    display: flex;
+    justify-content: center;
     grid-template-columns: repeat(5, 1fr);
     gap: 12px;
     padding: 1.5rem 0;
@@ -151,7 +152,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 /* --- 2. 카드 공통 스타일 (디자인 통일) --- */
 .product-grid-container .product-card,
 .product-grid-container .search-result-user-card {
-    width: 100%;
+    width: 250px;
     height: 230px;
     margin: 0;
     display: flex;
