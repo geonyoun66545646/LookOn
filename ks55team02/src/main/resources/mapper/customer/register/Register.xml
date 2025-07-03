@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.register.mapper.CustomerRegisterMapper">
+
+	<!-- 아이디 중복 확인 -->
+    <select id="idCheck" parameterType="String" resultType="boolean">
+        SELECT 
+        	COUNT(*) > 0 
+        FROM 
+        	USER 
+        WHERE 
+        	user_lgn_id = #{userLgnId}
+    </select>
+
+    <!-- 닉네임 중복 확인 -->
+    <select id="nicknameCheck" parameterType="String" resultType="boolean">
+        SELECT 
+        	COUNT(*) > 0 
+        FROM 
+        	USER 
+        WHERE 
+        	user_ncnm = #{userNcnm}
+    </select>
+    
+    <!-- 이메일 중복 확인 -->
+    <select id="emailCheck" parameterType="String" resultType="boolean">
+        SELECT 
+        	COUNT(*) > 0 
+        FROM 
+        	USER 
+        WHERE 
+        	eml_addr = #{emlAddr}
+    </select>
+    
+    <!-- 가장 마지막 user_no 조회 (숫자 부분을 기준으로 정렬하여 가장 큰 값을 찾음) -->
+    <select id="getLastUserNo" resultType="String">
+        SELECT 
+        	user_no
+        FROM 
+        	USER
+        ORDER BY 
+        	CAST(SUBSTRING_INDEX(user_no, '_', -1) AS UNSIGNED) DESC
+        LIMIT 1
+    </select>
+    
+    <!-- USER 테이블에 데이터 삽입 -->
+    <insert id="addUser" parameterType="ks55team02.customer.register.domain.User">
+        INSERT INTO USER (
+            user_no, 
+            mbr_grd_cd, 
+            user_lgn_id, 
+            user_nm, 
+            user_pswd_encpt_val, 
+            eml_addr, 
+            telno, 
+            zip_cd, 
+            addr, 
+            daddr, 
+            user_ncnm, 
+            user_status, 
+            join_dt
+        ) 
+        VALUES (
+            #{userNo}, 
+            #{mbrGrdCd}, 
+            #{userLgnId}, 
+            #{userNm}, 
+            #{userPswdEncptVal},
+            #{emlAddr}, 
+            #{telno}, 
+            #{zipCd}, 
+            #{addr}, 
+            #{daddr},
+            #{userNcnm}, 
+            #{userStatus}, 
+            NOW()
+        )
+    </insert>
+
+    <!-- USER_SECURITY 테이블에 데이터 삽입 -->
+    <insert id="addUserSecurity" parameterType="ks55team02.customer.register.domain.UserSecurity">
+        INSERT INTO USER_SECURITY (
+            user_no, 
+            lgn_fail_nmtm, 
+            mfa_use_yn
+        ) 
+        VALUES (
+            #{userNo}, 0, 'n'
+        )
+    </insert>
+    
+    <!-- USER_PROFILE 테이블에 데이터 삽입 -->
+    <insert id="addUserProfile" parameterType="ks55team02.customer.register.domain.UserProfile">
+        INSERT INTO USER_PROFILE (
+            user_no, 
+            push_ntfctn_agre_yn, 
+            eml_rcptn_agre_yn
+        ) 
+        VALUES (
+            #{userNo}, 
+            #{pushNtfctnAgreYn}, 
+            #{emlRcptnAgreYn}
+        )
+    </insert>
+</mapper>

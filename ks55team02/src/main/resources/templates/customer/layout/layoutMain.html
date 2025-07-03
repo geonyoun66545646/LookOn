@@ -51,7 +51,7 @@
             <footer th:replace="~{customer/fragments/footer :: footerFragment}"></footer>
         </main>
     </div> 
-
+	<div th:replace="~{fragments/commonModals :: signinModalFragment}"></div>
     <div th:replace="~{customer/fragments/categoryFilterModal :: categoryFilterModalFragment}"></div> <!-- 이거 햄버거 모달 -->
 
     <script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
