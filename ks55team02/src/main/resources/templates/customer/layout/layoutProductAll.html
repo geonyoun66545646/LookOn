@@ -26,26 +26,27 @@
     <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/magnific-popup/magnific-popup.css}">
     <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/nouislider/nouislider.css}">
     <link rel="stylesheet" th:href="@{/maincss/assets/css/product-category-table.css}">
+    
+    <link rel="stylesheet" th:href="@{/maincss/assets/mainHeader/mainHeader.css}"> 
+    <link rel="stylesheet" th:href="@{/maincss/assets/categoryFilterModal/categoryFilterModal.css}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
     <th:block layout:fragment="cssFile"></th:block>
 </head>
 
 <body>
     <div class="page-wrapper">
-        <header th:replace="~{customer/fragments/header :: headerFragment}"></header>
-
-        <div th:if="${breadCrumbExists}" th:replace="~{customer/fragments/productBreadCrumb :: productBreadCrumbFragment}"></div>
+        <header th:replace="~{customer/fragments/mainHeader :: mainHeaderFragment}"></header>
 
         <main class="main">
             <div class="page-content">
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-12">
-                            <div th:replace="~{customer/fragments/productCategory :: productCategoryFragment}"></div>
                             <div th:replace="~{customer/fragments/toolBox :: toolBoxFragment}"></div>
-
+                            <div th:replace="~{customer/fragments/productCategory :: productCategoryFragment}"></div>
                             <th:block layout:fragment="content"></th:block>
-
-                            <div th:replace="~{customer/fragments/fillter :: fillterFragment}"></div>
                         </div>
                     </div>
                 </div>
@@ -55,7 +56,7 @@
         <footer th:replace="~{customer/fragments/footer :: footerFragment}"></footer>
     </div>
 
-    <div th:replace="~{customer/fragments/mobile_menu :: mobileMenuFragment}"></div>
+    <div th:replace="~{customer/fragments/categoryFilterModal :: categoryFilterModalFragment}"></div>
 
     <script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
     <script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
@@ -67,8 +68,15 @@
     <script th:src="@{/maincss/assets/js/bootstrap-input-spinner.js}"></script>
     <script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
     <script th:src="@{/maincss/assets/js/nouislider.min.js}"></script>
-    <th:block layout:fragment="jsFile"></th:block>
     <script th:src="@{/maincss/assets/js/main.js}"></script>
+    
+    <th:block layout:fragment="jsFile"></th:block>
     <th:block layout:fragment="jsScript"></th:block>
-</body>
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    
+    <script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
+    
+
+    </body>
 </html>

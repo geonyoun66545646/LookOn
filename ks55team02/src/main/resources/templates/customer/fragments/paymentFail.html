@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>결제 실패</title>
+    <!-- 기존 템플릿과 동일한 CSS/폰트 링크를 유지합니다 -->
+    
+    <!-- payment-success.html의 스타일을 거의 그대로 재사용합니다. -->
+    <style>
+        .order-fail-container { /* success -> fail 로 클래스명 변경 */
+            max-width: 700px;
+            margin: 4rem auto;
+            padding: 4rem;
+            text-align: center;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .fail-icon { /* success-icon -> fail-icon 으로 클래스명 변경 */
+            font-size: 6rem;
+            color: #dc3545; /* 실패를 의미하는 빨간색 */
+            margin-bottom: 2rem;
+        }
+        .fail-title { /* success-title -> fail-title 으로 클래스명 변경 */
+            font-size: 2.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .fail-message { /* success-message -> fail-message 으로 클래스명 변경 */
+            font-size: 1.6rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+        .error-details-box {
+            width: 100%;
+            margin: 2.5rem 0;
+            padding: 2rem;
+            text-align: left;
+            background-color: #f8f9fa;
+            border: 1px dashed #ced4da;
+            border-radius: 4px;
+        }
+        .error-details-box p {
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+        }
+        .error-details-box p strong {
+            display: inline-block;
+            width: 100px;
+            color: #495057;
+        }
+        .action-buttons {
+            margin-top: 3rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+        .action-buttons .btn {
+            min-width: 180px;
+            padding: 1.2rem 2rem;
+            font-size: 1.6rem;
+        }
+    </style>
+</head>
+
+<body>
+<th:block layout:fragment="contents">
+    <div class="page-wrapper">
+        <main class="main">
+            <!-- 페이지 헤더 (checkout3.txt와 동일한 스타일) -->
+            <div class="page-header text-center" style="background-image: url('/maincss/assets/images/page-header-bg.jpg')">
+                <div class="container">
+                    <h1 class="page-title">Payment Failed<span>결제 실패</span></h1>
+                </div>
+            </div>
+            <!-- 브레드크럼 (Breadcrumb) -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/checkout}">Checkout</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Payment Failed</li>
+                    </ol>
+                </div>
+            </nav>
+
+            <div class="page-content">
+                <div class="container">
+                    <div class="order-fail-container">
+                        <!-- 실패 아이콘 (템플릿에 맞는 아이콘 클래스 사용) -->
+                        <i class="icon-close-circle fail-icon"></i>
+                        
+                        <h2 class="fail-title">결제에 실패했습니다.</h2>
+                        <p class="fail-message">아래 오류 정보를 확인하신 후, 다시 시도해 주세요.</p>
+                        
+                        <!-- 오류 정보 상세 박스 -->
+                        <div class="error-details-box" th:if="${errorMessage}">
+                            <p>
+                                <strong>오류 코드:</strong>
+                                <!-- 컨트롤러에서 모델에 담아 보낸 errorMessage를 Thymeleaf로 표시 -->
+                                <span th:text="${errorCode ?: '정보 없음'}"></span>
+                            </p>
+                             <p>
+                                <strong>오류 메시지:</strong>
+                                <span th:text="${errorMessage}">결제 처리 중 문제가 발생했습니다.</span>
+                            </p>
+                        </div>
+                        
+                        <!-- 다음 행동을 유도하는 버튼 -->
+                        <div class="action-buttons">
+                            <a th:href="@{/checkout}" class="btn btn-primary">결제 다시 시도</a>
+                            <a th:href="@{/}" class="btn btn-outline-primary-2">메인으로 돌아가기</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</th:block>
+</body>
+</html>

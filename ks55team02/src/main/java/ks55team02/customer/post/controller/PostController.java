@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import ks55team02.customer.board.domain.Board;
-import ks55team02.customer.board.service.BoardService;
+import ks55team02.customer.post.domain.Board;
+import ks55team02.customer.post.domain.Comment;
 import ks55team02.customer.post.domain.Post;
+import ks55team02.customer.post.service.BoardService;
 import ks55team02.customer.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,30 @@ public class PostController {
 
 	private final PostService postService;
 	private final BoardService boardService;
+	
+	// 댓글 삭제
+	@DeleteMapping("/commentDelete/{pstCmntSn}")
+	@ResponseBody
+	public String commentDelete(@PathVariable String pstCmntSn) {
+		try {
+			postService.deleteComment(pstCmntSn);
+			return "삭제 성공";
+		} catch (Exception e) {
+			return null;			
+		}
+	}
+	
+	// 댓글 수정
+	@PostMapping("/commentUpdate")
+	@ResponseBody
+	public String updateComment(@PathVariable Comment comment) {
+		try {
+			postService.updateComment(comment);
+			return "수정 성공";
+		} catch (Exception e) {
+			return "수정 실패";
+		}
+	}
 	
 	// 게시글 삭제
 	@DeleteMapping("/postDelete/{pstSn}")
@@ -46,7 +71,7 @@ public class PostController {
 	// 게시글 수정
 	@PostMapping("/postUpdate")
 	@ResponseBody // Ajax 요청에 '데이터'를 직접 응답하기 위한 필수 어노테이션
-	public String processUpdateForm(Post post) { // 수정된 폼 데이터가 자동으로 Post 객체에 담깁니다.
+	public String updatePost(Post post) { // 수정된 폼 데이터가 자동으로 Post 객체에 담깁니다.
 	    
 	    // try-catch로 예외 상황을 처리하는 것이 안전합니다.
 	    try {
@@ -71,15 +96,15 @@ public class PostController {
 	}	
 	
 	// 게시글 수정 정보
-	@GetMapping("/postEdit/{pstSn}")
-	public String showEditForm(@PathVariable String pstSn, Model model) {
+	@GetMapping("/postUpdate/{pstSn}")
+	public String selectPostUpdateForm(@PathVariable String pstSn, Model model) {
 	    // 1. pstSn을 사용해서 DB에서 수정할 게시글의 정보를 가져옵니다.
 		List<Board> boardList = boardService.selectBoardName();
-	    Post postToEdit = postService.selectPostDetailByPostSn(pstSn);
+	    Post postToUpdate = postService.selectPostDetailByPostSn(pstSn);
 	    
 	    // 2. 가져온 게시글 정보를 Model에 담아서 뷰로 전달합니다.
 		model.addAttribute("boardList", boardList);
-	    model.addAttribute("post", postToEdit);
+	    model.addAttribute("post", postToUpdate);
 	    
 	    // 3. '글 작성'에 사용했던 그 폼 페이지를 그대로 재사용합니다.
 	    return "customer/post/postWrite"; 
@@ -91,13 +116,14 @@ public class PostController {
 			Post post, // 폼 데이터가 Post 객체로 자동 바인딩됩니다.
 			Model model) {
 
-			// 새 글 작성
-			postService.insertPost(post);
+		// 새 글 작성
+		postService.insertPost(post);
 
 
 		// 저장 후 목록 페이지로 리다이렉트
 		return "redirect:/customer/post/postList";
 	}
+
 	
 	// 게시글 작성
 	@GetMapping("/postWrite")
@@ -106,7 +132,7 @@ public class PostController {
 	        Model model) {
 		List<Board> boardList = boardService.selectBoardName();
 	    Post post = new Post();
-	    if (pstSn != null && !pstSn.isEmpty()) {
+	    if(pstSn != null && !pstSn.isEmpty()) {
 	        post = postService.selectPostDetailByPostSn(pstSn); // 여기서 post 객체가 제대로 채워져야 함
 	    }
 	    // Model에 'post'라는 이름으로 Post 객체를 담는 것이 필수입니다.
@@ -115,8 +141,6 @@ public class PostController {
 	    // ...
 	    return "customer/post/postWrite";
 	}
-	
-	
 
 
 	// 게시글 조회
