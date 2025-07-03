@@ -2,22 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ks55team02.customer.inquiry.mapper.InquiryMapper">
 
-    <resultMap id="inquiryResultMap" type="ks55team02.customer.inquiry.domain.Inquiry">
-        <id property="inqryId" column="inqry_id"/>
-        <result property="inqryTypeCd" column="inqry_type_cd"/>
-        <result property="inqryTrgtTypeCd" column="inqry_trgt_type_cd"/>
-        <result property="wrtrId" column="wrtr_id"/>
-        <result property="inqryStoreId" column="inqry_store_id"/>
-        <result property="inqryTtl" column="inqry_ttl"/>
-        <result property="inqryCn" column="inqry_cn"/>
-        <result property="prvtYn" column="prvt_yn"/>
-        <result property="prcsStts" column="prcs_stts"/>
-        <result property="prcsUserNo" column="prcs_user_no"/>
-        <result property="regYmd" column="reg_ymd"/>
-        <result property="mdfcnYmd" column="mdfcn_ymd"/>
-        <result property="delDt" column="del_dt"/>
-        <result property="delUserNo" column="del_user_no"/>
-        <result property="delActvtnYn" column="del_actvtn_yn"/>
+    <resultMap id="inquiryResultMap" 			type="ks55team02.customer.inquiry.domain.Inquiry">
+        <id property="inqryId" 					column="inqry_id"/>
+        <result property="inqryTypeCd" 			column="inqry_type_cd"/>
+        <result property="inqryTrgtTypeCd" 		column="inqry_trgt_type_cd"/>
+        <result property="wrtrId" 				column="wrtr_id"/>
+        <result property="inqryStoreId" 		column="inqry_store_id"/>
+        <result property="inqryTtl" 			column="inqry_ttl"/>
+        <result property="inqryCn" 				column="inqry_cn"/>
+        <result property="prvtYn" 				column="prvt_yn"/>
+        <result property="prcsStts" 			column="prcs_stts"/>
+        <result property="prcsUserNo" 			column="prcs_user_no"/>
+        <result property="regYmd" 				column="reg_ymd"/>
+        <result property="mdfcnYmd" 			column="mdfcn_ymd"/>
+        <result property="delDt" 				column="del_dt"/>
+        <result property="delUserNo" 			column="del_user_no"/>
+        <result property="delActvtnYn" 			column="del_actvtn_yn"/>
         <!-- InquiryImage 리스트 매핑 (1:N 관계) -->
         <collection property="inquiryImages" ofType="ks55team02.customer.inquiry.domain.InquiryImage"
                     select="ks55team02.customer.inquiry.mapper.InquiryImageMapper.getInquiryImagesByInquiryId"

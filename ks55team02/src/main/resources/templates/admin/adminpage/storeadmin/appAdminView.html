@@ -4,7 +4,10 @@
 	  layout:decorate="~{admin/layout/layoutMain}">
 		
 	 <head>
-	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />	
+	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />
+	 	<th:block layout:fragment="customCss">
+        <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/appAdminView.css}">
+    </th:block>
 	 </head>
 	 <!--/* 개발시 추가할 jsfile 영역 정의 */-->
 	 <th:block layout:fragment="jsFile">
@@ -85,7 +88,7 @@
 		    </div> <!-- card end// -->
 		
 		    <!-- 2. 회원 목록 테이블 카드 -->
-		    <div class="card" id="userListContainer" th:fragment="userListFragment">
+		    <div class="card" id="appListContainer" th:fragment="appListFragment">
 		        <div class="card-body">
 		            <div class="row gx-3 align-items-center mb-4">
 		                <div class="col-md-6">
@@ -113,7 +116,7 @@
 		                        </div>
 		                    </div>
 		                    <!-- 회원 조회 분류 키워드 -->
-		                    <div class="d-inline-block">
+		                  <!--   <div class="d-inline-block">
 		                        <select class="form-select d-inline-block" id="sortOrder" name="sortOrder" style="width: auto;">
 								    <option value="joinDtDesc" th:selected="${searchCriteria.sortOrder == 'joinDtDesc'}">최신 가입일순</option>
 								    <option value="joinDtAsc" th:selected="${searchCriteria.sortOrder == 'joinDtAsc'}">오래된 가입일순</option>
@@ -123,7 +126,7 @@
 		                            <option value="30" th:selected="${searchCriteria.pageSize == 30}">30개씩 보기</option>
 		                            <option value="50" th:selected="${searchCriteria.pageSize == 50}">50개씩 보기</option>
 		                        </select>
-		                    </div>
+		                    </div> -->
 		                </div>
 		            </div> <!-- row end// -->
 		
@@ -134,39 +137,35 @@
 				                <th scope="col" class="col-checkbox">
 				                	<input class="form-check-input" type="checkbox" id="checkAll">
 				                </th>
-				                <th scope="col">ID</th>
-				                <th scope="col">이름</th>
-				                <th scope="col">성별</th>
-				                <th scope="col">이메일</th>
-				                <th scope="col">휴대폰 번호</th>
-				                <th scope="col">주소</th>
+				                <th scope="col">신청 아이디</th>
+				                <th scope="col">상점명</th>
+				                <th scope="col">신청자 이름</th>
+				                <th scope="col">신청 유저 아이디</th>
+				                <th scope="col">수수료 비율</th>
+				                <th scope="col">계약 신청일</th>
 				                <th scope="col">상태</th>
-				                <th scope="col">가입 일자</th>
 				            </tr>
 				        </thead>
 				        <tbody class="text-center">
-				            <tr th:if="${#lists.isEmpty(userList)}">
-				                <td colspan="9" class="text-center py-5">조회된 회원이 없습니다.</td>
+				            <tr th:if="${#lists.isEmpty(appAdminList)}">
+				                <td colspan="8" class="text-center py-5">조회된 신청이 없습니다.</td>
 				            </tr>
-				            <tr th:unless="${#lists.isEmpty(userList)}" th:each="user : ${userList}">
-				                <td>
-				                	<input class="form-check-input member-check" type="checkbox" th:value="${user.userNo}">
-				                </td>
-				                <td class="ellipsis text-left" th:text="${user.userLgnId}" th:title="${user.userLgnId}"></td>
-				                <td class="text-left" th:text="${user.userNm}"></td>
-				                <td th:text="${user.getGenderText()}"></td>
-				                <td class="ellipsis text-left" th:text="${user.emlAddr}" th:title="${user.emlAddr}"></td>
-				                <td th:text="${user.telno}"></td>
-				                <td class="ellipsis text-left" th:text="${user.getFullAddress()}" th:title="${user.getFullAddress()}"></td>
+				            <tr th:unless="${#lists.isEmpty(appAdminList)}" th:each="appAdmin : ${appAdminList}">
+				                <td> <input class="form-check-input member-check" type="checkbox" th:value="${appAdmin.aplyId}"></td>
+				                <td class="ellipsis text" th:text="${appAdmin.aplyId}" th:title="${appAdmin.aplyId}"></td>
+				                <td class="text" th:text="${appAdmin.storeNm}"></td>
+				                <td th:text="${appAdmin.userNm}"></td>
+				                <td th:text="${appAdmin.aplyUserNo}"></td>				                
+				                <td class="ellipsis text" th:text="${appAdmin.plcyId}"></td>
+				                <td th:text="${#temporals.format(appAdmin.ctrtAplyYmd, 'yyyy-MM-dd')}"></td>
 				                <td>
 				                    <span class="badge custom-badge"
-				                          th:text="${user.userStatus}"
-				                          th:classappend="${user.userStatus == '활동'} ? 'bg-success' : 
-				                                         (${user.userStatus == '휴면'} ? 'bg-warning text-dark' : 
-				                                         (${user.userStatus == '탈퇴'} ? 'bg-danger' : 'bg-secondary'))">
+				                          th:text="${appAdmin.aplyStts}"
+				                          th:classappend="${appAdmin.aplyStts == '보류'} ? 'bg-success' : 
+				                                         (${appAdmin.aplyStts == '승인'} ? 'bg-warning text-dark' : 
+				                                         (${appAdmin.aplyStts == '반려'} ? 'bg-danger' : 'bg-secondary'))">
 				                    </span>
 				                </td>
-				                <td th:text="${#temporals.format(user.joinDt, 'yyyy-MM-dd')}"></td>
 				            </tr>
 				        </tbody>
 				    </table>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.admin.adminpage.storeadmin.appAdmin.mapper.AppAdminMapper">
+
+		<resultMap id="appAdminResultMap" 		type="ks55team02.admin.adminpage.storeadmin.appAdmin.domain.AppAdmin">
+        <id property="aplyId" 					column="aply_id"/>
+		<result property="aplyUserNo" 			column="aply_user_no"/>
+		<result property="storeNm" 				column="store_nm"/>
+		<result property="brnoImgId" 			column="brno_img_id"/>
+		<result property="cmmDclrImgId" 		column="cmm_dclr_img_id"/>
+		<result property="selGdsProofImgId" 	column="sel_gds_proof_img_id"/>
+		<result property="rrnoCardCopyImgId" 	column="rrno_card_copy_img_id"/>
+		<result property="bankbookCopyImgId" 	column="bankbook_copy_img_id"/>
+		<result property="etcDocImgId" 			column="etc_doc_img_id"/>
+		<result property="plcyId" 				column="plcy_id"/>
+		<result property="ctrtAplyYmd" 			column="ctrt_aply_ymd"/>
+		<result property="ctrtBgngYmd" 			column="ctrt_bgng_ymd"/>
+		<result property="ctrtTermVal" 			column="ctrt_term_val"/>
+		<result property="rvwMngrNo" 			column="rvw_mngr_no"/>
+		<result property="mngrNm" 				column="mngr_nm"/>
+		<result property="mngrEmlAddr" 			column="mngr_eml_addr"/>
+		<result property="mngrTelNo" 			column="mngr_tel_no"/>
+		<result property="bplcAddr" 			column="bplc_addr"/>
+		<result property="aplyStts" 			column="aply_stts"/>
+		<result property="aprvRjctRsn" 			column="aprv_rjct_rsn"/>
+		<result property="userNm" 			column="user_nm"/>
+		
+		</resultMap>
+		
+		
+		<select id="getAppAdminList" resultMap="appAdminResultMap">
+		SELECT 
+			sa.aply_id, 
+			sa.store_nm,   
+			u.user_nm,
+			sa.aply_user_no, 
+			sa.plcy_id, 
+			sa.ctrt_aply_ymd,  
+			sa.aply_stts
+		FROM 
+			store_application sa inner join users u 
+			on sa.aply_user_no = u.user_no
+		</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
