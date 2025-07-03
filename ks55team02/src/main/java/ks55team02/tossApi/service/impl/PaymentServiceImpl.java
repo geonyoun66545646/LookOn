@@ -50,31 +50,57 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public String createOrder(Map<String, Object> orderData) {
-    	String orderId = paymentMapper.selectNextOrderId();
+        String orderId = paymentMapper.selectNextOrderId();
         log.info("새로운 주문 번호 생성: {}", orderId);
         
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setOrdrNo(orderId);
         
         // TODO: 실제 로그인된 사용자 ID를 가져와야 합니다.
-        // users 테이블에 이 userNo가 반드시 존재해야 합니다.
         orderDTO.setUserNo("temp-user-01"); 
         
         orderDTO.setOrdrDt(LocalDateTime.now());
-        orderDTO.setGdsTotAmt(new BigDecimal(orderData.get("totalAmount").toString()));
+        
+        // --- 변경 시작 ---
+        // 프론트에서 보낸 'gdsTotAmt' 키를 사용합니다.
+        // null 체크를 추가하여 안전하게 변환합니다.
+        Object gdsTotAmtObj = orderData.get("gdsTotAmt");
+        if (gdsTotAmtObj != null) {
+            orderDTO.setGdsTotAmt(new BigDecimal(gdsTotAmtObj.toString()));
+        } else {
+            log.warn("orderData에 gdsTotAmt 키가 없거나 null입니다.");
+            // 기본값을 설정하거나, 예외를 던지거나, 비즈니스 로직에 맞게 처리
+            orderDTO.setGdsTotAmt(BigDecimal.ZERO); // 예: 0으로 설정
+        }
+        
+        // 'lastStlmAmt'는 최종 결제 금액으로 토스페이먼츠 승인 요청에 사용되지만, OrderDTO에도 저장한다면 추가
+        // Object lastStlmAmtObj = orderData.get("lastStlmAmt");
+        // if (lastStlmAmtObj != null) {
+        //     orderDTO.setLastStlmAmt(new BigDecimal(lastStlmAmtObj.toString()));
+        // }
+        // --- 변경 끝 ---
+
         orderDTO.setOrdrSttsCd("PENDING_PAYMENT"); // 주문 상태: 결제 대기
 
         // 배송지 정보 추출 및 설정
-        if (orderData.get("shippingAddress") instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map<String, String> shippingAddress = (Map<String, String>) orderData.get("shippingAddress");
-            orderDTO.setRcvrNm((String) orderData.get("customerName"));
-            // orderDTO.setRcvrTelno(...); // 전화번호가 있다면 설정
-            orderDTO.setDlvyAddr(shippingAddress.get("address"));
-            orderDTO.setDlvyDaddr(shippingAddress.get("detailAddress"));
-            orderDTO.setZip(shippingAddress.get("postcode"));
-            orderDTO.setDlvyMemoCn(shippingAddress.get("deliveryRequest"));
-        }
+        // 이 부분은 이미 frontend와 매핑되도록 수정된 것으로 가정합니다.
+        orderDTO.setRcvrNm((String) orderData.get("rcvrNm"));
+        orderDTO.setRcvrTelno((String) orderData.get("rcvrTelno"));
+        orderDTO.setDlvyAddr((String) orderData.get("dlvyAddr"));
+        orderDTO.setDlvyDaddr((String) orderData.get("dlvyDaddr"));
+        orderDTO.setZip((String) orderData.get("zip"));
+        orderDTO.setDlvyMemoCn((String) orderData.get("dlvyMemoCn"));
+        orderDTO.setUserName((String) orderData.get("userName")); // DTO에 userName 필드가 있다면
+
+        log.info("OrderDTO after mapping:");
+        log.info("  rcvrNm: {}", orderDTO.getRcvrNm());
+        log.info("  rcvrTelno: {}", orderDTO.getRcvrTelno());
+        log.info("  dlvyAddr: {}", orderDTO.getDlvyAddr());
+        log.info("  dlvyDaddr: {}", orderDTO.getDlvyDaddr());
+        log.info("  zip: {}", orderDTO.getZip());
+        log.info("  dlvyMemoCn: {}", orderDTO.getDlvyMemoCn());
+        log.info("  userName: {}", orderDTO.getUserName());
+        log.info("  gdsTotAmt: {}", orderDTO.getGdsTotAmt());
         
         paymentMapper.insertOrder(orderDTO);
         log.info("DB에 '결제 대기' 주문 정보 저장 완료. OrderId: {}", orderId);
@@ -98,7 +124,7 @@ public class PaymentServiceImpl implements PaymentService {
             log.info("결제 승인 성공: {}", responseBody);
             
             // [수정 1] DB 저장을 먼저 확실하게 끝냅니다.
-            savePaymentDetails(responseBody);
+            savePaymentDetails(responseBody); // responseBody는 토스에서 받은 데이터 (totalAmount 키 그대로 사용)
             
             // [수정 2] Thymeleaf에 데이터를 전달하기 위한 후처리 작업은 별도의 try-catch로 감싸서,
             // 이 부분에서 에러가 나더라도 전체 로직이 실패하지 않도록 합니다.
@@ -111,15 +137,20 @@ public class PaymentServiceImpl implements PaymentService {
                     }
                 }
             } catch (Exception e) {
-                // 날짜 파싱에 실패하더라도 이미 DB 저장은 성공했으므로, 에러를 로깅만 하고 무시합니다.
-                // 화면에는 날짜가 표시되지 않겠지만, 결제 실패 페이지로 넘어가지는 않습니다.
                 log.error("Thymeleaf 표시를 위한 날짜 파싱 중 오류 발생 (무시함): {}", e.getMessage());
             }
 
             return responseBody;
         } else {
             log.error("결제 승인 실패: {}", responseEntity);
-            throw new Exception("결제 승인에 실패했습니다. 응답 코드: " + responseEntity.getStatusCode());
+            // 에러 응답 바디가 있다면 메시지를 포함합니다.
+            String errorMessage = "결제 승인에 실패했습니다.";
+            if (responseBody != null && responseBody.containsKey("message")) {
+                errorMessage += " 응답 메시지: " + responseBody.get("message");
+            } else {
+                errorMessage += " 응답 코드: " + responseEntity.getStatusCode();
+            }
+            throw new Exception(errorMessage);
         }
     }
     
@@ -136,7 +167,7 @@ public class PaymentServiceImpl implements PaymentService {
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("paymentKey", paymentKey);
         requestBody.put("orderId", orderId);
-        requestBody.put("amount", amount);
+        requestBody.put("amount", amount); // 이 amount는 토스페이먼츠로 보낼 '최종 결제 금액'
 
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
@@ -161,7 +192,19 @@ public class PaymentServiceImpl implements PaymentService {
             paymentDTO.setStlmId(nextPaymentId);
             paymentDTO.setOrdrNo((String) paymentData.get("orderId"));
             paymentDTO.setPgDlngId((String) paymentData.get("paymentKey"));
-            paymentDTO.setStlmAmt(new BigDecimal(paymentData.get("totalAmount").toString()));
+            
+            // --- 변경 시작 ---
+            // 토스페이먼츠 응답에는 'totalAmount' 키가 있습니다.
+            // null 체크를 추가하여 안전하게 변환합니다.
+            Object totalAmountObj = paymentData.get("totalAmount");
+            if (totalAmountObj != null) {
+                paymentDTO.setStlmAmt(new BigDecimal(totalAmountObj.toString()));
+            } else {
+                log.warn("paymentData에 totalAmount 키가 없거나 null입니다.");
+                paymentDTO.setStlmAmt(BigDecimal.ZERO); // 예: 0으로 설정
+            }
+            // --- 변경 끝 ---
+
             paymentDTO.setStlmSttsCd((String) paymentData.get("status"));
             paymentDTO.setStlmMthdCd(getPaymentMethod(paymentData));
             paymentDTO.setPgCoInfo("Toss Payments");
@@ -179,12 +222,10 @@ public class PaymentServiceImpl implements PaymentService {
             paymentHistoryDTO.setStlmHstryId(nextHistoryId);
             paymentHistoryDTO.setStlmId(paymentDTO.getStlmId());
             paymentHistoryDTO.setHstryCrtDt(now);
-            paymentHistoryDTO.setHstryMdfcnDt(now);
             
             paymentMapper.insertPaymentHistory(paymentHistoryDTO);
             log.info("결제 이력(PaymentHistory) 저장 성공! ID: {}", paymentHistoryDTO.getStlmHstryId());
 
-            // --- ▼▼▼▼▼▼ [중요] 이 부분이 추가/수정되었습니다 ▼▼▼▼▼▼ ---
             // === 3. Orders 테이블 상태 업데이트 ===
             String orderId = (String) paymentData.get("orderId");
             Map<String, Object> statusParams = new HashMap<>();
@@ -193,7 +234,6 @@ public class PaymentServiceImpl implements PaymentService {
             
             paymentMapper.updateOrderStatus(statusParams);
             log.info("주문 상태 '결제 완료'로 업데이트 성공. OrderId: {}", orderId);
-            // --- ▲▲▲▲▲▲ 여기까지 추가/수정 ▲▲▲▲▲▲ ---
             
         } catch (Exception e) {
             log.error("!!!!!!!!!! DB 저장 중 심각한 오류 발생 !!!!!!!!!!", e);
