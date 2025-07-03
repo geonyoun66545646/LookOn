@@ -1,0 +1,544 @@
+/* ================== 상품 관련 ===================== */
+.container {
+	width: 100%;
+	padding-right: 0px;
+	padding-left: 0px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.page-content {
+	padding-bottom: 0;
+}
+
+.col-lg-12 {
+	padding: 0;
+	background-color: #f9f9f9;
+}
+
+.row.justify-content-center {
+	/* 부트스트랩의 음수 마진을 강제로 제거 */
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.col-xl-3 {
+	padding: 0px;
+}
+
+.row {
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.product-label.label-sale {
+	color: #fff;
+	background-color: #c96;
+}
+
+.product-label {
+	position: absolute;
+	z-index: 1;
+	top: 1rem;
+	left: 1rem;
+	font-weight: 400;
+	font-size: 1.3rem;
+	line-height: 1.6rem;
+	letter-spacing: -.01em;
+	padding: .5rem .9rem;
+	min-width: 45px;
+	text-align: center;
+	color: #333333;
+	background-color: #fff;
+}
+
+.product {
+	position: relative;
+	margin-bottom: 0rem;
+	transition: box-shadow .35s ease;
+	background-color: #fff;
+}
+
+.product-body {
+	position: relative;
+	padding: 20px 10px;
+	transition: all .35s ease;
+	background-color: #f9f9f9;
+	/* 각 상품 body 자체에는 보더를 두지 않습니다. */
+	/* gap이 선 역할을 할 것입니다. */
+	/* 추가: 내용이 적을 때 최소한 이 높이를 유지합니다. */
+	min-height: 120px; /* 원하는 최소 높이로 조정하세요. */
+	/* 내부 폰트 사이즈, 패딩 등을 고려하여 적절히 설정 */
+}
+
+.product-cat {
+	color: #777;
+	font-weight: 400;
+	font-size: 1.2rem;
+	line-height: 1.2;
+	letter-spacing: -.01em;
+	margin-bottom: 1rem;
+}
+
+.text-center {
+	text-align: left !important;
+}
+
+.product.text-center .product-price, .product.text-center .ratings-container,
+	.product.text-center .product-nav, .product.text-center .product-size {
+	justify-content: flex-start;
+}
+
+/* 상품 목록을 감싸는 컨테이너와 행(row)에 대한 기본 설정 */
+.products .row {
+	display: flex;
+	flex-wrap: wrap; /* 상품이 여러 줄로 내려가도록 설정 */
+	/* 여기에 gap을 적용하고, gap이 보더처럼 보이도록 배경색을 설정합니다. */
+	gap: 1px; /* 아이템 사이의 간격 (보더 두께) */
+	background-color: #f0f0f0; /* 이 색상이 아이템 사이의 보더 색상이 됩니다. */
+	/* 컨테이너의 모든 가장자리에 1px 보더처럼 보이게 padding을 추가 */
+	padding: 1px; /* 이 부분을 수정했습니다! */
+}
+
+/* [기존 코드] 각 상품 카드의 기본 스타일
+  - 모든 상품 카드가 같은 높이를 갖도록 합니다.
+*/
+.products>.row>[class*=col-] {
+	display: flex; /* 내부 컨텐츠를 위한 flex */
+	align-items: stretch;
+	align-content: stretch;
+	box-sizing: border-box; /* 이미 되어 있지만, 중요합니다. */
+	/* 각 col- 요소에 기본적으로 background-color를 흰색으로 줘서 gap 배경색을 덮도록 합니다. */
+	background-color: #fff;
+}
+
+/* 1. 기본 스타일 (모바일 우선): 2개씩 표시 */
+/* 화면이 600px 미만일 때 적용됩니다. */
+.products>.row>[class*=col-] {
+	/* 2열 (50%) - gap 값의 절반을 뺍니다 (양쪽 gap을 합쳐서 1px이 되도록) */
+	flex: 0 0 calc(50% - 0.5px); /* (100% / 2) - (gap / 2) = 50% - 0.5px */
+	max-width: calc(50% - 0.5px);
+}
+
+@media ( min-width : 600px) {
+	.products>.row>[class*=col-] {
+		/* 4열 (25%) - gap 값의 조정을 적용합니다 */
+		flex: 0 0 calc(25% - 0.75px);
+		/* (100% / 4) - (gap * 3 / 4) = 25% - 0.75px */
+		max-width: calc(25% - 0.75px);
+	}
+}
+
+/* 2. 데스크탑 스타일: 5개씩 표시 */
+/* 화면이 992px 이상일 때 이 스타일이 적용됩니다. */
+@media ( min-width : 992px) {
+	.products>.row>[class*=col-] {
+		/* 5열 (20%) - gap 값의 조정을 적용합니다 */
+		flex: 0 0 calc(20% - 0.8px);
+		/* (100% / 5) - (gap * 4 / 5) = 20% - 0.8px */
+		max-width: calc(20% - 0.8px);
+	}
+}
+
+/* ================== 상품이미지 비율 설정 =================  */
+/* 컨테이너 (비율을 가짐) */
+.product-media {
+	position: relative;
+	overflow: hidden;
+	width: 100%; /* 너비를 기준으로 높이가 결정되므로 너비는 100%로 설정 */
+	height: 0; /* 높이를 padding으로 제어하기 위해 0으로 설정 */
+	/* 계산된 비율(119.6%)을 padding-top에 적용하여 높이 공간을 만듦 */
+	padding-top: 100.6%;
+}
+
+/* 내부 이미지 (컨테이너를 채움) */
+.product-media img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+}
+/* ================== 기본 & 툴바 스타일 ================== */
+.product-toolbar-container {
+	width: 100%;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		"Helvetica Neue", Arial, sans-serif;
+	color: #333;
+}
+
+.main-category-nav {
+	margin-top: 20px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #ebebeb;
+	/* [수정] 가로 스크롤을 항상 활성화하여 어떤 상황에서도 레이아웃이 깨지지 않게 함 */
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch; /* 터치 기기 스크롤 개선 */
+	/* 스크롤바 숨기기 */
+	-ms-overflow-style: none; /* IE, Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
+.main-category-nav::-webkit-scrollbar {
+	display: none; /* Chrome, Safari, Opera */
+}
+
+.main-category-list {
+	display: flex;
+	align-items: center;
+	list-style: none;
+	margin: 0;
+	padding: 0 15px;
+	gap: 15px;
+	/* [핵심 수정] wrap -> nowrap 으로 변경하여 항상 한 줄로 고정 */
+	flex-wrap: nowrap;
+}
+
+.main-category-item {
+	flex-shrink: 0; /* 항목이 좁은 공간에서 찌그러지는 것 방지 */
+}
+
+/* 드래그-스크롤 기능 향상을 위한 스타일 */
+.main-category-nav.active-drag {
+	cursor: grabbing;
+	cursor: -webkit-grabbing;
+	user-select: none;
+}
+
+.category-title {
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.main-category-link {
+	text-decoration: none;
+	color: #888;
+	font-size: 15px;
+	font-weight: 500;
+	padding: 10px 0;
+	position: relative;
+	transition: color 0.2s ease;
+}
+
+/* 활성화된 카테고리 탭 스타일 */
+.main-category-link.active {
+	color: #000;
+	font-weight: 700;
+}
+
+.main-category-link.active::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -7px;
+	height: 3px;
+	background-color: #000;
+}
+
+.product-filter-bar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px 15px;
+	flex-wrap: wrap;
+}
+
+.filter-controls {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+/* 모든 버튼의 공통 스타일 */
+.filter-main-button, .filter-button, .filter-dropdown, .sort-dropdown {
+	background-color: #fff;
+	border: 1px solid #dcdcdc;
+	padding: 3px 12px;
+	border-radius: 8px;
+	font-size: 0.9em;
+	cursor: pointer;
+	transition: background-color 0.2s, border-color 0.2s;
+	white-space: nowrap;
+}
+
+.filter-main-button:hover, .filter-button:hover, .filter-dropdown:hover,
+	.sort-dropdown:hover {
+	border-color: #aaa;
+}
+
+/* '남', '여' 같은 토글 버튼 */
+.filter-button.active {
+	background-color: #333;
+	color: #fff;
+	border-color: #333;
+}
+
+/* 정렬 드롭다운에만 화살표 표시 */
+.sort-dropdown::after {
+	content: ' ▾';
+	font-size: 1.1em;
+	padding: 0;
+	margin: 0;
+	color: #555;
+}
+
+/* ================== 반응형 스타일 (832px 이하) ================== */
+@media ( max-width : 832px) {
+	/* '상품 필터'와 '신상품'을 제외한 나머지 필터 버튼 숨기기 */
+	.filter-button, .filter-dropdown {
+		display: none;
+	}
+
+	/* 
+      [수정] .main-category-nav 와 .main-category-list 에 있던 
+      반응형 스타일은 이제 전역으로 옮겨졌으므로 이 곳에서는 제거합니다.
+      코드가 더 깔끔해집니다.
+    */
+}
+/* ================== 필터 모달 스타일 ================== */
+
+/* ================== 필터 모달 스타일 ================== */
+
+/* 모달이 열렸을 때 배경 스크롤 방지 */
+body.app-modal-open {
+	overflow: hidden;
+}
+
+/* 1. 모달 뒷배경 (Overlay) */
+.app-filter-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.6);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1050; /* 부트스트랩 모달 z-index와 유사 */
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.app-filter-modal-overlay.show {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* 2. 모달 본문 (Content) */
+.app-filter-modal-content {
+	background-color: #fff;
+	border-radius: 12px;
+	width: 90%;
+	max-width: 480px;
+	max-height: 85vh;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+	transform: translateY(20px);
+	transition: transform 0.3s ease;
+}
+
+.app-filter-modal-overlay.show .app-filter-modal-content {
+	transform: translateY(0);
+}
+
+/* 2-1. 모달 헤더 */
+.app-modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px 20px;
+	border-bottom: 1px solid #f0f0f0;
+	flex-shrink: 0; /* 줄어들지 않음 */
+}
+
+.app-modal-title {
+	margin: 0;
+	font-size: 1.25em; /* 20px */
+	font-weight: 600;
+}
+
+.app-modal-close-button {
+	background: none;
+	border: none;
+	font-size: 2em; /* 32px */
+	line-height: 1;
+	color: #888;
+	cursor: pointer;
+	padding: 0;
+}
+
+.app-modal-close-button:hover {
+	color: #000;
+}
+
+/* 2-2. 모달 바디 (스크롤 영역) */
+.app-modal-body {
+	flex-grow: 1; /* 남은 공간을 모두 차지 */
+	overflow-y: auto; /* 내용이 길어지면 스크롤 */
+	padding: 0 24px;
+}
+
+.app-modal-tab-nav {
+	display: flex;
+	border-bottom: 1px solid #e0e0e0;
+	position: sticky; /* 스크롤 시 상단에 고정 */
+	top: 0;
+	background-color: #fff; /* 스크롤 시 배경 비치지 않게 */
+	z-index: 10;
+}
+
+.app-modal-tab-button {
+	flex: 1 1 0; /* 모든 버튼이 동일한 너비를 가짐 */
+	padding: 14px 8px;
+	border: none;
+	background: none;
+	cursor: pointer;
+	color: #888;
+	font-size: 0.9em;
+	font-weight: 500;
+	text-align: center;
+	white-space: nowrap;
+	border-bottom: 2px solid transparent;
+	transition: color 0.2s, border-color 0.2s;
+}
+
+.app-modal-tab-button:hover {
+	color: #000;
+}
+
+.app-modal-tab-button.active {
+	color: #000;
+	font-weight: 700;
+	border-bottom-color: #000;
+}
+
+.app-modal-tab-pane {
+	display: none; /* 기본적으로 모든 탭 콘텐츠는 숨김 */
+}
+
+.app-modal-tab-pane.active {
+	display: block; /* 활성화된 탭 콘텐츠만 보임 */
+}
+
+.app-tab-pane-title {
+	font-size: 1.1em;
+	font-weight: 600;
+	margin: 24px 0 16px;
+}
+
+.app-filter-options-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 16px 12px;
+	padding-bottom: 24px;
+}
+
+.app-filter-option {
+	display: flex;
+	align-items: center;
+	font-size: 0.95em;
+	cursor: pointer;
+}
+
+.app-filter-option input[type="checkbox"] {
+	margin-right: 8px;
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+}
+
+/* 2-3. 모달 푸터 */
+.app-modal-footer {
+	padding: 16px 24px;
+	border-top: 1px solid #f0f0f0;
+	background-color: #fff;
+	flex-shrink: 0; /* 줄어들지 않음 */
+}
+
+.app-view-products-button {
+	width: 100%;
+	background-color: #000;
+	color: #fff;
+	border: none;
+	padding: 15px;
+	border-radius: 8px;
+	font-size: 1em;
+	font-weight: bold;
+	cursor: pointer;
+	transition: opacity 0.2s;
+}
+
+.app-view-products-button:hover {
+	opacity: 0.8;
+}
+/* 정렬 드롭다운 메뉴 컨테이너 */
+.sort-dropdown-container {
+	position: relative; /* 중요: 드롭다운 메뉴가 이 컨테이너를 기준으로 위치하도록 */
+	display: inline-block; /* 버튼이 인라인 블록 요소로 존재하도록 */
+}
+
+/* 정렬 드롭다운 메뉴 (기본 숨김 상태) */
+.sort-dropdown-menu {
+	display: none; /* 핵심: 초기에는 메뉴를 숨김 */
+	position: absolute;
+	background-color: #f9f9f9; /* 메뉴 배경색 */
+	min-width: 160px; /* 메뉴의 최소 너비 */
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+	z-index: 1000; /* 다른 요소 위에 표시되도록 (높은 z-index) */
+	list-style: none; /* 목록 점 제거 */
+	padding: 0; /* 내부 패딩 제거 */
+	margin: 0; /* 마진 제거 */
+	border-radius: 8px; /* 버튼과 동일한 둥근 모서리 */
+	right: 0; /* 드롭다운을 버튼의 오른쪽에 맞춤 */
+	top: calc(100% + 5px); /* 버튼 아래로 5px 떨어진 위치에 표시 */
+}
+
+/* `.sort-dropdown-container`에 `.active` 클래스가 있을 때 메뉴를 표시 */
+.sort-dropdown-container.active .sort-dropdown-menu {
+	display: block; /* 핵심: active 클래스 있을 때 메뉴 보임 */
+}
+
+/* 드롭다운 메뉴 내 링크 스타일 */
+.sort-dropdown-menu li a {
+	color: #333; /* 링크 텍스트 색상 */
+	padding: 12px 16px; /* 링크 내부 패딩 */
+	text-decoration: none; /* 밑줄 제거 */
+	display: block; /* 전체 영역 클릭 가능하도록 */
+	white-space: nowrap; /* 텍스트가 한 줄에 표시되도록 */
+}
+
+.sort-dropdown-menu li a:hover {
+	background-color: #ddd; /* 호버 시 배경색 */
+	border-radius: 8px; /* 메뉴 아이템에도 둥근 모서리 */
+}
+
+/* 정렬 버튼 자체의 텍스트와 화살표 위치 조정을 위한 플렉스박스 (선택 사항) */
+/* .sort-dropdown-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; // 또는 적절한 너비
+} */
+
+/* .sort-dropdown::after 화살표 위치 조정을 위해 */
+.sort-dropdown {
+	/* 기존 스타일 유지 */
+	position: relative; /* ::after 가상요소 위치 조정을 위해 */
+	padding-right: 25px; /* 화살표 공간 확보 */
+}
+
+.sort-dropdown::after {
+	position: absolute;
+	right: 12px; /* 버튼 오른쪽 끝에서 12px 떨어지게 */
+	top: 50%;
+	transform: translateY(-50%);
+	/* content: ' ▾'; <- 기존 코드에 이미 있음. */
+}

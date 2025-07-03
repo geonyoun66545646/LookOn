@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="productToolbarFragment">
+
+  <div class="product-toolbar-container">
+    <nav class="main-category-nav">
+      <ul class="main-category-list">
+        <li class="main-category-item category-title" th:text="${parentCategoryName ?: '카테고리'}">카테고리</li>
+        <li class="main-category-item">
+          <a th:href="@{/customer/products/list(categoryId=${parentCategoryId})}"
+             class="main-category-link"
+             th:classappend="${#strings.isEmpty(param.categoryId) || param.categoryId == parentCategoryId ? 'active' : ''}">전체</a>
+        </li>
+        <li class="main-category-item" th:each="subCategory : ${subCategories}">
+          <a th:href="@{/customer/products/list(categoryId=${subCategory.categoryId})}"
+             class="main-category-link"
+             th:classappend="${param.categoryId == subCategory.categoryId ? 'active' : ''}"
+             th:text="${subCategory.categoryName}">하위 카테고리명</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="product-filter-bar">
+      <div class="filter-controls">
+        <button class="filter-main-button app-modal-trigger">상품 필터</button>
+        <button class="filter-button" data-filter-group="gender" data-gender="M">남</button>
+        <button class="filter-button" data-filter-group="gender" data-gender="F">여</button>
+        <button class="filter-dropdown modal-trigger" data-modal-tab="color">컬러</button>
+        <button class="filter-dropdown modal-trigger" data-modal-tab="price">가격</button>
+        <button class="filter-dropdown modal-trigger" data-modal-tab="size">사이즈</button>
+        <button class="filter-dropdown modal-trigger" data-modal-tab="brand">브랜드</button>
+        <button class="filter-dropdown modal-trigger" data-modal-tab="options">상세옵션</button>
+        <button class="filter-dropdown modal-trigger" data-modal-tab="type">상품유형</button>
+        </div>
+
+      <div class="sort-control">
+        <div class="sort-dropdown-container">
+            <button class="sort-dropdown-button">신상품(재입고)순</button>
+            <ul class="sort-dropdown-menu">
+                <li><a href="#" class="sort-option-link" data-sort-by="new">신상품순</a></li>
+                <li><a href="#" class="sort-option-link" data-sort-by="price_asc">낮은가격순</a></li>
+                <li><a href="#" class="sort-option-link" data-sort-by="price_desc">높은가격순</a></li>
+                <li><a href="#" class="sort-option-link" data-sort-by="discount_desc">할인률순</a></li>
+                <li><a href="#" class="sort-option-link" data-sort-by="popular">인기순(판매량)</a></li>
+            </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-filter-modal-overlay">
+    <div class="app-filter-modal-content">
+
+      <header class="app-modal-header">
+        <h2 class="app-modal-title">필터</h2>
+        <button class="app-modal-close-button">×</button>
+      </header>
+
+      <div class="app-modal-body">
+        <nav class="app-modal-tab-nav">
+          <button class="app-modal-tab-button active" data-tab="style">스타일</button>
+          <button class="app-modal-tab-button" data-tab="color">컬러</button>
+          <button class="app-modal-tab-button" data-tab="price">가격</button>
+          <button class="app-modal-tab-button" data-tab="size">사이즈</button>
+          <button class="app-modal-tab-button" data-tab="brand">브랜드</button>
+          <button class="app-modal-tab-button" data-tab="options">상세옵션</button>
+          <button class="app-modal-tab-button" data-tab="type">상품유형</button>
+          </nav>
+
+        <div class="app-modal-tab-content-wrapper">
+          <div class="app-modal-tab-pane active" id="style-content">
+            <h3 class="app-tab-pane-title">스타일</h3>
+            <div class="app-filter-options-grid">
+              <label class="app-filter-option"><input type="checkbox" name="style" value="캐주얼"> 캐주얼</label>
+              <label class="app-filter-option"><input type="checkbox" name="style" value="스트릿"> 스트릿</label>
+              <label class="app-filter-option"><input type="checkbox" name="style" value="고프코어"> 고프코어</label>
+              <label class="app-filter-option"><input type="checkbox" name="style" value="워크웨어"> 워크웨어</label>
+              <label class="app-filter-option"><input type="checkbox" name="style" value="프레피"> 프레피</label>
+              <label class="app-filter-option"><input type="checkbox" name="style" value="시티보이"> 시티보이</label>
+              <label class="app-filter-option"><input type="checkbox" name="style" value="스포티"> 스포티</label>
+              <label class="app-filter-option"><input type="checkbox" name="style" value="로맨틱"> 로맨틱</label>
+              <label class="app-filter-option"><input type="checkbox" name="style" value="걸리시"> 걸리시</label>
+              <label class="app-filter-option"><input type="checkbox" name="style" value="클래식"> 클래식</label>
+              <label class="app-filter-option"><input type="checkbox"> 미니멀</label>
+              <label class="app-filter-option"><input type="checkbox"> 시크</label>
+              <label class="app-filter-option"><input type="checkbox"> 레트로</label>
+              <label class="app-filter-option"><input type="checkbox"> 에스닉</label>
+              <label class="app-filter-option"><input type="checkbox"> 리조트</label>
+            </div>
+          </div>
+
+          <div class="app-modal-tab-pane" id="color-content">
+            <h3 class="app-tab-pane-title">컬러</h3>
+            <div class="app-filter-options-grid" id="color-options-container">
+              </div>
+          </div>
+
+          <div class="app-modal-tab-pane" id="price-content">
+            <h3 class="app-tab-pane-title">가격</h3>
+            <div class="app-filter-options-grid app-price-filter-group">
+              <label class="app-filter-option"><input type="radio" name="priceRange" value="all" checked> 전체</label>
+              <label class="app-filter-option"><input type="radio" name="priceRange" value="0-50000"> 5만원 이하</label>
+              <label class="app-filter-option"><input type="radio" name="priceRange" value="50000-100000"> 5~10만원</label>
+              <label class="app-filter-option"><input type="radio" name="priceRange" value="100000-200000"> 10~20만원</label>
+              <label class="app-filter-option"><input type="radio" name="priceRange" value="200000-300000"> 20~30만원</label>
+              <label class="app-filter-option"><input type="radio" name="priceRange" value="300000-max"> 30만원 이상</label>
+            </div>
+            <div class="app-price-direct-input">
+                <input type="number" class="app-min-price-input" placeholder="최소" min="0"> ~
+                <input type="number" class="app-max-price-input" placeholder="최대" min="0">
+                <button class="app-apply-price-button">적용</button>
+            </div>
+          </div>
+
+          <div class="app-modal-tab-pane" id="size-content">
+            <h3 class="app-tab-pane-title">사이즈</h3>
+            <div class="app-size-filter-section">
+                <h4>의류 표준사이즈</h4>
+                <div class="app-filter-options-grid" id="apparel-size-options-container">
+                    </div>
+            </div>
+            <div class="app-size-filter-section">
+                <h4>신발 표준사이즈</h4>
+                <div class="app-filter-options-grid" id="shoe-size-options-container">
+                    </div>
+            </div>
+            <div class="app-size-filter-section">
+                <h4>패션소품 사이즈</h4>
+                <div class="app-filter-options-grid">
+                    <label class="app-filter-option"><input type="checkbox" name="accessorySize" value="FREE"> 프리</label>
+                </div>
+            </div>
+          </div>
+
+          <div class="app-modal-tab-pane" id="brand-content">
+            <h3 class="app-tab-pane-title">브랜드</h3>
+            <div class="app-brand-search-area">
+                <input type="text" class="app-brand-search-input" placeholder="브랜드 검색">
+            </div>
+            <div class="app-filter-options-grid app-brand-list-container" id="brand-options-container">
+              </div>
+          </div>
+
+          <div class="app-modal-tab-pane" id="options-content">
+            <h3 class="app-tab-pane-title">할인율</h3>
+            <div class="app-filter-options-grid app-discount-rate-filter-group">
+                <label class="app-filter-option"><input type="checkbox" name="discountRate" value="0-30"> 30% 미만</label>
+                <label class="app-filter-option"><input type="checkbox" name="discountRate" value="30-50"> 30%~50% 미만</label>
+                <label class="app-filter-option"><input type="checkbox" name="discountRate" value="50-70"> 50%~70% 미만</label>
+                <label class="app-filter-option"><input type="checkbox" name="70-100"> 70% 이상</label>
+            </div>
+             <h3 class="app-tab-pane-title">상세옵션 (기타)</h3>
+            <p>기타 상세 옵션이 여기에 표시됩니다.</p>
+          </div>
+
+          <div class="app-modal-tab-pane" id="type-content">
+            <h3 class="app-tab-pane-title">상품유형</h3>
+            <div class="app-product-type-filter-group app-filter-options-grid" id="product-type-options-container">
+                </div>
+            <div class="app-sale-type-filter-group app-filter-options-grid" id="sale-type-options-container">
+                </div>
+            <div class="app-misc-filter-group">
+                <h3 class="app-tab-pane-title">판매 상태</h3>
+                <label class="app-filter-option"><input type="checkbox" name="includeSoldOut" value="true"> 품절포함</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="app-modal-footer">
+        <button class="app-view-products-button">상품보기</button> </footer>
+
+    </div>
+  </div>
+
+</div>
+
+</html>
