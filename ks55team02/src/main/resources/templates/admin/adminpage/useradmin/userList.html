@@ -52,7 +52,7 @@
 		                        <div class="d-flex">
 		                            <input type="date" class="form-control" name="startDate" value="2020-03-16">
 		                            <span class="mx-2 d-flex align-items-center">-</span>
-		                            <input type="date" class="form-control" name="endDate" value="2025-06-16">
+		                            <input type="date" class="form-control" name="endDate" th:value="${#dates.format(#dates.createToday(), 'yyyy-MM-dd')}">
 		                        </div>
 		                    </div>
 		                    <div class="col-lg-4">

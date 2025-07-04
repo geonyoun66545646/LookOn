@@ -1,0 +1,25 @@
+@charset "UTF-8";
+/* 피드백 메시지 위치 통일 */
+#signin-modal .form-group > .feedback-message {
+    height: 1.2em;
+    margin-top: 5px;
+    display: block;
+    clear: both; 
+}
+
+/* 성별 버튼 활성화 스타일 */
+#signin-modal .btn-group-toggle > label.btn.active {
+    background-color: #c96 !important;
+    color: white !important;
+    border-color: #c96 !important;
+}
+
+/* 성별 버튼 내부 아이콘(가상 요소) 제거 */
+#signin-modal .btn-group-toggle > label.btn > input[type="radio"] {
+    display: none; /* 실제 라디오 버튼은 숨김 */
+}
+#signin-modal .btn-group-toggle > label.btn::before,
+#signin-modal .btn-group-toggle > label.btn::after {
+    content: none !important;
+    display: none !important;
+}
