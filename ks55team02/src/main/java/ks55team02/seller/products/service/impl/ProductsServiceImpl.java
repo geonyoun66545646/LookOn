@@ -72,6 +72,7 @@ public class ProductsServiceImpl implements ProductsService {
         product.setMdfrNo(selUserNo);
         product.setGdsNm(request.getProductName());
         product.setGdsExpln(request.getProductDescription());
+        
         product.setBasPrc(request.getBasePrice() != null ? request.getBasePrice().intValue() : 0);
         product.setDscntRt(request.getDiscountRate());
 
@@ -359,9 +360,15 @@ public class ProductsServiceImpl implements ProductsService {
     // --- ⭐ 이 두 메서드를 수정하여 페이지네이션 로직을 포함시킵니다 ⭐ ---
     @Override
     public Map<String, Object> getFilteredAndSortedProducts(String categoryId, String sortBy, Map<String, Object> filterParams, int currentPage) {
-        Map<String, Object> paramMap = new HashMap<>(filterParams);
+    	System.out.println("--- ProductsServiceImpl.getFilteredAndSortedProducts 진입 ---");
+        System.out.println("전달받은 categoryId: " + categoryId);
+        System.out.println("전달받은 filterParams: " + filterParams);
+    	
+    	Map<String, Object> paramMap = new HashMap<>(filterParams);
         paramMap.put("categoryId", categoryId);
         paramMap.put("sortBy", sortBy);
+        
+        System.out.println("매퍼에 전달될 최종 paramMap: " + paramMap);
 
         // 1. 페이지네이션 파라미터 설정
         // 한 페이지에 보여줄 상품 수 (기본값 12, 필요에 따라 조정 가능)

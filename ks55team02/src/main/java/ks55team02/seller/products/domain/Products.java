@@ -18,7 +18,7 @@ public class Products {
     private String gdsExpln;
     private Integer basPrc;
     private Double dscntRt;
-    private Integer lastSelPrc; // Consider if this should be BigDecimal as well
+    private Integer lastSelPrc;
     private LocalDateTime regDt;
     private LocalDateTime mdfcnDt;
     private LocalDateTime inactvtnDt;
@@ -33,14 +33,12 @@ public class Products {
     private Integer totalStockQuantity;
     private Boolean isSoldOut;
 
-    // ⭐⭐⭐ MISSING FIELD: discountedPrice - ADD THIS! ⭐⭐⭐
-    private BigDecimal discountedPrice; // Or Double, but BigDecimal is recommended for currency.
+    private BigDecimal discountedPrice;
 
     private ProductCategory productCategory;
     private List<ProductImage> productImages;
     private List<ProductOption> productOptions;
 
-    // These getters are redundant with @Data but won't cause harm.
     public Boolean getExpsrYn() {
         return this.expsrYn;
     }
