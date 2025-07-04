@@ -2,7 +2,8 @@ package ks55team02.seller.products.domain;
 
 import lombok.Data;
 import java.time.LocalDateTime;
-import java.util.List; // List를 사용하기 위해 임포트가 필요합니다.
+import java.util.List;
+import java.math.BigDecimal; // Add this import for BigDecimal
 
 @Data
 public class Products {
@@ -21,20 +22,23 @@ public class Products {
     private LocalDateTime regDt;
     private LocalDateTime mdfcnDt;
     private LocalDateTime inactvtnDt;
-    private Boolean expsrYn; // Boolean 타입 (래퍼 클래스)
-    private Boolean actvtnYn; // Boolean 타입 (래퍼 클래스)
-    private String thumbnailImagePath; // 고객용 상품 목록에서 썸네일 경로를 직접 사용하기 위함
-    private Integer minPurchaseQty; // DB 컬럼 min_purchase_qty와 매핑
+    private Boolean expsrYn;
+    private Boolean actvtnYn;
+    private String thumbnailImagePath;
+    private Integer minPurchaseQty;
     private Integer maxPurchaseQty;
-    
-    // ⭐⭐⭐ 카테고리 ⭐⭐⭐
-    private ProductCategory productCategory; // 카테고리 정보 객체
-    private List<ProductImage> productImages; // 상품 이미지 리스트
 
-    // ⭐⭐⭐ ProductOption 리스트 필드 ⭐⭐⭐
-    private List<ProductOption> productOptions; // 이 필드가 있어야 옵션 정보를 가져올 수 있습니다.
+    private String storeName;
 
- 
+    private Integer totalStockQuantity;
+    private Boolean isSoldOut;
+
+    private BigDecimal discountedPrice;
+
+    private ProductCategory productCategory;
+    private List<ProductImage> productImages;
+    private List<ProductOption> productOptions;
+
     public Boolean getExpsrYn() {
         return this.expsrYn;
     }
