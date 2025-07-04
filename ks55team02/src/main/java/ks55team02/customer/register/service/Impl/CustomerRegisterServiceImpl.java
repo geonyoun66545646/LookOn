@@ -77,8 +77,9 @@ public class CustomerRegisterServiceImpl implements CustomerRegisterService {
         user.setDaddr(userJoinRequest.getDaddr());
         
         // 서비스 단에서 설정하는 기본값들
-        user.setMbrGrdCd("grd_03"); // 예시: 기본 회원 등급
+        user.setMbrGrdCd("grd_cd_3"); // 예시: 기본 회원 등급
         user.setUserStatus("활동"); // 기본 상태 '활동'
+        user.setGenderSeCd(userJoinRequest.getGenderSeCd());
         
         // 2-2. UserProfile 객체 설정
         UserProfile userProfile = new UserProfile();
@@ -86,14 +87,18 @@ public class CustomerRegisterServiceImpl implements CustomerRegisterService {
         
         // 체크박스가 선택되지 않으면 null이 오므로, 'N'으로 기본값 처리
         // 사용자의 푸쉬알림 수신 동의 체크
-        userProfile.setPushNtfctnAgreYn(userJoinRequest.getPushNtfctnAgreYn() != null ? "Y" : "N");
+        boolean pushAgreed = userJoinRequest.getPushNtfctnRcptnAgreYn() != null;
+        userProfile.setPushNtfctnRcptnAgreYn(pushAgreed);
+        
         // 사용자의 이메일 수신 동의 체크
-        userProfile.setEmlRcptnAgreYn(userJoinRequest.getEmlRcptnAgreYn() != null ? "Y" : "N");
+        boolean emailAgreed = userJoinRequest.getEmlRcptnAgreYn() != null;
+        userProfile.setEmlRcptnAgreYn(emailAgreed);
 
         // 2-3. UserSecurity 객체 설정 (user_no만 필요)
         UserSecurity userSecurity = new UserSecurity();
         userSecurity.setUserNo(newUserNo);
 
+        userSecurity.setMfaUseYn(false); 	
 
         // 3. Mapper를 호출하여 3개 테이블에 순차적으로 INSERT
         customerRegisterMapper.addUser(user);

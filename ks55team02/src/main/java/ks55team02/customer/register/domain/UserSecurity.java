@@ -11,7 +11,7 @@ public class UserSecurity {
     private LocalDateTime 	lastPswdChgDt;
     private int 			lgnFailNmtm;
     private LocalDateTime 	acntLockRmvTm;
-    private String 			mfaUseYn;
+    private Boolean 		mfaUseYn;
     private String 			mfaScrtKeyEncptVal;
     private LocalDateTime 	mfaLastCertScsDt;
     private String 			mfaRcyrCdHashListVal;

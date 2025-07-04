@@ -29,6 +29,7 @@
     <link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
     <link rel="stylesheet" th:href="@{/maincss/assets/css/skins/skin-demo-6.css}">
     <link rel="stylesheet" th:href="@{/maincss/assets/css/demos/demo-6.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/registerModale.css}">
     
     <link rel="stylesheet" th:href="@{/maincss/assets/mainHeader/mainHeader.css}"> 
     <link rel="stylesheet" th:href="@{/maincss/assets/categoryFilterModal/categoryFilterModal.css}">
@@ -51,7 +52,7 @@
             <footer th:replace="~{customer/fragments/footer :: footerFragment}"></footer>
         </main>
     </div> 
-	<div th:replace="~{fragments/commonModals :: signinModalFragment}"></div>
+	<div th:replace="~{customer/fragments/commonModals :: signinModalFragment}"></div>
     <div th:replace="~{customer/fragments/categoryFilterModal :: categoryFilterModalFragment}"></div> <!-- 이거 햄버거 모달 -->
 
     <script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
@@ -63,6 +64,7 @@
     <script th:src="@{/maincss/assets/js/jquery.plugin.min.js}"></script>
     <script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
     <script th:src="@{/maincss/assets/js/jquery.countdown.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/customer/register.js}"></script>
     
     <th:block layout:fragment="jsFile"></th:block>
     

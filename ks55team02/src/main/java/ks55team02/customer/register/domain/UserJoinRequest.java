@@ -33,7 +33,10 @@ public class UserJoinRequest {
     private String addr;
     private String daddr;
     
-    // 8. 선택적 동의 항목 (폼에 체크박스가 있다면 포함)
-    private String pushNtfctnAgreYn;
-    private String emlRcptnAgreYn;
+    // 8. 성별
+    private String genderSeCd;
+    
+    // 9. 선택적 동의 항목 (폼에 체크박스가 있다면 포함)
+    private Boolean pushNtfctnRcptnAgreYn;
+    private Boolean emlRcptnAgreYn;
 }

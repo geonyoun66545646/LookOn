@@ -7,7 +7,7 @@
         SELECT 
         	COUNT(*) > 0 
         FROM 
-        	USER 
+        	users 
         WHERE 
         	user_lgn_id = #{userLgnId}
     </select>
@@ -17,7 +17,7 @@
         SELECT 
         	COUNT(*) > 0 
         FROM 
-        	USER 
+        	users 
         WHERE 
         	user_ncnm = #{userNcnm}
     </select>
@@ -27,17 +27,27 @@
         SELECT 
         	COUNT(*) > 0 
         FROM 
-        	USER 
+        	users 
         WHERE 
         	eml_addr = #{emlAddr}
     </select>
     
-    <!-- 가장 마지막 user_no 조회 (숫자 부분을 기준으로 정렬하여 가장 큰 값을 찾음) -->
+    <!-- 전화번호 중복 확인 -->
+    <select id="telnoCheck" parameterType="String" resultType="boolean">
+	    SELECT 
+	    	COUNT(*) > 0 
+	    FROM 
+	    	users 
+	    WHERE 
+	    	telno = #{telno}
+	</select>
+	
+    <!-- 가장 마지막 user_no 조회 -->
     <select id="getLastUserNo" resultType="String">
         SELECT 
         	user_no
         FROM 
-        	USER
+        	users
         ORDER BY 
         	CAST(SUBSTRING_INDEX(user_no, '_', -1) AS UNSIGNED) DESC
         LIMIT 1
@@ -45,7 +55,7 @@
     
     <!-- USER 테이블에 데이터 삽입 -->
     <insert id="addUser" parameterType="ks55team02.customer.register.domain.User">
-        INSERT INTO USER (
+        INSERT INTO users (
             user_no, 
             mbr_grd_cd, 
             user_lgn_id, 
@@ -58,7 +68,8 @@
             daddr, 
             user_ncnm, 
             user_status, 
-            join_dt
+            join_dt,
+            gender_se_cd
         ) 
         VALUES (
             #{userNo}, 
@@ -73,33 +84,36 @@
             #{daddr},
             #{userNcnm}, 
             #{userStatus}, 
-            NOW()
+            NOW(),
+            #{genderSeCd}
         )
     </insert>
 
     <!-- USER_SECURITY 테이블에 데이터 삽입 -->
     <insert id="addUserSecurity" parameterType="ks55team02.customer.register.domain.UserSecurity">
-        INSERT INTO USER_SECURITY (
+        INSERT INTO user_security_settings (
             user_no, 
             lgn_fail_nmtm, 
             mfa_use_yn
         ) 
         VALUES (
-            #{userNo}, 0, 'n'
+            #{userNo},
+             0, 
+             0
         )
     </insert>
     
     <!-- USER_PROFILE 테이블에 데이터 삽입 -->
     <insert id="addUserProfile" parameterType="ks55team02.customer.register.domain.UserProfile">
-        INSERT INTO USER_PROFILE (
-            user_no, 
-            push_ntfctn_agre_yn, 
-            eml_rcptn_agre_yn
-        ) 
-        VALUES (
-            #{userNo}, 
-            #{pushNtfctnAgreYn}, 
-            #{emlRcptnAgreYn}
-        )
+        INSERT INTO user_profiles (
+	        user_no, 
+	        push_ntfctn_rcptn_agre_yn,
+	        eml_rcptn_agre_yn
+	    ) 
+	    VALUES (
+	        #{userNo}, 
+	        #{pushNtfctnRcptnAgreYn}, 
+	        #{emlRcptnAgreYn}
+	    )
     </insert>
 </mapper>

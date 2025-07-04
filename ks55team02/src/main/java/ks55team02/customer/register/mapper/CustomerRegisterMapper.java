@@ -17,6 +17,9 @@ public interface CustomerRegisterMapper {
     
     // 이메일 중복 확인 (단순 타입 boolean 반환)
     boolean emailCheck(String emlAddr);
+    
+    // 전화번호 중복 확인 (단순 타입 boolean 반환)
+    boolean telnoCheck(String telno);
 
     // 가장 마지막 user_no 조회 (단순 타입 String 반환)
     String getLastUserNo();
@@ -29,4 +32,5 @@ public interface CustomerRegisterMapper {
     
     // USER_PROFILE 테이블에 회원 프로필 정보 삽입
     void addUserProfile(UserProfile userProfile);
+    
 }

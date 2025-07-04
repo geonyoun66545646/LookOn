@@ -10,7 +10,7 @@ public class UserProfile {
 	private String userNo;
     private String prflImg;
     private String selfIntroCn;
-    private String pushNtfctnAgreYn;
-    private String emlRcptnAgreYn;
+    private Boolean pushNtfctnRcptnAgreYn;
+    private Boolean emlRcptnAgreYn;
     private LocalDateTime lastPrflMdfcnDt;
 }

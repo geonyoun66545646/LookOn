@@ -8,7 +8,7 @@
     <header class="lookon-main-header" th:fragment="mainHeaderFragment">
         <div class="lookon-header-upper-bar">
             <div class="lookon-header-content-wrapper">
-                <a th:href="@{/customer}" class="lookon-brand-logo">LookOn</a>
+                <a th:href="@{/main}" class="lookon-brand-logo">LookOn</a>
                 <form action="/search" class="lookon-search-input-area">
                     <i class="fas fa-search lookon-search-icon"></i>
                     <input type="text" class="lookon-search-input-field" placeholder="여기에 검색어를 입력해주세요">
@@ -33,7 +33,7 @@
                     </nav>
                 </div>
                 <div class="lookon-user-action-menu">
-                    <a href="@{/mypage}"><i class="far fa-user"></i></a>
+                    <a th:href="@{/mypage}"><i class="far fa-user"></i></a>
                     <a href="#" class="lookon-action-link" data-toggle="modal" data-target="#signin-modal">
                         <i class="far fa-heart"></i>
                         <span class="lookon-badge">3</span>
