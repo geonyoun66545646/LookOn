@@ -33,16 +33,15 @@
 
 			<ul class="nav nav-pills justify-content-center mb-5" id="tabs"
 				role="tablist">
-				<li class="nav-item mx-2"><a class="nav-link active"
-					id="all-tab" href="#allResults" role="tab"
-					onclick="handleTabClick(event, this)">전체</a></li>
-				<li class="nav-item mx-2"><a class="nav-link" id="shopping-tab"
+				<li class="nav-item"><a class="nav-link active" id="all-tab"
+					href="#allResults" role="tab" onclick="handleTabClick(event, this)">전체</a></li>
+				<li class="nav-item"><a class="nav-link" id="shopping-tab"
 					href="#shoppingResults" role="tab"
 					onclick="handleTabClick(event, this)">상품</a></li>
-				<li class="nav-item mx-2"><a class="nav-link" id="post-tab"
+				<li class="nav-item"><a class="nav-link" id="post-tab"
 					href="#postResults" role="tab"
 					onclick="handleTabClick(event, this)">게시글</a></li>
-				<li class="nav-item mx-2"><a class="nav-link" id="user-tab"
+				<li class="nav-item"><a class="nav-link" id="user-tab"
 					href="#userResults" role="tab"
 					onclick="handleTabClick(event, this)">사용자</a></li>
 			</ul>
@@ -52,7 +51,7 @@
 				<div class="tab-pane fade show active" id="allResults"
 					role="tabpanel">
 
-					<div class="mb-5">
+					<div class="search-results-card mb-5">
 						<h5 class="section-title fw-bold">상품 검색 결과</h5>
 
 						<div class="product-grid-container" id="shoppingPreviewContainer">
@@ -90,9 +89,9 @@
 
 					</div>
 
-					<div class="mb-5">
+					<div class="search-results-card mb-5">
 						<h5 class="section-title fw-bold">게시글 검색 결과</h5>
-						<div class="card-body search-results-card py-4 px-4">
+						<div class="card-body search-post-card py-4 px-4">
 							<div id="postPreviewContainer">
 								<th:block th:if="${!#lists.isEmpty(searchResult.posts)}">
 									<div class="post-item"
@@ -120,7 +119,7 @@
 						</div>
 					</div>
 
-					<div class="mb-5">
+					<div class="search-results-card mb-5">
 						<h5 class="section-title fw-bold">사용자 검색 결과</h5>
 						<div class="product-grid-container" id="userPreviewContainer">
 
@@ -399,29 +398,53 @@
     }
 
     /**
-     * 2. 게시글 목록을 그리는 함수 (페이지네이션 컨테이너 추가)
+     * 2. 게시글 목록을 그리는 함수 (요청사항 반영 최종본)
      */
     function renderPosts(container, posts) {
-         if (!posts || posts.length === 0) {
-            container.innerHTML = '<div class="text-center p-5">검색된 게시글이 없습니다.</div>';
+        // 1. 검색 결과가 없을 때의 처리
+        if (!posts || posts.length === 0) {
+            // '결과 없음' 메시지도 동일한 구조로 감싸서 일관성을 유지합니다.
+            container.innerHTML = `
+                <div class="search-results-card mb-5">
+                    <div class="card-body search-post-card py-4 px-4">
+                        <div class="post-item">
+                            <p class="text-center w-100">검색된 게시글이 없습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
             return;
         }
-        let html = '<div class="py-4 px-4">';
+
+        // 2. 게시글 목록 HTML 생성 (기존 로직 활용)
+        let itemsHtml = '';
         posts.forEach(post => {
             const formattedDate = post.crtDt ? new Date(post.crtDt).toISOString().split('T')[0] : '';
-            html += `
+            itemsHtml += `
                 <div class="post-item">
                     <h6 class="mb-1 text-truncate"><a href="/customer/posts/${post.pstSn}">${post.pstTtl}</a></h6>
                     <small class="text-muted">${post.userNcnm} | ${formattedDate}</small>
                     <p class="text-truncate-2">${post.pstCn}</p>
                 </div>`;
         });
-        html += '</div>';
 
-        // 페이지네이션 버튼이 들어갈 컨테이너 추가
-        html += '<div class="pagination-container mt-5"></div>';
+        // 3. 페이지네이션 버튼이 들어갈 컨테이너 생성
+        const paginationHtml = '<div class="pagination-container mt-5"></div>';
+
+        // 4. 요청하신 대로 모든 조각을 최종 HTML 구조로 조립합니다.
+        const finalHtml = `
+            <div class="search-results-card mb-5">
+                <div class="card-body search-post-card py-4 px-4">
+                    ${itemsHtml}
+                </div>
+                <div class="card-footer search-etc py-4 px-4 bg-white text-center">
+                    ${paginationHtml}
+                </div>
+            </div>
+        `;
         
-        container.innerHTML = html;
+        // 5. 완성된 HTML을 화면에 렌더링
+        container.innerHTML = finalHtml;
     }
     
     /**
