@@ -41,10 +41,10 @@ public class CustomerHomeController {
 		return "customer/fragments/cart";
 	}
 	
-	@GetMapping(value= {"/paymentHistory"})
-	public String paymentHistoryView() {
-		return "customer/fragments/paymentHistory";
-	}
+//	@GetMapping(value= {"/paymentHistory"})
+//	public String paymentHistoryView() {
+//		return "customer/fragments/paymentHistory";
+//	}
 	
 	@GetMapping(value= {"/shippmentStts"})
 	public String shippmentSttsView() {
@@ -53,6 +53,6 @@ public class CustomerHomeController {
 	
 	@GetMapping(value= {"/premiumAdd"})
 	public String premiumAddView() {
-		return "customer/fragments/premiumAdd";
+		return "admin/fragments/premiumAdd";
 	}
 }
