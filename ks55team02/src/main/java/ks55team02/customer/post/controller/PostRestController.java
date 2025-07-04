@@ -20,18 +20,34 @@ public class PostRestController {
     @Autowired
     private PostService postService;
     
+    // 댓글 수정
+    @PostMapping("/updateComment")
+    public Map<String, Object> updateComment(Comment comment) {
+    	
+    	Map<String, Object> response = new HashMap<>();
+    	
+    	try {
+    		postService.updateComment(comment);
+    		response.put("result", "success");
+    	} catch(Exception e) {
+    		response.put("result", "fail");
+    		log.error("Error adding comment : {}", e.getMessage());
+    	}
+    	return response;
+    }
+    
 	// 댓글 작성
 	@PostMapping("/insertComment")
-	public Map<String, Object> submitComment(Comment comment) {
+	public Map<String, Object> insertComment(Comment comment) {
 		
 		Map<String, Object> response = new HashMap<>();
 
 		try {
 			postService.insertComment(comment);
 			response.put("result", "success");
-		} catch (Exception e) {
+		} catch(Exception e) {
 			response.put("result", "fail");
-			log.error("Error adding comment: {}", e.getMessage());
+			log.error("Error adding comment : {}", e.getMessage());
 		}
 		
 		return response;

@@ -20,6 +20,7 @@ public class Post {
 	private LocalDateTime delDt;
 	
 	private int cmntCnt;
+	private int interCnt;
 	
 	private UserList userInfo;
 	private List<Comment> comment;
