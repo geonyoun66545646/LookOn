@@ -275,26 +275,37 @@
 	</select>
 
 	<select id="getFilteredAndSortedProducts"
-	parameterType="java.util.Map" resultMap="productsWithFilterResultMap">
+    parameterType="java.util.Map" resultMap="productsWithFilterResultMap">
 	    SELECT
 	        p.gds_no,
 	        p.gds_nm,
 	        p.bas_prc,
 	        p.dscnt_rt,
-	        (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc, pc.ctgry_no AS pc_ctgry_no, pc.ctgry_nm AS pc_ctgry_nm, (
+	        (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) AS last_sel_prc,
+	        pc.ctgry_no AS pc_ctgry_no,
+	        pc.ctgry_nm AS pc_ctgry_nm,
+	        (
 	            SELECT pi.img_file_path_nm
 	            FROM ks55team02db.product_images pi
 	            WHERE pi.gds_no = p.gds_no
 	              AND pi.img_type = 1 AND pi.actvtn_yn = TRUE ORDER BY pi.img_indct_sn ASC
 	            LIMIT 1
-	        ) AS thumbnail_image_path, s.store_conm AS store_name, SUM(ps.sel_psblty_qntty) AS total_stock_quantity, MAX(CASE WHEN ps.sldout_yn = TRUE THEN 1 ELSE 0 END) AS is_sold_out FROM
+	        ) AS thumbnail_image_path,
+	        s.store_conm AS store_name,
+	        SUM(ps.sel_psblty_qntty) AS total_stock_quantity,
+	        MAX(CASE WHEN ps.sldout_yn = TRUE THEN 1 ELSE 0 END) AS is_sold_out
+	    FROM
 	        ks55team02db.products p
 	    LEFT JOIN
 	        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
 	    LEFT JOIN
-	        ks55team02db.stores s ON p.store_id = s.store_id LEFT JOIN
-	        ks55team02db.product_status ps ON p.gds_no = ps.gds_no AND ps.actvtn_yn = TRUE WHERE
-	        p.expsr_yn = 1 AND p.actvtn_yn = 1 AND s.del_prcr_yn = FALSE <if test="categoryId != null and categoryId != ''">
+	        ks55team02db.stores s ON p.store_id = s.store_id
+	    LEFT JOIN
+	        ks55team02db.product_status ps ON p.gds_no = ps.gds_no AND ps.actvtn_yn = TRUE
+	    
+	    <where> p.expsr_yn = 1 AND p.actvtn_yn = 1 AND s.del_prcr_yn = FALSE
+	        
+	        <if test="categoryId != null and categoryId != ''">
 	            AND (
 	                p.ctgry_no = #{categoryId}
 	                OR EXISTS (
@@ -305,124 +316,228 @@
 	                )
 	            )
 	        </if>
-	        <if test="gender != null and gender != ''">AND p.gender_type = #{gender}</if>
-	        <if test="minPrice != null">AND (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) &gt;= #{minPrice}</if>
-	        <if test="maxPrice != null">AND (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) &lt;= #{maxPrice}</if>
+	        
+	        <if test="gender != null and gender != ''">
+	            AND p.gds_gndr_cd = #{gender}
+	        </if>
+	        
+	        <choose>
+	            <when test="minPrice != null and maxPrice != null">
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> #{minPrice}
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> #{maxPrice}
+	            </when>
+	            <when test="minPrice != null"> AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> #{minPrice}
+	            </when>
+	            <when test="maxPrice != null"> AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> #{maxPrice}
+	            </when>
+	            <when test="priceRange != null and priceRange != 'all'">
+	                AND
+	                <choose>
+	                    <when test="priceRange == '0-50000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 50000</when>
+	                    <when test="priceRange == '50000-100000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 50000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 100000</when>
+	                    <when test="priceRange == '100000-200000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 100000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 200000</when>
+	                    <when test="priceRange == '200000-300000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 200000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 300000</when>
+	                    <when test="priceRange == '300000-max'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 300000</when>
+	                </choose>
+	            </when>
+	        </choose>
+	        
 	        <if test="colors != null and colors.size() > 0">
-	            AND EXISTS (
-	                SELECT 1
-	                FROM product_option_values pov
-	                JOIN product_options po ON pov.opt_no = po.opt_no
-	                WHERE po.gds_no = p.gds_no AND po.opt_nm = '색상' AND pov.vl_nm IN
+	            AND p.gds_no IN (
+	                SELECT po.gds_no
+	                FROM ks55team02db.product_options po
+	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+	                WHERE po.opt_nm = '색상' AND pov.vl_nm IN
 	                <foreach item="color" collection="colors" open="(" separator="," close=")">
 	                    #{color}
 	                </foreach>
+	                AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
 	            )
 	        </if>
+	        
 	        <if test="sizes != null and sizes.size() > 0">
-	            AND EXISTS (
-	                SELECT 1
-	                FROM product_option_values pov
-	                JOIN product_options po ON pov.opt_no = po.opt_no
-	                WHERE po.gds_no = p.gds_no AND (po.opt_nm = '의류 사이즈' OR po.opt_nm = '신발 사이즈') AND pov.vl_nm IN
+	            AND p.gds_no IN (
+	                SELECT po.gds_no
+	                FROM ks55team02db.product_options po
+	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+	                WHERE (po.opt_nm = '의류 사이즈' OR po.opt_nm = '신발 사이즈' OR po.opt_nm = '사이즈' OR po.opt_nm = '패션소품 사이즈')
+	                AND pov.vl_nm IN
 	                <foreach item="size" collection="sizes" open="(" separator="," close=")">
 	                    #{size}
 	                </foreach>
+	                AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
 	            )
 	        </if>
+	        
 	        <if test="brands != null and brands.size() > 0">
-	            AND s.store_conm IN
-	            <foreach item="brand" collection="brands" open="(" separator="," close=")">
-	                #{brand}
+	            AND s.store_id IN
+	            <foreach item="brandId" collection="brands" open="(" separator="," close=")">
+	                #{brandId}
 	            </foreach>
 	        </if>
-	        <if test="styles != null and styles.size() > 0">
-	            </if>
-	        <if test="discountRates != null and discountRates.size() > 0">
-	            AND (
-	            <foreach item="rate" collection="discountRates" separator="OR">
-	                <if test="rate == '10'">p.dscnt_rt &gt;= 10 AND p.dscnt_rt &lt; 20</if>
-	                <if test="rate == '20'">p.dscnt_rt &gt;= 20 AND p.dscnt_rt &lt; 30</if>
-	                <if test="rate == '30'">p.dscnt_rt &gt;= 30 AND p.dscnt_rt &lt; 40</if>
-	                <if test="rate == '40'">p.dscnt_rt &gt;= 40</if>
-	            </foreach>
-	            )
+	        
+	        <if test="discountRate != null and discountRate != '' and discountRate != 'all'">
+			    AND p.dscnt_rt <![CDATA[ >= ]]> #{discountRate}
+			</if>
+	    </where>
+	    
+	    GROUP BY p.gds_no
+	    
+	    <trim prefix="HAVING" prefixOverrides="AND |OR">
+	        <if test="includeSoldOut == null or includeSoldOut == false">
+	            SUM(ps.sel_psblty_qntty) > 0
 	        </if>
-	
-	    GROUP BY p.gds_no HAVING total_stock_quantity > 0 AND is_sold_out = 0
-	        <if test="includeSoldOut == true">
-	            </if>
+	    </trim>
+	    
 	    ORDER BY
 	        <choose>
 	            <when test="sortBy == 'new'">p.reg_dt DESC</when>
 	            <when test="sortBy == 'old'">p.reg_dt ASC</when>
 	            <when test="sortBy == 'priceAsc'">last_sel_prc ASC</when>
 	            <when test="sortBy == 'priceDesc'">last_sel_prc DESC</when>
+	            <when test="sortBy == 'popularity'">p.gds_view_cnt DESC</when>
 	            <otherwise>p.reg_dt DESC</otherwise>
 	        </choose>
 	</select>
-
-	<select id="countFilteredProducts" parameterType="map"
-		resultType="long">
-		SELECT
-		COUNT(p.gds_no)
-		FROM
-		products p
-		JOIN
-		product_categories pc ON
-		p.ctgry_no = pc.ctgry_no
-		WHERE
-		p.actvtn_yn = 1
-		AND p.expsr_yn = 1
-		<if test="categoryId != null and categoryId != ''">
-			AND (
-			p.ctgry_no = #{categoryId}
-			OR EXISTS (
-			SELECT 1
-			FROM
-			product_categories sub_pc
-			WHERE sub_pc.ctgry_no = p.ctgry_no
-			AND
-			sub_pc.up_ctgry_no = #{categoryId}
-			)
-			)
-		</if>
-		<if test="minPrice != null">
-			AND (p.bas_prc * (100 - p.dscnt_rt) / 100) >= #{minPrice}
-		</if>
-		<if test="maxPrice != null">
-			AND (p.bas_prc * (100 - p.dscnt_rt) / 100) &lt;=
-			#{maxPrice}
-		</if>
+	
+	<select id="countFilteredProducts" parameterType="map" resultType="long">
+	    SELECT
+	        COUNT(DISTINCT p.gds_no)
+	    FROM
+	        ks55team02db.products p
+	    LEFT JOIN
+	        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+	    LEFT JOIN
+	        ks55team02db.stores s ON p.store_id = s.store_id
+	    LEFT JOIN
+	        ks55team02db.product_status ps ON p.gds_no = ps.gds_no AND ps.actvtn_yn = TRUE
+	    <where> p.expsr_yn = 1 AND p.actvtn_yn = 1 AND s.del_prcr_yn = FALSE
+	        
+	        <if test="categoryId != null and categoryId != ''">
+	            AND (
+	                p.ctgry_no = #{categoryId}
+	                OR EXISTS (
+	                    SELECT 1
+	                    FROM product_categories sub_pc
+	                    WHERE sub_pc.ctgry_no = p.ctgry_no
+	                    AND sub_pc.up_ctgry_no = #{categoryId}
+	                )
+	            )
+	        </if>
+	        
+	        <if test="gender != null and gender != ''">
+	            AND p.gds_gndr_cd = #{gender}
+	        </if>
+	        
+	        <choose>
+	            <when test="minPrice != null and maxPrice != null">
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> #{minPrice}
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> #{maxPrice}
+	            </when>
+	            <when test="minPrice != null">
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> #{minPrice}
+	            </when>
+	            <when test="maxPrice != null">
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> #{maxPrice}
+	            </when>
+	            <when test="priceRange != null and priceRange != 'all'">
+	                AND
+	                <choose>
+	                    <when test="priceRange == '0-50000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 50000</when>
+	                    <when test="priceRange == '50000-100000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 50000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 100000</when>
+	                    <when test="priceRange == '100000-200000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 100000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 200000</when>
+	                    <when test="priceRange == '200000-300000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 200000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 300000</when>
+	                    <when test="priceRange == '300000-max'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 300000</when>
+	                </choose>
+	            </when>
+	        </choose>
+	        
+	        <if test="colors != null and colors.size() > 0">
+	            AND p.gds_no IN (
+	                SELECT po.gds_no
+	                FROM ks55team02db.product_options po
+	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+	                WHERE po.opt_nm = '색상' AND pov.vl_nm IN
+	                <foreach item="color" collection="colors" open="(" separator="," close=")">
+	                    #{color}
+	                </foreach>
+	                AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
+	            )
+	        </if>
+	        
+	        <if test="sizes != null and sizes.size() > 0">
+	            AND p.gds_no IN (
+	                SELECT po.gds_no
+	                FROM ks55team02db.product_options po
+	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+	                WHERE (po.opt_nm = '의류 사이즈' OR po.opt_nm = '신발 사이즈' OR po.opt_nm = '사이즈' OR po.opt_nm = '패션소품 사이즈')
+	                AND pov.vl_nm IN
+	                <foreach item="size" collection="sizes" open="(" separator="," close=")">
+	                    #{size}
+	                </foreach>
+	                AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
+	            )
+	        </if>
+	        
+	        <if test="brands != null and brands.size() > 0">
+	            AND s.store_id IN
+	            <foreach item="brandId" collection="brands" open="(" separator="," close=")">
+	                #{brandId}
+	            </foreach>
+	        </if>
+	        
+	        <if test="discountRate != null and discountRate != '' and discountRate != 'all'">
+			    AND p.dscnt_rt <![CDATA[ >= ]]> #{discountRate}
+			</if>
+	        
+	        <if test="includeSoldOut == null or includeSoldOut == false">
+	            AND p.gds_no IN (
+	                SELECT ps_inner.gds_no
+	                FROM ks55team02db.product_status ps_inner
+	                WHERE ps_inner.actvtn_yn = TRUE AND ps_inner.sel_psblty_qntty > 0
+	            )
+	        </if>
+	    </where>
 	</select>
-
-
 
 	<select id="getAllProductOptionValuesByType"
-		parameterType="String" resultMap="productOptionValueResultMap">
-		/* 특정 옵션 유형에 해당하는 모든 옵션 값들을 조회 */
-		SELECT
-		pov.opt_vl_no AS opt_vl_no,
-		pov.opt_no AS opt_vl_opt_no,
-		pov.creatr_no AS opt_vl_creatr_no,
-		pov.mdfr_no AS opt_vl_mdfr_no,
-		pov.del_user_no AS opt_vl_del_user_no,
-		pov.vl_nm AS vl_nm,
-		pov.opt_vl_img_url_addr AS opt_vl_img_url_addr,
-		pov.clr_cd AS clr_cd,
-		pov.reg_dt AS opt_vl_reg_dt,
-		pov.mdfcn_dt AS opt_vl_mdfcn_dt,
-		pov.inactvtn_dt AS opt_vl_inactvtn_dt,
-		pov.actvtn_yn AS
-		opt_vl_actvtn_yn
-		FROM ks55team02db.product_option_values pov
-		JOIN
-		ks55team02db.product_options po ON pov.opt_no = po.opt_no
-		WHERE
-		po.opt_nm = #{optionTypeName} AND pov.actvtn_yn = TRUE AND
-		po.actvtn_yn = TRUE
-		ORDER BY pov.vl_nm;
-	</select>
+            parameterType="String" resultMap="productOptionValueResultMap">
+        SELECT
+            pov.opt_vl_no AS opt_vl_no,
+            pov.opt_no AS opt_vl_opt_no,
+            pov.creatr_no AS opt_vl_creatr_no,
+            pov.mdfr_no AS opt_vl_mdfr_no,
+            pov.del_user_no AS opt_vl_del_user_no,
+            pov.vl_nm AS vl_nm,
+            pov.opt_vl_img_url_addr AS opt_vl_img_url_addr,
+            pov.clr_cd AS clr_cd,
+            pov.reg_dt AS opt_vl_reg_dt,
+            pov.mdfcn_dt AS opt_vl_mdfcn_dt,
+            pov.inactvtn_dt AS opt_vl_inactvtn_dt,
+            pov.actvtn_yn AS opt_vl_actvtn_yn
+        FROM
+            ks55team02db.product_option_values pov
+        JOIN
+            ks55team02db.product_options po ON pov.opt_no = po.opt_no
+        WHERE
+            po.opt_nm = #{optionTypeName} AND pov.actvtn_yn = TRUE AND
+            po.actvtn_yn = TRUE
+        ORDER BY pov.vl_nm;
+    </select>
+
+    <select id="getDistinctProductOptionValueNamesByType"
+            parameterType="String" resultType="String">
+        SELECT DISTINCT
+            pov.vl_nm
+        FROM
+            ks55team02db.product_option_values pov
+        JOIN
+            ks55team02db.product_options po ON pov.opt_no = po.opt_no
+        WHERE
+            po.opt_nm = #{optionTypeName} AND pov.actvtn_yn = TRUE AND
+            po.actvtn_yn = TRUE
+        ORDER BY pov.vl_nm;
+    </select>
 
 	<select id="getAllStores" resultMap="storesResultMap">
 		/* 모든 브랜드(상점) 목록 조회 */

@@ -88,6 +88,14 @@ public interface ProductsMapper {
     // 특정 옵션 유형(예: "컬러", "의류 사이즈", "신발 사이즈")에 해당하는 모든 옵션 값들을 조회합니다.
     List<ProductOptionValue> getAllProductOptionValuesByType(String optionTypeName);
 
+    /**
+     * ⭐ 새로 추가: 특정 옵션 유형에 해당하는 vl_nm만 중복 없이 조회 (String 리스트 반환) ⭐
+     * 이 메서드는 getAllProductColors()에서 사용되어 색상 중복을 방지합니다.
+     * @param optionTypeName 옵션 유형 이름 (예: "색상")
+     * @return 중복 제거된 vl_nm (String) 리스트
+     */
+    List<String> getDistinctProductOptionValueNamesByType(String optionTypeName); // <--- 이 줄이 추가되었습니다!
+
     // 모든 브랜드(상점) 목록을 조회합니다.
     List<Stores> getAllStores();
 }

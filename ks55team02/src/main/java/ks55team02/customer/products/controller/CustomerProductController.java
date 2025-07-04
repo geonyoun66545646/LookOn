@@ -6,6 +6,7 @@ import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.service.ProductCategoryService;
 import ks55team02.seller.products.domain.ProductImage;
 import ks55team02.seller.products.domain.ProductImageType;
+import ks55team02.seller.products.domain.ProductOptionValue;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -26,18 +27,55 @@ import java.util.stream.Collectors;
 @Controller
 @RequiredArgsConstructor
 public class CustomerProductController {
-	
+
 	private final ProductCategoryService productCategoryService;
     private final ProductsService productsService;
-    
-    // 고객 메인 페이지 뷰를 반환합니다.
+
+    // =============== ColorOption DTO 및 COLOR_STYLE_MAP은 그대로 유지 ===============
+
+    public static class ColorOption {
+        private String name;
+        private String style;
+
+        public ColorOption(String name, String style) {
+            this.name = name;
+            this.style = style;
+        }
+
+        public String getName() { return name; }
+        public String getStyle() { return style; }
+    }
+
+    private static final Map<String, String> COLOR_STYLE_MAP = new HashMap<>();
+    static {
+        COLOR_STYLE_MAP.put("블랙", "background-color: #000;");
+        COLOR_STYLE_MAP.put("화이트", "background-color: #fff; border: 1px solid #e0e0e0;");
+        COLOR_STYLE_MAP.put("레드", "background-color: #ff0000;");
+        COLOR_STYLE_MAP.put("블루", "background-color: #0000ff;");
+        COLOR_STYLE_MAP.put("그린", "background-color: #008000;");
+        COLOR_STYLE_MAP.put("옐로우", "background-color: #ffff00;");
+        COLOR_STYLE_MAP.put("핑크", "background-color: #ffc0cb;");
+        COLOR_STYLE_MAP.put("그레이", "background-color: #808080;");
+        COLOR_STYLE_MAP.put("네이비", "background-color: #000080;");
+        COLOR_STYLE_MAP.put("브라운", "background-color: #a52a2a;");
+        COLOR_STYLE_MAP.put("베이지", "background-color: #f5f5dc;");
+        COLOR_STYLE_MAP.put("오렌지", "background-color: #ffa500;");
+        COLOR_STYLE_MAP.put("퍼플", "background-color: #800080;");
+        COLOR_STYLE_MAP.put("실버", "background-color: #c0c0c0;");
+        COLOR_STYLE_MAP.put("기타 패턴", "background-image: repeating-linear-gradient(45deg, #ccc 0, #ccc 5px, #eee 5px, #eee 10px);");
+        COLOR_STYLE_MAP.put("기타 색상", "background-color: #eee; border: 1px dashed #999;");
+        COLOR_STYLE_MAP.put("default", "background-color: #ccc;");
+    }
+
+    // =============== ColorOption DTO 및 COLOR_STYLE_MAP은 그대로 유지 ===============
+
+
     @GetMapping(value = {"/customer", "/customer/"})
     public String customerHomeView() {
         System.out.println(">>> customerHomeView 컨트롤러 메서드 진입! <<<");
         return "/customer/main";
     }
 
-    // 기존 상품 메인 뷰를 반환합니다 (필터/정렬 기능 제외).
     @GetMapping("/customer/products")
     public String productMainView(Model model,
                                   @RequestParam(name = "category", required = false) String category) {
@@ -73,11 +111,11 @@ public class CustomerProductController {
             System.out.println("  > 카테고리 파라미터 없음. 전체 활성 상품 조회.");
             productList = productsService.getAllActiveProductsForCustomer();
         }
-        
+
         System.out.println(">>> productMainView: productList 서비스 조회 결과 <<<");
         if (productList == null) {
             System.out.println("  > CRITICAL: productList 자체가 서비스에서 null로 반환되었습니다! 빈 리스트로 초기화합니다.");
-            productList = new ArrayList<>(); // null 방어
+            productList = new ArrayList<>();
         } else {
             System.out.println("  > productList 크기: " + productList.size());
             if (productList.isEmpty()) {
@@ -89,7 +127,7 @@ public class CustomerProductController {
                         System.err.println("  > CRITICAL ERROR: productList[" + i + "] 번째 요소가 null 입니다! 서비스 레이어 또는 매퍼 확인 필요.");
                     } else {
                         System.out.println("  > productList[" + i + "] - gdsNo: " + product.getGdsNo() +
-                                           ", gdsNm: " + product.getGdsNm());
+                                            ", gdsNm: " + product.getGdsNm());
                         if (product.getProductCategory() == null) {
                             System.err.println("    > productList[" + i + "] - productCategory가 null입니다!");
                         } else {
@@ -105,14 +143,13 @@ public class CustomerProductController {
         model.addAttribute("breadCrumbExists", true);
         model.addAttribute("breadCrumbTitle", breadCrumbTitle);
         model.addAttribute("title", title);
-        model.addAttribute("productList", productList); 
+        model.addAttribute("productList", productList);
 
         return "customer/productMain";
     }
 
-    // 고객용 상품 목록 뷰를 반환하며, 동적 카테고리, 필터 및 정렬 기능을 지원합니다.
-    // 이 메서드가 이제 모든 상품 목록 조회(전체, 카테고리별, 필터링, 정렬)를 담당합니다.
     @GetMapping({"/products", "/products/category/{categoryId}", "/customer/products/list", "/products/list"})
+    @SuppressWarnings("unchecked")
     public String getFilteredAndSortedProductsView(
             Model model,
             @RequestParam(name = "categoryId", required = false) String categoryId,
@@ -127,7 +164,7 @@ public class CustomerProductController {
             @RequestParam(name = "style", required = false) List<String> styles,
             @RequestParam(name = "discountRate", required = false) List<String> discountRates,
             @RequestParam(name = "includeSoldOut", required = false, defaultValue = "false") boolean includeSoldOut,
-            @RequestParam(name = "currentPage", defaultValue = "1") int currentPage, // ⭐ 추가: currentPage 파라미터
+            @RequestParam(name = "currentPage", defaultValue = "1") int currentPage,
             @PathVariable(value = "categoryId", required = false) String pathCategoryId
     ) {
         System.out.println(">>> getFilteredAndSortedProductsView 컨트롤러 메서드 진입! <<<");
@@ -146,7 +183,7 @@ public class CustomerProductController {
         System.out.println("  > styles: " + (styles != null ? String.join(", ", styles) : "없음"));
         System.out.println("  > discountRates: " + (discountRates != null ? String.join(", ", discountRates) : "없음"));
         System.out.println("  > includeSoldOut: " + includeSoldOut);
-        System.out.println("  > currentPage: " + currentPage); // ⭐ 로그 추가
+        System.out.println("  > currentPage: " + currentPage);
 
         String title = "상품 목록";
         String breadCrumbTitle = "상품";
@@ -177,7 +214,6 @@ public class CustomerProductController {
                 parentCategoryName = (String) categoryHierarchyData.get("parentCategoryName");
                 parentCategoryId = (String) categoryHierarchyData.get("parentCategoryId");
 
-                @SuppressWarnings("unchecked")
                 List<ProductCategory> tempSubCategories = (List<ProductCategory>) categoryHierarchyData.get("subCategories");
                 subCategories = tempSubCategories != null ? tempSubCategories : new ArrayList<>();
 
@@ -200,7 +236,7 @@ public class CustomerProductController {
                 if (defaultCategoryData != null) {
                     parentCategoryName = (String) defaultCategoryData.get("parentCategoryName");
                     parentCategoryId = (String) defaultCategoryData.get("parentCategoryId");
-                    @SuppressWarnings("unchecked")
+
                     List<ProductCategory> tempSubCategories = (List<ProductCategory>) defaultCategoryData.get("subCategories");
                     subCategories = tempSubCategories != null ? tempSubCategories : new ArrayList<>();
                     System.out.println("    > 기본 최상위 카테고리 (" + defaultTopLevelCategoryIdForToolbar + ") 하위 카테고리 조회 성공. 개수: " + subCategories.size());
@@ -222,16 +258,12 @@ public class CustomerProductController {
         }
         System.out.println("  > 카테고리 계층 정보 조회 끝.");
 
-
         System.out.println("  > 필터링된 상품 목록 조회 시작...");
-        // ⭐ 핵심 수정: currentPage 파라미터를 추가했습니다.
         Map<String, Object> productsResult = productsService.getFilteredAndSortedProducts(categoryId, sortBy, filterParams, currentPage);
 
-        // ⭐ productsResult 맵에서 실제 상품 목록과 페이지네이션 정보를 추출합니다.
         List<Products> productList = (List<Products>) productsResult.get("productsList");
         long totalProductCount = (long) productsResult.get("totalProductsCount");
         int lastPage = (int) productsResult.get("lastPage");
-        // currentPage는 이미 컨트롤러 파라미터로 받아서 사용하고 있으므로 다시 추출할 필요 없습니다.
 
         if (productList == null) {
             productList = new ArrayList<>();
@@ -248,10 +280,10 @@ public class CustomerProductController {
                     System.err.println("  > CRITICAL ERROR: productList[" + i + "] 번째 요소가 null 입니다! 서비스 레이어 확인 필요.");
                 } else {
                     System.out.println("  > productList[" + i + "] - gdsNo: " + product.getGdsNo() +
-                                       ", gdsNm: " + product.getGdsNm() +
-                                       ", storeName: " + product.getStoreName() +
-                                       ", totalStockQuantity: " + product.getTotalStockQuantity() +
-                                       ", isSoldOut: " + product.getIsSoldOut());
+                                         ", gdsNm: " + product.getGdsNm() +
+                                         ", storeName: " + product.getStoreName() +
+                                         ", totalStockQuantity: " + product.getTotalStockQuantity() +
+                                         ", isSoldOut: " + product.getIsSoldOut());
                     if (product.getProductCategory() == null) {
                         System.err.println("    > productList[" + i + "] - productCategory가 null입니다!");
                     } else {
@@ -272,8 +304,8 @@ public class CustomerProductController {
         model.addAttribute("title", title);
         model.addAttribute("productList", productList);
         model.addAttribute("totalProductCount", totalProductCount);
-        model.addAttribute("currentPage", currentPage); // 현재 페이지 정보
-        model.addAttribute("lastPage", lastPage);       // 마지막 페이지 정보
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("lastPage", lastPage);
 
 
         // HTML 툴바 및 필터 모달에 필요한 데이터 추가
@@ -284,22 +316,37 @@ public class CustomerProductController {
         model.addAttribute("currentGender", gender);
         model.addAttribute("currentSortBy", sortBy);
 
-        // 필터 모달에 필요한 동적 옵션 데이터 추가 (null 방어)
-        model.addAttribute("allColors", productsService.getAllProductColors() != null ? productsService.getAllProductColors() : new ArrayList<>());
-        model.addAttribute("allApparelSizes", productsService.getAllApparelSizes() != null ? productsService.getAllApparelSizes() : new ArrayList<>());
-        model.addAttribute("allShoeSizes", productsService.getAllShoeSizes() != null ? productsService.getAllShoeSizes() : new ArrayList<>());
-        model.addAttribute("allBrands", productsService.getAllBrands() != null ? productsService.getAllBrands() : new ArrayList<>());
-
-        // 현재 적용된 필터 값을 모델에 넣어 HTML에서 선택 상태를 유지
-        model.addAttribute("selectedColors", colors);
-        model.addAttribute("selectedSizes", sizes);
-        model.addAttribute("selectedBrands", brands);
-        model.addAttribute("selectedStyles", styles);
-        model.addAttribute("selectedDiscountRates", discountRates);
+        // ⭐⭐⭐ 이 부분이 핵심 수정입니다! ⭐⭐⭐
+        // @RequestParam으로 받은 List<String> 변수들이 null일 경우, 빈 ArrayList로 초기화하여 모델에 추가합니다.
+        // 이렇게 하면 HTML에서 #lists.contains()를 사용할 때 NullPointerException이 발생하지 않습니다.
+        model.addAttribute("selectedColors", colors != null ? colors : new ArrayList<>());
+        model.addAttribute("selectedSizes", sizes != null ? sizes : new ArrayList<>());
+        model.addAttribute("selectedBrands", brands != null ? brands : new ArrayList<>());
+        model.addAttribute("selectedStyles", styles != null ? styles : new ArrayList<>());
+        model.addAttribute("selectedDiscountRates", discountRates != null ? discountRates : new ArrayList<>());
         model.addAttribute("selectedMinPrice", minPrice);
         model.addAttribute("selectedMaxPrice", maxPrice);
         model.addAttribute("selectedPriceRange", priceRange);
-        model.addAttribute("selectedIncludeSoldOut", includeSoldOut);
+        model.addAttribute("selectedIncludeSoldOut", includeSoldOut); // boolean은 기본적으로 null이 될 수 없음
+
+        List<ProductOptionValue> rawColorOptionValues = productsService.getAllProductColors();
+        List<ColorOption> allColorOptions = new ArrayList<>();
+        if (rawColorOptionValues != null) {
+            for (ProductOptionValue pov : rawColorOptionValues) {
+                String colorName = pov.getVlNm();
+                String style = COLOR_STYLE_MAP.getOrDefault(colorName, COLOR_STYLE_MAP.get("default"));
+                allColorOptions.add(new ColorOption(colorName, style));
+            }
+        }
+        model.addAttribute("allColorOptions", allColorOptions);
+
+
+        model.addAttribute("allApparelSizes", productsService.getAllApparelSizes() != null ? productsService.getAllApparelSizes() : new ArrayList<>());
+        model.addAttribute("allShoeSizes", productsService.getAllShoeSizes() != null ? productsService.getAllShoeSizes() : new ArrayList<>());
+        // allBrands는 Store 객체 리스트여야 하므로, 여기에 Store 대신 String이 직접 들어갈 수 있다면 문제가 됩니다.
+        // ProductsService의 getAllBrands()가 어떤 타입의 리스트를 반환하는지 확인 필요합니다.
+        // 여기서는 일단 Store 객체 리스트로 가정하고, HTML에서 storeId를 사용하도록 수정합니다.
+        model.addAttribute("allBrands", productsService.getAllBrands() != null ? productsService.getAllBrands() : new ArrayList<>());
 
         System.out.println(">>> getFilteredAndSortedProductsView: 모델에 데이터 추가 완료. 템플릿 반환: customer/productMain <<<");
         return "customer/productMain";
@@ -320,14 +367,14 @@ public class CustomerProductController {
         System.out.println("2차 카테고리 요청 수신: primaryCategoryId = " + primaryCategoryId);
         return productCategoryService.getProductCategoriesByParentId(primaryCategoryId);
     }
-    
+
     // 고객용 상품 상세 페이지 조회 (로그인 불필요)
     @GetMapping("/products/detail/{productCode}")
     public String getProductDetailForCustomer(@PathVariable String productCode, Model model) {
         Products product = productsService.getProductDetailWithImages(productCode);
 
         if (product == null || !Boolean.TRUE.equals(product.getExpsrYn()) || !Boolean.TRUE.equals(product.getActvtnYn())) {
-            return "redirect:/error/404"; // 상품이 없거나 노출/활성화되지 않았다면 404 페이지로 리다이렉트
+            return "redirect:/error/404";
         }
 
         model.addAttribute("product", product);
@@ -341,7 +388,7 @@ public class CustomerProductController {
                 .orElse(allImages.stream()
                         .filter(img -> img.getImgType() == ProductImageType.MAIN)
                         .findFirst()
-                        .orElse(null)); // 모든 이미지 없을 경우 null
+                        .orElse(null));
 
         // 메인 갤러리 이미지 (MAIN 타입, 순서대로 정렬)
         List<ProductImage> mainGalleryImages = allImages.stream()

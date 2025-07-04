@@ -337,7 +337,7 @@ body.app-modal-open {
     width: 90%;
     max-width: 420px; /* 이미지와 유사한 너비 */
     height: 80vh; /* 화면 높이의 80% */
-    max-height: 650px; /* 최대 높이 제한 */
+    max-height: 600px; /* 최대 높이 제한 */
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -489,7 +489,7 @@ label {
 	transition: transform 0.2s ease;
 }
 .app-color-option input:checked + .color-swatch {
-	transform: scale(1.2);
+	transform: scale(1.05);
 	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
 }
 
@@ -562,26 +562,66 @@ label {
 
 /* 2-3. 모달 푸터 */
 .app-modal-footer {
-	padding: 16px 20px;
-	border-top: 1px solid #f0f0f0;
-	background-color: #fff;
-	flex-shrink: 0; /* 줄어들지 않음 */
+    display: flex;
+    flex-direction: column; /* 세로 방향 정렬 (이전과 동일) */
+    padding: 15px 20px;
+    background-color: #fff;
+    border-top: 1px solid #eee;
+    gap: 15px; /* 푸터 내부 요소들 (버튼 그룹과 상품보기 버튼) 사이의 간격 */
 }
 
+/* 새로 추가된 filter-options-and-reset 컨테이너에 flexbox 적용 */
+.filter-options-and-reset {
+    display: flex;
+    justify-content: space-between; /* 양 끝 정렬 (태그는 왼쪽, 초기화 버튼은 오른쪽) */
+    align-items: center; /* 수직 중앙 정렬 */
+    width: 100%; /* 부모(footer)의 전체 너비 사용 */
+    flex-wrap: wrap; /* 내용이 많아지면 다음 줄로 넘어가도록 허용 */
+    gap: 10px; /* 내부 요소 간 간격 */
+}
+
+/* selected-filters-container는 그대로 flex-wrap 유지 */
+.selected-filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* 태그들 사이의 간격 */
+    /* flex-grow를 1로 주어 가능한 공간을 채우게 할 수 있습니다. */
+    flex-grow: 1;
+}
+
+/* 필터 초기화 버튼 스타일은 이전과 동일하게 유지 */
+.app-reset-filters-button {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1em;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+    flex-shrink: 0; /* 필터 태그가 많아져도 이 버튼이 줄어들지 않도록 */
+}
+
+.app-reset-filters-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #000;
+}
+
+/* 상품보기 버튼 스타일도 이전과 동일하게 유지 */
 .app-view-products-button {
-	width: 100%;
+    width: 100%;
+    padding: 12px 20px;
     background-color: #000;
     color: #fff;
     border: none;
-    padding: 9px;
-    border-radius: 12px;
-    font-size: 1em;
-    font-weight: bold;
-    transition: opacity 0.2s;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-align: center;
 }
 
 .app-view-products-button:hover {
-	opacity: 0.8;
+    background-color: #333;
 }
 /* 정렬 드롭다운 메뉴 컨테이너 */
 .sort-dropdown-container {
@@ -622,4 +662,96 @@ label {
 .sort-dropdown-menu li a:hover {
 	background-color: #ddd; /* 호버 시 배경색 */
 	border-radius: 8px; /* 메뉴 아이템에도 둥근 모서리 */
+}
+
+/* 모달 js 스타일 */
+/* footer 내부 버튼 그룹을 위한 스타일 */
+.footer-buttons-group {
+    display: flex;
+    justify-content: space-between; /* 양 끝 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+    width: 100%; /* 전체 너비 사용 */
+    gap: 10px; /* 버튼 사이 간격 */
+}
+
+/* 필터 초기화 버튼 스타일 (모달 X 버튼과 유사하게) */
+.app-reset-filters-button {
+    background: none; /* 배경 투명 */
+    border: none; /* 테두리 없음 */
+    color: #888; /* 옅은 회색 텍스트 */
+    font-size: 1em; /* 기본 폰트 크기 */
+    cursor: pointer;
+    padding: 8px 12px; /* 패딩 */
+    border-radius: 4px; /* 둥근 모서리 */
+    transition: background-color 0.2s, color 0.2s; /* 호버 효과 */
+    flex-shrink: 0; /* flex item에서 공간이 부족해도 줄어들지 않도록 */
+}
+
+.app-reset-filters-button:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* 호버 시 약간 어두운 배경 */
+    color: #000; /* 호버 시 텍스트 색상 진하게 */
+}
+
+/* 개별 필터 태그 내 'x' 버튼 스타일 (remove-filter-btn) */
+.remove-filter-btn {
+    background: none;
+    border: none;
+    color: #999; /* X 버튼 색상 */
+    font-size: 1.2em; /* 크기 조정 */
+    margin-left: 5px; /* 텍스트와의 간격 */
+    cursor: pointer;
+    padding: 0 3px;
+    line-height: 1; /* 라인 높이 조절 */
+    transition: color 0.2s;
+}
+
+.remove-filter-btn:hover {
+    color: #333; /* 호버 시 진한 색상 */
+}
+
+/* selected-filter-tag 자체의 디자인을 모달스럽게 조정 (필요하다면) */
+.selected-filter-tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: #f0f0f0; /* 밝은 배경색 */
+    border: 1px solid #ddd; /* 옅은 테두리 */
+    border-radius: 4px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+
+.app-view-products-button:hover {
+    background-color: #333;
+}
+
+/* 상품정렬  */
+/* filter-button의 스타일 (예시) */
+.filter-button {
+    background-color: #fff;
+    border: 1px solid #dcdcdc;
+    padding: 3px 12px;
+    border-radius: 8px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+}
+/* sort-control에 삼각형 추가 (이 부분은 이전과 동일) */
+.sort-control::after {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 7px;
+    margin-left: 5px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid #333;
+}
+.sort-dropdown-button {
+    margin: 0;
+    border: none;
+    padding: 0;
+    background-color: white;
 }
