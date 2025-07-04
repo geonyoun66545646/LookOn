@@ -1,0 +1,44 @@
+@charset "UTF-8";
+
+.custom-badge {
+    padding: 1.0em 3em !important;
+}
+
+.content-header {
+    margin-bottom: 15px;
+}
+
+/* appDetailView.css 또는 다른 CSS 파일에 추가 */
+
+/* 테이블에 table-layout: fixed; 적용 */
+.table {
+    table-layout: fixed;
+    width: 100%; /* 테이블 전체 너비를 부모 요소에 맞게 설정 */
+    text-align : center;
+}
+
+/* 각 열의 너비 비율 설정 */
+.table th:nth-child(1),
+.table td:nth-child(1) {
+    width: 10%; /* 10% (비율 1) */
+}
+
+.table th:nth-child(2),
+.table td:nth-child(2) {
+    width: 30%; /* 30% (비율 3) */
+}
+
+.table th:nth-child(3),
+.table td:nth-child(3) {
+    width: 40%; /* 40% (비율 4) */
+}
+
+.table th:nth-child(4),
+.table td:nth-child(4) {
+    width: 10%; /* 10% (비율 1) */
+}
+
+.table th:nth-child(5),
+.table td:nth-child(5) {
+    width: 10%; /* 10% (비율 1) */
+}

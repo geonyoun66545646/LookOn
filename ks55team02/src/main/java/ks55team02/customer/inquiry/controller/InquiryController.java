@@ -42,7 +42,7 @@ public class InquiryController {
     private String getCurrentUserId(HttpSession session) {
         // 현재는 user_no_1000이 로그인 되어있다고 가정.
         log.info("[임시] 현재 로그인된 사용자 ID: user_no_1000"); // 로그 추가
-        return "user_no_10";
+        return "user_no_1000";
 
         /*
          * ==== 로그인 기능 완성 후 아래 주석 해제 및 위 'return "user_no_1000";' 라인 제거 ====

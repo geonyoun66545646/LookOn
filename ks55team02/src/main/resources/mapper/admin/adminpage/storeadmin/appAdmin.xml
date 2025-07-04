@@ -23,23 +23,26 @@
 		<result property="bplcAddr" 			column="bplc_addr"/>
 		<result property="aplyStts" 			column="aply_stts"/>
 		<result property="aprvRjctRsn" 			column="aprv_rjct_rsn"/>
-		<result property="userNm" 			column="user_nm"/>
+		<result property="userNm" 				column="user_nm"/>
 		
 		</resultMap>
 		
 		
 		<select id="getAppAdminList" resultMap="appAdminResultMap">
-		SELECT 
-			sa.aply_id, 
-			sa.store_nm,   
-			u.user_nm,
-			sa.aply_user_no, 
-			sa.plcy_id, 
-			sa.ctrt_aply_ymd,  
-			sa.aply_stts
-		FROM 
-			store_application sa inner join users u 
-			on sa.aply_user_no = u.user_no
+		SELECT
+		    sa.aply_id,
+		    sa.store_nm,
+		    u.user_nm,
+		    sa.aply_user_no,
+		    sa.plcy_id,
+		    sa.ctrt_aply_ymd,
+		    sa.aply_stts
+		FROM
+		    store_application sa
+		INNER JOIN
+		    users u ON sa.aply_user_no = u.user_no
+		ORDER BY
+		    CAST(REGEXP_SUBSTR(sa.aply_id, '[0-9]+') AS UNSIGNED) DESC;
 		</select>
 	
 </mapper>

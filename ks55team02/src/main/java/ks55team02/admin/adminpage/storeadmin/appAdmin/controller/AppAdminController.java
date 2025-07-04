@@ -21,14 +21,24 @@ public class AppAdminController {
 	private final AppAdminService appAdminService;
 
 	@GetMapping("/appAdmin")
-	public String storeadminApllicationController(Model model) {
+	public String appAdminView(Model model) {
 		
 		
 	List<AppAdmin> appAdminList = appAdminService.getAppAdminList(); 
 	log.info("AppAdminList에 담긴 데이터 개수: {}", appAdminList.size());
+	
+		
 		model.addAttribute("title", "상점 신청");
 		model.addAttribute("appAdminList", appAdminList);
 		
 		return "admin/adminpage/storeadmin/appAdminView";
 	}
+	
+	@GetMapping("/appDetail")
+	public String appDeailView(Model model) {
+		model.addAttribute("title", "상점 신청 상세");
+		
+		return "admin/adminpage/storeadmin/appDetailView";
+	}
+	
 }

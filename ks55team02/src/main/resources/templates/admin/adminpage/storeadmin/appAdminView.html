@@ -20,7 +20,7 @@
 	 <th:block layout:fragment="contents">
 		<main class="main-content">
 		    <section class="content-header">
-		        <h2 class="content-title">상점 신청 목록</h2>
+		        <h2 class="content-title">상점 신청 내용</h2>
 		    </section>	
 		    <!-- 1. 검색 필터 카드 -->
 		    <div class="card mb-4">
@@ -32,22 +32,22 @@
 		                        <div class="d-flex align-items-center">
 		                            <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="" value="" checked>
+		                                	   name="appAdminList" value="접수" checked>
 		                                <label class="form-check-label">접수</label>
 		                            </div>
 		                            <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="" value="" checked>
+		                                	   name="appAdminList" value="보류" checked>
 		                                <label class="form-check-label">보류</label>
 		                            </div>
 		                            <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="" value="" checked>
+		                                	   name="appAdminList" value="승인" checked>
 		                                <label class="form-check-label">승인</label>
 		                            </div>
 		                             <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="" value="" checked>
+		                                	   name="appAdminList" value="반려" checked>
 		                                <label class="form-check-label">반려</label>
 		                            </div>
 		                            <div class="form-check me-4">
@@ -73,9 +73,10 @@
 		                        <div class="input-group">
 		                            <select class="form-select" name="searchKey" style="max-width: 120px; background-color: #fff;">
 		                                <option value="" selected>전체</option>
-		                                <option value="">ID</option>
-		                                <option value="">이름</option>
-		                                <option value="">이메일</option>
+		                                <option value="">신청 아이디</option>
+		                                <option value="">상점 명</option>
+		                                <option value="">신청자 이름</option>
+		                                <option value="">신청자 아이디</option>
 		                            </select>
 		                            <input type="text" class="form-control" name="searchValue" placeholder="검색어를 입력하세요">
 		                        </div>
@@ -103,15 +104,18 @@
 		                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
 		                            선택한 회원 상태 변경
 		                        </button>
-		                        <div class="dropdown-menu dropdown-menu-end">
+		                        <div class="dropdown-menu status">
 		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="활동">
-		                            	<span class="badge-dot bg-success"></span>활동
+		                            	<span class="badge-dot bg-primary"></span>접수
 		                            </a>
 		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="휴면">
-		                            	<span class="badge-dot bg-warning"></span>휴면
+		                            	<span class="badge-dot bg-warning"></span>보류
 		                            </a>
 		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="탈퇴">
-		                            	<span class="badge-dot bg-danger"></span>탈퇴
+		                            	<span class="badge-dot bg-success"></span>승인
+		                            </a>
+		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="탈퇴">
+		                            	<span class="badge-dot bg-danger"></span>반려
 		                            </a>
 		                        </div>
 		                    </div>
@@ -153,7 +157,9 @@
 				            <tr th:unless="${#lists.isEmpty(appAdminList)}" th:each="appAdmin : ${appAdminList}">
 				                <td> <input class="form-check-input member-check" type="checkbox" th:value="${appAdmin.aplyId}"></td>
 				                <td class="ellipsis text" th:text="${appAdmin.aplyId}" th:title="${appAdmin.aplyId}"></td>
-				                <td class="text" th:text="${appAdmin.storeNm}"></td>
+				                <td>
+				                <a class="text" th:href="@{/adminpage/storeadmin/appDetail}" th:text="${appAdmin.storeNm}"></a>
+				                </td>
 				                <td th:text="${appAdmin.userNm}"></td>
 				                <td th:text="${appAdmin.aplyUserNo}"></td>				                
 				                <td class="ellipsis text" th:text="${appAdmin.plcyId}"></td>
@@ -161,8 +167,8 @@
 				                <td>
 				                    <span class="badge custom-badge"
 				                          th:text="${appAdmin.aplyStts}"
-				                          th:classappend="${appAdmin.aplyStts == '보류'} ? 'bg-success' : 
-				                                         (${appAdmin.aplyStts == '승인'} ? 'bg-warning text-dark' : 
+				                          th:classappend="${appAdmin.aplyStts == '보류'} ? 'bg-warning' : 
+				                                         (${appAdmin.aplyStts == '승인'} ? 'bg-success' : 
 				                                         (${appAdmin.aplyStts == '반려'} ? 'bg-danger' : 'bg-secondary'))">
 				                    </span>
 				                </td>
@@ -191,5 +197,23 @@
 		    </div> <!-- card end// -->
 		</main>
 	 </th:block>
+	 <th:block layout:fragment="jsFile">
 	 </th:block>	
+	 <th:block layout:fragment="jsScript">
+	 <script>
+	 const mainContent = $('main.main-content');
+	  // [테이블] 헤더 체크박스로 전체 선택/해제
+	        mainContent.on('click', '#checkAll', function() {
+	            $('.member-check').prop('checked', $(this).is(':checked'));
+	        });
+	
+	        // [테이블] 개별 체크박스 선택 시, 헤더 체크박스 상태 동기화
+	        mainContent.on('click', '.member-check', () => {
+	            const totalChecks = $('.member-check').length;
+	            const checkedChecks = $('.member-check:checked').length;
+	            $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
+	        });
+	    </script>
+	 </th:block>	
+   
 </html>
