@@ -1,12 +1,7 @@
-package ks55team02.admin.adminpage.useradmin.userlist.domain;
+package ks55team02.admin.common.domain;
 
 import lombok.Data;
 
-/**
- * 페이징 처리에 필요한 모든 정보를 담는 도메인(DTO) 클래스입니다.
- * 전체 데이터 개수, 페이지당 데이터 수, 현재 페이지 등을 기반으로
- * SQL 쿼리에 필요한 offset 값과 화면에 표시할 페이지 블록 정보를 계산합니다.
- */
 @Data
 public class Pagination {
 
@@ -24,7 +19,7 @@ public class Pagination {
     private boolean existPrevBlock;   // 이전 페이지 블록(<<) 존재 여부
     private boolean existNextBlock;   // 다음 페이지 블록(>>) 존재 여부
 
-    public Pagination(int totalRecordCount, UserList searchCriteria) {
+    public Pagination(int totalRecordCount, SearchCriteria searchCriteria) {
         this.totalRecordCount = totalRecordCount;
         this.currentPage = searchCriteria.getCurrentPage();
         this.recordSize = searchCriteria.getPageSize(); // UserList 객체에서 pageSize 값을 가져와 recordSize에 설정
@@ -67,4 +62,3 @@ public class Pagination {
         existNextBlock = endPage < totalPageCount;
     }
 }
-
