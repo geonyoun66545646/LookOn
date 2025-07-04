@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" 
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{admin/layout/layout_main}">
+	  layout:decorate="~{admin/layout/layoutMain}">
 		
 	 <head>
 	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />	
-	 	<link rel="stylesheet" th:href="@{/admincss/assets/customadminpagecss/userList.css}">
+	 	<link rel="stylesheet" th:href="@{/admincss/assets/css/customadminpagecss/userList.css}">
 	 </head>
 	 
 	 <!-- 추가할 페이지 contents -->
@@ -52,7 +52,7 @@
 		                        <div class="d-flex">
 		                            <input type="date" class="form-control" name="startDate" value="2020-03-16">
 		                            <span class="mx-2 d-flex align-items-center">-</span>
-		                            <input type="date" class="form-control" name="endDate" value="2025-06-16">
+		                            <input type="date" class="form-control" name="endDate" th:value="${#dates.format(#dates.createToday(), 'yyyy-MM-dd')}">
 		                        </div>
 		                    </div>
 		                    <div class="col-lg-4">
@@ -87,21 +87,15 @@
 		                <div class="col-md-6 text-md-end">
 		                	<!-- 회원 상태 변경 -->
 		                    <div class="btn-group me-2">
-		                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-		                            선택한 회원 상태 변경
-		                        </button>
-		                        <div class="dropdown-menu dropdown-menu-end">
-		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="활동">
-		                            	<span class="badge-dot bg-success"></span>활동
-		                            </a>
-		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="휴면">
-		                            	<span class="badge-dot bg-warning"></span>휴면
-		                            </a>
-		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="탈퇴">
-		                            	<span class="badge-dot bg-danger"></span>탈퇴
-		                            </a>
-		                        </div>
-		                    </div>
+							    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+							        선택한 회원 상태 변경
+							    </button>
+							    <div class="dropdown-menu dropdown-menu-end">
+							        <a class="dropdown-item status-badge-item change-status-btn status-active" href="#" data-status="활동">활동</a>
+							        <a class="dropdown-item status-badge-item change-status-btn status-dormant" href="#" data-status="휴면">휴면</a>
+							        <a class="dropdown-item status-badge-item change-status-btn status-withdrawal" href="#" data-status="탈퇴">탈퇴</a>
+							    </div>
+							</div>
 		                    <!-- 회원 조회 분류 키워드 -->
 		                    <div class="d-inline-block">
 		                        <select class="form-select d-inline-block" id="sortOrder" name="sortOrder" style="width: auto;">

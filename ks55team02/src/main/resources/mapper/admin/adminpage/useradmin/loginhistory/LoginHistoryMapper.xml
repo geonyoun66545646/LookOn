@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.admin.adminpage.useradmin.loginhistory.mapper.LoginHistoryMapper">
+
+    <!-- 1. resultMap 정의 -->
+    <resultMap id="loginHistoryResultMap" type="LoginHistory">
+        <id 	column="lgn_hstry_id" 		property="loginHistoryNo" 	/>    
+        <result column="user_no" 			property="userNo" 			/>
+        <result column="lgn_dt" 			property="lgnDt" 			/>
+        <result column="lgt_dt" 			property="lgtDt" 			/>
+        <result column="lgn_ip_addr" 		property="lgnIpAddr" 		/>
+        <result column="lgn_fail_nmtm" 		property="lgnFailNmtm" 		/>
+        <result column="user_lgn_id"       	property="userLgnId" 		/>
+    </resultMap>
+
+    <!-- 2. select 쿼리에서 resultMap 참조 -->
+    <select id="getLoginHistoryList" parameterType="LoginHistory" resultMap="loginHistoryResultMap">
+        SELECT
+            lh.lgn_hstry_id,
+            lh.user_no,
+            lh.lgn_dt,
+            lh.lgt_dt,
+            lh.lgn_ip_addr,
+            lh.lgn_fail_nmtm,
+            u.user_lgn_id
+        FROM
+            login_history AS lh
+        LEFT JOIN
+            users AS u ON lh.user_no = u.user_no
+        ORDER BY
+            lh.lgn_dt DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+    <select id="getLoginHistoryCount" parameterType="LoginHistory" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            login_history AS lh
+        LEFT JOIN
+            users AS u ON lh.user_no = u.user_no
+    </select>
+
+</mapper>

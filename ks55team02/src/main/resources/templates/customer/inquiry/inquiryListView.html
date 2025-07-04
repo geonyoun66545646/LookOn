@@ -96,8 +96,17 @@
         </th:block>
 
         <th:block layout:fragment="jsScript">
-            <script>
-                // 이 페이지 전용 JavaScript 코드
+            <script th:inline="javascript">
+            /*<![CDATA[*/
+            // 컨트롤러에서 전달받은 errorMessage가 있다면 alert 창 띄우기
+            // errorMessage 변수에 서버에서 넘어온 값이 할당됩니다.
+            var errorMessage = /*[[${errorMessage}]]*/ null;
+
+            if (errorMessage != null && errorMessage !== '') {
+                // 서버에서 전달된 메시지를 그대로 alert에 사용
+                alert(errorMessage);
+            }
+            /*]]>*/
                 console.log("문의 게시판 스크립트 실행!");
             </script>
         </th:block>
