@@ -1,4 +1,4 @@
-package ks55team02.customer.search.domain;
+package ks55team02.util;
 
 import java.util.List;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class SearchPagination<T> {
+public class CustomerPagination<T> {
 
     private List<T> list;            // 현재 페이지의 데이터 목록
     private int currentPage;         // 현재 페이지 번호
@@ -20,7 +20,7 @@ public class SearchPagination<T> {
     private boolean hasNextBlock;     // 다음 페이지 블록 존재 여부
 
     // 생성자
-    public SearchPagination(List<T> list, long totalCount, int currentPage, int pageSize, int blockSize) {
+    public CustomerPagination(List<T> list, long totalCount, int currentPage, int pageSize, int blockSize) {
         this.list = list;
         this.totalCount = totalCount;
         this.currentPage = currentPage;
