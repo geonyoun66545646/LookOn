@@ -8,7 +8,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 25px; /* 기본값으로 설정, 미디어 쿼리에서 더 넓게 설정 */
+    padding: 0 15px; /* 기본값으로 설정, 미디어 쿼리에서 더 넓게 설정 */
     width: 100%;
     max-width: 1200px; /* 최대 너비 설정 */
     margin: 0 auto; /* 중앙 정렬 */
@@ -167,7 +167,7 @@
     }
     .lookon-user-action-menu { /* 모바일에서 사용자 메뉴 간격 조정 */
         gap: 20px;
-        margin-top: 10px; /* 상단 바와 간격 추가 */
+
     }
     .lookon-brand-logo {
         font-size: 30px; /* 모바일 로고 크기 조정 */

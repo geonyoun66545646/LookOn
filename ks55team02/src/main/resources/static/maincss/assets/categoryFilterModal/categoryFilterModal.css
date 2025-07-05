@@ -25,6 +25,7 @@
     position: relative;
     transform: scale(0.95);
     transition: transform 0.3s;
+    overflow: hidden;
 }
 .lookon-modal-container.show .lookon-modal-content { transform: scale(1); } /* 변경 */
 
