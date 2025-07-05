@@ -23,10 +23,10 @@ public class CouponsServiceImpl implements CouponsService {
     private static final int BLOCK_SIZE = 10;
 
     @Override
-    public CustomerPagination<Coupons> getAvailableCoupons(String userId, String keyword, String sortOrder, int page) {
+    public CustomerPagination<Coupons> getAvailableCoupons(String userNo, String keyword, String sortOrder, int page) {
         // 1. 파라미터 조합
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("userId", userId);
+        paramMap.put("userNo", userNo);
         paramMap.put("keyword", keyword);
         paramMap.put("sortOrder", sortOrder);
 
@@ -46,10 +46,10 @@ public class CouponsServiceImpl implements CouponsService {
     }
 
     @Override
-    public CustomerPagination<UserCoupons> getMyCoupons(String userId, String keyword, String sortOrder, int page) {
+    public CustomerPagination<UserCoupons> getMyCoupons(String userNo, String keyword, String sortOrder, int page) {
         // 위 getAvailableCoupons와 동일한 로직으로 보유 쿠폰 목록을 조회합니다.
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("userId", userId);
+        paramMap.put("userNo", userNo);
         paramMap.put("keyword", keyword);
         paramMap.put("sortOrder", sortOrder);
         
@@ -65,11 +65,11 @@ public class CouponsServiceImpl implements CouponsService {
     }
 
     @Override
-    public boolean issueCouponToUser(String userId, String couponId) {
+    public boolean issueCouponToUser(String userNo, String couponId) {
         // TODO: 여기에 쿠폰 발급 전 유효성 검사(예: 이미 발급받았는지, 수량이 남았는지 등) 로직 추가
         
         UserCoupons newUserCoupon = new UserCoupons();
-        newUserCoupon.setUserId(userId);
+        newUserCoupon.setUserNo(userNo);
         newUserCoupon.setPblcnCpnId(couponId);
         // ... 그 외 필요한 정보 설정 ...
         
