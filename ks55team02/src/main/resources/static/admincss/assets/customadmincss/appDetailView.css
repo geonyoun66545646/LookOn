@@ -42,3 +42,13 @@
 .table td:nth-child(5) {
     width: 10%; /* 10% (비율 1) */
 }
+.btn-primary{
+	background : #00B517 !important;
+}
+.btn-primary:hover{
+	background : #fec825!important;
+	transform: scale(1.05);
+	transition : 0.2s ;
+}
+
+

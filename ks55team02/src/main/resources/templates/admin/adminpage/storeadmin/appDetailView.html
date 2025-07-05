@@ -7,13 +7,17 @@
     <meta name="appDetail" content="appDetail" />
     <th:block layout:fragment="customCss">
         <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/appDetailView.css}">
-    </th:block>
+        
+        <script src="${/summernote/summernote-lite.js}"></script>
+ 	 	<script src="${/summernote/lang/summernote-ko-KR.js}"></script>
+  		<link rel="stylesheet" href="${/summernote/summernote-lite.css}">
+
+    </th:block>   
 </head>
 <th:block layout:fragment="jsFile">
-</th:block>
+    <script th:src="@{/summernote/summernote-lite.js}"></script>
+    </th:block>
 
-<th:block layout:fragment="jsScript">
-</th:block>
 <th:block layout:fragment="contents">
 
     <div class="content-header">
@@ -37,49 +41,49 @@
             <div class="row">
                 <div class="col-md-3">
                     <form>
-                        <div class="mb-4">
-                            <label for="product_name" class="form-label">신청 ID</label>
-                            <div type="text" class="form-control" id="product_name" ></div>
+                        <div  class="mb-4">
+                            <label for="aply_id" class="form-label">신청 ID</label>
+                            <div class="form-control"  id="aply_id" th:text="${appAdmin.aplyId}"></div>
                         </div>
                         <div class="mb-4">
-                            <label for="product_slug" class="form-label">상점</label>
-                            <div type="text" class="form-control" id="product_slug"></div>
+                            <label for="store_nm" class="form-label">상점</label>
+                            <div class="form-control" id="store_nm" th:text="${appAdmin.storeNm}"></div>
                         </div>
                         <div class="mb-4">
-                            <label for="product_slug" class="form-label">신청자</label>
-                            <div type="text" class="form-control" id="product_slug"></div>
+                            <label for="user_nm" class="form-label">신청자</label>
+                            <div class="form-control" id="user_nm" th:text="${appAdmin.userNm}"></div>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label">계약 신청일</label>
-                            <div type="text" class="form-control" id="product_slug"></div>
+                            <label class="ctrt_aply_ymd">계약 신청일</label>
+                            <div class="form-control" id="ctrt_aply_ymd" th:text="${#temporals.format(appAdmin.ctrtAplyYmd, 'yyyy-MM-dd')}"></div>
                         </div>
                         <div class="mb-4">
-                            <label for="product_slug" class="form-label">계약 시작일</label>
-                            <div type="text" class="form-control" id="product_slug"></div>
+                            <label for="ctrt_bgng_ymd" class="form-label">계약 시작일</label>
+                            <div class="form-control" id="ctrt_bgng_ymd"  th:text="${#temporals.format(appAdmin.ctrtBgngYmd, 'yyyy-MM-dd')}"></div>
                         </div>
                     </form>
                 </div>
                 <div class="col-md-3">
                     <form>
                         <div class="mb-4">
-                            <label for="product_name" class="form-label">매니저명</label>
-                            <div type="text" class="form-control" id="product_name" ></div>
+                            <label for="mngr_nm" class="form-label">매니저명</label>
+                            <div  class="form-control" id="mngr_nm" th:text="${appAdmin.mngrNm}"></div>
                         </div>
                         <div class="mb-4">
-                            <label for="product_slug" class="form-label">매니저 이메일</label>
-                            <div type="text" class="form-control" id="product_slug"></div>
+                            <label for="mngr_eml" class="form-label">매니저 이메일</label>
+                            <div class="form-control" id="mngr_eml" th:text="${appAdmin.mngrEml}"></div>
                         </div>
                         <div class="mb-4">
-                            <label for="product_slug" class="form-label">매니저 연락처</label>
-                            <div type="text" class="form-control" id="product_slug"></div>
+                            <label for="mngr_tel_no" class="form-label">매니저 연락처</label>
+                            <div class="form-control" id="mngr_tel_no" th:text="${appAdmin.mngrTelNo}"></div>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label">사업장 주소</label>
-                            <div type="text" class="form-control" id="product_slug"></div>
+                            <label class="bplc_addr">사업장 주소</label>
+                            <div class="form-control" id="bplc_addr" th:text="${appAdmin.bplcAddr}"></div>
                         </div>
                         <div class="mb-4">
-                            <label for="product_slug" class="form-label">수수료 비율</label>
-                            <div type="text" class="form-control" id="product_slug"></div>
+                            <label for="plcy_id" class="form-label">수수료 비율</label>
+                            <div class="form-control" id="plcy_id" th:text="${appAdmin.plcyId}"></div>
                         </div>
                     </form>
                 </div>
@@ -108,8 +112,8 @@
                                     </div>
                                 </td>
                                 <td>사업자 등록증</td>
-                                <td></td>
-                                <td>1</td>
+                                <td th:text="${appAdmin.brnoImgId}"></td>
+                                <td th:text="${appAdmin.brnoImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -121,7 +125,7 @@
                                             <a class="dropdown-item text-danger" href="#">Delete</a>
                                         </div>
                                     </div>
-                                    </td>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="text-center">
@@ -130,8 +134,8 @@
                                     </div>
                                 </td>
                                 <td>통신 판매업 신고증</td>
-                                <td></td>
-                                <td>1</td>
+                                <td th:text="${appAdmin.cmmDclrImgId}"></td>
+                                <td th:text="${appAdmin.cmmDclrImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -143,7 +147,7 @@
                                             <a class="dropdown-item text-danger" href="#">Delete</a>
                                         </div>
                                     </div>
-                                    </td>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="text-center">
@@ -152,8 +156,8 @@
                                     </div>
                                 </td>
                                 <td>판매 상품 관련 증빙서류</td>
-                                <td></td>
-                                <td>1</td>
+                                <td th:text="${appAdmin.selGdsProofImgId}"></td>
+                                <td th:text="${appAdmin.selGdsProofImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -165,7 +169,7 @@
                                             <a class="dropdown-item text-danger" href="#">Delete</a>
                                         </div>
                                     </div>
-                                    </td>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="text-center">
@@ -174,8 +178,8 @@
                                     </div>
                                 </td>
                                 <td>주민등록 증 사본</td>
-                                <td></td>
-                                <td>1</td>
+                                <td th:text="${appAdmin.rrnoCardCopyImgId}"></td>
+                                <td th:text="${appAdmin.rrnoCardCopyImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -187,7 +191,7 @@
                                             <a class="dropdown-item text-danger" href="#">Delete</a>
                                         </div>
                                     </div>
-                                    </td>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="text-center">
@@ -196,8 +200,8 @@
                                     </div>
                                 </td>
                                 <td>통장 사본</td>
-                                <td></td>
-                                <td>1</td>
+                                <td th:text="${appAdmin.bankbookCopyImgId}"></td>
+                                <td th:text="${appAdmin.bankbookCopyImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -209,7 +213,7 @@
                                             <a class="dropdown-item text-danger" href="#">Delete</a>
                                         </div>
                                     </div>
-                                    </td>
+                                </td>
                             </tr>
                             <tr>
                                 <td class="text-center">
@@ -218,8 +222,8 @@
                                     </div>
                                 </td>
                                 <td>기타</td>
-                                <td></td>
-                                <td>1</td>
+                                <td th:text="${appAdmin.etcDocImgId}"></td>
+                                <td th:text="${appAdmin.etcDocImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
@@ -229,20 +233,50 @@
                                             <a class="dropdown-item text-danger" href="#">Delete</a>
                                         </div>
                                     </div>
-                                    </td>
+                                </td>
                             </tr>
 
                             </tbody>
                         </table>
                     </div>
                 </div>
-                </div>
             </div>
         </div>
+    </div>
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">반려/보류</h2>
+        </div>
+        <button class="btn btn-primary" >
+            반려/보류 사항 입력
+        </button>
+        <span class="badge custom-badge bg-secondary"
+              th:if="${appAdmin == null or appAdmin.aplyStts == null}">
+              상태 없음
+        </span>
+   </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="container">
+			<textarea id="summernote" rows="5" name="explanation"></textarea>
+		</div>
+
+        </div>
+    </div>
     </th:block>
-<th:block layout:fragment="jsFile">
-</th:block>
+
 <th:block layout:fragment="jsScript">
+  $(document).ready(function() {
+          $('#summernote').summernote({
+              height: 300,                 
+              minHeight: null,            
+              maxHeight: null,             
+              focus: true,                 
+              lang: "ko-KR",            
+              placeholder: '반려/보류 사유를 적으시오'
+          });
+        });
 </th:block>
+
 
 </html>

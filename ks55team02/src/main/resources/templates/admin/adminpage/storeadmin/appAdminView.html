@@ -158,7 +158,7 @@
 				                <td> <input class="form-check-input member-check" type="checkbox" th:value="${appAdmin.aplyId}"></td>
 				                <td class="ellipsis text" th:text="${appAdmin.aplyId}" th:title="${appAdmin.aplyId}"></td>
 				                <td>
-				                <a class="text" th:href="@{/adminpage/storeadmin/appDetail}" th:text="${appAdmin.storeNm}"></a>
+				                	<a class="text" th:href="@{/adminpage/storeadmin/appDetail(aplyId=${appAdmin.aplyId})}" th:text="${appAdmin.storeNm}"></a>
 				                </td>
 				                <td th:text="${appAdmin.userNm}"></td>
 				                <td th:text="${appAdmin.aplyUserNo}"></td>				                
