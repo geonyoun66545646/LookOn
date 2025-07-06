@@ -48,7 +48,7 @@
             </div> <!-- card end// -->
         
             <!-- 2. 목록 테이블 카드 (AJAX로 이 영역이 교체됩니다) -->
-            <div class="card" id="userListContainer" th:fragment="userListFragment">
+            <div class="card" id="userListContainer">
                 <div class="card-body">
                     <div class="row gx-3 align-items-center mb-4">
                         <!-- 조회된 검색 수 -->
@@ -78,7 +78,6 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr class="text-center">
-                                    <th scope="col">No.</th>
                                     <th scope="col">회원 ID</th>
                                     <th scope="col">접속 IP</th>
                                     <th scope="col">로그인 일시</th>
@@ -87,10 +86,9 @@
                             </thead>
                             <tbody class="text-center">
                                 <tr th:if="${#lists.isEmpty(loginHistoryList)}">
-                                    <td colspan="5" class="text-center py-5">조회된 기록이 없습니다.</td>
+                                    <td colspan="4" class="text-center py-5">조회된 기록이 없습니다.</td>
                                 </tr>
                                 <tr th:unless="${#lists.isEmpty(loginHistoryList)}" th:each="log, iter : ${loginHistoryList}">
-                                    <td th:text="${(totalCount - (pagination.currentPage - 1) * pagination.recordSize) - iter.index}"></td>
                                     <td th:text="${log.userLgnId}"></td>
                                     <td th:text="${log.lgnIpAddr}"></td>
                                     <td th:text="${#temporals.format(log.lgnDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
@@ -128,47 +126,6 @@
 
 <!--/* 개발시 추가할 스크립트 */-->
 <th:block layout:fragment="jsScript">
-    <script>
-        $(() => {
-            const mainContent = $('main.main-content'); 
-
-            const searchAndReloadList = (currentPage = 1) => {
-                const searchCriteria = {
-                    startDate:   $('input[name="startDate"]').val(),
-                    endDate:     $('input[name="endDate"]').val(),
-                    searchKey:   $('select[name="searchKey"]').val(),
-                    searchValue: $('input[name="searchValue"]').val(),
-                    sortOrder:   $('#sortOrder').val(),
-                    pageSize:    $('#pageSize').val(),
-                    currentPage: currentPage
-                };
-                
-                $.ajax({
-                    url: '/adminpage/log/loginHistory/search', // ✨ 요청 보낼 컨트롤러 주소
-                    type: 'GET',
-                    data: searchCriteria,
-                    success: fragment => {
-                        // ✨ '#userListContainer' 영역을 통째로 새 내용으로 교체
-                        $('#userListContainer').replaceWith(fragment);
-                    },
-                    error: () => alert("로그인 기록을 불러오는 데 실패했습니다.")
-                });
-            };
-            
-            // ===== 이벤트 핸들러 바인딩 =====
-            mainContent.on('click', '#searchBtn', () => searchAndReloadList(1));
-            mainContent.on('change', '#sortOrder, #pageSize', () => searchAndReloadList(1));
-            mainContent.on('click', '.page-link', e => {
-                e.preventDefault();
-                searchAndReloadList($(e.currentTarget).data('page'));
-            });
-            // 엔터 키로 검색
-            mainContent.on('keypress', 'input[name="searchValue"]', e => {
-                if (e.which === 13) { // 13 is the key code for Enter
-                    $('#searchBtn').click();
-                }
-            });
-        });
-    </script> 
+    <script th:src="@{/admincss/assets/js/adminpage/loginHistory.js}"></script>
 </th:block>    
 </html>

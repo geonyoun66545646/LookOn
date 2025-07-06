@@ -26,11 +26,36 @@
         FROM
             login_history AS lh
         LEFT JOIN
-            users AS u ON lh.user_no = u.user_no
-        ORDER BY
-            lh.lgn_dt DESC
+            users AS u ON lh.user_no = u.user_no    
+         <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="startDate != null and endDate != null">
+                AND DATE(lh.lgn_dt) BETWEEN #{startDate} AND #{endDate}
+            </if>
+            <if test="searchValue != null and searchValue != ''">
+                <if test="searchKey != null and searchKey != ''">
+                    <choose>
+                        <when test="searchKey == 'userLgnId'">
+                            AND u.user_lgn_id LIKE CONCAT('%', #{searchValue}, '%')
+                        </when>
+                        <when test="searchKey == 'lgnIpAddr'">
+                            AND lh.lgn_ip_addr LIKE CONCAT('%', #{searchValue}, '%')
+                        </when>
+                    </choose>
+                </if>
+            </if>
+        </trim>
+        <choose>
+            <when test="sortOrder == 'lgnDtAsc'">
+                ORDER BY lh.lgn_dt ASC
+            </when>
+            <otherwise>
+                ORDER BY lh.lgn_dt DESC
+            </otherwise>
+        </choose>
+        
         LIMIT #{offset}, #{pageSize}
     </select>
+    
     <select id="getLoginHistoryCount" parameterType="LoginHistory" resultType="int">
         SELECT
             COUNT(*)
@@ -38,6 +63,24 @@
             login_history AS lh
         LEFT JOIN
             users AS u ON lh.user_no = u.user_no
+            
+        <trim prefix="WHERE" prefixOverrides="AND |OR ">
+            <if test="startDate != null and endDate != null">
+                AND DATE(lh.lgn_dt) BETWEEN #{startDate} AND #{endDate}
+            </if>
+            <if test="searchValue != null and searchValue != ''">
+                <if test="searchKey != null and searchKey != ''">
+                    <choose>
+                        <when test="searchKey == 'userLgnId'">
+                            AND u.user_lgn_id LIKE CONCAT('%', #{searchValue}, '%')
+                        </when>
+                        <when test="searchKey == 'lgnIpAddr'">
+                            AND lh.lgn_ip_addr LIKE CONCAT('%', #{searchValue}, '%')
+                        </when>
+                    </choose>
+                </if>
+            </if>
+        </trim>
     </select>
 
 </mapper>
