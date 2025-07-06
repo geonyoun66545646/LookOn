@@ -9,10 +9,10 @@
         <div class="lookon-header-upper-bar">
             <div class="lookon-header-content-wrapper">
                 <a th:href="@{/customer}" class="lookon-brand-logo">LookOn</a>
-                <form action="/search" class="lookon-search-input-area">
-                    <i class="fas fa-search lookon-search-icon"></i>
-                    <input type="text" class="lookon-search-input-field" placeholder="여기에 검색어를 입력해주세요">
-                </form>
+                <form th:action="@{/customer/searchResult}" method="get" class="lookon-search-input-area">
+				    <i class="fas fa-search lookon-search-icon"></i>
+				    <input type="search" class="lookon-search-input-field" name="keyword" placeholder="여기에 검색어를 입력해주세요" required>
+				</form>
             </div>
         </div>
 
