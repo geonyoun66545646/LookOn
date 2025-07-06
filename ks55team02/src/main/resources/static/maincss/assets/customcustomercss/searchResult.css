@@ -24,7 +24,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 .integrated-search-container {
 	max-width: 1400px;
 	margin: 0 auto;
-	padding: 3.5rem 1.5rem;
+	padding: 5rem 1.5rem;
 }
 
 /* 페이지 제목 스타일 (h2 태그용) */
@@ -37,7 +37,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 
 /* 검색 입력 영역 */
 .card-body form .input-group {
-	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 5px 5px rgba(200, 200, 200, 0.2);
 	border-radius: 0.75rem;
 	overflow: hidden;
 	border: 1px solid var(--molla-light-color);
@@ -57,7 +57,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 	color: #fff;
 	font-weight: 600;
 	padding: 0 2rem;
-	font-size: 1.1rem;
+	font-size: 16px;
 	transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
@@ -72,7 +72,6 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 }
 
 .nav-pills .nav-item {
-	margin: 0 10px;
 }
 
 .nav-pills .nav-link {
@@ -86,9 +85,13 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 	text-align: center;
 }
 
+.search-intro-section {
+	gap: 0px;
+}
+
 .nav-pills .nav-link.active {
 	background-color: var(--molla-main-color);
-	color: #fff;
+	color: #fff !important;
 	box-shadow: 0 5px 15px rgba(210, 180, 140, 0.3);
 }
 
@@ -101,10 +104,11 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 .section-title {
 	font-size: 1.8rem;
 	color: var(--text-dark);
-	margin-bottom: 1.5rem;
+	margin-bottom: 0px !important;
 	text-align: center;
 	width: 100%;
-	padding-top: 1.5rem;
+	border-bottom: 1px solid #eee !important;
+	padding-bottom: 30px !important;
 }
 
 /* '더보기' 버튼 및 푸터 */
@@ -114,7 +118,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 	justify-content: center;
 	padding: 0.8rem 2.5rem;
 	border-radius: 50px;
-	font-size: 1.1rem;
+	font-size: 1.4rem;
 	font-weight: 600;
 	color: var(--molla-main-color);
 	border: 2px solid var(--molla-main-color);
@@ -132,7 +136,6 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 
 .search-etc {
 	border-top: none;
-	margin-top: 15px;
 }
 
 
@@ -146,9 +149,10 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
     flex-wrap: wrap;
     justify-content: center;
     gap: 12px;
-    padding: 1.5rem 0;
-    max-width: 1150px; 
+    padding: 30px;
+    max-width: 1400px; 
     margin: 0 auto;
+    overflow: hidden;
 }
 
 /* --- 2. 카드 공통 스타일 (디자인 통일) --- */
@@ -158,14 +162,16 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
     flex-direction: column; /* ★★★ 아이템을 세로로 쌓도록 변경 (가장 중요) ★★★ */
     align-items: center;   /* 내부 아이템들을 수평 중앙 정렬 */
     width: 220px;
+    height: 220px !important;
     flex-shrink: 0;
-    height: auto;
     margin: 0;
     border: 1px solid var(--card-border-color);
     border-radius: 0.75rem;
     background-color: #fff;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     overflow: hidden;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .product-grid-container .product-card:hover,
@@ -207,7 +213,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 
 .product-card .card-text,
 .search-result-user-card .small {
-    font-size: 0.9rem;
+    font-size: 14px;
     color: var(--text-muted);
 }
 
@@ -227,7 +233,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 
 /* --- 6. 게시글 리스트 스타일 --- */
 .post-item {
-	padding: 1.25rem 0.5rem;
+	padding: 1.5rem 0.5rem;
 	border-bottom: 1px solid #f0f0f0;
 }
 
@@ -268,8 +274,42 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 
 .card {
     border-top: none;
+    border-bottom: none;
 }
 
 .form-control {
     font-size: 16px !important;
+}
+
+/* 1. 테두리가 필요한 결과 영역에만 스타일 적용 */
+.search-results-card {
+    border: 1px solid var(--card-border-color); /* 테두리 스타일 */
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    overflow: hidden; /* border-radius가 적용되도록 */
+    padding: 30px;
+}
+
+/* 2. 테두리가 필요 없는 상단 영역 스타일 */
+.search-intro-section .card-body {
+    /* 기존 card-body의 안쪽 여백(padding)은 유지하되, 테두리는 없음 */
+    padding: 2.5rem;
+}
+
+/* 3. 기존 card-body 전체에 적용되던 스타일은 그대로 유지 */
+.search-results-card .card-body {
+    padding: 2.5rem;
+}
+
+.nav.nav-pills .nav-item+.nav-item {
+	margin-left:0px;
+}
+.card-body {
+    padding: 0px !important;
+}
+.card-footer {
+	padding: 0px !important;
+}
+.search-post-section {
+	padding-bottom: 15px !important;
 }

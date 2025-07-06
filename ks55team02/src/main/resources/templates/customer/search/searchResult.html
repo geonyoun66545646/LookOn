@@ -33,16 +33,15 @@
 
 			<ul class="nav nav-pills justify-content-center mb-5" id="tabs"
 				role="tablist">
-				<li class="nav-item mx-2"><a class="nav-link active"
-					id="all-tab" href="#allResults" role="tab"
-					onclick="handleTabClick(event, this)">전체</a></li>
-				<li class="nav-item mx-2"><a class="nav-link" id="shopping-tab"
+				<li class="nav-item"><a class="nav-link active" id="all-tab"
+					href="#allResults" role="tab" onclick="handleTabClick(event, this)">전체</a></li>
+				<li class="nav-item"><a class="nav-link" id="shopping-tab"
 					href="#shoppingResults" role="tab"
 					onclick="handleTabClick(event, this)">상품</a></li>
-				<li class="nav-item mx-2"><a class="nav-link" id="post-tab"
+				<li class="nav-item"><a class="nav-link" id="post-tab"
 					href="#postResults" role="tab"
 					onclick="handleTabClick(event, this)">게시글</a></li>
-				<li class="nav-item mx-2"><a class="nav-link" id="user-tab"
+				<li class="nav-item"><a class="nav-link" id="user-tab"
 					href="#userResults" role="tab"
 					onclick="handleTabClick(event, this)">사용자</a></li>
 			</ul>
@@ -52,7 +51,7 @@
 				<div class="tab-pane fade show active" id="allResults"
 					role="tabpanel">
 
-					<div class="mb-5">
+					<div class="search-results-card mb-5">
 						<h5 class="section-title fw-bold">상품 검색 결과</h5>
 
 						<div class="product-grid-container" id="shoppingPreviewContainer">
@@ -90,9 +89,9 @@
 
 					</div>
 
-					<div class="mb-5">
+					<div class="search-results-card mb-5">
 						<h5 class="section-title fw-bold">게시글 검색 결과</h5>
-						<div class="card-body search-results-card py-4 px-4">
+						<div class="card-body search-post-card py-4 px-4">
 							<div id="postPreviewContainer">
 								<th:block th:if="${!#lists.isEmpty(searchResult.posts)}">
 									<div class="post-item"
@@ -120,7 +119,7 @@
 						</div>
 					</div>
 
-					<div class="mb-5">
+					<div class="search-results-card mb-5">
 						<h5 class="section-title fw-bold">사용자 검색 결과</h5>
 						<div class="product-grid-container" id="userPreviewContainer">
 
@@ -170,46 +169,84 @@
 	<th:block layout:fragment="jsFile"></th:block>
 
 	<th:block layout:fragment="jsScript">
-		<script th:inline="javascript">
+<script th:inline="javascript">
 /* <![CDATA[ */
 
+    // ===================================================================
+    // 이벤트 핸들러 (사용자 행동 감지)
+    // ===================================================================
+
     /**
-     * 최초에 '더보기' 버튼을 클릭하거나, 상단 탭을 직접 클릭했을 때 호출되는 메인 함수
+     * 탭을 클릭했을 때 실행되는 메인 함수
      */
     function handleTabClick(event, clickedElement) {
         event.preventDefault();
+        // 모든 탭의 활성화 상태 초기화
+        document.querySelectorAll('#tabs .nav-link').forEach(link => link.classList.remove('active'));
+        document.querySelectorAll('.tab-content .tab-pane').forEach(pane => pane.classList.remove('active', 'show'));
 
-        // 모든 탭의 active 클래스 제거
-        document.querySelectorAll('#tabs .nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        document.querySelectorAll('.tab-content .tab-pane').forEach(pane => {
-            pane.classList.remove('active', 'show');
-        });
-
-        // 클릭된 탭에 active 클래스 추가
+        // 클릭된 탭과 내용을 활성화
         clickedElement.classList.add('active');
         const targetPaneId = clickedElement.getAttribute('href');
         document.querySelector(targetPaneId).classList.add('active', 'show');
-        
+
         const searchInput = document.getElementById('searchInput');
         const keyword = searchInput.value;
         const tabId = clickedElement.id;
 
-        // '전체' 탭이 아닐 경우, 항상 1페이지부터 데이터를 불러옵니다.
+        // '전체' 탭이 아니면, 항상 1페이지부터 데이터를 불러옴
         if (tabId !== 'all-tab') {
-            loadTabData(tabId, keyword, 1); // page 파라미터로 1을 전달
+            loadTabData(tabId, keyword, 1);
         }
     }
 
     /**
-     * API를 호출하여 특정 페이지의 데이터를 가져오고, 화면을 그리는 핵심 함수
-     * @param page 불러올 페이지 번호
+     * 페이지 로드 완료 시 '더보기' 버튼에 기능 부여
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        const viewMoreButtons = document.querySelectorAll('.view-more-btn-lg');
+        viewMoreButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const targetTab = this.getAttribute('data-target-tab');
+                const targetTabId = `#${targetTab}-tab`;
+                const tabLink = document.querySelector(targetTabId);
+                if (tabLink) {
+                    tabLink.click();
+                }
+            });
+        });
+    });
+
+    /**
+     * 페이지네이션 버튼 클릭 이벤트를 처리하는 부분 (이벤트 위임)
+     */
+    document.getElementById('searchResultTabsContent').addEventListener('click', function(event) {
+        const clickedElement = event.target;
+        // 클릭된 요소가 페이지네이션 링크이고, 비활성화 상태가 아닐 때만 실행
+        if (clickedElement.matches('.page-link') && !clickedElement.parentElement.classList.contains('disabled')) {
+            event.preventDefault();
+            const page = clickedElement.dataset.page;
+            if (page) {
+                // 현재 활성화된 탭 정보를 찾아서 loadTabData를 다시 호출
+                const activeTabLink = document.querySelector('#tabs .nav-link.active');
+                const tabId = activeTabLink.id;
+                const keyword = document.getElementById('searchInput').value;
+                loadTabData(tabId, keyword, parseInt(page));
+            }
+        }
+    });
+
+
+    // ===================================================================
+    // 데이터 로딩 및 렌더링
+    // ===================================================================
+
+    /**
+     * API를 호출하여 특정 페이지의 데이터를 가져오는 핵심 함수
      */
     function loadTabData(tabId, keyword, page) {
-        if (!keyword || keyword.trim() === '') {
-            return;
-        }
+        if (!keyword || keyword.trim() === '') return;
 
         let apiUrl = '';
         let targetContainerSelector = '';
@@ -217,7 +254,7 @@
 
         switch (tabId) {
             case 'shopping-tab':
-                apiUrl = `/api/search/products?keyword=${keyword}&page=${page}`; // URL에 page 파라미터 추가
+                apiUrl = `/api/search/products?keyword=${keyword}&page=${page}`;
                 targetContainerSelector = '#shoppingResults';
                 renderFunction = renderProducts;
                 break;
@@ -240,244 +277,154 @@
 
         fetch(apiUrl)
             .then(response => response.json())
-            .then(pageData => { // 이제 data가 아닌 pageData 객체를 받습니다.
-                // 1. 실제 데이터 목록을 그려줍니다.
-                renderFunction(container, pageData.list);
-
-                // 2. 페이지네이션 버튼들을 그려줍니다.
-                const paginationContainer = container.querySelector('.pagination-container');
-                if (paginationContainer) {
-                    renderPagination(paginationContainer, pageData);
-                }
+            .then(pageData => {
+                // ★★★ 수정된 부분 ★★★
+                // 이제 render 함수가 pageData 객체 전체를 받아서 처리합니다.
+                renderFunction(container, pageData);
             })
             .catch(error => {
                 console.error('Error fetching tab data:', error);
                 container.innerHTML = '<p class="text-center p-5">데이터를 불러오는 데 실패했습니다.</p>';
             });
     }
-    
+
     /**
-     * 페이지네이션 HTML을 생성하고 화면에 그리는 함수 (수정된 버전)
-     * @param container 페이지 버튼들이 들어갈 div 요소
-     * @param pageData 서버로부터 받은 Pagination 객체
+     * 페이지네이션 HTML '문자열'을 생성하여 반환하는 함수
      */
-    function renderPagination(container, pageData) {
-        // 전체 페이지가 1페이지 이하면 페이지네이션을 그리지 않음
-        if (!pageData || pageData.totalPages <= 1) {
-            container.innerHTML = '';
-            return;
-        }
+    function renderPagination(pageData) {
+        if (!pageData || pageData.totalPages <= 1) return ''; // 페이지가 하나 이하면 빈 문자열 반환
 
         let html = '<nav><ul class="pagination justify-content-center">';
-
-        // '처음' & '이전' 버튼
-        // ★★★ 수정된 부분: 'hasPreviousBlock' 대신 'currentPage > 1'로 변경
-        html += pageData.currentPage > 1 
-            ? `<li class="page-item"><a class="page-link" href="#" data-page="1">처음</a></li>` 
-            : '<li class="page-item disabled"><a class="page-link" href="#">처음</a></li>';
-        html += pageData.currentPage > 1
-            ? `<li class="page-item"><a class="page-link" href="#" data-page="${pageData.currentPage - 1}">이전</a></li>`
-            : '<li class="page-item disabled"><a class="page-link" href="#">이전</a></li>';
-        
-        // 페이지 번호 버튼들 (기존과 동일)
+        html += pageData.currentPage > 1 ? `<li class="page-item"><a class="page-link" href="#" data-page="1">처음</a></li>` : '<li class="page-item disabled"><a class="page-link" href="#">처음</a></li>';
+        html += pageData.currentPage > 1 ? `<li class="page-item"><a class="page-link" href="#" data-page="${pageData.currentPage - 1}">이전</a></li>` : '<li class="page-item disabled"><a class="page-link" href="#">이전</a></li>';
         for (let i = pageData.startPage; i <= pageData.endPage; i++) {
-            html += i === pageData.currentPage
-                ? `<li class="page-item active"><a class="page-link" href="#">${i}</a></li>`
-                : `<li class="page-item"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+            html += i === pageData.currentPage ? `<li class="page-item active"><a class="page-link" href="#">${i}</a></li>` : `<li class="page-item"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
         }
-
-        // '다음' & '마지막' 버튼
-        // ★★★ 수정된 부분: 'hasNextBlock' 대신 'currentPage < totalPages'로 변경
-        html += pageData.currentPage < pageData.totalPages
-            ? `<li class="page-item"><a class="page-link" href="#" data-page="${pageData.currentPage + 1}">다음</a></li>`
-            : '<li class="page-item disabled"><a class="page-link" href="#">다음</a></li>';
-        html += pageData.currentPage < pageData.totalPages
-            ? `<li class="page-item"><a class="page-link" href="#" data-page="${pageData.totalPages}">마지막</a></li>`
-            : '<li class="page-item disabled"><a class="page-link" href="#">마지막</a></li>';
-
+        html += pageData.currentPage < pageData.totalPages ? `<li class="page-item"><a class="page-link" href="#" data-page="${pageData.currentPage + 1}">다음</a></li>` : '<li class="page-item disabled"><a class="page-link" href="#">다음</a></li>';
+        html += pageData.currentPage < pageData.totalPages ? `<li class="page-item"><a class="page-link" href="#" data-page="${pageData.totalPages}">마지막</a></li>` : '<li class="page-item disabled"><a class="page-link" href="#">마지막</a></li>';
         html += '</ul></nav>';
-        container.innerHTML = html;
+        return html; // 완성된 HTML 문자열을 반환
     }
 
-
     /**
+<<<<<<< HEAD
      * 
      * 페이지 버튼 클릭 이벤트를 처리하는 부분 (이벤트 위임)
+=======
+     * 1. 상품 목록을 그리는 함수
+>>>>>>> branch 'yge' of https://github.com/geonyoun66545646/LookOn.git
      */
-    document.getElementById('searchResultTabsContent').addEventListener('click', function(event) {
-        const clickedElement = event.target;
-
-        // 클릭된 요소가 페이지네이션 링크(.page-link)이고, 비활성화(disabled) 상태가 아닐 때만 실행
-        if (clickedElement.matches('.page-link') && !clickedElement.parentElement.classList.contains('disabled')) {
-            event.preventDefault();
-
-            // 이동할 페이지 번호를 data-page 속성에서 가져옵니다.
-            const page = clickedElement.dataset.page;
-            
-            if (page) {
-                // 현재 활성화된 탭 정보를 찾아서 loadTabData를 다시 호출합니다.
-                const activeTabLink = document.querySelector('#tabs .nav-link.active');
-                const tabId = activeTabLink.id;
-                const keyword = document.getElementById('searchInput').value;
-                loadTabData(tabId, keyword, parseInt(page));
-            }
-        }
-    });
-
-    /**
-     * ▼▼▼ 신규 추가된 코드 ▼▼▼
-     * 페이지 로드 완료 시, '더보기' 버튼에 기능 부여
-     */
-    document.addEventListener('DOMContentLoaded', function() {
-        const viewMoreButtons = document.querySelectorAll('.view-more-btn-lg');
-        viewMoreButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();
-                const targetTab = this.getAttribute('data-target-tab');
-                const targetTabId = `#${targetTab}-tab`;
-                const tabLink = document.querySelector(targetTabId);
-                if (tabLink) {
-                    tabLink.click();
-                }
+    function renderProducts(container, pageData) {
+        let contentHtml;
+        if (!pageData.list || pageData.list.length === 0) {
+            contentHtml = '<div class="no-results"><p class="text-center w-100">검색된 상품이 없습니다.</p></div>';
+        } else {
+            let itemsHtml = '';
+            pageData.list.forEach(product => {
+                itemsHtml += `
+                    <div class="card h-100 product-card">
+                        <a href="/customer/products/${product.gdsNo}">
+                            <img src="${product.imgFilePathNm}" class="card-img-top" alt="${product.gdsNm}"
+                                 onerror="this.onerror=null; this.src='/maincss/assets/images/sellerUploads/default_product.png';">
+                        </a>
+                        <div class="card-body">
+                            <h6 class="card-title text-truncate">
+                                <a href="/customer/products/${product.gdsNo}">${product.gdsNm}</a>
+                            </h6>
+                            <p class="card-text text-muted">₩ ${product.lastSelPrc.toLocaleString()}</p>
+                        </div>
+                    </div>`;
             });
-        });
-    });
-
-
-    /**
-     * 1. 상품 목록을 그리는 함수 (HTML 구조 통일 버전)
-     */
-    function renderProducts(container, products) {
-        // 검색 결과가 없는 경우 처리
-        if (!products || products.length === 0) {
-            // '전체' 탭과 동일한 구조로 '결과 없음' 메시지를 표시합니다.
-            container.innerHTML = `
-                <div class="card shadow-sm search-results-card">
-                    <div class="card-body py-4 px-4">
-                        <p class="text-center w-100">검색된 상품이 없습니다.</p>
-                    </div>
-                </div>`;
-            return;
+            contentHtml = `<div class="product-grid-container">${itemsHtml}</div>`;
         }
-
-        // ★★★ '전체' 탭과 동일한 카드/카드바디 구조를 추가합니다 ★★★
-        let html = `
+        
+        container.innerHTML = `
             <div class="card shadow-sm search-results-card">
                 <div class="card-body py-4 px-4">
-                    <div class="product-grid-container">
-        `;
-
-        // 상품 카드 목록 생성 (기존과 동일)
-        products.forEach(product => {
-            html += `
-                <div class="card h-100 product-card">
-                    <a href="/customer/products/${product.gdsNo}">
-                        <img src="${product.imgFilePathNm}" 
-                             class="card-img-top" 
-                             alt="${product.gdsNm}"
-                             onerror="this.onerror=null; this.src='/maincss/assets/images/sellerUploads/default_product.png';">
-                    </a>
-                    <div class="card-body">
-                        <h6 class="card-title text-truncate">
-                            <a href="/customer/products/${product.gdsNo}">${product.gdsNm}</a>
-                        </h6>
-                        <p class="card-text text-muted">₩ ${product.lastSelPrc.toLocaleString()}</p>
-                    </div>
-                </div>`;
-        });
-
-        html += `
-                    </div>
+                    ${contentHtml}
+                </div>
+                <div class="card-footer search-etc py-4 px-4 bg-white text-center">
+                    ${renderPagination(pageData)}
                 </div>
             </div>
         `;
-        
-        // 페이지네이션 버튼이 들어갈 컨테이너 추가
-        html += '<div class="pagination-container mt-5"></div>';
-
-        container.innerHTML = html;
     }
 
     /**
-     * 2. 게시글 목록을 그리는 함수 (페이지네이션 컨테이너 추가)
+     * 2. 게시글 목록을 그리는 함수
      */
-    function renderPosts(container, posts) {
-         if (!posts || posts.length === 0) {
-            container.innerHTML = '<div class="text-center p-5">검색된 게시글이 없습니다.</div>';
-            return;
+    function renderPosts(container, pageData) {
+        let contentHtml;
+        if (!pageData.list || pageData.list.length === 0) {
+            contentHtml = '<div class="post-item"><p class="text-center w-100">검색된 게시글이 없습니다.</p></div>';
+        } else {
+            let itemsHtml = '';
+            pageData.list.forEach(post => {
+                const formattedDate = post.crtDt ? new Date(post.crtDt).toISOString().split('T')[0] : '';
+                itemsHtml += `
+                    <div class="post-item">
+                        <h6 class="mb-1 text-truncate"><a href="/customer/posts/${post.pstSn}">${post.pstTtl}</a></h6>
+                        <small class="text-muted">${post.userNcnm} | ${formattedDate}</small>
+                        <p class="text-truncate-2">${post.pstCn}</p>
+                    </div>`;
+            });
+            contentHtml = `<div id="postPreviewContainer">${itemsHtml}</div>`;
         }
-        let html = '<div class="py-4 px-4">';
-        posts.forEach(post => {
-            const formattedDate = post.crtDt ? new Date(post.crtDt).toISOString().split('T')[0] : '';
-            html += `
-                <div class="post-item">
-                    <h6 class="mb-1 text-truncate"><a href="/customer/posts/${post.pstSn}">${post.pstTtl}</a></h6>
-                    <small class="text-muted">${post.userNcnm} | ${formattedDate}</small>
-                    <p class="text-truncate-2">${post.pstCn}</p>
-                </div>`;
-        });
-        html += '</div>';
 
-        // 페이지네이션 버튼이 들어갈 컨테이너 추가
-        html += '<div class="pagination-container mt-5"></div>';
-        
-        container.innerHTML = html;
+        container.innerHTML = `
+            <div class="card-body search-results-card py-4 px-4">
+                ${contentHtml}
+                <div class="card-footer search-etc py-4 px-4 bg-white text-center">
+                    ${renderPagination(pageData)}
+                </div>
+            </div>
+        `;
     }
     
     /**
-     * 3. 사용자 목록을 그리는 함수 (HTML 구조 통일 버전)
+     * 3. 사용자 목록을 그리는 함수
      */
-    function renderUsers(container, users) {
-        if (!users || users.length === 0) {
-            container.innerHTML = `
-                <div class="card shadow-sm search-results-card">
-                    <div class="card-body py-4 px-4">
-                        <p class="text-center w-100">검색된 사용자가 없습니다.</p>
-                    </div>
-                </div>`;
-            return;
+    function renderUsers(container, pageData) {
+        let contentHtml;
+        if (!pageData.list || pageData.list.length === 0) {
+            contentHtml = '<div class="no-results"><p class="text-center w-100">검색된 사용자가 없습니다.</p></div>';
+        } else {
+            let itemsHtml = '';
+            pageData.list.forEach(user => {
+                const profileImagePath = user.prflImg && user.prflImg.trim() !== "" 
+                    ? user.prflImg : '/maincss/assets/images/default_user.png';
+                itemsHtml += `
+                    <div class="card h-100 search-result-user-card">
+                        <a href="/customer/users/${user.userNcnm}">
+                           <img src="${profileImagePath}" class="rounded-circle mx-auto mt-3 search-profile-img" alt="프로필" style="width: 80px; height: 80px; object-fit: cover;"
+                                onerror="this.onerror=null; this.src='/maincss/assets/images/default_user.png';">
+                        </a>
+                        <div class="card-body text-center">
+                            <h6 class="card-title mb-0 text-truncate">
+                                <a href="/customer/users/${user.userNcnm}">${user.userNcnm}</a>
+                            </h6>
+                            <small class="text-muted">${user.userNm}</small>
+                        </div>
+                    </div>`;
+            });
+            contentHtml = `<div class="product-grid-container">${itemsHtml}</div>`;
         }
 
-        // ★★★ '전체' 탭과 동일한 카드/카드바디 구조를 추가합니다 ★★★
-        let html = `
+        container.innerHTML = `
             <div class="card shadow-sm search-results-card">
                 <div class="card-body py-4 px-4">
-                    <div class="product-grid-container">
-        `;
-
-        users.forEach(user => {
-            const profileImagePath = user.prflImg && user.prflImg.trim() !== "" 
-                ? user.prflImg : '/maincss/assets/images/default_user.png';
-            html += `
-                <div class="card h-100 search-result-user-card">
-                    <a href="/customer/users/${user.userNcnm}">
-                       <img src="${profileImagePath}" class="rounded-circle mx-auto mt-3 search-profile-img" alt="프로필" style="width: 80px; height: 80px; object-fit: cover;"
-                            onerror="this.onerror=null; this.src='/maincss/assets/images/default_user.png';">
-                    </a>
-                    <div class="card-body text-center">
-                        <h6 class="card-title mb-0 text-truncate">
-                            <a href="/customer/users/${user.userNcnm}">${user.userNcnm}</a>
-                        </h6>
-                        <small class="text-muted">${user.userNm}</small>
-                    </div>
-                </div>`;
-        });
-        
-        html += `
-                    </div>
+                    ${contentHtml}
+                </div>
+                <div class="card-footer search-etc py-4 px-4 bg-white text-center">
+                    ${renderPagination(pageData)}
                 </div>
             </div>
         `;
-
-        // 페이지네이션 버튼이 들어갈 컨테이너 추가
-        html += '<div class="pagination-container mt-5"></div>';
-
-        container.innerHTML = html;
     }
 
 /* ]]> */
-		</script>
-	</th:block>
+</script>
+</th:block>
 
 </body>
 </html>

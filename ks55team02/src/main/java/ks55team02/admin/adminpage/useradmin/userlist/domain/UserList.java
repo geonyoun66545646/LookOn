@@ -6,7 +6,9 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import ks55team02.admin.common.domain.SearchCriteria;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 회원 목록 정보를 담는 도메인(DTO/VO) 클래스입니다.
@@ -14,7 +16,8 @@ import lombok.Data;
  * 검색 조건 및 페이징 관련 정보를 함께 담는 역할을 수행합니다.
  */
 @Data
-public class UserList {
+@EqualsAndHashCode(callSuper = true)
+public class UserList extends SearchCriteria {
 
 	// ====================================================================================
 	// DB 'users' 테이블 컬럼과 매핑되는 필드들
@@ -38,27 +41,14 @@ public class UserList {
 	private LocalDateTime lastInfoMdfcnDt; // 최종 정보 수정일
 	private LocalDateTime lastLoginDt; // 최종 로그인 일시
 
-	// ====================================================================================
-	// 검색 및 페이징 처리를 위한 필드들
-	// ====================================================================================
-	private String sortOrder; 		// 정렬 순서 (예: 'ASC', 'DESC')
-	private int pageSize; 			// **페이지당 표시할 항목 수 (10, 30, 50 등)**
-	
-	// 검색 조건용 필드
-	private List<String> statusList; // 회원 상태 목록 (다중 선택 검색용)
-	    
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate startDate; 	// 검색 시작 날짜
-    
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate endDate; 		// 검색 종료 날짜
-    
-    private String searchKey; 	 	// 현재 페이지 번호 (기본값: 1)
-    private String searchValue;
-    
-    private int currentPage = 1; 	// 기본값은 항상 1페이지
-    private int offset; 		 	// DB 쿼리를 위한 시작 인덱스 (LIMIT의 offset)
 
+	public List<String> getStatusList() {
+        return super.getFilterConditions();
+    }
+    
+    public void setStatusList(List<String> statusList) {
+        super.setFilterConditions(statusList);
+    }
     // ====================================================================================
  	// 편의 메서드 (데이터를 가공하여 반환)
  	// ====================================================================================
@@ -83,4 +73,6 @@ public class UserList {
         }
         return "-";
     }
+    
+    
 }

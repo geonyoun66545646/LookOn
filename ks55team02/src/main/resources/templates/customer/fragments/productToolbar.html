@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div th:fragment="productToolbarFragment">
+	<div class="product-toolbar-container">
+		<nav class="main-category-nav">
+			<ul class="main-category-list">
+				<li class="main-category-item"><a
+					th:href="@{/customer/products/list(categoryId=${parentCategoryId})}"
+					class="main-category-link"
+					th:classappend="${#strings.isEmpty(currentCategoryId) || currentCategoryId == parentCategoryId ? 'active' : ''}">전체</a>
+				</li>
+				<li class="main-category-item"
+					th:each="subCategory : ${subCategories}"><a
+					th:href="@{/customer/products/list(categoryId=${subCategory.categoryId})}"
+					class="main-category-link"
+					th:classappend="${currentCategoryId == subCategory.categoryId ? 'active' : ''}"
+					th:text="${subCategory.categoryName}">하위 카테고리명</a></li>
+			</ul>
+		</nav>
+
+		<div class="product-filter-bar">
+			<div class="filter-controls">
+				<button class="filter-main-button app-modal-trigger">상품 필터</button>
+				<button class="filter-button" data-filter-group="gender"
+					data-gender="M"
+					th:classappend="${currentGender == 'M' ? 'active' : ''}">남</button>
+				<button class="filter-button" data-filter-group="gender"
+					data-gender="F"
+					th:classappend="${currentGender == 'F' ? 'active' : ''}">여</button>
+				<button class="filter-dropdown modal-trigger" data-modal-tab="color">컬러</button>
+				<button class="filter-dropdown modal-trigger" data-modal-tab="price">가격</button>
+				<button class="filter-dropdown modal-trigger" data-modal-tab="size">사이즈</button>
+				<button class="filter-dropdown modal-trigger" data-modal-tab="brand">브랜드</button>
+				<button class="filter-dropdown modal-trigger"
+					data-modal-tab="discount">할인율</button>
+				<button class="filter-dropdown modal-trigger" data-modal-tab="type">상품유형</button>
+			</div>
+
+			<div class="sort-control filter-button">
+				<div class="sort-dropdown-container">
+					<button class="sort-dropdown-button"
+						th:text="${#strings.replace(#strings.replace(#strings.replace(#strings.replace(#strings.replace(currentSortBy, 'new', '신상품순'), 'priceAsc', '낮은가격순'), 'priceDesc', '높은가격순'), 'discountDesc', '할인률순'), 'popularity', '인기순(판매량)')}">정렬
+						기준</button>
+					<ul class="sort-dropdown-menu">
+						<li><a
+							th:href="@{/customer/products/list(
+								categoryId=${currentCategoryId},
+								sortBy='new',
+								gender=${currentGender},
+								minPrice=${selectedMinPrice},
+								maxPrice=${selectedMaxPrice},
+								priceRange=${selectedPriceRange},
+								color=${selectedColors},
+								size=${selectedSizes},
+								brand=${selectedBrands},
+								style=${selectedStyles},
+								discountRate=${selectedDiscountRates},
+								includeSoldOut=${selectedIncludeSoldOut},
+								currentPage=${currentPage}
+							)}"
+							class="sort-option-link" data-sort-by="new"
+							th:classappend="${currentSortBy == 'new' ? 'active' : ''}">신상품순</a></li>
+						<li><a
+							th:href="@{/customer/products/list(
+								categoryId=${currentCategoryId},
+								sortBy='priceAsc',
+								gender=${currentGender},
+								minPrice=${selectedMinPrice},
+								maxPrice=${selectedMaxPrice},
+								priceRange=${selectedPriceRange},
+								color=${selectedColors},
+								size=${selectedSizes},
+								brand=${selectedBrands},
+								style=${selectedStyles},
+								discountRate=${selectedDiscountRates},
+								includeSoldOut=${selectedIncludeSoldOut},
+								currentPage=${currentPage}
+							)}"
+							class="sort-option-link" data-sort-by="priceAsc"
+							th:classappend="${currentSortBy == 'priceAsc' ? 'active' : ''}">낮은가격순</a></li>
+						<li><a
+							th:href="@{/customer/products/list(
+								categoryId=${currentCategoryId},
+								sortBy='priceDesc',
+								gender=${currentGender},
+								minPrice=${selectedMinPrice},
+								maxPrice=${selectedMaxPrice},
+								priceRange=${selectedPriceRange},
+								color=${selectedColors},
+								size=${selectedSizes},
+								brand=${selectedBrands},
+								style=${selectedStyles},
+								discountRate=${selectedDiscountRates},
+								includeSoldOut=${selectedIncludeSoldOut},
+								currentPage=${currentPage}
+							)}"
+							class="sort-option-link" data-sort-by="priceDesc"
+							th:classappend="${currentSortBy == 'priceDesc' ? 'active' : ''}">높은가격순</a></li>
+						<li><a
+							th:href="@{/customer/products/list(
+								categoryId=${currentCategoryId},
+								sortBy='discountDesc',
+								gender=${currentGender},
+								minPrice=${selectedMinPrice},
+								maxPrice=${selectedMaxPrice},
+								priceRange=${selectedPriceRange},
+								color=${selectedColors},
+								size=${selectedSizes},
+								brand=${selectedBrands},
+								style=${selectedStyles},
+								discountRate=${selectedDiscountRates},
+								includeSoldOut=${selectedIncludeSoldOut},
+								currentPage=${currentPage}
+							)}"
+							class="sort-option-link" data-sort-by="discountDesc"
+							th:classappend="${currentSortBy == 'discountDesc' ? 'active' : ''}">할인률순</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="initialFilterData" style="display: none;"
+		th:attr="data-current-category-id=${currentCategoryId},
+	              data-current-category-name=${currentCategory != null ? currentCategory.categoryName : ''},
+	              data-parent-category-id=${parentCategoryId},
+	              data-parent-category-name=${parentCategoryName},
+	              data-current-gender=${currentGender},
+	              data-selected-colors=${#strings.arrayJoin(selectedColors, ',')},
+	              data-selected-sizes=${#strings.arrayJoin(selectedSizes, ',')},
+	              data-selected-brands=${#strings.arrayJoin(selectedBrands, ',')},
+	              data-selected-min-price=${selectedMinPrice ?: ''},
+	              data-selected-max-price=${selectedMaxPrice ?: ''},
+	              data-selected-price-range=${selectedPriceRange ?: ''},
+	              data-selected-discount-rates=${#strings.arrayJoin(selectedDiscountRates, ',')},
+	              data-selected-include-sold-out=${selectedIncludeSoldOut}">
+	</div>
+
+
+	<div class="app-filter-modal-overlay">
+		<div class="app-filter-modal-content">
+
+			<header class="app-modal-header">
+				<div class="app-modal-header-top">
+					<h2 class="app-modal-title">필터</h2>
+					<button class="app-modal-close-button">×</button>
+				</div>
+				<nav class="app-modal-tab-nav">
+					<button class="app-modal-tab-button" data-tab="color">컬러</button>
+					<button class="app-modal-tab-button" data-tab="price">가격</button>
+					<button class="app-modal-tab-button" data-tab="discount">할인율</button>
+					<button class="app-modal-tab-button" data-tab="size">사이즈</button>
+					<button class="app-modal-tab-button" data-tab="brand">브랜드</button>
+					<button class="app-modal-tab-button" data-tab="type">상품유형</button>
+				</nav>
+			</header>
+
+			<div class="app-modal-body">
+				<div class="app-modal-tab-pane" id="color-pane">
+					<h3 class="app-tab-pane-title">컬러</h3>
+					<div class="app-filter-options-grid app-color-options">
+						<label class="app-color-option"
+							th:each="colorOption : ${allColorOptions}"> <input
+							type="checkbox" name="color" th:value="${colorOption.name}"
+							hidden
+							th:checked="${#lists.contains(selectedColors, colorOption.name)}">
+							<span class="color-swatch" th:style="${colorOption.style}"></span>
+							<span th:text="${colorOption.name}">색상명</span>
+						</label>
+					</div>
+				</div>
+
+				<div class="app-modal-tab-pane" id="price-pane">
+					<h3 class="app-tab-pane-title">가격</h3>
+					<div class="app-filter-options-grid app-price-options">
+						<label class="app-filter-option"><input type="radio"
+							name="priceRange" value="all"
+							th:checked="${selectedPriceRange == null or selectedPriceRange == 'all'}"><span>전체</span></label>
+						<label class="app-filter-option"><input type="radio"
+							name="priceRange" value="0-50000"
+							th:checked="${selectedPriceRange == '0-50000'}"><span>5만원
+								이하</span></label> <label class="app-filter-option"><input type="radio"
+							name="priceRange" value="50000-100000"
+							th:checked="${selectedPriceRange == '50000-100000'}"><span>5만원
+								~ 10만원</span></label> <label class="app-filter-option"><input
+							type="radio" name="priceRange" value="100000-200000"
+							th:checked="${selectedPriceRange == '100000-200000'}"><span>10만원
+								~ 20만원</span></label> <label class="app-filter-option"><input
+							type="radio" name="priceRange" value="200000-300000"
+							th:checked="${selectedPriceRange == '200000-300000'}"><span>20만원
+								~ 30만원</span></label> <label class="app-filter-option"><input
+							type="radio" name="priceRange" value="300000-max"
+							th:checked="${selectedPriceRange == '300000-max'}"><span>30만원
+								이상</span></label> <label class="app-filter-option"><input type="radio"
+							name="priceRange" value="direct"
+							th:checked="${selectedPriceRange == 'direct' or (selectedMinPrice != null or selectedMaxPrice != null)}"><span>직접입력</span></label>
+					</div>
+					<div class="app-price-direct-input"
+						th:style="${selectedPriceRange == 'direct' or (selectedMinPrice != null or selectedMaxPrice != null) ? 'display: flex;' : 'display: none;'}">
+						<input type="text" class="app-price-input" placeholder="4,900"
+							th:value="${selectedMinPrice}" name="minPrice"> <span
+							class="price-input-divider">-</span> <input type="text"
+							class="app-price-input" placeholder="2,425,990"
+							th:value="${selectedMaxPrice}" name="maxPrice">
+						<button class="app-apply-price-button">적용</button>
+					</div>
+				</div>
+
+				<div class="app-modal-tab-pane" id="discount-pane">
+					<h3 class="app-tab-pane-title">할인율</h3>
+					<div class="app-filter-options-grid app-discount-options">
+						<label class="app-filter-option"><input type="radio"
+							name="discountRate" value="all"
+							th:checked="${selectedDiscountRates.isEmpty() or selectedDiscountRates.contains('all')}"><span>전체</span></label>
+						<label class="app-filter-option"><input type="radio"
+							name="discountRate" value="10"
+							th:checked="${#lists.contains(selectedDiscountRates, '10')}"><span>10%
+								이상</span></label> <label class="app-filter-option"><input type="radio"
+							name="discountRate" value="30"
+							th:checked="${#lists.contains(selectedDiscountRates, '30')}"><span>30%
+								이상</span></label> <label class="app-filter-option"><input type="radio"
+							name="discountRate" value="50"
+							th:checked="${#lists.contains(selectedDiscountRates, '50')}"><span>50%
+								이상</span></label> <label class="app-filter-option"><input type="radio"
+							name="discountRate" value="70"
+							th:checked="${#lists.contains(selectedDiscountRates, '70')}"><span>70%
+								이상</span></label>
+					</div>
+				</div>
+
+				<div class="app-modal-tab-pane" id="size-pane">
+					<h3 class="app-tab-pane-title">의류 사이즈</h3>
+					<div class="app-filter-options-grid app-size-options">
+						<th:block
+							th:if="${allApparelSizes != null and not allApparelSizes.isEmpty()}">
+							<label class="app-filter-option"
+								th:each="sizeOption : ${allApparelSizes}"> <input
+								type="checkbox" name="size" th:value="${sizeOption.vlNm}"
+								th:checked="${#lists.contains(selectedSizes, sizeOption.vlNm)}"><span>[[${sizeOption.vlNm}]]</span>
+							</label>
+						</th:block>
+						<th:block
+							th:unless="${allApparelSizes != null and not allApparelSizes.isEmpty()}">
+							<p>의류 사이즈 옵션이 없습니다.</p>
+						</th:block>
+					</div>
+					<h3 class="app-tab-pane-title">신발 사이즈</h3>
+					<div class="app-filter-options-grid app-size-options">
+						<th:block
+							th:if="${allShoeSizes != null and not allShoeSizes.isEmpty()}">
+							<label class="app-filter-option"
+								th:each="sizeOption : ${allShoeSizes}"> <input
+								type="checkbox" name="size" th:value="${sizeOption.vlNm}"
+								th:checked="${#lists.contains(selectedSizes, sizeOption.vlNm)}"><span>[[${sizeOption.vlNm}]]</span>
+							</label>
+						</th:block>
+						<th:block
+							th:unless="${allShoeSizes != null and not allShoeSizes.isEmpty()}">
+							<p>신발 사이즈 옵션이 없습니다.</p>
+						</th:block>
+					</div>
+					<h3 class="app-tab-pane-title">패션소품 사이즈</h3>
+					<div class="app-filter-options-grid app-size-options">
+						<label class="app-filter-option"> <input type="checkbox"
+							name="size" value="FREE"
+							th:checked="${#lists.contains(selectedSizes, 'FREE')}"><span>FREE</span>
+						</label>
+					</div>
+				</div>
+
+				<div class="app-modal-tab-pane" id="brand-pane">
+					<h3 class="app-tab-pane-title">브랜드</h3>
+					<div class="app-brand-search-wrapper">
+						<input type="text" class="app-brand-search-input"
+							placeholder="브랜드명을 입력해주세요.">
+						<button class="app-brand-search-button">
+							<svg width="18px" height="18px" viewBox="0 0 18 18" fill="none"
+								xmlns="http://www.w3.org/2000/svg">
+								<path
+									d="M12.5 11H11.71L11.43 10.73C12.41 9.59 13 8.11 13 6.5C13 2.91 10.09 0 6.5 0C2.91 0 0 2.91 0 6.5C0 10.09 2.91 13 6.5 13C8.11 13 9.59 12.41 10.73 11.43L11 11.71V12.5L16 17.49L17.49 16L12.5 11ZM6.5 11C4.01 11 2 8.99 2 6.5C2 4.01 4.01 2 6.5 2C8.99 2 11 4.01 11 6.5C11 8.99 8.99 11 6.5 11Z"
+									fill="#888"></path>
+							</svg>
+						</button>
+					</div>
+					<div class="app-filter-options-grid app-brand-options">
+						<label class="app-filter-option" th:each="brand : ${allBrands}">
+							<input type="checkbox" name="brand" th:value="${brand.storeId}"
+							th:checked="${#lists.contains(selectedBrands, brand.storeId)}">
+							<span class="brand-name">[[${brand.storeConm}]]<small>[[${brand.storeConm}]]</small></span>
+						</label>
+					</div>
+				</div>
+
+				<div class="app-modal-tab-pane" id="type-pane">
+					<h3 class="app-tab-pane-title">판매 상태</h3>
+					<div class="app-filter-options-grid"
+						style="grid-template-columns: 1fr;">
+						<label class="app-filter-option"> <input type="checkbox"
+							name="includeSoldOut" value="true"
+							th:checked="${selectedIncludeSoldOut}"> <span>품절포함</span>
+						</label>
+					</div>
+				</div>
+
+			</div>
+
+			<footer class="app-modal-footer">
+				<div class="filter-options-and-reset">
+					<div class="selected-filters-container"
+						style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+					<button type="button" class="app-reset-filters-button">초기화</button>
+				</div>
+				<button class="app-view-products-button">상품보기</button>
+			</footer>
+
+		</div>
+	</div>
+</div>
+
+</html>
