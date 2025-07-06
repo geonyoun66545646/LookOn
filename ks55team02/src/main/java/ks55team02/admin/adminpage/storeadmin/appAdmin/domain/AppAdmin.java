@@ -20,7 +20,7 @@ public class AppAdmin {
 	private int 			ctrtTermVal;        // 계약 기간 (ctrt_term_val)
 	private String 			rvwMngrNo;          // 검토(승인) 관리자 (rvw_mngr_no)
 	private String 			mngrNm;             // 매니저명 (mngr_nm)
-	private String 			mngrEmlAddr;        // 매니저 이메일 (mngr_eml_addr)
+	private String 			mngrEml;        // 매니저 이메일 (mngr_eml_addr)
 	private String 			mngrTelNo;          // 매니저 연락처 (mngr_tel_no)
 	private String 			bplcAddr;           // 사업장 주소 (bplc_addr)
 	private String 			aplyStts;           // 신청(승인) 상태 (aply_stts)

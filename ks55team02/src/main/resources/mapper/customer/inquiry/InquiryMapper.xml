@@ -22,7 +22,7 @@
         <collection property="inquiryImages" ofType="ks55team02.customer.inquiry.domain.InquiryImage"
                     select="ks55team02.customer.inquiry.mapper.InquiryImageMapper.getInquiryImagesByInquiryId"
                     column="inqry_id"/>
-    </resultMap>
+    	</resultMap>
 
     <insert id="addInquiry" parameterType="ks55team02.customer.inquiry.domain.Inquiry">
         INSERT INTO inquiries
@@ -46,7 +46,21 @@
 
     <select id="getInquiryList" resultMap="inquiryResultMap">
         SELECT
-            inqry_id, inqry_type_cd, inqry_trgt_type_cd, wrtr_id, inqry_store_id, inqry_ttl, inqry_cn, prvt_yn, prcs_stts, prcs_user_no, reg_ymd, mdfcn_ymd, del_dt, del_user_no, del_actvtn_yn
+            inqry_id, 
+            inqry_type_cd, 
+            inqry_trgt_type_cd, 
+            wrtr_id, 
+            inqry_store_id, 
+            inqry_ttl, 
+            inqry_cn, 
+            prvt_yn, 
+            prcs_stts, 
+            prcs_user_no, 
+            reg_ymd, 
+            mdfcn_ymd, 
+            del_dt, 
+            del_user_no, 
+            del_actvtn_yn
         FROM
             inquiries
         ORDER BY
@@ -55,7 +69,21 @@
 
     <select id="getInquiryById" parameterType="String" resultMap="inquiryResultMap">
         SELECT
-            inqry_id, inqry_type_cd, inqry_trgt_type_cd, wrtr_id, inqry_store_id, inqry_ttl, inqry_cn, prvt_yn, prcs_stts, prcs_user_no, reg_ymd, mdfcn_ymd, del_dt, del_user_no, del_actvtn_yn
+            inqry_id, 
+            inqry_type_cd, 
+            inqry_trgt_type_cd, 
+            wrtr_id, 
+            inqry_store_id, 
+            inqry_ttl, 
+            inqry_cn, 
+            prvt_yn, 
+            prcs_stts, 
+            prcs_user_no, 
+            reg_ymd, 
+            mdfcn_ymd, 
+            del_dt, 
+            del_user_no, 
+            del_actvtn_yn
         FROM
             inquiries
         WHERE
@@ -65,7 +93,18 @@
     <!-- 이미지 정보와 함께 문의를 조회하는 메서드 -->
     <select id="getInquiryByIdWithImages" parameterType="String" resultMap="inquiryResultMap">
         SELECT
-            i.inqry_id, i.inqry_type_cd, i.inqry_trgt_type_cd, i.wrtr_id, i.inqry_store_id, i.inqry_ttl, i.inqry_cn, i.prvt_yn, i.prcs_stts, i.prcs_user_no, i.reg_ymd, i.mdfcn_ymd, i.del_dt, i.del_user_no, i.del_actvtn_yn
+            i.inqry_id, 
+            i.inqry_type_cd, 
+            i.inqry_trgt_type_cd, 
+            i.wrtr_id, i.inqry_store_id, 
+            i.inqry_ttl, i.inqry_cn, 
+            i.prvt_yn, i.prcs_stts, 
+            i.prcs_user_no, 
+            i.reg_ymd, 
+            i.mdfcn_ymd, 
+            i.del_dt, 
+            i.del_user_no, 
+            i.del_actvtn_yn
         FROM
             inquiries i
         WHERE

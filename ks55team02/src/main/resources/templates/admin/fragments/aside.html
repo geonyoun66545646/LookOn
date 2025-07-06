@@ -3,7 +3,7 @@
     <aside class="navbar-aside" id="offcanvas_aside" th:fragment="asideFragments">
         <div class="aside-top">
             <a href="main.html" class="brand-wrap">
-                <img src="/admincss/assets/imgs/theme/logo.svg" class="logo" alt="Nest Dashboard" th:href="@{/customer}" />
+                <img src="/admincss/assets/imgs/theme/logo.svg" class="logo" alt="Nest Dashboard" th:href="@{/main}" />
             </a>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"><i class="text-muted material-icons md-menu_open"></i></button>
@@ -68,7 +68,7 @@
                         <span class="text">상점관리</span>
                     </a>
                     <div class="submenu">
-                        <a th:href="@{/adminpage/storeadmin/storeApllicationManagementView}">상점 신청 관리</a>
+                        <a th:href="@{/adminpage/storeadmin/appAdmin}">상점 신청 관리</a>
                         <a th:href="@{/adminpage/storeadmin/storeAdminManagementView}">상점 관리</a>
                         <a th:href="@{/adminpage/storeadmin/settlementDetailByStore}">상점별 정산 내역 조회</a>
                         <a th:href="@{/adminpage/storeadmin/premiumAdd}">구독권 추가</a>

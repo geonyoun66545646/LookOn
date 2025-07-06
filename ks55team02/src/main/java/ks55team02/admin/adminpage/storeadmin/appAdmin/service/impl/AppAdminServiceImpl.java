@@ -24,5 +24,11 @@ public class AppAdminServiceImpl implements AppAdminService{
 		
 		return appAdminList;
 	}
+	
+@Override
+	public AppAdmin getAppAdminById(String aplyId) {
+			AppAdmin appAdmin = appAdminMapper.getAppAdminById(aplyId);
+		return appAdmin;
+	}
 
 }

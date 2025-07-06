@@ -18,28 +18,62 @@
 		<result property="ctrtTermVal" 			column="ctrt_term_val"/>
 		<result property="rvwMngrNo" 			column="rvw_mngr_no"/>
 		<result property="mngrNm" 				column="mngr_nm"/>
-		<result property="mngrEmlAddr" 			column="mngr_eml_addr"/>
+		<result property="mngrEml" 				column="mngr_eml"/>
 		<result property="mngrTelNo" 			column="mngr_tel_no"/>
 		<result property="bplcAddr" 			column="bplc_addr"/>
 		<result property="aplyStts" 			column="aply_stts"/>
 		<result property="aprvRjctRsn" 			column="aprv_rjct_rsn"/>
-		<result property="userNm" 			column="user_nm"/>
+		<result property="userNm" 				column="user_nm"/>
 		
 		</resultMap>
 		
 		
 		<select id="getAppAdminList" resultMap="appAdminResultMap">
+		<!-- /* 상점 신청 조회 */ -->
+		SELECT
+		    sa.aply_id,
+		    sa.store_nm,
+		    u.user_nm,
+		    sa.aply_user_no,
+		    sa.plcy_id,
+		    sa.ctrt_aply_ymd,
+		    sa.aply_stts
+		FROM
+		    store_application sa
+		INNER JOIN
+		    users u ON sa.aply_user_no = u.user_no
+		ORDER BY
+		    CAST(REGEXP_SUBSTR(sa.aply_id, '[0-9]+') AS UNSIGNED) DESC;
+		</select>
+		
+		<select id="getAppAdminById" parameterType="String" resultMap="appAdminResultMap">
+		<!-- /* 신청 아이디로 특정 정보 조회 */ -->
 		SELECT 
 			sa.aply_id, 
-			sa.store_nm,   
-			u.user_nm,
 			sa.aply_user_no, 
-			sa.plcy_id, 
-			sa.ctrt_aply_ymd,  
-			sa.aply_stts
-		FROM 
+			sa.store_nm,
+			sa.brno_img_id, 
+			sa.cmm_dclr_img_id, 
+			sa.sel_gds_proof_img_id, 
+			sa.rrno_card_copy_img_id, 
+			sa.bankbook_copy_img_id, 
+			sa.etc_doc_img_id, plcy_id, 
+			sa.ctrt_aply_ymd, 
+			sa.ctrt_bgng_ymd, 
+			sa.ctrt_term_val, 
+			sa.rvw_mngr_no, 
+			sa.mngr_nm, 
+			sa.mngr_eml, 
+			sa.mngr_tel_no, 
+			sa.bplc_addr, 
+			sa.aply_stts, 
+			sa.aprv_rjct_rsn,
+			u.user_nm 
+		FROM
 			store_application sa inner join users u 
 			on sa.aply_user_no = u.user_no
+		where
+			sa.aply_id = #{aplyId}
 		</select>
 	
 </mapper>
