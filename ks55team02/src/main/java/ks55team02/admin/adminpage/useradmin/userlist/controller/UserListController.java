@@ -40,7 +40,7 @@ public class UserListController {
 		// 1. 검색 조건에 맞는 전체 회원 수를 조회
 		int totalCount = userListService.getUserCount(searchCriteria);
 
-		// 2. 전체 회원 수와 검색 조건을 기반으로 SearchPagination 객체를 생성
+		// 2. 전체 회원 수와 검색 조건을 기반으로 CustomerPagination 객체를 생성
 		Pagination pagination = new Pagination(totalCount, searchCriteria);
 
 		// 3. 페이징 처리를 위해 DB 쿼리에 필요한 'offset'을 설정

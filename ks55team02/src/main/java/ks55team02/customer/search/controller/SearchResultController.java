@@ -23,7 +23,6 @@ public class SearchResultController {
 
     @GetMapping("/searchResult")
     public String showSearchResults(
-            // ★★★ @RequestParam을 아래와 같이 수정 ★★★
             @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword, 
             Model model) {
 
