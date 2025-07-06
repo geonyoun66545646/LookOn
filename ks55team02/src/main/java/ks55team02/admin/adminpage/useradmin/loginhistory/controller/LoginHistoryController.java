@@ -31,7 +31,6 @@ public class LoginHistoryController {
     @GetMapping("/loginHistory/search")
     public String searchLoginHistory(@ModelAttribute LoginHistory criteria, Model model) {
         loginHistoryService.loadLoginHistory(criteria, model);
-        // 목록 영역 전체를 리로드하기 위해 userListFragment를 반환
-        return "admin/adminpage/log/loginHistory :: userListFragment"; 
+        return "admin/adminpage/useradmin/loginHistory :: #userListContainer"; 
     }
 }
