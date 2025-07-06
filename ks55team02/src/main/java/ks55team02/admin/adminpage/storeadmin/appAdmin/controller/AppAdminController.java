@@ -25,8 +25,9 @@ public class AppAdminController {
 		
 		
 	List<AppAdmin> appAdminList = appAdminService.getAppAdminList(); 
-	log.info("AppAdminList에 담긴 데이터 개수: {}", appAdminList.size());
+	
 		model.addAttribute("title", "상점 신청");
+		// 상점 신청(어드민페이지) 전체 조회
 		model.addAttribute("appAdminList", appAdminList);
 		
 		return "admin/adminpage/storeadmin/appAdminView";
