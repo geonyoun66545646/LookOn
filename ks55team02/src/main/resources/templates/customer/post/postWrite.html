@@ -14,33 +14,12 @@
 	<th:block layout:fragment="jsFile">
         <!-- jQuery 라이브러리가 layoutMain에서 로드되지 않았다면 여기에 추가해야 합니다. -->
         <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+        <script th:src="@{/maincss/assets/js/customer/postWrite.js}"></script>
 	</th:block>
 	
 	<!-- 추가할 script -->
 	<th:block layout:fragment="jsScript">
-		<script th:inline="javascript">
-			$(() => {
-				// 게시글 작성 ajax 스크립트
-			    const $postForm = $('#postForm');
-			
-			    if($postForm.length) {
-			        $postForm.on('submit', e => {
-			            e.preventDefault();
-			
-			            $.ajax({
-			                url: $postForm.attr('action'),
-			                method: $postForm.attr('method'),
-			                data: $postForm.serialize()
-			            }).done(result => {
-			                window.location.href = '/customer/post/postList';
-			            }).fail(error => {
-			                console.error('AJAX 실패:', error);
-			                alert('글 작성중 오류 발생');
-			            });
-			        });
-			    }
-			});
-		</script>
+
 	</th:block>
 
 	<th:block layout:fragment="contents"> <!-- 1. "이것이 사진입니다" 라는 라벨 (절대 지우면 안 됨) -->
