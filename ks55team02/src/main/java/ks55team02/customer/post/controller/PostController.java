@@ -1,6 +1,8 @@
 package ks55team02.customer.post.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import ks55team02.customer.post.domain.Board;
-import ks55team02.customer.post.domain.Comment;
 import ks55team02.customer.post.domain.Interaction;
 import ks55team02.customer.post.domain.Post;
 import ks55team02.customer.post.service.BoardService;
@@ -33,11 +34,18 @@ public class PostController {
 	// 추천수 증가
 	@PostMapping("/interactionInsert")
 	@ResponseBody
-	public void insertInteraction(@PathVariable Interaction interaction, Model model) {
-		try {
-			postService.insertInterCount(interaction);
-		} catch (Exception e) {
-		}
+	public Map<String, Object> insertInteraction(Interaction interaction) {
+		Map<String, Object> response = new HashMap<>();
+	    try {
+	        postService.insertInterCount(interaction);
+	        response.put("result", "success");
+	    } catch (Exception e) {
+	        // 데이터베이스 제약 조건(예: 동일 유저 중복 추천) 등으로 인해 실패할 수 있습니다.
+	        log.error("Error increasing interaction count: {}", e.getMessage());
+	        response.put("result", "fail");
+	        response.put("message", e.getMessage());
+	    }
+	    return response;
 	}
 	
 	
@@ -189,6 +197,20 @@ public class PostController {
 		int offset = (page - 1) * size;
 
 		var postList = postService.selectPostListByBoardCd(bbsClsfCd, offset, size);
+		
+	    // 1. 페이지네이션 바에 한 번에 보여줄 페이지 번호의 개수 (사용자 요청: 10개)
+	    int pageNavSize = 10;
+
+	    // 2. 페이지네이션 바의 시작 번호 계산
+	    int startPageNum = ((page - 1) / pageNavSize) * pageNavSize + 1;
+
+	    // 3. 페이지네이션 바의 끝 번호 계산
+	    int endPageNum = startPageNum + pageNavSize - 1;
+
+	    // 4. (중요) 계산된 끝 번호가 실제 전체 페이지 수보다 클 경우, 끝 번호를 전체 페이지 수로 맞춤
+	    if (endPageNum > totalPage) {
+	        endPageNum = totalPage;
+	    }
 
 		model.addAttribute("boardList", boardList);
 		model.addAttribute("boardName", boardName);
@@ -197,6 +219,8 @@ public class PostController {
 		model.addAttribute("size", size);
 		model.addAttribute("totalPage", totalPage);
 		model.addAttribute("bbsClsfCd", bbsClsfCd);
+	    model.addAttribute("startPageNum", startPageNum);
+	    model.addAttribute("endPageNum", endPageNum);
 
 		return "customer/post/postList";
 	}
