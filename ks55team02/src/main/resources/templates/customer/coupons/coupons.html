@@ -1,251 +1,319 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{customer/layout/layoutMain}"> <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>내 쿠폰 페이지 - 페이징 예시</title>
-    
-    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/coupons.css}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{customer/layout/layoutMain}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>내 쿠폰 페이지 - 페이징 예시</title>
+
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/customcustomercss/coupons.css}">
 </head>
 
 
 
 <body>
 
-<th:block layout:fragment="contents">
+	<th:block layout:fragment="contents">
 
-    <div class="member-coupon">
-        <div class="member-coupon__top">
-            <nav class="member-coupon__1depth">
-                <a class="gtm-catch-click is-active amp-click-event" href="#" >
-                    보유 쿠폰 (711장)
-                </a>
-                <a class="gtm-catch-click amp-click-event" href="#">
-                    쿠폰 받기 (1351장)
-                </a>
-            </nav>
-            <button type="button" class="gtm-catch-click member-coupon__button-apply">
-                <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2.90039 8H14.1004" stroke="black"></path>
-                    <path d="M8.5 13.6L8.5 2.40001" stroke="black"></path>
-                </svg>
-                쿠폰등록
-            </button>
-        </div>
-        <div class="member-coupon__search">
-            <div class="custom-input-form amp-click-event">
-                <input type="text" placeholder="브랜드, 쿠폰명으로 검색해보세요." class="custom-input-form__input " name="searchTxt" value="">
-                <div class="custom-input-form__util">
-                    <button type="submit" aria-label="Reset" class="input-form__reset custom-input__button-delete is-active" style="display: none">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><title>삭제</title>
-                            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2Z" fill="#ccc"></path>
-                            <path d="M6.5 6.5L13.5 13.5" stroke="white"></path>
-                            <path d="M13.5 6.5L6.5 13.5" stroke="white"></path>
-                        </svg>
-                    </button>
-                    <button class="custom-input__button-search" type="submit" aria-label="Search">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="8.5" cy="8.5" r="5.5" stroke="#8A8A8A"></circle>
+		<div class="member-coupon">
+			<div class="member-coupon__top">
+				<nav id="couponTabs" class="member-coupon__1depth">
+					<a href="#" id="my-coupons-tab" class="gtm-catch-click is-active">
+						보유 쿠폰 <span id="my-coupons-count"></span>
+					</a> <a href="#" id="available-coupons-tab" class="gtm-catch-click">
+						쿠폰 받기 <span id="available-coupons-count"></span>
+					</a>
+				</nav>
+			</div>
+
+			<div class="member-coupon__search">
+				<div class="custom-input-form">
+					<input type="text" id="coupon-search-input"
+						placeholder="쿠폰명으로 검색해보세요." class="custom-input-form__input"
+						value="">
+					<div class="custom-input-form__util">
+						<button id="coupon-search-btn" class="custom-input__button-search"
+							type="button">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+								xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="8.5" cy="8.5" r="5.5"
+									stroke="#8A8A8A"></circle>
                             <path d="M12.5 12.5L17 17" stroke="#8A8A8A"></path>
                         </svg>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="member-coupon__util">
+				<div id="coupon-total-count" class="member-coupon__total">전체
+					0개</div>
+				<div class="member-coupon__sort">
+					<select id="coupon-sort-order" class="form-select form-select-sm">
+						<option value="expiry">만료임박순</option>
+						<option value="recent">최근발급순</option>
+						<option value="rate">할인율순</option>
+						<option value="amount">할인가격순</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="coupon-list-container">
+				<ul id="coupon-list-container" class="coupon-list">
+				</ul>
+			</div>
+
+			<div class="pagination-container mt-5"></div>
+		</div>
+
+	</th:block>
+
+	<th:block layout:fragment="jsFile">
+	</th:block>
+
+<th:block layout:fragment="jsScript">
+<script th:inline="javascript">
+/* <![CDATA[ */
+
+// 페이지의 모든 HTML 요소가 로드된 후에 스크립트를 실행합니다.
+document.addEventListener('DOMContentLoaded', function() {
+
+    // ===================================================================
+    // 1. 상태 및 요소 관리
+    // ===================================================================
+
+    // 현재 페이지의 모든 상태(탭, 검색어, 정렬, 페이지)를 관리하는 객체
+    let currentState = {
+        tab: 'my', // 'my'(보유쿠폰) 또는 'available'(쿠폰받기)
+        keyword: '',
+        sortOrder: 'recent', // 정렬 기본값
+        page: 1
+    };
+
+    // 자주 사용하는 HTML 요소들을 미리 찾아 변수에 저장 (성능 향상)
+    const tabContainer = document.getElementById('couponTabs');
+    const couponListContainer = document.getElementById('coupon-list-container');
+    const paginationContainer = document.querySelector('.pagination-container');
+    const searchInput = document.getElementById('coupon-search-input');
+    const searchBtn = document.getElementById('coupon-search-btn');
+    const sortOrderSelect = document.getElementById('coupon-sort-order');
+    const totalCountEl = document.getElementById('coupon-total-count');
+    const myCouponsCountEl = document.getElementById('my-coupons-count');
+    const availableCouponsCountEl = document.getElementById('available-coupons-count');
+
+
+    // ===================================================================
+    // 2. 핵심 로직 함수 (데이터 로딩 및 화면 그리기)
+    // ===================================================================
+
+    /**
+     * 현재 상태(currentState)를 기반으로 쿠폰 데이터를 로드하는 메인 함수
+     */
+    function loadCoupons() {
+        // 현재 선택된 탭에 따라 API 주소와 화면을 그릴 함수를 결정
+        const isMyCouponsTab = currentState.tab === 'my';
+        const apiUrl = isMyCouponsTab ? '/api/coupons/my' : '/api/coupons/available';
+        const renderFunction = isMyCouponsTab ? renderMyCoupons : renderAvailableCoupons;
+
+        // 서버에 보낼 URL 파라미터를 조합
+        const params = new URLSearchParams({
+            keyword: currentState.keyword,
+            sortOrder: currentState.sortOrder,
+            page: currentState.page
+        });
+
+        // 데이터를 불러오기 전, 로딩 메시지 표시
+        couponListContainer.innerHTML = '<li><p class="text-center p-5">로딩 중...</p></li>';
+
+        // fetch API를 이용한 비동기(AJAX) 요청
+        fetch(`${apiUrl}?${params.toString()}`)
+            .then(response => response.json())
+            .then(pageData => {
+                // 1. 쿠폰 목록 그리기
+                renderFunction(couponListContainer, pageData.list);
+                
+                // 2. 페이지네이션 그리기 (공용 부품 호출)
+                paginationContainer.innerHTML = renderPagination(pageData);
+
+                // 3. 전체 개수 및 탭별 개수 업데이트
+                totalCountEl.textContent = `전체 ${pageData.totalCount}개`;
+                if (isMyCouponsTab) {
+                    myCouponsCountEl.textContent = `(${pageData.totalCount})`;
+                } else {
+                    availableCouponsCountEl.textContent = `(${pageData.totalCount})`;
+                }
+            })
+            .catch(error => {
+                console.error('쿠폰 데이터를 불러오는 중 오류 발생:', error);
+                couponListContainer.innerHTML = '<li><p class="text-center p-5">데이터를 불러오는 데 실패했습니다.</p></li>';
+            });
+    }
+
+    /**
+     * '보유 쿠폰' 목록 HTML을 생성하는 함수 (수정본)
+     */
+    function renderMyCoupons(container, coupons) {
+        if (!coupons || coupons.length === 0) {
+            container.innerHTML = '<li><p class="text-center p-5">보유한 쿠폰이 없습니다.</p></li>';
+            return;
+        }
+        let html = '';
+        coupons.forEach(userCoupon => {
+            // ★★★ 중요: userCoupon 안에 들어있는 coupon 객체의 상세 정보를 사용합니다. ★★★
+            const coupon = userCoupon.coupon; 
+            const discount = coupon.dscntTypeCd === 'RATE' ? `${coupon.dscntVl}%` : `${coupon.dscntVl.toLocaleString()}원`;
+            const formattedExpiryDate = userCoupon.indivExpryDt ? new Date(userCoupon.indivExpryDt).toLocaleDateString() : '기한 없음';
+
+            
+         // userCoupon.useYn 값(true/false)에 따라 버튼의 텍스트와 비활성화 상태를 동적으로 결정합니다.
+            const isUsed = userCoupon.useYn;
+            const buttonText = isUsed ? '사용완료' : '사용하기';
+            const buttonDisabled = isUsed ? 'disabled' : '';
+            
+            
+            // isUsed 값에 따라 coupon-item에 is-used 클래스를 추가하여 시각적으로 구분합니다.
+            html += `
+                <li class="coupon-item ${isUsed ? 'is-used' : ''}">
+                    <div class="coupon-details">
+                        <span class="coupon-percentage">${discount}</span>
+                        <span class="coupon-name">${coupon.cpnNm}</span>
+                        <span class="coupon-conditions">
+                            ${coupon.minOrdrAmt.toLocaleString()}원 이상 구매 시, 최대 ${coupon.maxDscntAmt.toLocaleString()}원 할인
+                        </span>
+                        <span class="coupon-period">만료일: ${formattedExpiryDate}</span>
+                    </div>
+                    <button class="coupon-download-btn" ${buttonDisabled}>
+                        ${buttonText}
                     </button>
-                </div>
-            </div>
-        </div>
+                </li>
+            `;
+        });
+        container.innerHTML = html;
+    }
 
-        <div class="member-coupon__category-tab-wrap">
-            <div class="member-coupon__category-tab set-draggable" draggable="true">
-                <button type="button" class="gtm-catch-click member-coupon__category-tab__button is-active">전체</button>
-                <button type="button" class="gtm-catch-click member-coupon__category-tab__button">만료임박</button>
-                <button type="button" class="gtm-catch-click member-coupon__category-tab__button">키즈</button>
-                <button type="button" class="gtm-catch-click member-coupon__category-tab__button">플레이어</button>
-                <button type="button" class="gtm-catch-click member-coupon__category-tab__button">뷰티</button>
-                <button type="button" class="gtm-catch-click member-coupon__category-tab__button">부티크</button>
-                <button type="button" class="gtm-catch-click member-coupon__category-tab__button">어스</button>
-                <button type="button" class="gtm-catch-click member-coupon__category-tab__button">회원혜택</button>
-            </div>
-        </div>
+    /**
+     * '발급 가능 쿠폰' 목록 HTML을 생성하는 함수 (수정본)
+     */
+    function renderAvailableCoupons(container, coupons) {
+        if (!coupons || coupons.length === 0) {
+            container.innerHTML = '<li><p class="text-center p-5">발급 가능한 쿠폰이 없습니다.</p></li>';
+            return;
+        }
+        let html = '';
+        coupons.forEach(coupon => {
+            const discount = coupon.dscntTypeCd === 'RATE' ? `${coupon.dscntVl}%` : `${coupon.dscntVl.toLocaleString()}원`;
+            const formattedExpiryDate = coupon.vldEndDt ? new Date(coupon.vldEndDt).toLocaleDateString() : '기한 없음';
+            
+            html += `
+                <li class="coupon-item">
+                    <div class="coupon-details">
+                        <span class="coupon-percentage">${discount}</span>
+                        <span class="coupon-name">${coupon.cpnNm}</span>
+                        <span class="coupon-conditions">
+                            ${coupon.minOrdrAmt.toLocaleString()}원 이상 구매 시, 최대 ${coupon.maxDscntAmt.toLocaleString()}원 할인
+                        </span>
+                        <span class="coupon-period">유효기간: ${formattedExpiryDate}까지</span>
+                    </div>
+                    <button class="coupon-download-btn" data-coupon-id="${coupon.pblcnCpnId}">쿠폰받기</button>
+                </li>
+            `;
+        });
+        container.innerHTML = html;
+    }
 
-        <div class="member-coupon__util">
-            <div class="member-coupon__total">
-                전체 711개
-            </div>
-            <div class="member-coupon__sort">
-                <input type="checkbox" id="CouponSort">
-                <label for="CouponSort">
-                    최신순
-                    <svg width="12" height="12" viewBox="0 0 18 18" fill="none">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M8.99584 11.49L4.00484 6.5L3.33984 7.165L8.99584 12.821L14.6528 7.165L13.9868 6.5L8.99584 11.49Z" fill="currentColor" style="vector-effect: non-scaling-stroke;"></path>
-                    </svg>
-                </label>
-                <div class="member-coupon__sort__list">
-                    <button type="button" class="is-active">최신순</button>
-                    <button type="button">할인순</button>
-                </div>
-            </div>
-        </div>
 
-        <div class="coupon-list-container">
-            <ul id="couponList" class="coupon-list">
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-percentage">5%</span>
-                        <span class="coupon-name">[중복 사용 가능] 무인성 연간회원 5% 재구매 쿠폰</span>
-                        <span class="coupon-conditions">1만원 이상 구매 시, 최대 5천원 할인</span>
-                        <span class="coupon-period">발급일 5일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-amount">1만원</span>
-                        <span class="coupon-name">[신규] 특별 가입 환영 1만원 할인 쿠폰</span>
-                        <span class="coupon-conditions">5만원 이상 구매 시, 최대 1만원 할인</span>
-                        <span class="coupon-period">발급일 3일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-percentage">10%</span>
-                        <span class="coupon-name">[HOT] 여름 시즌 한정 10% 할인 쿠폰</span>
-                        <span class="coupon-conditions">3만원 이상 구매 시, 최대 8천원 할인</span>
-                        <span class="coupon-period">발급일 2일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-percentage">7%</span>
-                        <span class="coupon-name">[ONLY APP] 모바일 앱 전용 7% 할인 쿠폰</span>
-                        <span class="coupon-conditions">1만원 이상 구매 시, 최대 7천원 할인</span>
-                        <span class="coupon-period">발급일 1일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-amount">2천원</span>
-                        <span class="coupon-name">[친구 초대] 2천원 감사 할인 쿠폰</span>
-                        <span class="coupon-conditions">2만원 이상 구매 시, 최대 2천원 할인</span>
-                        <span class="coupon-period">발급일 4일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-percentage">12%</span>
-                        <span class="coupon-name">[베스트] 인기 상품 12% 특별 할인</span>
-                        <span class="coupon-conditions">5만원 이상 구매 시, 최대 1.5만원 할인</span>
-                        <span class="coupon-period">발급일 6일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-amount">5천원</span>
-                        <span class="coupon-name">[재구매] 단골 고객 감사 5천원 쿠폰</span>
-                        <span class="coupon-conditions">3만원 이상 구매 시, 최대 5천원 할인</span>
-                        <span class="coupon-period">발급일 10일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-percentage">8%</span>
-                        <span class="coupon-name">[주말 특가] 주말 한정 8% 할인 쿠폰</span>
-                        <span class="coupon-conditions">2.5만원 이상 구매 시, 최대 8천원 할인</span>
-                        <span class="coupon-period">발급일 1일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-amount">1만원</span>
-                        <span class="coupon-name">[VIP 전용] 프리미엄 1만원 할인 쿠폰</span>
-                        <span class="coupon-conditions">10만원 이상 구매 시, 최대 1만원 할인</span>
-                        <span class="coupon-period">발급일 7일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-percentage">6%</span>
-                        <span class="coupon-name">[새로운 시즌] 6% 신상품 할인 쿠폰</span>
-                        <span class="coupon-conditions">2만원 이상 구매 시, 최대 6천원 할인</span>
-                        <span class="coupon-period">발급일 3일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-amount">3천원</span>
-                        <span class="coupon-name">[출석 체크] 3천원 추가 할인 쿠폰</span>
-                        <span class="coupon-conditions">1만원 이상 구매 시, 최대 3천원 할인</span>
-                        <span class="coupon-period">발급일 2일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-percentage">9%</span>
-                        <span class="coupon-name">[멤버십] 등급별 9% 할인 쿠폰</span>
-                        <span class="coupon-conditions">4만원 이상 구매 시, 최대 9천원 할인</span>
-                        <span class="coupon-period">발급일 5일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-amount">7천원</span>
-                        <span class="coupon-name">[이벤트] 기간 한정 7천원 쿠폰</span>
-                        <span class="coupon-conditions">3.5만원 이상 구매 시, 최대 7천원 할인</span>
-                        <span class="coupon-period">발급일 8일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-percentage">15%</span>
-                        <span class="coupon-name">[슈퍼 세일] 역대급 15% 할인 쿠폰</span>
-                        <span class="coupon-conditions">7만원 이상 구매 시, 최대 2만원 할인</span>
-                        <span class="coupon-period">발급일 12일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-                <li class="coupon-item">
-                    <div class="coupon-details">
-                        <span class="coupon-amount">4천원</span>
-                        <span class="coupon-name">[앱 푸시] 알림 동의 4천원 쿠폰</span>
-                        <span class="coupon-conditions">2만원 이상 구매 시, 최대 4천원 할인</span>
-                        <span class="coupon-period">발급일 2일 전</span>
-                    </div>
-                    <button class="coupon-download-btn">쿠폰받기</button>
-                </li>
-            </ul>
 
-            <div class="pagination">
-                <button class="prev-page" disabled>이전</button>
-                <div id="pageNumbers" class="page-numbers">
-                    <button class="page-number is-active">1</button>
-                    <button class="page-number">2</button>
-                    <button class="page-number">3</button>
-                    <button class="page-number">4</button>
-                    <button class="page-number">5</button>
-                    <span>...</span>
-                    <button class="page-number">48</button> </div>
-                <button class="next-page">다음</button>
-            </div>
-            </div>
-        </div>
-        
-            </th:block>
+    // ===================================================================
+    // 3. 이벤트 핸들러 바인딩 (사용자 행동 감지 및 처리)
+    // ===================================================================
 
-    <th:block layout:fragment="jsFile">
-        </th:block>
-    <th:block layout:fragment="jsScript">
-        </th:block>
+    // 탭 메뉴 클릭 시
+    tabContainer.addEventListener('click', function(event) {
+        event.preventDefault();
+        const clickedTab = event.target.closest('a');
+        if (!clickedTab || clickedTab.classList.contains('is-active')) return;
+
+        tabContainer.querySelectorAll('a').forEach(a => a.classList.remove('is-active'));
+        clickedTab.classList.add('is-active');
+
+        currentState.tab = clickedTab.id === 'my-coupons-tab' ? 'my' : 'available';
+        currentState.page = 1;
+        loadCoupons();
+    });
+
+    // 검색 버튼 클릭 시
+    searchBtn.addEventListener('click', function() {
+        currentState.keyword = searchInput.value;
+        currentState.page = 1;
+        loadCoupons();
+    });
+    
+    // 검색창에서 Enter 키 입력 시
+    searchInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            searchBtn.click();
+        }
+    });
+
+    // 정렬 순서 변경 시
+    sortOrderSelect.addEventListener('change', function() {
+        currentState.sortOrder = this.value;
+        currentState.page = 1;
+        loadCoupons();
+    });
+
+    // 페이지네이션 버튼 클릭 시 (이벤트 위임)
+    paginationContainer.addEventListener('click', function(event) {
+        const pageLink = event.target.closest('a.page-link');
+        if (pageLink && pageLink.dataset.page) {
+            event.preventDefault();
+            currentState.page = parseInt(pageLink.dataset.page, 10);
+            loadCoupons();
+        }
+    });
+    
+    // '쿠폰받기' 버튼 클릭 시 (이벤트 위임)
+    couponListContainer.addEventListener('click', function(event) {
+        const downloadBtn = event.target.closest('.coupon-download-btn');
+        if (downloadBtn && downloadBtn.dataset.couponId && !downloadBtn.disabled) {
+            const couponId = downloadBtn.dataset.couponId;
+            
+            if (confirm("쿠폰을 발급받으시겠습니까?")) {
+                fetch(`/api/coupons/${couponId}/issue`, { method: 'POST' })
+                    .then(response => {
+                        if (!response.ok) {
+                            // 서버에서 에러 응답이 왔을 때 처리
+                            return response.json().then(err => { throw new Error(err.message) });
+                        }
+                        return response.json();
+                    })
+                    .then(result => {
+                        alert(result.message);
+                        // 성공 시 버튼 비활성화
+                        downloadBtn.textContent = '발급완료';
+                        downloadBtn.disabled = true;
+                    })
+                    .catch(error => {
+                        console.error('쿠폰 발급 오류:', error);
+                        alert(error.message || '쿠폰 발급 중 오류가 발생했습니다.');
+                    });
+            }
+        }
+    });
+
+    // ===================================================================
+    // 4. 최초 데이터 로딩
+    // ===================================================================
+    loadCoupons();
+
+});
+
+/* ]]> */
+</script>
+</th:block>
 
 </body>
 

@@ -1,12 +1,12 @@
 package ks55team02.customer.search.service.impl;
 
-import ks55team02.customer.search.domain.SearchPagination;
 import ks55team02.customer.search.domain.PostsSearch;
 import ks55team02.customer.search.domain.ProductsSearch;
 import ks55team02.customer.search.domain.Search;
 import ks55team02.customer.search.domain.UsersSearch;
 import ks55team02.customer.search.mapper.SearchMapper;
 import ks55team02.customer.search.service.SearchService;
+import ks55team02.util.CustomerPagination;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +50,7 @@ public class SearchServiceImpl implements SearchService {
      * @return 페이지네이션 정보가 포함된 상품 목록
      */
     @Override
-    public SearchPagination<ProductsSearch> getProductsList(String keyword, int page) {
+    public CustomerPagination<ProductsSearch> getProductsList(String keyword, int page) {
         // 1. 검색어에 해당하는 전체 상품 개수를 가져옵니다.
         int totalCount = searchMapper.getProductsCount(keyword);
 
@@ -66,15 +66,15 @@ public class SearchServiceImpl implements SearchService {
         // 4. 해당 페이지의 상품 목록만 가져옵니다.
         List<ProductsSearch> products = searchMapper.searchProducts(paramMap);
 
-        // 5. 최종적으로 데이터 목록과 페이지 정보를 담은 SearchPagination 객체를 생성하여 반환합니다.
-        return new SearchPagination<>(products, totalCount, page, PAGE_SIZE, BLOCK_SIZE);
+        // 5. 최종적으로 데이터 목록과 페이지 정보를 담은 CustomerPagination 객체를 생성하여 반환합니다.
+        return new CustomerPagination<>(products, totalCount, page, PAGE_SIZE, BLOCK_SIZE);
     }
 
     /**
      * '게시글' 탭의 페이지네이션을 위한 메서드.
      */
     @Override
-    public SearchPagination<PostsSearch> getPostsList(String keyword, int page) {
+    public CustomerPagination<PostsSearch> getPostsList(String keyword, int page) {
         int totalCount = searchMapper.getPostsCount(keyword);
         int offset = (page - 1) * PAGE_SIZE;
 
@@ -84,14 +84,14 @@ public class SearchServiceImpl implements SearchService {
         paramMap.put("offset", offset);
 
         List<PostsSearch> posts = searchMapper.searchPosts(paramMap);
-        return new SearchPagination<>(posts, totalCount, page, PAGE_SIZE, BLOCK_SIZE);
+        return new CustomerPagination<>(posts, totalCount, page, PAGE_SIZE, BLOCK_SIZE);
     }
 
     /**
      * '사용자' 탭의 페이지네이션을 위한 메서드.
      */
     @Override
-    public SearchPagination<UsersSearch> getUsersList(String keyword, int page) {
+    public CustomerPagination<UsersSearch> getUsersList(String keyword, int page) {
         int totalCount = searchMapper.getUsersCount(keyword);
         int offset = (page - 1) * PAGE_SIZE;
 
@@ -101,6 +101,6 @@ public class SearchServiceImpl implements SearchService {
         paramMap.put("offset", offset);
 
         List<UsersSearch> users = searchMapper.searchUsers(paramMap);
-        return new SearchPagination<>(users, totalCount, page, PAGE_SIZE, BLOCK_SIZE);
+        return new CustomerPagination<>(users, totalCount, page, PAGE_SIZE, BLOCK_SIZE);
     }
 }
