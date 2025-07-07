@@ -7,15 +7,11 @@
     <meta name="appDetail" content="appDetail" />
     <th:block layout:fragment="customCss">
         <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/appDetailView.css}">
-        
-        <script src="${/summernote/summernote-lite.js}"></script>
- 	 	<script src="${/summernote/lang/summernote-ko-KR.js}"></script>
-  		<link rel="stylesheet" href="${/summernote/summernote-lite.css}">
 
     </th:block>   
 </head>
 <th:block layout:fragment="jsFile">
-    <script th:src="@{/summernote/summernote-lite.js}"></script>
+   
     </th:block>
 
 <th:block layout:fragment="contents">
@@ -100,7 +96,6 @@
                                 </th>
                                 <th>문서 분류</th>
                                 <th>문서 이름</th>
-                                <th>등록 여부</th>
                                 <th class="text-end">Action</th>
                             </tr>
                             </thead>
@@ -113,7 +108,6 @@
                                 </td>
                                 <td>사업자 등록증</td>
                                 <td th:text="${appAdmin.brnoImgId}"></td>
-                                <td th:text="${appAdmin.brnoImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -135,7 +129,6 @@
                                 </td>
                                 <td>통신 판매업 신고증</td>
                                 <td th:text="${appAdmin.cmmDclrImgId}"></td>
-                                <td th:text="${appAdmin.cmmDclrImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -157,7 +150,6 @@
                                 </td>
                                 <td>판매 상품 관련 증빙서류</td>
                                 <td th:text="${appAdmin.selGdsProofImgId}"></td>
-                                <td th:text="${appAdmin.selGdsProofImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -179,7 +171,6 @@
                                 </td>
                                 <td>주민등록 증 사본</td>
                                 <td th:text="${appAdmin.rrnoCardCopyImgId}"></td>
-                                <td th:text="${appAdmin.rrnoCardCopyImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -201,7 +192,6 @@
                                 </td>
                                 <td>통장 사본</td>
                                 <td th:text="${appAdmin.bankbookCopyImgId}"></td>
-                                <td th:text="${appAdmin.bankbookCopyImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -223,7 +213,6 @@
                                 </td>
                                 <td>기타</td>
                                 <td th:text="${appAdmin.etcDocImgId}"></td>
-                                <td th:text="${appAdmin.etcDocImgId != null and appAdmin.selGdsProofImgId != '' ? '✅' : '❌'}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
@@ -258,7 +247,8 @@
     <div class="card">
         <div class="card-body">
             <div class="container">
-			<textarea id="summernote" rows="5" name="explanation"></textarea>
+			<textarea >
+			</textarea>
 		</div>
 
         </div>
@@ -266,16 +256,7 @@
     </th:block>
 
 <th:block layout:fragment="jsScript">
-  $(document).ready(function() {
-          $('#summernote').summernote({
-              height: 300,                 
-              minHeight: null,            
-              maxHeight: null,             
-              focus: true,                 
-              lang: "ko-KR",            
-              placeholder: '반려/보류 사유를 적으시오'
-          });
-        });
+ 
 </th:block>
 
 
