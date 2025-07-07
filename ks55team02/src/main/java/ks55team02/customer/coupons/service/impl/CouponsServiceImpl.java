@@ -66,15 +66,22 @@ public class CouponsServiceImpl implements CouponsService {
 
     @Override
     public boolean issueCouponToUser(String userNo, String couponId) {
-        // TODO: 여기에 쿠폰 발급 전 유효성 검사(예: 이미 발급받았는지, 수량이 남았는지 등) 로직 추가
-        
+        // TODO: 여기에 쿠폰 발급 전 유효성 검사 로직 추가
+
+        // ★★★ 수정된 부분 시작 ★★★
+        // 1. 새로운 사용자 쿠폰 ID를 생성합니다.
+        String nextUserCouponId = couponsMapper.getNextUserCouponId();
+
         UserCoupons newUserCoupon = new UserCoupons();
+        newUserCoupon.setUserCpnId(nextUserCouponId); // 생성된 ID 설정
         newUserCoupon.setUserNo(userNo);
         newUserCoupon.setPblcnCpnId(couponId);
-        // ... 그 외 필요한 정보 설정 ...
-        
+        // ... 그 외 필요한 정보 설정 (예: 개별 만료일 계산) ...
+
+        // ★★★ 수정된 부분 끝 ★★★
+
         couponsMapper.issueUserCoupon(newUserCoupon);
-        
+
         return true; // 성공 시 true 반환
     }
 }

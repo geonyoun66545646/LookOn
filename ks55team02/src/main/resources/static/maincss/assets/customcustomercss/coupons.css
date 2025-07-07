@@ -1,319 +1,340 @@
 /* 기본 스타일 초기화 */
-        body {
-            font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Dotum', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
-        }
+body {
+	font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', 'Dotum', sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #f5f5f5;
+	color: #333;
+}
 
-        .member-coupon {
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: #fff;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border-radius: 8px;
-        }
+.member-coupon {
+	margin: 40px auto;
+	background-color: #fff;
+	padding: 40px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	border-radius: 8px;
+}
 
-        /* Top Section */
-        .member-coupon__top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 20px;
-        }
+/* Top Section */
+.member-coupon__top {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding-bottom: 20px;
+	border-bottom: 1px solid #eee;
+	margin-bottom: 20px;
+}
 
-        .member-coupon__1depth {
-            display: flex;
-            gap: 15px;
-        }
+.member-coupon__1depth {
+	display: flex;
+	gap: 15px;
+}
 
-        .member-coupon__1depth a {
-            text-decoration: none;
-            color: #888;
-            font-weight: bold;
-            padding-bottom: 5px;
-            position: relative;
-            font-size: 1.1em;
-        }
+.member-coupon__1depth a {
+	text-decoration: none;
+	color: #888;
+	font-weight: bold;
+	padding-bottom: 5px;
+	position: relative;
+	font-size: 1.1em;
+}
 
-        .member-coupon__1depth a.is-active {
-            color: #333;
-            border-bottom: 2px solid #333;
-        }
+.member-coupon__1depth a.is-active {
+	color: #333;
+	border-bottom: 2px solid #333;
+}
 
-        .member-coupon__button-apply {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.9em;
-            color: #333;
-        }
+.member-coupon__button-apply {
+	background-color: #f8f8f8;
+	border: 1px solid #ddd;
+	padding: 8px 15px;
+	border-radius: 5px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 0.9em;
+	color: #333;
+}
 
-        .member-coupon__button-apply svg {
-            stroke: #333;
-        }
+.member-coupon__button-apply svg {
+	stroke: #333;
+}
 
-        /* Search Section */
-        .member-coupon__search {
-            margin-bottom: 20px;
-        }
+/* Search Section */
+.member-coupon__search {
+	margin-bottom: 20px;
+}
 
-        .custom-input-form {
-            display: flex;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-        }
+.custom-input-form {
+	display: flex;
+	border: 1px solid #ddd;
+	border-radius: 5px;
+	overflow: hidden;
+}
 
-        .custom-input-form__input {
-            flex-grow: 1;
-            border: none;
-            padding: 10px 15px;
-            font-size: 0.95em;
-            outline: none;
-        }
+.custom-input-form__input {
+	flex-grow: 1;
+	border: none;
+	padding: 10px 15px;
+	font-size: 0.95em;
+	outline: none;
+}
 
-        .custom-input-form__util {
-            display: flex;
-            border-left: 1px solid #eee;
-        }
+.custom-input-form__util {
+	display: flex;
+	border-left: 1px solid #eee;
+}
 
-        .custom-input__button-delete,
-        .custom-input__button-search {
-            background: none;
-            border: none;
-            padding: 10px 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.custom-input__button-delete, .custom-input__button-search {
+	background: none;
+	border: none;
+	padding: 10px 12px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
 
-        /* Category Tab */
-        .member-coupon__category-tab-wrap {
-            margin-bottom: 20px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch; /* iOS 스크롤 부드럽게 */
-        }
+/* Category Tab */
+.member-coupon__category-tab-wrap {
+	margin-bottom: 20px;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch; /* iOS 스크롤 부드럽게 */
+}
 
-        .member-coupon__category-tab {
-            display: flex;
-            gap: 8px;
-            padding-bottom: 10px; /* 스크롤바 공간 */
-        }
+.member-coupon__category-tab {
+	display: flex;
+	gap: 8px;
+	padding-bottom: 10px; /* 스크롤바 공간 */
+}
 
-        .member-coupon__category-tab__button {
-            background-color: #f0f0f0;
-            border: 1px solid #e0e0e0;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85em;
-            color: #555;
-            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-        }
+.member-coupon__category-tab__button {
+	background-color: #f0f0f0;
+	border: 1px solid #e0e0e0;
+	padding: 8px 15px;
+	border-radius: 20px;
+	cursor: pointer;
+	font-size: 0.85em;
+	color: #555;
+	white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+}
 
-        .member-coupon__category-tab__button.is-active {
-            background-color: #333;
-            color: white;
-            border-color: #333;
-        }
+.member-coupon__category-tab__button.is-active {
+	background-color: #333;
+	color: white;
+	border-color: #333;
+}
 
-        /* Utility Section */
-        .member-coupon__util {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
+/* Utility Section */
+.member-coupon__util {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #eee;
+}
 
-        .member-coupon__total {
-            font-size: 0.9em;
-            color: #666;
-        }
+.member-coupon__total {
+	font-size: 0.9em;
+	color: #666;
+}
 
-        .member-coupon__sort {
-            position: relative;
-        }
+.member-coupon__sort {
+	position: relative;
+}
 
-        .member-coupon__sort input[type="checkbox"] {
-            display: none; /* 체크박스 숨기기 */
-        }
+.member-coupon__sort input[type="checkbox"] {
+	display: none; /* 체크박스 숨기기 */
+}
 
-        .member-coupon__sort label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            color: #333;
-        }
+.member-coupon__sort label {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	cursor: pointer;
+	font-size: 0.9em;
+	color: #333;
+}
 
-        .member-coupon__sort label svg {
-            fill: currentColor;
-            transform: rotate(0deg);
-            transition: transform 0.2s ease-in-out;
-        }
+.member-coupon__sort label svg {
+	fill: currentColor;
+	transform: rotate(0deg);
+	transition: transform 0.2s ease-in-out;
+}
 
-        .member-coupon__sort input[type="checkbox"]:checked + label svg {
-            transform: rotate(180deg);
-        }
+.member-coupon__sort input[type="checkbox"]:checked+label svg {
+	transform: rotate(180deg);
+}
 
-        .member-coupon__sort__list {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            min-width: 100px;
-            z-index: 10;
-            display: none; /* 기본 숨김 */
-        }
+.member-coupon__sort__list {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 5px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	min-width: 100px;
+	z-index: 10;
+	display: none; /* 기본 숨김 */
+}
 
-        .member-coupon__sort input[type="checkbox"]:checked ~ .member-coupon__sort__list {
-            display: block; /* 체크되면 보이기 */
-        }
+.member-coupon__sort input[type="checkbox"]:checked ~
+	.member-coupon__sort__list {
+	display: block; /* 체크되면 보이기 */
+}
 
-        .member-coupon__sort__list button {
-            display: block;
-            width: 100%;
-            text-align: left;
-            padding: 10px 15px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 0.9em;
-            color: #555;
-        }
+.member-coupon__sort__list button {
+	display: block;
+	width: 100%;
+	text-align: left;
+	padding: 10px 15px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 0.9em;
+	color: #555;
+}
 
-        .member-coupon__sort__list button:hover,
-        .member-coupon__sort__list button.is-active {
-            background-color: #f0f0f0;
-            color: #333;
-        }
+.member-coupon__sort__list button:hover, .member-coupon__sort__list button.is-active
+	{
+	background-color: #f0f0f0;
+	color: #333;
+}
+
+/* 쿠폰 목록 컨테이너 */
+.coupon-list-container {
+	margin-top: 20px;
+	/* border-top: 1px solid #eee; */ /* 무신사 페이지처럼 구분선 추가 */
+	/* padding-top: 20px; */
+}
+
+/* 쿠폰 목록 */
+.coupon-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.coupon-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px 0;
+	border-bottom: 1px solid #eee;
+}
+
+.coupon-item:last-child {
+	border-bottom: none; /* 마지막 항목은 하단 선 제거 */
+}
+
+.coupon-details {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.coupon-percentage, .coupon-amount {
+	font-weight: bold;
+	font-size: 22px;
+	color: #333;
+	margin-bottom: 5px;
+}
+
+.coupon-name {
+	font-size: 1em;
+	color: #555;
+	margin-bottom: 3px;
+}
+
+.coupon-conditions, .coupon-period {
+	font-size: 0.85em;
+	color: #888;
+}
+
+.coupon-download-btn {
+	background-color: #d2b48c; /* 버튼 색상 예시 */
+	color: white;
+	border: none;
+	padding: 8px 15px;
+	border-radius: 5px;
+	cursor: pointer;
+	white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+}
+
+.coupon-download-btn:hover {
+	background-color: #c4a282;
+}
+
+/* 페이지네이션 */
+.pagination {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 30px;
+	padding: 20px 0;
+	border-top: 1px solid #eee; /* 페이지네이션 상단 구분선 */
+}
+
+.pagination button {
+	background-color: #f8f8f8;
+	border: 1px solid #ddd;
+	padding: 8px 12px;
+	margin: 0 5px;
+	cursor: pointer;
+	border-radius: 4px;
+	font-size: 0.9em;
+}
+
+.pagination button:hover:not(.is-active) {
+	background-color: #e9e9e9;
+}
+
+.pagination button.is-active {
+	background-color: #007bff;
+	color: white;
+	border-color: #007bff;
+}
+
+.pagination .page-numbers {
+	display: flex;
+	margin: 0 10px;
+}
+
+.pagination .page-numbers button {
+	min-width: 30px; /* 페이지 번호 버튼 크기 조절 */
+}
+
+.pagination .prev-page, .pagination .next-page {
+	font-weight: bold;
+}
+
+.pagination button:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+/* SweetAlert 창 크기 및 폰트 크기 조정 */
+.swal2-popup {
+    width: 400px !important; /* 예시 이미지와 비슷한 너비 */
+    font-size: 16px !important; /* 기본 폰트 크기 약간 증가 */
+}
 
 
-        /* 쿠폰 목록 컨테이너 */
-        .coupon-list-container {
-            margin-top: 20px;
-            /* border-top: 1px solid #eee; */ /* 무신사 페이지처럼 구분선 추가 */
-            /* padding-top: 20px; */
-        }
+.swal2-title {
+    font-size: 20px !important; /* 제목 폰트 크기 조정 */
+}
 
-        /* 쿠폰 목록 */
-        .coupon-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
 
-        .coupon-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
+.swal2-content {
+    font-size: 14px !important; /* 내용 폰트 크기 조정 */
+}
 
-        .coupon-item:last-child {
-            border-bottom: none; /* 마지막 항목은 하단 선 제거 */
-        }
 
-        .coupon-details {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .coupon-percentage, .coupon-amount {
-            font-weight: bold;
-            font-size: 1.2em;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .coupon-name {
-            font-size: 1em;
-            color: #555;
-            margin-bottom: 3px;
-        }
-
-        .coupon-conditions, .coupon-period {
-            font-size: 0.85em;
-            color: #888;
-        }
-
-        .coupon-download-btn {
-            background-color: #007bff; /* 버튼 색상 예시 */
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-        }
-
-        .coupon-download-btn:hover {
-            background-color: #0056b3;
-        }
-
-        /* 페이지네이션 */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 30px;
-            padding: 20px 0;
-            border-top: 1px solid #eee; /* 페이지네이션 상단 구분선 */
-        }
-
-        .pagination button {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
-            padding: 8px 12px;
-            margin: 0 5px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-
-        .pagination button:hover:not(.is-active) {
-            background-color: #e9e9e9;
-        }
-
-        .pagination button.is-active {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-
-        .pagination .page-numbers {
-            display: flex;
-            margin: 0 10px;
-        }
-
-        .pagination .page-numbers button {
-            min-width: 30px; /* 페이지 번호 버튼 크기 조절 */
-        }
-
-        .pagination .prev-page, .pagination .next-page {
-            font-weight: bold;
-        }
-
-        .pagination button:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
+.swal2-confirm,
+.swal2-cancel {
+    font-size: 14px !important; /* 버튼 폰트 크기 조정 */
+    padding: 8px 16px !important; /* 버튼 패딩 조정 */
+}

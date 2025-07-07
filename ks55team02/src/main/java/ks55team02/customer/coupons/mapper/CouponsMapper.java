@@ -44,5 +44,11 @@ public interface CouponsMapper {
      * 사용자에게 쿠폰 발급 (user_coupons 테이블에 INSERT)
      */
     void issueUserCoupon(UserCoupons userCoupon);
+    
+    /**
+     * 새로운 사용자 쿠폰 ID를 생성하기 위한 쿼리
+     * @return 생성될 다음 사용자 쿠폰 ID (예: USRCPN_055)
+     */
+    String getNextUserCouponId();
 
 }

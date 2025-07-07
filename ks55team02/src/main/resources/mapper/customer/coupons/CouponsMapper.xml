@@ -1,122 +1,148 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="ks55team02.customer.coupons.mapper.CouponsMapper">
+<mapper
+	namespace="ks55team02.customer.coupons.mapper.CouponsMapper">
 
-    <resultMap id="couponsResultMap" type="ks55team02.customer.coupons.domain.Coupons">
-        <result column="pblcn_cpn_id" property="pblcnCpnId"/>
-        <result column="pblcn_cpn_cd" property="pblcnCpnCd"/>
-        <result column="user_no" property="userNo"/>
-        <result column="cpn_nm" property="cpnNm"/>
-        <result column="dscnt_type_cd" property="dscntTypeCd"/>
-        <result column="dscnt_vl" property="dscntVl"/>
-        <result column="min_ordr_amt" property="minOrdrAmt"/>
-        <result column="max_dscnt_amt" property="maxDscntAmt"/>
-        <result column="vld_bgng_dt" property="vldBgngDt"/>
-        <result column="vld_end_dt" property="vldEndDt"/>
-        <result column="tot_use_lmt_nmtm" property="totUseLmtNmtm"/>
-        <result column="user_per_use_lmt_nmtm" property="userPerUseLmtNmtm"/>
-        <result column="actvtn_yn" property="actvtnYn"/>
-        <result column="crt_dt" property="crtDt"/>
-        <result column="mdfcn_dt" property="mdfcnDt"/>
-    </resultMap>
+	<resultMap id="couponsResultMap"
+		type="ks55team02.customer.coupons.domain.Coupons">
+		<result column="pblcn_cpn_id" property="pblcnCpnId" />
+		<result column="pblcn_cpn_cd" property="pblcnCpnCd" />
+		<result column="user_no" property="userNo" />
+		<result column="cpn_nm" property="cpnNm" />
+		<result column="dscnt_vl" property="dscntVl" />
+		<result column="min_ordr_amt" property="minOrdrAmt" />
+		<result column="max_dscnt_amt" property="maxDscntAmt" />
+		<result column="vld_bgng_dt" property="vldBgngDt" />
+		<result column="vld_end_dt" property="vldEndDt" />
+		<result column="tot_use_lmt_nmtm" property="totUseLmtNmtm" />
+		<result column="user_per_use_lmt_nmtm"
+			property="userPerUseLmtNmtm" />
+		<result column="actvtn_yn" property="actvtnYn" />
+		<result column="crt_dt" property="crtDt" />
+		<result column="mdfcn_dt" property="mdfcnDt" />
+	</resultMap>
 
-    <resultMap id="userCouponsResultMap" type="ks55team02.customer.coupons.domain.UserCoupons">
-        <result column="user_cpn_id" property="userCpnId"/>
-        <result column="user_no" property="userNo"/>
-        <result column="pblcn_cpn_id" property="pblcnCpnId"/>
-        <result column="use_yn" property="useYn"/>
-        <result column="cpn_give_dt" property="cpnGiveDt"/>
-        <result column="indiv_expry_dt" property="indivExpryDt"/>
-        <result column="use_dt" property="useDt"/>
-        <result column="cpn_mdfcn_dt" property="cpnMdfcnDt"/>
-        <result column="issu_rsn_src_cn" property="issuRsnSrcCn"/>
-        <association property="coupon" javaType="ks55team02.customer.coupons.domain.Coupons">
-            <result column="cpn_nm" property="cpnNm"/>
-            <result column="dscnt_type_cd" property="dscntTypeCd"/>
-            <result column="dscnt_vl" property="dscntVl"/>
-            <result column="min_ordr_amt" property="minOrdrAmt"/>
-            <result column="max_dscnt_amt" property="maxDscntAmt"/>
-        </association>
-    </resultMap>
+	<resultMap id="userCouponsResultMap"
+		type="ks55team02.customer.coupons.domain.UserCoupons">
+		<result column="user_cpn_id" property="userCpnId" />
+		<result column="user_no" property="userNo" />
+		<result column="pblcn_cpn_id" property="pblcnCpnId" />
+		<result column="use_yn" property="useYn" />
+		<result column="cpn_give_dt" property="cpnGiveDt" />
+		<result column="indiv_expry_dt" property="indivExpryDt" />
+		<result column="use_dt" property="useDt" />
+		<result column="cpn_mdfcn_dt" property="cpnMdfcnDt" />
+		<result column="issu_rsn_src_cn" property="issuRsnSrcCn" />
+		<association property="coupon"
+			javaType="ks55team02.customer.coupons.domain.Coupons">
+			<result column="cpn_nm" property="cpnNm" />
+			<result column="dscnt_vl" property="dscntVl" />
+			<result column="min_ordr_amt" property="minOrdrAmt" />
+			<result column="max_dscnt_amt" property="maxDscntAmt" />
+			<result column="vld_end_dt" property="vldEndDt" />
+		</association>
+	</resultMap>
 
 
-    <select id="getAvailableCoupons" parameterType="map" resultMap="couponsResultMap">
-        SELECT
-            pblcn_cpn_id, cpn_nm, dscnt_type_cd, dscnt_vl, min_ordr_amt, max_dscnt_amt, vld_end_dt
-        FROM
-            coupons
-        WHERE
-            actvtn_yn = 1
-            AND pblcn_cpn_id NOT IN (SELECT pblcn_cpn_id FROM user_coupons WHERE user_no = #{userNo})
-            <if test="keyword != null and keyword != ''">
-                AND cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-            </if>
-        ORDER BY
-            <choose>
-                <when test="'expiry'.equals(sortOrder)">vld_end_dt ASC</when>
-                <when test="'rate'.equals(sortOrder)">dscnt_vl DESC</when>
-                <when test="'amount'.equals(sortOrder)">dscnt_vl DESC</when>
-                <otherwise>crt_dt DESC</otherwise>
-            </choose>
-        LIMIT #{limit} OFFSET #{offset}
-    </select>
+	<select id="getAvailableCoupons" parameterType="map"
+		resultMap="couponsResultMap">
+		/* 발급 가능한 쿠폰 목록 조회 */
+		SELECT
+		pblcn_cpn_id, cpn_nm, dscnt_vl, min_ordr_amt, max_dscnt_amt, vld_end_dt
+		FROM
+		coupons
+		WHERE
+		actvtn_yn = 1
+		AND pblcn_cpn_id NOT IN (SELECT pblcn_cpn_id FROM user_coupons WHERE
+		user_no = #{userNo})
+		<if test="keyword != null and keyword != ''">
+			AND cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		ORDER BY
+		<choose>
+			<when test="'expiry'.equals(sortOrder)">vld_end_dt ASC</when>
+			<when test="'rate'.equals(sortOrder)">dscnt_vl DESC</when>
+			<when test="'amount'.equals(sortOrder)">dscnt_vl DESC</when>
+			<otherwise>crt_dt DESC</otherwise>
+		</choose>
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
 
-    <select id="getAvailableCouponsCount" parameterType="map" resultType="int">
-        SELECT COUNT(*) FROM coupons
-        WHERE actvtn_yn = 1
-          AND pblcn_cpn_id NOT IN (SELECT pblcn_cpn_id FROM user_coupons WHERE user_no = #{userNo})
-          <if test="keyword != null and keyword != ''">
-              AND cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-          </if>
-    </select>
+	<select id="getAvailableCouponsCount" parameterType="map"
+		resultType="int">
+		/* 발급 가능한 쿠폰의 전체 개수 조회 */
+		SELECT COUNT(*) FROM coupons
+		WHERE actvtn_yn = 1
+		AND pblcn_cpn_id NOT IN (SELECT pblcn_cpn_id FROM user_coupons WHERE
+		user_no = #{userNo})
+		<if test="keyword != null and keyword != ''">
+			AND cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+	</select>
 
-    <select id="getMyCoupons" parameterType="map" resultMap="userCouponsResultMap">
-        SELECT
-            uc.user_cpn_id, uc.user_no, uc.pblcn_cpn_id, uc.use_yn,
-            uc.cpn_give_dt, uc.indiv_expry_dt, c.cpn_nm, c.dscnt_type_cd,
-            c.dscnt_vl, c.min_ordr_amt, c.max_dscnt_amt
-        FROM
-            user_coupons uc
-        JOIN
-            coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
-        WHERE
-            uc.user_no = #{userNo}
-            <if test="keyword != null and keyword != ''">
-                AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-            </if>
-        ORDER BY
-            <choose>
-                <when test="'expiry'.equals(sortOrder)">uc.indiv_expry_dt ASC</when>
-                <when test="'recent'.equals(sortOrder)">uc.cpn_give_dt DESC</when>
-                <otherwise>uc.cpn_give_dt DESC</otherwise>
-            </choose>
-        LIMIT #{limit} OFFSET #{offset}
-    </select>
+	<select id="getMyCoupons" parameterType="map"
+		resultMap="userCouponsResultMap">
+		/* 사용자가 보유한 쿠폰 목록 조회 */
+		SELECT
+		uc.user_cpn_id, uc.user_no, uc.pblcn_cpn_id, uc.use_yn,
+		uc.cpn_give_dt, c.vld_end_dt, c.cpn_nm,
+		c.dscnt_vl, c.min_ordr_amt, c.max_dscnt_amt
+		FROM
+		user_coupons uc
+		JOIN
+		coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+		WHERE
+		uc.user_no = #{userNo}
+		<if test="keyword != null and keyword != ''">
+			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		ORDER BY
+		<choose>
+			<when test="'expiry'.equals(sortOrder)">c.vld_end_dt ASC</when>
+			<when test="'recent'.equals(sortOrder)">uc.cpn_give_dt DESC</when>
+			<otherwise>uc.cpn_give_dt DESC</otherwise>
+		</choose>
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
 
-    <select id="getMyCouponsCount" parameterType="map" resultType="int">
-        SELECT COUNT(*)
-        FROM user_coupons uc
-        JOIN coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
-        WHERE uc.user_no = #{userNo}
-          <if test="keyword != null and keyword != ''">
-              AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-          </if>
-    </select>
-    
-    <select id="getCouponInfo" parameterType="string" resultMap="couponsResultMap">
-        SELECT * FROM coupons WHERE pblcn_cpn_id = #{couponId}
-    </select>
-    
-    <select id="countUserCouponByCouponId" resultType="int">
-        SELECT COUNT(*) FROM user_coupons WHERE user_no = #{userNo} AND pblcn_cpn_id = #{couponId}
-    </select>
+	<select id="getMyCouponsCount" parameterType="map"
+		resultType="int">
+		/* 사용자가 보유한 쿠폰의 전체 개수 조회 */
+		SELECT COUNT(*)
+		FROM user_coupons uc
+		JOIN coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+		WHERE uc.user_no = #{userNo}
+		<if test="keyword != null and keyword != ''">
+			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+	</select>
 
-    <insert id="issueUserCoupon" parameterType="ks55team02.customer.coupons.domain.UserCoupons">
-        INSERT INTO user_coupons
-            (user_cpn_id, user_no, pblcn_cpn_id, use_yn, cpn_give_dt, indiv_expry_dt, issu_rsn_src_cn)
-        VALUES
-            (#{userCpnId}, #{userNo}, #{pblcnCpnId}, 0, NOW(), #{indivExpryDt}, '사용자 발급')
-    </insert>
+	<select id="getCouponInfo" parameterType="string"
+		resultMap="couponsResultMap">
+		/* 단일 쿠폰의 상세 정보 조회 */
+		SELECT * FROM coupons WHERE pblcn_cpn_id = #{couponId}
+	</select>
+
+	<select id="countUserCouponByCouponId" resultType="int">
+		/* 사용자의 특정 쿠폰 보유 여부 확인 */
+		SELECT COUNT(*) FROM user_coupons WHERE user_no = #{userNo} AND pblcn_cpn_id
+		= #{couponId}
+	</select>
+
+	<insert id="issueUserCoupon"
+		parameterType="ks55team02.customer.coupons.domain.UserCoupons">
+		/* 사용자에게 쿠폰 발급 처리 */
+		INSERT INTO user_coupons
+		(user_cpn_id, user_no, pblcn_cpn_id, use_yn, cpn_give_dt, indiv_expry_dt,
+		issu_rsn_src_cn)
+		VALUES
+		(#{userCpnId}, #{userNo}, #{pblcnCpnId}, 0, NOW(), #{indivExpryDt}, '사용자 발급')
+	</insert>
+	
+	<select id="getNextUserCouponId" resultType="String">
+    SELECT CONCAT('USRCPN_', LPAD(IFNULL(MAX(SUBSTRING(user_cpn_id, 8)), 0) + 1, 3, '0'))
+    FROM user_coupons
+	</select>
 
 </mapper>
