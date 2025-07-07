@@ -24,12 +24,6 @@ public class SellerHomeController {
 		return "seller/fragments/premiumCheckoutHistory";
 	}
 	
-	@GetMapping(value= {"/settlementDetailByStore"})
-	public String settlementDetailByStoreView() {
-		
-		return "seller/fragments/settlementDetailByStore";
-	}
-	
 
 	
 	

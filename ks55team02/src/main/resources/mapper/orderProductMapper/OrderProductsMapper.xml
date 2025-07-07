@@ -84,5 +84,121 @@
         WHERE
             oi.ordr_no = #{orderId}
     </select>
+    
+<!-- ================================== 배송 관련 ================================== -->
+
+    <!-- Result Map: ShipmentDTO와 shipments 테이블 컬럼 매핑 -->
+    <resultMap id="shipmentResultMap" type="ks55team02.orderProduct.domain.ShipmentDTO"> <!-- 당신의 DTO 패키지 경로에 맞게 수정하세요. -->
+        <id 	property="dlvyNo" 			column="dlvy_no"/>
+        <result property="ordrNo" 			column="ordr_no"/>
+        <result property="stlmId" 			column="stlm_id"/>
+        <result property="dlvyCoNm" 		column="dlvy_co_nm"/>
+        <result property="waybilNo" 		column="waybil_no"/>
+        <result property="dlvySttsCd" 		column="dlvy_stts_cd"/>
+        <result property="sndngDt" 			column="sndng_dt"/>
+        <result property="dlvyCmptnDt" 		column="dlvy_cmptn_dt"/>
+        <result property="dlvyInfoCrtDt" 	column="dlvy_info_crt_dt"/>
+        <result property="dlvyInfoMdfcnDt" 	column="dlvy_info_mdfcn_dt"/>
+    </resultMap>
+
+    <!-- 새로운 배송 정보 등록 -->
+    <insert id="insertShipment" parameterType="ks55team02.orderProduct.domain.ShipmentDTO">
+        INSERT INTO shipments
+        (dlvy_no, ordr_no, stlm_id, dlvy_co_nm, waybil_no, dlvy_stts_cd, sndng_dt, dlvy_cmptn_dt, dlvy_info_crt_dt, dlvy_info_mdfcn_dt)
+        VALUES
+        (#{dlvyNo}, #{ordrNo}, #{stlmId}, #{dlvyCoNm}, #{waybilNo}, #{dlvySttsCd}, #{sndngDt}, #{dlvyCmptnDt}, #{dlvyInfoCrtDt}, #{dlvyInfoMdfcnDt})
+    </insert>
+
+    <!-- 모든 배송 정보 조회 -->
+    <select id="getAllShipments" resultMap="shipmentResultMap">
+        SELECT
+            dlvy_no,
+            ordr_no,
+            stlm_id,
+            dlvy_co_nm,
+            waybil_no,
+            dlvy_stts_cd,
+            sndng_dt,
+            dlvy_cmptn_dt,
+            dlvy_info_crt_dt,
+            dlvy_info_mdfcn_dt
+        FROM
+            shipments
+    </select>
+
+    <!-- 특정 배송 번호로 배송 정보 조회 -->
+    <select id="getShipmentByDlvyNo" parameterType="string" resultMap="shipmentResultMap">
+        SELECT
+            dlvy_no,
+            ordr_no,
+            stlm_id,
+            dlvy_co_nm,
+            waybil_no,
+            dlvy_stts_cd,
+            sndng_dt,
+            dlvy_cmptn_dt,
+            dlvy_info_crt_dt,
+            dlvy_info_mdfcn_dt
+        FROM
+            shipments
+        WHERE
+            dlvy_no = #{dlvyNo}
+    </select>
+
+    <!-- 특정 운송장 번호로 배송 정보 조회 -->
+    <select id="getShipmentByWaybilNo" parameterType="string" resultMap="shipmentResultMap">
+        SELECT
+            dlvy_no,
+            ordr_no,
+            stlm_id,
+            dlvy_co_nm,
+            waybil_no,
+            dlvy_stts_cd,
+            sndng_dt,
+            dlvy_cmptn_dt,
+            dlvy_info_crt_dt,
+            dlvy_info_mdfcn_dt
+        FROM
+            shipments
+        WHERE
+            waybil_no = #{waybilNo}
+    </select>
+
+    <!-- 배송 정보 수정 -->
+    <update id="updateShipment" parameterType="ks55team02.orderProduct.domain.ShipmentDTO">
+        UPDATE shipments
+        SET
+            ordr_no = #{ordrNo},
+            stlm_id = #{stlmId},
+            dlvy_co_nm = #{dlvyCoNm},
+            waybil_no = #{waybilNo},
+            dlvy_stts_cd = #{dlvySttsCd},
+            sndng_dt = #{sndngDt},
+            dlvy_cmptn_dt = #{dlvyCmptnDt},
+            dlvy_info_mdfcn_dt = NOW()
+        WHERE
+            dlvy_no = #{dlvyNo}
+    </update>
+
+    <!-- 특정 배송 번호의 배송 정보 삭제 -->
+    <delete id="deleteShipment" parameterType="string">
+        DELETE FROM shipments
+        WHERE dlvy_no = #{dlvyNo}
+    </delete>
+
+    <!-- 다음 배송 번호 조회 (예시: 'dlvy_00001' 형식) -->
+    <!-- 실제 프로젝트에서는 시퀀스 또는 UUID 등 적절한 ID 생성 전략을 사용해야 합니다. -->
+    <select id="getNextDlvyNo" resultType="string">
+        SELECT
+            CASE
+                WHEN COUNT(dlvy_no) = 0 THEN 'dlvy_00001'
+                ELSE CONCAT('dlvy_', LPAD(CAST(SUBSTRING(MAX(dlvy_no), 6) AS UNSIGNED) + 1, 5, '0'))
+            END
+        FROM
+            shipments
+        WHERE
+            dlvy_no LIKE 'dlvy_%'
+    </select>
+    
   
   </mapper>
