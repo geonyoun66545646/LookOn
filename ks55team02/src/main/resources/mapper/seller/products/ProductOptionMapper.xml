@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ks55team02.seller.products.mapper.ProductOptionMapper">
+
+    <!-- 상품 옵션 값 ResultMap -->
+    <resultMap id="productOptionValueResultMap" type="ks55team02.seller.products.domain.ProductOptionValue">
+        <id property="optVlNo" column="opt_vl_no" />
+        <result property="optNo" column="opt_vl_opt_no" />
+        <result property="creatrNo" column="opt_vl_creatr_no" />
+        <result property="mdfrNo" column="opt_vl_mdfr_no" />
+        <result property="delUserNo" column="opt_vl_del_user_no" />
+        <result property="vlNm" column="vl_nm" />
+        <result property="optVlImgUrlAddr" column="opt_vl_img_url_addr" />
+        <result property="clrCd" column="clr_cd" />
+        <result property="regDt" column="opt_vl_reg_dt" />
+        <result property="mdfcnDt" column="opt_vl_mdfcn_dt" />
+        <result property="inactvtnDt" column="opt_vl_inactvtn_dt" />
+        <result property="actvtnYn" column="opt_vl_actvtn_yn" />
+    </resultMap>
+    
+    <!-- 특정 옵션 유형에 해당하는 모든 옵션 값 조회 -->
+    <select id="getAllProductOptionValuesByType" parameterType="String" resultMap="productOptionValueResultMap">
+        SELECT
+            pov.opt_vl_no           AS opt_vl_no,
+            pov.opt_no              AS opt_vl_opt_no,
+            pov.creatr_no           AS opt_vl_creatr_no,
+            pov.mdfr_no             AS opt_vl_mdfr_no,
+            pov.del_user_no         AS opt_vl_del_user_no,
+            pov.vl_nm               AS vl_nm,
+            pov.opt_vl_img_url_addr AS opt_vl_img_url_addr,
+            pov.clr_cd              AS clr_cd,
+            pov.reg_dt              AS opt_vl_reg_dt,
+            pov.mdfcn_dt            AS opt_vl_mdfcn_dt,
+            pov.inactvtn_dt         AS opt_vl_inactvtn_dt,
+            pov.actvtn_yn           AS opt_vl_actvtn_yn
+        FROM
+            ks55team02db.product_option_values pov
+        JOIN
+            ks55team02db.product_options po ON pov.opt_no = po.opt_no
+        WHERE
+            po.opt_nm = #{optionTypeName} 
+            AND pov.actvtn_yn = TRUE 
+            AND po.actvtn_yn = TRUE
+        ORDER BY
+            pov.vl_nm;
+    </select>
+
+    <!-- 특정 옵션 유형에 해당하는 옵션 값 이름(vl_nm) 중복 없이 조회 -->
+    <select id="getDistinctProductOptionValueNamesByType" parameterType="String" resultType="String">
+        SELECT DISTINCT
+            pov.vl_nm
+        FROM
+            ks55team02db.product_option_values pov
+        JOIN
+            ks55team02db.product_options po ON pov.opt_no = po.opt_no
+        WHERE
+            po.opt_nm = #{optionTypeName} 
+            AND pov.actvtn_yn = TRUE 
+            AND po.actvtn_yn = TRUE
+        ORDER BY
+            pov.vl_nm;
+    </select>
+    
+</mapper>
