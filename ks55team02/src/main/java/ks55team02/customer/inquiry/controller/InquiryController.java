@@ -42,7 +42,7 @@ public class InquiryController {
     private String getCurrentUserId(HttpSession session) {
         // 현재는 user_no_1000이 로그인 되어있다고 가정.
         log.info("[임시] 현재 로그인된 사용자 ID: user_no_1000"); // 로그 추가
-        return "user_no_1000";
+        return "user_no_100";
 
         /*
          * ==== 로그인 기능 완성 후 아래 주석 해제 및 위 'return "user_no_1000";' 라인 제거 ====
@@ -113,7 +113,7 @@ public class InquiryController {
      * @return 문의 등록 폼 뷰 이름 또는 리다이렉트 경로
      */
     @GetMapping("/addInquiry")
-    public String addInquiryView(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String addInquiry(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
         //1 현재 로그인된 사용자 ID를 가져옵니다
         String currentUserId = getCurrentUserId(session);
 
