@@ -1,0 +1,23 @@
+package ks55team02.systems.config;
+
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ModelAttribute;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@ControllerAdvice
+public class GlobalControllerAdvice {
+
+	/**
+     * 모든 요청에 대해 모델(Model)에 공통 속성을 추가하는 메소드.
+     * 컨트롤러 메소드가 실행되기 전에 호출되어, 모든 뷰(HTML)에서 "currentUrl" 변수를 사용할 수 있게 한다.
+     *
+     * @param model   뷰에 데이터를 전달할 모델 객체
+     * @param request 현재 HTTP 요청 객체
+     */
+    @ModelAttribute
+    public void addCommonAttributes(Model model, HttpServletRequest request) {
+        model.addAttribute("currentUrl", request.getRequestURI());
+    }
+}
