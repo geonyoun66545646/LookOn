@@ -15,6 +15,8 @@
 	    <result column="crt_dt"         property="crtDt"/>
 	    <result column="mdfcn_dt"       property="mdfcnDt"/>
 	    <result column="del_dt"         property="delDt"/>
+	    <result column="cmnt_cnt" 		property="cmntCnt"/>
+	    <result column="inter_cnt" 		property="interCnt"/>
 	</resultMap>
 	
 	<resultMap id="userResultMap" type="UserList">
@@ -50,10 +52,16 @@
 	    <result column="user_ncnm"      property="userNcnm"/>
 	</resultMap>
 	
+	<resultMap id="InteractionResultMap" type="Interaction">
+		<id 	column="pst_intract_sn" 	property="pstIntractSn"></id>
+		<result column="pst_sn" 			property="pstSn"></result>
+		<result column="user_no" 			property="userNo"></result>
+		<result column="intract_type_cd" 	property="intractTypeCd"></result>
+		<result column="crt_dt" 			property="crtDt"></result>
+		<result column="rtrcn_dt" 			property="rtrcnDt"></result>
+	</resultMap>
+	
 	<resultMap id="postListResultMap" type="Post" extends="postResultMap">
-
-	    <result column="cmnt_cnt" property="cmntCnt"/>
-
 	    <association property="userInfo" javaType="UserList">
 	        <result column="user_ncnm" property="userNcnm"/>
 	    </association>
@@ -68,6 +76,34 @@
 			<result column="user_ncnm"  property="userNcnm"/>
 		</association>
 	</resultMap>
+	
+	<select id="selectMaxInterNumber" resultType="Integer">
+		/* 추천 일련번호 생성 */
+	    SELECT 
+	    	MAX(CAST(SUBSTRING_INDEX(pst_intract_sn, '_', -1) AS UNSIGNED))
+	    FROM 
+	    	post_interactions pi
+	    WHERE 
+	    	pi.pst_intract_sn REGEXP '^pst_itrct_[0-9]+$';
+	</select>
+	
+	<insert id="insertInterCount" parameterType="Interaction">
+		/* 추천수 증가 */
+		INSERT INTO post_interactions
+			(pst_intract_sn, 
+			pst_sn, 
+			user_no, 
+			intract_type_cd, 
+			crt_dt, 
+			rtrcn_dt)
+		VALUES
+			(#{pstIntractSn}, 
+			#{pstSn}, 
+			#{userNo}, 
+			like, 
+			Now(), 
+			'');
+	</insert>
 	
 	<update id="updateViewCount" parameterType="String">
 		/* 게시글 조회수 증가 */
@@ -94,7 +130,7 @@
             b.bbs_nm,
             u.user_ncnm,
             (SELECT COUNT(pc.pst_cmnt_sn) FROM post_comments pc WHERE pc.pst_sn = p.pst_sn And pc.del_dt IS null) AS cmnt_cnt,
-            (SELECT COUNT(pi.pst_intract_sn) FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS likesCount
+            (SELECT COUNT(pi.pst_intract_sn) FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS inter_cnt
         FROM 
         	posts p
         	JOIN boards b ON p.bbs_clsf_cd = b.bbs_clsf_cd
@@ -133,7 +169,9 @@
 			p.ntc_pst_yn,
 			p.crt_dt,
 			p.mdfcn_dt,
-			p.del_dt
+			p.del_dt,
+			(SELECT COUNT(pc.pst_cmnt_sn) FROM post_comments pc WHERE pc.pst_sn = p.pst_sn And pc.del_dt IS null) AS cmnt_cnt,
+			(SELECT COUNT(pi.pst_intract_sn) FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS inter_cnt
 		FROM
 			posts p
 			LEFT JOIN users u ON p.wrtr_user_no = u.user_no

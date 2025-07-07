@@ -6,10 +6,13 @@ import org.springframework.stereotype.Service;
 
 import ks55team02.customer.post.domain.Comment;
 import ks55team02.customer.post.domain.Post;
+import ks55team02.customer.post.domain.Interaction;
 
 @Service
 public interface PostService {
 	
+	// 추천수 증가
+	void insertInterCount(Interaction interaction);
 
 	// 게시판 글 목록 조회
 	List<Post> selectPostListByBoardCd(String bbsClsfCd, int offset, int size);
