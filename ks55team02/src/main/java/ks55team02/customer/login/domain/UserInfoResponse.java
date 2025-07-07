@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class Login {
+public class UserInfoResponse {
 
 	// ===== users 테이블 정보 =====
     private String userNo;					// 사용자의 번호
@@ -32,13 +32,6 @@ public class Login {
     
 
     // ===== user_security_settings 테이블 정보 =====
-    private int lgnFailNmtm;
-    private LocalDateTime acntLockRmvTm; // LocalDateTime 이나 Timestamp 타입이 더 적합할 수 있습니다.
-
-    // ===== 로그인 폼에서만 받는 추가 정보 =====
-    // DTO는 DB 테이블과 1:1로만 매핑되는 것이 아니라,
-    // 화면과 데이터를 주고받는 목적도 있으므로 이런 필드도 가능합니다.
-    private String lgnUseId; // 로그인시 사용된 아이디
-    private LocalDateTime lgnDt; // 로그인시 사용된 아이디    
-    private String ipAddress; // 컨트롤러에서 채워줄 IP 주소 정보
+    private String lastPswdChgDt; 			// 마지막 비밀번호 변경 일시
+    private Boolean mfa_use_yn;				// 2단계인증 사용 여부
 }
