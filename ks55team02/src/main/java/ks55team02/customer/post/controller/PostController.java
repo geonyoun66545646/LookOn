@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import ks55team02.customer.post.domain.Board;
 import ks55team02.customer.post.domain.Comment;
+import ks55team02.customer.post.domain.Interaction;
 import ks55team02.customer.post.domain.Post;
 import ks55team02.customer.post.service.BoardService;
 import ks55team02.customer.post.service.PostService;
@@ -29,10 +30,21 @@ public class PostController {
 	private final PostService postService;
 	private final BoardService boardService;
 	
+	// 추천수 증가
+	@PostMapping("/interactionInsert")
+	@ResponseBody
+	public void insertInteraction(@PathVariable Interaction interaction, Model model) {
+		try {
+			postService.insertInterCount(interaction);
+		} catch (Exception e) {
+		}
+	}
+	
+	
 	// 댓글 삭제
 	@DeleteMapping("/commentDelete/{pstCmntSn}")
 	@ResponseBody
-	public String commentDelete(@PathVariable String pstCmntSn) {
+	public String deleteComment(@PathVariable String pstCmntSn) {
 		try {
 			postService.deleteComment(pstCmntSn);
 			return "삭제 성공";
@@ -40,23 +52,12 @@ public class PostController {
 			return null;			
 		}
 	}
-	
-	// 댓글 수정
-	@PostMapping("/commentUpdate")
-	@ResponseBody
-	public String updateComment(@PathVariable Comment comment) {
-		try {
-			postService.updateComment(comment);
-			return "수정 성공";
-		} catch (Exception e) {
-			return "수정 실패";
-		}
-	}
+
 	
 	// 게시글 삭제
 	@DeleteMapping("/postDelete/{pstSn}")
 	@ResponseBody
-	public String postDelete(@PathVariable String pstSn) {
+	public String deletePost(@PathVariable String pstSn) {
 	    try {
 	        postService.deletePost(pstSn);
 	        // 이 "삭제 성공" 이라는 문자열이 그대로 Ajax의 success 콜백으로 전달됩니다.
@@ -145,7 +146,7 @@ public class PostController {
 
 	// 게시글 조회
 	@GetMapping("/postView")
-	public String postView(@RequestParam String pstSn, Model model) {
+	public String selectPostDetail(@RequestParam String pstSn, Model model) {
 
 		Post postDetail = postService.selectPostDetailByPostSn(pstSn);
 
@@ -156,7 +157,7 @@ public class PostController {
 
 	// 게시글 목록 조회
 	@GetMapping("/postList")
-	public String postListView(
+	public String selectPostList(
 			@RequestParam(required = false) String bbsClsfCd,
 			@RequestParam(defaultValue = "1") int page,
 			@RequestParam(defaultValue = "#{paginationProperties.defaultSize}") int size,

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ks55team02.customer.post.domain.Comment;
+import ks55team02.customer.post.domain.Interaction;
 import ks55team02.customer.post.domain.Post;
 import ks55team02.customer.post.mapper.PostMapper;
 import ks55team02.customer.post.service.PostService;
@@ -21,6 +22,17 @@ public class PostServiceImpl implements PostService {
 	private final PostMapper postMapper;
 	
 
+	// 추천수 증가
+	@Override
+	public void insertInterCount(Interaction interaction) {
+		Integer interMaxNum = postMapper.selectMaxInterNumber();
+		int nextNum = interMaxNum + 1;
+		String newInterNum = String.format("pst_itrct_%d", nextNum);
+		interaction.setPstIntractSn(newInterNum);
+		
+		postMapper.insertInterCount(interaction);
+	}
+	
 	// 게시판 글 목록 조회
 	@Override
 	public List<Post> selectPostListByBoardCd(String bbsClsfCd, int offset, int size) {
@@ -60,20 +72,6 @@ public class PostServiceImpl implements PostService {
 		log.info(insertResult);
 	};
 	
-	// 댓글 등록
-	@Override
-	public void insertComment(Comment comment) {
-		Integer commentMaxNum = postMapper.selectMaxCommentNumber();
-		int nextNum = commentMaxNum + 1;
-		String newCommentNum = String.format("cmnt_%d", nextNum);
-		comment.setPstCmntSn(newCommentNum);
-		
-		int result = postMapper.insertComment(comment);
-		String insertResult = "댓글 등록 실패";
-		if(result > 0) insertResult = "댓글 등록 성공";
-		
-		log.info(insertResult);
-	}
 	
 	// 게시글 수정
 	@Override
@@ -91,6 +89,21 @@ public class PostServiceImpl implements PostService {
 	    postMapper.deletePost(pstSn);
 	}
 	
+	// 댓글 등록
+	@Override
+	public void insertComment(Comment comment) {
+		Integer commentMaxNum = postMapper.selectMaxCommentNumber();
+		int nextNum = commentMaxNum + 1;
+		String newCommentNum = String.format("cmnt_%d", nextNum);
+		comment.setPstCmntSn(newCommentNum);
+		
+		int result = postMapper.insertComment(comment);
+		String insertResult = "댓글 등록 실패";
+		if(result > 0) insertResult = "댓글 등록 성공";
+		
+		log.info(insertResult);
+	}
+	
 	// 댓글 수정
 	@Override
 	public void updateComment(Comment comment) {
@@ -99,6 +112,7 @@ public class PostServiceImpl implements PostService {
 		if(result > 0) updateResult = "댓글 수정 성공";
 		
 		log.info(updateResult);
+		log.info("댓글 객체 : {}", comment);
 	}
 	
 	// 댓글 삭제

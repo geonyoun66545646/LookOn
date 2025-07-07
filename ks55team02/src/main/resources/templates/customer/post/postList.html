@@ -109,11 +109,12 @@
 	                <table class="table table-hover">
 	                    <thead>
 	                        <tr>
-	                            <th scope="col">게시글일련번호</th>
-	                            <th scope="col">게시글제목</th>
-	                            <th scope="col">작성자</th> <!-- 작성자사용자번호 대신 '작성자'로 표시 -->
-	                            <th scope="col">조회수</th>
-	                            <th scope="col">생성일시</th>
+								<th style="width: 15%;">게시글일련번호</th>
+								<th style="width: 40%;">게시글제목</th>
+								<th style="width: 15%;">작성자</th>
+								<th style="width: 8%;">추천수</th>
+								<th style="width: 8%;">조회수</th>
+								<th style="width: 14%;">생성일시</th>
 	                        </tr>
 	                    </thead>
 	                    <tbody>
@@ -129,6 +130,7 @@
 	                                    </span>
 	                                </td>
 	                                <td th:text="${p.userInfo.userNcnm}">작성자</td>
+	                                <td th:text="${p.interCnt}">추천수</td>
 	                                <td th:text="${p.viewCnt}">조회수</td>
 	                                <td th:text="${ #temporals.format(p.crtDt, 'yyyy-MM-dd') == #temporals.format(#temporals.createNow(), 'yyyy-MM-dd') 
 												? #temporals.format(p.crtDt, 'HH:mm') 
