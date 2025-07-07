@@ -72,7 +72,7 @@
 		<result property="mdfrNo" column="opt_mdfr_no" />
 		<result property="delUserNo" column="opt_del_user_no" />
 		<result property="optNm" column="opt_nm" />
-		<result property="snglMtplChcSeCd" column="sngl_mtpl_chc_se_cd" />
+		<result property="snglMtplChcSeCd" column="sngl_mltpl_chc_se_cd" />
 		<result property="optIndctSn" column="opt_indct_sn" />
 		<result property="regDt" column="opt_reg_dt" />
 		<result property="mdfcnDt" column="opt_mdfcn_dt" />
@@ -606,7 +606,7 @@
 		po.del_user_no AS opt_del_user_no,
 		po.opt_nm
 		AS opt_nm,
-		po.sngl_mltpl_chc_se_cd AS sngl_mtpl_chc_se_cd,
+		po.sngl_mltpl_chc_se_cd AS sngl_mltpl_chc_se_cd,
 		po.opt_indct_sn AS opt_indct_sn,
 		po.reg_dt AS opt_reg_dt,
 		po.mdfcn_dt AS
@@ -1024,7 +1024,7 @@
 		parameterType="ks55team02.seller.products.domain.ProductOption">
 		INSERT INTO ks55team02db.product_options
 		(opt_no, gds_no,
-		creatr_no, mdfr_no, del_user_no, opt_nm, sngl_mtpl_chc_se_cd,
+		creatr_no, mdfr_no, del_user_no, opt_nm, sngl_mltpl_chc_se_cd,
 		opt_indct_sn, reg_dt, mdfcn_dt, inactvtn_dt, actvtn_yn)
 		VALUES(#{optNo}, #{gdsNo}, #{creatrNo}, #{mdfrNo}, #{delUserNo},
 		#{optNm}, #{snglMtplChcSeCd}, #{optIndctSn}, CURRENT_TIMESTAMP,

@@ -28,12 +28,14 @@
     <link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
     <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/nouislider/nouislider.css}">
     <link rel="stylesheet" th:href="@{/maincss/assets/productDetail/productDetail.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/mainHeader/mainHeader.css}"> 
+    <link rel="stylesheet" th:href="@{/maincss/assets/categoryFilterModal/categoryFilterModal.css}">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"/>
 </head>
 
 <body>
-	<header th:replace="~{customer/fragments/header :: header}"></header>
+	<header th:replace="~{customer/fragments/mainHeader :: mainHeaderFragment}"></header> <!-- 이거 헤더 -->
 
     <div class="page-wrapper">
         <main class="main">
@@ -512,7 +514,10 @@
             </div>
         </div>
     </div>
-
+	
+	<div th:replace="~{customer/fragments/commonModals :: signinModalFragment}"></div>
+    <div th:replace="~{customer/fragments/categoryFilterModal :: categoryFilterModalFragment}"></div> <!-- 이거 햄버거 모달 -->
+	
     <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
     
 	<script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
@@ -536,6 +541,7 @@
 	<script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
 	<script th:src="@{/maincss/assets/js/main.js}"></script>
 	<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
+	<script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
 	<script>
 	    function copyShareLink() {
 	        const el = document.createElement('textarea');
