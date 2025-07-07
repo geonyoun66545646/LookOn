@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}"> <head>
+         <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/appStoreView.css}">
+    <title>상점 신청 페이지</title>
+</head>
+<body>
+    <th:block layout:fragment="contents">
+    
+		   <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title">상점신청<span>Store</span></h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+            	
+	                <div class="container">
+	                <h2 class="checkout-title">신청 정보</h2><!-- End .checkout-title -->
+	                <div class="summary" id="cotainer-body">
+            			<form action="#">
+		                	<div class="row">
+		                		<div class="col-lg-3">
+		                				<label>신청ID</label>
+	            						<input type="text" class="form-control">
+	            						
+		                				<label>상점 명</label>
+	            						<input type="text" class="form-control">
+
+	            						<label>신청자</label>
+	            						<input type="text" class="form-control">
+
+	            						<label>계약 신청일</label>
+	            						<input type="text" class="form-control" required>
+
+	            						<label>계약 기간일</label>
+	            						<input type="text" class="form-control" placeholder="House number and Street name" required>
+	            						<input type="text" class="form-control" placeholder="Appartments, suite, unit etc ..." required>
+
+	            						
+		                		</div><!-- End .col-lg-9 -->
+		                		<div class="col-lg-3">
+		                			
+		                				<label>매니저 명</label>
+	            						<input type="text" class="form-control">
+	            						
+		                				<label>매니저 연락처</label>
+	            						<input type="text" class="form-control">
+
+	            						<label>매니저 이메일</label>
+	            						<input type="text" class="form-control">
+
+	            						<label>사업장 주소</label>
+	            						<input type="text" class="form-control" required>
+
+	            						<label>수수료 비율</label>
+	            						<input type="text" class="form-control" placeholder="House number and Street name" required>
+	            						<input type="text" class="form-control" placeholder="Appartments, suite, unit etc ..." required>
+	            						
+		                		</div><!-- End .col-lg-9 -->
+		                		<aside class="col-lg-6">
+		                				<div id="table-head">
+		                				<label>첨부 파일</label>
+		                				</div>
+		                				<table class="table table-reg">
+		                					<thead>
+		                						<tr class="table-head">
+		                							<th>필요 문서</th>
+		                							<th>첨부된 문서</th>
+		                							<th>첨부 하기</th>
+		                						</tr>
+		                					</thead>
+									
+		                					<tbody>
+		                						<tr>
+		                							<td>사업자 등록증</td>
+		                							<td>$84.00</td>		                					
+		                							<td>
+													    <input type="file" id="fileUpload" name="file">
+													</td>
+		                						</tr>
+		                						<tr>
+		                							<td>통신 판매업 신고증</td>		                							
+		                							<td>$84.00</td>
+		                							<td>$84.00</td>
+		                						</tr>
+		                						<tr>
+		                							<td>판매상품 관련 증빙</td>
+		                							<td>$84.00</td>
+		                							<td>$84.00</td>
+		                						</tr>
+		                						<tr>
+		                							<td>주민등록증 사본</td>
+		                							<td>$84.00</td>
+		                							<td>$84.00</td>
+		                						</tr>
+		                						<tr>
+		                							<td>통장 사본</td>		                							
+		                							<td>$84.00</td>
+		                							<td>$84.00</td>
+		                						</tr>
+		                						<tr>
+		                							<td>기타 서류</td>
+		                							<td>$84.00</td>
+		                							<td>$84.00</td>
+		                						</tr>
+
+		                						<!-- End .summary-total -->
+		                					</tbody>
+		                				</table><!-- End .table table-summary -->		         										     
+		                				
+		                			
+		                		</aside><!-- End .col-lg-3 -->
+		                	</div><!-- End .row -->
+            			</form>
+	                </div><!-- End .container -->
+	                 <div class="button-wrapper">
+	                <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
+	                	<span class="btn-text">신청 하기</span>
+             			<span class="btn-hover-text">신청 하기</span>
+            		</button>
+            		</div>
+	                </div>
+                
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+
+    </th:block>
+
+    <th:block layout:fragment="jsFile">
+        <script th:src="@{/maincss/assets/js/home_specific.js}"></script>
+    </th:block>
+
+    <th:block layout:fragment="jsScript">
+        <script>
+            // 홈 페이지 전용 JavaScript 코드
+            console.log("홈 페이지 스크립트 실행!");
+        </script>
+    </th:block>
+</body>
+</html>
