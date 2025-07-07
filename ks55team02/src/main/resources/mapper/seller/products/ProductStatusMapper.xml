@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.seller.products.mapper.ProductStatusMapper">
+
+    <resultMap id="statusWithValuesResultMap" type="ks55team02.seller.products.domain.ProductStatus">
+        <id property="gdsSttsNo" column="gds_stts_no"/>
+        <result property="selPsbltyQntty" column="sel_psblty_qntty"/>
+        <collection property="mappedOptionValues"
+                    select="ks55team02.seller.products.mapper.ProductOptionMapper.getMappedOptionValuesByStatusNo"
+                    column="gds_stts_no" 
+                    javaType="java.util.List"
+                    ofType="ks55team02.seller.products.domain.ProductOptionValue" />
+    </resultMap>
+
+    <select id="getStatusListByGdsNo" parameterType="String" resultMap="statusWithValuesResultMap">
+        SELECT
+            gds_stts_no,
+            sel_psblty_qntty
+        FROM
+            product_status
+        WHERE
+            gds_no = #{gdsNo} AND actvtn_yn = TRUE;
+    </select>
+</mapper>

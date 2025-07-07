@@ -32,7 +32,117 @@ public class ProductsServiceImpl implements ProductsService {
 	private final ProductsMapper productsMapper;
 	private final ProductOptionMapper productOptionMapper;
 	private final StoreMapper storeMapper;
+	
+	// ProductsServiceImpl.java에 추가
+    @Override
+    public void deactivateProduct(String gdsNo, String selUserNo) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("gdsNo", gdsNo);
+        paramMap.put("selUserNo", selUserNo); // 나중에 권한 체크 등에 활용 가능
+        
+        productsMapper.deactivateProduct(paramMap);
+    }
+	
+    @Override
+    @Transactional
+    public void updateProduct(ProductRegistrationRequest request) {
+        String gdsNo = request.getGdsNo();
+        if (!StringUtils.hasText(gdsNo)) {
+            throw new IllegalArgumentException("상품 수정을 위한 상품 ID가 없습니다.");
+        }
 
+        // --- 1. 상품 기본 정보 업데이트 ---
+        Products product = new Products();
+        product.setGdsNo(gdsNo);
+        
+        String finalCategoryNo = StringUtils.hasText(request.getProductCategory2()) ?
+                                 request.getProductCategory2() : request.getProductCategory1();
+        product.setCtgryNo(finalCategoryNo);
+        
+        product.setGdsNm(request.getProductName());
+        product.setGdsExpln(request.getProductDescription());
+        product.setBasPrc(request.getBasePrice() != null ? request.getBasePrice().intValue() : 0);
+        product.setDscntRt(request.getDiscountRate());
+        product.setMinPurchaseQty(request.getMinPurchase());
+        product.setMaxPurchaseQty(request.getMaxPurchase());
+        request.calculateFinalPrice();
+        product.setLastSelPrc(request.getFinalPrice() != null ? request.getFinalPrice().intValue() : 0);
+        
+        // TODO: 수정자 정보는 실제 로그인된 사용자 정보로 설정해야 합니다.
+        // product.setMdfrNo(loggedInUserId);
+        
+        productsMapper.updateProduct(product);
+
+        // --- 2. 기존 연관 데이터(이미지, 옵션, 재고) 비활성화 ---
+        // 기존 데이터를 모두 비활성화(actvtn_yn = false) 처리합니다.
+        productsMapper.deactivateImagesByGdsNo(gdsNo);
+        productsMapper.deactivateOptionsByGdsNo(gdsNo);
+        productsMapper.deactivateStatusByGdsNo(gdsNo);
+        
+        // --- 3. 수정된 정보로 새로 INSERT (addProduct 로직 재활용) ---
+        
+        // 3-1. 이미지 새로 삽입
+        int imgIndctSn = 1;
+        if (request.getThumbnailImage() != null) {
+			for (MultipartFile file : request.getThumbnailImage()) {
+				if(!file.isEmpty()) saveAndInsertImage(file, gdsNo, request.getSelUserNo(), productsMapper.getMaxImageNo(), imgIndctSn++, ProductImageType.THUMBNAIL);
+			}
+		}
+		if (request.getMainImage() != null) {
+			for (MultipartFile file : request.getMainImage()) {
+				if(!file.isEmpty()) saveAndInsertImage(file, gdsNo, request.getSelUserNo(), productsMapper.getMaxImageNo(), imgIndctSn++, ProductImageType.MAIN);
+			}
+		}
+		if (request.getDetailImage() != null) {
+			for (MultipartFile file : request.getDetailImage()) {
+				if(!file.isEmpty()) saveAndInsertImage(file, gdsNo, request.getSelUserNo(), productsMapper.getMaxImageNo(), imgIndctSn++, ProductImageType.DETAIL);
+			}
+		}
+        // TODO: 기존에 업로드된 이미지를 그대로 사용하는 경우에 대한 처리가 필요합니다.
+        // (예: 프론트에서 기존 이미지 URL 목록을 hidden input으로 함께 보내고,
+        //  새로 업로드된 파일이 없을 경우 이 URL을 기반으로 DB에 다시 insert)
+
+        // 3-2. 옵션 및 재고 새로 삽입
+		Map<String, String> genderOptionValueMap = new HashMap<>();
+		Map<String, String> colorOptionValueMap = new HashMap<>();
+		Map<String, String> sizeOptionValueMap = new HashMap<>();
+
+		int optOrder = 1;
+        if (StringUtils.hasText(request.getGenderOption())) {
+			String genderOptNo = productsMapper.getMaxOptionNo();
+			genderOptionValueMap = insertOptionAndValue(gdsNo, request.getSelUserNo(), "성별", "S", optOrder++, genderOptNo, List.of(request.getGenderOption()));
+		}
+		if (request.getColorOptions() != null && !request.getColorOptions().isEmpty()) {
+			String colorOptNo = productsMapper.getMaxOptionNo();
+			List<String> uniqueColorOptions = request.getColorOptions().stream().distinct().collect(Collectors.toList());
+			colorOptionValueMap = insertOptionAndValue(gdsNo, request.getSelUserNo(), "색상", "S", optOrder++, colorOptNo, uniqueColorOptions);
+		}
+		if (request.getSizeOptions() != null && !request.getSizeOptions().isEmpty()) {
+			String sizeOptNo = productsMapper.getMaxOptionNo();
+			List<String> uniqueSizeOptions = request.getSizeOptions().stream().distinct().collect(Collectors.toList());
+			sizeOptionValueMap = insertOptionAndValue(gdsNo, request.getSelUserNo(), "사이즈", "S", optOrder++, sizeOptNo, uniqueSizeOptions);
+		}
+
+		if (request.getProductOptionCombinations() != null && !request.getProductOptionCombinations().isEmpty()) {
+			for (ProductRegistrationRequest.ProductCombinationData combinationData : request.getProductOptionCombinations()) {
+				String gdsSttsNo = productsMapper.getMaxStatusNo();
+				insertProductStatus(gdsSttsNo, gdsNo, request.getSelUserNo(), combinationData.getQuantity());
+
+				String genderOptValueId = genderOptionValueMap.get(combinationData.getOptVlNo1());
+				String colorOptValueId = colorOptionValueMap.get(combinationData.getOptVlNo2());
+				String sizeOptValueId = sizeOptionValueMap.get(combinationData.getOptVlNo3());
+
+				if (StringUtils.hasText(genderOptValueId)) insertStatusOptionMapping(gdsSttsNo, genderOptValueId, request.getSelUserNo());
+				if (StringUtils.hasText(colorOptValueId)) insertStatusOptionMapping(gdsSttsNo, colorOptValueId, request.getSelUserNo());
+				if (StringUtils.hasText(sizeOptValueId)) insertStatusOptionMapping(gdsSttsNo, sizeOptValueId, request.getSelUserNo());
+			}
+		} else { // 단일 상품 재고
+			String gdsSttsNo = productsMapper.getMaxStatusNo();
+			insertProductStatus(gdsSttsNo, gdsNo, request.getSelUserNo(), request.getStockQuantity());
+		}
+    }
+	
+	
 	@Value("${product.upload.dir}")
 	private String uploadDir;
 

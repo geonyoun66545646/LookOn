@@ -7,64 +7,60 @@
 
 	<!-- ================== ResultMaps ================== -->
 	
+	<!-- ⭐ 추가: 재고 상태(ProductStatus)와 매핑된 옵션 값(OptionValue)을 함께 담는 ResultMap -->
+    <resultMap id="productStatusWithValuesResultMap" type="ks55team02.seller.products.domain.ProductStatus">
+        <id property="gdsSttsNo" column="ps_gds_stts_no"/>
+        <result property="gdsNo" column="ps_gds_no"/>
+        <result property="selPsbltyQntty" column="ps_sel_psblty_qntty"/>
+        <collection property="mappedOptionValues" 
+                    ofType="ks55team02.seller.products.domain.ProductOptionValue">
+            <id property="optVlNo" column="pov_opt_vl_no_for_status"/>
+            <result property="vlNm" column="pov_vl_nm_for_status"/>
+        </collection>
+    </resultMap>
+
 	<!-- 상품 옵션 ResultMap: 상품 상세 조회 시 사용 -->
 	<resultMap id="productOptionResultMap" type="ks55team02.seller.products.domain.ProductOption">
-		<id property="optNo" column="opt_no" />
-		<result property="gdsNo" column="opt_gds_no" />
-		<result property="creatrNo" column="opt_creatr_no" />
-		<result property="mdfrNo" column="opt_mdfr_no" />
-		<result property="delUserNo" column="opt_del_user_no" />
-		<result property="optNm" column="opt_nm" />
-		<result property="snglMtplChcSeCd" column="sngl_mltpl_chc_se_cd" />
-		<result property="optIndctSn" column="opt_indct_sn" />
-		<result property="regDt" column="opt_reg_dt" />
-		<result property="mdfcnDt" column="opt_mdfcn_dt" />
-		<result property="inactvtnDt" column="opt_inactvtn_dt" />
-		<result property="actvtnYn" column="opt_actvtn_yn" />
+		<id property="optNo" column="po_opt_no" />
+		<result property="optNm" column="po_opt_nm" />
+		<result property="optIndctSn" column="po_opt_indct_sn" />
 		<collection property="optionValues"
 			ofType="ks55team02.seller.products.domain.ProductOptionValue"
-			javaType="java.util.ArrayList"
-			column="opt_no"
-			resultMap="ks55team02.seller.products.mapper.ProductOptionMapper.productOptionValueResultMap">
-		</collection>
+            resultMap="optionValuesForOptionResultMap"/>
 	</resultMap>
 	
-	<!-- 상품 상세 정보 ResultMap (이미지, 옵션 포함) -->
-	<resultMap id="productDetailWithImagesResultMap" type="ks55team02.seller.products.domain.Products">
-		<id column="p_gds_no" property="gdsNo" />
-		<result column="p_store_id" property="storeId" />
-		<result column="p_ctgry_no" property="ctgryNo" />
-		<result column="p_sel_user_no" property="selUserNo" />
-		<result column="p_mdfr_no" property="mdfrNo" />
-		<result column="p_del_user_no" property="delUserNo" />
-		<result column="p_gds_nm" property="gdsNm" />
-		<result column="p_gds_expln" property="gdsExpln" />
-		<result column="p_bas_prc" property="basPrc" jdbcType="DECIMAL"/>
-		<result column="p_dscnt_rt" property="dscntRt" />
-		<result column="p_last_sel_prc" property="lastSelPrc" jdbcType="DECIMAL"/>
-		<result column="p_reg_dt" property="regDt" />
-		<result column="p_mdfcn_dt" property="mdfcnDt" />
-		<result column="p_inactvtn_dt" property="inactvtnDt" />
-		<result column="p_expsr_yn" property="expsrYn" />
-		<result column="p_actvtn_yn" property="actvtnYn" />
-		<result column="p_min_purchase_qty" property="minPurchaseQty" />
-		<result column="p_max_purchase_qty" property="maxPurchaseQty" />
-        <association property="productCategory" javaType="ks55team02.seller.products.domain.ProductCategory">
-			<id property="categoryId" column="pc_ctgry_no" />
-			<result property="parentCategoryId" column="pc_up_ctgry_no" />
-			<result property="categoryName" column="pc_ctgry_nm" />
-			<result property="categoryLevel" column="pc_ctgry_dpth" />
-		</association>
-		<collection property="productImages"
-			ofType="ks55team02.seller.products.domain.ProductImage"
-			resultMap="ks55team02.seller.products.mapper.ProductImageMapper.productImageResultMap" />
-		<collection property="productOptions"
-			ofType="ks55team02.seller.products.domain.ProductOption"
-			javaType="java.util.ArrayList"
-			column="p_gds_no"
-			resultMap="productOptionResultMap">
-		</collection>
-	</resultMap>
+	<!-- ⭐ 추가: ProductOption에 속한 OptionValue들을 위한 전용 ResultMap -->
+    <resultMap id="optionValuesForOptionResultMap" type="ks55team02.seller.products.domain.ProductOptionValue">
+        <id property="optVlNo" column="pov_opt_vl_no"/>
+        <result property="optNo" column="pov_opt_no"/>
+        <result property="vlNm" column="pov_vl_nm"/>
+    </resultMap>
+	
+	<!-- 상품 상세 정보 ResultMap (이미지, 옵션, 재고 포함) -->
+	<!-- 상품 상세 정보 최종 ResultMap -->
+	 <resultMap id="productDetailWithImagesResultMap" type="ks55team02.seller.products.domain.Products">
+        <id column="gds_no" property="gdsNo" />
+        <result column="gds_nm" property="gdsNm" />
+        <result column="gds_expln" property="gdsExpln" />
+        <result column="bas_prc" property="basPrc" jdbcType="DECIMAL"/>
+        <result column="dscnt_rt" property="dscntRt" />
+        <result column="min_purchase_qty" property="minPurchaseQty"/>
+        <result column="max_purchase_qty" property="maxPurchaseQty"/>
+        <result column="ctgry_no" property="ctgryNo"/>
+
+        <association property="productCategory"
+                     select="ks55team02.seller.products.mapper.ProductCategoryMapper.getCategoryById"
+                     column="ctgry_no" javaType="ks55team02.seller.products.domain.ProductCategory" />
+        <collection property="productImages"
+                    select="ks55team02.seller.products.mapper.ProductImageMapper.getImagesByGdsNo"
+                    column="gds_no" ofType="ks55team02.seller.products.domain.ProductImage" />
+        <collection property="productOptions"
+                    select="ks55team02.seller.products.mapper.ProductOptionMapper.getOptionsByGdsNo"
+                    column="gds_no" ofType="ks55team02.seller.products.domain.ProductOption" />
+        <collection property="productStatusList"
+                    select="ks55team02.seller.products.mapper.ProductStatusMapper.getStatusListByGdsNo"
+                    column="gds_no" ofType="ks55team02.seller.products.domain.ProductStatus" />
+    </resultMap>
 	
 	<!-- 판매자별 상품 목록 ResultMap -->
 	<resultMap id="productsResultMap" type="ks55team02.seller.products.domain.Products">
@@ -85,7 +81,77 @@
 		</association>
 	</resultMap>
 	
+	<!-- ===================== 상품 삭제(Update) 관련 쿼리 ===================== -->
 
+	<!-- 상품 비활성화 (소프트 삭제) -->
+	<update id="deactivateProduct" parameterType="map">
+		UPDATE
+			ks55team02db.products
+		SET
+			actvtn_yn = false,      <!-- 판매자에게 안보이도록 비활성 -->
+			expsr_yn = false,       <!-- 구매자에게도 안보이도록 비노출 -->
+			del_user_no = #{selUserNo}, <!-- 삭제 요청자 ID 기록 -->
+			inactvtn_dt = CURRENT_TIMESTAMP <!-- 비활성화 일시 기록 -->
+		WHERE
+			gds_no = #{gdsNo}
+	</update>
+	
+	<!-- ===================== 상품 수정(Update) 관련 쿼리 ===================== -->
+	
+	<!-- 상품 기본 정보 수정 -->
+	<update id="updateProduct" parameterType="ks55team02.seller.products.domain.Products">
+		UPDATE
+			ks55team02db.products
+		<set>
+			<if test="gdsNm != null and gdsNm != ''">gds_nm = #{gdsNm},</if>
+			<if test="gdsExpln != null and gdsExpln != ''">gds_expln = #{gdsExpln},</if>
+			<if test="ctgryNo != null and ctgryNo != ''">ctgry_no = #{ctgryNo},</if>
+			<if test="basPrc != null">bas_prc = #{basPrc},</if>
+			<if test="dscntRt != null">dscnt_rt = #{dscntRt},</if>
+			<if test="lastSelPrc != null">last_sel_prc = #{lastSelPrc},</if>
+			<if test="minPurchaseQty != null">min_purchase_qty = #{minPurchaseQty},</if>
+			<if test="maxPurchaseQty != null">max_purchase_qty = #{maxPurchaseQty},</if>
+			<if test="mdfrNo != null and mdfrNo != ''">mdfr_no = #{mdfrNo},</if>
+			mdfcn_dt = CURRENT_TIMESTAMP
+		</set>
+		WHERE
+			gds_no = #{gdsNo}
+	</update>
+
+	<!-- 특정 상품의 모든 이미지를 비활성화 -->
+	<update id="deactivateImagesByGdsNo" parameterType="string">
+		UPDATE
+			ks55team02db.product_images
+		SET
+			actvtn_yn = false,
+			inactvtn_dt = CURRENT_TIMESTAMP
+		WHERE
+			gds_no = #{gdsNo}
+	</update>
+
+	<!-- 특정 상품의 모든 옵션을 비활성화 -->
+	<update id="deactivateOptionsByGdsNo" parameterType="string">
+		UPDATE
+			ks55team02db.product_options
+		SET
+			actvtn_yn = false,
+			inactvtn_dt = CURRENT_TIMESTAMP
+		WHERE
+			gds_no = #{gdsNo}
+	</update>
+
+	<!-- 특정 상품의 모든 재고/상태를 비활성화 -->
+	<update id="deactivateStatusByGdsNo" parameterType="string">
+		UPDATE
+			ks55team02db.product_status
+		SET
+			actvtn_yn = false,
+			inactvtn_dt = CURRENT_TIMESTAMP
+		WHERE
+			gds_no = #{gdsNo}
+	</update>
+	
+	
 	<!-- ===================== 상품 등록(Create) 관련 쿼리 ===================== -->
 	
 	<!-- 새 상품 코드(gds_no) 생성 -->
@@ -221,6 +287,7 @@
 		WHERE
 			p.sel_user_no = #{selUserNo}
 			AND p.store_id = #{storeId}
+			AND p.actvtn_yn = true
 		ORDER BY
 			p.reg_dt DESC
 	</select>
@@ -246,43 +313,23 @@
 			p.reg_dt DESC
 	</select>
 	
-	<!-- 상품 상세 정보 조회 (이미지, 옵션, 카테고리 포함) -->
+	<!-- ProductsMapper.xml -->
+	<!-- 상품 상세 정보 조회 (최종 수정 버전) -->
 	<select id="getProductDetailWithImages" parameterType="String" resultMap="productDetailWithImagesResultMap">
-		SELECT
-			p.gds_no AS p_gds_no, p.store_id AS p_store_id, p.ctgry_no AS p_ctgry_no,
-			p.sel_user_no AS p_sel_user_no, p.mdfr_no AS p_mdfr_no, p.del_user_no AS p_del_user_no,
-			p.gds_nm AS p_gds_nm, p.gds_expln AS p_gds_expln, p.bas_prc AS p_bas_prc,
-			IFNULL(p.dscnt_rt, 0.00) AS p_dscnt_rt,
-			(p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS p_last_sel_prc,
-			p.reg_dt AS p_reg_dt, p.mdfcn_dt AS p_mdfcn_dt, p.inactvtn_dt AS p_inactvtn_dt,
-			p.expsr_yn AS p_expsr_yn, p.actvtn_yn AS p_actvtn_yn,
-			p.min_purchase_qty AS p_min_purchase_qty, p.max_purchase_qty AS p_max_purchase_qty,
-			
-			pc.ctgry_no AS pc_ctgry_no, pc.up_ctgry_no AS pc_up_ctgry_no, pc.ctgry_nm AS pc_ctgry_nm, pc.ctgry_dpth AS pc_ctgry_dpth,
-
-			pi.img_no, pi.gds_no, pi.creatr_no, pi.mdfr_no, pi.img_file_path_nm,
-			pi.video_url, pi.img_indct_sn, pi.reg_dt AS img_reg_dt, pi.img_type, pi.actvtn_yn AS img_actvtn_yn,
-			
-			po.opt_no, po.gds_no AS opt_gds_no, po.creatr_no AS opt_creatr_no, po.opt_nm,
-			po.sngl_mltpl_chc_se_cd, po.opt_indct_sn, po.reg_dt AS opt_reg_dt, po.actvtn_yn AS opt_actvtn_yn,
-
-			pov.opt_vl_no, pov.opt_no AS opt_vl_opt_no, pov.creatr_no AS opt_vl_creatr_no, pov.vl_nm,
-			pov.opt_vl_img_url_addr, pov.clr_cd, pov.reg_dt AS opt_vl_reg_dt, pov.actvtn_yn AS opt_vl_actvtn_yn
-		FROM
-			ks55team02db.products p
-		LEFT JOIN
-			ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
-		LEFT JOIN
-			ks55team02db.product_images pi ON p.gds_no = pi.gds_no AND pi.actvtn_yn = TRUE
-		LEFT JOIN
-			ks55team02db.product_options po ON p.gds_no = po.gds_no AND po.actvtn_yn = TRUE
-		LEFT JOIN
-			ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no AND pov.actvtn_yn = TRUE
-		WHERE
-			p.gds_no = #{gdsNo}
-		ORDER BY
-			po.opt_indct_sn ASC, pov.reg_dt ASC, pi.img_indct_sn ASC
-	</select>
+        SELECT
+            gds_no,
+            gds_nm,
+            gds_expln,
+            bas_prc,
+            dscnt_rt,
+            min_purchase_qty,
+            max_purchase_qty,
+            ctgry_no
+        FROM
+            products
+        WHERE
+            gds_no = #{gdsNo}
+    </select>
 	
 	
 	<!-- ===================== 유틸리티 쿼리 ===================== -->

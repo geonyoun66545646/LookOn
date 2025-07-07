@@ -13,6 +13,21 @@ import java.util.List;
  */
 public interface ProductsService {
 	
+	
+	
+	/**
+     * 특정 상품을 비활성화(소프트 삭제) 합니다.
+     * @param gdsNo 비활성화할 상품 ID
+     * @param selUserNo 작업을 요청한 판매자 ID
+     */
+    void deactivateProduct(String gdsNo, String selUserNo);
+
+    /**
+     * 기존 상품의 정보를 수정합니다.
+     * @param request 수정할 상품 정보가 담긴 DTO
+     */
+    void updateProduct(ProductRegistrationRequest request);
+	
     // 특정 판매자 번호와 스토어 ID에 해당하는 상품 목록을 조회합니다.
     List<Products> getProductsBySellerAndStore(String selUserNo, String storeId);
     // 새로운 상품을 시스템에 등록합니다.
@@ -24,7 +39,7 @@ public interface ProductsService {
     // 특정 상품의 상세 정보를 조회하고, 연관된 이미지 및 카테고리 정보까지 반환합니다.
     Products getProductDetailWithImages(String gdsNo);
 
-
+    
 
     // 모든 상품 컬러 옵션 값을 조회합니다.
     List<ProductOptionValue> getAllProductColors();

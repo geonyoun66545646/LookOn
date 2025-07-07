@@ -5,6 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 public interface ProductCategoryService {
+	
+	// ProductCategoryService.java 에 추가
+    /**
+     * 카테고리 ID로 단일 카테고리 정보를 조회합니다.
+     * @param categoryId 조회할 카테고리 ID
+     * @return 조회된 카테고리 객체
+     */
+    ProductCategory getCategoryById(String categoryId);
 
     /**
      * 모든 상품 카테고리 목록을 조회합니다.

@@ -45,4 +45,6 @@ public class Products {
     public Boolean getActvtnYn() {
         return this.actvtnYn;
     }
+    
+    private List<ProductStatus> productStatusList;
 }

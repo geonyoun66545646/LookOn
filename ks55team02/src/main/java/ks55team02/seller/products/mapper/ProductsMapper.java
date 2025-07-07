@@ -22,8 +22,40 @@ public interface ProductsMapper {
     void insertProductStatus(ProductStatus productStatus);
     void insertStatusOptionMapping(StatusOptionMapping mapping);
 
-    // --- 상품 조회(Read) 관련 메소드 (주로 판매자/관리자용) ---
+    // 상품 수정
+    /**
+     * 상품의 기본 정보를 수정합니다.
+     * @param product 수정할 정보가 담긴 Products 객체
+     */
+    void updateProduct(Products product);
 
+    /**
+     * 특정 상품에 속한 모든 이미지를 비활성화 처리합니다.
+     * @param gdsNo 상품 ID
+     */
+    void deactivateImagesByGdsNo(String gdsNo);
+
+    /**
+     * 특정 상품에 속한 모든 옵션을 비활성화 처리합니다.
+     * @param gdsNo 상품 ID
+     */
+    void deactivateOptionsByGdsNo(String gdsNo);
+
+    /**
+     * 특정 상품에 속한 모든 재고/상태 정보를 비활성화 처리합니다.
+     * @param gdsNo 상품 ID
+     */
+    void deactivateStatusByGdsNo(String gdsNo);
+    
+    // -- 상품 삭제
+    /**
+     * 특정 상품을 비활성화(소프트 삭제) 처리합니다.
+     * @param paramMap 'gdsNo', 'selUserNo' (삭제 요청자)를 포함한 맵
+     */
+    void deactivateProduct(Map<String, Object> paramMap);
+    
+    // --- 상품 조회(Read) 관련 메소드 (주로 판매자/관리자용) ---
+    
     /**
      * 특정 판매자의 특정 스토어에 속한 모든 상품 목록을 조회합니다.
      * @param paramMap 'selUserNo', 'storeId'를 포함한 맵

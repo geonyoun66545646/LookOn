@@ -15,7 +15,12 @@ import java.util.Map;
 public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     private final ProductCategoryMapper productCategoryMapper;
-
+    
+    @Override
+    public ProductCategory getCategoryById(String categoryId) {
+        return productCategoryMapper.getCategoryById(categoryId);
+    }
+    
     @Override
     public List<ProductCategory> getAllProductCategories() {
         return productCategoryMapper.getAllProductCategories();
