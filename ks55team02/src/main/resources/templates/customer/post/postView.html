@@ -98,13 +98,16 @@
 			    	const pstCmntSn = $btn.data('comment-sn');
 			    	const cmntCn = $btn.data('comment-update-input');
 			    	
+			    	const commentData = {
+			    			pstCmntSn: pstCmntSn,
+			    			cmntCn: cmntCn
+			    		};
+			    	
 			    	$.ajax({
 			    		url: updateUrl,
 			    		type: 'POST',
-			    		data: {
-			    			pstCmntSn: pstCmntSn,
-			    			cmntCn: cmntCn
-			    		},
+			    		contentType: 'application/json',
+			    		data: JSON.stringify(commentData),
 			    		dataType: 'json'
 			    	}).done(response => {
 			    		if(response.result === "success") {

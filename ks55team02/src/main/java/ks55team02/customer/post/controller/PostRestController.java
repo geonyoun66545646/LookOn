@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +23,7 @@ public class PostRestController {
     
     // 댓글 수정
     @PostMapping("/updateComment")
-    public Map<String, Object> updateComment(Comment comment) {
+    public Map<String, Object> updateComment(@RequestBody Comment comment) {
     	
     	Map<String, Object> response = new HashMap<>();
     	

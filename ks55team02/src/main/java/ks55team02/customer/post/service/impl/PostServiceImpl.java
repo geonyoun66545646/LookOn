@@ -112,6 +112,7 @@ public class PostServiceImpl implements PostService {
 		if(result > 0) updateResult = "댓글 수정 성공";
 		
 		log.info(updateResult);
+		log.info("댓글 객체 : {}", comment);
 	}
 	
 	// 댓글 삭제
