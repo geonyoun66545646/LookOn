@@ -17,6 +17,7 @@
 
 	<th:block layout:fragment="contents">
 
+	<div class="container">
 		<div class="member-coupon">
 			<div class="member-coupon__top">
 				<nav id="couponTabs" class="member-coupon__1depth">
@@ -67,14 +68,15 @@
 
 			<div class="pagination-container mt-5"></div>
 		</div>
+	</div>
 
 	</th:block>
 
 	<th:block layout:fragment="jsFile">
 	</th:block>
 
-<th:block layout:fragment="jsScript">
-<script th:inline="javascript">
+	<th:block layout:fragment="jsScript">
+		<script th:inline="javascript">
 /* <![CDATA[ */
 
 // 페이지의 모든 HTML 요소가 로드된 후에 스크립트를 실행합니다.
@@ -88,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentState = {
         tab: 'my', // 'my'(보유쿠폰) 또는 'available'(쿠폰받기)
         keyword: '',
-        sortOrder: 'recent', // 정렬 기본값
+        sortOrder: 'expiry', // 정렬 기본값
         page: 1
     };
 
@@ -129,11 +131,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // fetch API를 이용한 비동기(AJAX) 요청
         fetch(`${apiUrl}?${params.toString()}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('서버 응답에 문제가 있습니다.');
+                }
+                return response.json();
+            })
             .then(pageData => {
                 // 1. 쿠폰 목록 그리기
                 renderFunction(couponListContainer, pageData.list);
-                
+
                 // 2. 페이지네이션 그리기 (공용 부품 호출)
                 paginationContainer.innerHTML = renderPagination(pageData);
 
@@ -161,19 +168,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         let html = '';
         coupons.forEach(userCoupon => {
-            // ★★★ 중요: userCoupon 안에 들어있는 coupon 객체의 상세 정보를 사용합니다. ★★★
-            const coupon = userCoupon.coupon; 
-            const discount = coupon.dscntTypeCd === 'RATE' ? `${coupon.dscntVl}%` : `${coupon.dscntVl.toLocaleString()}원`;
-            const formattedExpiryDate = userCoupon.indivExpryDt ? new Date(userCoupon.indivExpryDt).toLocaleDateString() : '기한 없음';
-
+            const coupon = userCoupon.coupon; // JOIN된 쿠폰 상세 정보
+            const discount = `${coupon.dscntVl}%`;
             
-         // userCoupon.useYn 값(true/false)에 따라 버튼의 텍스트와 비활성화 상태를 동적으로 결정합니다.
+            // ★★★ 수정된 부분 ★★★
+            // 개별 만료일(userCoupon.indivExpryDt) 대신,
+            // 원본 쿠폰의 유효 종료일(coupon.vldEndDt)을 사용합니다.
+            const formattedExpiryDate = coupon.vldEndDt ? new Date(coupon.vldEndDt).toLocaleDateString() : '기한 없음';
+            
             const isUsed = userCoupon.useYn;
             const buttonText = isUsed ? '사용완료' : '사용하기';
             const buttonDisabled = isUsed ? 'disabled' : '';
-            
-            
-            // isUsed 값에 따라 coupon-item에 is-used 클래스를 추가하여 시각적으로 구분합니다.
+
             html += `
                 <li class="coupon-item ${isUsed ? 'is-used' : ''}">
                     <div class="coupon-details">
@@ -184,9 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </span>
                         <span class="coupon-period">만료일: ${formattedExpiryDate}</span>
                     </div>
-                    <button class="coupon-download-btn" ${buttonDisabled}>
-                        ${buttonText}
-                    </button>
+                    <button class="coupon-download-btn" ${buttonDisabled}>${buttonText}</button>
                 </li>
             `;
         });
@@ -194,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * '발급 가능 쿠폰' 목록 HTML을 생성하는 함수 (수정본)
+     * '발급 가능 쿠폰' 목록 HTML을 생성하는 함수
      */
     function renderAvailableCoupons(container, coupons) {
         if (!coupons || coupons.length === 0) {
@@ -203,9 +207,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         let html = '';
         coupons.forEach(coupon => {
-            const discount = coupon.dscntTypeCd === 'RATE' ? `${coupon.dscntVl}%` : `${coupon.dscntVl.toLocaleString()}원`;
+            const discount = `${coupon.dscntVl}%`;
             const formattedExpiryDate = coupon.vldEndDt ? new Date(coupon.vldEndDt).toLocaleDateString() : '기한 없음';
-            
+
             html += `
                 <li class="coupon-item">
                     <div class="coupon-details">
@@ -222,7 +226,25 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         container.innerHTML = html;
     }
-
+    
+    /**
+     * '발급 가능 쿠폰'의 개수만 비동기로 조회하여 화면에 표시하는 함수
+     */
+    function loadAvailableCouponsCount() {
+        // '쿠폰 받기' API에 page=1로 요청해서 전체 개수만 가져옵니다.
+        const apiUrl = '/api/coupons/available?page=1';
+        
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(pageData => {
+                // 받아온 데이터에서 totalCount만 사용하여 숫자를 업데이트합니다.
+                availableCouponsCountEl.textContent = `(${pageData.totalCount})`;
+            })
+            .catch(error => {
+                console.error('발급 가능 쿠폰 개수 조회 오류:', error);
+                availableCouponsCountEl.textContent = '(?)';
+            });
+    }
 
 
     // ===================================================================
@@ -276,44 +298,65 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // '쿠폰받기' 버튼 클릭 시 (이벤트 위임)
-    couponListContainer.addEventListener('click', function(event) {
-        const downloadBtn = event.target.closest('.coupon-download-btn');
-        if (downloadBtn && downloadBtn.dataset.couponId && !downloadBtn.disabled) {
-            const couponId = downloadBtn.dataset.couponId;
+  couponListContainer.addEventListener('click', function(event) {
+    const downloadBtn = event.target.closest('.coupon-download-btn');
+    if (downloadBtn && downloadBtn.dataset.couponId && !downloadBtn.disabled) {
+        const couponId = downloadBtn.dataset.couponId;
             
-            if (confirm("쿠폰을 발급받으시겠습니까?")) {
+     // ★★★ 요청하신 예시 디자인의 SweetAlert 확인 창으로 교체 ★★★
+        Swal.fire({
+            title: '쿠폰을 발급하시겠습니까?',
+            text: "발급 후에는 취소할 수 없습니다!",
+            icon: 'question', // 아이콘을 'warning'으로 변경
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6', // 기본 파란색
+            cancelButtonColor: '#d33',    // 기본 빨간색
+            confirmButtonText: '네, 발급받을게요!',
+            cancelButtonText: '아니요'
+        }).then((result) => {
+            // 사용자가 '확인' 버튼을 눌렀을 때만 실행
+            if (result.isConfirmed) {
                 fetch(`/api/coupons/${couponId}/issue`, { method: 'POST' })
                     .then(response => {
                         if (!response.ok) {
-                            // 서버에서 에러 응답이 왔을 때 처리
-                            return response.json().then(err => { throw new Error(err.message) });
+                            return response.json().then(err => { throw new Error(err.message || '쿠폰 발급에 실패했습니다.') });
                         }
                         return response.json();
                     })
-                    .then(result => {
-                        alert(result.message);
-                        // 성공 시 버튼 비활성화
+                    .then(data => {
+                        // 성공 알림창
+                        Swal.fire({
+                            title: '발급 완료!',
+                            text: data.message,
+                            icon: 'success'
+                        });
                         downloadBtn.textContent = '발급완료';
                         downloadBtn.disabled = true;
                     })
                     .catch(error => {
-                        console.error('쿠폰 발급 오류:', error);
-                        alert(error.message || '쿠폰 발급 중 오류가 발생했습니다.');
+                        // 실패 알림창
+                        Swal.fire({
+                            title: '오류 발생',
+                            text: error.message,
+                            icon: 'error'
+                        });
                     });
             }
-        }
-    });
+        });
+    }
+});
 
     // ===================================================================
     // 4. 최초 데이터 로딩
     // ===================================================================
     loadCoupons();
+    loadAvailableCouponsCount();
 
 });
 
 /* ]]> */
 </script>
-</th:block>
+	</th:block>
 
 </body>
 

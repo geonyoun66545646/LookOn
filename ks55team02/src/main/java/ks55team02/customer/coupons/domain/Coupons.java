@@ -9,7 +9,6 @@ public class Coupons {
     private String pblcnCpnCd;
     private String userNo;
     private String cpnNm;
-    private String dscntTypeCd;
     private double dscntVl;
     private double minOrdrAmt;
     private double maxDscntAmt;

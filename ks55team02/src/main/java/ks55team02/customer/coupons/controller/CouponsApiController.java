@@ -19,6 +19,8 @@ import java.util.Map;
 public class CouponsApiController {
 
     private final CouponsService couponsService;
+    
+    
 
     /**
      * '쿠폰 받기' 탭의 쿠폰 목록을 조회하는 API
@@ -30,7 +32,7 @@ public class CouponsApiController {
             @RequestParam(value = "page", defaultValue = "1") int page) {
         
         // TODO: 실제 로그인한 사용자 아이디를 가져오는 로직 필요 (스프링 시큐리티 연동)
-        String userNo = "user_no_144"; // 임시 사용자 ID
+        String userNo = "user_no_201"; // 임시 사용자 ID
         
         log.info("API 호출 - 발급 가능 쿠폰 조회: keyword={}, sort={}, page={}", keyword, sortOrder, page);
         CustomerPagination<Coupons> availableCouponsPage = couponsService.getAvailableCoupons(userNo, keyword, sortOrder, page);
@@ -47,7 +49,7 @@ public class CouponsApiController {
             @RequestParam(value = "page", defaultValue = "1") int page) {
 
         // TODO: 실제 로그인한 사용자 아이디를 가져오는 로직 필요 (스프링 시큐리티 연동)
-        String userNo = "user_no_144"; // 임시 사용자 ID
+        String userNo = "user_no_201"; // 임시 사용자 ID
 
         log.info("API 호출 - 보유 쿠폰 조회: keyword={}, sort={}, page={}", keyword, sortOrder, page);
         CustomerPagination<UserCoupons> myCouponsPage = couponsService.getMyCoupons(userNo, keyword, sortOrder, page);
@@ -61,7 +63,7 @@ public class CouponsApiController {
     public ResponseEntity<Map<String, String>> issueCoupon(@PathVariable String couponId) {
         
         // TODO: 실제 로그인한 사용자 아이디를 가져오는 로직 필요 (스프링 시큐리티 연동)
-        String userNo = "user_no_144"; // 임시 사용자 ID
+        String userNo = "user_no_201"; // 임시 사용자 ID
 
         log.info("API 호출 - 쿠폰 발급: userNo={}, couponId={}", userNo, couponId);
         
@@ -78,4 +80,6 @@ public class CouponsApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "오류가 발생했습니다."));
         }
     }
+    
+    
 }
