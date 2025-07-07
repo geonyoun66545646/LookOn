@@ -47,24 +47,27 @@
 
 	<select id="getAvailableCoupons" parameterType="map"
 		resultMap="couponsResultMap">
-		/* 발급 가능한 쿠폰 목록 조회 */
 		SELECT
-		pblcn_cpn_id, cpn_nm, dscnt_vl, min_ordr_amt, max_dscnt_amt, vld_end_dt
+		pblcn_cpn_id, cpn_nm, dscnt_vl, min_ordr_amt, max_dscnt_amt, vld_end_dt,
+		vld_bgng_dt, crt_dt
 		FROM
-		coupons
+		coupons c
 		WHERE
-		actvtn_yn = 1
-		AND pblcn_cpn_id NOT IN (SELECT pblcn_cpn_id FROM user_coupons WHERE
+		c.actvtn_yn = 1
+		AND c.pblcn_cpn_id NOT IN (SELECT pblcn_cpn_id FROM user_coupons WHERE
 		user_no = #{userNo})
 		<if test="keyword != null and keyword != ''">
-			AND cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
 		</if>
 		ORDER BY
 		<choose>
-			<when test="'expiry'.equals(sortOrder)">vld_end_dt ASC</when>
-			<when test="'rate'.equals(sortOrder)">dscnt_vl DESC</when>
-			<when test="'amount'.equals(sortOrder)">dscnt_vl DESC</when>
-			<otherwise>crt_dt DESC</otherwise>
+			<when test="'expiry'.equals(sortOrder)">c.vld_end_dt ASC</when>
+			<when test="'rate'.equals(sortOrder)">c.dscnt_vl DESC</when>
+
+			<when test="'recommended'.equals(sortOrder)">c.vld_bgng_dt DESC</when>
+			<when test="'recent'.equals(sortOrder)">c.vld_bgng_dt DESC</when>
+
+			<otherwise>c.vld_bgng_dt DESC</otherwise>
 		</choose>
 		LIMIT #{limit} OFFSET #{offset}
 	</select>
@@ -73,7 +76,8 @@
 		resultType="int">
 		/* 발급 가능한 쿠폰의 전체 개수 조회 */
 		SELECT COUNT(*) FROM coupons
-		WHERE actvtn_yn = 1
+		WHERE actvtn_yn =
+		1
 		AND pblcn_cpn_id NOT IN (SELECT pblcn_cpn_id FROM user_coupons WHERE
 		user_no = #{userNo})
 		<if test="keyword != null and keyword != ''">
@@ -85,7 +89,8 @@
 		resultMap="userCouponsResultMap">
 		/* 사용자가 보유한 쿠폰 목록 조회 */
 		SELECT
-		uc.user_cpn_id, uc.user_no, uc.pblcn_cpn_id, uc.use_yn,
+		uc.user_cpn_id, uc.user_no,
+		uc.pblcn_cpn_id, uc.use_yn,
 		uc.cpn_give_dt, c.vld_end_dt, c.cpn_nm,
 		c.dscnt_vl, c.min_ordr_amt, c.max_dscnt_amt
 		FROM
@@ -93,15 +98,17 @@
 		JOIN
 		coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
 		WHERE
-		uc.user_no = #{userNo}
+		uc.user_no =
+		#{userNo}
 		<if test="keyword != null and keyword != ''">
 			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
 		</if>
 		ORDER BY
 		<choose>
 			<when test="'expiry'.equals(sortOrder)">c.vld_end_dt ASC</when>
+			<when test="'rate'.equals(sortOrder)">c.dscnt_vl DESC</when>
 			<when test="'recent'.equals(sortOrder)">uc.cpn_give_dt DESC</when>
-			<otherwise>uc.cpn_give_dt DESC</otherwise>
+			<otherwise>c.vld_end_dt ASC</otherwise>
 		</choose>
 		LIMIT #{limit} OFFSET #{offset}
 	</select>
@@ -111,8 +118,10 @@
 		/* 사용자가 보유한 쿠폰의 전체 개수 조회 */
 		SELECT COUNT(*)
 		FROM user_coupons uc
-		JOIN coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
-		WHERE uc.user_no = #{userNo}
+		JOIN
+		coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+		WHERE uc.user_no =
+		#{userNo}
 		<if test="keyword != null and keyword != ''">
 			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
 		</if>
@@ -121,12 +130,15 @@
 	<select id="getCouponInfo" parameterType="string"
 		resultMap="couponsResultMap">
 		/* 단일 쿠폰의 상세 정보 조회 */
-		SELECT * FROM coupons WHERE pblcn_cpn_id = #{couponId}
+		SELECT * FROM coupons WHERE
+		pblcn_cpn_id = #{couponId}
 	</select>
 
 	<select id="countUserCouponByCouponId" resultType="int">
-		/* 사용자의 특정 쿠폰 보유 여부 확인 */
-		SELECT COUNT(*) FROM user_coupons WHERE user_no = #{userNo} AND pblcn_cpn_id
+		/* 사용자의 특정 쿠폰
+		보유 여부 확인 */
+		SELECT COUNT(*) FROM user_coupons WHERE user_no = #{userNo}
+		AND pblcn_cpn_id
 		= #{couponId}
 	</select>
 
@@ -134,15 +146,19 @@
 		parameterType="ks55team02.customer.coupons.domain.UserCoupons">
 		/* 사용자에게 쿠폰 발급 처리 */
 		INSERT INTO user_coupons
-		(user_cpn_id, user_no, pblcn_cpn_id, use_yn, cpn_give_dt, indiv_expry_dt,
+		(user_cpn_id, user_no, pblcn_cpn_id, use_yn, cpn_give_dt,
+		indiv_expry_dt,
 		issu_rsn_src_cn)
 		VALUES
-		(#{userCpnId}, #{userNo}, #{pblcnCpnId}, 0, NOW(), #{indivExpryDt}, '사용자 발급')
+		(#{userCpnId}, #{userNo},
+		#{pblcnCpnId}, 0, NOW(), #{indivExpryDt}, '사용자 발급')
 	</insert>
-	
+
 	<select id="getNextUserCouponId" resultType="String">
-    SELECT CONCAT('USRCPN_', LPAD(IFNULL(MAX(SUBSTRING(user_cpn_id, 8)), 0) + 1, 3, '0'))
-    FROM user_coupons
+		SELECT
+		CONCAT('USRCPN_', LPAD(IFNULL(MAX(SUBSTRING(user_cpn_id, 8)), 0) + 1,
+		3, '0'))
+		FROM user_coupons
 	</select>
 
 </mapper>
