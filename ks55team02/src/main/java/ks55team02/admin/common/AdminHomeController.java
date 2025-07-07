@@ -1,4 +1,4 @@
-package ks55team02.admin.common.controller;
+package ks55team02.admin.common;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -3,177 +3,506 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="ks55team02.seller.products.mapper.ProductsMapper">
+<mapper
+	namespace="ks55team02.seller.products.mapper.ProductsMapper">
 
-    <resultMap id="productImageResultMap" type="ks55team02.seller.products.domain.ProductImage">
-        <id property="imgNo" column="img_no"/>
-        <result property="gdsNo" column="gds_no"/>
-        <result property="creatrNo" column="creatr_no"/>
-        <result property="mdfrNo" column="mdfr_no"/>
-        <result property="imgFilePathNm" column="img_file_path_nm"/>
-        <result property="videoUrl" column="video_url"/>
-        <result property="imgIndctSn" column="img_indct_sn"/>
-        <result property="regDt" column="reg_dt"/>
-        <result property="mdfcnDt" column="mdfcn_dt"/>
-        <result property="inactvtnDt" column="inactvtn_dt"/>
-        <result property="actvtnYn" column="actvtn_yn"/>
-        <result property="imgType" column="img_type" javaType="ks55team02.seller.products.domain.ProductImageType"
-                typeHandler="ks55team02.seller.products.handler.ProductImageTypeHandler"/>
-    </resultMap>
+	<!-- ============================================================================= 
+		ResultMaps - Mantidos do ProductsMapper2.xml e adicionados os que faltavam 
+		do ProductsMapper.xml ============================================================================= -->
 
-    <resultMap id="productOptionValueResultMap" type="ks55team02.seller.products.domain.ProductOptionValue">
-        <id property="optVlNo" column="opt_vl_no"/>
-        <result property="optNo" column="opt_vl_opt_no"/>
-        <result property="creatrNo" column="opt_vl_creatr_no"/>
-        <result property="mdfrNo" column="opt_vl_mdfr_no"/>
-        <result property="delUserNo" column="opt_vl_del_user_no"/>
-        <result property="vlNm" column="vl_nm"/>
-        <result property="optVlImgUrlAddr" column="opt_vl_img_url_addr"/>
-        <result property="clrCd" column="clr_cd"/>
-        <result property="regDt" column="opt_vl_reg_dt"/>
-        <result property="mdfcnDt" column="opt_vl_mdfcn_dt"/>
-        <result property="inactvtnDt" column="opt_vl_inactvtn_dt"/>
-        <result property="actvtnYn" column="opt_vl_actvtn_yn"/>
-    </resultMap>
+	<!-- Adicionado do ProductsMapper.xml -->
+	<resultMap id="productCategoryResultMap"
+		type="ks55team02.seller.products.domain.ProductCategory">
+		<id property="categoryId" column="ctgry_no" />
+		<result property="parentCategoryId" column="up_ctgry_no" />
+		<result property="userNo" column="creatr_no" />
+		<result property="categoryName" column="ctgry_nm" />
+		<result property="categoryLevel" column="ctgry_dpth" />
+		<result property="regDate" column="reg_dt" />
+		<result property="activationYn" column="actvtn_yn" />
+	</resultMap>
 
-    <resultMap id="productOptionResultMap" type="ks55team02.seller.products.domain.ProductOption">
-        <id property="optNo" column="opt_no"/>
-        <result property="gdsNo" column="opt_gds_no"/>
-        <result property="creatrNo" column="opt_creatr_no"/>
-        <result property="mdfrNo" column="opt_mdfr_no"/>
-        <result property="delUserNo" column="opt_del_user_no"/>
-        <result property="optNm" column="opt_nm"/>
-        <result property="snglMtplChcSeCd" column="sngl_mtpl_chc_se_cd"/>
-        <result property="optIndctSn" column="opt_indct_sn"/>
-        <result property="regDt" column="opt_reg_dt"/>
-        <result property="mdfcnDt" column="opt_mdfcn_dt"/>
-        <result property="inactvtnDt" column="opt_inactvtn_dt"/>
-        <result property="actvtnYn" column="opt_actvtn_yn"/>
+	<resultMap id="storesResultMap"
+		type="ks55team02.seller.stores.domain.Stores">
+		<id property="storeId" column="store_id" />
+		<result property="storeConm" column="store_conm" />
+		<result property="storeLogoImg" column="store_logo_img" />
+		<result property="delPrcrYn" column="del_prcr_yn" />
+	</resultMap>
 
-        <collection property="optionValues" ofType="ks55team02.seller.products.domain.ProductOptionValue"
-                    javaType="java.util.ArrayList" column="opt_no"
-                    resultMap="productOptionValueResultMap">
-        </collection>
-    </resultMap>
+	<resultMap id="productImageResultMap"
+		type="ks55team02.seller.products.domain.ProductImage">
+		<id property="imgNo" column="img_no" />
+		<result property="gdsNo" column="gds_no" />
+		<result property="creatrNo" column="creatr_no" />
+		<result property="mdfrNo" column="mdfr_no" />
+		<result property="imgFilePathNm" column="img_file_path_nm" />
+		<result property="videoUrl" column="video_url" />
+		<result property="imgIndctSn" column="img_indct_sn" />
+		<result property="regDt" column="reg_dt" />
+		<result property="mdfcnDt" column="mdfcn_dt" />
+		<result property="inactvtnDt" column="inactvtn_dt" />
+		<result property="actvtnYn" column="actvtn_yn" />
+		<result property="imgType" column="img_type"
+			javaType="ks55team02.seller.products.domain.ProductImageType"
+			typeHandler="ks55team02.seller.products.handler.ProductImageTypeHandler" />
+	</resultMap>
 
-    <resultMap id="productDetailWithImagesResultMap" type="ks55team02.seller.products.domain.Products">
-        <id 	column="p_gds_no" 		property="gdsNo" />
-        <result column="p_store_id" 		property="storeId" />
-        <result column="p_ctgry_no" 		property="ctgryNo" />
-        <result column="p_sel_user_no" 	property="selUserNo" />
-        <result column="p_mdfr_no" 		property="mdfrNo" />
-        <result column="p_del_user_no" 	property="delUserNo" />
-        <result column="p_gds_nm" 		property="gdsNm" />
-        <result column="p_gds_expln" 		property="gdsExpln" />
-        <result column="p_bas_prc" 		property="basPrc" />
-        <result column="p_dscnt_rt" 		property="dscntRt" />
-        <result column="p_last_sel_prc" 	property="lastSelPrc" />
-        <result column="p_reg_dt" 		property="regDt" />
-        <result column="p_mdfcn_dt" 		property="mdfcnDt" />
-        <result column="p_inactvtn_dt" 	property="inactvtnDt" />
-        <result column="p_expsr_yn" 		property="expsrYn" />
-        <result column="p_actvtn_yn" 		property="actvtnYn" />
-        <result column="p_min_purchase_qty" property="minPurchaseQty" />
-        <result column="p_max_purchase_qty" property="maxPurchaseQty" />
-        
-        <association property="productCategory" javaType="ks55team02.seller.products.domain.ProductCategory">
-            <id property="categoryId" column="pc_ctgry_no"/>
-            <result property="parentCategoryId" column="pc_up_ctgry_no"/>
-            <result property="userNo" column="pc_creatr_no"/>
-            <result property="categoryName" column="pc_ctgry_nm"/>
-            <result property="categoryLevel" column="pc_ctgry_dpth"/>
-            <result property="regDate" column="pc_reg_dt"/>
-        </association>
+	<resultMap id="productOptionValueResultMap"
+		type="ks55team02.seller.products.domain.ProductOptionValue">
+		<id property="optVlNo" column="opt_vl_no" />
+		<result property="optNo" column="opt_vl_opt_no" />
+		<result property="creatrNo" column="opt_vl_creatr_no" />
+		<result property="mdfrNo" column="opt_vl_mdfr_no" />
+		<result property="delUserNo" column="opt_vl_del_user_no" />
+		<result property="vlNm" column="vl_nm" />
+		<result property="optVlImgUrlAddr" column="opt_vl_img_url_addr" />
+		<result property="clrCd" column="clr_cd" />
+		<result property="regDt" column="opt_vl_reg_dt" />
+		<result property="mdfcnDt" column="opt_vl_mdfcn_dt" />
+		<result property="inactvtnDt" column="opt_vl_inactvtn_dt" />
+		<result property="actvtnYn" column="opt_vl_actvtn_yn" />
+	</resultMap>
 
-        <collection property="productImages" ofType="ks55team02.seller.products.domain.ProductImage"
-                    resultMap="productImageResultMap"/>
+	<resultMap id="productOptionResultMap"
+		type="ks55team02.seller.products.domain.ProductOption">
+		<id property="optNo" column="opt_no" />
+		<result property="gdsNo" column="opt_gds_no" />
+		<result property="creatrNo" column="opt_creatr_no" />
+		<result property="mdfrNo" column="opt_mdfr_no" />
+		<result property="delUserNo" column="opt_del_user_no" />
+		<result property="optNm" column="opt_nm" />
+		<result property="snglMtplChcSeCd" column="sngl_mtpl_chc_se_cd" />
+		<result property="optIndctSn" column="opt_indct_sn" />
+		<result property="regDt" column="opt_reg_dt" />
+		<result property="mdfcnDt" column="opt_mdfcn_dt" />
+		<result property="inactvtnDt" column="opt_inactvtn_dt" />
+		<result property="actvtnYn" column="opt_actvtn_yn" />
 
-        <collection property="productOptions" ofType="ks55team02.seller.products.domain.ProductOption"
-                    javaType="java.util.ArrayList" column="p_gds_no"
-                    resultMap="productOptionResultMap">
-        </collection>
-    </resultMap>
+		<collection property="optionValues"
+			ofType="ks55team02.seller.products.domain.ProductOptionValue"
+			javaType="java.util.ArrayList" column="opt_no"
+			resultMap="productOptionValueResultMap">
+		</collection>
+	</resultMap>
 
-    <resultMap type="ks55team02.seller.products.domain.Products" id="productsResultMap">
-        <id 	column="gds_no" 		property="gdsNo" />
-        <result column="store_id" 		property="storeId" />
-        <result column="ctgry_no" 		property="ctgryNo" />
-        <result column="sel_user_no" 	property="selUserNo" />
-        <result column="mdfr_no" 		property="mdfrNo" />
-        <result column="del_user_no" 	property="delUserNo" />
-        <result column="gds_nm" 		property="gdsNm" />
-        <result column="gds_expln" 		property="gdsExpln" />
-        <result column="bas_prc" 		property="basPrc" />
-        <result column="dscnt_rt" 		property="dscntRt" />
-        <result column="last_sel_prc" 	property="lastSelPrc" />
-        <result column="reg_dt" 		property="regDt" />
-        <result column="mdfcn_dt" 		property="mdfcnDt" />
-        <result column="inactvtn_dt" 	property="inactvtn_dt" />
-        <result column="expsr_yn" 		property="expsrYn" />
-        <result column="actvtn_yn" 		property="actvtnYn" />
-        <result column="min_purchase_qty" property="minPurchaseQty" />
-        <result column="max_purchase_qty" property="maxPurchaseQty" />
-        <result column="thumbnail_image_path" property="thumbnailImagePath" /> 
+	<resultMap id="productDetailWithImagesResultMap"
+		type="ks55team02.seller.products.domain.Products">
+		<id column="p_gds_no" property="gdsNo" />
+		<result column="p_store_id" property="storeId" />
+		<result column="p_ctgry_no" property="ctgryNo" />
+		<result column="p_sel_user_no" property="selUserNo" />
+		<result column="p_mdfr_no" property="mdfrNo" />
+		<result column="p_del_user_no" property="delUserNo" />
+		<result column="p_gds_nm" property="gdsNm" />
+		<result column="p_gds_expln" property="gdsExpln" />
+		<result column="p_bas_prc" property="basPrc" jdbcType="DECIMAL"/>
+		<result column="p_dscnt_rt" property="dscntRt" />
+		<result column="p_last_sel_prc" property="lastSelPrc" jdbcType="DECIMAL"/>
+		<result column="p_reg_dt" property="regDt" />
+		<result column="p_mdfcn_dt" property="mdfcnDt" />
+		<result column="p_inactvtn_dt" property="inactvtnDt" />
+		<result column="p_expsr_yn" property="expsrYn" />
+		<result column="p_actvtn_yn" property="actvtnYn" />
+		<result column="p_min_purchase_qty" property="minPurchaseQty" />
+		<result column="p_max_purchase_qty" property="maxPurchaseQty" />
+        <association property="productCategory"
+			javaType="ks55team02.seller.products.domain.ProductCategory">
+			<id property="categoryId" column="pc_ctgry_no" />
+			<result property="parentCategoryId" column="pc_up_ctgry_no" />
+			<result property="userNo" column="pc_creatr_no" />
+			<result property="categoryName" column="pc_ctgry_nm" />
+			<result property="categoryLevel" column="pc_ctgry_dpth" />
+			<result property="regDate" column="pc_reg_dt" />
+		</association>
 
-        <association property="productCategory" javaType="ks55team02.seller.products.domain.ProductCategory">
-            <id property="categoryId" column="ctgry_no"/>
-            <result property="categoryName" column="ctgry_nm_from_category"/>
-        </association>
-    </resultMap>
+		<collection property="productImages"
+			ofType="ks55team02.seller.products.domain.ProductImage"
+			resultMap="productImageResultMap" />
 
-    <select id="getProductDetailWithImages" parameterType="String" resultMap="productDetailWithImagesResultMap">
+		<collection property="productOptions"
+			ofType="ks55team02.seller.products.domain.ProductOption"
+			javaType="java.util.ArrayList" column="p_gds_no"
+			resultMap="productOptionResultMap">
+		</collection>
+	</resultMap>
+
+	<resultMap type="ks55team02.seller.products.domain.Products"
+		id="productsResultMap">
+		<id column="gds_no" property="gdsNo" />
+		<result column="store_id" property="storeId" />
+		<result column="ctgry_no" property="ctgryNo" />
+		<result column="sel_user_no" property="selUserNo" />
+		<result column="mdfr_no" property="mdfrNo" />
+		<result column="del_user_no" property="delUserNo" />
+		<result column="gds_nm" property="gdsNm" />
+		<result column="gds_expln" property="gdsExpln" />
+		<result column="bas_prc" property="basPrc" jdbcType="DECIMAL" />
+		<result column="dscnt_rt" property="dscntRt" />
+		<result column="last_sel_prc" property="lastSelPrc" jdbcType="DECIMAL" />
+		<result column="reg_dt" property="regDt" />
+		<result column="mdfcn_dt" property="mdfcnDt" />
+		<result column="inactvtn_dt" property="inactvtnDt" />
+		<result column="expsr_yn" property="expsrYn" />
+		<result column="actvtn_yn" property="actvtnYn" />
+		<result column="min_purchase_qty" property="minPurchaseQty" />
+		<result column="max_purchase_qty" property="maxPurchaseQty" />
+		<result column="thumbnail_image_path" property="thumbnailImagePath" /> <result column="discountedPrice" property="discountedPrice" jdbcType="DECIMAL"/>
+
+		<association property="productCategory"
+			javaType="ks55team02.seller.products.domain.ProductCategory">
+			<id property="categoryId" column="ctgry_no" />
+			<result property="categoryName" column="ctgry_nm" /> </association>
+
+	</resultMap>
+
+	<resultMap type="ks55team02.seller.products.domain.Products"
+    id="productsWithFilterResultMap">
+    <id column="gds_no" property="gdsNo" />
+    <result column="store_id" property="storeId" />
+    <result column="ctgry_no" property="ctgryNo" />
+    <result column="sel_user_no" property="selUserNo" />
+    <result column="mdfr_no" property="mdfrNo" />
+    <result column="del_user_no" property="delUserNo" />
+    <result column="gds_nm" property="gdsNm" />
+    <result column="gds_expln" property="gdsExpln" />
+    <result column="bas_prc" property="basPrc" jdbcType="DECIMAL" />
+    <result column="dscnt_rt" property="dscntRt" />
+    <result column="last_sel_prc" property="lastSelPrc" jdbcType="DECIMAL" />
+    <result column="reg_dt" property="regDt" />
+    <result column="mdfcn_dt" property="mdfcnDt" />
+    <result column="inactvtn_dt" property="inactvtnDt" />
+    <result column="expsr_yn" property="expsrYn" />
+    <result column="actvtn_yn" property="actvtnYn" />
+    <result column="min_purchase_qty" property="minPurchaseQty" />
+    <result column="max_purchase_qty" property="maxPurchaseQty" />
+    <result column="thumbnail_image_path"
+        property="thumbnailImagePath" />
+    <result column="store_name" property="storeName" />
+    <result column="total_stock_quantity"
+        property="totalStockQuantity" />
+    <result column="is_sold_out" property="isSoldOut" />
+    <association property="productCategory"
+        javaType="ks55team02.seller.products.domain.ProductCategory">
+        <id property="categoryId" column="pc_ctgry_no" /> <result property="categoryName" column="pc_ctgry_nm" /> </association>
+</resultMap>
+
+
+	<!-- ============================================================================= 
+		Queries - Adicionadas do ProductsMapper.xml ============================================================================= -->
+
+	<select id="getCategoryById" parameterType="String"
+		resultMap="productCategoryResultMap">
+		/* 카테고리 ID로 단일 카테고리 정보 조회 */
+		SELECT
+		ctgry_no,
+		up_ctgry_no,
+		creatr_no,
+		ctgry_nm,
+		ctgry_dpth,
+		reg_dt,
+		actvtn_yn
+		FROM
+		ks55team02db.product_categories
+		WHERE ctgry_no = #{categoryId} AND
+		actvtn_yn = TRUE;
+	</select>
+
+	<select id="getSubCategoriesByParentId" parameterType="String"
+		resultMap="productCategoryResultMap">
+		/* 부모 카테고리 ID에 해당하는 하위 카테고리 목록 조회 */
+		SELECT
+		ctgry_no,
+		up_ctgry_no,
+		creatr_no,
+		ctgry_nm,
+		ctgry_dpth,
+		reg_dt,
+		actvtn_yn
+		FROM
+		ks55team02db.product_categories
+		WHERE up_ctgry_no = #{parentCategoryId}
+		AND actvtn_yn = TRUE
+		ORDER BY ctgry_nm;
+	</select>
+
+	<select id="getAllTopLevelCategories"
+		resultMap="productCategoryResultMap">
+		/* 모든 최상위 카테고리 목록 조회 */
+		SELECT
+		ctgry_no,
+		up_ctgry_no,
+		creatr_no,
+		ctgry_nm,
+		ctgry_dpth,
+		reg_dt,
+		actvtn_yn
+		FROM
+		ks55team02db.product_categories
+		WHERE up_ctgry_no IS NULL AND actvtn_yn
+		= TRUE
+		ORDER BY ctgry_nm;
+	</select>
+
+	<select id="getTopLevelCategoryIdByName" parameterType="String"
+		resultType="String">
+		/* 최상위 카테고리 이름으로 카테고리 ID 조회 */
+		SELECT ctgry_no
+		FROM
+		ks55team02db.product_categories
+		WHERE ctgry_nm = #{categoryName} AND
+		up_ctgry_no IS NULL
+		AND actvtn_yn = TRUE
+		LIMIT 1;
+	</select>
+
+	<select id="getAllProductCategories"
+		resultMap="productCategoryResultMap">
+		/* 모든 상품 카테고리 목록 조회 */
+		SELECT
+		ctgry_no,
+		up_ctgry_no,
+		creatr_no,
+		ctgry_nm,
+		ctgry_dpth,
+		reg_dt,
+		actvtn_yn
+		FROM
+		ks55team02db.product_categories
+		WHERE actvtn_yn = TRUE
+		ORDER BY
+		ctgry_nm;
+	</select>
+
+	<select id="getFilteredAndSortedProducts"
+    parameterType="java.util.Map" resultMap="productsWithFilterResultMap">
+	    SELECT
+	        p.gds_no,
+	        p.gds_nm,
+	        p.bas_prc,
+	        p.dscnt_rt,
+	        (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) AS last_sel_prc,
+	        pc.ctgry_no AS pc_ctgry_no,
+	        pc.ctgry_nm AS pc_ctgry_nm,
+	        (
+	            SELECT pi.img_file_path_nm
+	            FROM ks55team02db.product_images pi
+	            WHERE pi.gds_no = p.gds_no
+	              AND pi.img_type = 1 AND pi.actvtn_yn = TRUE ORDER BY pi.img_indct_sn ASC
+	            LIMIT 1
+	        ) AS thumbnail_image_path,
+	        s.store_conm AS store_name,
+	        SUM(ps.sel_psblty_qntty) AS total_stock_quantity,
+	        MAX(CASE WHEN ps.sldout_yn = TRUE THEN 1 ELSE 0 END) AS is_sold_out
+	    FROM
+	        ks55team02db.products p
+	    LEFT JOIN
+	        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+	    LEFT JOIN
+	        ks55team02db.stores s ON p.store_id = s.store_id
+	    LEFT JOIN
+	        ks55team02db.product_status ps ON p.gds_no = ps.gds_no AND ps.actvtn_yn = TRUE
+	    
+	    <where> p.expsr_yn = 1 AND p.actvtn_yn = 1 AND s.del_prcr_yn = FALSE
+	        
+	        <if test="categoryId != null and categoryId != ''">
+	            AND (
+	                p.ctgry_no = #{categoryId}
+	                OR EXISTS (
+	                    SELECT 1
+	                    FROM product_categories sub_pc
+	                    WHERE sub_pc.ctgry_no = p.ctgry_no
+	                    AND sub_pc.up_ctgry_no = #{categoryId}
+	                )
+	            )
+	        </if>
+	        
+	        <if test="gender != null and gender != ''">
+	            AND p.gds_gndr_cd = #{gender}
+	        </if>
+	        
+	        <choose>
+	            <when test="minPrice != null and maxPrice != null">
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> #{minPrice}
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> #{maxPrice}
+	            </when>
+	            <when test="minPrice != null"> AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> #{minPrice}
+	            </when>
+	            <when test="maxPrice != null"> AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> #{maxPrice}
+	            </when>
+	            <when test="priceRange != null and priceRange != 'all'">
+	                AND
+	                <choose>
+	                    <when test="priceRange == '0-50000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 50000</when>
+	                    <when test="priceRange == '50000-100000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 50000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 100000</when>
+	                    <when test="priceRange == '100000-200000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 100000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 200000</when>
+	                    <when test="priceRange == '200000-300000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 200000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 300000</when>
+	                    <when test="priceRange == '300000-max'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 300000</when>
+	                </choose>
+	            </when>
+	        </choose>
+	        
+	        <if test="colors != null and colors.size() > 0">
+	            AND p.gds_no IN (
+	                SELECT po.gds_no
+	                FROM ks55team02db.product_options po
+	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+	                WHERE po.opt_nm = '색상' AND pov.vl_nm IN
+	                <foreach item="color" collection="colors" open="(" separator="," close=")">
+	                    #{color}
+	                </foreach>
+	                AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
+	            )
+	        </if>
+	        
+	        <if test="sizes != null and sizes.size() > 0">
+	            AND p.gds_no IN (
+	                SELECT po.gds_no
+	                FROM ks55team02db.product_options po
+	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+	                WHERE (po.opt_nm = '의류 사이즈' OR po.opt_nm = '신발 사이즈' OR po.opt_nm = '사이즈' OR po.opt_nm = '패션소품 사이즈')
+	                AND pov.vl_nm IN
+	                <foreach item="size" collection="sizes" open="(" separator="," close=")">
+	                    #{size}
+	                </foreach>
+	                AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
+	            )
+	        </if>
+	        
+	        <if test="brands != null and brands.size() > 0">
+	            AND s.store_id IN
+	            <foreach item="brandId" collection="brands" open="(" separator="," close=")">
+	                #{brandId}
+	            </foreach>
+	        </if>
+	        
+	        <if test="discountRate != null and discountRate != '' and discountRate != 'all'">
+			    AND p.dscnt_rt <![CDATA[ >= ]]> #{discountRate}
+			</if>
+	    </where>
+	    
+	    GROUP BY p.gds_no
+	    
+	    <trim prefix="HAVING" prefixOverrides="AND |OR">
+	        <if test="includeSoldOut == null or includeSoldOut == false">
+	            SUM(ps.sel_psblty_qntty) > 0
+	        </if>
+	    </trim>
+	    
+	    ORDER BY
+	        <choose>
+	            <when test="sortBy == 'new'">p.reg_dt DESC</when>
+	            <when test="sortBy == 'old'">p.reg_dt ASC</when>
+	            <when test="sortBy == 'priceAsc'">last_sel_prc ASC</when>
+	            <when test="sortBy == 'priceDesc'">last_sel_prc DESC</when>
+	            <when test="sortBy == 'popularity'">p.gds_view_cnt DESC</when>
+	            <otherwise>p.reg_dt DESC</otherwise>
+	        </choose>
+	</select>
+	
+	<select id="countFilteredProducts" parameterType="map" resultType="long">
+	    SELECT
+	        COUNT(DISTINCT p.gds_no)
+	    FROM
+	        ks55team02db.products p
+	    LEFT JOIN
+	        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+	    LEFT JOIN
+	        ks55team02db.stores s ON p.store_id = s.store_id
+	    LEFT JOIN
+	        ks55team02db.product_status ps ON p.gds_no = ps.gds_no AND ps.actvtn_yn = TRUE
+	    <where> p.expsr_yn = 1 AND p.actvtn_yn = 1 AND s.del_prcr_yn = FALSE
+	        
+	        <if test="categoryId != null and categoryId != ''">
+	            AND (
+	                p.ctgry_no = #{categoryId}
+	                OR EXISTS (
+	                    SELECT 1
+	                    FROM product_categories sub_pc
+	                    WHERE sub_pc.ctgry_no = p.ctgry_no
+	                    AND sub_pc.up_ctgry_no = #{categoryId}
+	                )
+	            )
+	        </if>
+	        
+	        <if test="gender != null and gender != ''">
+	            AND p.gds_gndr_cd = #{gender}
+	        </if>
+	        
+	        <choose>
+	            <when test="minPrice != null and maxPrice != null">
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> #{minPrice}
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> #{maxPrice}
+	            </when>
+	            <when test="minPrice != null">
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> #{minPrice}
+	            </when>
+	            <when test="maxPrice != null">
+	                AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> #{maxPrice}
+	            </when>
+	            <when test="priceRange != null and priceRange != 'all'">
+	                AND
+	                <choose>
+	                    <when test="priceRange == '0-50000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 50000</when>
+	                    <when test="priceRange == '50000-100000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 50000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 100000</when>
+	                    <when test="priceRange == '100000-200000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 100000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 200000</when>
+	                    <when test="priceRange == '200000-300000'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 200000 AND (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ <= ]]> 300000</when>
+	                    <when test="priceRange == '300000-max'">(p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) <![CDATA[ >= ]]> 300000</when>
+	                </choose>
+	            </when>
+	        </choose>
+	        
+	        <if test="colors != null and colors.size() > 0">
+	            AND p.gds_no IN (
+	                SELECT po.gds_no
+	                FROM ks55team02db.product_options po
+	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+	                WHERE po.opt_nm = '색상' AND pov.vl_nm IN
+	                <foreach item="color" collection="colors" open="(" separator="," close=")">
+	                    #{color}
+	                </foreach>
+	                AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
+	            )
+	        </if>
+	        
+	        <if test="sizes != null and sizes.size() > 0">
+	            AND p.gds_no IN (
+	                SELECT po.gds_no
+	                FROM ks55team02db.product_options po
+	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+	                WHERE (po.opt_nm = '의류 사이즈' OR po.opt_nm = '신발 사이즈' OR po.opt_nm = '사이즈' OR po.opt_nm = '패션소품 사이즈')
+	                AND pov.vl_nm IN
+	                <foreach item="size" collection="sizes" open="(" separator="," close=")">
+	                    #{size}
+	                </foreach>
+	                AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
+	            )
+	        </if>
+	        
+	        <if test="brands != null and brands.size() > 0">
+	            AND s.store_id IN
+	            <foreach item="brandId" collection="brands" open="(" separator="," close=")">
+	                #{brandId}
+	            </foreach>
+	        </if>
+	        
+	        <if test="discountRate != null and discountRate != '' and discountRate != 'all'">
+			    AND p.dscnt_rt <![CDATA[ >= ]]> #{discountRate}
+			</if>
+	        
+	        <if test="includeSoldOut == null or includeSoldOut == false">
+	            AND p.gds_no IN (
+	                SELECT ps_inner.gds_no
+	                FROM ks55team02db.product_status ps_inner
+	                WHERE ps_inner.actvtn_yn = TRUE AND ps_inner.sel_psblty_qntty > 0
+	            )
+	        </if>
+	    </where>
+	</select>
+
+	<select id="getAllProductOptionValuesByType"
+            parameterType="String" resultMap="productOptionValueResultMap">
         SELECT
-            p.gds_no AS p_gds_no,
-            p.store_id AS p_store_id,
-            p.ctgry_no AS p_ctgry_no,
-            p.sel_user_no AS p_sel_user_no,
-            p.mdfr_no AS p_mdfr_no,
-            p.del_user_no AS p_del_user_no,
-            p.gds_nm AS p_gds_nm,
-            p.gds_expln AS p_gds_expln,
-            p.bas_prc AS p_bas_prc,
-            IFNULL(p.dscnt_rt, 0.00) AS p_dscnt_rt,
-            (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS p_last_sel_prc,
-            p.reg_dt AS p_reg_dt,
-            p.mdfcn_dt AS p_mdfcn_dt,
-            p.inactvtn_dt AS p_inactvtn_dt,
-            p.expsr_yn AS p_expsr_yn,
-            p.actvtn_yn AS p_actvtn_yn,
-            p.min_purchase_qty AS p_min_purchase_qty,
-            p.max_purchase_qty AS p_max_purchase_qty,
-            pc.ctgry_no AS pc_ctgry_no,
-            pc.up_ctgry_no AS pc_up_ctgry_no,
-            pc.creatr_no AS pc_creatr_no,
-            pc.ctgry_nm AS pc_ctgry_nm,
-            pc.ctgry_dpth AS pc_ctgry_dpth,
-            pc.reg_dt AS pc_reg_dt,
-
-            pi.img_no,
-            pi.gds_no,
-            pi.creatr_no,
-            pi.mdfr_no,
-            pi.img_file_path_nm,
-            pi.video_url,
-            pi.img_indct_sn,
-            pi.reg_dt,
-            pi.mdfcn_dt,
-            pi.inactvtn_dt,
-            pi.img_type, 
-            pi.actvtn_yn,
-
-            po.opt_no AS opt_no,
-            po.gds_no AS opt_gds_no,
-            po.creatr_no AS opt_creatr_no,
-            po.mdfr_no AS opt_mdfr_no,
-            po.del_user_no AS opt_del_user_no,
-            po.opt_nm AS opt_nm,
-            po.sngl_mltpl_chc_se_cd AS sngl_mtpl_chc_se_cd,
-            po.opt_indct_sn AS opt_indct_sn,
-            po.reg_dt AS opt_reg_dt,
-            po.mdfcn_dt AS opt_mdfcn_dt,
-            po.inactvtn_dt AS opt_inactvtn_dt,
-            po.actvtn_yn AS opt_actvtn_yn,
-
             pov.opt_vl_no AS opt_vl_no,
             pov.opt_no AS opt_vl_opt_no,
             pov.creatr_no AS opt_vl_creatr_no,
@@ -187,336 +516,552 @@
             pov.inactvtn_dt AS opt_vl_inactvtn_dt,
             pov.actvtn_yn AS opt_vl_actvtn_yn
         FROM
-            ks55team02db.products p
-        LEFT JOIN
-            ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
-        LEFT JOIN
-            ks55team02db.product_images pi ON p.gds_no = pi.gds_no
-        LEFT JOIN
-            ks55team02db.product_options po ON p.gds_no = po.gds_no AND po.actvtn_yn = TRUE LEFT JOIN
-            ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no AND pov.actvtn_yn = TRUE WHERE
-            p.gds_no = #{gdsNo}
-            AND p.actvtn_yn = TRUE
-            AND p.expsr_yn = TRUE
-        ORDER BY
-            p.gds_no, po.opt_indct_sn ASC, pov.reg_dt ASC, pi.img_indct_sn ASC;
-    </select>
-
-    <insert id="insertProductImage" parameterType="ks55team02.seller.products.domain.ProductImage">
-        INSERT INTO ks55team02db.product_images
-        (img_no, gds_no, creatr_no, mdfr_no, img_file_path_nm, video_url, img_indct_sn, reg_dt, mdfcn_dt, inactvtn_dt, img_type, actvtn_yn)
-        VALUES(
-            #{imgNo}, 
-            #{gdsNo}, 
-            #{creatrNo}, 
-            #{mdfrNo}, 
-            #{imgFilePathNm}, 
-            #{videoUrl}, 
-            #{imgIndctSn}, 
-            CURRENT_TIMESTAMP, 
-            #{mdfcnDt}, 
-            #{inactvtnDt}, 
-            #{imgType, typeHandler=ks55team02.seller.products.handler.ProductImageTypeHandler}, #{actvtnYn}
-        )
-    </insert>
-
-    <update id="updateProductImage" parameterType="ks55team02.seller.products.domain.ProductImage">
-        UPDATE ks55team02db.product_images
-        SET
-            mdfr_no = #{mdfrNo},
-            img_file_path_nm = #{imgFilePathNm},
-            video_url = #{videoUrl},
-            img_indct_sn = #{imgIndctSn},
-            mdfcn_dt = CURRENT_TIMESTAMP,
-            img_type = #{imgType, typeHandler=ks55team02.seller.products.handler.ProductImageTypeHandler}, actvtn_yn = #{actvtnYn}
+            ks55team02db.product_option_values pov
+        JOIN
+            ks55team02db.product_options po ON pov.opt_no = po.opt_no
         WHERE
-            img_no = #{imgNo}
-    </update>
+            po.opt_nm = #{optionTypeName} AND pov.actvtn_yn = TRUE AND
+            po.actvtn_yn = TRUE
+        ORDER BY pov.vl_nm;
+    </select>
 
-    <select id="getImagesByGdsNo" parameterType="string" resultMap="productImageResultMap">
-        SELECT
-            img_no, gds_no, creatr_no, mdfr_no, img_file_path_nm, video_url, img_indct_sn,
-            reg_dt, mdfcn_dt, inactvtn_dt, img_type, actvtn_yn
+    <select id="getDistinctProductOptionValueNamesByType"
+            parameterType="String" resultType="String">
+        SELECT DISTINCT
+            pov.vl_nm
         FROM
-            ks55team02db.product_images
+            ks55team02db.product_option_values pov
+        JOIN
+            ks55team02db.product_options po ON pov.opt_no = po.opt_no
         WHERE
-            gds_no = #{gdsNo}
-        ORDER BY
-            img_indct_sn ASC
+            po.opt_nm = #{optionTypeName} AND pov.actvtn_yn = TRUE AND
+            po.actvtn_yn = TRUE
+        ORDER BY pov.vl_nm;
     </select>
 
-    <select id="getProductsBySellerAndStore" parameterType="map" resultMap="productsResultMap">
-    	/* 판매자/스토어별 상품 목록 조회: 노출/활성 여부 관계없이 모든 상품 */
-        SELECT
-            p.gds_no,
-            p.store_id,
-            p.ctgry_no,
-            p.sel_user_no,
-            p.mdfr_no,
-            p.del_user_no,
-            p.gds_nm,
-            p.gds_expln,
-            p.bas_prc,
-            IFNULL(p.dscnt_rt, 0.00) AS dscnt_rt,
-            (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
-            p.reg_dt,
-            p.mdfcn_dt,
-            p.inactvtn_dt,
-            p.expsr_yn,
-            p.actvtn_yn,
-            p.min_purchase_qty,
-            p.max_purchase_qty,
-            (
-                SELECT pi.img_file_path_nm
-                FROM ks55team02db.product_images pi
-                WHERE pi.gds_no = p.gds_no
-                  AND pi.img_type = 1 ORDER BY pi.img_indct_sn ASC
-                LIMIT 1
-            ) AS thumbnail_image_path,
-            pc.ctgry_nm AS ctgry_nm_from_category
-        FROM
-            ks55team02db.products p
-        LEFT JOIN
-            ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
-        WHERE
-            p.sel_user_no = #{selUserNo}
-            AND p.store_id = #{storeId}
-        ORDER BY
-            p.reg_dt DESC
-    </select>
+	<select id="getAllStores" resultMap="storesResultMap">
+		/* 모든 브랜드(상점) 목록 조회 */
+		SELECT
+		store_id,
+		store_conm,
+		store_logo_img,
+		del_prcr_yn
+		FROM
+		ks55team02db.stores
+		WHERE store_stts = '정상' AND del_prcr_yn = FALSE
+		ORDER BY store_conm;
+	</select>
 
-    <select id="getProductList" resultMap="productsResultMap">
-        /* 판매자용: 모든 상품 목록 조회 (노출/활성 여부 관계없이 모든 상품) */
-        SELECT
-            p.gds_no,
-            p.store_id,
-            p.ctgry_no,
-            p.sel_user_no,
-            p.mdfr_no,
-            p.del_user_no,
-            p.gds_nm,
-            p.gds_expln,
-            p.bas_prc,
-            IFNULL(p.dscnt_rt, 0.00) AS dscnt_rt,
-            (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
-            p.reg_dt,
-            p.mdfcn_dt,
-            p.inactvtn_dt,
-            p.expsr_yn,
-            p.actvtn_yn,
-            p.min_purchase_qty,
-            p.max_purchase_qty,
-            (
-                SELECT pi.img_file_path_nm
-                FROM ks55team02db.product_images pi
-                WHERE pi.gds_no = p.gds_no
-                  AND pi.img_type = 1 ORDER BY pi.img_indct_sn ASC
-                LIMIT 1
-            ) AS thumbnail_image_path,
-            pc.ctgry_nm AS ctgry_nm_from_category
-        FROM
-            ks55team02db.products p
-        LEFT JOIN
-            ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
-        ORDER BY gds_no DESC
-    </select>
+	<select id="getProductDetailWithImages" parameterType="String"
+		resultMap="productDetailWithImagesResultMap">
+		SELECT
+		p.gds_no AS p_gds_no,
+		p.store_id AS p_store_id,
+		p.ctgry_no AS p_ctgry_no,
+		p.sel_user_no AS p_sel_user_no,
+		p.mdfr_no AS
+		p_mdfr_no,
+		p.del_user_no AS p_del_user_no,
+		p.gds_nm AS p_gds_nm,
+		p.gds_expln AS p_gds_expln,
+		p.bas_prc AS p_bas_prc,
+		IFNULL(p.dscnt_rt,
+		0.00) AS p_dscnt_rt,
+		(p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) /
+		100) AS p_last_sel_prc,
+		p.reg_dt AS p_reg_dt,
+		p.mdfcn_dt AS p_mdfcn_dt,
+		p.inactvtn_dt AS p_inactvtn_dt,
+		p.expsr_yn AS p_expsr_yn,
+		p.actvtn_yn AS
+		p_actvtn_yn,
+		p.min_purchase_qty AS p_min_purchase_qty,
+		p.max_purchase_qty AS p_max_purchase_qty,
+		pc.ctgry_no AS pc_ctgry_no,
+		pc.up_ctgry_no AS pc_up_ctgry_no,
+		pc.creatr_no AS pc_creatr_no,
+		pc.ctgry_nm AS pc_ctgry_nm,
+		pc.ctgry_dpth AS pc_ctgry_dpth,
+		pc.reg_dt AS
+		pc_reg_dt,
 
-    <select id="getAllActiveProductsForCustomer" resultMap="productsResultMap">
-        /* 고객용: 활성화되고 노출되는 상품 목록 조회 */
-        SELECT
-            p.gds_no,
-            p.store_id,
-            p.ctgry_no,
-            p.sel_user_no,
-            p.mdfr_no,
-            p.del_user_no,
-            p.gds_nm,
-            p.gds_expln,
-            p.bas_prc,
-            IFNULL(p.dscnt_rt, 0.00) AS dscnt_rt,
-            (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
-            p.reg_dt,
-            p.mdfcn_dt,
-            p.inactvtn_dt,
-            p.expsr_yn,
-            p.actvtn_yn,
-            p.min_purchase_qty,
-            p.max_purchase_qty,
-            (
-                SELECT pi.img_file_path_nm
-                FROM ks55team02db.product_images pi
-                WHERE pi.gds_no = p.gds_no
-                  AND pi.img_type = 1 ORDER BY pi.img_indct_sn ASC
-                LIMIT 1
-            ) AS thumbnail_image_path,
-            pc.ctgry_nm AS ctgry_nm_from_category
-        FROM
-            ks55team02db.products p
-        LEFT JOIN
-            ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
-        WHERE
-            p.expsr_yn = 1 AND p.actvtn_yn = 1
-        ORDER BY p.gds_no DESC
-    </select>
+		pi.img_no,
+		pi.gds_no,
+		pi.creatr_no,
+		pi.mdfr_no,
+		pi.img_file_path_nm,
+		pi.video_url,
+		pi.img_indct_sn,
+		pi.reg_dt,
+		pi.mdfcn_dt,
+		pi.inactvtn_dt,
+		pi.img_type,
+		pi.actvtn_yn,
 
-    <select id="getActiveProductsForCustomerByCategory" parameterType="string" resultMap="productsResultMap">
-        /* 고객용: 카테고리별 활성화 및 노출 상품 목록 조회 */
-        SELECT
-            p.gds_no,
-            p.store_id,
-            p.ctgry_no,
-            p.sel_user_no,
-            p.mdfr_no,
-            p.del_user_no,
-            p.gds_nm,
-            p.gds_expln,
-            p.bas_prc,
-            IFNULL(p.dscnt_rt, 0.00) AS dscnt_rt,
-            (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
-            p.reg_dt,
-            p.mdfcn_dt,
-            p.inactvtn_dt,
-            p.expsr_yn,
-            p.actvtn_yn,
-            p.min_purchase_qty,
-            p.max_purchase_qty,
-            (
-                SELECT pi.img_file_path_nm
-                FROM ks55team02db.product_images pi
-                WHERE pi.gds_no = p.gds_no
-                  AND pi.img_type = 1 ORDER BY pi.img_indct_sn ASC
-                LIMIT 1
-            ) AS thumbnail_image_path,
-            pc.ctgry_nm AS ctgry_nm_from_category
-        FROM
-            ks55team02db.products p
-        LEFT JOIN
-            ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
-        WHERE
-            p.expsr_yn = 1
-            AND p.actvtn_yn = 1
-            AND p.ctgry_no = #{categoryId} ORDER BY p.gds_no DESC
-    </select>
+		po.opt_no AS
+		opt_no,
+		po.gds_no AS opt_gds_no,
+		po.creatr_no AS opt_creatr_no,
+		po.mdfr_no AS opt_mdfr_no,
+		po.del_user_no AS opt_del_user_no,
+		po.opt_nm
+		AS opt_nm,
+		po.sngl_mltpl_chc_se_cd AS sngl_mtpl_chc_se_cd,
+		po.opt_indct_sn AS opt_indct_sn,
+		po.reg_dt AS opt_reg_dt,
+		po.mdfcn_dt AS
+		opt_mdfcn_dt,
+		po.inactvtn_dt AS opt_inactvtn_dt,
+		po.actvtn_yn AS
+		opt_actvtn_yn,
 
-    <insert id="addProduct" parameterType="ks55team02.seller.products.domain.Products">
-        INSERT INTO ks55team02db.products (
-            gds_no, store_id, ctgry_no, sel_user_no, mdfr_no, del_user_no, gds_nm, gds_expln, bas_prc, dscnt_rt,
-            last_sel_prc, reg_dt, mdfcn_dt, inactvtn_dt, expsr_yn, actvtn_yn,
-            min_purchase_qty, max_purchase_qty  ) VALUES (
-            #{gdsNo}, #{storeId}, #{ctgryNo}, #{selUserNo}, #{mdfrNo}, #{delUserNo}, #{gdsNm}, #{gdsExpln}, #{basPrc},
-            #{dscntRt}, #{lastSelPrc}, CURRENT_TIMESTAMP, NULL, NULL, 0, 0, #{minPurchaseQty}, #{maxPurchaseQty})
-    </insert>
+		pov.opt_vl_no AS opt_vl_no,
+		pov.opt_no AS opt_vl_opt_no,
+		pov.creatr_no AS opt_vl_creatr_no,
+		pov.mdfr_no AS opt_vl_mdfr_no,
+		pov.del_user_no AS opt_vl_del_user_no,
+		pov.vl_nm AS vl_nm,
+		pov.opt_vl_img_url_addr AS opt_vl_img_url_addr,
+		pov.clr_cd AS clr_cd,
+		pov.reg_dt AS opt_vl_reg_dt,
+		pov.mdfcn_dt AS opt_vl_mdfcn_dt,
+		pov.inactvtn_dt AS opt_vl_inactvtn_dt,
+		pov.actvtn_yn AS
+		opt_vl_actvtn_yn
+		FROM
+		ks55team02db.products p
+		LEFT JOIN
+		ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+		LEFT
+		JOIN
+		ks55team02db.product_images pi ON p.gds_no = pi.gds_no
+		LEFT JOIN
+		ks55team02db.product_options po ON p.gds_no = po.gds_no AND
+		po.actvtn_yn = TRUE LEFT JOIN
+		ks55team02db.product_option_values pov ON
+		po.opt_no = pov.opt_no AND
+		pov.actvtn_yn = TRUE WHERE
+		p.gds_no =
+		#{gdsNo}
+		AND p.actvtn_yn = TRUE
+		AND p.expsr_yn = TRUE
+		ORDER BY
+		p.gds_no,
+		po.opt_indct_sn ASC, pov.reg_dt ASC, pi.img_indct_sn ASC;
+	</select>
 
-    <select id="countProductCode" parameterType="string" resultType="int">
-        SELECT COUNT(*) FROM ks55team02db.products WHERE gds_no = #{gdsNo}
-    </select>
+	<insert id="insertProductImage"
+		parameterType="ks55team02.seller.products.domain.ProductImage">
+		INSERT INTO ks55team02db.product_images
+		(img_no, gds_no,
+		creatr_no, mdfr_no, img_file_path_nm, video_url,
+		img_indct_sn, reg_dt,
+		mdfcn_dt, inactvtn_dt, img_type, actvtn_yn)
+		VALUES(
+		#{imgNo},
+		#{gdsNo},
+		#{creatrNo},
+		#{mdfrNo},
+		#{imgFilePathNm},
+		#{videoUrl},
+		#{imgIndctSn},
+		CURRENT_TIMESTAMP,
+		#{mdfcnDt},
+		#{inactvtnDt},
+		#{imgType,
+		typeHandler=ks55team02.seller.products.handler.ProductImageTypeHandler},
+		#{actvtnYn}
+		)
+	</insert>
 
-    <select id="getNewGdsNo" resultType="string">
-        SELECT
-            CASE
-                WHEN COUNT(p.gds_no) = 0 THEN 'gds_no_1'
-                ELSE CONCAT(
-                    'gds_no_',
-                    COALESCE(MAX(CAST(SUBSTRING_INDEX(p.gds_no, '_', -1) AS UNSIGNED)), 0) + 1
-                )
-            END
-        FROM ks55team02db.products p
-    </select>
+	<update id="updateProductImage"
+		parameterType="ks55team02.seller.products.domain.ProductImage">
+		UPDATE ks55team02db.product_images
+		SET
+		mdfr_no =
+		#{mdfrNo},
+		img_file_path_nm = #{imgFilePathNm},
+		video_url = #{videoUrl},
+		img_indct_sn = #{imgIndctSn},
+		mdfcn_dt = CURRENT_TIMESTAMP,
+		img_type =
+		#{imgType,
+		typeHandler=ks55team02.seller.products.handler.ProductImageTypeHandler},
+		actvtn_yn = #{actvtnYn}
+		WHERE
+		img_no = #{imgNo}
+	</update>
 
-    <select id="getMaxProductCode" resultType="string">
-        SELECT
-            CASE
-                WHEN COUNT(p.gds_no) = 0 THEN 'gds_no_1'
-                ELSE CONCAT(
-                    'gds_no_',
-                    COALESCE(MAX(CAST(SUBSTRING_INDEX(p.gds_no, '_', -1) AS UNSIGNED)), 0) + 1
-                )
-            END
-        FROM ks55team02db.products p
-    </select>
+	<select id="getImagesByGdsNo" parameterType="string"
+		resultMap="productImageResultMap">
+		SELECT
+		img_no, gds_no, creatr_no, mdfr_no, img_file_path_nm,
+		video_url,
+		img_indct_sn,
+		reg_dt, mdfcn_dt, inactvtn_dt, img_type,
+		actvtn_yn
+		FROM
+		ks55team02db.product_images
+		WHERE
+		gds_no = #{gdsNo}
+		ORDER BY
+		img_indct_sn ASC
+	</select>
 
-    <select id="getMaxImageNo" resultType="string">
-        SELECT
-            CASE
-                WHEN COUNT(pi.img_no) = 0 THEN 'img_no_1'
-                ELSE CONCAT(
-                    'img_no_',
-                    COALESCE(MAX(CAST(SUBSTRING_INDEX(pi.img_no, '_', -1) AS UNSIGNED)), 0) + 1
-                )
-            END
-        FROM ks55team02db.product_images pi
-    </select>
+	<select id="getProductsBySellerAndStore" parameterType="map"
+		resultMap="productsResultMap">
+		/* 판매자/스토어별 상품 목록 조회: 노출/활성 여부 관계없이 모든 상품 */
+		SELECT
+		p.gds_no,
+		p.store_id,
+		p.ctgry_no,
+		p.sel_user_no,
+		p.mdfr_no,
+		p.del_user_no,
+		p.gds_nm,
+		p.gds_expln,
+		p.bas_prc,
+		IFNULL(p.dscnt_rt, 0.00) AS dscnt_rt,
+		(p.bas_prc
+		* (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
+		p.reg_dt,
+		p.mdfcn_dt,
+		p.inactvtn_dt,
+		p.expsr_yn,
+		p.actvtn_yn,
+		p.min_purchase_qty,
+		p.max_purchase_qty,
+		(
+		SELECT pi.img_file_path_nm
+		FROM
+		ks55team02db.product_images pi
+		WHERE pi.gds_no = p.gds_no
+		AND
+		pi.img_type = 1 ORDER BY pi.img_indct_sn ASC
+		LIMIT 1
+		) AS
+		thumbnail_image_path,
+		pc.ctgry_nm AS ctgry_nm_from_category
+		FROM
+		ks55team02db.products p
+		LEFT JOIN
+		ks55team02db.product_categories pc ON
+		p.ctgry_no = pc.ctgry_no
+		WHERE
+		p.sel_user_no = #{selUserNo}
+		AND
+		p.store_id = #{storeId}
+		ORDER BY
+		p.reg_dt DESC
+	</select>
 
-    <select id="getMaxOptionNo" resultType="string">
-        SELECT
-            CASE
-                WHEN COUNT(po.opt_no) = 0 THEN 'opt_no_1'
-                ELSE CONCAT(
-                    'opt_no_',
-                    COALESCE(MAX(CAST(SUBSTRING_INDEX(po.opt_no, '_', -1) AS UNSIGNED)), 0) + 1
-                )
-            END
-        FROM ks55team02db.product_options po
-    </select>
+	<select id="getProductList" resultMap="productsResultMap">
+		/* 판매자용: 모든 상품 목록 조회
+		(노출/활성 여부 관계없이 모든 상품) */
+		SELECT
+		p.gds_no,
+		p.store_id,
+		p.ctgry_no,
+		p.sel_user_no,
+		p.mdfr_no,
+		p.del_user_no,
+		p.gds_nm,
+		p.gds_expln,
+		p.bas_prc,
+		IFNULL(p.dscnt_rt, 0.00) AS dscnt_rt,
+		(p.bas_prc * (100 -
+		IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
+		p.reg_dt,
+		p.mdfcn_dt,
+		p.inactvtn_dt,
+		p.expsr_yn,
+		p.actvtn_yn,
+		p.min_purchase_qty,
+		p.max_purchase_qty,
+		(
+		SELECT pi.img_file_path_nm
+		FROM
+		ks55team02db.product_images pi
+		WHERE pi.gds_no = p.gds_no
+		AND
+		pi.img_type = 1 ORDER BY pi.img_indct_sn ASC
+		LIMIT 1
+		) AS
+		thumbnail_image_path,
+		pc.ctgry_nm AS ctgry_nm_from_category
+		FROM
+		ks55team02db.products p
+		LEFT JOIN
+		ks55team02db.product_categories pc ON
+		p.ctgry_no = pc.ctgry_no
+		ORDER BY gds_no DESC
+	</select>
 
-    <select id="getMaxOptionValueNo" resultType="string">
-        SELECT
-            CASE
-                WHEN COUNT(pov.opt_vl_no) = 0 THEN 'opt_vl_no_1'
-                ELSE CONCAT(
-                    'opt_vl_no_',
-                    COALESCE(MAX(CAST(SUBSTRING_INDEX(pov.opt_vl_no, '_', -1) AS UNSIGNED)), 0) + 1
-                )
-            END
-        FROM ks55team02db.product_option_values pov
-    </select>
+	<select id="getAllActiveProductsForCustomer"
+		resultMap="productsResultMap">
+		/* 고객용: 활성화되고 노출되는 상품 목록 조회 */
+		SELECT
+		    p.gds_no,
+		    p.store_id,
+		    p.ctgry_no,
+		    p.sel_user_no,
+		    p.mdfr_no,
+		    p.del_user_no,
+		    p.gds_nm,
+		    p.gds_expln,
+		    p.bas_prc,
+		    IFNULL(p.dscnt_rt, 0.00) AS dscnt_rt,
+		    (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
+		    p.reg_dt,
+		    p.mdfcn_dt,
+		    p.inactvtn_dt,
+		    p.expsr_yn,
+		    p.actvtn_yn,
+		    p.min_purchase_qty,
+		    p.max_purchase_qty,
+		    (
+		        SELECT pi.img_file_path_nm
+		        FROM ks55team02db.product_images pi
+		        WHERE pi.gds_no = p.gds_no
+		          AND pi.img_type = 1 AND pi.actvtn_yn = TRUE ORDER BY pi.img_indct_sn ASC
+		        LIMIT 1
+		    ) AS thumbnail_image_path,
+		    s.store_conm AS store_name,
+		    SUM(ps.sel_psblty_qntty) AS total_stock_quantity,
+		    MAX(CASE WHEN ps.sldout_yn = TRUE THEN 1 ELSE 0 END) AS is_sold_out,
+		    pc.ctgry_no AS ctgry_no,
+		    pc.ctgry_nm AS ctgry_nm
+		FROM
+		    ks55team02db.products p
+		LEFT JOIN
+		    ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+		LEFT JOIN
+		    ks55team02db.stores s ON p.store_id = s.store_id
+		LEFT JOIN
+		    ks55team02db.product_status ps ON p.gds_no = ps.gds_no AND ps.actvtn_yn = TRUE
+		WHERE
+		    p.expsr_yn = 1 AND p.actvtn_yn = 1 AND s.del_prcr_yn = FALSE
+		GROUP BY p.gds_no
+		HAVING total_stock_quantity > 0 AND is_sold_out = 0
+		ORDER BY p.gds_no DESC
+	</select>
 
-    <select id="getMaxStatusNo" resultType="string">
-        SELECT
-            CASE
-                WHEN COUNT(ps.gds_stts_no) = 0 THEN 'gds_stts_no_1'
-                ELSE CONCAT(
-                    'gds_stts_no_',
-                    COALESCE(MAX(CAST(SUBSTRING_INDEX(ps.gds_stts_no, '_', -1) AS UNSIGNED)), 0) + 1
-                )
-            END
-        FROM ks55team02db.product_status ps
-    </select>
+	<select id="getActiveProductsForCustomerByCategory"
+		parameterType="string" resultMap="productsResultMap">
+		/* 고객용: 카테고리별 활성화 및 노출 상품 목록 조회 */
+		SELECT
+		    p.gds_no,
+		    p.store_id,
+		    p.ctgry_no,
+		    p.sel_user_no,
+		    p.mdfr_no,
+		    p.del_user_no,
+		    p.gds_nm,
+		    p.gds_expln,
+		    p.bas_prc,
+		    IFNULL(p.dscnt_rt, 0.00) AS dscnt_rt,
+		    (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
+		    p.reg_dt,
+		    p.mdfcn_dt,
+		    p.inactvtn_dt,
+		    p.expsr_yn,
+		    p.actvtn_yn,
+		    p.min_purchase_qty,
+		    p.max_purchase_qty,
+		    (
+		        SELECT pi.img_file_path_nm
+		        FROM ks55team02db.product_images pi
+		        WHERE pi.gds_no = p.gds_no
+		          AND pi.img_type = 1 AND pi.actvtn_yn = TRUE
+		        ORDER BY pi.img_indct_sn ASC
+		        LIMIT 1
+		    ) AS thumbnail_image_path,
+		    s.store_conm AS store_name,
+		    SUM(ps.sel_psblty_qntty) AS total_stock_quantity,
+		    MAX(CASE WHEN ps.sldout_yn = TRUE THEN 1 ELSE 0 END) AS is_sold_out,
+		    pc.ctgry_no AS ctgry_no,
+		    pc.ctgry_nm AS ctgry_nm
+		FROM
+		    ks55team02db.products p
+		LEFT JOIN
+		    ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+		LEFT JOIN
+		    ks55team02db.stores s ON p.store_id = s.store_id
+		LEFT JOIN
+		    ks55team02db.product_status ps ON p.gds_no = ps.gds_no AND ps.actvtn_yn = TRUE
+		WHERE
+		    p.expsr_yn = 1             
+		    AND p.actvtn_yn = 1        
+		    AND s.del_prcr_yn = FALSE 
+		    AND p.ctgry_no = #{categoryId} GROUP BY p.gds_no
+		HAVING total_stock_quantity > 0 AND is_sold_out = 0
+		ORDER BY p.gds_no DESC
+	</select>
 
-    <select id="getMaxStatusOptionMappingNo" resultType="string">
-        SELECT
-            CASE
-                WHEN COUNT(som.gds_stts_no) = 0 THEN 'SOM_1'
-                ELSE CONCAT(
-                    'SOM_',
-                    COALESCE(MAX(CAST(SUBSTRING_INDEX(som.gds_stts_no, '_', -1) AS UNSIGNED)), 0) + 1
-                )
-            END
-        FROM ks55team02db.status_option_mappings som
-    </select>
+	<insert id="addProduct"
+		parameterType="ks55team02.seller.products.domain.Products">
+		INSERT INTO ks55team02db.products (
+		gds_no, store_id,
+		ctgry_no, sel_user_no, mdfr_no, del_user_no, gds_nm,
+		gds_expln,
+		bas_prc, dscnt_rt,
+		last_sel_prc, reg_dt, mdfcn_dt, inactvtn_dt,
+		expsr_yn, actvtn_yn,
+		min_purchase_qty, max_purchase_qty ) VALUES (
+		#{gdsNo}, #{storeId}, #{ctgryNo}, #{selUserNo}, #{mdfrNo},
+		#{delUserNo},
+		#{gdsNm}, #{gdsExpln}, #{basPrc},
+		#{dscntRt},
+		#{lastSelPrc}, CURRENT_TIMESTAMP, NULL, NULL, 0, 0,
+		#{minPurchaseQty},
+		#{maxPurchaseQty})
+	</insert>
 
-    <insert id="insertProductOption" parameterType="ks55team02.seller.products.domain.ProductOption">
-        INSERT INTO ks55team02db.product_options
-        (opt_no, gds_no, creatr_no, mdfr_no, del_user_no, opt_nm, sngl_mltpl_chc_se_cd, opt_indct_sn, reg_dt, mdfcn_dt, inactvtn_dt, actvtn_yn)
-        VALUES(#{optNo}, #{gdsNo}, #{creatrNo}, #{mdfrNo}, #{delUserNo}, #{optNm}, #{snglMtplChcSeCd}, #{optIndctSn}, CURRENT_TIMESTAMP, #{mdfcnDt}, #{inactvtnDt}, #{actvtnYn})
-    </insert>
+	<select id="countProductCode" parameterType="string"
+		resultType="int">
+		SELECT COUNT(*) FROM ks55team02db.products WHERE gds_no =
+		#{gdsNo}
+	</select>
 
-    <insert id="insertProductOptionValue" parameterType="ks55team02.seller.products.domain.ProductOptionValue">
-        INSERT INTO ks55team02db.product_option_values
-        (opt_vl_no, opt_no, creatr_no, mdfr_no, del_user_no, vl_nm, opt_vl_img_url_addr, clr_cd, reg_dt, mdfcn_dt, inactvtn_dt, actvtn_yn)
-        VALUES(#{optVlNo}, #{optNo}, #{creatrNo}, #{mdfrNo}, #{delUserNo}, #{vlNm}, #{optVlImgUrlAddr}, #{clrCd}, CURRENT_TIMESTAMP, #{mdfcnDt}, #{inactvtnDt}, #{actvtnYn})
-    </insert>
+	<select id="getNewGdsNo" resultType="string">
+		SELECT
+		CASE
+		WHEN
+		COUNT(p.gds_no) = 0 THEN 'gds_no_1'
+		ELSE CONCAT(
+		'gds_no_',
+		COALESCE(MAX(CAST(SUBSTRING_INDEX(p.gds_no, '_', -1) AS UNSIGNED)), 0)
+		+ 1
+		)
+		END
+		FROM ks55team02db.products p
+	</select>
 
-    <insert id="insertProductStatus" parameterType="ks55team02.seller.products.domain.ProductStatus">
-        INSERT INTO ks55team02db.product_status
-        (gds_stts_no, gds_no, creatr_no, mdfr_no, del_user_no, sel_psblty_qntty, reg_dt, mdfcn_dt, inactvtn_dt, sldout_yn, actvtn_yn)
-        VALUES(#{gdsSttsNo}, #{gdsNo}, #{creatrNo}, #{mdfrNo}, #{delUserNo}, #{selPsbltyQntty}, CURRENT_TIMESTAMP, #{mdfcnDt}, #{inactvtnDt}, #{sldoutYn}, #{actvtnYn})
-    </insert>
+	<select id="getMaxProductCode" resultType="string">
+		SELECT
+		CASE
+		WHEN
+		COUNT(p.gds_no) = 0 THEN 'gds_no_1'
+		ELSE CONCAT(
+		'gds_no_',
+		COALESCE(MAX(CAST(SUBSTRING_INDEX(p.gds_no, '_', -1) AS UNSIGNED)), 0)
+		+ 1
+		)
+		END
+		FROM ks55team02db.products p
+	</select>
 
-    <insert id="insertStatusOptionMapping" parameterType="ks55team02.seller.products.domain.StatusOptionMapping">
-        INSERT INTO ks55team02db.status_option_mappings
-        (gds_stts_no, opt_vl_no, creatr_no, del_user_no, crt_ymd, inactvtn_dt, actvtn_yn)
-        VALUES(#{gdsSttsNo}, #{optVlNo}, #{creatrNo}, #{delUserNo}, CURRENT_TIMESTAMP, #{inactvtnDt}, #{actvtnYn})
-    </insert>
+	<select id="getMaxImageNo" resultType="string">
+		SELECT
+		CASE
+		WHEN
+		COUNT(pi.img_no) = 0 THEN 'img_no_1'
+		ELSE CONCAT(
+		'img_no_',
+		COALESCE(MAX(CAST(SUBSTRING_INDEX(pi.img_no, '_', -1) AS UNSIGNED)),
+		0) + 1
+		)
+		END
+		FROM ks55team02db.product_images pi
+	</select>
+
+	<select id="getMaxOptionNo" resultType="string">
+		SELECT
+		CASE
+		WHEN
+		COUNT(po.opt_no) = 0 THEN 'opt_no_1'
+		ELSE CONCAT(
+		'opt_no_',
+		COALESCE(MAX(CAST(SUBSTRING_INDEX(po.opt_no, '_', -1) AS UNSIGNED)),
+		0) + 1
+		)
+		END
+		FROM ks55team02db.product_options po
+	</select>
+
+	<select id="getMaxOptionValueNo" resultType="string">
+		SELECT
+		CASE
+		WHEN
+		COUNT(pov.opt_vl_no) = 0 THEN 'opt_vl_no_1'
+		ELSE CONCAT(
+		'opt_vl_no_',
+		COALESCE(MAX(CAST(SUBSTRING_INDEX(pov.opt_vl_no, '_', -1) AS
+		UNSIGNED)), 0) + 1
+		)
+		END
+		FROM ks55team02db.product_option_values pov
+	</select>
+
+	<select id="getMaxStatusNo" resultType="string">
+		SELECT
+		CASE
+		WHEN
+		COUNT(ps.gds_stts_no) = 0 THEN 'gds_stts_no_1'
+		ELSE CONCAT(
+		'gds_stts_no_',
+		COALESCE(MAX(CAST(SUBSTRING_INDEX(ps.gds_stts_no, '_',
+		-1) AS UNSIGNED)), 0) + 1
+		)
+		END
+		FROM ks55team02db.product_status ps
+	</select>
+
+	<select id="getMaxStatusOptionMappingNo" resultType="string">
+		SELECT
+		CASE
+		WHEN COUNT(som.gds_stts_no) = 0 THEN 'SOM_1'
+		ELSE CONCAT(
+		'SOM_',
+		COALESCE(MAX(CAST(SUBSTRING_INDEX(som.gds_stts_no, '_', -1) AS
+		UNSIGNED)), 0) + 1
+		)
+		END
+		FROM ks55team02db.status_option_mappings som
+	</select>
+
+	<insert id="insertProductOption"
+		parameterType="ks55team02.seller.products.domain.ProductOption">
+		INSERT INTO ks55team02db.product_options
+		(opt_no, gds_no,
+		creatr_no, mdfr_no, del_user_no, opt_nm, sngl_mtpl_chc_se_cd,
+		opt_indct_sn, reg_dt, mdfcn_dt, inactvtn_dt, actvtn_yn)
+		VALUES(#{optNo}, #{gdsNo}, #{creatrNo}, #{mdfrNo}, #{delUserNo},
+		#{optNm}, #{snglMtplChcSeCd}, #{optIndctSn}, CURRENT_TIMESTAMP,
+		#{mdfcnDt}, #{inactvtnDt}, #{actvtnYn})
+	</insert>
+
+	<insert id="insertProductOptionValue"
+		parameterType="ks55team02.seller.products.domain.ProductOptionValue">
+		INSERT INTO ks55team02db.product_option_values
+		(opt_vl_no, opt_no, creatr_no, mdfr_no, del_user_no, vl_nm,
+		opt_vl_img_url_addr,
+		clr_cd, reg_dt, mdfcn_dt, inactvtn_dt, actvtn_yn)
+		VALUES(#{optVlNo}, #{optNo}, #{creatrNo}, #{mdfrNo}, #{delUserNo},
+		#{vlNm},
+		#{optVlImgUrlAddr}, #{clrCd}, CURRENT_TIMESTAMP, #{mdfcnDt},
+		#{inactvtnDt}, #{actvtnYn})
+	</insert>
+
+	<insert id="insertProductStatus"
+		parameterType="ks55team02.seller.products.domain.ProductStatus">
+		INSERT INTO ks55team02db.product_status
+		(gds_stts_no,
+		gds_no, creatr_no, mdfr_no, del_user_no, sel_psblty_qntty, reg_dt,
+		mdfcn_dt, inactvtn_dt, sldout_yn, actvtn_yn)
+		VALUES(#{gdsSttsNo},
+		#{gdsNo}, #{creatrNo}, #{mdfrNo}, #{delUserNo}, #{selPsbltyQntty},
+		CURRENT_TIMESTAMP, #{mdfcnDt}, #{inactvtnDt}, #{sldoutYn},
+		#{actvtnYn})
+	</insert>
+
+	<insert id="insertStatusOptionMapping"
+		parameterType="ks55team02.seller.products.domain.StatusOptionMapping">
+		INSERT INTO ks55team02db.status_option_mappings
+		(gds_stts_no, opt_vl_no, creatr_no, del_user_no, crt_ymd, inactvtn_dt,
+		actvtn_yn)
+		VALUES(#{gdsSttsNo}, #{optVlNo}, #{creatrNo}, #{delUserNo},
+		CURRENT_TIMESTAMP, #{inactvtnDt}, #{actvtnYn})
+	</insert>
 
 </mapper>
