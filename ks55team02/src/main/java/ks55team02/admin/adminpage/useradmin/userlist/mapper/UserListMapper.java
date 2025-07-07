@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import ks55team02.admin.adminpage.useradmin.userlist.domain.UserList;
 
@@ -21,5 +22,8 @@ public interface UserListMapper {
 		
 		// 여러 회원의 로그인 기록을 일괄적으로 생성
 	    void insertLoginHistoryForActivatedUsers(List<String> userNos);
+	    
+	    // user_no 으로 특정 유저 검색(이지성)
+	    UserList getUserByUserNo(@Param("userNo") String userNo);
 }
 
