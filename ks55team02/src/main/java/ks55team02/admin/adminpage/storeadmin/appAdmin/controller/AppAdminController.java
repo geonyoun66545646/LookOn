@@ -54,11 +54,6 @@ public class AppAdminController {
 	    }
 	}
 	
-	@GetMapping("/summer")
-	public String summer() {
-		
-		return "admin/adminpage/storeadmin/sumer";
-	}
 	
 	
 }
