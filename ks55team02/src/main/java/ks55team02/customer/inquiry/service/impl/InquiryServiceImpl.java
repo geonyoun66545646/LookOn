@@ -45,7 +45,6 @@ public class InquiryServiceImpl implements InquiryService {
         return inquiryList;
     }
 
-
     // 질문 세부
     @Override
     public Inquiry getInquiryById(String inquiryId, String currentUserId) {

@@ -6,10 +6,17 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import ks55team02.customer.post.domain.Comment;
+import ks55team02.customer.post.domain.Interaction;
 import ks55team02.customer.post.domain.Post;
 
 @Mapper
 public interface PostMapper {
+	
+	// 추천 일련번호 생성
+	Integer selectMaxInterNumber();
+	
+	// 추천수 증가
+	int insertInterCount(Interaction interaction);
 
 	// 게시글 조회수 증가
 	int updateViewCount(String pstSn);

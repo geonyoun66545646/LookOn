@@ -1,0 +1,86 @@
+/* member-list.css */
+
+.content-title {
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+.form-label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+.member-table {
+    table-layout: fixed; /* 테이블 레이아웃 고정 (가장 중요) */
+    width: 100%;
+}
+
+.member-table th,
+.member-table td {
+    vertical-align: middle;
+    text-align: center;
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee; /* 테두리 선을 좀 더 연하게 */
+	word-break: break-all;    
+}
+
+.member-table th {
+    background-color: #f8f9fa; /* 헤더 배경색 */
+   	font-weight: 600; /* 헤더 텍스트를 약간 더 굵게 */ 
+}
+
+/* [개선!] 긴 텍스트를 '...'으로 처리하는 클래스 */
+.ellipsis {
+    white-space: nowrap;      /* 줄 바꿈 방지 */
+    overflow: hidden;         /* 영역 밖 내용 숨김 */
+    text-overflow: ellipsis;  /* 숨겨진 내용을 ...으로 표시 */
+}
+
+/* 텍스트 정렬용 클래스 */
+.text-center { text-align: center; }
+
+/* 컬럼별 너비 지정 (nth-child 사용은 그대로 유지, 선택자만 단순화) */
+.member-table .col-checkbox { width: 5%; }
+.member-table .col-id       { width: 12%; }
+.member-table .col-name     { width: 8%; }
+.member-table .col-gender   { width: 5%; }
+.member-table .col-email    { width: 18%; }
+.member-table .col-phone    { width: 12%; }
+.member-table .col-address  { width: auto; } /* 주소는 남는 공간 모두 사용 */
+.member-table .col-status   { width: 8%; }
+.member-table .col-joindate { width: 10%; }
+
+
+/* ... (기존 .search-result-info, .status-badge-item, .custom-badge 등 좋은 스타일은 그대로 유지) ... */
+.search-result-info {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #f2f3f8;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 10px;
+}
+.search-result-info .text-brand {
+    color: #0d6efd;
+    font-size: 16px;
+}
+.custom-badge {
+    padding: 0.5em 0.9em;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    min-width: 60px;
+    text-align: center;
+    border-radius: 10px;
+}
+/* 긴 텍스트를 '...'으로 처리하는 클래스 */
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 텍스트 정렬용 클래스 */
+.text-left { text-align: left !important; } /* important를 추가하여 중앙정렬을 덮어씁니다. */
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
