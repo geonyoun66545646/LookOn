@@ -160,5 +160,71 @@
 		3, '0'))
 		FROM user_coupons
 	</select>
+	
+	<select id="countUserOrders" resultType="int">
+    SELECT COUNT(*) 
+    FROM orders 
+    WHERE user_no = #{userNo}
+</select>
+	
+	<select id="countUserReviews" resultType="int">
+    SELECT COUNT(*) 
+    FROM reviews 
+    WHERE writer_user_no = #{userNo}
+</select>
+	
+	<select id="countMonthlyIssuedReviewCoupons" resultType="int">
+    SELECT COUNT(*) 
+    FROM user_coupons 
+    WHERE user_no = #{userNo}
+      AND pblcn_cpn_id = #{couponId}
+      AND issu_rsn_src_cn = 'REVIEW'
+      AND DATE_FORMAT(cpn_give_dt, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+</select>
+	
+	<select id="isBirthdayWeek" resultType="boolean">
+    SELECT CASE 
+        WHEN DATE_FORMAT(NOW(), '%m-%d') 
+             BETWEEN DATE_FORMAT(DATE_SUB(u.birth_date, INTERVAL 3 DAY), '%m-%d') 
+                 AND DATE_FORMAT(DATE_ADD(u.birth_date, INTERVAL 3 DAY), '%m-%d') 
+        THEN TRUE ELSE FALSE END AS is_in_birthday_week
+    FROM users u
+    WHERE u.user_no = #{userNo}
+</select>
+	
+	<select id="countIssuedBirthdayCouponThisYear" resultType="int">
+    SELECT COUNT(*) 
+    FROM user_coupons 
+    WHERE user_no = #{userNo}
+      AND pblcn_cpn_id = #{couponId}
+      AND issu_rsn_src_cn = 'BIRTHDAY'
+      AND YEAR(cpn_give_dt) = YEAR(NOW())
+</select>
+	
+	<select id="countMonthlyIssuedCoupon" resultType="int">
+    SELECT COUNT(*) 
+    FROM user_coupons 
+    WHERE user_no = #{userNo}
+      AND pblcn_cpn_id = #{couponId}
+      AND DATE_FORMAT(cpn_give_dt, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+</select>
+	
+	<select id="countWeeklyIssuedCoupon" resultType="int">
+    SELECT COUNT(*) 
+    FROM user_coupons
+    WHERE user_no = #{userNo}
+      AND pblcn_cpn_id = #{couponId}
+      AND YEARWEEK(cpn_give_dt, 1) = YEARWEEK(NOW(), 1)
+</select>
+	
+	<select id="countYearlyIssuedCoupon" resultType="int">
+    SELECT COUNT(*) 
+    FROM user_coupons
+    WHERE user_no = #{userNo}
+      AND pblcn_cpn_id = #{couponId}
+      AND YEAR(cpn_give_dt) = YEAR(NOW())
+</select>
+	
+	
 
 </mapper>
