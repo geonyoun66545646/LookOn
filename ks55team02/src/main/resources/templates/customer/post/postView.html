@@ -45,23 +45,42 @@
 	        <div class="post-content">
 	            <p th:utext="${postDetail.pstCn}">게시글 내용</p>
 	        </div>
-	
-			<!-- 게시글 추천 버튼 -->
-			<div class="post-interaction">
-				<button type="button" id="post_interaction_btn" class="btn btn-info" 
-				th:data-interaction-pstsn="${postDetail.pstSn}"
-				th:data-interaction-userno="${'user_no_1'}"
-				th:data-post-interaction-insert-url="@{/customer/post/interactionInsert}">추천</button>
-			</div>
+	        
+	        <div class="post-interaction">
+			    <!-- 1. 로그인 상태일 때만 보여줄 버튼 -->
+			    <!-- 여기에는 세션 정보에 접근하는 코드가 들어가도 안전합니다. -->
+			    <button th:if="${session.loginUser != null}"
+			            type="button" 
+			            id="post_interaction_btn" 
+			            class="btn btn-info" 
+			            th:data-interaction-pstsn="${postDetail.pstSn}"
+			            th:data-interaction-userno="${session.loginUser.userNo}"
+			            th:data-post-interaction-insert-url="@{/customer/post/interactionInsert}">추천</button>
+			    
+			    <!-- 2. 비로그인 상태일 때만 보여줄 버튼 -->
+			    <!-- 여기에는 세션 정보에 접근하는 코드가 전혀 없으므로 100% 안전합니다. -->
+			    <button th:unless="${session.loginUser != null}" 
+			            type="button" 
+			            id="post_interaction_btn"
+			            class="btn btn-info" 
+			            data-toggle="modal" 
+			            data-target="#signin-modal">추천</button>
+	        </div>
 	
 	        <!-- 게시글 관련 액션 버튼 (수정, 삭제, 목록) -->
 	        <div class="post-actions">
 
 	        	<button type="button" id="select-postlist-btn" class="btn btn-secondary" onclick="history.back()">목록</button>
-	        	<a class="btn btn-primary" id="update-post-btn" th:href="@{/customer/post/postUpdate/{pstSn}(pstSn=${postDetail.pstSn})}">수정</a>
+	        	<a class="btn btn-primary" 
+	        		id="update-post-btn" 
+	        		th:href="@{/customer/post/postUpdate/{pstSn}(pstSn=${postDetail.pstSn})}"
+	        		th:if="${session.loginUser != null and session.loginUser.userNo == postDetail.wrtrUserNo}">수정</a>
 
-	            <button type="button" id="delete-post-btn" class="btn btn-danger"
-	       				 th:data-post-delete-url="@{/customer/post/postDelete/{pstSn}(pstSn=${postDetail.pstSn})}">삭제</button>
+	            <button type="button" 
+	            		id="delete-post-btn" 
+	            		class="btn btn-danger"
+	       				th:data-post-delete-url="@{/customer/post/postDelete/{pstSn}(pstSn=${postDetail.pstSn})}"
+	       				th:if="${session.loginUser != null and session.loginUser.userNo == postDetail.wrtrUserNo}">삭제</button>
 	        </div>
 	    </div>
 	    
@@ -89,7 +108,15 @@
 	            <!-- <input type="hidden" name="userId" th:value="${session.loginUser.userId}"> -->
 	            <textarea name="cmntCn" placeholder="댓글을 입력해주세요."></textarea>
 	            <input type="hidden" name="pstSn" th:value="${postDetail.pstSn}" />
-	            <button type="submit" class="btn btn-primary insert-comment-btn">등록</button>
+			    <th:block th:if="${session.loginUser != null}">
+			        <input type="hidden" name="wrtrUserNo" th:value="${session.loginUser.userNo}" />
+			    </th:block>
+	            <button th:if="${session.loginUser != null}"
+	            		type="submit" class="btn btn-primary insert-comment-btn">등록</button>
+	            <button th:unless="${session.loginUser != null}"
+	                    data-toggle="modal" 
+        				data-target="#signin-modal"
+	            		type="button" class="btn btn-primary insert-comment-btn">등록</button>
 	        </form>
 	
 	        <!-- 댓글 목록 -->
@@ -109,7 +136,8 @@
 						              th:text="${c.cmntCn}"></textarea>
 						</div>
 						<div class="comment-actions">
-						    <button type="button" class="btn btn-primary update-comment-btn">수정</button>
+						    <button type="button" class="btn btn-primary update-comment-btn"
+						    		th:if="${session.loginUser != null and session.loginUser.userNo == c.wrtrUserNo}">수정</button>
 						    <!-- 수정 2: '저장' 버튼에도 수정할 댓글의 고유 번호(pstCmntSn)를 data 속성으로 추가합니다. -->
 						    <button type="button" class="btn btn-success save-comment-btn" style="display:none;"
 						            th:data-comment-sn="${c.pstCmntSn}"
@@ -117,7 +145,8 @@
 						    <button type="button" class="btn btn-secondary cancel-comment-btn" style="display:none;">취소</button>
 	                        
 	                        <button type="button" class="btn btn-danger delete-comment-btn"
-	                                th:data-comment-delete-url="@{/customer/post/commentDelete/{pstCmntSn}(pstCmntSn=${c.pstCmntSn})}">삭제</button>
+	                                th:data-comment-delete-url="@{/customer/post/commentDelete/{pstCmntSn}(pstCmntSn=${c.pstCmntSn})}"
+	                                th:if="${session.loginUser != null and session.loginUser.userNo == c.wrtrUserNo}">삭제</button>
 	                    </div>
 	                </div>
 	            </th:block>

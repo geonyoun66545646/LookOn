@@ -21,7 +21,7 @@
     font-size: 32px;      /* 글자 크기 */
     font-weight: bold;    /* 글자 굵기 */
     text-align: left;     /* 왼쪽 정렬 (가운데 정렬을 원하면 'center') */
-    margin: 40px 0 30px 0; /* 위(40px), 아래(30px) 여백 추가 */
+    margin-top: 20px; /* 위(20px) 여백 추가 */
 }
 
 /* 1. 상단 탭 메뉴 */

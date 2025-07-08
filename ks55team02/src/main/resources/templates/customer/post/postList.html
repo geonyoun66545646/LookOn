@@ -96,7 +96,20 @@
 		        <!-- card-body end// -->
 		
 		        <div class="content-footer-action">
-		            <button type="button" class="btn-write-post" th:onclick="location.href='/customer/post/postWrite'">글 작성</button>
+		            <!-- 1. 로그인 되어 있을 때 보여줄 버튼 -->
+					<!-- 세션에 loginUser가 존재할 때만 이 버튼이 화면에 그려집니다. -->
+					<button th:if="${session.loginUser != null}"
+					        type="button" 
+					        class="btn-write-post" 
+					        onclick="location.href='/customer/post/postWrite'">글 작성</button>
+					
+					<!-- 2. 로그인 되어 있지 않을 때 보여줄 버튼 -->
+					<!-- 세션에 loginUser가 존재하지 않을 때만 이 버튼이 화면에 그려집니다. -->
+					<button th:if="${session.loginUser == null}"
+					        type="button" 
+					        class="btn-write-post" 
+					        data-toggle="modal" 
+					        data-target="#signin-modal">글 작성</button>
 		        </div>
 	
 		    </div>

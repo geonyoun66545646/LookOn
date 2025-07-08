@@ -34,8 +34,9 @@ public class LoginController {
         String clientIp = request.getRemoteAddr();
         loginInfo.setIpAddress(clientIp);
 
-        log.info("로그인 시도 => ID: {}, IP: {}", loginInfo.getUserLgnId(), clientIp);
-
+        // 250708 리다이렉트 추가
+        log.info("로그인 시도 => ID: {}, IP: {}, 복귀주소: {}", loginInfo.getUserLgnId(), clientIp, loginInfo.getRedirectUrl());
+        
         // 2. LoginService를 호출하여 로그인 로직 실행
         Login userInfo = loginService.login(loginInfo, request);
 
@@ -60,6 +61,7 @@ public class LoginController {
             // 4-2. 최종 로그인 성공
             response.put("status", "success");
             response.put("message", "로그인에 성공하였습니다.");
+            response.put("redirectUrl", loginInfo.getRedirectUrl()); // 리다이렉트용 주소 정보 담기
             log.info("세션 생성 완료: {}", userInfo.getUserLgnId());
 
         } else {
