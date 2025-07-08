@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.login.mapper.UserInfoMapper">
+
+    <!-- UserInfoResponse DTO와 DB 컬럼을 매핑합니다. -->
+    <!-- mybatis.configuration.map-underscore-to-camel-case=true 설정 덕분에 대부분 자동 매핑됩니다. -->
+    <resultMap id="userInfoResultMap" type="UserInfoResponse">
+        <id 	column="user_no" 					property="userNo"/>
+        <result column="mbr_grd_cd" 				property="mbrGrdCd"/>
+        <result column="user_lgn_id" 				property="userLgnId"/>
+        <result column="user_nm" 					property="userNm"/>
+        <result column="gender_se_cd" 				property="genderSeCd"/>
+        <result column="eml_addr" 					property="emlAddr"/>
+        <result column="telno" 						property="telno"/>
+        <result column="user_brdt" 					property="userBrdt"/>
+        <result column="zip_cd" 					property="zipCd"/>
+        <result column="addr" 						property="addr"/>
+        <result column="daddr" 						property="daddr"/>
+        <result column="user_ncnm" 					property="userNcnm"/>
+        <result column="user_status" 				property="userStatus"/>
+        <result column="prfl_img" 					property="prflImg"/>
+        <result column="self_intro_cn" 				property="selfIntroCn"/>
+        <result column="push_ntfctn_rcptn_agre_yn" 	property="pushNtfctnRcptnAgreYn"/>
+        <result column="eml_rcptn_agre_yn" 			property="emlRcptnAgreYn"/>
+        <result column="last_prfl_mdfcn_dt" 		property="lastPrflMdfcnDt"/>
+        <result column="last_pswd_chg_dt" 			property="lastPswdChgDt"/>
+        <result column="mfa_use_yn" 				property="mfaUseYn"/>
+    </resultMap>
+
+    <select id="findUserInfoByUserNo" parameterType="String" resultMap="userInfoResultMap">
+        SELECT
+            u.user_no,
+            u.mbr_grd_cd,
+            u.user_lgn_id,
+            u.user_nm,
+            u.gender_se_cd,
+            u.eml_addr,
+            u.telno,
+            u.user_brdt,
+            u.zip_cd,
+            u.addr,
+            u.daddr,
+            u.user_ncnm,
+            u.user_status,
+            p.prfl_img,
+            p.self_intro_cn,
+            p.push_ntfctn_rcptn_agre_yn,
+            p.eml_rcptn_agre_yn,
+            s.last_pswd_chg_dt,
+            s.mfa_use_yn
+        FROM
+            users AS u
+        LEFT JOIN
+            user_profiles AS p ON u.user_no = p.user_no
+        LEFT JOIN
+            user_security_settings AS s ON u.user_no = s.user_no
+        WHERE
+            u.user_no = #{userNo};
+    </select>
+</mapper>

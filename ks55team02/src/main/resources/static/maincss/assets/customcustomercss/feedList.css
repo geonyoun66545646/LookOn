@@ -1,0 +1,142 @@
+@charset "UTF-8";
+/* 전체 피드 컨테이너 */
+.feed-container {
+    width: 100%;
+    max-width: 1200px; /* 사이트 너비에 맞게 조절 */
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* 페이지 제목 컨테이너 */
+.page-title-container {
+    /* 다른 콘텐츠와 동일한 너비 및 중앙 정렬을 위해 설정 */
+    width: 100%;
+    max-width: 1200px; /* .feed-container와 동일한 너비 */
+    margin: 0 auto;    /* 중앙 정렬 */
+    padding: 0 20px;   /* 좌우 여백 */
+}
+
+/* 페이지 제목 스타일 */
+.page-title {
+    font-size: 32px;      /* 글자 크기 */
+    font-weight: bold;    /* 글자 굵기 */
+    text-align: left;     /* 왼쪽 정렬 (가운데 정렬을 원하면 'center') */
+    margin-top: 20px; /* 위(20px) 여백 추가 */
+}
+
+/* 1. 상단 탭 메뉴 */
+.feed-tabs ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    border-bottom: 1px solid #eee;
+}
+.feed-tabs li a {
+    display: inline-block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: #888;
+    font-weight: bold;
+}
+.feed-tabs li.active a {
+    color: #000;
+    border-bottom: 2px solid #000;
+}
+
+/* 2. 필터링 바 */
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+.filter-bar select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.filter-more-btn {
+    margin-left: auto; /* 버튼을 오른쪽 끝으로 보냄 */
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px;
+    cursor: pointer;
+}
+.filter-more-btn svg {
+    display: block;
+}
+
+
+/* 3. 정렬 및 콘텐츠 정보 */
+.feed-info-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.content-count {
+    font-size: 14px;
+    color: #555;
+}
+.sort-dropdown {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+}
+
+/* 4. 콘텐츠 그리드 (수정) */
+.feed-grid {
+    display: grid;
+    /* 컬럼의 최소 너비를 200px 정도로 줄여 한 줄에 더 많은 이미지가 보이도록 조정할 수 있습니다. */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+    gap: 20px;
+}
+
+.feed-item {
+    position: relative;
+    cursor: pointer;
+    border-radius: 8px; /* 컨테이너에 둥근 모서리 적용 */
+    overflow: hidden; /* 내부 이미지가 모서리를 벗어나지 않도록 함 */
+    
+    /* 이미지 비율을 3:4로 고정하여 그리드를 정갈하게 만듭니다. */
+    aspect-ratio: 3 / 4; 
+}
+
+.feed-item a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.feed-item img {
+    width: 100%;
+    height: 100%; /* 부모 요소(a 태그)의 높이에 꽉 차도록 설정 */
+    display: block;
+    
+    /* 이미지가 컨테이너 비율에 맞춰 잘리더라도 꽉 차게 보입니다. */
+    object-fit: cover; 
+    
+    transition: transform 0.3s ease; /* 확대 효과를 위한 전환 */
+}
+
+.feed-item:hover img {
+    transform: scale(1.05); /* 마우스를 올리면 이미지가 살짝 확대됨 */
+}
+
+/* 마우스 올렸을 때 나타나는 오버레이 (기존과 동일, 확인용) */
+.feed-item .item-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    color: white;
+    padding: 20px 10px 10px 10px;
+    opacity: 0; /* 평소에는 숨김 */
+    transition: opacity 0.3s;
+    font-weight: bold;
+}
+.feed-item:hover .item-overlay {
+    opacity: 1; /* 마우스 올리면 나타남 */
+}

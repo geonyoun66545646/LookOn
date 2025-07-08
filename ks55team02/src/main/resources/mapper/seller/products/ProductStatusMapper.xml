@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.seller.products.mapper.ProductStatusMapper">
+
+     <resultMap id="statusWithValuesResultMap" type="ks55team02.seller.products.domain.ProductStatus">
+        <id property="gdsSttsNo" column="gds_stts_no"/>
+        <!-- ⭐ 이 부분이 중요! sel_psblty_qntty 컬럼을 정확히 매핑합니다. -->
+        <result property="selPsbltyQntty" column="sel_psblty_qntty"/>
+        <collection property="mappedOptionValues" ofType="ks55team02.seller.products.domain.ProductOptionValue">
+            <id property="optVlNo" column="opt_vl_no"/>
+            <result property="vlNm" column="vl_nm"/>
+        </collection>
+    </resultMap>
+
+    <select id="getStatusListByGdsNo" parameterType="string" resultMap="statusWithValuesResultMap">
+        SELECT
+            ps.gds_stts_no,
+            ps.sel_psblty_qntty,
+            pov.opt_vl_no,
+            pov.vl_nm
+        FROM
+            product_status ps
+        LEFT JOIN
+            status_option_mappings som ON ps.gds_stts_no = som.gds_stts_no
+        LEFT JOIN
+            product_option_values pov ON som.opt_vl_no = pov.opt_vl_no
+        WHERE
+            ps.gds_no = #{gdsNo} AND ps.actvtn_yn = TRUE;
+    </select>
+</mapper>

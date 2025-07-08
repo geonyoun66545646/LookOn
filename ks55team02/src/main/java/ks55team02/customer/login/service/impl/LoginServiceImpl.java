@@ -5,7 +5,10 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import ks55team02.customer.login.domain.Login;
+import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.customer.login.mapper.LoginMapper;
 import ks55team02.customer.login.service.LoginService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +23,7 @@ public class LoginServiceImpl  implements LoginService{
 	private final LoginMapper loginMapper;
 	
 		@Override
-		public Login login(Login loginInfo) {
+		public Login login(Login loginInfo, HttpServletRequest request) {
 		// 1. 사용자 아이디로 회원 정보 조회 (Mapper 호출)
         String userId = loginInfo.getUserLgnId();
         Login userInfoFromDb = loginMapper.getLoginUserInfo(userId);
@@ -88,6 +91,18 @@ public class LoginServiceImpl  implements LoginService{
         loginMapper.addLoginHistory(userInfoFromDb);
 
         // 6. 컨트롤러에 최종 사용자 정보 반환
+        LoginUser sessionUser = new LoginUser(
+                userInfoFromDb.getUserNo(),
+                userInfoFromDb.getMbrGrdCd(),
+                userInfoFromDb.getUserLgnId(),
+                userInfoFromDb.getUserNcnm()
+            );
+        
+        
+        HttpSession session = request.getSession(); // 파라미터로 받은 request 사용
+        session.setAttribute("loginUser", sessionUser);
+        log.info("세션에 사용자 정보 저장 완료. sessionUser: {}", sessionUser);
+        
         return userInfoFromDb;
     }
 }
