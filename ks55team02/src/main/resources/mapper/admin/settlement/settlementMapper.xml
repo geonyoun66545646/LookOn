@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="ks55team02.admin.adminpage.storeadmin.settlementdetailbystore.mapper.StoreSettlementMapper">
+  
+  	<!-- StoreSettlementListViewDTO 결과 매핑 -->
+    <resultMap id="StoreSettlementListViewDTOMap" type="ks55team02.admin.adminpage.storeadmin.settlementdetailbystore.domain.StoreSettlementListViewDTO">
+        <id 	property="storeClclnId" column="store_clcln_id"/>
+        <result property="storeId" 		column="store_id"/>
+        <result property="storeNm" 		column="store_conm"/> <!-- stores 테이블의 store_conm과 매핑 -->
+        <result property="plcyId" 		column="plcy_id"/>
+        <result property="plcyNm" 		column="plcy_expln"/> <!-- cdfp 테이블의 plcy_expln과 매핑 -->
+        <result property="totSelAmt" 	column="tot_sel_amt"/>
+        <result property="selFeeRt" 	column="sel_fee_rt"/>
+        <result property="clclnAmt" 	column="clcln_amt"/>
+        <result property="actnoId" 		column="actno_id"/>
+        <result property="clclnPrcsYmd" column="clcln_prcs_ymd"/>
+        <result property="clclnSttsCd" 	column="clcln_stts_cd"/>
+        <!-- clcln_reg_ymd는 store_settlements 테이블 스키마에 없으므로 제거 -->
+    </resultMap>
+
+    <!-- StoreSettlementDTO 결과 매핑 (정산 내역 상세용) -->
+    <resultMap id="StoreSettlementDTOMap" type="ks55team02.admin.adminpage.storeadmin.settlementdetailbystore.domain.StoreSettlementDTO">
+        <id 	property="storeClclnId" column="store_clcln_id"/>
+        <result property="storeId" 		column="store_id"/>
+        <result property="plcyId" 		column="plcy_id"/>
+        <result property="totSelAmt" 	column="tot_sel_amt"/>
+        <result property="selFeeRt" 	column="sel_fee_rt"/>
+        <result property="clclnAmt" 	column="clcln_amt"/>
+        <result property="actnoId" 		column="actno_id"/>
+        <result property="clclnPrcsYmd" column="clcln_prcs_ymd"/>
+        <result property="clclnSttsCd" 	column="clcln_stts_cd"/>
+        <!-- clcln_reg_ymd는 store_settlements 테이블 스키마에 없으므로 제거 -->
+    </resultMap>
+
+    <!-- StoreAccountDTO 결과 매핑 -->
+    <resultMap id="StoreAccountDTOMap" type="ks55team02.admin.adminpage.storeadmin.settlementdetailbystore.domain.StoreAccountDTO">
+        <id     property="actnoId" column="actno_id"/>
+        <result property="storeId" column="store_id"/>
+        <result property="bankNm" column="bank_nm"/>
+        <result property="actno" column="actno"/>
+        <result property="actnoHolderNm" column="dpstr_nm"/> <!-- dpstr_nm과 매핑 -->
+        <result property="actnoRegYmd" column="crt_dt"/> <!-- crt_dt와 매핑 -->
+        <!-- main_actno_yn, actvtn_yn, del_dt, del_user_no는 DTO에 없으므로 매핑에서 제외 -->
+    </resultMap>
+
+    <!-- CdfpDTO 결과 매핑 -->
+    <resultMap id="CdfpDTOMap" type="ks55team02.admin.adminpage.storeadmin.settlementdetailbystore.domain.CdfpDTO">
+        <id property="plcyId" column="plcy_id"/>
+        <result property="plcyExpln" column="plcy_expln"/>
+        <result property="feeRt" column="fee_rt"/>
+    </resultMap>
+
+    <!-- 전체 정산 정보의 개수를 조회 (페이지네이션용) -->
+    <select id="getTotalSettlementCount" resultType="int">
+        SELECT COUNT(*)
+        FROM store_settlements ss
+        JOIN stores s ON ss.store_id = s.store_id
+        LEFT JOIN cdfp cp ON ss.plcy_id = cp.plcy_id
+    </select>
+
+    <!-- 모든 상점의 정산 정보 목록을 조회 (페이지네이션 적용) -->
+    <select id="getAllStoreSettlementsForList" resultMap="StoreSettlementListViewDTOMap">
+        SELECT
+            ss.store_clcln_id,
+            ss.store_id,
+            s.store_conm,
+            ss.plcy_id,
+            cp.plcy_expln,
+            ss.tot_sel_amt,
+            ss.sel_fee_rt,
+            ss.clcln_amt,
+            ss.actno_id,
+            ss.clcln_prcs_ymd,
+            ss.clcln_stts_cd
+            <!-- clcln_reg_ymd는 store_settlements 테이블 스키마에 없으므로 제거 -->
+        FROM
+            store_settlements ss
+        JOIN
+            stores s ON ss.store_id = s.store_id
+        LEFT JOIN
+            cdfp cp ON ss.plcy_id = cp.plcy_id
+        ORDER BY
+            ss.clcln_prcs_ymd DESC, ss.store_clcln_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 특정 상점의 정산 내역 조회 -->
+    <select id="getSettlementHistoryByStoreId" parameterType="string" resultMap="StoreSettlementDTOMap">
+        SELECT
+            store_clcln_id,
+            store_id,
+            plcy_id,
+            tot_sel_amt,
+            sel_fee_rt,
+            clcln_amt,
+            actno_id,
+            clcln_prcs_ymd,
+            clcln_stts_cd
+            <!-- clcln_reg_ymd는 store_settlements 테이블 스키마에 없으므로 제거 -->
+        FROM
+            store_settlements
+        WHERE
+            store_id = #{storeId}
+        ORDER BY
+            clcln_prcs_ymd DESC, store_clcln_id DESC
+    </select>
+
+    <!-- 정산 상태 업데이트 -->
+    <update id="updateSettlementStatus">
+        UPDATE store_settlements
+        SET
+            clcln_stts_cd = #{clclnSttsCd},
+            clcln_prcs_ymd = CURDATE()
+        WHERE
+            store_clcln_id = #{storeClclnId}
+            AND clcln_stts_cd = '판매정산대기'
+    </update>
+
+    <!-- 여러 정산 상태 일괄 업데이트 -->
+    <update id="updateSettlementStatusBatch">
+        UPDATE store_settlements
+        SET
+            clcln_stts_cd = #{clclnSttsCd},
+            clcln_prcs_ymd = CURDATE()
+        WHERE
+            store_clcln_id IN
+            <foreach item="item" index="index" collection="storeClclnIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+            AND clcln_stts_cd = '판매정산대기'
+    </update>
+
+    <!-- 다음 store_clcln_id의 시퀀스 번호 조회 -->
+    <select id="getMaxStoreClclnSeq" resultType="int">
+        SELECT IFNULL(MAX(CAST(SUBSTRING(store_clcln_id, 7) AS UNSIGNED)), 0)
+        FROM store_settlements
+        WHERE store_clcln_id LIKE 'clcln_%'
+    </select>
+
+    <!-- 새로운 정산 대기 항목 삽입 -->
+    <insert id="insertStoreSettlement">
+        INSERT INTO store_settlements (
+            store_clcln_id,
+            store_id,
+            plcy_id,
+            tot_sel_amt,
+            sel_fee_rt,
+            clcln_amt,
+            actno_id,
+            clcln_prcs_ymd,
+            clcln_stts_cd
+            <!-- clcln_reg_ymd는 스키마에 없는 컬럼이므로 제거 -->
+        ) VALUES (
+            #{storeClclnId},
+            #{storeId},
+            #{plcyId},
+            #{totSelAmt},
+            #{selFeeRt},
+            #{clclnAmt},
+            #{actnoId},
+            #{clclnPrcsYmd},
+            #{clclnSttsCd}
+            <!-- CURDATE()는 스키마에 없는 컬럼이므로 제거 -->
+        )
+    </insert>
+
+    <!-- 특정 정책 ID에 해당하는 수수료율 정보 조회 -->
+    <select id="getCdfpByPlcyId" parameterType="string" resultMap="CdfpDTOMap">
+        SELECT
+            plcy_id,
+            plcy_expln,
+            fee_rt
+        FROM
+            cdfp
+        WHERE
+            plcy_id = #{plcyId}
+    </select>
+
+    <!-- 특정 storeClclnId에 해당하는 StoreSettlementDTO를 조회 -->
+    <select id="getStoreSettlementById" parameterType="string" resultMap="StoreSettlementDTOMap">
+        SELECT
+            store_clcln_id,
+            store_id,
+            plcy_id,
+            tot_sel_amt,
+            sel_fee_rt,
+            clcln_amt,
+            actno_id,
+            clcln_prcs_ymd,
+            clcln_stts_cd
+        FROM
+            store_settlements
+        WHERE
+            store_clcln_id = #{storeClclnId}
+    </select>
+
+    <!-- 특정 상점의 계좌 정보 조회 -->
+    <select id="getStoreAccountDetailsByStoreId" parameterType="string" resultMap="StoreAccountDTOMap">
+        SELECT
+            actno_id,
+            store_id,
+            bank_nm,
+            actno,
+            dpstr_nm, <!-- dpstr_nm을 그대로 사용 -->
+            crt_dt <!-- crt_dt를 그대로 사용 -->
+        FROM
+            store_account
+        WHERE
+            store_id = #{storeId} AND actvtn_yn = 1
+        ORDER BY
+            main_actno_yn DESC, crt_dt DESC
+        LIMIT 1
+    </select>
+
+</mapper>

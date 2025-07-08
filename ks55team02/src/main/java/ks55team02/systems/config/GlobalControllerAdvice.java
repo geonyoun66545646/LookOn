@@ -2,11 +2,15 @@ package ks55team02.systems.config;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalControllerAdvice {
 
 	/**
@@ -18,6 +22,41 @@ public class GlobalControllerAdvice {
      */
     @ModelAttribute
     public void addCommonAttributes(Model model, HttpServletRequest request) {
-        model.addAttribute("currentUrl", request.getRequestURI());
+        StringBuffer requestURL = request.getRequestURL();
+        String queryString = request.getQueryString();
+
+        // 쿼리 스트링이 있는 경우에만 URL에 추가합니다.
+        if (queryString != null) {
+            requestURL.append("?").append(queryString);
+        }
+        
+        // 모델에 "currentUrl"이라는 이름으로 완성된 전체 URL을 추가합니다.
+        model.addAttribute("currentUrl", requestURL.toString());
     }
+    
+	/*
+	 * @ExceptionHandler(NoResourceFoundException.class) public String
+	 * NoResourceFoundHandle(HttpServletRequest request, Exception ex, Model model)
+	 * { String uri = request.getRequestURI(); String viewName = "error/404";
+	 * 
+	 * if(uri.startsWith("/admin")) { viewName = "error/404"; }
+	 * 
+	 * StackTraceElement[] stackTrace = ex.getStackTrace(); StackTraceElement origin
+	 * = stackTrace[0];
+	 * log.error("[Exception] {}\n[method]:{} ({}:{}) - message={}",
+	 * origin.getClassName(), origin.getMethodName(), origin.getFileName(),
+	 * origin.getLineNumber(), ex.getMessage() );
+	 * 
+	 * return viewName; }
+	 * 
+	 * @ExceptionHandler(Exception.class) public String
+	 * globalExceptionHandle(HttpServletRequest request, Exception ex, Model model)
+	 * { StackTraceElement[] stackTrace = ex.getStackTrace(); StackTraceElement
+	 * origin = stackTrace[0];
+	 * log.error("[Exception] {}\n[method]:{} ({}:{}) - message={}",
+	 * origin.getClassName(), origin.getMethodName(), origin.getFileName(),
+	 * origin.getLineNumber(), ex.getMessage() );
+	 * 
+	 * return "error/500"; }
+	 */
 }

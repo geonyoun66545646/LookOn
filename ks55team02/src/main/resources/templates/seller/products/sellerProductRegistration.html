@@ -36,6 +36,7 @@
             <div class="page-content">
                 <div class="container product-reg-container">
                     <div class="row">
+                        <!-- ... 사이드바 메뉴 ... -->
                         <div class="col-lg-3 col-md-4">
                             <aside class="sidebar">
                                 <nav class="nav flex-column" id="productRegMenu">
@@ -57,174 +58,152 @@
                                 </nav>
                             </aside>
                         </div>
-
+                        
                         <div class="col-lg-9 col-md-8">
                             <div class="content-area">
-                                <form id="productRegistrationForm" action="/seller/products/register" method="POST" enctype="multipart/form-data" novalidate>
+                                <form id="productRegistrationForm"
+                                      th:action="${isUpdate ? '/seller/products/update' : '/seller/products/register'}"
+                                      method="POST" enctype="multipart/form-data" novalidate>
+                                    
+                                    <input type="hidden" name="gdsNo" th:if="${isUpdate}" th:value="${productRegistrationRequest.gdsNo}" />
+                                    <input type="hidden" id="deletedImageIds" name="deletedImageIds" />
+
+                                    <!-- =================== 1. 기본 정보 =================== -->
                                     <section id="basicInfo" class="content-section active">
                                         <div class="form-group styled-input-new">
                                             <div class="form-control-with-labels">
-                                                <div class="input-segment label-segment">
-                                                   제목&nbsp;<span class="text-danger">*</span>
-                                                </div>
+                                                <div class="input-segment label-segment">제목 <span class="text-danger">*</span></div>
                                                 <div class="input-segment input-segment-full">
-                                                    <input type="text" class="form-control" id="productName" name="productName" placeholder="판매상품 제목 입력" required maxlength="20">
+                                                    <input type="text" class="form-control" id="productName" name="productName" th:value="${productRegistrationRequest.productName}" placeholder="판매상품 제목 입력" required maxlength="20">
                                                 </div>
-                                                <div class="input-segment char-counter-segment">
-                                                    <span id="productNameCounter">0</span>/20
-                                                </div>
+                                                <div class="input-segment char-counter-segment"><span id="productNameCounter">0</span>/20</div>
                                             </div>
                                         </div>
                                         
 										<div class="form-group category-group">
-										    <label for="productCategory1">1차 카테고리&nbsp;<span class="text-danger">*</span></label>
+										    <label for="productCategory1">1차 카테고리 <span class="text-danger">*</span></label>
 										    <select class="form-control" id="productCategory1" name="productCategory1" required>
 										        <option value="">1차 카테고리 선택</option>
-										        <option th:each="category : ${primaryProductCategories}"
-										                th:value="${category.categoryId}"
-										                th:text="${category.categoryName}"></option>
+										        <option th:each="category : ${primaryProductCategories}" th:value="${category.categoryId}" th:text="${category.categoryName}" th:selected="${productRegistrationRequest.productCategory1 == category.categoryId}"></option>
 										    </select>
 										</div>
 										
 										<div class="form-group category-group" id="productCategory2Group" style="display: none;">
-										    <label for="productCategory2">2차 카테고리&nbsp;<span class="text-danger">*</span></label>
+										    <label for="productCategory2">2차 카테고리 <span class="text-danger">*</span></label>
 										    <select class="form-control" id="productCategory2" name="productCategory2" required>
 										        <option value="">2차 카테고리 선택</option>
-										        </select>
+										    </select>
 										</div>
+
                                         <div class="form-group styled-input-new product-description-group">
                                             <div class="form-control-with-labels textarea-type" style="flex-direction: column;">
-                                                <div class="input-segment label-segment" style="border-right: none; width: 100%; border-bottom: 1px solid #ebebeb; border-radius: 6px 6px 0 0; min-width: auto; justify-content: flex-start;">
-                                                    상품 설명&nbsp;<span class="text-danger">*</span>
+                                                <div class="input-segment label-segment" style="/*...*/">상품 설명 <span class="text-danger">*</span></div>
+                                                <div class="input-segment input-segment-full" style="/*...*/">
+                                                    <textarea class="form-control wysiwyg-editor" id="productDescription" name="productDescription" rows="10" placeholder="상품 특징, 용도, 장점 등을 상세하게 입력" required maxlength="2000" th:text="${productRegistrationRequest.productDescription}"></textarea>
                                                 </div>
-                                                <div class="input-segment input-segment-full" style="width: 100%; border-top: none;">
-                                                    <textarea class="form-control wysiwyg-editor" id="productDescription" name="productDescription" rows="10" placeholder="상품 특징, 용도, 장점 등을 상세하게 입력" required maxlength="2000"></textarea>
-                                                </div>
-                                                <div class="input-segment char-counter-segment">
-                                                    <span id="productDescriptionCounter">0</span>/2000
-                                                </div>
+                                                <div class="input-segment char-counter-segment"><span id="productDescriptionCounter">0</span>/2000</div>
                                             </div>
                                         </div>
                                     </section>
-
+                                    
+                                    <!-- =================== 2. 미디어 업로드 =================== -->
                                     <section id="mediaUpload" class="content-section">
+                                        <!-- 이미지 미리보기는 JS로 동적 생성되므로 HTML 수정은 불필요 -->
+                                        <!-- ... 기존 이미지 업로드 폼 구조 그대로 유지 ... -->
                                         <div class="form-group">
                                             <div class="custom-file mb-2">
-                                                <input type="file" class="custom-file-input" id="thumbnailImageUpload" name="thumbnailImage" accept="image/*" required>
+                                                <input type="file" class="custom-file-input" id="thumbnailImageUpload" name="thumbnailImage" accept="image/*" th:required="${!isUpdate}">
                                                 <label class="custom-file-label" for="thumbnailImageUpload">
                                                     <span class="file-name">상품 썸네일 업로드 (1장)<span class="text-danger"> *</span></span>
                                                 </label>
                                             </div>
-                                            <div id="thumbnailImagePreview" class="image-upload-preview">
-                                                <p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>
-                                            </div>
-                                            <small class="form-text text-muted">상품 목록에 보여질 대표 이미지를 1장 업로드 해주세요. (권장 596px*719px, 20MB 이하)</small>
+                                            <div id="thumbnailImagePreview" class="image-upload-preview"><p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p></div>
                                         </div>
                                         <div class="form-group">
-                                            
                                             <div class="custom-file mb-2">
-                                                <input type="file" class="custom-file-input" id="mainImageUpload" name="mainImage" multiple accept="image/*" required>
+                                                <input type="file" class="custom-file-input" id="mainImageUpload" name="mainImage" multiple accept="image/*" th:required="${!isUpdate}">
                                                 <label class="custom-file-label" for="mainImageUpload">
                                                     <span class="file-name">대표 이미지 업로드 (최소 1장, 최대 15장)<span class="text-danger"> *</span></span>
                                                 </label>
                                             </div>
-                                            <div id="mainImagePreview" class="image-upload-preview">
-                                                <p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>
-                                            </div>
-                                            <small class="form-text text-muted">첫 번째 이미지가 대표 이미지로 설정됩니다. 드래그하여 순서 변경 가능. (권장 596px*719px* 20MB 이하)</small>
+                                            <div id="mainImagePreview" class="image-upload-preview"><p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p></div>
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-file mb-2">
-                                                <input type="file" class="custom-file-input" id="detailImageUpload" name="detailImage" multiple accept="image/*" required>
+                                                <input type="file" class="custom-file-input" id="detailImageUpload" name="detailImage" multiple accept="image/*" th:required="${!isUpdate}">
                                                 <label class="custom-file-label" for="detailImageUpload">
                                                     <span class="file-name">상세 페이지 이미지 업로드 (최소 1장, 최대 20장)<span class="text-danger"> *</span></span>
                                                 </label>
                                             </div>
-                                            <div id="detailImagePreview" class="image-upload-preview">
-                                                <p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>
-                                            </div>
-                                            <small class="form-text text-muted">상세 설명에 사용될 이미지를 업로드하세요. (권장 860px*2500px, 20MB 이하)</small>
+                                            <div id="detailImagePreview" class="image-upload-preview"><p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p></div>
                                         </div>
                                         <div class="form-group styled-input-new">
                                             <div class="form-control-with-labels">
-                                                <div class="input-segment label-segment">
-                                                    동영상 첨부
-                                                </div>
+                                                <div class="input-segment label-segment">동영상 첨부</div>
                                                 <div class="input-segment input-segment-full">
-                                                    <input type="text" class="form-control" id="videoUrl" name="videoUrl" placeholder="YouTube 또는 Vimeo 동영상 URL 입력" maxlength="200">
+                                                    <input type="text" class="form-control" id="videoUrl" name="videoUrl" th:value="${productRegistrationRequest.videoUrl}" placeholder="YouTube 또는 Vimeo 동영상 URL 입력" maxlength="200">
                                                 </div>
-                                                <div class="input-segment char-counter-segment">
-                                                    <span id="videoUrlCounter">0</span>/200
-                                                </div>
+                                                <div class="input-segment char-counter-segment"><span id="videoUrlCounter">0</span>/200</div>
                                             </div>
-                                            <small class="form-text text-muted">동영상 파일 업로드 기능은 추가 개발이 필요합니다.</small>
                                         </div>
                                     </section>
-
+                                    
+                                    <!-- =================== 3. 가격 설정 =================== -->
                                     <section id="priceStock" class="content-section">
                                         <div class="form-group styled-input-new">
                                             <div class="form-control-with-labels">
-                                                <div class="input-segment label-segment">
-                                                    기본 판매 가격&nbsp;<span class="text-danger">*</span>
-                                                </div>
+                                                <div class="input-segment label-segment">기본 판매 가격 <span class="text-danger">*</span></div>
                                                 <div class="input-segment input-segment-full">
-                                                    <input type="text" class="form-control text-right" id="basePrice" name="basePrice" placeholder="숫자만 입력&nbsp;&nbsp;" required>
+                                                    <input type="text" class="form-control text-right" id="basePrice" name="basePrice" th:value="${#numbers.formatInteger(productRegistrationRequest.basePrice, 0, 'COMMA')}" placeholder="숫자만 입력  " required>
                                                 </div>
-                                                <div class="input-segment char-counter-segment">
-                                                    원
-                                                </div>
+                                                <div class="input-segment char-counter-segment">원</div>
                                             </div>
                                         </div>
                                         <div class="form-group styled-input-new">
                                             <div class="form-control-with-labels">
-                                                <div class="input-segment label-segment">
-                                                    할인율 / 할인가
-                                                </div>
+                                                <div class="input-segment label-segment">할인율 / 할인가</div>
                                                 <div class="input-segment input-segment-full">
-                                                    <input type="number" class="form-control" id="discountRate" name="discountRate" placeholder="할인율 (예: 10)" min="0" max="100">
+                                                    <input type="number" class="form-control" id="discountRate" name="discountRate" th:value="${productRegistrationRequest.discountRate}" placeholder="할인율 (예: 10)" min="0" max="100">
                                                 </div>
-                                                <div class="input-segment char-counter-segment">
-                                                    %
-                                                </div>
+                                                <div class="input-segment char-counter-segment">%</div>
                                             </div>
-                                            <small class="form-text text-muted">할인율을 입력하면 최종 판매 가격이 자동 계산됩니다.</small>
                                         </div>
                                         <div class="form-group styled-input-new">
                                             <div class="form-control-with-labels">
-                                                <div class="input-segment label-segment">
-                                                    최종 판매 가격
-                                                </div>
+                                                <div class="input-segment label-segment">최종 판매 가격</div>
                                                 <div class="input-segment input-segment-full">
                                                     <input type="text" class="form-control text-right" id="finalPrice" readonly>
                                                 </div>
-                                                <div class="input-segment char-counter-segment">
-                                                    원
-                                                </div>
+                                                <div class="input-segment char-counter-segment">원</div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <label>최소/최대 구매 수량</label>
                                             <div class="form-row">
                                                 <div class="col">
-                                                    <input type="number" class="form-control" id="minPurchase" name="minPurchase" value="1" min="1" readonly required>
+                                                    <input type="number" class="form-control" id="minPurchase" name="minPurchase" th:value="${productRegistrationRequest.minPurchase}" min="1" readonly required>
                                                     <small class="form-text text-muted text-center">최소 구매 수량 (고정)</small>
                                                 </div>
                                                 <div class="col">
-                                                    <input type="number" class="form-control" id="maxPurchase" name="maxPurchase" placeholder="최대 구매 수량" min="1">
+                                                    <input type="number" class="form-control" id="maxPurchase" name="maxPurchase" th:value="${productRegistrationRequest.maxPurchase}" placeholder="최대 구매 수량" min="1">
                                                     <small class="form-text text-muted text-center">최대 구매 수량 (선택)</small>
                                                 </div>
                                             </div>
                                         </div>
                                     </section>
-
+                                    
+                                    <!-- 옵션 -->
                                     <section id="optionSetting" class="content-section">
                                         <div class="form-group styled-input-new">
                                             <div class="form-control-with-labels">
                                                 <div class="input-segment label-segment">
-                                                    제품명&nbsp;<span class="text-danger">*</span>
+                                                    제품명 <span class="text-danger">*</span>
                                                 </div>
                                                 <div class="input-segment input-segment-full">
-                                                    <input type="text" class="form-control" id="optionProductName" name="optionProductName" placeholder="옵션 조합에 사용될 제품명 입력" required maxlength="100">
+                                                    <!-- ⭐ 수정: th:value 추가 -->
+                                                    <input type="text" class="form-control" id="optionProductName" name="optionProductName" 
+                                                           th:value="${productRegistrationRequest.productName}"
+                                                           placeholder="옵션 조합에 사용될 제품명 입력" required maxlength="100">
                                                 </div>
                                                 <div class="input-segment char-counter-segment">
                                                     <span id="optionProductNameCounter">0</span>/100
@@ -235,7 +214,7 @@
 
                                         <div id="fixedOptionGroupsContainer">
                                             <div class="option-group-item mb-4">
-                                                <h5>옵션 설정 - 성별&nbsp;<span class="text-danger">*</span></h5>
+                                                <h5>옵션 설정 - 성별 <span class="text-danger">*</span></h5>
                                                 <div class="form-group" id="genderOptionGroup">
                                                     <div>
                                                         <button type="button" class="btn btn-outline-secondary option-gender-btn" data-value="남성">남성</button>
@@ -247,18 +226,20 @@
                                             </div>
 
                                             <div class="option-group-item mb-4" id="colorOptionGroup">
-                                                <h5>옵션 설정 - 색상&nbsp;<span class="text-danger">*</span></h5>
+                                                <h5>옵션 설정 - 색상 <span class="text-danger">*</span></h5>
                                                 <div class="form-group">
                                                     <label>색상값</label>
                                                     <div id="colorOptionValues" class="option-value-buttons">
-                                                        </div>
+                                                        <!-- JS로 동적 생성 -->
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             <div class="option-group-item mb-4" id="sizeOptionGroup">
-                                                <h5>옵션 설정 - 사이즈&nbsp;<span class="text-danger">*</span></h5>
+                                                <h5>옵션 설정 - 사이즈 <span class="text-danger">*</span></h5>
                                                 <div class="form-group">
-                                                    <div class="form-group select-type-styled"> <label for="sizeOptionType">유형 선택&nbsp;<span class="text-danger">*</span></label>
+                                                    <div class="form-group select-type-styled">
+                                                        <label for="sizeOptionType">유형 선택 <span class="text-danger">*</span></label>
                                                         <select class="form-control" id="sizeOptionType" required>
                                                             <option value="none">사이즈 유형을 선택하세요</option>
                                                             <option value="size_apparel">의류 사이즈 (XS~3XL)</option>
@@ -271,7 +252,7 @@
                                                     <label>사이즈값</label>
                                                     <div id="sizeOptionValues" class="option-value-buttons">
                                                         <p class="text-muted">사이즈 유형을 선택하면 값이 표시됩니다.</p>
-                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -287,12 +268,14 @@
                                                     </thead>
                                                     <tbody id="optionCombinationsTableBody">
                                                         <tr><td colspan="2" class="text-center text-muted">색상 및 사이즈 옵션을 선택하면 조합이 생성됩니다.</td></tr>
-                                                        </tbody>
+                                                    </tbody>
                                                 </table>
                                             </div>
+                                            
                                         </div>
                                     </section>
-
+									
+									<!-- 5번 -->
                                     <section id="deliveryReturn" class="content-section">
                                         </section>
 
@@ -339,6 +322,14 @@
             </div>
         </div>
     </div>
+    <script th:inline="javascript">
+        /* <![CDATA[ */
+        const isUpdateMode = /*[[${isUpdate}]]*/ false;
+        const productData = /*[[${productData}]]*/ null;
+        const selectedCategory1 = /*[[${productRegistrationRequest.productCategory1}]]*/ null;
+        const selectedCategory2 = /*[[${productRegistrationRequest.productCategory2}]]*/ null;
+        /* ]]> */
+    </script>
     <script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
 	<script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
