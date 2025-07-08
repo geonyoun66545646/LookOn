@@ -1,62 +1,117 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="ks55team02.seller.products.mapper.ProductCategoryMapper">
 
+	<resultMap id="productCategoryResultMap"
+		type="ks55team02.seller.products.domain.ProductCategory">
+		<id property="categoryId" column="ctgry_no" />
+		<result property="parentCategoryId" column="up_ctgry_no" />
+		<result property="userNo" column="creatr_no" />
+		<result property="categoryName" column="ctgry_nm" />
+		<result property="categoryLevel" column="ctgry_dpth" />
+		<result property="regDate" column="reg_dt" />
+		<result property="activationYn" column="actvtn_yn" />
+	</resultMap>
 
-    <resultMap id="productCategoryResultMap" type="ks55team02.seller.products.domain.ProductCategory">
-        <id property="categoryId" column="ctgry_no"/>
-        <result property="parentCategoryId" column="up_ctgry_no"/>
-        <result property="userNo" column="creatr_no"/>
-        <result property="categoryName" column="ctgry_nm"/>
-        <result property="categoryLevel" column="ctgry_dpth"/>
-        <result property="regDate" column="reg_dt"/>
-    </resultMap>
+	<select id="getCategoryListCount"
+		parameterType="ks55team02.admin.common.domain.SearchCriteria"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM product_categories
+		<include refid="categorySearchCondition" />
+	</select>
 
-    <select id="getAllProductCategories" resultMap="productCategoryResultMap">
-        SELECT
-            ctgry_no,
-            up_ctgry_no,
-            creatr_no,
-            ctgry_nm,
-            ctgry_dpth,
-            reg_dt
-        FROM
-            product_categories
-        ORDER BY
-            ctgry_no ASC
-    </select>
+	<select id="getCategoryList"
+		parameterType="ks55team02.admin.common.domain.SearchCriteria"
+		resultMap="productCategoryResultMap">
+		SELECT
+		ctgry_no, up_ctgry_no, ctgry_nm, ctgry_dpth, actvtn_yn, reg_dt
+		FROM
+		product_categories
+		<include refid="categorySearchCondition" />
+		ORDER BY reg_dt DESC
+		LIMIT #{offset}, #{pageSize}
+	</select>
 
-    <select id="getProductCategoriesByParentId" parameterType="string" resultMap="productCategoryResultMap">
-        SELECT
-            ctgry_no,
-            up_ctgry_no,
-            creatr_no,
-            ctgry_nm,
-            ctgry_dpth,
-            reg_dt
-        FROM
-            product_categories
-        WHERE
-            up_ctgry_no = #{parentId}
-        ORDER BY
-            ctgry_no ASC
-    </select>
+	<insert id="addCategory"
+		parameterType="ks55team02.seller.products.domain.ProductCategory">
+		INSERT INTO product_categories
+		(ctgry_no, ctgry_nm, up_ctgry_no, ctgry_dpth, creatr_no, actvtn_yn)
+		VALUES
+		(#{categoryId}, #{categoryName}, #{parentCategoryId}, #{categoryLevel}, #{userNo}, #{activationYn})
+	</insert>
 
-    <select id="getPrimaryProductCategories" resultMap="productCategoryResultMap">
-        SELECT
-            ctgry_no,
-            up_ctgry_no,
-            creatr_no,
-            ctgry_nm,
-            ctgry_dpth,
-            reg_dt
-        FROM
-            product_categories
-        WHERE
-            ctgry_dpth = 1            OR up_ctgry_no IS NULL  ORDER BY
-            ctgry_no ASC
-    </select>
+	<sql id="categorySearchCondition">
+		<where>
+			<if test="searchKey != null and searchValue != null and searchValue != ''">
+				<choose>
+					<when test="searchKey == 'categoryName'"> AND ctgry_nm LIKE CONCAT('%', #{searchValue}, '%') </when>
+					<when test="searchKey == 'categoryId'"> AND ctgry_no LIKE CONCAT('%', #{searchValue}, '%') </when>
+					<when test="searchKey == 'all'"> AND (ctgry_nm LIKE CONCAT('%', #{searchValue}, '%') OR ctgry_no LIKE CONCAT('%', #{searchValue}, '%')) </when>
+				</choose>
+			</if>
+			<if test="startDate != null"> AND reg_dt >= #{startDate} </if>
+			<if test="endDate != null"> AND reg_dt <![CDATA[ <= ]]> DATE_ADD(#{endDate}, INTERVAL 1 DAY) </if>
+			<if test="levels != null and levels.size() > 0">
+				AND ctgry_dpth IN
+				<foreach item="level" collection="levels" open="(" separator="," close=")">
+					#{level}
+				</foreach>
+			</if>
+		</where>
+	</sql>
+
+	<select id="getCategoryById" parameterType="String"
+		resultMap="productCategoryResultMap">
+		SELECT
+		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
+		ctgry_dpth, reg_dt, actvtn_yn
+		FROM ks55team02db.product_categories
+		WHERE ctgry_no = #{categoryId} AND actvtn_yn = TRUE;
+	</select>
+
+	<select id="getSubCategoriesByParentId" parameterType="String"
+		resultMap="productCategoryResultMap">
+		SELECT
+		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
+		ctgry_dpth, reg_dt, actvtn_yn
+		FROM ks55team02db.product_categories
+		WHERE up_ctgry_no = #{parentCategoryId} AND actvtn_yn = TRUE
+		ORDER BY
+		ctgry_nm;
+	</select>
+
+	<select id="getAllTopLevelCategories"
+		resultMap="productCategoryResultMap">
+		SELECT
+		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
+		ctgry_dpth, reg_dt, actvtn_yn
+		FROM ks55team02db.product_categories
+		WHERE up_ctgry_no IS NULL AND actvtn_yn = TRUE
+		ORDER BY ctgry_nm;
+	</select>
+
+	<select id="getTopLevelCategoryIdByName" parameterType="String"
+		resultType="String">
+		SELECT ctgry_no
+		FROM ks55team02db.product_categories
+		WHERE
+		ctgry_nm = #{categoryName} AND up_ctgry_no IS NULL AND actvtn_yn =
+		TRUE
+		LIMIT 1;
+	</select>
+
+	<select id="getAllProductCategories"
+		resultMap="productCategoryResultMap">
+		SELECT
+		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
+		ctgry_dpth, reg_dt, actvtn_yn
+		FROM ks55team02db.product_categories
+		WHERE actvtn_yn = TRUE
+		ORDER BY ctgry_nm;
+	</select>
 
 </mapper>

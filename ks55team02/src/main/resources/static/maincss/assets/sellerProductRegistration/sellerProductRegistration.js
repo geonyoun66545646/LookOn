@@ -1,4 +1,175 @@
 $(document).ready(function() {
+	
+	// --- 수정 모드를 위한 헬퍼 함수들 ---
+	/**
+	 * 기존 이미지 목록을 받아 미리보기 영역을 생성합니다.
+	 */
+	function createExistingImagePreviews() {
+	    if (!productData || !productData.productImages) return;
+
+	    productData.productImages.forEach(img => {
+	        let previewContainerId;
+	        // 이미지 타입에 따라 미리보기를 넣을 컨테이너 ID를 결정합니다.
+	        switch(img.imgType) {
+	            case 'THUMBNAIL': previewContainerId = '#thumbnailImagePreview'; break;
+	            case 'MAIN':      previewContainerId = '#mainImagePreview'; break;
+	            case 'DETAIL':    previewContainerId = '#detailImagePreview'; break;
+	            default: return;
+	        }
+	        
+	        const $previewContainer = $(previewContainerId);
+	        if ($previewContainer.find('p').length) $previewContainer.empty(); // "클릭 또는 파일을..." 문구 제거
+	        $previewContainer.addClass('has-images');
+
+	        // 기존 이미지임을 표시하는 'existing-image' 클래스를 추가하고, 삭제 버튼에 이미지 ID를 저장합니다.
+	        const imgHtml = `
+	            <div class="image-upload-item existing-image">
+	                <img src="${img.imgFilePathNm}" alt="기존 이미지">
+	                <button type="button" class="remove-btn" data-existing-image-no="${img.imgNo}">x</button>
+	            </div>
+	        `;
+	        $previewContainer.append(imgHtml);
+	    });
+	}
+
+	// sellerProductRegistration.js
+
+	    // --- 수정 모드를 위한 헬퍼 함수들 (최종 버전) ---
+
+		function populateOptions() {
+		    if (!productData || !productData.productOptions) {
+		        console.log("수정: 기존 옵션 데이터가 없습니다.");
+		        return;
+		    }
+		    console.log("수정: 기존 옵션 데이터 채우기 시작", productData.productOptions);
+		    $('#optionProductName').val(productData.gdsNm);
+
+		    // 1. 사이즈 유형을 먼저 설정하고 사이즈 값 버튼들을 생성합니다.
+		    const sizeOption = productData.productOptions.find(opt => opt.optNm === '사이즈');
+		    if (sizeOption && sizeOption.optionValues.length > 0) {
+		        const optValues = sizeOption.optionValues.map(v => v.vlNm);
+		        const firstSize = optValues[0];
+		        let sizeType = 'none';
+
+		        if (['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'].includes(firstSize.toUpperCase())) {
+		            sizeType = 'size_apparel';
+		        } else if (['FREE'].includes(firstSize.toUpperCase())) {
+		            sizeType = 'size_fashion_acc';
+		        } else if (!isNaN(parseFloat(firstSize))) {
+		            sizeType = 'size_shoes';
+		        }
+		        
+		        console.log("수정: 사이즈 유형을 '" + sizeType + "'(으)로 자동 선택하고 버튼을 생성합니다.");
+		        $('#sizeOptionType').val(sizeType).trigger('change');
+		    }
+
+		    // 2. 약간의 지연 후, 생성된 버튼들을 포함하여 모든 옵션을 활성화합니다.
+		    setTimeout(() => {
+		        productData.productOptions.forEach(option => {
+		            const optName = option.optNm;
+		            const optValues = option.optionValues.map(v => v.vlNm);
+
+		            if (optName === '성별' && optValues.length > 0) {
+		                const genderValue = optValues[0];
+		                console.log("수정: 성별 옵션을 '" + genderValue + "'(으)로 설정합니다.");
+		                $(`.option-gender-btn[data-value="${genderValue}"]`).addClass('active');
+		                $('#genderOption').val(genderValue);
+		            } else if (optName === '색상' && optValues.length > 0) {
+		                console.log("수정: 색상 옵션을 설정합니다:", optValues);
+		                optValues.forEach(color => {
+		                    $(`.option-value-btn[data-type="color"][data-value="${color}"]`).addClass('active');
+		                });
+		            } else if (optName === '사이즈' && optValues.length > 0) {
+		                console.log("수정: 사이즈 값 버튼을 활성화합니다:", optValues);
+		                optValues.forEach(size => {
+		                    $(`.option-value-btn[data-type="size"][data-value="${size}"]`).addClass('active');
+		                });
+		            }
+		        });
+
+		        // 3. 모든 옵션 버튼이 활성화된 후, 조합 테이블을 최종적으로 업데이트합니다.
+		        console.log("수정: 모든 옵션 설정 후 조합 테이블을 업데이트합니다.");
+		        updateOptionCombinations();
+		    }, 150); // DOM이 사이즈 버튼을 그릴 시간을 줌 (조금 더 넉넉하게)
+		}
+
+		// 재고데이터 삽입
+		function populateStockData() {
+		    if (!productData || !productData.productStatusList || productData.productStatusList.length === 0) {
+		        console.log("수정: 기존 재고 데이터가 없습니다.");
+		        return;
+		    }
+		    console.log("수정: 기존 재고 데이터로 테이블을 채웁니다:", productData.productStatusList);
+
+		    $('#optionCombinationsTableBody tr').each(function(index, row) {
+		        const $row = $(row);
+		        const genderInRow = $row.find('input[name$="].optVlNo1"]').val();
+		        const colorInRow = $row.find('input[name$="].optVlNo2"]').val();
+		        const sizeInRow = $row.find('input[name$="].optVlNo3"]').val();
+		        
+		        // 화면에 그려진 조합 배열 생성
+		        const rowOptionNames = [genderInRow, colorInRow, sizeInRow].filter(Boolean).sort();
+		        const rowOptionString = JSON.stringify(rowOptionNames);
+
+		        // 일치하는 DB 재고 데이터를 찾음
+		        const matchingStatus = productData.productStatusList.find(status => {
+		            if (!status.mappedOptionValues || status.mappedOptionValues.length === 0) return false;
+		            
+		            // DB에서 가져온 옵션 조합 배열 생성
+		            const dbOptionNames = status.mappedOptionValues.map(v => v.vlNm).sort();
+		            const dbOptionString = JSON.stringify(dbOptionNames);
+		            
+		            // ⭐ 디버깅 로그 추가: 비교 과정을 눈으로 확인
+		            if (index === 0) { // 첫 번째 행에 대해서만 로그를 출력하여 콘솔이 너무 지저분해지는 것을 방지
+		                 console.log(`[비교] 화면 조합: ${rowOptionString} vs DB 조합: ${dbOptionString}`);
+		            }
+
+		            return rowOptionString === dbOptionString;
+		        });
+
+		        if (matchingStatus) {
+		            console.log("✅ 일치! 재고 설정:", rowOptionNames.join(', '), ":", matchingStatus.selPsbltyQntty);
+		            $row.find('input[name$="].quantity"]').val(matchingStatus.selPsbltyQntty);
+		        } else {
+		            // ⭐ 디버깅 로그 추가: 왜 불일치했는지 확인
+		            console.warn(`⚠️ 불일치. 화면 조합 ${rowOptionString}에 해당하는 DB 재고 데이터를 찾지 못했습니다.`);
+		        }
+		    });
+		}
+		
+	    // --- ⭐⭐ 이 함수와 아래 updateOptionCombinations 함수를 교체해주세요 ⭐⭐ ---
+		function initializeUpdateForm() {
+		    if (!isUpdateMode) return;
+	        console.log("--- 수정 모드 초기화 시작 ---");
+		    
+		    // 1. 기본 정보 및 이미지 채우기
+		    if (selectedCategory1) {
+		        $('#productCategory1').val(selectedCategory1).trigger('change');
+		        setTimeout(() => {
+		            if (selectedCategory2) $('#productCategory2').val(selectedCategory2);
+		        }, 500);
+		    }
+	        // createExistingImagePreviews() 함수가 있다고 가정합니다.
+		    createExistingImagePreviews(); 
+
+		    // 2. 옵션 관련 로직 실행
+		    populateOptions();
+		}
+
+	    // --- 옵션 조합 생성 및 업데이트 함수 (수정됨) ---
+	    function updateOptionCombinations() {
+	        // ... 함수의 모든 기존 코드는 그대로 ...
+
+	        /* ... 기존 코드 끝 ... */
+
+	        // ⭐ 수정 모드일 경우, 테이블 생성이 끝난 이 시점에 재고 데이터를 채워넣습니다.
+	        if (isUpdateMode) {
+	            console.log("수정: 테이블 생성 완료. 재고 데이터 채우기를 시작합니다.");
+	            populateStockData();
+	        }
+	    }
+
+	
     // Sidebar Navigation Logic
     $('#productRegMenu .nav-link').on('click', function(e) {
         e.preventDefault();
@@ -141,9 +312,9 @@ $(document).ready(function() {
             selectedColors.push($(this).data('value'));
         });
 
-        $('#sizeOptionValues .option-value-btn.active').each(function() {
-            selectedSizes.push($(this).data('value'));
-        });
+		$('#sizeOptionValues .option-value-btn.active').each(function() {
+	        selectedSizes.push($(this).data('value'));
+	    });
 
         // 기존에 생성된 숨겨진 옵션 필드 제거 (중복 방지)
         $('#productRegistrationForm input[name^="productOptionDetails"]').remove();
@@ -229,6 +400,9 @@ $(document).ready(function() {
             `;
             $combinationTableBody.append(rowHtml);
         });
+		if (isUpdateMode) {
+		            populateStockData();
+        }
     }
 
     // --- 이미지 업로드 미리보기 (상품 썸네일) ---
@@ -308,44 +482,66 @@ $(document).ready(function() {
             $(inputElement).trigger('change');
         }
     });
+	// 이미지 미리보기 삭제 버튼
+	$(document).on('click', '.image-upload-item .remove-btn', function() {
+	    const $itemToRemove = $(this).closest('.image-upload-item');
+	    const inputId = $(this).data('target-input'); // 새로 추가된 이미지의 input id
+	    const $previewContainer = $itemToRemove.parent();
 
-    // 이미지 미리보기 삭제 버튼
-    $(document).on('click', '.image-upload-item .remove-btn', function() {
-        var $itemToRemove = $(this).closest('.image-upload-item');
-        var inputId = $(this).data('target-input');
-        var fileIndex = $(this).data('file-index');
-        var inputElement = document.getElementById(inputId);
-        
-        const currentFiles = Array.from(inputElement.files);
-        const newFiles = currentFiles.filter((file, i) => i !== fileIndex);
+	    if ($itemToRemove.hasClass('existing-image')) {
+	        // --- 1. '기존 이미지'를 삭제하는 경우 ---
+	        const imageNoToDelete = $(this).data('existing-image-no');
+	        const $deletedIdsInput = $('#deletedImageIds');
+	        
+	        // 삭제할 이미지 ID 목록을 관리하는 hidden input에 ID 추가
+	        const currentIds = $deletedIdsInput.val() ? $deletedIdsInput.val().split(',') : [];
+	        if (!currentIds.includes(String(imageNoToDelete))) {
+	            currentIds.push(String(imageNoToDelete));
+	            $deletedIdsInput.val(currentIds.join(','));
+	        }
+	        
+	        $itemToRemove.remove(); // 화면에서 미리보기 아이템 제거
+	        console.log('삭제할 기존 이미지 ID 목록:', $deletedIdsInput.val());
 
-        const dataTransfer = new DataTransfer();
-        newFiles.forEach(file => dataTransfer.items.add(file));
+	    } else if (inputId) {
+	        // --- 2. '새로 추가한 이미지'를 삭제하는 경우 (기존 로직과 동일) ---
+	        const fileIndex = $(this).data('file-index');
+	        const inputElement = document.getElementById(inputId);
+	        
+	        // FileList에서 해당 인덱스의 파일을 제거
+	        const currentFiles = Array.from(inputElement.files);
+	        const newFiles = currentFiles.filter((file, i) => i !== fileIndex);
+	        const dataTransfer = new DataTransfer();
+	        newFiles.forEach(file => dataTransfer.items.add(file));
+	        inputElement.files = dataTransfer.files;
+	        
+	        $itemToRemove.remove(); // 화면에서 미리보기 아이템 제거
+	        
+	        // 파일 이름 레이블 업데이트
+	        const $fileInputLabel = $(inputElement).next('.custom-file-label').find('.file-name');
+	        if (inputElement.files.length > 0) {
+	            const fileNames = Array.from(inputElement.files).map(file => file.name).join(', ');
+	            $fileInputLabel.text(fileNames.length > 50 ? fileNames.substring(0, 50) + '...' : fileNames);
+	        } else {
+	            $fileInputLabel.text(
+	                (inputId === 'thumbnailImageUpload' ? '상품 썸네일 업로드 (1장)' :
+	                 (inputId === 'mainImageUpload' ? '대표 이미지 업로드 (최소 1장, 최대 15장)' :
+	                  '상세 페이지 이미지 업로드 (최소 1장, 최대 20장)'))
+	            );
+	        }
+	    }
+	    
+	    // --- 3. 공통: 미리보기 컨테이너 상태 및 인덱스 업데이트 ---
+	    // 남은 미리보기 아이템이 없으면 "클릭 또는 파일을..." 문구 표시
+	    if ($previewContainer.children('.image-upload-item').length === 0) {
+	        $previewContainer.removeClass('has-images').append('<p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>');
+	    }
 
-        inputElement.files = dataTransfer.files;
-        $itemToRemove.remove();
-
-        var $previewContainer = $(inputElement).closest('.form-group').find('.image-upload-preview');
-        if ($previewContainer.children('.image-upload-item').length === 0) {
-            $previewContainer.removeClass('has-images').append('<p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>');
-        }
-
-        var $fileInputLabel = $(inputElement).next('.custom-file-label').find('.file-name');
-        if (inputElement.files.length > 0) {
-            var fileNames = Array.from(inputElement.files).map(file => file.name).join(', ');
-            $fileInputLabel.text(fileNames.length > 50 ? fileNames.substring(0, 50) + '...' : fileNames);
-        } else {
-            $fileInputLabel.text(
-                (inputId === 'thumbnailImageUpload' ? '상품 썸네일 업로드 (1장)' :
-                 (inputId === 'mainImageUpload' ? '대표 이미지 업로드 (최소 1장, 최대 15장)' :
-                  '상세 페이지 이미지 업로드 (최소 1장, 최대 20장)'))
-            );
-        }
-
-        $previewContainer.find('.image-upload-item').each(function(idx) {
-            $(this).find('.remove-btn').data('file-index', idx);
-        });
-    });
+	    // 남은 '새로 추가된 이미지'들의 인덱스를 다시 정렬 (중요)
+	    $previewContainer.find('.image-upload-item:not(.existing-image)').each(function(newIndex) {
+	        $(this).find('.remove-btn').data('file-index', newIndex);
+	    });
+	});
 
     // 하단 버튼 액션
     $('#previewBtn').on('click', function() {
@@ -657,4 +853,6 @@ $(document).ready(function() {
         console.log("폼 제출: 모든 유효성 검사 통과");
         this.submit();
     });
+	// 페이지 로드 시 수정 모드 초기화 함수를 호출합니다.
+    initializeUpdateForm();
 });

@@ -100,7 +100,7 @@ public class LoginServiceImpl  implements LoginService{
         
         
         HttpSession session = request.getSession(); // 파라미터로 받은 request 사용
-        session.setAttribute("LoginUser", sessionUser);
+        session.setAttribute("loginUser", sessionUser);
         log.info("세션에 사용자 정보 저장 완료. sessionUser: {}", sessionUser);
         
         return userInfoFromDb;
