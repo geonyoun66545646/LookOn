@@ -161,11 +161,10 @@ $(() => {
                 window.location.reload();
             } else {
                 // 실패 시 서버가 보낸 메시지를 알림창에 표시합니다.
-                alert("추천에 실패했습니다: " + response.message);
+				console.log("추천 실패");
             }
         }).fail(error => {
             console.error("추천 실패", error);
-            alert('이미 추천한 게시물이거나, 추천 처리 중 오류가 발생했습니다.');
         });
     });
 });

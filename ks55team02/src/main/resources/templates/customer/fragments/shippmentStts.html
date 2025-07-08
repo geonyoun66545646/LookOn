@@ -1,27 +1,26 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org/"
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{customer/layout/layoutMain}"> 
       
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>배송조회 (충돌 방지 CSS)</title>
+    <title>배송조회 결과</title> <!-- 제목을 더 명확하게 변경 -->
     <style>
         /* Google Fonts Noto Sans KR - 폰트는 기존 스타일과 겹칠 수 있으나, 보통은 페이지 전체에 적용되므로 유지합니다. */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
 
-        /* 
-         * 모든 클래스에 'pkg-track-' 접두사를 붙여 CSS 충돌을 방지합니다.
+        /* * 모든 클래스에 'pkg-track-' 접두사를 붙여 CSS 충돌을 방지합니다.
          */
         .pkg-track-container {
             --border-color: #e9e9e9;
             --header-bg-color: #f7f7f7;
             --primary-text-color: #333;
             --secondary-text-color: #666;
-            --highlight-color: #ff7e00;
-            --completed-step-color: #8c98a5;
-            --final-border-color: #e53935;
+            --highlight-color: #ff7e00; /* 현재 상태 색상 */
+            --completed-step-color: #8c98a5; /* 완료된 단계 색상 */
+            --final-border-color: #e53935; /* 최종 단계 강조 색상 */
 
             font-family: 'Noto Sans KR', sans-serif;
             font-size: 14px;
@@ -29,7 +28,7 @@
             background-color: #ffffff;
             border: 1px solid var(--border-color);
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            max-width: 900px; /* 이 값은 필요에 따라 조절하세요 */
+            max-width: 1200px; /* 이 값은 필요에 따라 조절하세요 */
             margin: 20px auto; /* 페이지 내에서 적절한 여백을 위해 추가 */
         }
 
@@ -63,6 +62,7 @@
 
         .pkg-track-content {
             padding: 20px;
+            min-height: 400px; /* 최소 높이 추가 */
         }
 
         .pkg-track-container section {
@@ -179,11 +179,14 @@
             color: #d0d0d0;
         }
 
+        /* 동적 상태바 스타일 */
         .pkg-track-progress-step.completed .pkg-track-step-icon-wrapper {
             background-color: var(--completed-step-color);
+            color: white; /* 아이콘 색상 변경 */
         }
         .pkg-track-progress-step.current .pkg-track-step-icon-wrapper {
             background-color: var(--highlight-color);
+            color: white; /* 아이콘 색상 변경 */
         }
 
         .pkg-track-progress-step.completed .pkg-track-step-label,
@@ -201,9 +204,9 @@
             text-align: center;
         }
 
-        .pkg-track-status-log td:nth-child(1), 
-        .pkg-track-status-log td:nth-child(2), 
-        .pkg-track-status-log td:nth-child(4) {
+        .pkg-track-status-log td:nth-child(1), /* 단계 */
+        .pkg-track-status-log td:nth-child(2), /* 처리 시간 */
+        .pkg-track-status-log td:nth-child(4) { /* 담당 점소 */
             text-align: center;
         }
 
@@ -220,11 +223,30 @@
         .pkg-track-status-log tbody tr:last-child {
             border-bottom: 2px solid var(--final-border-color);
         }
+
+        /* 메시지 표시를 위한 스타일 */
+        .pkg-track-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+            color: #d9534f; /* 에러 메시지 색상 */
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 15px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .back-link:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
 <th:block layout:fragment="contents">
-    <!-- 이 컴포넌트를 기존 페이지의 <body> 내부에 삽입하세요. -->
     <div class="pkg-track-container">
         <header class="pkg-track-main-header">
             <div class="pkg-track-menu-icon">•••</div>
@@ -233,6 +255,13 @@
         </header>
 
         <main class="pkg-track-content">
+            <!-- 오류 메시지 표시 영역 (항상 상단에 표시) -->
+            <div th:if="${message}" class="pkg-track-message">
+                <p th:text="${message}"></p>
+                <a th:href="@{/track-form}" class="back-link">다시 조회하기</a>
+            </div>
+
+            <!-- 운송장 정보 요약 섹션 (항상 표시) -->
             <section class="pkg-track-result-summary">
                 <h2><span class="pkg-track-icon-square"></span>조회결과</h2>
                 <table class="pkg-track-table">
@@ -247,55 +276,63 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>347962622942</td>
-                            <td>위*</td>
-                            <td>김*</td>
-                            <td>상품명nt 18</td>
-                            <td>1</td>
+                            <td th:text="${response?.invoiceNo ?: '정보 없음'}"></td>
+                            <td th:text="${response?.senderName ?: '정보 없음'}"></td>
+                            <td th:text="${response?.receiverName ?: '정보 없음'}"></td>
+                            <td th:text="${response?.itemName ?: '정보 없음'}"></td>
+                            <td th:text="${response?.itemQty ?: '정보 없음'}"></td>
                         </tr>
                     </tbody>
                 </table>
             </section>
 
+            <!-- 상품상태 확인 섹션 (항상 표시) -->
             <section class="pkg-track-status-details">
                 <h2><span class="pkg-track-icon-square"></span>상품상태 확인</h2>
 
                 <div class="pkg-track-progress-bar">
-                    <!-- 실제 아이콘 이미지가 있다면 아래 div를 img 태그로 교체하세요 -->
-                    <div class="pkg-track-progress-step completed">
-                        <div class="pkg-track-step-icon-wrapper">
+                    <!-- 상태별 클래스 동적 적용 -->
+                    <!-- currentStatus가 null일 경우 모든 단계가 비활성화 상태로 표시됩니다. -->
+                    
+                    <!-- 01. 상품인수 -->
+                    <div th:classappend="${currentStatus == '상품인수' or currentStatus == '상품이동중' or currentStatus == '배달지도착' or currentStatus == '배달출발' or currentStatus == '배달완료'} ? 'completed' : ''" class="pkg-track-progress-step">
+                        <div th:classappend="${currentStatus == '상품인수'} ? 'current' : ''" class="pkg-track-step-icon-wrapper">
                             <div class="pkg-track-step-icon" title="상품인수 아이콘"></div>
                         </div>
                         <span class="pkg-track-step-label">01. 상품인수</span>
                     </div>
                     <div class="pkg-track-progress-arrow"></div>
                     
-                    <div class="pkg-track-progress-step completed">
-                        <div class="pkg-track-step-icon-wrapper">
+                    <!-- 02. 상품이동중 -->
+                    <div th:classappend="${currentStatus == '상품이동중' or currentStatus == '배달지도착' or currentStatus == '배달출발' or currentStatus == '배달완료'} ? 'completed' : ''" class="pkg-track-progress-step">
+                        <div th:classappend="${currentStatus == '상품이동중'} ? 'current' : ''" class="pkg-track-step-icon-wrapper">
                             <div class="pkg-track-step-icon" title="상품이동중 아이콘"></div>
                         </div>
                         <span class="pkg-track-step-label">02. 상품이동중</span>
                     </div>
                     <div class="pkg-track-progress-arrow"></div>
 
-                    <div class="pkg-track-progress-step completed">
-                        <div class="pkg-track-step-icon-wrapper">
+                    <!-- 03. 배달지도착 -->
+                    <div th:classappend="${currentStatus == '배달지도착' or currentStatus == '배달출발' or currentStatus == '배달완료'} ? 'completed' : ''" class="pkg-track-progress-step">
+                        <div th:classappend="${currentStatus == '배달지도착'} ? 'current' : ''" class="pkg-track-step-icon-wrapper">
                            <div class="pkg-track-step-icon" title="배달지도착 아이콘"></div>
                         </div>
                         <span class="pkg-track-step-label">03. 배달지도착</span>
                     </div>
                     <div class="pkg-track-progress-arrow"></div>
 
-                    <div class="pkg-track-progress-step completed">
-                        <div class="pkg-track-step-icon-wrapper">
+                    <!-- 04. 배달출발 -->
+                    <div th:classappend="${currentStatus == '배달출발' or currentStatus == '배달완료'} ? 'completed' : ''" class="pkg-track-progress-step">
+                        <div th:classappend="${currentStatus == '배달출발'} ? 'current' : ''" class="pkg-track-step-icon-wrapper">
                             <div class="pkg-track-step-icon" title="배달출발 아이콘"></div>
                         </div>
                         <span class="pkg-track-step-label">04. 배달출발</span>
                     </div>
                     <div class="pkg-track-progress-arrow"></div>
 
-                    <div class="pkg-track-progress-step current">
-                        <div class="pkg-track-step-icon-wrapper">
+                    <!-- 05. 배달완료 -->
+                    <div th:classappend="${currentStatus == '배달완료'} ? 'completed current' : ''" class="pkg-track-progress-step">
+                        <div th:classappend="${currentStatus == '배달완료'} ? 'current' : ''" class="pkg-track-step-icon-wrapper">
                             <div class="pkg-track-step-icon" title="배달완료 아이콘"></div>
                         </div>
                         <span class="pkg-track-step-label">05. 배달완료</span>
@@ -308,48 +345,27 @@
                             <th style="width: 15%;">단계</th>
                             <th style="width: 20%;">처리</th>
                             <th style="width: 45%;">상품상태</th>
-                            <th style="width: 20%;">담당 점소</th>
+                            <th style="width: 20%;">담당 장소</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>상품인수</td>
-                            <td>2018-11-30 21:30</td>
-                            <td>보내시는 고객님으로부터 상품을 인수받았습니다</td>
-                            <td>서울하나로</td>
-                        </tr>
-                        <tr>
-                            <td>상품이동중</td>
-                            <td>2018-11-30 23:28</td>
-                            <td>배달지역으로 상품이 이동중입니다.</td>
-                            <td>옥천HUB</td>
-                        </tr>
-                        <tr>
-                            <td>배달지도착</td>
-                            <td>2018-12-01 10:37</td>
+                        <!-- trackingDetails 목록이 있을 때만 반복하여 표시 -->
+                        <tr th:each="detail : ${response?.trackingDetails}">
+                            <td th:text="${detail.description}"></td> <!-- description이 단계 역할 -->
+                            <td th:text="${detail.time}"></td>
                             <td>
-                                <span class="pkg-track-status-description">고객님의 상품이 배달지에 도착하였습니다.</span>
-                                <span class="pkg-track-delivery-info">(배달예정:위사리언 010-1234-5678)</span>
+                                <span class="pkg-track-status-description" th:text="${detail.description}"></span>
+                                <!-- API 응답에 따라 추가 정보가 있다면 여기에 표시 -->
+                                <span th:if="${detail.telno}" class="pkg-track-delivery-info" th:text="${'(연락처: ' + detail.telno + ')'}"></span>
+                                <span th:if="${detail.manName}" class="pkg-track-delivery-info" th:text="${'(담당자: ' + detail.manName + ')'}"></span>
                             </td>
-                            <td>강남B1</td>
+                            <td th:text="${detail.location}"></td> <!-- location이 담당 장소 역할 -->
                         </tr>
-                        <tr>
-                            <td>배달출발</td>
-                            <td>2018-12-03 06:49</td>
-                            <td>
-                                <span class="pkg-track-status-description">고객님의 상품을 배달할 예정입니다.(13~15시)</span>
-                                <span class="pkg-track-delivery-info">(배달예정:위사리언 010-1234-5678)</span>
+                        <!-- 데이터가 없을 때 표시할 행 (선택 사항) -->
+                        <tr th:if="${response?.trackingDetails == null or #lists.isEmpty(response.trackingDetails)}">
+                            <td colspan="4" style="text-align: center; padding: 20px; color: #999;">
+                                조회된 배송 이력 정보가 없습니다.
                             </td>
-                            <td>서울강남미래</td>
-                        </tr>
-                        <tr>
-                            <td>배달완료</td>
-                            <td>2018-12-03 11:15</td>
-                            <td>
-                                <span class="pkg-track-status-description">고객님의 상품이 배달완료 되었습니다.</span>
-                                <span class="pkg-track-delivery-info">(배달예정:위사리언 010-1234-5678)</span>
-                            </td>
-                            <td>서울강남미래</td>
                         </tr>
                     </tbody>
                 </table>

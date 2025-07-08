@@ -41,6 +41,9 @@
 	
 	                <!-- 게시글 번호 (수정 시에만 필요) -->
 	                <input type="hidden" id="pstSn" th:field="*{pstSn}">
+	                
+	                <!-- 작성자 번호 -->
+	                <input type="hidden" name="wrtrUserNo" th:value="${session.loginUser.userNo}" />
 	
 	                <!-- 제목 -->
 	                <div class="form-group">

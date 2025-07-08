@@ -41,4 +41,5 @@ public class Login {
     private String lgnUseId; // 로그인시 사용된 아이디
     private LocalDateTime lgnDt; // 로그인시 사용된 아이디    
     private String ipAddress; // 컨트롤러에서 채워줄 IP 주소 정보
+    private String redirectUrl; // 되돌아갈 페이지 url 주소 정보
 }

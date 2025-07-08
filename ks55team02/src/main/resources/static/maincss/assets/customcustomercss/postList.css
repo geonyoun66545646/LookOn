@@ -12,6 +12,10 @@ body {
     max-width: 62%; /* 컨텐츠 영역을 조금 좁혀서 집중도 높임 */
 }
 
+.row-container {
+	padding: 50px;
+}
+
 .board-tabs-container {
 	overflow-x: auto;
 	cursor: grab;
