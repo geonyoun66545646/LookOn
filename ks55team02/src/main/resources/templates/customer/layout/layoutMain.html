@@ -52,7 +52,7 @@
             <footer th:replace="~{customer/fragments/footer :: footerFragment}"></footer>
         </main>
     </div> 
-	<div th:replace="~{customer/fragments/commonModals :: signinModalFragment}"></div>
+	<div th:replace="~{customer/fragments/loginRegisterModals :: signinModalFragment}"></div> <!-- 로그인 및 회원가입 모달 -->
     <div th:replace="~{customer/fragments/categoryFilterModal :: categoryFilterModalFragment}"></div> <!-- 이거 햄버거 모달 -->
 
     <script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
@@ -65,6 +65,7 @@
     <script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
     <script th:src="@{/maincss/assets/js/jquery.countdown.min.js}"></script>
     <script th:src="@{/maincss/assets/js/customer/register.js}"></script>
+    <script th:src="@{/maincss/assets/js/customer/login.js}"></script>
     
     <th:block layout:fragment="jsFile"></th:block>
     
@@ -74,7 +75,8 @@
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     
     <script th:src="@{/maincss/assets/js/demos/demo-2.js}"></script>
-<script th:src="@{/maincss/assets/js/customer/customer-pagination.js}"></script>
+	<script th:src="@{/maincss/assets/js/customer/customer-pagination.js}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <th:block layout:fragment="jsScript"></th:block>
 
     <script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>

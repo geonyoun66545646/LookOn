@@ -9,7 +9,7 @@ body {
     font-size: 14px; /* 기본 폰트 크기 조정 */
 }
 .container {
-    max-width: 900px; /* 컨텐츠 영역을 조금 좁혀서 집중도 높임 */
+    max-width: 62%; /* 컨텐츠 영역을 조금 좁혀서 집중도 높임 */
 }
 
 .board-tabs-container {
@@ -153,6 +153,21 @@ body {
 }
 .pagination .page-link:hover {
     background-color: #f1f1f1;
+}
+
+/* postList.html 하단 검색 및 페이지 크기 조절 컨트롤을 위한 스타일 */
+.lower-controls-container {
+    display: flex; /* 내부 요소들을 가로로 나란히 배치합니다. (가장 중요) */
+    justify-content: space-between; /* 양쪽 끝으로 요소를 분산 배치합니다. */
+    align-items: center; /* 요소들을 세로 중앙에 정렬합니다. */
+    margin-top: 20px; /* 페이지네이션과의 간격을 위해 상단 여백을 줍니다. */
+    flex-wrap: wrap; /* 화면이 작아지면 요소들이 다음 줄로 넘어가도록 합니다. */
+}
+
+/* 페이지 사이즈 선택기 내부 요소들을 보기 좋게 정렬 */
+.pagesize-container {
+    display: flex;
+    align-items: center;
 }
 
 /* 반응형 스타일 - 작은 화면에서는 폰트 크기 살짝 줄임 */

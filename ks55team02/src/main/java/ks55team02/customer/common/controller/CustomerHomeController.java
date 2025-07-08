@@ -5,6 +5,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Controller
 public class CustomerHomeController {
 	// 이 필드는 그대로 유지합니다.
@@ -24,7 +26,10 @@ public class CustomerHomeController {
 	
     // --- 이하 다른 메소드들은 그대로 유지합니다. ---
 	@GetMapping(value= {"/main","/main/"})
-    public String customerHomeView() {
+    public String customerHomeView(Model model, HttpServletRequest request) {
+		
+		model.addAttribute("currentUrl", request.getRequestURI());
+		
         return "/customer/main";
     }
 	

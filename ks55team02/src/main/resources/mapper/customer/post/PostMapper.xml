@@ -100,9 +100,9 @@
 			(#{pstIntractSn}, 
 			#{pstSn}, 
 			#{userNo}, 
-			like, 
+			'like', 
 			Now(), 
-			'');
+			null);
 	</insert>
 	
 	<update id="updateViewCount" parameterType="String">
