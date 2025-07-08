@@ -25,7 +25,7 @@ public class ProductRegistrationRequest {
  private Double discountRate;  // dscnt_rt
  private Long finalPrice;      // last_sel_prc (계산될 값)
  private Integer stockQuantity = 0; // sel_psblty_qntty (product_status)
- private Integer minPurchase;   // 최소 구매 수량 (DB에 직접 매핑되는 필드는 아닐 수 있으나, 일단 받음)
+ private Integer minPurchase = 1;   // 최소 구매 수량 (DB에 직접 매핑되는 필드는 아닐 수 있으나, 일단 받음)
  private Integer maxPurchase;   // 최대 구매 수량 (DB에 직접 매핑되는 필드는 아닐 수 있으나, 일단 받음)
 
  // 옵션 설정
