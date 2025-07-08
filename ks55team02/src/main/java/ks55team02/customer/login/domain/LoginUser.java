@@ -9,6 +9,8 @@ import lombok.Getter;
 
 @Getter
 public class LoginUser  implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 
 	// ===== users 테이블 정보 =====
     private String userNo;					// 사용자의 번호
