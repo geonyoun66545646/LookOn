@@ -13,118 +13,31 @@
 	<!-- 추가할 js file -->
 	<th:block layout:fragment="jsFile">
 	    <!-- 댓글 관련 JavaScript 파일이 있다면 여기에 추가 -->
+	    <script th:src="@{/maincss/assets/js/customer/postView.js}"></script>
 	</th:block>
 
 	<!-- 추가할 script -->
 	<th:block layout:fragment="jsScript">
-		<script>
-			$(() => {
-				// 게시글 삭제
-			    $('#post_del_btn').on('click', e => {
-			        e.preventDefault();
-			        
-			        if(!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
-			            return;
-			        }
-			
-			        const deleteUrl = $(e.currentTarget).data('post-delete-url');
-			
-			        $.ajax({
-			            url: deleteUrl,
-			            type: 'DELETE'
-			        }).done(result => {
-			            location.href = '/customer/post/postList';
-			        }).fail(error => {
-			            console.error("삭제 실패: ", error);
-			            alert('삭제에 실패했습니다.');
-			        });
-			    });
-			    
-				// 댓글 작성
-			    const $commentForm = $('#commentForm');
-			    if($commentForm.length) {
-			    	$commentForm.on('submit', e => {
-			    		e.preventDefault();
-			    		
-				    	const formData = $commentForm.serialize(); 
-			    		
-			    		$.ajax({
-			    			url: '/customer/post/insertComment',
-			    			method: 'Post',
-			    			data: formData,
-			    			dataType: 'json'
-			    		}).done(response => {
-			    			if(response.result === "success") {
-			    				window.location.reload();
-			    			} else {
-			    				alert(response);
-			    			}
-			    		}).fail(() => {
-			    			alert('댓글 작성중 오류 발생')
-			    		});
-			    	});
-			    }
-			    
-			    // 댓글 수정
-			    $('.update-comment-btn').on('click', e=> {
-			    	e.preventDefault();
-			    	
-			    	const $btn = $(e.currentTarget);
-			    	const updateUrl = $(e.currentTarget).data('comment-update-url')
-			    	const pstCmntSn = $btn.data();
-			    	const cmntCn = $btn.data();
-			    	
-			    	$.ajax({
-			    		url: updateUrl,
-			    		type: 'POST',
-			    		data: ''
-			    	}).done(result => {
-			    		window.location.reload();
-			    	}).fail(error => {
-			    		console.error("수정 실패", error);
-			    		alert('수정에 실패했습니다.');
-			    	});
-			    });
-			    
-			    // 댓글 삭제
-			    $('.delete-comment-btn').on('click', e => {
-			    	e.preventDefault();
-			    	
-			    	if(!confirm('정말로 댓글을 삭제하시겠습니까?')) {
-			    		return;
-			    	}
-			    	
-			    	const deleteUrl = $(e.currentTarget).data('comment-delete-url');
-			    	
-			    	$.ajax({
-			    		url: deleteUrl,
-			    		type: 'DELETE'
-			    	}).done(result => {
-			    		window.location.reload();
-			    	}).fail(error => {
-			            console.error("삭제 실패: ", error);
-			            alert('삭제에 실패했습니다.');
-			    	});
-			    });
-			    
-			});
-		</script>
+
 	</th:block>
 
 	<th:block layout:fragment="contents">
 	
 	    <!-- 게시글 상세 정보 영역 -->
-	    <div class="post-detail-area">
+	    <div class="post-detail-area"
+	    	 th:unless="${postDetail.delDt != null}">
 	        <!-- 게시글 제목, 작성자, 날짜 등 헤더 정보 -->
 	        <div class="post-detail-header">
 	            <!-- 게시글 제목 -->
-	            <h2 th:text="${postDetail.pstTtl}">게시글 제목</h2>
+	            <h2	th:text="${postDetail.pstTtl}">게시글 제목</h2>      
 	
 	            <!-- 게시글 정보 (작성자, 날짜, 조회수 등) -->
 	            <div class="post-detail-info">
-	                <span th:if="${postDetail.wrtrUserNo != null}" th:text="|작성자: ${postDetail.wrtrUserNo}|">작성자번호</span>
+	                <span th:if="${postDetail.userInfo.userNcnm != null}" th:text="${postDetail.userInfo.userNcnm}">작성자</span>
 	                <span th:text="${#temporals.format(postDetail.crtDt, 'yyyy.MM.dd HH:mm:ss')}">작성일</span>
 	                <span>조회수: <span th:text="${postDetail.viewCnt}">0</span></span>
+	                <span>추천수: <span th:text="${postDetail.interCnt}">0</span></span>
+	                <span>댓글수: <span th:text="${postDetail.cmntCnt}">0</span></span>
 	            </div>
 	        </div>
 	
@@ -133,20 +46,37 @@
 	            <p th:utext="${postDetail.pstCn}">게시글 내용</p>
 	        </div>
 	
+			<!-- 게시글 추천 버튼 -->
+			<div class="post-interaction">
+				<button type="button" id="post_interaction_btn" class="btn btn-info" 
+				th:data-interaction-pstsn="${postDetail.pstSn}"
+				th:data-interaction-userno="${'user_no_1'}"
+				th:data-post-interaction-insert-url="@{/customer/post/interactionInsert}">추천</button>
+			</div>
+	
 	        <!-- 게시글 관련 액션 버튼 (수정, 삭제, 목록) -->
 	        <div class="post-actions">
-	            <a th:href="@{/customer/post/postList(bbsClsfCd=${bbsClsfCd}, page=${currentPage}, size=${size})}" class="btn btn-secondary">목록</a>
-	            <!-- 수정, 삭제 버튼은 작성자 본인만 보이도록 권한 체크 필요 -->
-	            <!-- 예시: th:if="${session.loginUser.userId == postDetail.wrtrUserNo}" -->
-	            <a th:href="@{/customer/post/postUpdate/{pstSn}(pstSn=${postDetail.pstSn})}"
-	  				 class="btn btn-primary">수정</a>
-	            <button type="button" id="post_del_btn" class="btn btn-danger"
+
+	        	<button type="button" id="select-postlist-btn" class="btn btn-secondary" onclick="history.back()">목록</button>
+	        	<a class="btn btn-primary" id="update-post-btn" th:href="@{/customer/post/postUpdate/{pstSn}(pstSn=${postDetail.pstSn})}">수정</a>
+
+	            <button type="button" id="delete-post-btn" class="btn btn-danger"
 	       				 th:data-post-delete-url="@{/customer/post/postDelete/{pstSn}(pstSn=${postDetail.pstSn})}">삭제</button>
 	        </div>
 	    </div>
+	    
+		<div class="post-detail-area"
+			th:if="${postDetail.delDt != null}">
+			
+			<div class="post-detail-header">
+				<h2>오류</h2>
+			</div>
+			
+		</div>
 	
 	    <!-- 댓글 영역 -->
-	    <div class="comments-section">
+	    <div class="comments-section"
+	    	th:unless="${postDetail.delDt != null}">
 	        <h3>댓글</h3>
 	
 	        <!-- 댓글 작성 폼 -->
@@ -159,35 +89,32 @@
 	            <!-- <input type="hidden" name="userId" th:value="${session.loginUser.userId}"> -->
 	            <textarea name="cmntCn" placeholder="댓글을 입력해주세요."></textarea>
 	            <input type="hidden" name="pstSn" th:value="${postDetail.pstSn}" />
-	            <button type="submit" class="btn btn-primary">등록</button>
+	            <button type="submit" class="btn btn-primary insert-comment-btn">등록</button>
 	        </form>
 	
 	        <!-- 댓글 목록 -->
 	        <div class="comment-list">
 	            <th:block th:if="${!#lists.isEmpty(postDetail.comment)}">
-	                <div class="comment-item" th:each="c : ${postDetail.comment}">
+	                <div class="comment-item" 
+	                	th:each="c : ${postDetail.comment}">
 	                    <div class="comment-header">
 	                        <span class="comment-author" th:text="${c.userNcnm}">작성자</span>
 	                        <span class="comment-date" th:text="${#temporals.format(c.crtDt, 'yyyy-MM-dd HH:mm:ss')}">작성일</span>
 	                    </div>
-	                    <div class="comment-body">
-	                        <p class="comment-content-display" th:text="${c.cmntCn}">댓글 내용</p>
-	                        
-	                        <textarea class="comment-content-edit form-control" style="display:none;"
-	                        			th:data-comment-sn="${c.pstCmntSn}"
-	                        			th:text="${c.cmntCn}"></textarea>
-	                    </div>
-	                    <!-- 댓글 삭제 버튼 (작성자 본인만 보이도록 권한 체크 필요) -->
-	                    <div class="comment-actions">
-	                        <!-- 예시: <button type="button" class="btn btn-sm btn-outline-danger delete-comment-btn"
-	                                     th:data-comment-sn="${comment.commentSn}"
-	                                     th:if="${session.loginUser.userId == comment.commentWriter}">삭제</button> -->
-	                        <!-- 임시로 모든 사용자에게 삭제 버튼을 보이게 함 -->
-	                        <button type="button" class="btn btn-primary update-comment-btn"
-	                        		th:data-comment-update-url="@{/customer/post/commentUpdate/{pstCmntSn}(pstCmntSn=${c.pstCmntSn})}">수정</button>
-	                        
-	                        <button type="button" class="btn btn-success save-comment-btn" style="display:none;">저장</button>
-	                        <button type="button" class="btn btn-secondary cancel-comment-btn" style="display:none;">취소</button>
+						<div class="comment-body">
+						    <p class="comment-content-display" th:text="${c.cmntCn}">댓글 내용</p>
+						    <!-- 수정 1: textarea에 각 댓글을 식별할 수 있도록 data-comment-sn 속성을 추가합니다. -->
+						    <textarea class="comment-update-input form-control" style="display:none;"
+						              th:data-comment-sn="${c.pstCmntSn}"
+						              th:text="${c.cmntCn}"></textarea>
+						</div>
+						<div class="comment-actions">
+						    <button type="button" class="btn btn-primary update-comment-btn">수정</button>
+						    <!-- 수정 2: '저장' 버튼에도 수정할 댓글의 고유 번호(pstCmntSn)를 data 속성으로 추가합니다. -->
+						    <button type="button" class="btn btn-success save-comment-btn" style="display:none;"
+						            th:data-comment-sn="${c.pstCmntSn}"
+						            th:data-comment-update-url="@{/customer/post/updateComment}">저장</button>
+						    <button type="button" class="btn btn-secondary cancel-comment-btn" style="display:none;">취소</button>
 	                        
 	                        <button type="button" class="btn btn-danger delete-comment-btn"
 	                                th:data-comment-delete-url="@{/customer/post/commentDelete/{pstCmntSn}(pstCmntSn=${c.pstCmntSn})}">삭제</button>

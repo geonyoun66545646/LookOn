@@ -40,7 +40,7 @@ public class StoreImageController {
     private final StoreImageService storeImageService; // StoreImageService 주입
 
     @GetMapping("/upload")
-    public String uploadStoreImageView(Model model) {
+    public String uploadStoreImage(Model model) {
         model.addAttribute("title", "상점 이미지 업로드");
         return "admin/store/imageUpload";
     }

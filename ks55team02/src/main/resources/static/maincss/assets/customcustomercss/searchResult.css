@@ -233,7 +233,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 
 /* --- 6. 게시글 리스트 스타일 --- */
 .post-item {
-	padding: 1.5rem 0.5rem;
+	padding: 30px;
 	border-bottom: 1px solid #f0f0f0;
 }
 

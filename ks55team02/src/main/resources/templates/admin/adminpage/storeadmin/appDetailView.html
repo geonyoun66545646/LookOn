@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}">
+
+<head>
+    <meta name="appDetail" content="appDetail" />
+    <th:block layout:fragment="customCss">
+        <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/appDetailView.css}">
+
+    </th:block>   
+</head>
+<th:block layout:fragment="jsFile">
+   
+    </th:block>
+
+<th:block layout:fragment="contents">
+
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">신청 상세</h2>
+        </div>
+        <span class="badge custom-badge"
+              th:if="${appAdmin != null and appAdmin.aplyStts != null}"
+              th:text="${appAdmin.aplyStts}"
+              th:classappend="${appAdmin.aplyStts == '보류'} ? 'bg-warning' :
+                             (${appAdmin.aplyStts == '승인'} ? 'bg-success' :
+                             (${appAdmin.aplyStts == '반려'} ? 'bg-danger' : 'bg-secondary'))">
+        </span>
+        <span class="badge custom-badge bg-secondary"
+              th:if="${appAdmin == null or appAdmin.aplyStts == null}">
+              상태 없음
+        </span>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <form>
+                        <div  class="mb-4">
+                            <label for="aply_id" class="form-label">신청 ID</label>
+                            <div class="form-control"  id="aply_id" th:text="${appAdmin.aplyId}"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="store_nm" class="form-label">상점</label>
+                            <div class="form-control" id="store_nm" th:text="${appAdmin.storeNm}"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="user_nm" class="form-label">신청자</label>
+                            <div class="form-control" id="user_nm" th:text="${appAdmin.userNm}"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="ctrt_aply_ymd">계약 신청일</label>
+                            <div class="form-control" id="ctrt_aply_ymd" th:text="${#temporals.format(appAdmin.ctrtAplyYmd, 'yyyy-MM-dd')}"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="ctrt_bgng_ymd" class="form-label">계약 시작일</label>
+                            <div class="form-control" id="ctrt_bgng_ymd"  th:text="${#temporals.format(appAdmin.ctrtBgngYmd, 'yyyy-MM-dd')}"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-3">
+                    <form>
+                        <div class="mb-4">
+                            <label for="mngr_nm" class="form-label">매니저명</label>
+                            <div  class="form-control" id="mngr_nm" th:text="${appAdmin.mngrNm}"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="mngr_tel_no" class="form-label">매니저 연락처</label>
+                            <div class="form-control" id="mngr_tel_no" th:text="${appAdmin.mngrTelNo}"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="mngr_eml" class="form-label">매니저 이메일</label>
+                            <div class="form-control" id="mngr_eml" th:text="${appAdmin.mngrEml}"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="bplc_addr">사업장 주소</label>
+                            <div class="form-control" id="bplc_addr" th:text="${appAdmin.bplcAddr}"></div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="plcy_id" class="form-label">수수료 비율</label>
+                            <div class="form-control" id="plcy_id" th:text="${appAdmin.plcyId}"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <label for="product_name" class="form-label">필요 문서</label>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" />
+                                    </div>
+                                </th>
+                                <th>문서 분류</th>
+                                <th>문서 이름</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" />
+                                    </div>
+                                </td>
+                                <td>사업자 등록증</td>
+                                <td th:text="${appAdmin.brnoImgId}"></td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
+                                            <i class="material-icons md-more_horiz"></i>
+                                        </a>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#">자세히 보기</a>
+                                            <a class="dropdown-item" href="#">다운 로드</a>
+                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" />
+                                    </div>
+                                </td>
+                                <td>통신 판매업 신고증</td>
+                                <td th:text="${appAdmin.cmmDclrImgId}"></td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
+                                            <i class="material-icons md-more_horiz"></i>
+                                        </a>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#">View detail</a>
+                                            <a class="dropdown-item" href="#">Edit info</a>
+                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" />
+                                    </div>
+                                </td>
+                                <td>판매 상품 관련 증빙서류</td>
+                                <td th:text="${appAdmin.selGdsProofImgId}"></td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
+                                            <i class="material-icons md-more_horiz"></i>
+                                        </a>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#">View detail</a>
+                                            <a class="dropdown-item" href="#">Edit info</a>
+                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" />
+                                    </div>
+                                </td>
+                                <td>주민등록 증 사본</td>
+                                <td th:text="${appAdmin.rrnoCardCopyImgId}"></td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
+                                            <i class="material-icons md-more_horiz"></i>
+                                        </a>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#">View detail</a>
+                                            <a class="dropdown-item" href="#">Edit info</a>
+                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" />
+                                    </div>
+                                </td>
+                                <td>통장 사본</td>
+                                <td th:text="${appAdmin.bankbookCopyImgId}"></td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
+                                            <i class="material-icons md-more_horiz"></i>
+                                        </a>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#">View detail</a>
+                                            <a class="dropdown-item" href="#">Edit info</a>
+                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" />
+                                    </div>
+                                </td>
+                                <td>기타</td>
+                                <td th:text="${appAdmin.etcDocImgId}"></td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#">View detail</a>
+                                            <a class="dropdown-item" href="#">Edit info</a>
+                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">반려/보류</h2>
+        </div>
+        <button class="btn btn-primary" >
+            반려/보류 사항 입력
+        </button>
+        <span class="badge custom-badge bg-secondary"
+              th:if="${appAdmin == null or appAdmin.aplyStts == null}">
+              상태 없음
+        </span>
+   </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="container">
+			<textarea >
+			</textarea>
+		</div>
+
+        </div>
+    </div>
+    </th:block>
+
+<th:block layout:fragment="jsScript">
+ 
+</th:block>
+
+
+</html>

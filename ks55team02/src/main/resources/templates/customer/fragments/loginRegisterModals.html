@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<body>
+	
+	    <!-- 로그인/회원가입 모달 프래그먼트 -->
+	    <div th:fragment="signinModalFragment">
+	        <div class="modal fade" id="signin-modal" tabindex="-1" role="dialog" aria-hidden="true">
+	            <div class="modal-dialog modal-dialog-centered" role="document">
+	                <div class="modal-content">
+	                    <div class="modal-body">
+	                        <!-- ... (모달의 모든 내부 코드) ... -->
+	                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			                    <span aria-hidden="true"><i class="icon-close"></i></span>
+			                </button>
+			
+			                <div class="form-box">
+			                    <div class="form-tab">
+			                        <ul class="nav nav-pills nav-fill" role="tablist">
+			                            <li class="nav-item">
+			                                <a class="nav-link active" id="signin-tab" data-toggle="tab" href="#signin" role="tab" aria-controls="signin" aria-selected="true">로그인</a>
+			                            </li>
+			                            <li class="nav-item">
+			                                <a class="nav-link" id="register-tab" data-toggle="tab" href="#register" role="tab" aria-controls="register" aria-selected="false">회원가입</a>
+			                            </li>
+			                        </ul>
+			                        <div class="tab-content" id="tab-content-5">
+			                        
+			                            <!-- 로그인 탭 -->
+			                            
+										<div class="tab-pane fade show active" id="signin" role="tabpanel" aria-labelledby="signin-tab">
+                                            <form id="login-form">
+                                            <input type="hidden" id="redirectUrl" name="redirectUrl" th:value="${currentUrl}">
+                                                <div class="form-group">
+                                                    <label for="login-id">ID를 입력 해주세요.</label>
+                                                    <input type="text" class="form-control" id="login-id" name="userLgnId" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="login-pw">비밀번호를 입력 해주세요.</label>
+                                                    <input type="password" class="form-control" id="login-pw" name="userPswdEncptVal" required>
+                                                </div>
+                                                <div class="form-footer">
+                                                    <button type="button" id="login-btn" class="btn btn-outline-primary-2">
+                                                        <span>로그인</span>
+                                                        <i class="icon-long-arrow-right"></i>
+                                                    </button>
+                                                    <a href="#" class="forgot-link">비밀번호를 잊으셨습니까?</a>
+                                                </div>
+                                            </form>
+                                        </div>
+			
+			                            <!-- ================= 회원가입 탭 김성주 할일(유효성검사 및 ajax 진행 안함) ================= -->
+			                            <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+				                        	<form id="joinForm" novalidate>
+											    <!-- 1. 아이디 -->
+											    <div class="form-group">
+												    <label for="reg-id">아이디 <span class="text-danger">*</span></label>
+												    <!-- input-group과 button을 제거하고 input만 남김 -->
+												    <input type="text" class="form-control" id="reg-id" name="userLgnId" required autocomplete="off">
+												    <small id="id-feedback" class="form-text feedback-message"></small>
+												</div>
+											    
+											    <!-- 2. 비밀번호 -->
+											    <div class="form-group">
+											        <label for="reg-password">비밀번호 <span class="text-danger">*</span></label>
+											        <input type="password" class="form-control" id="reg-password" name="userPswd" required>
+											        <small id="password-feedback" class="form-text feedback-message"></small>
+											    </div>
+											
+											    <!-- 3. 비밀번호 확인 -->
+											    <div class="form-group">
+											        <label for="reg-password-confirm">비밀번호 확인 <span class="text-danger">*</span></label>
+											        <input type="password" class="form-control" id="reg-password-confirm" name="userPswdConfirm" required>
+											        <small id="password-confirm-feedback" class="form-text feedback-message"></small>
+											    </div>
+											
+											    <!-- 4. 이름 -->
+											    <div class="form-group">
+											        <label for="reg-name">이름 <span class="text-danger">*</span></label>
+											        <input type="text" class="form-control" id="reg-name" name="userNm" required>
+											        <small id="name-feedback" class="form-text feedback-message"></small>
+											    </div>
+
+												<!-- 5. 성별 (새로 추가) -->
+												<div class="form-group">
+												    <label>성별 <span class="text-danger">*</span></label>
+												    <!-- 1. 버튼 그룹을 Flexbox 컨테이너로 만듦 -->
+												    <div class="btn-group btn-group-toggle d-flex" data-toggle="buttons">
+												        <!-- 2. 남자 버튼 -->
+												        <label class="btn btn-outline-secondary w-100 mr-1"> <!-- 오른쪽 마진 1단계 추가 -->
+												            <!-- 3. 숨겨진 라디오 버튼 (필수!) -->
+												            <input type="radio" name="genderSeCd" value="m" id="gender-male" autocomplete="off"> 남자
+												        </label>
+												        <!-- 4. 여자 버튼 -->
+												        <label class="btn btn-outline-secondary w-100 ml-1"> <!-- 왼쪽 마진 1단계 추가 -->
+												            <input type="radio" name="genderSeCd" value="f" id="gender-female" autocomplete="off"> 여자
+												        </label>
+												    </div>
+												    <small id="gender-feedback" class="form-text feedback-message"></small>
+												</div>
+											    
+											    <!-- 5. 닉네임 -->
+											    <div class="form-group">
+												    <label for="reg-nickname">닉네임 <span class="text-danger">*</span></label>
+												    <!-- input-group과 button을 제거하고 input만 남김 -->
+												    <input type="text" class="form-control" id="reg-nickname" name="userNcnm" required autocomplete="off">
+												    <small id="nickname-feedback" class="form-text feedback-message"></small>
+												</div>
+											    
+											    <!-- 6. 이메일 -->
+											    <div class="form-group">
+											        <label for="reg-email">이메일 <span class="text-danger">*</span></label>
+											        <input type="email" class="form-control" id="reg-email" name="emlAddr" required>
+											        <small id="email-feedback" class="form-text feedback-message"></small>
+											    </div>
+											    
+											    <!-- 7. 전화번호 -->
+											    <div class="form-group">
+											        <label>전화번호 <span class="text-danger">*</span></label>
+											        <div class="d-flex align-items-center">
+											            <input type="tel" class="form-control text-center" id="reg-tel1" name="telno1" maxlength="3" style="width: 25%;">
+											            <span class="mx-2">-</span>
+											            <input type="tel" class="form-control text-center" id="reg-tel2" name="telno2" maxlength="4" style="width: 35%;">
+											            <span class="mx-2">-</span>
+											            <input type="tel" class="form-control text-center" id="reg-tel3" name="telno3" maxlength="4" style="width: 35%;">
+											        </div>
+											        <small id="tel-feedback" class="form-text feedback-message"></small>
+											    </div>
+											
+											    <!-- 8. 주소 -->
+											    <div class="form-group">
+											        <label>주소 <span class="text-danger">*</span></label>
+											        <div class="input-group mb-2">
+											            <input type="text" class="form-control" id="reg-zipcode" name="zipCd" placeholder="우편번호" readonly>
+											            <div class="input-group-append">
+											                <button class="btn btn-outline-secondary" type="button" id="btn-find-postcode">주소검색</button>
+											            </div>
+											        </div>
+											        <input type="text" class="form-control mb-2" id="reg-addr" name="addr" placeholder="주소" readonly>
+											        <input type="text" class="form-control" id="reg-daddr" name="daddr" placeholder="상세주소를 입력해주세요">
+											        <small id="addr-feedback" class="form-text feedback-message"></small>
+											    </div>
+											
+											    <!-- 9. 선택적 동의 -->
+											    <div class="form-group">
+											        <div class="custom-control custom-checkbox">
+											            <input type="checkbox" class="custom-control-input" id="reg-push-agree" name="pushNtfctnAgreYn" value="Y">
+											            <label class="custom-control-label" for="reg-push-agree">푸시 알림 수신 동의 (선택)</label>
+											        </div>
+											        <div class="custom-control custom-checkbox">
+											            <input type="checkbox" class="custom-control-input" id="reg-email-rcv-agree" name="emlRcptnAgreYn" value="Y">
+											            <label class="custom-control-label" for="reg-email-rcv-agree">이메일 수신 동의 (선택)</label>
+											        </div>
+											    </div>
+											
+											    <div class="form-footer">
+											        <button type="submit" class="btn btn-outline-primary-2">
+											            <span>가입하기</span>
+											            <i class="icon-long-arrow-right"></i>
+											        </button>
+											    </div>
+											</form>
+			                            </div>
+			                        </div>
+			                    </div>
+			                </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	
+	    <!-- 여기에 다른 공용 모달(예: 알림 모달)을 추가할 수도 있음 -->
+	    <!--
+	    <div th:fragment="alertModalFragment">
+	        ...
+	    </div>
+	    -->
+	    
+	
+	</body>
+	
+</html>

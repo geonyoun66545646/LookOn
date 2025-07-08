@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.login.mapper.LoginMapper">
+
+    <!--
+        로그인 관련 조회 결과를 Login DTO에 매핑하기 위한 resultMap 입니다.
+        users 테이블과 user_security_settings 테이블을 JOIN한 결과를 담습니다.
+    -->
+    <resultMap id="loginResultMap" type="ks55team02.customer.login.domain.Login">
+        <!-- users 테이블 컬럼 매핑 -->
+        <result column="user_no" 			property="userNo"/>
+        <result column="mbr_grd_cd" 		property="mbrGrdCd"/>
+        <result column="user_lgn_id" 		property="userLgnId"/>
+        <result column="user_pswd_encpt_val" property="userPswdEncptVal"/>
+        <result column="user_ncnm" 			property="userNcnm"/>
+        <result column="user_status" 		property="userStatus"/>
+
+        <!-- user_security_settings 테이블 컬럼 매핑 -->
+        <result column="lgn_fail_nmtm" 		property="lgnFailNmtm"/>
+        <result column="acnt_lock_rmv_tm" 	property="acntLockRmvTm"/>
+        
+        <!-- login_history 테이블 컬럼 매핑 -->
+        <result column="lgn_dt" 			property="lgnDt"/>
+        <result column="lgn_ip_addr" 		property="ipAddress"/>
+        <result column="acnt_lock_rmv_tm" 	property="acntLockRmvTm"/>
+    </resultMap>
+
+    <!--
+        사용자 아이디로 회원 기본 정보와 보안 설정 정보를 조회하는 쿼리입니다.
+    -->
+    <select id="getLoginUserInfo" parameterType="String" resultMap="loginResultMap">
+        SELECT
+            u.user_no,
+            u.mbr_grd_cd,
+            u.user_lgn_id,
+            u.user_pswd_encpt_val,
+            u.user_ncnm,
+            u.user_status,
+            uss.lgn_fail_nmtm,
+            uss.acnt_lock_rmv_tm
+        FROM
+            users AS u
+        LEFT JOIN
+            user_security_settings AS uss
+        ON
+            u.user_no = uss.user_no
+        WHERE
+            u.user_lgn_id = #{userLgnId};
+    </select>
+    
+    <!-- 로그인 실패 횟수 1 증가 -->
+	<update id="incrementLoginFailCount" parameterType="String">
+	    UPDATE user_security_settings
+	    SET lgn_fail_nmtm = lgn_fail_nmtm + 1
+	    WHERE 
+	    	user_no = (
+	    				SELECT 
+	    					user_no 
+	    				FROM 
+	    					users 
+	    				WHERE 
+	    					user_lgn_id = #{userId});
+	</update>
+	
+	<!-- 계정 잠금 (잠금 해제 시간을 현재시간 + 15분으로 설정) -->
+	<update id="lockUserAccount" parameterType="String">
+	    UPDATE user_security_settings
+	    SET acnt_lock_rmv_tm = DATE_ADD(NOW(), INTERVAL 15 MINUTE)
+	    WHERE 
+	    	user_no = (
+	    				SELECT 
+	    					user_no 
+	    				FROM 
+	    					users 
+	    				WHERE 
+	    					user_lgn_id = #{userId});
+	</update>
+	
+	<!-- 로그인 기록 추가 -->
+	<insert id="addLoginHistory" parameterType="ks55team02.customer.login.domain.Login">
+	    INSERT INTO login_history
+	        (user_no, lgn_use_id, lgn_dt, lgn_fail_nmtm, lgn_ip_addr)
+	    VALUES
+	        (#{userNo}, #{userLgnId}, NOW(), #{lgnFailNmtm}, #{ipAddress});
+	</insert>
+	
+	<!-- 로그인 성공 시 실패 횟수 0으로 초기화 -->
+	<update id="resetLoginFailCount" parameterType="String">
+	    UPDATE user_security_settings
+	    SET lgn_fail_nmtm = 0
+	    WHERE user_no = (
+	    					SELECT 
+	    						user_no 
+	    					FROM 
+	    						users 
+	    					WHERE 
+	    						user_lgn_id = #{userId});
+	</update>
+
+</mapper>

@@ -1,0 +1,12 @@
+package ks55team02.customer.store.mapper;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import ks55team02.customer.store.domain.AppStore;
+
+@Mapper
+public interface AppStoreMapper {
+	
+	AppStore getAppStoreByUserNo(String aplyUserNo);
+
+}

@@ -1,6 +1,8 @@
 package ks55team02.customer.post.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import ks55team02.customer.post.domain.Board;
-import ks55team02.customer.post.domain.Comment;
+import ks55team02.customer.post.domain.Interaction;
 import ks55team02.customer.post.domain.Post;
 import ks55team02.customer.post.service.BoardService;
 import ks55team02.customer.post.service.PostService;
@@ -29,10 +31,28 @@ public class PostController {
 	private final PostService postService;
 	private final BoardService boardService;
 	
+	// 추천수 증가
+	@PostMapping("/interactionInsert")
+	@ResponseBody
+	public Map<String, Object> insertInteraction(Interaction interaction) {
+		Map<String, Object> response = new HashMap<>();
+	    try {
+	        postService.insertInterCount(interaction);
+	        response.put("result", "success");
+	    } catch (Exception e) {
+	        // 데이터베이스 제약 조건(예: 동일 유저 중복 추천) 등으로 인해 실패할 수 있습니다.
+	        log.error("Error increasing interaction count: {}", e.getMessage());
+	        response.put("result", "fail");
+	        response.put("message", e.getMessage());
+	    }
+	    return response;
+	}
+	
+	
 	// 댓글 삭제
 	@DeleteMapping("/commentDelete/{pstCmntSn}")
 	@ResponseBody
-	public String commentDelete(@PathVariable String pstCmntSn) {
+	public String deleteComment(@PathVariable String pstCmntSn) {
 		try {
 			postService.deleteComment(pstCmntSn);
 			return "삭제 성공";
@@ -40,23 +60,12 @@ public class PostController {
 			return null;			
 		}
 	}
-	
-	// 댓글 수정
-	@PostMapping("/commentUpdate")
-	@ResponseBody
-	public String updateComment(@PathVariable Comment comment) {
-		try {
-			postService.updateComment(comment);
-			return "수정 성공";
-		} catch (Exception e) {
-			return "수정 실패";
-		}
-	}
+
 	
 	// 게시글 삭제
 	@DeleteMapping("/postDelete/{pstSn}")
 	@ResponseBody
-	public String postDelete(@PathVariable String pstSn) {
+	public String deletePost(@PathVariable String pstSn) {
 	    try {
 	        postService.deletePost(pstSn);
 	        // 이 "삭제 성공" 이라는 문자열이 그대로 Ajax의 success 콜백으로 전달됩니다.
@@ -145,7 +154,7 @@ public class PostController {
 
 	// 게시글 조회
 	@GetMapping("/postView")
-	public String postView(@RequestParam String pstSn, Model model) {
+	public String selectPostDetail(@RequestParam String pstSn, Model model) {
 
 		Post postDetail = postService.selectPostDetailByPostSn(pstSn);
 
@@ -156,7 +165,7 @@ public class PostController {
 
 	// 게시글 목록 조회
 	@GetMapping("/postList")
-	public String postListView(
+	public String selectPostList(
 			@RequestParam(required = false) String bbsClsfCd,
 			@RequestParam(defaultValue = "1") int page,
 			@RequestParam(defaultValue = "#{paginationProperties.defaultSize}") int size,
@@ -188,6 +197,20 @@ public class PostController {
 		int offset = (page - 1) * size;
 
 		var postList = postService.selectPostListByBoardCd(bbsClsfCd, offset, size);
+		
+	    // 1. 페이지네이션 바에 한 번에 보여줄 페이지 번호의 개수 (사용자 요청: 10개)
+	    int pageNavSize = 10;
+
+	    // 2. 페이지네이션 바의 시작 번호 계산
+	    int startPageNum = ((page - 1) / pageNavSize) * pageNavSize + 1;
+
+	    // 3. 페이지네이션 바의 끝 번호 계산
+	    int endPageNum = startPageNum + pageNavSize - 1;
+
+	    // 4. (중요) 계산된 끝 번호가 실제 전체 페이지 수보다 클 경우, 끝 번호를 전체 페이지 수로 맞춤
+	    if (endPageNum > totalPage) {
+	        endPageNum = totalPage;
+	    }
 
 		model.addAttribute("boardList", boardList);
 		model.addAttribute("boardName", boardName);
@@ -196,6 +219,8 @@ public class PostController {
 		model.addAttribute("size", size);
 		model.addAttribute("totalPage", totalPage);
 		model.addAttribute("bbsClsfCd", bbsClsfCd);
+	    model.addAttribute("startPageNum", startPageNum);
+	    model.addAttribute("endPageNum", endPageNum);
 
 		return "customer/post/postList";
 	}

@@ -9,7 +9,6 @@ public class Coupons {
     private String pblcnCpnCd;
     private String userNo;
     private String cpnNm;
-    private String dscntTypeCd;
     private double dscntVl;
     private double minOrdrAmt;
     private double maxDscntAmt;
@@ -20,4 +19,7 @@ public class Coupons {
     private boolean actvtnYn;
     private LocalDateTime crtDt;
     private LocalDateTime mdfcnDt;
+    
+    private String issueConditionType; // issue_condition_type 컬럼과 연결될 필드
+    private String reissueCycle;       // reissue_cycle 컬럼과 연결될 필드
 }
