@@ -15,12 +15,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import ks55team02.customer.login.domain.Login;
 import ks55team02.customer.login.service.LoginService;
-import ks55team02.customer.store.service.impl.StoreImageServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
-@RequestMapping("/customer/login")
+@RequestMapping("/customer")
 @RequiredArgsConstructor
 @Slf4j
 public class LoginController {
@@ -28,7 +27,7 @@ public class LoginController {
 	private final LoginService loginService;
 
     // 로그인 처리를 위한 POST 요청을 받는 메소드
-    @PostMapping
+    @PostMapping("/login")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> loginProcess(@RequestBody Login loginInfo, HttpServletRequest request) {
 
@@ -78,6 +77,7 @@ public class LoginController {
     public String logout(HttpSession session) {
     	session.invalidate();
     	
+    	log.info("========== 로그아웃 메소드 실행됨 ==========");
     	return "redirect:/"; 
     }
 }
