@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{seller/layout/layoutMain}"> 
+      layout:decorate="~{admin/layout/layoutMain}"> 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>프리미엄 멤버십 결제</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="maincss/assets/customcustomercss/premiumCheckout.css"> 
+    
+     <!-- Toss Payments SDK (head 최상단에 위치) -->
+    <script src="https://js.tosspayments.com/v1"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     
 </head>
 <body>

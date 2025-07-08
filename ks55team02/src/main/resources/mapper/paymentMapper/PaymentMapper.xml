@@ -55,7 +55,7 @@
 	        user_cpn_id, apld_cpn_dscnt_amt, last_stlm_amt, ordr_stts_cd,
 	        rcvr_nm, rcvr_telno, dlvy_addr, dlvy_daddr, zip, dlvy_memo_cn, user_name
 	    ) VALUES (
-	        #{ordrNo}, #{userNo}, #{ordrDt}, #{gdsTotAmt}, #{dlvyFeeAmt}, #{pblcnCpnId},
+	        #{ordrNo}, #{userNo}, #{ordrDt}, #{gdsTotAmt}, 0, #{pblcnCpnId},
 	        #{userCpnId}, #{apldCpnDscntAmt}, #{lastStlmAmt}, #{ordrSttsCd},
 	        #{rcvrNm}, #{rcvrTelno}, #{dlvyAddr}, #{dlvyDaddr}, #{zip}, #{dlvyMemoCn}, #{userName}
 	    )

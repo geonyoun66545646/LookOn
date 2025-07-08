@@ -13,14 +13,6 @@ public class CustomerHomeController {
 	@Value("${toss.client-key}")
     private String tossClientKey;
 
-    // [이전 코드]
-    // @GetMapping("/checkout")
-    // public String showCheckoutPage(Model model) { ... }
-    
-    // [이전 코드]
-    // @GetMapping(value= {"/checkout"})
-	// public String customerCheckOutView() { ... }
-
     // [새로운 통합 코드] 위 두 메소드를 지우고 아래 메소드 하나만 남깁니다.
 	@GetMapping("/checkout") // URL 경로는 /checkout 입니다.
 	public String customerCheckOutView(Model model) { // 파라미터로 Model을 받습니다.
@@ -46,18 +38,18 @@ public class CustomerHomeController {
 		return "customer/fragments/cart";
 	}
 	
-	@GetMapping(value= {"/paymentHistory"})
-	public String paymentHistoryView() {
-		return "customer/fragments/paymentHistory";
-	}
+//	@GetMapping(value= {"/paymentHistory"})
+//	public String paymentHistoryView() {
+//		return "customer/fragments/paymentHistory";
+//	}
 	
-	@GetMapping(value= {"/shippmentStts"})
+	@GetMapping(value = {"/shippmentStts"})
 	public String shippmentSttsView() {
 		return "customer/fragments/shippmentStts";
 	}
 	
-	@GetMapping(value= {"/premiumAdd"})
+	@GetMapping(value = {"/premiumAdd"})
 	public String premiumAddView() {
-		return "customer/fragments/premiumAdd";
+		return "admin/fragments/premiumAdd";
 	}
 }
