@@ -20,45 +20,33 @@ public class GlobalControllerAdvice {
      * @param model   뷰에 데이터를 전달할 모델 객체
      * @param request 현재 HTTP 요청 객체
      */
-    @ModelAttribute
-    public void addCommonAttributes(Model model, HttpServletRequest request) {
-        model.addAttribute("currentUrl", request.getRequestURI());
-    }
-    
-    @ExceptionHandler(NoResourceFoundException.class)
-	public String NoResourceFoundHandle(HttpServletRequest request, Exception ex, Model model) {
-		String uri = request.getRequestURI();
-		String viewName = "error/404";
-		
-		if(uri.startsWith("/admin")) {
-			viewName = "error/404";
-		}
-		
-		StackTraceElement[] stackTrace = ex.getStackTrace();
-		StackTraceElement origin = stackTrace[0];
-		log.error("[Exception] {}\n[method]:{} ({}:{}) - message={}",
-					origin.getClassName(),
-					origin.getMethodName(),
-					origin.getFileName(),
-					origin.getLineNumber(),
-					ex.getMessage()
-				);
-		
-		return viewName;
-	}
-
-	@ExceptionHandler(Exception.class)
-	public String globalExceptionHandle(HttpServletRequest request, Exception ex, Model model) {
-		StackTraceElement[] stackTrace = ex.getStackTrace();
-		StackTraceElement origin = stackTrace[0];
-		log.error("[Exception] {}\n[method]:{} ({}:{}) - message={}",
-					origin.getClassName(),
-					origin.getMethodName(),
-					origin.getFileName(),
-					origin.getLineNumber(),
-					ex.getMessage()
-				);
-		
-		return "error/500";
-	}
+	
+	  @ModelAttribute public void addCommonAttributes(Model model,
+	  HttpServletRequest request) { model.addAttribute("currentUrl",
+	  request.getRequestURI()); }
+	  
+	  @ExceptionHandler(NoResourceFoundException.class) public String
+	  NoResourceFoundHandle(HttpServletRequest request, Exception ex, Model model)
+	  { String uri = request.getRequestURI(); String viewName = "error/404";
+	  
+	  if(uri.startsWith("/admin")) { viewName = "error/404"; }
+	  
+	  StackTraceElement[] stackTrace = ex.getStackTrace(); StackTraceElement origin
+	  = stackTrace[0];
+	  log.error("[Exception] {}\n[method]:{} ({}:{}) - message={}",
+	  origin.getClassName(), origin.getMethodName(), origin.getFileName(),
+	  origin.getLineNumber(), ex.getMessage() );
+	  
+	  return viewName; }
+	  
+	  @ExceptionHandler(Exception.class) public String
+	  globalExceptionHandle(HttpServletRequest request, Exception ex, Model model)
+	  { StackTraceElement[] stackTrace = ex.getStackTrace(); StackTraceElement
+	  origin = stackTrace[0];
+	  log.error("[Exception] {}\n[method]:{} ({}:{}) - message={}",
+	  origin.getClassName(), origin.getMethodName(), origin.getFileName(),
+	  origin.getLineNumber(), ex.getMessage() );
+	  
+	  return "error/500"; }
+	 
 }

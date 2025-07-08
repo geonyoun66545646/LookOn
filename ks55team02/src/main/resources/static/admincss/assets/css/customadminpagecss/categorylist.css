@@ -1,0 +1,112 @@
+/* admin.css 또는 layoutMain.html에 연결된 CSS 파일에 추가 */
+
+/* 드롭다운 메뉴 아이템 (.dropdown-item) 스타일 */
+.dropdown-menu .dropdown-item {
+    display: flex; /* Flexbox 사용 */
+    align-items: center; /* 수직 가운데 정렬 */
+    justify-content: center; /* 수평 가운데 정렬 */
+    padding: 10px 15px; /* 패딩 조정 */
+    color: #333;
+    font-size: 15px;
+    white-space: nowrap;
+    cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* 각 항목 앞의 색상 점 (a 태그의 가상 요소로) */
+.dropdown-menu .dropdown-item::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px; /* 점과 텍스트 사이 간격 */
+    flex-shrink: 0; /* 점이 줄어들지 않도록 */
+}
+
+/* 활동 상태 점 (초록색) */
+.dropdown-menu .dropdown-item.status-active::before {
+    background-color: #28a745; /* 초록색 */
+}
+
+/* 휴면 상태 점 (주황색) */
+.dropdown-menu .dropdown-item.status-dormant::before {
+    background-color: #ffc107; /* 주황색 */
+}
+
+/* 탈퇴 상태 점 (빨간색) */
+.dropdown-menu .dropdown-item.status-withdrawal::before {
+    background-color: #dc3545; /* 빨간색 */
+}
+
+/* 이전 span[class*="status-"] 관련 CSS는 삭제하세요! */
+
+.filter-card .card-body {
+    padding: 2rem;
+}
+
+/* 폼 그룹 정렬 */
+.form-group.row {
+    margin-bottom: 1.5rem;
+}
+
+/* 라벨 스타일 */
+.form-group .col-form-label {
+    font-size: 14px;
+    color: #333;
+}
+
+/* 체크박스 스타일 */
+.form-check-input {
+    width: 1.25em;
+    height: 1.25em;
+    margin-top: 0.15em;
+    border: 1px solid #ced4da;
+}
+.form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+.form-check-label {
+    font-size: 14px;
+    padding-left: 0.5rem;
+}
+
+/* 구분선 스타일 */
+hr.my-3 {
+    border-top: 1px solid #e9ecef;
+}
+
+/* 날짜 입력 필드 스타일 */
+input[type="date"].form-control {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+}
+.d-flex .mx-2 {
+    color: #adb5bd;
+}
+
+/* 검색 키워드 영역 스타일 */
+.input-group .custom-select {
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-right: none;
+}
+.input-group .form-control {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-left: none;
+}
+.input-group .form-control::placeholder {
+    color: #adb5bd;
+}
+.input-group .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    font-weight: 500;
+}

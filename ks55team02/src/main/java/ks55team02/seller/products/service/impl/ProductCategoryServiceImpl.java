@@ -1,9 +1,12 @@
 package ks55team02.seller.products.service.impl;
 
+import ks55team02.admin.common.domain.Pagination;
+import ks55team02.admin.common.domain.SearchCriteria;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.mapper.ProductCategoryMapper;
 import ks55team02.seller.products.service.ProductCategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -15,6 +18,53 @@ import java.util.Map;
 public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     private final ProductCategoryMapper productCategoryMapper;
+    
+    @Override
+    public void addCategory(ProductCategory productCategory) {
+        
+        // ⭐ 수정: parentCategoryId가 빈 문자열("")이면 null로 변경
+        if (productCategory.getParentCategoryId() != null && productCategory.getParentCategoryId().isEmpty()) {
+            productCategory.setParentCategoryId(null);
+        }
+
+        // 1. 카테고리 레벨(ctgry_dpth) 설정
+        if (productCategory.getParentCategoryId() != null) { // 이제 StringUtils.hasText 대신 null 체크만 해도 됨
+            productCategory.setCategoryLevel(2);
+        } else {
+            productCategory.setCategoryLevel(1);
+        }
+        
+        // 2. 활성 상태 기본값 설정
+        productCategory.setActivationYn(true);
+        
+        // 3. Mapper 호출하여 DB에 INSERT
+        productCategoryMapper.addCategory(productCategory);
+    }
+    
+    @Override
+    public Map<String, Object> getCategoryList(SearchCriteria searchCriteria) {
+        // 1. 검색 조건에 맞는 데이터의 총 개수 조회
+        int categoryListCount = productCategoryMapper.getCategoryListCount(searchCriteria);
+        
+        // 2. 페이지네이션 객체 생성 (이때 모든 페이지 정보 및 offset이 계산됨)
+        Pagination pagination = new Pagination(categoryListCount, searchCriteria);
+        
+        // 3. SearchCriteria에 계산된 offset 설정
+        // searchCriteria.setOffset() 호출이 불필요해 보일 수 있으나,
+        // Pagination 생성자에서 currentPage 보정이 일어날 수 있으므로,
+        // Mapper에 전달하기 전에 최종 계산된 offset 값으로 동기화해주는 것이 안전합니다.
+        searchCriteria.setOffset(pagination.getLimitStart());
+        
+        // 4. 페이지네이션이 적용된 목록 조회
+        List<ProductCategory> categoryList = productCategoryMapper.getCategoryList(searchCriteria);
+        
+        // 5. 컨트롤러에 전달할 Map 생성
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("pagination", pagination);
+        resultMap.put("categoryList", categoryList);
+        
+        return resultMap;
+    }
     
     @Override
     public ProductCategory getCategoryById(String categoryId) {
