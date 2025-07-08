@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+	    <title th:text="${title}">Nest Dashboard</title>
+	    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+	    <meta name="viewport" content="width=device-width, initial-scale=1" />
+	    <!-- Favicon -->
+	    <link rel="shortcut icon" type="image/x-icon" th:href="@{/maincss/assets/imgs/theme/favicon.svg}" />
+	    <!-- Template CSS -->
+	    <link th:href="@{/maincss/assets/css/main.css}" rel="stylesheet" type="text/css" />
+    </head>
+
+    <body>
+        <main class="main">
+            <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/main}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">404</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+        	<div class="error-content text-center" style="background-image: url(maincss/assets/images/backgrounds/error-bg.jpg)">
+            	<div class="container">
+            		<h1 class="error-title">Error 404</h1><!-- End .error-title -->
+            		<p>We are sorry, the page you've requested is not available.</p>
+            		<a href="index.html" class="btn btn-outline-primary-2 btn-minwidth-lg">
+            			<span>BACK TO HOMEPAGE</span>
+            			<i class="icon-long-arrow-right"></i>
+            		</a>
+            	</div><!-- End .container -->
+        	</div><!-- End .error-content text-center -->
+        </main><!-- End .main -->
+        <div class="screen-overlay"></div>
+                
+        <script th:src="@{/maincss/assets/js/vendors/jquery-3.6.0.min.js}"></script>
+	    <script th:src="@{/maincss/assets/js/vendors/bootstrap.bundle.min.js}"></script>
+	    <script th:src="@{/maincss/assets/js/vendors/select2.min.js}"></script>
+	    <script th:src="@{/maincss/assets/js/vendors/perfect-scrollbar.js}"></script>
+	    <script th:src="@{/maincss/assets/js/vendors/jquery.fullscreen.min.js}"></script>
+	    <!-- Main Script -->
+	    <script th:src="@{/maincss/assets/js/main.js?v=1.1}" type="text/javascript"></script>
+    </body>
+</html>

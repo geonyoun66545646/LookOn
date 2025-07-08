@@ -1,175 +1,511 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{admin/layout/layoutMain}">
-		
-	 <head>
-	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />	
-	 </head>
-	 <!--/* 개발시 추가할 jsfile 영역 정의 */-->
-	 <th:block layout:fragment="jsFile">
-	 </th:block>
-	 
-	 <!--/* 개발시 추가할 스크립트 */-->
-	 <th:block layout:fragment="jsScript">	 
-	 </th:block>
-	 <!-- 추가할 페이지 contents -->
-	 <th:block layout:fragment="contents">
-	 	<main class="main-content">
-	    <h1 class="h3 mb-4 font-weight-bold">상점별 정산 내역</h1>
-	
-	    <!-- 검색 필터 카드 (기존과 동일) -->
-	    <div class="card mb-4">
-	        <div class="card-body">
-	            <table class="table table-bordered filter-table">
-	                <tbody>
-	                    <tr>
-	                        <th>분류</th>
-	                        <td>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkAll" checked>
-	                                <label class="form-check-label" for="checkAll">전체</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkActive" checked>
-	                                <label class="form-check-label" for="checkActive">활동 계정</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkDormant" checked>
-	                                <label class="form-check-label" for="checkDormant">휴면 계정</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkWithdrawn" checked>
-	                                <label class="form-check-label" for="checkWithdrawn">탈퇴 계정</label>
-	                            </div>
-	                        </td>
-	                    </tr>
-	                    <tr>
-	                        <th>기간</th>
-	                        <td>
-	                            <div class="form-row align-items-center">
-	                                <div class="col-auto">
-	                                    <input type="date" class="form-control form-control-sm" value="2025-03-16">
-	                                </div>
-	                                <div class="col-auto">-</div>
-	                                <div class="col-auto">
-	                                    <input type="date" class="form-control form-control-sm" value="2025-06-16">
-	                                </div>
-	                            </div>
-	                        </td>
-	                    </tr>
-	                    <tr>
-	                        <th>검색 키워드</th>
-	                        <td>
-	                            <div class="input-group">
-	                                <div class="input-group-prepend">
-	                                    <select class="custom-select custom-select-sm" style="width: 150px;">
-	                                        <option selected>전체</option>
-	                                        <option value="1">ID</option>
-	                                        <option value="2">이름</option>
-	                                        <option value="3">이메일</option>
-	                                        <option value="4">상태</option>
-	                                        <option value="5">성별</option>
-	                                    </select>
-	                                </div>
-	                                <input type="text" class="form-control form-control-sm">
-	                            </div>
-	                        </td>
-	                    </tr>
-	                </tbody>
-	            </table>
-	            <div class="text-center mt-3">
-	                <button class="btn btn-dark" style="width: 120px;">검색</button>
-	            </div>
-	        </div>
-	    </div>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 정산 관리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* 모든 요소에 box-sizing 적용 */
+        * {
+            box-sizing: border-box;
+        }
 
-    <!-- 회원 목록 테이블 카드 -->
-    <div class="card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <span class="font-weight-bold">[ 검색 결과 <span class="text-primary">183</span>건 ]</span>
+        /* 기존 CSS는 그대로 유지하고, 필요에 따라 추가/수정합니다. */
+        /* 예시: 상태별 색상 */
+        .status.pending { color: #d9534f; font-weight: bold; } /* 정산대기 */
+        .status.completed { color: #5cb85c; } /* 정산완료 */
+        
+        .settlement-list-header, .shop-settlement-item, .history-list-header, .history-item {
+            display: flex;
+            align-items: center; /* 세로 중앙 정렬 */
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            background-color: #fff;
+            justify-content : space-between;
+        }
+        .settlement-list-header {
+            font-weight: bold;
+            background-color: #f8f8f8;
+            border-top: 1px solid #ddd;
+        }
+        .shop-settlement-item:nth-child(even) {
+            background-color: #f9f9f9;
+        }
 
-                    <!-- ▼▼▼ 1. 상태 변경 기능 버튼 추가 ▼▼▼ -->
-                    <div class="btn-group ml-3">
-                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            선택한 회원 상태 변경
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">활동중으로 변경</a>
-                            <a class="dropdown-item" href="#">휴면으로 변경</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#">탈퇴 처리</a>
-                        </div>
+        /* 각 컬럼의 너비를 일관되게 정의 */
+        .header-item, .item-cell {
+            text-align: center;
+            padding: 5px;
+            flex-grow: 0; /* 기본적으로 확장하지 않음 */
+            flex-shrink: 0; /* 기본적으로 축소하지 않음 */
+            /* 각 컬럼의 flex-basis와 max-width를 정확히 일치시킴 */
+        }
+
+        /* 체크박스 컬럼 - 고정 너비 */
+        .header-item.checkbox-col, .item-cell.checkbox-col {
+            flex-basis: 40px; 
+            max-width: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .settle-checkbox {
+            margin: 0; /* 기본 마진 제거 */
+        }
+
+        /* 상점명 컬럼 */
+        .header-item.shop-name, .item-cell.shop-name { 
+            flex-basis: 180px; 
+            max-width: 180px;
+            /* text-align: left;  */
+        }
+
+        /* 금액 관련 컬럼 */
+        .header-item.sales-amount, .item-cell.sales-amount,
+        .header-item.commission-amount, .item-cell.commission-amount,
+        .header-item.payable-amount, .item-cell.payable-amount { 
+            flex-basis: 120px; 
+            max-width: 120px;
+        }
+
+        /* 날짜 컬럼 */
+        .header-item.last-settlement-date, .item-cell.last-settlement-date { 
+            flex-basis: 100px; 
+            max-width: 100px;
+        }
+
+        /* 상태 컬럼 */
+        .header-item.status, .item-cell.status { 
+            flex-basis: 80px; 
+            max-width: 80px;
+            white-space: nowrap;
+        }
+
+        /* 액션 버튼 컬럼 */
+        .header-item.action, .item-cell.action { 
+            flex-basis: 160px; 
+            max-width: 160px;
+            text-align: center; 
+            display: flex; 
+            justify-content: center; /* 버튼들을 가운데 정렬 */
+            align-items: center;
+            gap: 5px; /* 버튼 간 간격 */
+        }
+        
+        .settle-single-button, .view-history-button, .batch-settle-button, .close-history-button {
+            padding: 5px 10px;
+            /* margin-left: 5px; -> action에 gap으로 대체 */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+        }
+        .settle-single-button { background-color: #007bff; color: white; }
+        .settle-single-button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        .view-history-button { background-color: #6c757d; color: white; }
+        .batch-settle-button { background-color: #28a745; color: white; margin-left: 15px; }
+        .close-history-button { background-color: #dc3545; color: white; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; justify-content: center; align-items: center; font-size: 16px; }
+        
+        .settlement-summary {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .summary-label { margin-right: 10px; }
+        .summary-value { font-size: 1.2em; color: #007bff; }
+
+        .settlement-history-panel {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #fdfdfd;
+        }
+        .settlement-history-panel .panel-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .settlement-history-panel .panel-title span { margin-right: auto; }
+        .history-item .item-cell { flex: 1; text-align: center; }
+        .history-item .item-cell.history-date { flex: 1.5; }
+        .history-item .item-cell.history-amount { flex: 1.2; }
+        .history-item .item-cell.history-status { flex: 1; }
+
+        .no-data, .no-history {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+
+        /* 페이지네이션 CSS */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            list-style: none;
+        }
+        .page-item {
+            margin: 0 5px;
+        }
+        .page-link {
+            display: block;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #007bff;
+            background-color: #fff;
+        }
+        .page-link:hover {
+            background-color: #e9e9e9;
+        }
+        .page-item.active .page-link {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="contents">
+    <div class="page-container">
+        <h1 class="page-title">정산 관리</h1>
+        <p class="page-subtitle">상점들의 판매 수수료를 정산하고 내역을 관리합니다.</p>
+
+        <div class="content-wrapper">
+            <div class="settlement-panel">
+                <h2 class="panel-title">정산 대상 상점 목록</h2>
+                
+                <div class="settlement-list-header">
+                    <span class="header-item checkbox-col"></span> <span class="header-item shop-name">상점명</span>
+                    <span class="header-item sales-amount">총 판매액</span>
+                    <span class="header-item commission-amount">수수료</span>
+                    <span class="header-item payable-amount">정산 예정액</span>
+                    <span class="header-item last-settlement-date">최근 정산일</span>
+                    <span class="header-item status">상태</span>
+                    <span class="header-item action">정산</span>
+                </div>
+
+                <div id="shop-settlement-list" class="shop-settlement-list">
+                    <!-- Thymeleaf가 서버에서 받은 settlementList를 여기에 렌더링 -->
+                    <div th:each="settlement : ${settlementList}" class="shop-settlement-item" 
+                         th:data-store-id="${settlement.storeId}" th:data-store-clcln-id="${settlement.storeClclnId}">
+                        <input type="checkbox" class="settle-checkbox item-cell checkbox-col" 
+                               th:data-store-id="${settlement.storeId}"
+                               th:data-store-clcln-id="${settlement.storeClclnId}"
+                               th:data-total-sales="${settlement.totSelAmt}"
+                               th:data-commission-rate="${settlement.selFeeRt}"
+                               th:data-payable-amount="${settlement.clclnAmt}"
+                               th:disabled="${settlement.clclnSttsCd == '판매정산완료'}">
+                        <span class="item-cell shop-name" th:text="${settlement.storeNm}"></span>
+                        <span class="item-cell sales-amount" th:text="${#numbers.formatDecimal(settlement.totSelAmt, 0, 'COMMA', 0, 'POINT') + '원'}"></span>
+                        <span class="item-cell commission-amount" th:text="${#numbers.formatDecimal(settlement.totSelAmt - settlement.clclnAmt, 0, 'COMMA', 0, 'POINT') + '원'}"></span>
+                        <span class="item-cell payable-amount" th:text="${#numbers.formatDecimal(settlement.clclnAmt, 0, 'COMMA', 0, 'POINT') + '원'}"></span>
+                        <span class="item-cell last-settlement-date" th:text="${settlement.clclnPrcsYmd != null ? #temporals.format(settlement.clclnPrcsYmd, 'yyyy.MM.dd') : '없음'}"></span>
+							<span class="item-cell status" 
+							      th:classappend="${settlement.clclnSttsCd == '판매정산대기'} ? 'pending' : (settlement.clclnSttsCd == '판매정산완료' ? 'completed' : '')" 
+							      th:text="${settlement.clclnSttsCd == '판매정산대기' ? '정산대기' : (settlement.clclnSttsCd == '판매정산완료' ? '정산완료' : settlement.clclnSttsCd)}"></span>
+                        <span class="item-cell action">
+                            <button class="settle-single-button" 
+                                    th:data-store-id="${settlement.storeId}" th:data-store-clcln-id="${settlement.storeClclnId}"
+                                    th:disabled="${settlement.clclnSttsCd == '판매정산완료'}">
+                                <span>정산하기</span>
+                            </button>
+                            <button class="view-history-button" th:data-store-id="${settlement.storeId}">내역보기</button>
+                        </span>
                     </div>
                 </div>
-                <div class="d-flex">
-                    <select class="custom-select custom-select-sm mr-2" style="width: 150px;">
-                        <option selected>최신 가입일순</option>
-                        <option value="1">오래된 가입일순</option>
-                    </select>
-                    <select class="custom-select custom-select-sm" style="width: 120px;">
-                        <option value="1">15개씩 보기</option>
-                        <option selected>30개씩 보기</option>
-                        <option value="2">50개씩 보기</option>
-                        <option value="3">100개씩 보기</option>
-                    </select>
+
+                <div class="no-data" id="no-settlement-data-message" th:if="${#lists.isEmpty(settlementList)}">
+                    <p>정산할 상점 데이터가 없습니다.</p>
+                </div>
+
+                <div class="settlement-summary">
+                    <span class="summary-label">총 정산 예정액:</span>
+                    <span class="summary-value" id="total-payable-amount">0원</span>
+                    <button class="batch-settle-button" id="batch-settle-button" th:disabled="${#lists.isEmpty(settlementList)}">선택 정산하기</button>
                 </div>
             </div>
 
-            <table class="table table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th><div class="form-check"><input class="form-check-input" type="checkbox" id="checkAllRows"></div></th>
-                        <th>ID</th>
-                        <th>이름</th>
-                        <th>성별</th>
-                        <th>이메일</th>
-                        <th>휴대폰 번호</th>
-                        <th>주소</th>
-                        <th>상태</th>
-                        <th>가입 일자</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- ▼▼▼ 2. 체크박스 중앙 정렬 및 컬럼 개수 수정 ▼▼▼ -->
-                    <tr>
-                        <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
-                        <td>user01</td>
-                        <td>김성주</td>
-                        <td>남</td>
-                        <td>sungju@test.com</td>
-                        <td>010-1111-1111</td>
-                        <td>서울시 강남구</td>
-                        <td>활동중</td>
-                        <td>2024-05-21</td>
-                    </tr>
-                    <tr>
-                        <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
-                        <td>user02</td>
-                        <td>정성훈</td>
-                        <td>남</td>
-                        <td>seanghun@test.com</td>
-                        <td>010-2222-2222</td>
-                        <td>경기도 성남시</td>
-                        <td>휴면</td>
-                        <td>2024-05-20</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <nav class="d-flex justify-content-center mt-4" aria-label="Page navigation">
-                <ul class="pagination">
-                    <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">다음</a></li>
-                </ul>
-            </nav>
+            <div class="settlement-history-panel" id="settlement-history-panel" style="display:none;">
+                <h2 class="panel-title">
+                    <span id="history-shop-name"></span> 정산 내역 
+                    <button class="close-history-button" id="close-history-button"><i class="fas fa-times"></i></button>
+                </h2>
+                <div class="history-list-header">
+                    <span class="header-item history-date">정산일</span>
+                    <span class="header-item history-amount">정산 금액</span>
+                    <span class="header-item history-status">상태</span>
+                </div>
+                <div id="settlement-history-detail-list" class="settlement-history-detail-list">
+                    </div>
+                <div class="no-history" id="no-individual-history-message" style="display: none;">
+                    <p>해당 상점의 정산 내역이 없습니다.</p>
+                </div>
+            </div>
         </div>
     </div>
-</main>
-	 </th:block>	
+  		        <!-- 페이지네이션 -->
+	            <nav class="mt-4" aria-label="Page navigation" th:if="${pagination.totalRecordCount > 0}">
+				    <ul class="pagination justify-content-center">
+				        <!-- 이전 블록으로 이동 -->
+				        <li class="page-item" th:if="${pagination.existPrevBlock}">
+				            <a class="page-link page-num" 
+                               th:href="@{/adminpage/storeadmin/settlementDetailByStore(currentPage=${pagination.startPage - 1}, pageSize=${pagination.recordSize})}" 
+                               aria-label="Previous">
+				                <span aria-hidden="true">&laquo;</span>
+				            </a>
+				        </li>
+				        
+				        <!-- 페이지 번호 -->
+				        <li class="page-item" th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+				            th:classappend="${page == pagination.currentPage} ? 'active' : ''">
+				            <a class="page-link page-num" 
+                               th:href="@{/adminpage/storeadmin/settlementDetailByStore(currentPage=${page}, pageSize=${pagination.recordSize})}" 
+                               th:text="${page}"></a>
+				        </li>
+				        
+				        <!-- 다음 블록으로 이동 -->
+				        <li class="page-item" th:if="${pagination.existNextBlock}">
+				            <a class="page-link page-num" 
+                               th:href="@{/adminpage/storeadmin/settlementDetailByStore(currentPage=${pagination.endPage + 1}, pageSize=${pagination.recordSize})}" 
+                               aria-label="Next">
+				                <span aria-hidden="true">&raquo;</span>
+				            </a>
+				        </li>
+				    </ul>
+				</nav>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const shopSettlementList = document.getElementById('shop-settlement-list');
+            const totalPayableAmountElement = document.getElementById('total-payable-amount');
+            const batchSettleButton = document.getElementById('batch-settle-button');
+            const noSettlementDataMessage = document.getElementById('no-settlement-data-message');
+            
+            const settlementHistoryPanel = document.getElementById('settlement-history-panel');
+            const historyShopName = document.getElementById('history-shop-name');
+            const settlementHistoryDetailList = document.getElementById('settlement-history-detail-list');
+            const closeHistoryButton = document.getElementById('close-history-button');
+            const noIndividualHistoryMessage = document.getElementById('no-individual-history-message');
+
+            // 서버에서 전달받은 데이터 (Thymeleaf 인라인)
+            // 초기 렌더링은 Thymeleaf가 담당하므로, JavaScript에서 이 변수를 직접 사용하지 않고
+            // DOM에서 데이터를 읽어오는 방식으로 변경합니다.
+            // let settlementList = /*[[${settlementList}]]*/ []; 
+            const paginationNav = document.querySelector('.pagination'); // 페이지네이션 nav 요소
+
+            function formatCurrency(number) {
+                return parseFloat(number).toLocaleString('ko-KR') + '원';
+            }
+
+            // 총 정산 예정액 계산 및 업데이트
+            function updateOverallTotalPayable() {
+                let totalPayable = 0;
+                // 현재 DOM에 렌더링된 항목들을 기준으로 계산
+                document.querySelectorAll('.shop-settlement-item').forEach(item => {
+                    const status = item.querySelector('.status').textContent.trim(); // 상태 텍스트 가져오기
+                    if (status === '정산대기') { // '정산대기' 상태인 경우에만 합산
+                        const payableAmountText = item.querySelector('.payable-amount').textContent;
+                        const payableAmount = parseFloat(payableAmountText.replace(/원|,/g, '')); // '원'과 ',' 제거 후 숫자로 변환
+                        totalPayable += payableAmount;
+                    }
+                });
+                totalPayableAmountElement.textContent = formatCurrency(totalPayable);
+            }
+
+            // 초기 로드 시 총 정산 예정액 업데이트
+            updateOverallTotalPayable(); 
+
+            // 개별 정산 버튼 클릭 이벤트 (이벤트 위임)
+            document.querySelector('.shop-settlement-list').addEventListener('click', async (event) => {
+                if (event.target.classList.contains('settle-single-button')) {
+                    const button = event.target;
+                    const storeId = button.dataset.storeId;
+                    const storeClclnId = button.dataset.storeClclnId;
+
+                    if (button.disabled) return;
+
+                    try {
+                        const accountResponse = await fetch(`/adminpage/storeadmin/api/account-details/${storeId}`);
+                        const accountData = await accountResponse.json();
+
+                        let swalTitle = "정산하시겠습니까?";
+                        let swalText = "선택된 상점을 정산 처리합니다. 이 작업은 되돌릴 수 없습니다.";
+
+                        if (accountResponse.ok && accountData) {
+                            swalTitle = `[${accountData.storeId}] ${accountData.bankNm} ${accountData.actno}`;
+                            swalText = "위 계좌 정보로 정산을 진행하시겠습니까? 이 작업은 되돌릴 수 없습니다.";
+                        } else {
+                            console.warn(`상점 ID ${storeId}의 계좌 정보를 가져오지 못했습니다.`);
+                        }
+
+                        Swal.fire({
+                            title: swalTitle,
+                            text: swalText,
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "네, 정산합니다!",
+                            cancelButtonText: "취소"
+                        }).then(async (result) => {
+                            if (result.isConfirmed) {
+                                try {
+                                    const processResponse = await fetch('/adminpage/storeadmin/api/process-single', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ storeClclnId: storeClclnId })
+                                    });
+                                    const processResult = await processResponse.json();
+
+                                    if (processResponse.ok) {
+                                        Swal.fire({ title: "정산 완료!", text: processResult.message, icon: "success" }).then(() => {
+                                            location.reload(); 
+                                        });
+                                    } else {
+                                        Swal.fire({ title: "정산 실패", text: processResult.message, icon: "error" });
+                                    }
+                                } catch (error) {
+                                    console.error('정산 처리 중 오류 발생:', error);
+                                    Swal.fire({ title: "오류 발생", text: "정산 처리 중 네트워크 오류가 발생했습니다.", icon: "error" });
+                                }
+                            }
+                        });
+
+                    } catch (error) {
+                        console.error('계좌 정보 조회 중 오류 발생:', error);
+                        Swal.fire({ title: "오류 발생", text: "계좌 정보를 불러오는 중 오류가 발생했습니다.", icon: "error" });
+                    }
+                } else if (event.target.classList.contains('view-history-button')) {
+                    const storeId = event.target.dataset.storeId;
+                    const storeName = event.target.closest('.shop-settlement-item').querySelector('.shop-name').textContent;
+                    viewSettlementHistory(storeId, storeName);
+                }
+            });
+
+            // 선택 정산 버튼 클릭 이벤트
+            batchSettleButton.addEventListener('click', async () => {
+                const selectedCheckboxes = document.querySelectorAll('.settle-checkbox:checked:not(:disabled)');
+                if (selectedCheckboxes.length === 0) {
+                    Swal.fire({ title: "선택 필요", text: "정산할 상점을 선택해주세요.", icon: "info" });
+                    return;
+                }
+
+                Swal.fire({
+                    title: "일괄 정산하시겠습니까?",
+                    text: `${selectedCheckboxes.length}개의 상점을 일괄 정산 처리합니다. 이 작업은 되돌릴 수 없습니다.`,
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "네, 일괄 정산합니다!",
+                    cancelButtonText: "취소"
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const storeClclnIdsToProcess = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.storeClclnId);
+
+                        try {
+                            const response = await fetch('/adminpage/storeadmin/api/process-batch', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ storeClclnIds: storeClclnIdsToProcess })
+                            });
+                            const processResult = await response.json();
+
+                            if (response.ok) {
+                                Swal.fire({ title: "일괄 정산 완료!", text: processResult.message, icon: "success" }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({ title: "일괄 정산 실패", text: processResult.message, icon: "error" });
+                            }
+                        } catch (error) {
+                            console.error('일괄 정산 처리 중 오류 발생:', error);
+                            Swal.fire({ title: "오류 발생", text: "일괄 정산 처리 중 네트워크 오류가 발생했습니다.", icon: "error" });
+                        }
+                    }
+                });
+            });
+
+            // 정산 내역 보기 함수 (AJAX 호출)
+            async function viewSettlementHistory(storeId, storeName) {
+                historyShopName.textContent = `${storeName}`;
+                historyShopName.setAttribute('data-shop-id', storeId);
+                settlementHistoryDetailList.innerHTML = '';
+                noIndividualHistoryMessage.style.display = 'none';
+                settlementHistoryPanel.style.display = 'block';
+
+                try {
+                    const response = await fetch(`/adminpage/storeadmin/api/history/${storeId}`);
+                    const history = await response.json();
+
+                    if (history.length === 0) {
+                        noIndividualHistoryMessage.style.display = 'block';
+                    } else {
+                        history.forEach(historyItem => {
+                            const statusText = getKoreanStatus(historyItem.clclnSttsCd);
+                            const historyRow = document.createElement('div');
+                            historyRow.classList.add('history-item');
+                            historyRow.innerHTML = `
+                                <span class="item-cell history-date">${historyItem.clclnPrcsYmd || '날짜 없음'}</span>
+                                <span class="item-cell history-amount">${formatCurrency(historyItem.clclnAmt || 0)}</span>
+                                <span class="item-cell history-status ${historyItem.clclnSttsCd === '판매정산완료' ? 'completed' : ''}"> ${statusText}
+                                </span>
+                            `;
+                            settlementHistoryDetailList.appendChild(historyRow);
+                        });
+                    }
+                } catch (error) {
+                    console.error('정산 내역 조회 중 오류 발생:', error);
+                    Swal.fire({ title: "오류 발생", text: "정산 내역을 불러오는 중 오류가 발생했습니다.", icon: "error" });
+                    noIndividualHistoryMessage.style.display = 'block';
+                    noIndividualHistoryMessage.querySelector('p').textContent = '정산 내역을 불러올 수 없습니다.';
+                }
+            }
+
+            // 정산 내역 패널 닫기 버튼
+            closeHistoryButton.addEventListener('click', () => {
+                settlementHistoryPanel.style.display = 'none';
+            });
+            
+            // 페이지네이션 클릭 이벤트 핸들러 추가
+            if (paginationNav) { // paginationNav가 존재할 때만 이벤트 리스너 추가
+                paginationNav.addEventListener('click', (event) => {
+                    if (event.target.classList.contains('page-num')) {
+                        event.preventDefault(); // 기본 링크 동작 방지
+                        const page = event.target.dataset.page;
+                        // 현재 URL에 페이지 번호만 변경하여 페이지를 다시 로드
+                        // 다른 검색 조건이 있다면 함께 전달해야 함 (현재는 페이지 번호만)
+                        window.location.href = `/adminpage/storeadmin/settlementDetailByStore?currentPage=${page}&pageSize=[[${pagination.recordSize}]]`;
+                    }
+                });
+            }
+
+            // DB값이 '판매정산완료'이면 '정산완료'라고 표시
+            // '판매정산대기'이면 '정산대기'라고 표시
+            function getKoreanStatus(statusCode) {
+                if (statusCode === '판매정산대기') {
+                    return '정산대기';
+                } else if (statusCode === '판매정산완료') {
+                    return '정산완료';
+                }
+                return statusCode || '상태 없음';
+            }
+        });
+    </script>
+</th:block>
+</body>
 </html>
