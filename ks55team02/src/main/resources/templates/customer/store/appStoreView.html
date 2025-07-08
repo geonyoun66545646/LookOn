@@ -7,42 +7,32 @@
 </head>
 <body>
     <th:block layout:fragment="contents">
-    
 		   <main class="main">
         	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
         		<div class="container">
         			<h1 class="page-title">상점신청<span>Store</span></h1>
-        		</div><!-- End .container -->
-        	</div><!-- End .page-header -->
-            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        		</div></div><nav aria-label="breadcrumb" class="breadcrumb-nav">
                 <div class="container">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Shop</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Checkout</li>
                     </ol>
-                </div><!-- End .container -->
-            </nav><!-- End .breadcrumb-nav -->
-
-            <div class="page-content">
+                </div></nav><div class="page-content">
             	
 	                <div class="container">
-	                <h2 class="checkout-title">신청 정보</h2><!-- End .checkout-title -->
+	                <h2 class="checkout-title">신청 정보</h2>
 	                <div class="summary" id="cotainer-body">
             			<form action="#">
 		                	<div class="row">
 		                		<div class="col-lg-3">
 	            						<label>신청자 ID</label>
 	            						<div class="user-info" th:text="${userInfo.userLgnId}"></div>
-	            						<!-- <input type="text" class="form-control" readonly="readonly"> -->
 	            						<label>신청자 이름</label>
 	            						<div class="user-info" th:text="${userInfo.userNm}"></div>
-	            						<!-- <input type="text" class="form-control" readonly="readonly"> -->
 	            						<label>신청자 연락처</label>
 	            						<div class="user-info" th:text="${userInfo.telno}"></div>
-	            						<!-- <input type="text" class="form-control" readonly="readonly"> -->
-	            						
-		                				<label>상점 명</label>
+	            						<label>상점 명</label>
 	            						<input type="text" class="form-control">
 
 	            						<label>계약 신청일</label>
@@ -52,8 +42,7 @@
 	            						<input type="text" class="form-control">
 
 	            						
-		                		</div><!-- End .col-lg-9 -->
-		                		<div class="col-lg-3">
+		                		</div><div class="col-lg-3">
 		                			
 		                				<label>매니저 명</label>
 	            						<input type="text" class="form-control">
@@ -63,15 +52,23 @@
 
 	            						<label>매니저 이메일</label>
 	            						<input type="text" class="form-control">
-
-	            						<label>사업장 주소</label>
-	            						<input type="text" class="form-control" required>
-
+	            						
 	            						<label>수수료 비율</label>
 	            						<input type="text" class="form-control" required>
+
+	            						<label>사업장 주소</label>
+											<input type="button" onclick="sample2_execDaumPostcode()" value="우편번호 찾기"><br>
+	            							<input type="text" id="sample2_postcode" placeholder="우편번호">
+											<input type="text" id="sample2_address" placeholder="주소">
+											<input type="text" id="sample2_detailAddress" placeholder="상세주소">
+											
+											
+											<div id="layer">
+											<img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" onclick="closeDaumPostcode()" alt="닫기 버튼">
+											</div>
+
 	            						
-		                		</div><!-- End .col-lg-9 -->
-		                		<aside class="col-lg-6">
+		                		</div><aside class="col-lg-6">
 		                				<div id="table-head">
 		                				<label>첨부 파일</label>
 		                				</div>
@@ -185,35 +182,24 @@
 														</td>
 		                						</tr>
 
-		                						<!-- End .summary-total -->
-		                					</tbody>
-		                				</table><!-- End .table table-summary -->		         										     
-		                				
-		                			
-		                		</aside><!-- End .col-lg-3 -->
-		                	</div><!-- End .row -->
-            			</form>
-	                </div><!-- End .container -->
-	                 <div class="button-wrapper">
-	                <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
-	                	<span class="btn-text">신청 하기</span>
+		                						</tbody>
+		                				</table></aside></div></form>
+	                </div><div class="button-wrapper">
+	                <button type="button" class="btn btn-outline-primary-2 btn-order btn-block" id="submitApplication"> <span class="btn-text">신청 하기</span>
              			<span class="btn-hover-text">신청 하기</span>
             		</button>
             		</div>
 	                </div>
                 
-            </div><!-- End .page-content -->
-        </main><!-- End .main -->
-
-    </th:block>
+            </div></main></th:block>
 
     <th:block layout:fragment="jsFile">
         <script th:src="@{/maincss/assets/js/home_specific.js}"></script>
+        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     </th:block>
 
     <th:block layout:fragment="jsScript">
         <script>
-            // 홈 페이지 전용 JavaScript 코드
             console.log("홈 페이지 스크립트 실행!");
             	
             document.addEventListener('DOMContentLoaded', function(){
@@ -280,6 +266,209 @@
 	            });
 			
             });
+            
+            /* 주소 api */
+             // 우편번호 찾기 화면을 넣을 element
+    var element_layer = document.getElementById('layer');
+
+    function closeDaumPostcode() {
+        // iframe을 넣은 element를 안보이게 한다.
+        element_layer.style.display = 'none';
+    }
+
+    function sample2_execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                var addr = ''; // 주소 변수
+                var extraAddr = ''; // 참고항목 변수
+
+                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+                if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                    addr = data.roadAddress;
+                } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                    addr = data.jibunAddress;
+                }
+
+                // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+                if(data.userSelectedType === 'R'){
+                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                        extraAddr += data.bname;
+                    }
+                    // 건물명이 있고, 공동주택일 경우 추가한다.
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                    if(extraAddr !== ''){
+                        extraAddr = ' (' + extraAddr + ')';
+                    }
+                }
+
+                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                document.getElementById('sample2_postcode').value = data.zonecode;
+                document.getElementById("sample2_address").value = addr;
+                // 커서를 상세주소 필드로 이동한다.
+                document.getElementById("sample2_detailAddress").focus();
+
+                // iframe을 넣은 element를 안보이게 한다.
+                // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+                element_layer.style.display = 'none';
+            },
+            width : '100%',
+            height : '100%',
+            maxSuggestItems : 5
+        }).embed(element_layer);
+
+        // iframe을 넣은 element를 보이게 한다.
+        element_layer.style.display = 'block';
+
+        // iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+        initLayerPosition();
+    }
+
+    // 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+    // resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+    // 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
+    function initLayerPosition(){
+        var width = 300; //우편번호서비스가 들어갈 element의 width
+        var height = 400; //우편번호서비스가 들어갈 element의 height
+        var borderWidth = 5; //샘플에서 사용하는 border의 두께
+
+        // 위에서 선언한 값들을 실제 element에 넣는다.
+        element_layer.style.width = width + 'px';
+        element_layer.style.height = height + 'px';
+        element_layer.style.border = borderWidth + 'px solid';
+        // 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+        element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width)/2 - borderWidth) + 'px';
+        element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height)/2 - borderWidth) + 'px';
+    }
+    
+    // 이메일 유효성 검사 헬퍼 함수
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    /* 통합 유효성 검사 함수 */
+    function validateForm() {
+        // 1. 필수 텍스트 입력 필드 검사
+        const storeName = document.querySelector('input[placeholder="상점 명"]');
+        const contractDate = document.querySelector('input[placeholder="계약 신청일"]');
+        const contractPeriod = document.querySelector('input[placeholder="계약 기간일"]');
+        const managerName = document.querySelector('input[placeholder="매니저 명"]');
+        const managerContact = document.querySelector('input[placeholder="매니저 연락처"]');
+        const managerEmail = document.querySelector('input[placeholder="매니저 이메일"]');
+        const postcode = document.getElementById('sample2_postcode');
+        const address = document.getElementById('sample2_address');
+        const detailAddress = document.getElementById('sample2_detailAddress');
+        const feeRate = document.querySelector('input[placeholder="수수료 비율"]');
+
+        if (!storeName.value.trim()) {
+            alert('상점 명을 입력해주세요.');
+            storeName.focus();
+            return false;
+        }
+        if (!contractDate.value.trim()) {
+            alert('계약 신청일을 입력해주세요.');
+            contractDate.focus();
+            return false;
+        }
+        if (!contractPeriod.value.trim()) {
+            alert('계약 기간일을 입력해주세요.');
+            contractPeriod.focus();
+            return false;
+        }
+        if (!managerName.value.trim()) {
+            alert('매니저 명을 입력해주세요.');
+            managerName.focus();
+            return false;
+        }
+        if (!managerContact.value.trim()) {
+            alert('매니저 연락처를 입력해주세요.');
+            managerContact.focus();
+            return false;
+        }
+        if (!managerEmail.value.trim()) {
+            alert('매니저 이메일을 입력해주세요.');
+            managerEmail.focus();
+            return false;
+        }
+        if (!postcode.value.trim() || !address.value.trim() || !detailAddress.value.trim()) {
+            alert('사업장 주소를 모두 입력해주세요.');
+            postcode.focus(); // 또는 가장 먼저 비어있는 주소 필드에 포커스
+            return false;
+        }
+        if (!feeRate.value.trim()) {
+            alert('수수료 비율을 입력해주세요.');
+            feeRate.focus();
+            return false;
+        }
+
+        // 추가적인 유효성 검사 (예: 이메일 형식, 숫자만 입력 등)
+        if (!isValidEmail(managerEmail.value)) {
+            alert('올바른 이메일 형식을 입력해주세요.');
+            managerEmail.focus();
+            return false;
+        }
+        // 수수료 비율이 숫자인지, 0보다 큰지 검사
+        const parsedFeeRate = parseFloat(feeRate.value);
+        if (isNaN(parsedFeeRate) || parsedFeeRate <= 0) {
+            alert('유효한 수수료 비율을 입력해주세요 (양수만 입력 가능).');
+            feeRate.focus();
+            return false;
+        }
+
+
+        // 2. 필수 첨부파일 검사
+        const requiredFiles = [
+            { id: 'file-upload-1', name: '사업자 등록증' },
+            { id: 'file-upload-2', name: '통신 판매업 신고증' },
+            // { id: 'file-upload-3', name: '판매상품 관련 증빙' }, // 이 파일이 선택 사항이라면 주석 처리
+            { id: 'file-upload-4', name: '주민등록증 사본' },
+            { id: 'file-upload-5', name: '통장 사본' }
+        ];
+
+        for (const fileInfo of requiredFiles) {
+            const fileInput = document.getElementById(fileInfo.id);
+            if (!fileInput || fileInput.files.length === 0) {
+                alert(fileInfo.name + ' 파일을 첨부해주세요.');
+                fileInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+        }
+
+        return true; // 모든 검사를 통과하면 true 반환
+    }
+
+    /* 유효성 검사 이벤트 연결 */
+    document.addEventListener('DOMContentLoaded', function(){
+        // ... (기존 파일 업로드 관련 코드) ...
+
+        // 신청 하기 버튼 클릭 이벤트
+        const submitButton = document.getElementById('submitApplication');
+        if (submitButton) {
+            submitButton.addEventListener('click', function(event) {
+                // 폼 유효성 검사
+                if (!validateForm()) {
+                    event.preventDefault(); // 유효성 검사 실패 시 폼 제출 방지
+                } else {
+                    // 모든 유효성 검사를 통과한 경우
+                    // 여기에 폼 데이터를 서버로 전송하는 AJAX 요청 또는
+                    // 실제 폼 제출 (form.submit()) 로직을 구현합니다.
+                    // 예: document.querySelector('form').submit();
+                    alert('상점 신청이 성공적으로 제출되었습니다!'); // 임시 메시지
+                    // 실제 제출 로직은 여기에 작성 (예: fetch API, jQuery.ajax 등)
+                }
+            });
+        }
+    });
+
         </script>
     </th:block>
 </body>
