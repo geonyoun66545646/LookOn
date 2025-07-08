@@ -162,6 +162,7 @@
 		SELECT
 			p.pst_sn,
 			p.bbs_clsf_cd,
+			p.wrtr_user_no,
 			u.user_ncnm,
 			p.pst_ttl,
 			p.pst_cn,
@@ -184,6 +185,7 @@
 		SELECT
 			pc.pst_cmnt_sn,
 			pc.pst_sn,
+			pc.wrtr_user_no,
 			u.user_ncnm,
 			pc.cmnt_cn,
 			pc.crt_dt
@@ -221,7 +223,7 @@
 		VALUES
 		(#{pstSn},
 		#{bbsClsfCd},
-		'user_no_1',
+		#{wrtrUserNo},
 		#{pstTtl},
 		#{pstCn},
 		0,
@@ -256,7 +258,7 @@
 		VALUES
 		(#{pstCmntSn},
 		#{pstSn},
-		'user_no_1',
+		#{wrtrUserNo},
 		null,
 		#{cmntCn},
 		Now(),

@@ -24,7 +24,7 @@ public class UserInfoApiController {
 	@GetMapping("/me")
 	public ResponseEntity<?> getMyInfo(HttpSession session){
 		
-		LoginUser loginUser = (LoginUser) session.getAttribute("LoginUser");
+		LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
 		
 		// 2. 비로그인 상태인지 확인 (가장 중요한 방어 로직)
         if (loginUser == null) {

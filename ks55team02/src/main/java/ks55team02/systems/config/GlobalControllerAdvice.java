@@ -22,7 +22,16 @@ public class GlobalControllerAdvice {
      */
     @ModelAttribute
     public void addCommonAttributes(Model model, HttpServletRequest request) {
-        model.addAttribute("currentUrl", request.getRequestURI());
+        StringBuffer requestURL = request.getRequestURL();
+        String queryString = request.getQueryString();
+
+        // 쿼리 스트링이 있는 경우에만 URL에 추가합니다.
+        if (queryString != null) {
+            requestURL.append("?").append(queryString);
+        }
+        
+        // 모델에 "currentUrl"이라는 이름으로 완성된 전체 URL을 추가합니다.
+        model.addAttribute("currentUrl", requestURL.toString());
     }
     
     @ExceptionHandler(NoResourceFoundException.class)
