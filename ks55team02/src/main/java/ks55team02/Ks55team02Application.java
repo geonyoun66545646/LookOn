@@ -9,5 +9,6 @@ public class Ks55team02Application {
 	public static void main(String[] args) {
 		SpringApplication.run(Ks55team02Application.class, args);
 	}
+	
 
 }
