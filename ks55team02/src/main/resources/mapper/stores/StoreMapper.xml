@@ -13,8 +13,18 @@
 		<result property="storeLogoImg" column="store_logo_img" />
 		<result property="delPrcrYn" column="del_prcr_yn" />
 	</resultMap>
-
-	<!-- ===================== Queries ===================== -->
+	
+	<select id="getStoreById" parameterType="string" resultMap="storesResultMap">
+	    SELECT
+	        store_id,
+	        store_conm,
+	        store_logo_img
+	    FROM
+	        stores
+	    WHERE
+	        store_id = #{storeId};
+	</select>
+	
 	<select id="getAllStores" resultMap="storesResultMap">
 		/* 모든 브랜드(상점) 목록 조회 */
 		SELECT

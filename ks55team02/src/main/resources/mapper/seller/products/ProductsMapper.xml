@@ -47,7 +47,13 @@
         <result column="min_purchase_qty" property="minPurchaseQty"/>
         <result column="max_purchase_qty" property="maxPurchaseQty"/>
         <result column="ctgry_no" property="ctgryNo"/>
+        <result column="expsr_yn" property="expsrYn"/>
+        <result column="actvtn_yn" property="actvtnYn"/>
 
+		<association property="store"
+                     select="ks55team02.seller.stores.mapper.StoreMapper.getStoreById"
+                     column="store_id" 
+                     javaType="ks55team02.seller.stores.domain.Stores" />
         <association property="productCategory"
                      select="ks55team02.seller.products.mapper.ProductCategoryMapper.getCategoryById"
                      column="ctgry_no" javaType="ks55team02.seller.products.domain.ProductCategory" />
@@ -319,12 +325,15 @@
 		SELECT
 			gds_no,
 			gds_nm,
+			store_id,
 			gds_expln,
             bas_prc,
             dscnt_rt,
             min_purchase_qty,
             max_purchase_qty,
-            ctgry_no
+            ctgry_no,
+            expsr_yn,
+            actvtn_yn
 		FROM
 			products
 		WHERE
