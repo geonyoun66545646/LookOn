@@ -32,13 +32,16 @@ public class CouponsApiController {
 			@RequestParam(value = "sortOrder", required = false, defaultValue = "recent") String sortOrder,
 			@RequestParam(value = "page", defaultValue = "1") int page, HttpSession session) { // 1. HttpSession 파라미터 추가
 
-		// 2. 세션에서 로그인된 사용자 정보 가져오기
-		String userNo = (String) session.getAttribute("LOGIN_ID");
+		// 1. 세션에서 'LoginUser' 객체를 가져옵니다.
+		LoginUser loginUser = (LoginUser) session.getAttribute("LoginUser");
 
-		// 3. 비로그인 사용자 예외 처리
-		if (userNo == null) {
+		// 2. 비로그인 사용자 예외 처리
+		if (loginUser == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
+
+		// 3. LoginUser 객체에서 사용자 번호를 가져옵니다.
+		String userNo = loginUser.getUserNo();
 
 		log.info("API 호출 - 발급 가능 쿠폰 조회: userNo={}, keyword={}, page={}", userNo, keyword, page);
 		CustomerPagination<Coupons> availableCouponsPage = couponsService.getAvailableCoupons(userNo, keyword,
