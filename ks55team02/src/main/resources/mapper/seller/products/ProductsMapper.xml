@@ -39,11 +39,11 @@
 	<!-- 상품 상세 정보 ResultMap (이미지, 옵션, 재고 포함) -->
 	<!-- 상품 상세 정보 최종 ResultMap -->
 	 <resultMap id="productDetailWithImagesResultMap" type="ks55team02.seller.products.domain.Products">
-        <id column="gds_no" property="gdsNo" />
-        <result column="gds_nm" property="gdsNm" />
-        <result column="gds_expln" property="gdsExpln" />
+		<id column="gds_no" property="gdsNo" />
+		<result column="gds_nm" property="gdsNm" />
+		<result column="gds_expln" property="gdsExpln" />
         <result column="bas_prc" property="basPrc" jdbcType="DECIMAL"/>
-        <result column="dscnt_rt" property="dscntRt" />
+		<result column="dscnt_rt" property="dscntRt" />
         <result column="min_purchase_qty" property="minPurchaseQty"/>
         <result column="max_purchase_qty" property="maxPurchaseQty"/>
         <result column="ctgry_no" property="ctgryNo"/>
@@ -51,16 +51,16 @@
         <association property="productCategory"
                      select="ks55team02.seller.products.mapper.ProductCategoryMapper.getCategoryById"
                      column="ctgry_no" javaType="ks55team02.seller.products.domain.ProductCategory" />
-        <collection property="productImages"
+		<collection property="productImages"
                     select="ks55team02.seller.products.mapper.ProductImageMapper.getImagesByGdsNo"
                     column="gds_no" ofType="ks55team02.seller.products.domain.ProductImage" />
-        <collection property="productOptions"
+		<collection property="productOptions"
                     select="ks55team02.seller.products.mapper.ProductOptionMapper.getOptionsByGdsNo"
                     column="gds_no" ofType="ks55team02.seller.products.domain.ProductOption" />
         <collection property="productStatusList"
                     select="ks55team02.seller.products.mapper.ProductStatusMapper.getStatusListByGdsNo"
                     column="gds_no" ofType="ks55team02.seller.products.domain.ProductStatus" />
-    </resultMap>
+	</resultMap>
 	
 	<!-- 판매자별 상품 목록 ResultMap -->
 	<resultMap id="productsResultMap" type="ks55team02.seller.products.domain.Products">
@@ -316,20 +316,20 @@
 	<!-- ProductsMapper.xml -->
 	<!-- 상품 상세 정보 조회 (최종 수정 버전) -->
 	<select id="getProductDetailWithImages" parameterType="String" resultMap="productDetailWithImagesResultMap">
-        SELECT
-            gds_no,
-            gds_nm,
-            gds_expln,
+		SELECT
+			gds_no,
+			gds_nm,
+			gds_expln,
             bas_prc,
             dscnt_rt,
             min_purchase_qty,
             max_purchase_qty,
             ctgry_no
-        FROM
-            products
-        WHERE
-            gds_no = #{gdsNo}
-    </select>
+		FROM
+			products
+		WHERE
+			gds_no = #{gdsNo}
+	</select>
 	
 	
 	<!-- ===================== 유틸리티 쿼리 ===================== -->

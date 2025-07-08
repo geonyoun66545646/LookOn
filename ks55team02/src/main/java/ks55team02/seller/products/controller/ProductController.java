@@ -29,6 +29,8 @@ public class ProductController {
         model.addAttribute("productRegistrationRequest", new ProductRegistrationRequest());
         List<ProductCategory> primaryProductCategories = productCategoryService.getAllTopLevelCategories();
         model.addAttribute("primaryProductCategories", primaryProductCategories);
+        
+        model.addAttribute("isUpdate", false);
         return "seller/products/sellerProductRegistration";
     }
 

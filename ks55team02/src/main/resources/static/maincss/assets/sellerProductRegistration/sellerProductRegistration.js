@@ -95,41 +95,44 @@ $(document).ready(function() {
 
 		// 재고데이터 삽입
 		function populateStockData() {
-		    // 1. 필요한 데이터가 없으면 즉시 종료
 		    if (!productData || !productData.productStatusList || productData.productStatusList.length === 0) {
-		        console.error("수정: 재고 데이터를 채울 수 없습니다. (productStatusList 없음)");
+		        console.log("수정: 기존 재고 데이터가 없습니다.");
 		        return;
 		    }
 		    console.log("수정: 기존 재고 데이터로 테이블을 채웁니다:", productData.productStatusList);
 
-		    // 2. 화면에 그려진 옵션 조합 테이블의 각 행(tr)을 순회
-		    $('#optionCombinationsTableBody tr').each(function() {
-		        const $row = $(this);
+		    $('#optionCombinationsTableBody tr').each(function(index, row) {
+		        const $row = $(row);
+		        const genderInRow = $row.find('input[name$="].optVlNo1"]').val();
+		        const colorInRow = $row.find('input[name$="].optVlNo2"]').val();
+		        const sizeInRow = $row.find('input[name$="].optVlNo3"]').val();
 		        
-		        // 3. 현재 행에서 옵션 값들을 추출하여 정렬된 배열 생성 (예: ['FREE', '남성', '블랙'])
-		        const genderInRow = $row.find('input[name*="optVlNo1"]').val();
-		        const colorInRow = $row.find('input[name*="optVlNo2"]').val();
-		        const sizeInRow = $row.find('input[name*="optVlNo3"]').val();
+		        // 화면에 그려진 조합 배열 생성
 		        const rowOptionNames = [genderInRow, colorInRow, sizeInRow].filter(Boolean).sort();
+		        const rowOptionString = JSON.stringify(rowOptionNames);
 
-		        // 4. 백엔드에서 온 재고 목록(productStatusList)을 순회하며 일치하는 데이터 찾기
+		        // 일치하는 DB 재고 데이터를 찾음
 		        const matchingStatus = productData.productStatusList.find(status => {
-		            // 5. 각 재고(status)에 연결된 옵션 값들의 이름을 추출하여 정렬된 배열 생성
-		            if (!status.mappedOptionValues || status.mappedOptionValues.length === 0) {
-		                return false; // 매핑된 옵션 값이 없으면 비교 대상이 아님
-		            }
-		            const dbOptionNames = status.mappedOptionValues.map(v => v.vlNm).sort();
+		            if (!status.mappedOptionValues || status.mappedOptionValues.length === 0) return false;
 		            
-		            // 6. 화면 조합과 DB 조합이 정확히 일치하는지 비교
-		            return JSON.stringify(rowOptionNames) === JSON.stringify(dbOptionNames);
+		            // DB에서 가져온 옵션 조합 배열 생성
+		            const dbOptionNames = status.mappedOptionValues.map(v => v.vlNm).sort();
+		            const dbOptionString = JSON.stringify(dbOptionNames);
+		            
+		            // ⭐ 디버깅 로그 추가: 비교 과정을 눈으로 확인
+		            if (index === 0) { // 첫 번째 행에 대해서만 로그를 출력하여 콘솔이 너무 지저분해지는 것을 방지
+		                 console.log(`[비교] 화면 조합: ${rowOptionString} vs DB 조합: ${dbOptionString}`);
+		            }
+
+		            return rowOptionString === dbOptionString;
 		        });
 
-		        // 7. 일치하는 재고 데이터를 찾았다면, 재고 수량 입력
 		        if (matchingStatus) {
-		            console.log(`✅ 일치! 화면 조합 [${rowOptionNames.join(', ')}]에 재고 ${matchingStatus.selPsbltyQntty}를 설정합니다.`);
-		            $row.find('input[name*=".quantity"]').val(matchingStatus.selPsbltyQntty);
+		            console.log("✅ 일치! 재고 설정:", rowOptionNames.join(', '), ":", matchingStatus.selPsbltyQntty);
+		            $row.find('input[name$="].quantity"]').val(matchingStatus.selPsbltyQntty);
 		        } else {
-		            console.warn(`⚠️ 불일치. 화면 조합 [${rowOptionNames.join(', ')}]에 해당하는 DB 재고 데이터를 찾지 못했습니다.`);
+		            // ⭐ 디버깅 로그 추가: 왜 불일치했는지 확인
+		            console.warn(`⚠️ 불일치. 화면 조합 ${rowOptionString}에 해당하는 DB 재고 데이터를 찾지 못했습니다.`);
 		        }
 		    });
 		}

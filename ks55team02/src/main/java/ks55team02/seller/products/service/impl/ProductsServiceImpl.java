@@ -7,6 +7,8 @@ import ks55team02.seller.products.mapper.ProductsMapper;
 import ks55team02.seller.products.service.ProductsService;
 import ks55team02.seller.stores.domain.Stores;
 import ks55team02.seller.stores.mapper.StoreMapper;
+import ks55team02.util.FilesUtils;
+import ks55team02.util.FileDetail;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -142,7 +144,9 @@ public class ProductsServiceImpl implements ProductsService {
 		}
     }
 	
-	
+    private final FilesUtils filesUtils; // ⭐ FilesUtils 의존성 주입
+    
+    
 	@Value("${product.upload.dir}")
 	private String uploadDir;
 
