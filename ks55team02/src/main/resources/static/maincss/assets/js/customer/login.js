@@ -3,15 +3,15 @@
  */
 
 $('#login-btn').on('click', (e) => {
-    // 폼의 기본 전송 기능(새로고침)을 막습니다.
     e.preventDefault();
 
+    // [수정 후] 로그인 데이터에 redirectUrl을 포함시킵니다.
     const loginData = {
         userLgnId: $('#login-id').val(),
-        userPswdEncptVal: $('#login-pw').val()
+        userPswdEncptVal: $('#login-pw').val(),
+        redirectUrl: $('#redirectUrl').val() // 숨겨진 필드의 값을 가져와 추가
     };
 
-    // 간단한 유효성 검사
     if (!loginData.userLgnId || !loginData.userPswdEncptVal) {
         alert('아이디와 비밀번호를 모두 입력해주세요.');
         return;
@@ -34,20 +34,20 @@ $('#login-btn').on('click', (e) => {
 	});
 
     $.ajax({
-        url: '/customer/login', // 서버의 로그인 처리 URL
+        url: '/customer/login',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(loginData),
         success: (response) => {
-            console.log(response); // 서버 응답 확인용 로그
+            console.log(response);
             
             if (response.status === 'success') {
                 alert(response.message);
-				const redirectUrl = $('#redirectUrl').val();
-                // 로그인 성공 후 메인 페이지 등으로 이동
-                window.location.href = redirectUrl ? redirectUrl : '/'; 
+                
+                // [수정 후] 서버가 돌려준 redirectUrl을 사용합니다. 없으면 기본값 '/' 사용.
+                window.location.href = response.redirectUrl ? response.redirectUrl : '/';
+
             } else {
-                // 실패 메시지(잠김, 휴면, 불일치 등)를 사용자에게 알림
                 alert(response.message);
             }
         },
