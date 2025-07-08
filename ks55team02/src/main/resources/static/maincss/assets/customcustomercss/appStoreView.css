@@ -128,15 +128,14 @@ input[type="file"] {
     display: inline-block; /* 버튼처럼 보이게 */
     padding: 6px 12px;
     cursor: pointer;
-    background-color: #f0f0f0; /* 배경색 */
-    border: 1px solid #ccc; /* 테두리 */
-    border-radius: 4px; /* 모서리 둥글게 */
-    color: #333; /* 텍스트 색상 */
+    color: #c96;
+    background-image: none;
     font-size: 14px;
     line-height: 20px; /* 텍스트 세로 정렬 */
     text-align: center;
     vertical-align: middle;
     margin: 0;
+    border : 1px solid #c96;
 }
 
 .custom-file-upload:hover {
