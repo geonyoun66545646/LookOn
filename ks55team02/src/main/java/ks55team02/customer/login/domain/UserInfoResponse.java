@@ -33,5 +33,5 @@ public class UserInfoResponse {
 
     // ===== user_security_settings 테이블 정보 =====
     private String lastPswdChgDt; 			// 마지막 비밀번호 변경 일시
-    private Boolean mfa_use_yn;				// 2단계인증 사용 여부
+    private Boolean mfaUseYn;				// 2단계인증 사용 여부
 }
