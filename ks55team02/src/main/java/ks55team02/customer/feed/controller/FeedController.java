@@ -12,4 +12,9 @@ public class FeedController {
 	public String selectFeedList() {
 		return "customer/feed/feedList";
 	}
+	
+	@GetMapping("/feedListByMe")
+	public String selectFeedListByMe() {
+		return "customer/feed/feedListByMe";
+	}
 }
