@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{customer/layout/layoutMain}"> 
+      layout:decorate="~{customer/layout/layoutMain}">
 <head>
     <title>장바구니</title>
 </head>
 <body>
 <th:block layout:fragment="contents">
-    
-    <div class="page-wrapper" >
+
+    <div class="page-wrapper">
 
         <main class="main">
         	<div class="page-header text-center" style="background-image: url('maincss/assets/images/page-header-bg.jpg')">
         		<div class="container">
         			<h1 class="page-title">Shopping Cart<span>Shop</span></h1>
-        		</div><!-- End .container -->
-        	</div><!-- End .page-header -->
+        		</div>
+        	</div>
 
             <nav aria-label="breadcrumb" class="breadcrumb-nav">
                 <div class="container">
@@ -24,8 +24,8 @@
                         <li class="breadcrumb-item"><a href="#">Shop</a></li>
                         <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
                     </ol>
-                </div><!-- End .container -->
-            </nav><!-- End .breadcrumb-nav -->
+                </div>
+            </nav>
 
             <div class="page-content">
             	<div class="cart">
@@ -42,55 +42,8 @@
 								      <th></th>
 								    </tr>
 								  </thead>
-								  <tbody>
-								    <!-- 상품 1 -->
-								    <tr data-price="84.00">
-								      <td class="product-col">
-								        <div class="product">
-								          <figure class="product-media">
-								            <a href="#">
-								              <img src="maincss/assets/images/products/table/product-1.jpg" alt="Product image">
-								            </a>
-								          </figure>
-								          <h3 class="product-title">
-								            <a href="#">Beige knitted elastic runner shoes</a>
-								          </h3>
-								        </div>
-								      </td>
-								      <td class="price-col">84.00</td>
-								      <td class="quantity-col">
-								        <div class="cart-product-quantity">
-								          <input type="number" class="form-control qty-input" value="1" min="1" max="10" step="1" data-decimals="0" required>
-								        </div>
-								      </td>
-								      <td class="total-col item-total">84.00</td>
-								      <td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
-								    </tr>
-								
-								    <!-- 상품 2 -->
-								    <tr data-price="76.00">
-								      <td class="product-col">
-								        <div class="product">
-								          <figure class="product-media">
-								            <a href="#">
-								              <img src="maincss/assets/images/products/table/product-2.jpg" alt="Product image">
-								            </a>
-								          </figure>
-								          <h3 class="product-title">
-								            <a href="#">Blue utility pinafore denim dress</a>
-								          </h3>
-								        </div>
-								      </td>
-								      <td class="price-col">76.00</td>
-								      <td class="quantity-col">
-								        <div class="cart-product-quantity">
-								          <input type="number" class="form-control qty-input" value="1" min="1" max="10" step="1" data-decimals="0" required>
-								        </div>
-								      </td>
-								      <td class="total-col item-total">76.00</td>
-								      <td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
-								    </tr>
-								  </tbody>
+								  <tbody id="cart-body">
+								    </tbody>
 								</table>
 
 	                			<div class="cart-bottom">
@@ -100,14 +53,14 @@
 				        						<input type="text" class="form-control" required placeholder="coupon code">
 				        						<div class="input-group-append">
 													<button class="btn btn-outline-primary-2" type="submit"><i class="icon-long-arrow-right"></i></button>
-												</div><!-- .End .input-group-append -->
-			        						</div><!-- End .input-group -->
+												</div>
+			        						</div>
 			            				</form>
-			            			</div><!-- End .cart-discount -->
+			            			</div>
 
 			            			<a href="#" class="btn btn-outline-dark-2"><span>UPDATE CART</span><i class="icon-refresh"></i></a>
-		            			</div><!-- End .cart-bottom -->
-	                		</div><!-- End .col-lg-9 -->
+		            			</div>
+	                		</div>
 
 	                		<aside class="col-lg-3">
 	                			<div class="summary summary-cart">
@@ -129,30 +82,23 @@
 									<a href="checkout" id="checkoutBtn" class="btn btn-outline-primary-2 btn-order btn-block">
 									  PROCEED TO CHECKOUT
 									</a>
-                                </div><!-- End .summary -->
+                                </div>
 
 		            			<a href="category.html" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
-	                		</aside><!-- End .col-lg-3 -->
-	                	</div><!-- End .row -->
-	                </div><!-- End .container -->
-                </div><!-- End .cart -->
-            </div><!-- End .page-content -->
-        </main><!-- End .main -->
+	                		</aside>
+	                	</div>
+	                </div>
+                </div>
+            </div>
+        </main>
 
-    </div><!-- End .page-wrapper -->
+    </div>
     <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
 
-    <!-- Mobile Menu, Sign In Modal 등은 변경 없이 그대로 유지됩니다 -->
     <div class="mobile-menu-overlay"></div>
-    <div class="mobile-menu-container">
-        <!-- ... mobile menu content ... -->
-    </div>
+    <div class="mobile-menu-container"></div>
+    <div class="modal fade" id="signin-modal" tabindex="-1" role="dialog" aria-hidden="true"></div>
 
-    <div class="modal fade" id="signin-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <!-- ... sign in modal content ... -->
-    </div>
-
-    <!-- Plugins JS File -->
     <script src="maincss/assets/js/jquery.min.js"></script>
     <script src="maincss/assets/js/bootstrap.bundle.min.js"></script>
     <script src="maincss/assets/js/jquery.hoverIntent.min.js"></script>
@@ -160,116 +106,123 @@
     <script src="maincss/assets/js/superfish.min.js"></script>
     <script src="maincss/assets/js/owl.carousel.min.js"></script>
     <script src="maincss/assets/js/bootstrap-input-spinner.js"></script>
-    <!-- Main JS File -->
     <script src="maincss/assets/js/main.js"></script>
 
-    <!-- [최종 수정] 장바구니 관련 모든 JavaScript 로직을 여기에 통합 -->
     <script>
         $(document).ready(function() {
-    
-            // --- 모든 장바구니 관련 로직을 이 안에 통합 ---
-    
-            // 1. 총액 계산 및 화면 업데이트 함수
-            function updateCartView() {
+            // 가격 포맷팅 함수 (예: 10000 -> 10,000)
+            function formatPrice(price) {
+                return price.toLocaleString('ko-KR');
+            }
+
+            // 1. 세션 스토리지에서 장바구니 데이터 가져오기
+            const cartData = JSON.parse(sessionStorage.getItem('cart_data'));
+            const $tbody = $('#cart-body');
+
+            console.log("불러온 세션 장바구니:", cartData); // ✅ 디버깅용 로그
+
+            // 2. 장바구니 데이터를 기반으로 HTML 동적 생성
+            if (cartData && cartData.products && cartData.products.length > 0) {
+                cartData.products.forEach(product => {
+                    const itemTotal = product.price * product.quantity;
+                    const newRow = $(`
+                        <tr data-price="${product.price}" data-id="${product.id}">
+                            <td class="product-col">
+                                <div class="product">
+                                    <figure class="product-media">
+                                        <a href="#"><img src="${product.image}" alt="Product image" style="width: 60px; height: auto;"></a>
+                                    </figure>
+                                    <h3 class="product-title">
+                                        <a href="#">${product.name}</a>
+                                    </h3>
+                                </div>
+                            </td>
+                            <td class="price-col">₩${formatPrice(product.price)}</td>
+                            <td class="quantity-col">
+                                <div class="cart-product-quantity">
+                                    <input type="number" class="form-control qty-input" value="${product.quantity}" min="1" max="10" step="1" required>
+                                </div>
+                            </td>
+                            <td class="total-col item-total">₩${formatPrice(itemTotal)}</td>
+                            <td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
+                        </tr>
+                    `);
+                    $tbody.append(newRow);
+                });
+            } else {
+                $tbody.append(`<tr><td colspan="5" class="text-center">장바구니에 담긴 상품이 없습니다.</td></tr>`);
+            }
+
+            // 3. 장바구니 총액 계산 및 업데이트 함수
+            function updateCartTotals() {
                 let subtotal = 0;
-    
-                // 모든 상품 행(tr)을 순회하며 계산
-                $('table.table-cart tbody tr').each(function() {
+                // 화면의 각 상품 row를 순회하며 총액 계산
+                $('table.table-cart tbody tr[data-id]').each(function() {
                     const $row = $(this);
                     const unitPrice = parseFloat($row.data('price')) || 0;
                     const quantity = parseInt($row.find('.qty-input').val()) || 0;
-    
                     const itemTotal = unitPrice * quantity;
-                    $row.find('.item-total').text('₩' + itemTotal.toFixed(2));
+
+                    // 개별 상품 합계 업데이트
+                    $row.find('.item-total').text('₩' + formatPrice(itemTotal));
                     subtotal += itemTotal;
                 });
-    
-                // 계산된 최종 금액을 화면에 표시
-                $('#subtotal_amount').text(subtotal.toFixed(2));
-                $('#final_total_amount').text(subtotal.toFixed(2));
+
+                // 최종 합계 업데이트
+                $('#subtotal_amount').text(formatPrice(subtotal));
+                $('#final_total_amount').text(formatPrice(subtotal));
             }
-    
-            // 2. 체크아웃 버튼 클릭 시 sessionStorage에 데이터 저장 함수
-            function saveCartDataToSession() {
-                const products = [];
-                let subtotal = 0;
-    
-                $('table.table-cart tbody tr').each(function() {
+
+            // 4. 세션 스토리지 데이터 업데이트 함수
+            function updateSessionStorage() {
+                const currentCartData = JSON.parse(sessionStorage.getItem('cart_data')) || { products: [] };
+                const updatedProducts = [];
+
+                $('table.table-cart tbody tr[data-id]').each(function() {
                     const $row = $(this);
-                    const productName = $row.find('.product-title a').text().trim();
-                    const unitPrice = parseFloat($row.data('price')) || 0;
-                    const quantity = parseInt($row.find('.qty-input').val()) || 0;
-                    
-                    // [핵심 수정] 상품명과 수량이 모두 유효할 때만 배열에 추가
-                    if (productName && quantity > 0) {
-                        const itemTotal = unitPrice * quantity;
-                        
-                        products.push({
-                            name: productName,
-                            price: unitPrice,
-                            quantity: quantity,
-                            total: itemTotal
-                        });
-    
-                        subtotal += itemTotal;
+                    const id = $row.data('id');
+                    const quantity = parseInt($row.find('.qty-input').val());
+
+                    // 현재 cartData.products 배열에서 해당 id를 가진 상품을 찾아서 업데이트
+                    // `productDetailCart.js`에서 저장할 때 id에 상품명, 색상, 사이즈를 모두 포함하여 고유하게 만들었기 때문에
+                    // 여기서는 단순히 id로 찾으면 됩니다.
+                    const product = currentCartData.products.find(p => p.id === id);
+                    if (product) {
+                        product.quantity = quantity;
+                        updatedProducts.push(product);
                     }
                 });
-    
-                // 상품이 하나라도 있을 때만 sessionStorage에 저장
-                if (products.length > 0) {
-                    const cartData = {
-                        products: products,
-                        subtotal: subtotal.toFixed(2),
-                        total: subtotal.toFixed(2) // 현재는 할인/배송비가 없으므로 동일
-                    };
-                    sessionStorage.setItem('cart_data', JSON.stringify(cartData));
-                    console.log("세션에 저장된 데이터:", cartData);
-                    return true; // 저장 성공
-                } else {
-                    alert("장바구니에 상품이 없습니다.");
-                    return false; // 저장 실패
-                }
+
+                currentCartData.products = updatedProducts;
+                sessionStorage.setItem('cart_data', JSON.stringify(currentCartData));
+                console.log("세션 스토리지 업데이트 완료:", currentCartData);
             }
-    
-            // --- 3. 이벤트 리스너 설정 ---
-    
-            // 페이지 로드 시 즉시 총액 계산
-            updateCartView();
-    
-            // 수량 변경 시 총액 다시 계산
-            // .on()을 사용하여 동적으로 추가/삭제되는 요소에도 이벤트가 적용되도록 함
-            $('tbody').on('change input', '.qty-input', function() {
-                updateCartView();
+
+
+            // 5. 이벤트 핸들러 (수량 변경, 상품 삭제)
+            $tbody.on('change input', '.qty-input', function() {
+                updateCartTotals();
+                updateSessionStorage(); // 수량 변경 시 세션 스토리지 업데이트
             });
-    
-            // 삭제 버튼 클릭 시
-            $('tbody').on('click', '.btn-remove', function() {
+
+            $tbody.on('click', '.btn-remove', function() {
                 $(this).closest('tr').remove();
-                updateCartView();
-            });
-    
-            // 체크아웃 버튼 클릭 시
-            $('#checkoutBtn').on('click', function(event) {
-                // saveCartDataToSession 함수를 호출하고, 성공했을 때만 페이지 이동
-                if (!saveCartDataToSession()) {
-                    event.preventDefault(); // 데이터 저장에 실패하면 페이지 이동을 막음
+                updateCartTotals();
+                updateSessionStorage(); // 상품 삭제 시 세션 스토리지 업데이트
+
+                // 장바구니가 비었는지 확인 후 메시지 표시
+                if ($('table.table-cart tbody tr[data-id]').length === 0) {
+                     $tbody.html(`<tr><td colspan="5" class="text-center">장바구니에 담긴 상품이 없습니다.</td></tr>`);
                 }
             });
-    
+
+            // 페이지 최초 로드 시 총액 계산 실행
+            updateCartTotals();
         });
     </script>
-    
 </th:block>
 
-<th:block layout:fragment="jsFile">
-</th:block>
-
-<th:block layout:fragment="jsScript">
-    <!-- <script>
-        // 홈 페이지 전용 JavaScript 코드
-        console.log("홈 페이지 스크립트 실행!");
-    </script> -->
-</th:block>
-
+<th:block layout:fragment="jsFile"></th:block>
+<th:block layout:fragment="jsScript"></th:block>
 </body>
 </html>

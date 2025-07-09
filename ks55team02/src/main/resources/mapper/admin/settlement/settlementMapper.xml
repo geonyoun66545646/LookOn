@@ -70,7 +70,7 @@
                         AND ss.store_clcln_id LIKE CONCAT('%', #{searchValue}, '%')
                     </when>
                     <when test="searchKey == 'clclnSttsCd'">
-                        AND ss.clcln_stts_cd LIKE CONCAT('%', #{searchValue}, '%')
+                        AND ss.clcln_stts_cd = #{searchValue}
                     </when>
                     <when test="searchKey == 'storeNm'">
                         AND s.store_conm LIKE CONCAT('%', #{searchValue}, '%')
@@ -122,7 +122,7 @@
                         AND ss.store_clcln_id LIKE CONCAT('%', #{searchValue}, '%')
                     </when>
                     <when test="searchKey == 'clclnSttsCd'">
-                        AND ss.clcln_stts_cd LIKE CONCAT('%', #{searchValue}, '%')
+                        AND ss.clcln_stts_cd = #{searchValue}
                     </when>
                     <when test="searchKey == 'storeNm'">
                         AND s.store_conm LIKE CONCAT('%', #{searchValue}, '%')
@@ -143,7 +143,15 @@
             </if>
         </where>
         ORDER BY
-            ss.clcln_prcs_ymd DESC, ss.store_clcln_id DESC LIMIT #{offset}, #{pageSize}
+            -- ⭐ 이 부분이 핵심입니다. 정산 상태에 따라 우선순위를 부여합니다.
+            CASE ss.clcln_stts_cd
+                WHEN '판매정산대기' THEN 1
+                WHEN '판매정산완료' THEN 2
+                ELSE 3 -- 그 외 다른 상태가 있다면 이 순서로
+            END,
+            ss.clcln_prcs_ymd DESC, -- 그 다음 정산 처리일 기준 내림차순
+            ss.store_clcln_id DESC -- 마지막으로 정산 ID 기준 내림차순
+        LIMIT #{offset}, #{pageSize}
     </select>
 
     <insert id="insertStoreSettlement" parameterType="ks55team02.admin.adminpage.storeadmin.settlementdetailbystore.domain.StoreSettlementDTO">
@@ -235,7 +243,7 @@
         WHERE
             store_id = #{storeId} AND main_actno_yn = TRUE AND actvtn_yn = TRUE
         LIMIT 1
-    </select>
+    </select>	
 
     <select id="getSettlementHistoryByStoreId" parameterType="string" resultMap="StoreSettlementDTOMap">
         SELECT

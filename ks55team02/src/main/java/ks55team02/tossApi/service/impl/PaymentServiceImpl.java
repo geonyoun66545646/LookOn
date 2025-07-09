@@ -34,7 +34,41 @@ public class PaymentServiceImpl implements PaymentService {
         // TODO: 이 부분에 orderData Map을 OrderDTO로 변환하여
         //       Mapper를 통해 DB의 orders, order_items 테이블에 INSERT하는 로직을 구현해야 합니다.
         log.info("saveOrder 서비스 호출. orderId: {}", orderData.get("ordrNo"));
-        log.warn("<<<<< saveOrder: 실제 DB 저장 로lic 구현이 필요합니다. >>>>>");
+
+        // orders 테이블에 데이터 삽입 (PaymentMapper.xml에 insertOrder 쿼리 필요)
+        // 예시:
+        // paymentMapper.insertOrder(orderData); // orderData 맵을 직접 넘기거나 DTO로 변환하여 넘깁니다.
+
+        // order_items 테이블에 데이터 삽입 (PaymentMapper.xml에 insertOrderItem 쿼리 필요)
+        // orderData.get("products") 등으로 상품 목록을 가져와 반복문을 돌며 저장
+        // List<Map<String, Object>> products = (List<Map<String, Object>>) orderData.get("products");
+        // if (products != null) {
+        //     for (Map<String, Object> product : products) {
+        //         product.put("ordrNo", orderData.get("ordrNo")); // 주문 상품에도 주문번호 설정
+        //         paymentMapper.insertOrderItem(product); // 각 상품 정보를 저장
+        //     }
+        // }
+
+        // 여기에 DB 저장 로직을 실제 구현해야 합니다. (Mapper 호출)
+        // 예시:
+        Map<String, Object> order = new HashMap<>();
+        order.put("ordrNo", orderData.get("ordrNo"));
+        order.put("totalAmount", orderData.get("totalAmount"));
+        order.put("userNo", orderData.get("userNo")); // 사용자 ID가 orderData에 있어야 함
+        order.put("orderStatus", "ORDER_COMPLETED"); // 주문 상태 코드
+        order.put("orderDate", ZonedDateTime.now(ZoneId.of("Asia/Seoul"))); // 현재 시간
+        
+        // paymentMapper.insertOrder(order); // 주문 테이블에 삽입하는 Mapper 메소드 호출
+        log.info("주문 데이터 저장 로직 구현 필요: {}", order);
+
+        List<Map<String, Object>> products = (List<Map<String, Object>>) orderData.get("products");
+        if (products != null) {
+            for (Map<String, Object> product : products) {
+                product.put("ordrNo", orderData.get("ordrNo"));
+                // paymentMapper.insertOrderItem(product); // 주문 상품 테이블에 삽입하는 Mapper 메소드 호출
+                log.info("주문 상품 데이터 저장 로직 구현 필요: {}", product);
+            }
+        }
     }
     
     
@@ -60,9 +94,29 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String createOrder(Map<String, Object> orderData) {
-        // ... 주문 생성 로직 구현 ...
-        log.info("createOrder 구현 필요");
-        return "order_" + UUID.randomUUID().toString().replace("-", ""); // 임시 주문 ID 생성
+        log.info("PaymentService.createOrder 호출. 받은 데이터: {}", orderData);
+
+        // ★★★ 주문번호(ordrNo) 서버에서 생성 ★★★
+        String ordrNo = UUID.randomUUID().toString(); // 고유한 주문번호 생성 예시
+        orderData.put("ordrNo", ordrNo); // 생성된 주문번호를 orderData에 추가
+
+        // 사용자 번호 (userNo)는 로그인된 사용자 세션에서 가져와야 할 수 있습니다.
+        // 현재 orderData에 userNo가 없다면, 클라이언트에서 보내주거나
+        // 서버에서 사용자 인증 정보를 통해 가져와서 orderData에 추가해야 합니다.
+        // 예시: String userNo = (String) session.getAttribute("userNo");
+        // orderData.put("userNo", userNo);
+
+        // ★★★ orderData에서 필요한 정보를 추출하여 OrderDTO 등으로 변환 후 DB에 저장 ★★★
+        // 이전에 언급된 saveOrder 메소드를 활용하거나 여기에 직접 구현합니다.
+        try {
+            saveOrder(orderData); // 주문 정보 및 상품 목록을 DB에 저장하는 로직 호출
+            log.info("주문번호 {}로 주문 생성 및 DB 저장 완료.", ordrNo);
+        } catch (Exception e) {
+            log.error("주문번호 {} DB 저장 중 오류 발생: {}", ordrNo, e.getMessage(), e);
+            throw new RuntimeException("주문 저장 중 오류 발생", e); // 예외 다시 던지기
+        }
+
+        return ordrNo; // 생성된 주문번호 반환
     }
 
     @Override

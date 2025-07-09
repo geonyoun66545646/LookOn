@@ -1,496 +1,715 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/layout/layoutMain}"> 
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{customer/layout/layoutMain}">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>관리자 - 정산 관리</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        /* 모든 요소에 box-sizing 적용 */
-        * {
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>결제 확인</title>
+<meta name="keywords" content="HTML5 Template">
+<meta name="description" content="Molla - Bootstrap eCommerce Template">
+<meta name="author" content="p-themes">
 
-        /* 기존 CSS는 그대로 유지하고, 필요에 따라 추가/수정합니다. */
-        /* 예시: 상태별 색상 */
-        .status.pending { color: #d9534f; font-weight: bold; } /* 정산대기 */
-        .status.completed { color: #5cb85c; } /* 정산완료 */
-        
-        .settlement-list-header, .shop-settlement-item, .history-list-header, .history-item {
-            display: flex;
-            align-items: center; /* 세로 중앙 정렬 */
-            padding: 10px 15px;
-            border-bottom: 1px solid #eee;
-            background-color: #fff;
-            justify-content : space-between;
-        }
-        .settlement-list-header {
-            font-weight: bold;
-            background-color: #f8f8f8;
-            border-top: 1px solid #ddd;
-        }
-        .shop-settlement-item:nth-child(even) {
-            background-color: #f9f9f9;
-        }
+<!-- Toss Payments SDK (head 최상단에 위치) -->
+<script src="https://js.tosspayments.com/v1"></script>
 
-        /* 각 컬럼의 너비를 일관되게 정의 */
-        .header-item, .item-cell {
-            text-align: center;
-            padding: 5px;
-            flex-grow: 0; /* 기본적으로 확장하지 않음 */
-            flex-shrink: 0; /* 기본적으로 축소하지 않음 */
-            /* 각 컬럼의 flex-basis와 max-width를 정확히 일치시킴 */
-        }
+<link
+	href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+	rel="stylesheet">
 
-        /* 체크박스 컬럼 - 고정 너비 */
-        .header-item.checkbox-col, .item-cell.checkbox-col {
-            flex-basis: 40px; 
-            max-width: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .settle-checkbox {
-            margin: 0; /* 기본 마진 제거 */
-        }
+<!-- 카카오 우편번호 서비스 -->
+<script
+	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-        /* 상점명 컬럼 */
-        .header-item.shop-name, .item-cell.shop-name { 
-            flex-basis: 180px; 
-            max-width: 180px;
-        }
+<style>
+/* 요청하신 배송지 폼을 위한 전용 스타일 */
+.address-form-wrapper {
+	width: 100%;
+	max-width: 600px;
+	margin: 0 auto;
+	border: 1px solid #e9e9e9;
+	padding: 20px;
+	border-radius: 5px;
+}
 
-        /* 금액 관련 컬럼 */
-        .header-item.sales-amount, .item-cell.sales-amount,
-        .header-item.commission-amount, .item-cell.commission-amount,
-        .header-item.payable-amount, .item-cell.payable-amount { 
-            flex-basis: 120px; 
-            max-width: 120px;
-        }
+.address-form-group {
+	display: flex;
+	align-items: center;
+	margin-bottom: 12px;
+}
 
-        /* 날짜 컬럼 */
-        .header-item.last-settlement-date, .item-cell.last-settlement-date { 
-            flex-basis: 100px; 
-            max-width: 100px;
-        }
+.address-form-group label {
+	width: 140px;
+	flex-shrink: 0;
+	font-size: 1.4rem;
+	font-weight: 500;
+	color: #333;
+	margin-bottom: 0;
+}
 
-        /* 상태 컬럼 */
-        .header-item.status, .item-cell.status { 
-            flex-basis: 80px; 
-            max-width: 80px;
-        }
+.address-form-group .form-control {
+	height: 40px;
+}
 
-        /* 액션 버튼 컬럼 */
-        .header-item.action, .item-cell.action { 
-            flex-basis: 160px; 
-            max-width: 160px;
-            text-align: center; 
-            display: flex; 
-            justify-content: center; /* 버튼들을 오른쪽으로 정렬 */
-            align-items: center;
-            gap: 5px; /* 버튼 간 간격 */
-        }
-        
-        .settle-single-button, .view-history-button, .batch-settle-button, .close-history-button {
-            padding: 5px 10px;
-            /* margin-left: 5px; -> action에 gap으로 대체 */
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
-        }
-        .settle-single-button { background-color: #007bff; color: white; }
-        .settle-single-button:disabled { background-color: #cccccc; cursor: not-allowed; }
-        .view-history-button { background-color: #6c757d; color: white; }
-        .batch-settle-button { background-color: #28a745; color: white; margin-left: 15px; }
-        .close-history-button { background-color: #dc3545; color: white; border-radius: 50%; width: 30px; height: 30px; display: inline-flex; justify-content: center; align-items: center; font-size: 16px; }
-        
-        .settlement-summary {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 15px;
-            border-top: 1px solid #ddd;
-            background-color: #f0f0f0;
-            font-weight: bold;
-        }
-        .summary-label { margin-right: 10px; }
-        .summary-value { font-size: 1.2em; color: #007bff; }
+.address-form-group .input-group {
+	display: flex;
+	flex-grow: 1;
+}
 
-        .settlement-history-panel {
-            border: 1px solid #ddd;
-            padding: 20px;
-            margin-top: 30px;
-            background-color: #fdfdfd;
-        }
-        .settlement-history-panel .panel-title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .settlement-history-panel .panel-title span { margin-right: auto; }
-        .history-item .item-cell { flex: 1; text-align: center; }
-        .history-item .item-cell.history-date { flex: 1.5; }
-        .history-item .item-cell.history-amount { flex: 1.2; }
-        .history-item .item-cell.history-status { flex: 1; }
+.address-form-group .input-group .form-control {
+	flex: 1 1 auto;
+}
 
-        .no-data, .no-history {
-            text-align: center;
-            padding: 20px;
-            color: #999;
-        }
-    </style>
-</head>
-<body>
-<th:block layout:fragment="contents">
-    <div class="page-container">
-        <h1 class="page-title">정산 관리</h1>
-        <p class="page-subtitle">상점들의 판매 수수료를 정산하고 내역을 관리합니다.</p>
+.address-form-group .input-group span {
+	padding: 0 10px;
+	color: #ccc;
+}
 
-        <div class="content-wrapper">
-            <div class="settlement-panel">
-                <h2 class="panel-title">정산 대상 상점 목록</h2>
-                
-                <div class="settlement-list-header">
-                    <span class="header-item checkbox-col"></span> <span class="header-item shop-name">상점명</span>
-                    <span class="header-item sales-amount">총 판매액</span>
-                    <span class="header-item commission-amount">수수료</span>
-                    <span class="header-item payable-amount">정산 예정액</span>
-                    <span class="header-item last-settlement-date">최근 정산일</span>
-                    <span class="header-item status">상태</span>
-                    <span class="header-item action">정산</span>
+.address-form-group .btn-search-postcode {
+	margin-left: 10px;
+	white-space: nowrap;
+	background-color: #f8f9fa;
+	border-color: #dee2e6;
+	height: 40px; /* 수정: 입력창과 높이를 동일하게 설정 */
+}
+
+#address-entry-form .form-group {
+	margin-bottom: 1rem;
+}
+</style>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const registerAddressBtn = document.getElementById('register-address-btn');
+            const addressDisplay = document.getElementById('address-display');
+            const originalAddressDisplayContent = addressDisplay.innerHTML; // 초기 상태 저장
+
+            // 주소 입력 폼을 표시하는 함수
+            function showAddressForm() {
+                addressDisplay.innerHTML = `
+                <div class="address-form-wrapper">
+                    <form id="address-entry-form">
+                        <div class="address-form-group">
+                            <label for="shipping-name">배송지명</label>
+                            <div class="input-group">
+                                <input type="text" id="shipping-name" class="form-control">
+                            </div>
+                        </div>                    
+                        <div class="address-form-group">
+                            <label for="postcode">배송지 *</label>
+                            <div class="input-group">
+                                <input type="text" id="postcode" class="form-control" readonly style="max-width: 120px;">
+                                <button type="button" id="search-postcode-btn" class="btn btn-search-postcode">우편번호 검색</button>
+                            </div>
+                        </div>
+                        <div class="address-form-group">
+                            <label></label>
+                            <div class="input-group">
+                                <input type="text" id="main-address" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="address-form-group">
+                            <label>상세주소 *</label>
+                            <div class="input-group">
+                                <input type="text" id="detail-address" class="form-control" placeholder="상세주소 입력">
+                            </div>
+                        </div>
+                        <div class="address-form-group">
+                            <label for="phone1-1">연락처1 *</label>
+                            <div class="input-group">
+                                <input type="tel" id="phone1-1" class="form-control" maxlength="3">
+                                <span>-</span>
+                                <input type="tel" id="phone1-2" class="form-control" maxlength="4">
+                                <span>-</span>
+                                <input type="tel" id="phone1-3" class="form-control" maxlength="4">
+                            </div>
+                        </div>
+                        <div class="address-form-group">
+                            <label for="phone2-1">연락처2</label>
+                            <div class="input-group">
+                                <input type="tel" id="phone2-1" class="form-control" maxlength="3">
+                                <span>-</span>
+                                <input type="tel" id="phone2-2" class="form-control" maxlength="4">
+                                <span>-</span>
+                                <input type="tel" id="phone2-3" class="form-control" maxlength="4">
+                            </div>
+                        </div>
+                        <div class="address-form-group">
+                            <label></label>
+                            <div class="input-group">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="set-default-address">
+                                    <label class="custom-control-label" for="set-default-address">기본배송지로 등록</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="address-form-group">
+                           <label></label>
+                           <div class="input-group">
+                                <select id="delivery-request" class="form-control">
+                                    <option value="">배송시 요청사항을 선택해 주세요</option>
+                                    <option value="부재시 경비실에 맡겨주세요">부재시 경비실에 맡겨주세요</option>
+                                    <option value="부재시 전화 또는 문자 주세요">부재시 전화 또는 문자 주세요</option>
+                                    <option value="배송 전 연락주세요">배송 전 연락주세요</option>
+                                    <option value="택배함에 넣어주세요">택배함에 넣어주세요</option>
+                                    <option value="파손위험 상품, 배송 주의해주세요">파손위험 상품, 배송 주의해주세요</option>
+                                </select>
+                           </div>
+                        </div>
+                        <div class="text-center" style="margin-top: 20px;">
+                            <button type="button" id="save-address-btn" class="btn btn-primary">저장</button>
+                            <button type="button" id="cancel-address-btn" class="btn btn-light" style="margin-left: 10px;">취소</button>
+                        </div>
+                    </form>
                 </div>
+                `;
+                addressDisplay.classList.remove('address-content-placeholder');
 
-                <div id="shop-settlement-list" class="shop-settlement-list">
-                    <div th:each="settlement : ${settlementList}" class="shop-settlement-item" th:data-store-id="${settlement.storeId}" th:data-store-clcln-id="${settlement.storeClclnId}">
-                        <input type="checkbox" class="settle-checkbox item-cell checkbox-col" 
-                               th:data-store-id="${settlement.storeId}"
-                               th:data-store-clcln-id="${settlement.storeClclnId}"
-                               th:data-total-sales="${settlement.totSelAmt}"
-                               th:data-commission-rate="${settlement.selFeeRt}"
-                               th:data-payable-amount="${settlement.clclnAmt}"
-                               th:disabled="${settlement.clclnSttsCd == 'CLCL_COMPLETED'}"> <span class="item-cell shop-name" th:text="${settlement.storeNm}"></span>
-                        <span class="item-cell sales-amount" th:text="${#numbers.formatDecimal(settlement.totSelAmt, 0, 'COMMA', 0, 'POINT') + '원'}"></span>
-                        <span class="item-cell commission-amount" th:text="${#numbers.formatDecimal(settlement.totSelAmt - settlement.clclnAmt, 0, 'COMMA', 0, 'POINT') + '원'}"></span>
-                        <span class="item-cell payable-amount" th:text="${#numbers.formatDecimal(settlement.clclnAmt, 0, 'COMMA', 0, 'POINT') + '원'}"></span>
-                        <span class="item-cell last-settlement-date" th:text="${settlement.clclnPrcsYmd != null ? #temporals.format(settlement.clclnPrcsYmd, 'yyyy.MM.dd') : '없음'}"></span>
-                        <span class="item-cell status" 
-                              th:classappend="${settlement.clclnSttsCd == 'CLCL_WAITING'} ? 'pending' : (${settlement.clclnSttsCd == 'CLCL_COMPLETED'} ? 'completed' : '')"
-                              th:text="${settlement.clclnSttsCd == 'CLCL_WAITING' ? '정산대기' : (settlement.clclnSttsCd == 'CLCL_COMPLETED' ? '정산완료' : settlement.clclnSttsCd)}"></span> <span class="item-cell action">
-                            <button class="settle-single-button" 
-                                    th:data-store-id="${settlement.storeId}" th:data-store-clcln-id="${settlement.storeClclnId}"
-                                    th:disabled="${settlement.clclnSttsCd == 'CLCL_COMPLETED'}">
-                                <span>정산하기</span>
-                            </button>
-                            <button class="view-history-button" th:data-store-id="${settlement.storeId}">내역보기</button>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="no-data" id="no-settlement-data-message" th:if="${#lists.isEmpty(settlementList)}">
-                    <p>정산할 상점 데이터가 없습니다.</p>
-                </div>
-
-                <div class="settlement-summary">
-                    <span class="summary-label">총 정산 예정액:</span>
-                    <span class="summary-value" id="total-payable-amount">0원</span>
-                    <button class="batch-settle-button" id="batch-settle-button" th:disabled="${#lists.isEmpty(settlementList)}">선택 정산하기</button>
-                </div>
-            </div>
-
-            <div class="settlement-history-panel" id="settlement-history-panel" style="display:none;">
-                <h2 class="panel-title">
-                    <span id="history-shop-name"></span> 정산 내역 
-                    <button class="close-history-button" id="close-history-button"><i class="fas fa-times"></i></button>
-                </h2>
-                <div class="history-list-header">
-                    <span class="header-item history-date">정산일</span>
-                    <span class="header-item history-amount">정산 금액</span>
-                    <span class="header-item history-status">상태</span>
-                </div>
-                <div id="settlement-history-detail-list" class="settlement-history-detail-list">
-                    </div>
-                <div class="no-history" id="no-individual-history-message" style="display: none;">
-                    <p>해당 상점의 정산 내역이 없습니다.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', () => {
-            const shopSettlementList = document.getElementById('shop-settlement-list');
-            const totalPayableAmountElement = document.getElementById('total-payable-amount');
-            const batchSettleButton = document.getElementById('batch-settle-button');
-            const noSettlementDataMessage = document.getElementById('no-settlement-data-message');
-            
-            const settlementHistoryPanel = document.getElementById('settlement-history-panel');
-            const historyShopName = document.getElementById('history-shop-name');
-            const settlementHistoryDetailList = document.getElementById('settlement-history-detail-list');
-            const closeHistoryButton = document.getElementById('close-history-button');
-            const noIndividualHistoryMessage = document.getElementById('no-individual-history-message');
-
-            // 서버에서 전달받은 데이터 (Thymeleaf 인라인)
-            const settlementList = /*[[${settlementList}]]*/ []; 
-
-            function formatCurrency(number) {
-                return parseFloat(number).toLocaleString('ko-KR') + '원';
-            }
-
-            // 상태 코드를 한글로 변환하는 헬퍼 함수
-            function getKoreanStatus(statusCode) {
-                if (statusCode === 'CLCL_WAITING') {
-                    return '정산대기';
-                } else if (statusCode === 'CLCL_COMPLETED') {
-                    return '정산완료';
-                }
-                return statusCode || '상태 없음'; // 알 수 없는 코드는 그대로 반환하거나 '상태 없음'
-            }
-
-            // 총 정산 예정액 계산 및 업데이트
-            function updateOverallTotalPayable() {
-                let totalPayable = 0;
-                settlementList.forEach(settlement => {
-                    // 'CLCL_WAITING' 상태인 경우에만 총 정산 예정액에 합산
-                    if (settlement.clclnSttsCd === 'CLCL_WAITING') {
-                        totalPayable += parseFloat(settlement.clclnAmt); 
-                    }
+                // 폼 내부 버튼들에 이벤트 리스너 추가
+                document.getElementById('search-postcode-btn').addEventListener('click', execDaumPostcode);
+                document.getElementById('save-address-btn').addEventListener('click', saveAddress);
+                document.getElementById('cancel-address-btn').addEventListener('click', () => {
+                    addressDisplay.innerHTML = originalAddressDisplayContent;
+                    addressDisplay.classList.add('address-content-placeholder');
                 });
-                totalPayableAmountElement.textContent = formatCurrency(totalPayable);
             }
 
-            // 상점 목록 렌더링 (서버 데이터 사용)
-            function renderShopList() {
-                if (settlementList.length === 0) {
-                    noSettlementDataMessage.style.display = 'block';
-                    batchSettleButton.disabled = true;
-                } else {
-                    noSettlementDataMessage.style.display = 'none';
-                    // 초기 로드 시 체크박스 선택 여부와 관계없이 버튼 활성화
-                    batchSettleButton.disabled = false; 
-                }
-                updateOverallTotalPayable();
-            }
+            // 카카오 우편번호 API 실행 함수
+            function execDaumPostcode() {
+                new daum.Postcode({
+                    oncomplete: function(data) {
+                        let fullAddress = data.address;
+                        let extraAddress = '';
 
-         	// 개별 정산 버튼 클릭 이벤트
-            shopSettlementList.addEventListener('click', async (event) => {
-                if (event.target.classList.contains('settle-single-button')) {
-                    const button = event.target;
-                    const storeId = button.dataset.storeId; // storeId 가져오기
-                    const storeClclnId = button.dataset.storeClclnId;
-
-                    // 이미 정산완료된 항목은 클릭 불가 (disabled 속성으로도 제어됨)
-                    if (button.disabled) return;
-
-                    try {
-                        // 1. 계좌 정보 가져오기
-                        const accountResponse = await fetch(`/adminpage/storeadmin/api/account-details/${storeId}`);
-                        const accountData = await accountResponse.json();
-
-                        let swalTitle = "정산하시겠습니까?";
-                        let swalText = "선택된 상점을 정산 처리합니다. 이 작업은 되돌릴 수 없습니다.";
-
-                        if (accountResponse.ok && accountData) {
-                            // 상점 ID 제거하고 '계좌번호 : ' 추가 (사용자 요청 반영)
-                            swalTitle = `${accountData.bankNm} <br> 계좌번호 :  ${accountData.actno}`; 
-                            swalText = "위 계좌 정보로 정산을 진행하시겠습니까? 이 작업은 되돌릴 수 없습니다.";
-                        } else {
-                            // 계좌 정보가 없거나 가져오기 실패 시 일반 메시지
-                            console.warn(`상점 ID ${storeId}의 계좌 정보를 가져오지 못했습니다.`);
+                        if (data.addressType === 'R') {
+                            if (data.bname !== '') { extraAddress += data.bname; }
+                            if (data.buildingName !== '') { extraAddress += (extraAddress !== '' ? ', ' + data.buildingName : data.buildingName); }
+                            fullAddress += (extraAddress !== '' ? ' (' + extraAddress + ')' : '');
                         }
-
-                        // 2. SweetAlert2 확인창 띄우기
-                        Swal.fire({
-                            title: swalTitle,
-                            text: swalText,
-                            icon: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#3085d6",
-                            cancelButtonColor: "#d33",
-                            confirmButtonText: "네, 정산합니다!",
-                            cancelButtonText: "취소"
-                        }).then(async (result) => { // SweetAlert2 결과 처리
-                            if (result.isConfirmed) {
-                                try {
-                                    // 3. 정산 처리 API 호출
-                                    const processResponse = await fetch('/adminpage/storeadmin/api/process-single', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            storeClclnId: storeClclnId // storeClclnId만 전송
-                                        })
-                                    });
-                                    const processResult = await processResponse.json();
-
-                                    if (processResponse.ok) {
-                                        Swal.fire({
-                                            title: "정산 완료!",
-                                            text: processResult.message,
-                                            icon: "success"
-                                        }).then(() => {
-                                            location.reload(); // 정산 성공 후 페이지 새로고침
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            title: "정산 실패",
-                                            text: processResult.message,
-                                            icon: "error"
-                                        });
-                                    }
-                                } catch (error) {
-                                    console.error('정산 처리 중 오류 발생:', error);
-                                    Swal.fire({
-                                        title: "오류 발생",
-                                        text: "정산 처리 중 네트워크 오류가 발생했습니다.",
-                                        icon: "error"
-                                    });
-                                }
-                            }
-                        });
-
-                    } catch (error) {
-                        console.error('계좌 정보 조회 중 오류 발생:', error);
-                        Swal.fire({
-                            title: "오류 발생",
-                            text: "계좌 정보를 불러오는 중 오류가 발생했습니다.",
-                            icon: "error"
-                        });
+                        
+                        document.getElementById('postcode').value = data.zonecode;
+                        document.getElementById('main-address').value = fullAddress;
+                        document.getElementById('detail-address').focus();
                     }
-                } else if (event.target.classList.contains('view-history-button')) {
-                    const storeId = event.target.dataset.storeId;
-                    const storeName = event.target.closest('.shop-settlement-item').querySelector('.shop-name').textContent;
-                    viewSettlementHistory(storeId, storeName);
-                }
-            });
-         
-         
-         
-            // 선택 정산 버튼 클릭 이벤트
-            batchSettleButton.addEventListener('click', async () => {
-                const selectedCheckboxes = document.querySelectorAll('.settle-checkbox:checked:not(:disabled)');
-                if (selectedCheckboxes.length === 0) {
-                    Swal.fire({
-                        title: "선택 필요",
-                        text: "정산할 상점을 선택해주세요.",
-                        icon: "info"
-                    });
+                }).open();
+            }
+
+            // 주소 저장 및 요약 표시 함수
+            function saveAddress() {
+                // --- 유효성 검사 ---
+                const postcode = document.getElementById('postcode').value.trim();
+                const detailAddress = document.getElementById('detail-address').value.trim();
+                const phone1_1 = document.getElementById('phone1-1').value.trim();
+                const phone1_2 = document.getElementById('phone1-2').value.trim();
+                const phone1_3 = document.getElementById('phone1-3').value.trim();
+
+                if (!postcode || !detailAddress || !phone1_1 || !phone1_2 || !phone1_3) {
+                    alert('필수 항목(*)을 모두 입력해주세요.');
                     return;
                 }
 
-                Swal.fire({
-                    title: "일괄 정산하시겠습니까?",
-                    text: `${selectedCheckboxes.length}개의 상점을 일괄 정산 처리합니다. 이 작업은 되돌릴 수 없습니다.`,
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "네, 일괄 정산합니다!",
-                    cancelButtonText: "취소"
-                }).then(async (result) => {
-                    if (result.isConfirmed) {
-                        const storeClclnIdsToProcess = Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.storeClclnId);
+                // --- 데이터 수집 ---
+                const shippingName = document.getElementById('shipping-name').value.trim();
+                const mainAddress = document.getElementById('main-address').value;
+                const fullAddress = `${mainAddress} ${detailAddress}`;
+                const phone1 = `${phone1_1}-${phone1_2}-${phone1_3}`;
+                const deliveryRequest = document.getElementById('delivery-request').value;
 
-                        try {
-                            const response = await fetch('/adminpage/storeadmin/api/process-batch', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    storeClclnIds: storeClclnIdsToProcess
-                                })
-                            });
-                            const processResult = await response.json();
-
-                            if (response.ok) {
-                                Swal.fire({
-                                    title: "일괄 정산 완료!",
-                                    text: processResult.message,
-                                    icon: "success"
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: "일괄 정산 실패",
-                                    text: processResult.message,
-                                    icon: "error"
-                                });
-                            }
-                        } catch (error) {
-                            console.error('일괄 정산 처리 중 오류 발생:', error);
-                            Swal.fire({
-                                title: "오류 발생",
-                                text: "일괄 정산 처리 중 네트워크 오류가 발생했습니다.",
-                                icon: "error"
-                            });
-                        }
-                    }
-                });
-            });
-
-            // 정산 내역 보기 함수 (AJAX 호출)
-            async function viewSettlementHistory(storeId, storeName) {
-                historyShopName.textContent = `${storeName}`;
-                historyShopName.setAttribute('data-shop-id', storeId);
-                settlementHistoryDetailList.innerHTML = ''; // 기존 내역 초기화
-                noIndividualHistoryMessage.style.display = 'none'; // 메시지 숨김
-                settlementHistoryPanel.style.display = 'block'; // 패널 보이기
-
-                try {
-                    // 변경된 API 엔드포인트
-                    const response = await fetch(`/adminpage/storeadmin/api/history/${storeId}`);
-                    const history = await response.json();
-
-                    if (history.length === 0) {
-                        noIndividualHistoryMessage.style.display = 'block';
-                    } else {
-                        history.forEach(historyItem => {
-                            const statusText = getKoreanStatus(historyItem.clclnSttsCd); // 헬퍼 함수 사용
-
-                            const historyRow = document.createElement('div');
-                            historyRow.classList.add('history-item');
-                            historyRow.innerHTML = `
-                                <span class="item-cell history-date">${historyItem.clclnPrcsYmd || '날짜 없음'}</span>
-                                <span class="item-cell history-amount">${formatCurrency(historyItem.clclnAmt || 0)}</span>
-                                <span class="item-cell history-status ${historyItem.clclnSttsCd === 'CLCL_COMPLETED' ? 'completed' : ''}">
-                                    ${statusText}
-                                </span>
-                            `;
-                            settlementHistoryDetailList.appendChild(historyRow);
-                        });
-                    }
-                } catch (error) {
-                    console.error('정산 내역 조회 중 오류 발생:', error);
-                    Swal.fire({
-                        title: "오류 발생",
-                        text: "정산 내역을 불러오는 중 오류가 발생했습니다.",
-                        icon: "error"
-                    });
-                    noIndividualHistoryMessage.style.display = 'block'; // 오류 시 메시지 표시
-                    noIndividualHistoryMessage.querySelector('p').textContent = '정산 내역을 불러올 수 없습니다.';
-                }
+                // --- 요약 정보 표시 ---
+                addressDisplay.innerHTML = `
+                    <div class="address-info" style="width: 100%; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+                        <p style="margin-bottom: 8px;"><strong>${shippingName || '기본 배송지'}</strong></p>
+                        <p style="margin-bottom: 8px;"><span id="display-recipient"></span> 연락처 :  <span id="display-phone">${phone1}</span></p>
+                        <p style="margin-bottom: 8px;">(<span id="display-postcode">${postcode}</span>) <span id="display-address">${fullAddress}</span></p>
+                        ${deliveryRequest ? `<p style="color: #868e96; margin-bottom: 0;">요청사항: <span id="display-request">${deliveryRequest}</span></p>` : ''}
+                    </div>
+                `;
+                // 버튼 텍스트 변경
+                registerAddressBtn.textContent = '배송지 변경';
             }
 
-            // 정산 내역 패널 닫기 버튼
-            closeHistoryButton.addEventListener('click', () => {
-                settlementHistoryPanel.style.display = 'none';
-            });
-
-            // 초기 렌더링 (페이지 로드 시 데이터가 이미 Thymeleaf에 의해 렌더링되었으므로,
-            // 여기서는 총 정산 예정액 계산 및 버튼 활성화/비활성화만 처리)
-            renderShopList();
+            // '배송지 등록/변경' 버튼의 메인 이벤트 리스너
+            registerAddressBtn.addEventListener('click', showAddressForm);
         });
+	</script>
+
+<script
+	th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey=0ab7f19c8492cbdd75c80c0e6d922e48&libraries=services'}"></script>
+<script>
+	 	// checkout.html 최상단에 추가
+	    if (!sessionStorage.getItem('cart_data')) {
+	      alert("장바구니가 비었습니다!");
+	      window.location.href = '/cart.html'; // 강제 리디렉션
+	    }
     </script>
-</th:block>
+<style>
+/* 기본 스타일 */
+body {
+	font-family: 'Poppins', sans-serif;
+} /* 폰트 적용 */
+.form-group {
+	margin-bottom: 15px;
+}
+
+input[type="text"] {
+	width: 100%;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.checkout-container {
+	width: 100%;
+	max-width: 800px;
+	background-color: #ffffff;
+	border: 1px solid #e9ecef;
+	border-radius: 8px;
+	padding: 24px;
+	box-sizing: border-box;
+}
+
+.section {
+	margin-bottom: 20px;
+}
+
+/* 헤더 (제목과 버튼) */
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.section-header h2 {
+	font-size: 20px;
+	font-weight: bold;
+	margin: 0;
+}
+
+#register-address-btn {
+	font-size: 14px;
+	padding: 8px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+/* 배송지 표시 영역 */
+#address-display {
+	min-height: 100px; /* 내용이 없을 때도 높이 유지 */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 20px;
+	border-radius: 5px;
+}
+
+/* 초기 안내 메시지 스타일 */
+.address-content-placeholder p {
+	margin: 4px 0;
+	color: #868e96;
+	font-size: 15px;
+}
+
+/* 구분선 */
+.divider {
+	border: none;
+	border-top: 1px solid #e9ecef;
+	margin: 24px 0;
+}
+
+.order-product-item {
+	display: flex;
+	align-items: center;
+	padding: 1.5rem 0;
+	border-bottom: 1px solid #e9ecef;
+}
+
+.order-product-item:last-child {
+	border-bottom: none;
+}
+
+.order-product-image {
+	width: 80px;
+	height: 80px;
+	margin-right: 20px;
+}
+
+.order-product-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 4px;
+}
+
+.order-product-details {
+	flex-grow: 1;
+}
+
+.order-product-name {
+	font-weight: 500;
+	font-size: 1.6rem;
+	margin: 0 0 0.5rem 0;
+	color: #333;
+}
+
+.order-product-info {
+	font-size: 1.4rem;
+	color: #666;
+}
+
+.order-product-price {
+	font-size: 1.6rem;
+	font-weight: 600;
+	color: #333;
+	min-width: 100px;
+	text-align: right;
+}
+</style>
+</head>
+
+<body>
+	<th:block layout:fragment="contents">
+		<div class="page-wrapper">
+
+			<main class="main">
+				<div class="page-header text-center"
+					style="background-image: url('maincss/assets/images/page-header-bg.jpg')">
+					<div class="container">
+						<h1 class="page-title">
+							Checkout<span>Shop</span>
+						</h1>
+					</div>
+				</div>
+				<nav aria-label="breadcrumb" class="breadcrumb-nav">
+					<div class="container">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+							<li class="breadcrumb-item"><a href="#">Shop</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Checkout</li>
+						</ol>
+					</div>
+				</nav>
+				<div class="page-content">
+					<div class="checkout">
+						<div class="container">
+							<div class="checkout-discount">
+								<form action="#">
+									<input type="text" class="form-control" required
+										id="checkout-discount-input"> <label
+										for="checkout-discount-input" class="text-truncate">Have
+										a coupon? <span>Click here to enter your code</span>
+									</label>
+								</form>
+							</div>
+
+							<form action="#">
+								<div class="row">
+									<div class="col-lg-9">
+										<div class="checkout-container">
+											<div class="section">
+												<div class="section-header">
+													<h2>배송지</h2>
+													<button type="button" id="register-address-btn"
+														class="btn btn-outline-primary btn-sm">배송지 등록</button>
+												</div>
+												<div id="address-display"
+													class="address-content-placeholder">
+													<p>등록된 배송지가 없습니다.</p>
+													<p>배송지를 등록해 주세요.</p>
+												</div>
+											</div>
+
+											<hr class="divider">
+
+											<div class="section">
+												<div class="section-header">
+													<h2>주문 상품</h2>
+												</div>
+
+												<!-- 주문 상품 목록이 표시될 컨테이너 -->
+												<div id="order-product-list-container">
+													<!-- JavaScript가 여기에 상품 목록을 동적으로 추가할 것입니다. -->
+												</div>
+											</div>
+										</div>
+										<!-- <script src="maincss/assets/js/script.js"></script>   -->
+									</div>
+									<aside class="col-lg-3">
+										<div class="summary">
+											<h3 class="summary-title">Your Order</h3>
+											<table class="table table-summary">
+												<tbody id="checkoutProducts">
+												</tbody>
+												<tbody>
+													<tr class="summary-subtotal">
+														<td>Subtotal:</td>
+														<td id="checkoutSubtotal">₩0</td>
+													</tr>
+													<tr class="summary-total">
+														<td>Total:</td>
+														<td id="checkoutTotal">₩0</td>
+													</tr>
+												</tbody>
+											</table>
+
+											<div id="payment-section" style="margin-bottom: 20px;"></div>
+											<button id="payment-button" type="button"
+												class="btn btn-outline-primary-2 btn-order btn-block">
+												<span class="btn-text">Place Order</span> <span
+													class="btn-hover-text">Proceed to Checkout</span>
+											</button>
+
+										</div>
+									</aside>
+								</div>
+							</form>
+
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<button id="scroll-top" title="Back to Top">
+			<i class="icon-arrow-up"></i>
+		</button>
+
+		<div class="mobile-menu-overlay"></div>
+
+		<div class="mobile-menu-container">
+			<div class="mobile-menu-wrapper">
+				<span class="mobile-menu-close"><i class="icon-close"></i></span>
+
+				<form action="#" method="get" class="mobile-search">
+					<label for="mobile-search" class="sr-only">Search</label> <input
+						type="search" class="form-control" name="mobile-search"
+						id="mobile-search" placeholder="Search in..." required>
+					<button class="btn btn-primary" type="submit">
+						<i class="icon-search"></i>
+					</button>
+				</form>
+
+				<nav class="mobile-nav">
+					<ul class="mobile-menu">
+						<li class="active"><a href="index.html">Home</a></li>
+						<li><a href="category.html">Shop</a></li>
+						<li><a href="product.html" class="sf-with-ul">Product</a></li>
+						<li><a href="#">Pages</a></li>
+						<li><a href="blog.html">Blog</a></li>
+						<li><a href="elements-list.html">Elements</a></li>
+					</ul>
+				</nav>
+				<div class="social-icons">
+					<a href="#" class="social-icon" target="_blank" title="Facebook"><i
+						class="icon-facebook-f"></i></a> <a href="#" class="social-icon"
+						target="_blank" title="Twitter"><i class="icon-twitter"></i></a> <a
+						href="#" class="social-icon" target="_blank" title="Instagram"><i
+						class="icon-instagram"></i></a> <a href="#" class="social-icon"
+						target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
+				</div>
+			</div>
+		</div>
+
+		<script src="maincss/assets/js/jquery.min.js"></script>
+		<script src="maincss/assets/js/bootstrap.bundle.min.js"></script>
+		<script src="maincss/assets/js/jquery.hoverIntent.min.js"></script>
+		<script src="maincss/assets/js/jquery.waypoints.min.js"></script>
+		<script src="maincss/assets/js/superfish.min.js"></script>
+		<script src="maincss/assets/js/owl.carousel.min.js"></script>
+		<script src="maincss/assets/js/bootstrap-input-spinner.js"></script>
+		<script src="maincss/assets/js/main.js"></script>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+	        // 1. 장바구니 데이터 가져오기
+	        const cartDataString = sessionStorage.getItem('cart_data');
+	        if (!cartDataString) {
+	            // alert("장바구니가 비어 있습니다.");
+	            // window.location.href = 'cart.html';
+	            return;
+	        }
+	    
+	        const cartData = JSON.parse(cartDataString);
+	        
+	        // cart.html을 거치지 않거나 데이터 일관성이 없을 경우를 대비하여
+	        // products 배열을 기반으로 subtotal과 total을 다시 계산합니다.
+	        let calculatedSubtotal = 0;
+	        cartData.products.forEach(product => {
+	            // 각 상품 항목의 총 가격을 계산합니다. (단가 * 수량)
+	            product.total = (product.price || 0) * (product.quantity || 0); 
+	            calculatedSubtotal += product.total;
+	        });
+
+	        cartData.subtotal = calculatedSubtotal;
+	        cartData.total = calculatedSubtotal; // 배송비 등이 없다면 total도 subtotal과 동일
+	        
+	        // --- "Your Order" 섹션 업데이트 ---
+	        const checkoutProductsTbody = document.getElementById('checkoutProducts');
+	        checkoutProductsTbody.innerHTML = '';
+	        const displayedProducts = cartData.products.slice(0, 2); 
+	    
+	        displayedProducts.forEach(product => {
+	            const row = checkoutProductsTbody.insertRow();
+	            // 이제 product.total은 유효한 숫자입니다.
+	            const formattedTotal = Math.round(product.total).toLocaleString('ko-KR');
+		
+	            row.innerHTML = `
+	                <td>${product.name} × ${product.quantity}</td>
+	                <td>₩${formattedTotal}</td>
+	            `;
+	        });
+	    
+	        // 이제 cartData.subtotal과 cartData.total은 유효한 숫자입니다.
+	        const formattedSubtotal = Math.round(cartData.subtotal).toLocaleString('ko-KR');
+	        const formattedTotal = Math.round(cartData.total).toLocaleString('ko-KR');
+	        
+	        document.getElementById('checkoutSubtotal').textContent = `₩${formattedSubtotal}`;
+	        document.getElementById('checkoutTotal').textContent = `₩${formattedTotal}`;
+		
+	        // --- "주문 상품" 목록 표시 로직 ---
+	        const productListContainer = document.getElementById('order-product-list-container');
+	        if (productListContainer && cartData.products) {
+	            let productListHtml = ''; 
+		
+	            cartData.products.forEach(product => {
+	                // product.total은 이미 위에서 계산되었습니다.
+	                const formattedPrice = Math.round(product.total).toLocaleString('ko-KR');
+		
+	                productListHtml += `
+	                    <div class="order-product-item">
+	                        <div class="order-product-image">
+	                            <img src="${product.image || 'https://via.placeholder.com/80'}" alt="${product.name}">
+	                        </div>
+	                        <div class="order-product-details">
+	                            <h3 class="order-product-name">${product.name}</h3>
+	                            <div class="order-product-info">
+	                                수량: ${product.quantity}개
+	                            </div>
+	                        </div>
+	                        <div class="order-product-price">
+	                            ₩${formattedPrice}
+	                        </div>
+	                    </div>
+	                `;
+	            });
+	            
+	            productListContainer.innerHTML = productListHtml;
+	        }
+	    });
+	</script>
+		<script th:inline="javascript">
+/*<![CDATA[*/
+	
+	document.getElementById("payment-button").addEventListener("click", function() {
+    // 1. 배송지 정보가 제대로 입력되었는지 확인 (저장된 요약 정보 기준)
+    const postcode = document.querySelector('#display-postcode')?.textContent;
+    const address = document.querySelector('#display-address')?.textContent;
+
+    if (!postcode || !address) {
+        alert('배송지를 먼저 등록해주세요.');
+        return;
+    }
+
+    // 2. 서버로 보낼 주문 데이터 조립
+    const cartData = JSON.parse(sessionStorage.getItem('cart_data'));
+    const deliveryRequest = document.getElementById('display-request')?.textContent || '요청사항 없음';
+    const recipientName = document.getElementById('display-recipient')?.textContent;
+    
+    // 상세주소와 기본주소를 분리하기 위한 로직 (더 견고하게 만들 수 있음)
+    const fullAddress = address;
+    // 이 부분은 서버와 어떻게 주소를 주고받을지에 따라 조정이 필요합니다.
+    // 여기서는 전체 주소를 'address'로 보내고 서버에서 분리한다고 가정합니다.
+
+    const orderData = {
+        products: cartData.products,
+        totalAmount: cartData.total,
+        shippingAddress: {
+            postcode: postcode,
+            address: fullAddress, // 전체 주소
+            detailAddress: "", // 서버에서 분리하거나, 별도 필드 필요시 추가 로직 구현
+            deliveryRequest: deliveryRequest
+        },
+        customerName: recipientName
+    };
+
+    // 3. AJAX (fetch)를 사용하여 서버에 주문 정보 전송
+fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('주문 생성에 실패했습니다. 상태 코드: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // 4. 서버로부터 성공 응답 및 주문ID를 받으면 결제 진행
+        if (data.success && data.ordrNo) {
+            // ★★★ 주문 번호 관련 로그 (이전 요청에서 추가) ★★★
+            console.log("서버로부터 받은 응답 데이터:", data);
+            console.log("서버로부터 받은 주문번호 (data.ordrNo):", data.ordrNo);
+
+            const clientKey = 'test_ck_BX7zk2yd8yPpN1PLNlXprx9POLqK';
+            const tossPayments = TossPayments(clientKey);
+
+            const orderName = cartData.products.length > 1
+                ? `${cartData.products[0].name} 외 ${cartData.products.length - 1}건`
+                : cartData.products[0].name;
+
+            // ★★★ 결제 금액 관련 로그 (가장 중요) ★★★
+            console.log("결제 요청 직전 orderData.totalAmount (원본):", orderData.totalAmount);
+            const amountToSend = parseInt(orderData.totalAmount);
+            console.log("결제 요청 직전 amountToSend (parseInt 처리 후):", amountToSend);
+
+            // 중요: amountToSend 값이 유효한지 다시 한번 확인
+            if (isNaN(amountToSend) || amountToSend <= 0) {
+                alert('결제 금액이 유효하지 않습니다. 장바구니나 상품 정보를 다시 확인해주세요.');
+                console.error('유효하지 않은 결제 금액:', amountToSend);
+                return; // 결제 요청을 중단합니다.
+            }
+
+            tossPayments.requestPayment('카드', {
+                amount: amountToSend, // 이제 amountToSend 변수를 사용합니다.
+                ordrNo: data.ordrNo,
+                orderName: orderName,
+                successUrl: window.location.origin + "/payment/success",
+                failUrl: window.location.origin + "/payment/fail",
+                customerName: orderData.customerName
+            })
+            .catch(function (error) {
+                if (error.code === 'USER_CANCEL') {
+                    console.log('사용자가 결제를 취소했습니다.');
+                } else {
+                    console.error("결제 요청 에러:", error);
+                    alert('결제 중 오류가 발생했습니다: ' + error.message); // 에러 메시지를 사용자에게 보여줍니다.
+                }
+            });
+        } else {
+            alert('서버로부터 올바른 주문 정보를 받지 못했습니다. 주문번호가 누락되었을 수 있습니다.');
+            console.error("서버 응답 오류:", data); // 서버 응답 데이터 자체를 출력
+        }
+    })
+    .catch(error => {
+        console.error('주문 생성 AJAX 오류', error);
+        alert('주문 생성 중 오류가 발생했습니다: ' + error.message);
+    });
+    
+    console.log("서버로부터 받은 응답 데이터:", data);
+    console.log("서버로부터 받은 주문번호 (data.ordrNo):", data.ordrNo);
+});
+/*]]>*/
+</script>
+	</th:block>
+
 </body>
+
+
 </html>

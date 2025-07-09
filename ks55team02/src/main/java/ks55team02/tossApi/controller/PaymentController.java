@@ -34,43 +34,35 @@ public class PaymentController {
 	@PostMapping("/api/orders")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> createOrder(@RequestBody Map<String, Object> orderData,
-			HttpSession session) {
-		log.info("주문 생성 요청 수신: {}", orderData);
-		try {
-			// 1. [핵심] 서비스에서 새 ID를 만들지 않고, 프론트에서 보낸 주문번호를 그대로 사용합니다.
-			String orderId = (String) orderData.get("ordrNo");
-			if (orderId == null || orderId.trim().isEmpty()) {
-				throw new IllegalArgumentException("주문번호(ordrNo)가 요청에 포함되지 않았습니다.");
-			}
-			log.info("수신된 주문 ID를 그대로 사용: {}", orderId);
+	        HttpSession session) {
+	    log.info("주문 생성 요청 수신: {}", orderData);
+	    Map<String, Object> response = new HashMap<>(); // 응답 맵 생성
 
-			// 2. 받은 데이터를 DB에 저장하는 서비스 호출 (이 서비스는 ID를 반환하지 않습니다)
-			paymentService.saveOrder(orderData);
+	    try {
+	        // ★★★ 수정: ordrNo를 클라이언트로부터 받지 않고, PaymentService에서 생성하도록 변경 ★★★
+	        // paymentService.createOrder 메소드가 이제 생성된 ordrNo를 반환하도록 합니다.
+	        String ordrNo = paymentService.createOrder(orderData); // orderData만 서비스로 전달
 
-			// 3. 상품 목록을 세션에 저장
-			if (orderData.containsKey("products") && orderData.get("products") instanceof List) {
-				List<Map<String, Object>> products = (List<Map<String, Object>>) orderData.get("products");
-				// 세션 키는 프론트에서 넘어온 orderId를 사용합니다.
-				session.setAttribute(orderId + "_products", products);
-				log.info("'{}'에 해당하는 상품 목록을 세션에 저장했습니다.", orderId);
-			} else {
-				log.warn("요청 데이터에 'products' 목록이 없습니다. 세션에 저장하지 못했습니다.");
-			}
+	        // 이전에 세션에 상품 목록을 저장하는 로직이 있었다면, 이제 생성된 ordrNo를 사용하도록 업데이트
+	        // 예시: session.setAttribute(ordrNo + "_products", orderData.get("products"));
+	        // (세션 사용 방식에 따라 정확한 로직은 달라질 수 있습니다.)
 
-			// 4. 수신했던 주문 ID를 그대로 다시 프론트로 반환합니다.
-			Map<String, Object> responseBody = new HashMap<>();
-			responseBody.put("success", true);
-			responseBody.put("orderId", orderId);
+	        response.put("success", true);
+	        response.put("ordrNo", ordrNo); // 생성된 주문번호를 클라이언트에 반환
+	        log.info("주문 생성 성공. 주문번호: {}", ordrNo);
+	        return new ResponseEntity<>(response, HttpStatus.OK);
 
-			return ResponseEntity.ok(responseBody);
-
-		} catch (Exception e) {
-			log.error("주문 생성 중 오류 발생", e);
-			Map<String, Object> errorBody = new HashMap<>();
-			errorBody.put("success", false);
-			errorBody.put("message", "주문 생성 중 서버 오류가 발생했습니다: " + e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorBody);
-		}
+	    } catch (IllegalArgumentException e) {
+	        log.error("주문 생성 중 필수 파라미터 누락 또는 유효하지 않은 값: {}", e.getMessage());
+	        response.put("success", false);
+	        response.put("message", e.getMessage());
+	        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	    } catch (Exception e) {
+	        log.error("주문 생성 중 오류 발생", e);
+	        response.put("success", false);
+	        response.put("message", "주문 생성에 실패했습니다: " + e.getMessage());
+	        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 	}
 
 	/**
@@ -83,6 +75,8 @@ public class PaymentController {
 		try {
 			// 1. 결제 승인 로직 실행
 			log.info("실제 결제 승인 로직 실행. PaymentKey: {}", paymentKey);
+			// paymentService.confirmTossPayment 메소드는 실제 Toss API와 통신하여 결제를 승인하고,
+			// 결제 상세 정보를 Map 형태로 반환해야 합니다.
 			Map<String, Object> paymentDetails = paymentService.confirmTossPayment(paymentKey, orderId, amount);
 
 			// 2. 세션에서 상품 목록 가져오기
@@ -93,21 +87,22 @@ public class PaymentController {
 				List<Map<String, Object>> orderedProducts = (List<Map<String, Object>>) sessionData;
 				model.addAttribute("orderedProducts", orderedProducts);
 				log.info("세션에서 상품 목록 조회 성공. Key: {}", sessionKey);
-				session.removeAttribute(sessionKey);
+				session.removeAttribute(sessionKey); // 세션에서 상품 목록 제거
 			} else {
-				log.warn("세션에서 상품 목록을 찾을 수 없습니다. Key: {}.", sessionKey);
+				log.warn("세션에서 상품 목록을 찾을 수 없습니다. Key: {}. 이 경우 DB에서 주문 상세 내역을 조회해야 합니다.", sessionKey);
+				// TODO: 실제 서비스에서는 세션에 없을 경우 DB에서 주문 상세 내역을 조회하여 모델에 추가해야 합니다.
 			}
 
 			// ★★★ 3. 모델에 "orders" 라는 이름으로 결제 정보를 담습니다. ★★★
 			model.addAttribute("orders", paymentDetails);
 
 			// 4. 결제 완료 페이지로 이동
-			return "customer/fragments/paymentSuccess";
+			return "customer/fragments/paymentSuccess"; // paymentSuccess.html이 렌더링됩니다.
 
 		} catch (Exception e) {
 			log.error("결제 처리 중 오류 발생", e);
 			model.addAttribute("errorMessage", e.getMessage());
-			return "customer/fragments/paymentFail";
+			return "customer/fragments/paymentFail"; // paymentFail.html이 렌더링됩니다.
 		}
 	}
 
