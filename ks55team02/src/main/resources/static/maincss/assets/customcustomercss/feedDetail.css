@@ -1,0 +1,236 @@
+@charset "UTF-8";
+
+/* 피드 상세보기 페이지 전용 CSS */
+
+/* 전체 레이아웃 컨테이너 */
+.feed-detail-container {
+    max-width: 1024px; /* 페이지 너비를 1024px로 확장 */
+    margin: 2rem auto; /* 상하 여백 및 중앙 정렬 */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.feed-post {
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+/* 1. 상단 헤더: 프로필, 팔로우 버튼 */
+.feed-post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-profile .profile-image {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-profile .username {
+    font-weight: 600;
+    font-size: 18px; /* 글씨 크기 확대 (16px -> 17.6px) */
+}
+
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.follow-btn {
+    background-color: #0095f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.follow-btn:hover {
+    background-color: #0077c2;
+}
+
+.more-options-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+}
+.more-options-btn svg {
+    fill: #262626;
+}
+
+/* 2. 메인 이미지 */
+.feed-post-content {
+    position: relative; /* 신체 정보 태그의 기준점 */
+}
+
+.main-feed-image {
+    width: 100%;
+    height: auto;
+    display: block; /* 이미지 하단 여백 제거 */
+}
+
+.user-spec-tag {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: rgba(0, 0, 0, 0.4);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+/* 3. 착용 상품 정보 */
+.tagged-products-section {
+    padding: 12px 16px;
+    border-top: 1px solid #efefef;
+    border-bottom: 1px solid #efefef;
+}
+
+.products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+    cursor: pointer; /* 토글 기능을 암시 */
+}
+
+.products-header .arrow-down {
+    fill: #8e8e8e;
+}
+
+.product-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.product-item {
+    margin-bottom: 10px;
+}
+.product-item:last-child {
+    margin-bottom: 0;
+}
+
+.product-item a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    gap: 15px;
+}
+
+.product-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #efefef;
+}
+
+.product-info {
+    flex-grow: 1; /* 남는 공간을 모두 차지 */
+}
+
+.brand-name {
+    font-size: 1rem; /* 글씨 크기 확대 (14.4px -> 16px) */
+    font-weight: 600;
+}
+.product-name {
+    font-size: 1rem; /* 글씨 크기 확대 */
+    color: #555;
+    margin: 2px 0;
+}
+.price-info .final-price {
+    font-weight: 700;
+    font-size: 1.1rem; /* 가격 강조를 위해 크기 확대 */
+}
+
+.price-info .discount {
+    color: #f04444;
+    font-weight: 700;
+    margin-right: 8px;
+}
+
+/* 4. 하단 푸터: 인터랙션 버튼, 좋아요, 해시태그 등 */
+.feed-post-footer {
+    padding: 8px 16px 16px 16px;
+}
+
+.interaction-buttons {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.interaction-buttons button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.interaction-buttons svg {
+    width: 24px;
+    height: 24px;
+}
+
+.like-count {
+    font-weight: 600;
+    font-size: 14px; /* 글씨 크기 확대 */
+    margin: 0 0 8px 0;
+}
+.hashtags {
+    margin: 8px 0;
+    color: #00376b;
+    font-size: 13px; /* 글씨 크기 확대 */
+    line-height: 1.5;
+}
+
+.hashtags a {
+    color: inherit;
+    text-decoration: none;
+    margin-right: 5px;
+}
+.hashtags a:hover {
+    text-decoration: underline;
+}
+
+.comment-input-area {
+    margin: 12px 0;
+}
+
+.comment-input {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #dbdbdb;
+    padding: 8px 0;
+    background-color: transparent;
+    font-size: 14px; /* 입력창 글씨 크기 설정 */
+}
+.comment-input:focus {
+    outline: none;
+    border-bottom: 1px solid #a8a8a8;
+}
+
+.post-timestamp {
+    font-size: 13px;
+    color: #8e8e8e;
+    text-transform: uppercase;
+    margin: 0;
+}
