@@ -29,7 +29,7 @@ public class StoreController {
 	
 	private String getCurrentUserId(HttpSession session) {
 		// 실제 구현에서는 세션에서 현재 로그인된 사용자의 ID를 가져와야 합니다.
-		return "user_no_180"; // 예시
+		return "user_no_185"; // 예시
 	}
 	
 	
