@@ -21,6 +21,9 @@
 		<result column="actvtn_yn" property="actvtnYn" />
 		<result column="crt_dt" property="crtDt" />
 		<result column="mdfcn_dt" property="mdfcnDt" />
+		<result column="issue_condition_type"
+			property="issueConditionType" />
+		<result column="reissue_cycle" property="reissueCycle" />
 	</resultMap>
 
 	<resultMap id="userCouponsResultMap"
@@ -41,6 +44,7 @@
 			<result column="min_ordr_amt" property="minOrdrAmt" />
 			<result column="max_dscnt_amt" property="maxDscntAmt" />
 			<result column="vld_end_dt" property="vldEndDt" />
+			<result column="vld_bgng_dt" property="vldBgngDt" />
 		</association>
 	</resultMap>
 
@@ -48,38 +52,33 @@
 	<select id="getAvailableCoupons" parameterType="map"
 		resultMap="couponsResultMap">
 		SELECT
-		pblcn_cpn_id, cpn_nm, dscnt_vl, min_ordr_amt, max_dscnt_amt, vld_end_dt,
-		vld_bgng_dt, crt_dt
+		pblcn_cpn_id, cpn_nm, dscnt_vl,
+		min_ordr_amt, max_dscnt_amt,
+		vld_end_dt, vld_bgng_dt,
+		crt_dt, issue_condition_type,
+		reissue_cycle
 		FROM
 		coupons c
 		WHERE
 		c.actvtn_yn = 1
-		AND c.pblcn_cpn_id NOT IN (SELECT pblcn_cpn_id FROM user_coupons WHERE
-		user_no = #{userNo})
 		<if test="keyword != null and keyword != ''">
 			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
 		</if>
 		ORDER BY
 		<choose>
+			<when test="'recommended'.equals(sortOrder)">c.vld_end_dt ASC</when>
 			<when test="'expiry'.equals(sortOrder)">c.vld_end_dt ASC</when>
-			<when test="'rate'.equals(sortOrder)">c.dscnt_vl DESC</when>
-
-			<when test="'recommended'.equals(sortOrder)">c.vld_bgng_dt DESC</when>
 			<when test="'recent'.equals(sortOrder)">c.vld_bgng_dt DESC</when>
-
-			<otherwise>c.vld_bgng_dt DESC</otherwise>
+			<when test="'rate'.equals(sortOrder)">c.dscnt_vl DESC</when>
+			<otherwise>c.vld_end_dt ASC</otherwise>
 		</choose>
 		LIMIT #{limit} OFFSET #{offset}
 	</select>
 
 	<select id="getAvailableCouponsCount" parameterType="map"
 		resultType="int">
-		/* 발급 가능한 쿠폰의 전체 개수 조회 */
 		SELECT COUNT(*) FROM coupons
-		WHERE actvtn_yn =
-		1
-		AND pblcn_cpn_id NOT IN (SELECT pblcn_cpn_id FROM user_coupons WHERE
-		user_no = #{userNo})
+		WHERE actvtn_yn = 1
 		<if test="keyword != null and keyword != ''">
 			AND cpn_nm LIKE CONCAT('%', #{keyword}, '%')
 		</if>
@@ -92,11 +91,15 @@
 		uc.user_cpn_id, uc.user_no,
 		uc.pblcn_cpn_id, uc.use_yn,
 		uc.cpn_give_dt, c.vld_end_dt, c.cpn_nm,
-		c.dscnt_vl, c.min_ordr_amt, c.max_dscnt_amt
+		c.dscnt_vl, c.min_ordr_amt, c.max_dscnt_amt,
+		c.vld_bgng_dt,
+		uc.indiv_expry_dt
 		FROM
 		user_coupons uc
 		JOIN
-		coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+		coupons c ON uc.pblcn_cpn_id
+		=
+		c.pblcn_cpn_id
 		WHERE
 		uc.user_no =
 		#{userNo}
@@ -105,10 +108,11 @@
 		</if>
 		ORDER BY
 		<choose>
-			<when test="'expiry'.equals(sortOrder)">c.vld_end_dt ASC</when>
-			<when test="'rate'.equals(sortOrder)">c.dscnt_vl DESC</when>
+			<when test="'recommended'.equals(sortOrder)">uc.indiv_expry_dt ASC</when>
+			<when test="'expiry'.equals(sortOrder)">uc.indiv_expry_dt ASC</when>
 			<when test="'recent'.equals(sortOrder)">uc.cpn_give_dt DESC</when>
-			<otherwise>c.vld_end_dt ASC</otherwise>
+			<when test="'rate'.equals(sortOrder)">c.dscnt_vl DESC</when>
+			<otherwise>uc.indiv_expry_dt ASC</otherwise>
 		</choose>
 		LIMIT #{limit} OFFSET #{offset}
 	</select>
@@ -151,7 +155,7 @@
 		issu_rsn_src_cn)
 		VALUES
 		(#{userCpnId}, #{userNo},
-		#{pblcnCpnId}, 0, NOW(), #{indivExpryDt}, '사용자 발급')
+		#{pblcnCpnId}, 0, NOW(), #{indivExpryDt}, #{issuRsnSrcCn})
 	</insert>
 
 	<select id="getNextUserCouponId" resultType="String">
@@ -160,71 +164,90 @@
 		3, '0'))
 		FROM user_coupons
 	</select>
-	
+
 	<select id="countUserOrders" resultType="int">
-    SELECT COUNT(*) 
-    FROM orders 
-    WHERE user_no = #{userNo}
-</select>
-	
+		SELECT COUNT(*)
+		FROM
+		orders
+		WHERE user_no = #{userNo}
+	</select>
+
 	<select id="countUserReviews" resultType="int">
-    SELECT COUNT(*) 
-    FROM reviews 
-    WHERE writer_user_no = #{userNo}
-</select>
-	
+		SELECT COUNT(*)
+		FROM
+		product_reviews
+		WHERE prchsr_user_no = #{userNo}
+	</select>
+
 	<select id="countMonthlyIssuedReviewCoupons" resultType="int">
-    SELECT COUNT(*) 
-    FROM user_coupons 
-    WHERE user_no = #{userNo}
-      AND pblcn_cpn_id = #{couponId}
-      AND issu_rsn_src_cn = 'REVIEW'
-      AND DATE_FORMAT(cpn_give_dt, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
-</select>
-	
+		SELECT
+		COUNT(*)
+		FROM user_coupons
+		WHERE user_no = #{userNo}
+		AND pblcn_cpn_id =
+		#{couponId}
+		AND issu_rsn_src_cn = 'REVIEW'
+		AND DATE_FORMAT(cpn_give_dt,
+		'%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+	</select>
+
 	<select id="isBirthdayWeek" resultType="boolean">
-    SELECT CASE 
-        WHEN DATE_FORMAT(NOW(), '%m-%d') 
-             BETWEEN DATE_FORMAT(DATE_SUB(u.birth_date, INTERVAL 3 DAY), '%m-%d') 
-                 AND DATE_FORMAT(DATE_ADD(u.birth_date, INTERVAL 3 DAY), '%m-%d') 
-        THEN TRUE ELSE FALSE END AS is_in_birthday_week
-    FROM users u
-    WHERE u.user_no = #{userNo}
-</select>
-	
+		SELECT CASE
+		WHEN
+		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-', DATE_FORMAT(u.user_brdt,
+		'%m-%d')), '%Y-%m-%d'))) &lt;= 3
+		OR
+		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()) - 1, '-', DATE_FORMAT(u.user_brdt,
+		'%m-%d')), '%Y-%m-%d'))) &lt;= 3
+		OR
+		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()) + 1, '-', DATE_FORMAT(u.user_brdt,
+		'%m-%d')), '%Y-%m-%d'))) &lt;= 3
+		THEN TRUE
+		ELSE FALSE
+		END AS is_in_birthday_week
+		FROM users u
+		WHERE u.user_no = #{userNo}
+	</select>
+
 	<select id="countIssuedBirthdayCouponThisYear" resultType="int">
-    SELECT COUNT(*) 
-    FROM user_coupons 
-    WHERE user_no = #{userNo}
-      AND pblcn_cpn_id = #{couponId}
-      AND issu_rsn_src_cn = 'BIRTHDAY'
-      AND YEAR(cpn_give_dt) = YEAR(NOW())
-</select>
-	
+		SELECT COUNT(*)
+		FROM user_coupons
+		WHERE user_no = #{userNo}
+		AND
+		pblcn_cpn_id = #{couponId}
+		AND issu_rsn_src_cn = 'BIRTHDAY'
+		AND
+		YEAR(cpn_give_dt) = YEAR(NOW())
+	</select>
+
 	<select id="countMonthlyIssuedCoupon" resultType="int">
-    SELECT COUNT(*) 
-    FROM user_coupons 
-    WHERE user_no = #{userNo}
-      AND pblcn_cpn_id = #{couponId}
-      AND DATE_FORMAT(cpn_give_dt, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
-</select>
-	
+		SELECT COUNT(*)
+		FROM user_coupons
+		WHERE user_no = #{userNo}
+		AND pblcn_cpn_id =
+		#{couponId}
+		AND DATE_FORMAT(cpn_give_dt, '%Y-%m') = DATE_FORMAT(NOW(),
+		'%Y-%m')
+	</select>
+
 	<select id="countWeeklyIssuedCoupon" resultType="int">
-    SELECT COUNT(*) 
-    FROM user_coupons
-    WHERE user_no = #{userNo}
-      AND pblcn_cpn_id = #{couponId}
-      AND YEARWEEK(cpn_give_dt, 1) = YEARWEEK(NOW(), 1)
-</select>
-	
+		SELECT COUNT(*)
+		FROM user_coupons
+		WHERE user_no = #{userNo}
+		AND pblcn_cpn_id =
+		#{couponId}
+		AND YEARWEEK(cpn_give_dt, 1) = YEARWEEK(NOW(), 1)
+	</select>
+
 	<select id="countYearlyIssuedCoupon" resultType="int">
-    SELECT COUNT(*) 
-    FROM user_coupons
-    WHERE user_no = #{userNo}
-      AND pblcn_cpn_id = #{couponId}
-      AND YEAR(cpn_give_dt) = YEAR(NOW())
-</select>
-	
-	
+		SELECT COUNT(*)
+		FROM user_coupons
+		WHERE user_no = #{userNo}
+		AND pblcn_cpn_id =
+		#{couponId}
+		AND YEAR(cpn_give_dt) = YEAR(NOW())
+	</select>
+
+
 
 </mapper>
