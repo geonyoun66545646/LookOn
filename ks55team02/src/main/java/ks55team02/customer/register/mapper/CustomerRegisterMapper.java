@@ -25,14 +25,7 @@ public interface CustomerRegisterMapper {
     // 가장 마지막 user_no 조회 (단순 타입 String 반환)
     String getLastUserNo();
 
-    @Encrypt(only = {
-    	    "userNm",          // 이름
-    	    "emlAddr",         // 이메일
-    	    "telno",           // 전화번호
-    	    "addr",            // 주소
-    	    "daddr",           // 상세주소
-    	    "userBrdt",        // 생년월일
-    	})
+    @Encrypt
     // USER 테이블에 회원 정보 삽입
     void addUser(User user);
 
