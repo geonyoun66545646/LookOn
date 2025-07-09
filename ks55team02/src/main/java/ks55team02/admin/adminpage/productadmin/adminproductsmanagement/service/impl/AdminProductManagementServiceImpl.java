@@ -77,7 +77,7 @@ public class AdminProductManagementServiceImpl implements AdminProductManagement
     public void rejectProductUpdate(ProductRejectRequest rejectRequest, String managerId) {
         String gdsNo = rejectRequest.getGdsNo();
 
-        // 1. 새로운 승인 이력 PK 생성
+        // 1. 새로운 승인 이력 PK 생성 (현재 코드와 동일)
         String newHistoryCode = productsMapper.getMaxApprovalHistoryCode();
 
         // 2. product_approval_history에 '반려' 상태 이력 추가
@@ -87,16 +87,25 @@ public class AdminProductManagementServiceImpl implements AdminProductManagement
         history.setPrcsMngrId(managerId);
         history.setAprvSttsCd("반려"); // 상태를 '반려'로 설정
 
-        // 기존 상품의 최신 승인 차수 가져오기 (+1)
-        Integer latestCycle = adminProductManagementMapper.getLatestApprovalCycle(gdsNo);
-        int newCycle = (latestCycle != null) ? latestCycle + 1 : 1;
-        history.setAprvRjctCycl(newCycle);
+        // ⭐ ⭐ ⭐ 이 부분 수정: 가장 최근의 '대기' 상태 이력의 차수를 가져옵니다. ⭐ ⭐ ⭐
+        // 이력을 조회할 때 '대기' 상태의 이력 중 가장 최신 것을 찾아 그 차수를 사용합니다.
+        // 이를 위해 AdminProductManagementMapper에 새로운 메서드가 필요할 수 있습니다.
+        // 예: getLatestPendingApprovalCycle(gdsNo)
+        // 일단은 getLatestApprovalCycle을 사용하지만, 실제로는 대기 상태의 차수를 찾아야 합니다.
+        // 여기서는 기존에 계산된 차수가 넘어왔다고 가정하고 그대로 사용합니다.
+        // 기존 코드처럼 latestCycle + 1이 아니라, 현재 대기 중인 차수를 그대로 가져와야 합니다.
+        // (만약 updateProduct에서 newCycle이 올바르게 설정되었다면, 그 값을 사용합니다.)
 
-        // 관리자 직접 입력 상세 내용 설정
+        // ⭐ 변경 제안: 가장 최신 이력 (어떤 상태든)의 차수를 가져옵니다.
+        // 판매자가 대기 상태로 올린 그 차수를 그대로 사용해야 합니다.
+        Integer latestCycle = adminProductManagementMapper.getLatestApprovalCycle(gdsNo);
+        int currentCycle = (latestCycle != null) ? latestCycle : 1; // 대기 상태의 차수 사용
+        history.setAprvRjctCycl(currentCycle); // 현재 대기 중인 차수와 동일하게 설정
+
+        // 관리자 직접 입력 상세 내용 설정 (현재 코드와 동일)
         history.setMngrCmntCn(rejectRequest.getManagerComment());
 
-        // 선택된 반려 사유 코드를 기반으로 rjct_rsn (요약 사유) 설정
-        // ApprovalCriteria 목록에서 해당 코드를 찾아 상세 내용을 가져옴
+        // 선택된 반려 사유 코드를 기반으로 rjct_rsn (요약 사유) 설정 (현재 코드와 동일)
         if (rejectRequest.getRejectReasonCodes() != null && !rejectRequest.getRejectReasonCodes().isEmpty()) {
             List<ApprovalCriteria> allRejectCriteria = adminProductManagementMapper.getApprovalCriteriaList(); // 모든 반려 기준 조회
             String summarizedReason = rejectRequest.getRejectReasonCodes().stream()
@@ -104,16 +113,16 @@ public class AdminProductManagementServiceImpl implements AdminProductManagement
                               .filter(criteria -> criteria.getAprvRjctRsnCd().equals(code))
                               .map(ApprovalCriteria::getAprvRjctDtlCn)
                               .findFirst()
-                              .orElse("")) // 매핑되는 사유가 없으면 빈 문자열
+                              .orElse(""))
                 .filter(s -> !s.isEmpty())
-                .collect(Collectors.joining(", ")); // 쉼표로 연결
+                .collect(Collectors.joining(", "));
             
             history.setRjctRsn(summarizedReason);
         }
 
         adminProductManagementMapper.insertProductApprovalHistory(history);
 
-        // 3. product_rjct_rsn_hstry_mapping에 선택된 반려 사유 매핑 기록
+        // 3. product_rjct_rsn_hstry_mapping에 선택된 반려 사유 매핑 기록 (현재 코드와 동일)
         if (rejectRequest.getRejectReasonCodes() != null && !rejectRequest.getRejectReasonCodes().isEmpty()) {
             List<Map<String, Object>> mappings = new ArrayList<>();
             for (String reasonCode : rejectRequest.getRejectReasonCodes()) {
@@ -126,13 +135,11 @@ public class AdminProductManagementServiceImpl implements AdminProductManagement
             adminProductManagementMapper.insertProductRejectReasonMappings(mappings);
         }
 
-        // 4. products 테이블의 expsr_yn을 false로 변경 (노출 비활성화)
-        // actvtn_yn은 true 유지 (판매자에게는 계속 보임)
+        // 4. products 테이블의 expsr_yn을 false로 변경 (노출 비활성화) (현재 코드와 동일)
         Map<String, Object> productParams = new HashMap<>();
         productParams.put("gdsNo", gdsNo);
-        productParams.put("managerId", managerId); // mdfr_no 업데이트에 사용
-        productParams.put("exposure", false); // expsr_yn = false
-        // 기존 updateProductExposure 메소드 재사용
+        productParams.put("managerId", managerId);
+        productParams.put("exposure", false);
         adminProductManagementMapper.updateProductExposure(productParams);
     }
 
@@ -141,31 +148,27 @@ public class AdminProductManagementServiceImpl implements AdminProductManagement
     @Override
     @Transactional
     public void approveProductUpdate(String gdsNo, String managerId) {
-        // 1. product_approval_history 상태를 '승인'으로 변경
-        // 승인도 새로운 이력으로 남기는 것이 이력 관리에 더 적합합니다.
-        // 기존 updateProductApprovalStatus는 상태만 변경하고 새로운 이력은 남기지 않으므로,
-        // insertProductApprovalHistory를 사용하는 것이 좋습니다.
-        
-        // 새 이력 코드 생성
+        // 새 이력 코드 생성 (현재 코드와 동일)
         String newHistoryCode = productsMapper.getMaxApprovalHistoryCode();
         
-        // 기존 상품의 최신 승인 차수 가져오기 (+1)
+        // ⭐ ⭐ ⭐ 이 부분 수정: 가장 최근의 '대기' 상태 이력의 차수를 가져옵니다. ⭐ ⭐ ⭐
+        // 반려와 마찬가지로, 현재 대기 중인 이력의 차수를 그대로 사용해야 합니다.
         Integer latestCycle = adminProductManagementMapper.getLatestApprovalCycle(gdsNo);
-        int newCycle = (latestCycle != null) ? latestCycle + 1 : 1;
+        int currentCycle = (latestCycle != null) ? latestCycle : 1; // 대기 상태의 차수 사용
 
-        // ProductApprovalHistory 객체 생성
+        // ProductApprovalHistory 객체 생성 (현재 코드와 동일)
         ProductApprovalHistory history = new ProductApprovalHistory();
         history.setAprvRjctHstryCd(newHistoryCode);
         history.setGdsNo(gdsNo);
         history.setPrcsMngrId(managerId);
         history.setAprvSttsCd("승인");
         history.setPrcsDt(LocalDateTime.now());
-        history.setAprvRjctCycl(newCycle);
+        history.setAprvRjctCycl(currentCycle); // 현재 대기 중인 차수와 동일하게 설정
         history.setMngrCmntCn("관리자에 의해 승인 처리되었습니다.");
 
         adminProductManagementMapper.insertProductApprovalHistory(history);
 
-        // 2. products 테이블의 노출여부(expsr_yn)를 true로 변경
+        // 2. products 테이블의 노출여부(expsr_yn)를 true로 변경 (현재 코드와 동일)
         Map<String, Object> productParams = new HashMap<>();
         productParams.put("gdsNo", gdsNo);
         productParams.put("managerId", managerId);

@@ -61,6 +61,8 @@ public class AdminProductManagementController {
         
         response.put("gdsNo", gdsNo);
         response.put("rejectReasons", rejectReasons);
+        
+        log.info(">>>>>> [Controller] rejectProductForm 응답 데이터: {}", response); 
         return response;
     }
 

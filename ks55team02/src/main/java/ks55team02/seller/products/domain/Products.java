@@ -34,6 +34,8 @@ public class Products {
 
     private String storeName;
     
+    private String latestApprovalStatus;
+    
     private String aprvRjctHstryCd; 
     
     private Integer totalStockQuantity;

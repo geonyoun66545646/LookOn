@@ -15,4 +15,6 @@ public class AdminProductView {
     
     private String selUserNo;
     private String aprvSttsCd;
+    
+    private Integer aprvRjctCycl;
 }

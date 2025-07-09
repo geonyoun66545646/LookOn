@@ -121,7 +121,12 @@
 								class="final-price">10,800원</span></td>
 							<td th:text="${#temporals.format(p.regDt, 'yyyy-MM-dd')}">2023-01-01</td>
 							<!-- expsr_yn이 실질적인 '승인' 상태를 나타냅니다. -->
-							<td th:text="${p.expsrYn ? '승인 완료' : '승인 대기'}"></td>
+							<td>
+								<span class="badge"
+									  th:text="${p.latestApprovalStatus}"
+									  th:classappend="${p.latestApprovalStatus == '승인' ? 'bg-success' : (p.latestApprovalStatus == '반려' ? 'bg-danger' : 'bg-warning')}">
+								</span>
+							</td>
 							<!-- actvtn_yn은 판매자 관리 목록에서의 '활성' 상태입니다. -->
 							<td th:text="${p.actvtnYn ? '활성' : '비활성'}"></td>
 							<td class="text-center action-buttons">

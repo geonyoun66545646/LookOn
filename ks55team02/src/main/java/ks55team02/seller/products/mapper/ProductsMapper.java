@@ -1,5 +1,6 @@
 package ks55team02.seller.products.mapper;
 
+import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory;
 import ks55team02.seller.products.domain.*;
 import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
@@ -21,6 +22,12 @@ public interface ProductsMapper {
 	void insertProductStatus(ProductStatus productStatus);
 	void insertStatusOptionMapping(StatusOptionMapping mapping);
 
+	// 새로 추가: 최근 반려된 이력 조회
+    ProductApprovalHistory getLatestRejectedHistory(String gdsNo);
+    
+    // 새로 추가: 특정 상품의 최신 승인/반려 차수 조회 (대기 상태 제외)
+    Integer getLatestProcessedCycle(String gdsNo);
+	
 	// 새로운 승인 이력 PK를 가져오는 메소드
 	String getMaxApprovalHistoryCode();
 

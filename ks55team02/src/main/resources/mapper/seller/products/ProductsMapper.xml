@@ -81,6 +81,7 @@
 		<result column="expsr_yn" property="expsrYn" />
 		<result column="actvtn_yn" property="actvtnYn" />
 		<result column="thumbnail_image_path" property="thumbnailImagePath" />
+		<result column="latestApprovalStatus" property="latestApprovalStatus" />
 		<association property="productCategory" javaType="ks55team02.seller.products.domain.ProductCategory">
 			<id property="categoryId" column="ctgry_no" />
 			<result property="categoryName" column="ctgry_nm" />
@@ -303,27 +304,37 @@
 
 	<!-- 판매자/스토어별 상품 목록 조회 -->
 	<select id="getProductsBySellerAndStore" parameterType="map" resultMap="productsResultMap">
-		SELECT
-			p.gds_no, p.store_id, p.ctgry_no, p.gds_nm, p.bas_prc, p.dscnt_rt,
-			(p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
-			p.reg_dt, p.expsr_yn, p.actvtn_yn, pc.ctgry_nm,
-			(
-				SELECT pi.img_file_path_nm
-				FROM ks55team02db.product_images pi
-				WHERE pi.gds_no = p.gds_no AND pi.img_type = 1
-				ORDER BY pi.img_indct_sn ASC
-				LIMIT 1
-			) AS thumbnail_image_path
-		FROM
-			ks55team02db.products p
-		LEFT JOIN
-			ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
-		WHERE
-			p.sel_user_no = #{selUserNo}
-			AND p.store_id = #{storeId}
-			AND p.actvtn_yn = true
-		ORDER BY
-			p.reg_dt DESC
+	    SELECT
+	        p.gds_no, p.store_id, p.ctgry_no, p.gds_nm, p.bas_prc, p.dscnt_rt,
+	        (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
+	        p.reg_dt, p.expsr_yn, p.actvtn_yn, pc.ctgry_nm,
+	        (
+	            SELECT pi.img_file_path_nm
+	            FROM ks55team02db.product_images pi
+	            WHERE pi.gds_no = p.gds_no AND pi.img_type = 1
+	            ORDER BY pi.img_indct_sn ASC
+	            LIMIT 1
+	        ) AS thumbnail_image_path,
+	        
+	        -- ⭐ 추가: product_approval_history에서 최신 aprv_stts_cd를 가져옵니다.
+	        (
+	            SELECT pah.aprv_stts_cd
+	            FROM ks55team02db.product_approval_history pah
+	            WHERE pah.gds_no = p.gds_no
+	            ORDER BY pah.prcs_dt DESC, pah.aprv_rjct_cycl DESC
+	            LIMIT 1
+	        ) AS latestApprovalStatus
+	        
+	    FROM
+	        ks55team02db.products p
+	    LEFT JOIN
+	        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+	    WHERE
+	        p.sel_user_no = #{selUserNo}
+	        AND p.store_id = #{storeId}
+	        AND p.actvtn_yn = true
+	    ORDER BY
+	        p.reg_dt DESC
 	</select>
 
 	<!-- (관리자용) 모든 상품 목록 조회 -->
