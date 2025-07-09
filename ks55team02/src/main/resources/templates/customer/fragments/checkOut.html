@@ -685,7 +685,7 @@ fetch('/api/orders', {
                 customerName: orderData.customerName
             })
             .catch(function (error) {
-                if (error.code === 'USER_CANCEL') {
+                if (error.code === 'USER_CANCEL') {		
                     console.log('사용자가 결제를 취소했습니다.');
                 } else {
                     console.error("결제 요청 에러:", error);
