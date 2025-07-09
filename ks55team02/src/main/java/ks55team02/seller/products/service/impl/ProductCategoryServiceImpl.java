@@ -1,23 +1,65 @@
 package ks55team02.seller.products.service.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
 import ks55team02.admin.common.domain.Pagination;
 import ks55team02.admin.common.domain.SearchCriteria;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.mapper.ProductCategoryMapper;
+import ks55team02.seller.products.mapper.ProductsMapper;
 import ks55team02.seller.products.service.ProductCategoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.StringUtils;
-import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class ProductCategoryServiceImpl implements ProductCategoryService {
 
     private final ProductCategoryMapper productCategoryMapper;
+    private final ProductsMapper productsMapper;
+    
+    @Override
+    public void activateCategory(String categoryId) {
+        productCategoryMapper.activateCategory(categoryId);
+    }
+    
+ // ProductCategoryServiceImpl.java
+    @Override
+    public boolean isCategoryIdExists(String categoryId) {
+        return productCategoryMapper.countCategoryById(categoryId) > 0;
+    }
+
+    @Override
+    public boolean isCategoryNameExists(String categoryName) {
+        return productCategoryMapper.countCategoryByName(categoryName) > 0;
+    }
+
+    @Override
+    public void updateCategory(ProductCategory productCategory) {
+        // 상위 카테고리 ID가 빈 문자열이면 null로 변경
+        if (productCategory.getParentCategoryId() != null && productCategory.getParentCategoryId().isEmpty()) {
+            productCategory.setParentCategoryId(null);
+        }
+        // 카테고리 레벨 설정
+        productCategory.setCategoryLevel(StringUtils.hasText(productCategory.getParentCategoryId()) ? 2 : 1);
+        
+        productCategoryMapper.updateCategory(productCategory);
+    }
+    
+    @Override
+    @Transactional
+    public void deactivateCategoryAndRelatedProducts(String categoryId) {
+    	// 1. 해당 카테고리에 속한 상품들을 먼저 비노출 처리
+        productsMapper.deactivateProductsByCategoryId(categoryId);
+        
+        // 2. 카테고리 자체를 비활성화
+        productCategoryMapper.deactivateCategory(categoryId);
+    }
     
     @Override
     public void addCategory(ProductCategory productCategory) {

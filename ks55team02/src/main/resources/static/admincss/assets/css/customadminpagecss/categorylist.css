@@ -110,3 +110,13 @@ input[type="date"].form-control {
     border-color: #28a745;
     font-weight: 500;
 }
+.btn-success {
+    color: #00B517;
+    border-color: #00B517;
+    background-color: white;
+}
+.btn-success:hover {
+    color: #fff;
+    background-color: #26c03a;
+    border-color: #1abc2e;
+}
