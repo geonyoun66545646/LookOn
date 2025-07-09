@@ -22,4 +22,8 @@ public class Coupons {
     
     private String issueConditionType; // issue_condition_type 컬럼과 연결될 필드
     private String reissueCycle;       // reissue_cycle 컬럼과 연결될 필드
+    
+    private boolean isIssuable;      // 프론트엔드에 전달할 쿠폰 발급 가능 여부
+    private String statusMessage;    // 프론트엔드에 전달할 상태 메시지 (예: "금월 발급 완료")
+    
 }

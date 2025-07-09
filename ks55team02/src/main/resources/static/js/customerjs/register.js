@@ -33,12 +33,21 @@ $(document).ready(() => {
     const $pushAgreeCheckbox = $('#reg-push-agree');
     const $emailAgreeCheckbox = $('#reg-email-rcv-agree');
 	const $genderFeedback = $('#gender-feedback');
+	const $birthdateInput = $('#reg-birthdate');
+	const $birthdateFeedback = $('#birthdate-feedback');
     
     // 유효성 검사 통과 여부 추적 객체
     const validationStatus = {
-        id: false, password: false, passwordConfirm: false, name: false,
+        id: false, 
+		password: false, 
+		passwordConfirm: false, 
+		name: false,
+		birthdate: false,
 		gender: false,
-        nickname: false, email: false, tel: false, address: true // 주소는 선택사항으로 간주하거나, daddr 입력시 true로 변경
+        nickname: false, 
+		email: false, 
+		tel: false, 
+		address: true // 주소는 선택사항으로 간주하거나, daddr 입력시 true로 변경
     };
 
     const showFeedback = (element, message, isValid) => {
@@ -102,23 +111,34 @@ $(document).ready(() => {
            $nicknameInput.trigger('blur');
        }
    });
+   
+   // 생년월일
+   $birthdateInput.on('change', () => { 
+       validationStatus.birthdate = !!$birthdateInput.val(); // 값이 있기만 하면 true
+	   if (!validationStatus.birthdate) {
+	               showFeedback($birthdateFeedback, '생년월일을 선택해주세요.', false);
+	           } else {
+	               $birthdateFeedback.text(''); // 값이 있으면 메시지 삭제
+	           }
+   });
 
-    $emailInput.on('blur', () => {
-        const email = $emailInput.val();
-        if (!regex.email.test(email)) {
-            showFeedback($emailFeedback, '유효하지 않은 이메일 형식입니다.', false);
-            validationStatus.email = false;
-            return;
-        }
-        $.ajax({
-            url: '/api/customer/register/check-email', type: 'GET', data: { emlAddr: email },
-            success: isDuplicate => {
-                const isValid = !isDuplicate;
-                showFeedback($emailFeedback, isValid ? '사용 가능' : '이미 사용 중', isValid);
-                validationStatus.email = isValid;
-            }
-        });
-    });
+   // 이메일
+	$emailInput.on('blur', () => {
+	    const email = $emailInput.val();
+	    if (!regex.email.test(email)) {
+	        showFeedback($emailFeedback, '유효하지 않은 이메일 형식입니다.', false);
+	        validationStatus.email = false;
+	        return;
+	    }
+	    $.ajax({
+	        url: '/api/customer/register/check-email', type: 'GET', data: { emlAddr: email },
+	        success: isDuplicate => {
+	            const isValid = !isDuplicate;
+	            showFeedback($emailFeedback, isValid ? '사용 가능' : '이미 사용 중', isValid);
+	            validationStatus.email = isValid;
+	        }
+	    });
+	});
 
     $passwordInput.on('keyup', () => {
         validationStatus.password = regex.password.test($passwordInput.val());
@@ -234,7 +254,8 @@ $(document).ready(() => {
             data: JSON.stringify(jsonData),
             success: response => {
                 alert(response);
-                $('#signin-modal').modal('hide');
+				$joinForm[0].reset();
+                $('#signin-tab').tab('show');
                 $joinForm[0].reset();
                 $('.form-text').text('');
                 Object.keys(validationStatus).forEach(key => validationStatus[key] = false);

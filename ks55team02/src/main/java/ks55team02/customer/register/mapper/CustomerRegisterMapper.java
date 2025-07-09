@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import ks55team02.customer.register.domain.User;
 import ks55team02.customer.register.domain.UserProfile;
 import ks55team02.customer.register.domain.UserSecurity;
+import ks55team02.systems.crypto.annotation.Encrypt;
 
 @Mapper
 public interface CustomerRegisterMapper {
@@ -24,6 +25,7 @@ public interface CustomerRegisterMapper {
     // 가장 마지막 user_no 조회 (단순 타입 String 반환)
     String getLastUserNo();
 
+    @Encrypt
     // USER 테이블에 회원 정보 삽입
     void addUser(User user);
 

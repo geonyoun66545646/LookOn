@@ -5,8 +5,8 @@
 
 <mapper namespace="ks55team02.seller.products.mapper.ProductCategoryMapper">
 
-	<!-- ProductsMapper에 있던 더 완전한 버전의 ResultMap으로 교체 -->
-	<resultMap id="productCategoryResultMap" type="ks55team02.seller.products.domain.ProductCategory">
+	<resultMap id="productCategoryResultMap"
+		type="ks55team02.seller.products.domain.ProductCategory">
 		<id property="categoryId" column="ctgry_no" />
 		<result property="parentCategoryId" column="up_ctgry_no" />
 		<result property="userNo" column="creatr_no" />
@@ -15,46 +15,147 @@
 		<result property="regDate" column="reg_dt" />
 		<result property="activationYn" column="actvtn_yn" />
 	</resultMap>
+	
+	<!-- 카테고리 활성화 -->
+    <update id="activateCategory" parameterType="string">
+        UPDATE
+            product_categories
+        SET
+            actvtn_yn = true,
+            mdfcn_dt = CURRENT_TIMESTAMP,
+            inactvtn_dt = NULL
+        WHERE
+            ctgry_no = #{categoryId}
+    </update>
+	
+	<!-- 카테고리 ID 중복 체크 -->
+    <select id="countCategoryById" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM product_categories WHERE ctgry_no = #{categoryId}
+    </select>
 
-	<!-- 카테고리 ID로 단일 카테고리 정보 조회 (from ProductsMapper) -->
-	<select id="getCategoryById" parameterType="String" resultMap="productCategoryResultMap">
+    <!-- 카테고리명 중복 체크 -->
+    <select id="countCategoryByName" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM product_categories WHERE ctgry_nm = #{categoryName}
+    </select>
+
+    <!-- 카테고리 정보 수정 -->
+    <update id="updateCategory" parameterType="ks55team02.seller.products.domain.ProductCategory">
+        UPDATE product_categories
+        <set>
+            <!-- 카테고리 ID는 PK이므로 수정하지 않음 -->
+            <if test="categoryName != null and categoryName != ''"> ctgry_nm = #{categoryName}, </if>
+            <if test="parentCategoryId != null"> up_ctgry_no = #{parentCategoryId}, </if>
+            <if test="categoryLevel != null"> ctgry_dpth = #{categoryLevel}, </if>
+            mdfcn_dt = CURRENT_TIMESTAMP
+        </set>
+        WHERE ctgry_no = #{categoryId}
+    </update>
+	
+	<!--  -->
+	<select id="getCategoryListCount"
+		parameterType="ks55team02.admin.common.domain.SearchCriteria"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM product_categories
+		<include refid="categorySearchCondition" />
+	</select>
+	
+	<!-- 카테고리 비활성화 -->
+    <update id="deactivateCategory" parameterType="string">
+        UPDATE
+            product_categories
+        SET
+            actvtn_yn = false,
+            inactvtn_dt = CURRENT_TIMESTAMP
+        WHERE
+            ctgry_no = #{categoryId}
+    </update>
+	
+	<select id="getCategoryList"
+		parameterType="ks55team02.admin.common.domain.SearchCriteria"
+		resultMap="productCategoryResultMap">
 		SELECT
-		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm, ctgry_dpth, reg_dt, actvtn_yn
-		FROM ks55team02db.product_categories
-		WHERE ctgry_no = #{categoryId} AND actvtn_yn = TRUE;
+		ctgry_no, up_ctgry_no, ctgry_nm, ctgry_dpth, actvtn_yn, reg_dt
+		FROM
+		product_categories
+		<include refid="categorySearchCondition" />
+		ORDER BY reg_dt DESC
+		LIMIT #{offset}, #{pageSize}
 	</select>
 
-	<!-- 부모 카테고리 ID에 해당하는 하위 카테고리 목록 조회 -->
-    <!-- (id를 getSubCategoriesByParentId로 변경, 파라미터를 parentCategoryId로 변경) -->
-	<select id="getSubCategoriesByParentId" parameterType="String" resultMap="productCategoryResultMap">
+	<insert id="addCategory"
+		parameterType="ks55team02.seller.products.domain.ProductCategory">
+		INSERT INTO product_categories
+		(ctgry_no, ctgry_nm, up_ctgry_no, ctgry_dpth, creatr_no, actvtn_yn)
+		VALUES
+		(#{categoryId}, #{categoryName}, #{parentCategoryId}, #{categoryLevel}, #{userNo}, #{activationYn})
+	</insert>
+
+	<sql id="categorySearchCondition">
+		<where>
+			<if test="searchKey != null and searchValue != null and searchValue != ''">
+				<choose>
+					<when test="searchKey == 'categoryName'"> AND ctgry_nm LIKE CONCAT('%', #{searchValue}, '%') </when>
+					<when test="searchKey == 'categoryId'"> AND ctgry_no LIKE CONCAT('%', #{searchValue}, '%') </when>
+					<when test="searchKey == 'all'"> AND (ctgry_nm LIKE CONCAT('%', #{searchValue}, '%') OR ctgry_no LIKE CONCAT('%', #{searchValue}, '%')) </when>
+				</choose>
+			</if>
+			<if test="startDate != null"> AND reg_dt >= #{startDate} </if>
+			<if test="endDate != null"> AND reg_dt <![CDATA[ <= ]]> DATE_ADD(#{endDate}, INTERVAL 1 DAY) </if>
+			<if test="levels != null and levels.size() > 0">
+				AND ctgry_dpth IN
+				<foreach item="level" collection="levels" open="(" separator="," close=")">
+					#{level}
+				</foreach>
+			</if>
+		</where>
+	</sql>
+
+	<select id="getCategoryById" parameterType="String"
+		resultMap="productCategoryResultMap">
 		SELECT
-		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm, ctgry_dpth, reg_dt, actvtn_yn
+		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
+		ctgry_dpth, reg_dt, actvtn_yn
+		FROM ks55team02db.product_categories
+		WHERE ctgry_no = #{categoryId};
+	</select>
+
+	<select id="getSubCategoriesByParentId" parameterType="String"
+		resultMap="productCategoryResultMap">
+		SELECT
+		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
+		ctgry_dpth, reg_dt, actvtn_yn
 		FROM ks55team02db.product_categories
 		WHERE up_ctgry_no = #{parentCategoryId} AND actvtn_yn = TRUE
-		ORDER BY ctgry_nm;
+		ORDER BY
+		ctgry_nm;
 	</select>
 
-	<!-- 모든 최상위 카테고리 목록 조회 (from ProductsMapper) -->
-	<select id="getAllTopLevelCategories" resultMap="productCategoryResultMap">
+	<select id="getAllTopLevelCategories"
+		resultMap="productCategoryResultMap">
 		SELECT
-		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm, ctgry_dpth, reg_dt, actvtn_yn
+		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
+		ctgry_dpth, reg_dt, actvtn_yn
 		FROM ks55team02db.product_categories
 		WHERE up_ctgry_no IS NULL AND actvtn_yn = TRUE
 		ORDER BY ctgry_nm;
 	</select>
 
-	<!-- 최상위 카테고리 이름으로 카테고리 ID 조회 (from ProductsMapper) -->
-	<select id="getTopLevelCategoryIdByName" parameterType="String" resultType="String">
+	<select id="getTopLevelCategoryIdByName" parameterType="String"
+		resultType="String">
 		SELECT ctgry_no
 		FROM ks55team02db.product_categories
-		WHERE ctgry_nm = #{categoryName} AND up_ctgry_no IS NULL AND actvtn_yn = TRUE
+		WHERE
+		ctgry_nm = #{categoryName} AND up_ctgry_no IS NULL AND actvtn_yn =
+		TRUE
 		LIMIT 1;
 	</select>
 
-	<!-- 모든 상품 카테고리 목록 조회 -->
-	<select id="getAllProductCategories" resultMap="productCategoryResultMap">
+	<select id="getAllProductCategories"
+		resultMap="productCategoryResultMap">
 		SELECT
-		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm, ctgry_dpth, reg_dt, actvtn_yn
+		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
+		ctgry_dpth, reg_dt, actvtn_yn
 		FROM ks55team02db.product_categories
 		WHERE actvtn_yn = TRUE
 		ORDER BY ctgry_nm;

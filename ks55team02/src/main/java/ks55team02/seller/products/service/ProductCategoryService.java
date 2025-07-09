@@ -1,10 +1,26 @@
 package ks55team02.seller.products.service;
 
+import ks55team02.admin.common.domain.SearchCriteria;
 import ks55team02.seller.products.domain.ProductCategory;
 import java.util.List;
 import java.util.Map;
 
 public interface ProductCategoryService {
+	
+	/*활성*/
+	void activateCategory(String categoryId);
+	
+	/* */
+	boolean isCategoryIdExists(String categoryId);
+    boolean isCategoryNameExists(String categoryName);
+    void updateCategory(ProductCategory productCategory);
+	
+	/* */
+	void deactivateCategoryAndRelatedProducts(String categoryId);
+	
+	Map<String, Object> getCategoryList(SearchCriteria searchCriteria);
+	
+	void addCategory(ProductCategory productCategory);
 	
 	// ProductCategoryService.java 에 추가
     /**
