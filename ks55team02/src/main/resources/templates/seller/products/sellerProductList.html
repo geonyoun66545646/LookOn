@@ -93,7 +93,7 @@
 							<th scope="col">최종가격</th>
 							<th scope="col">등록일자</th>
 							<th scope="col">승인상태</th>
-							<th scope="col">노출상태</th>
+							<th scope="col">활성상태</th>
 							<th scope="col">수정/삭제</th>
 						</tr>
 					</thead>
@@ -121,9 +121,9 @@
 								class="final-price">10,800원</span></td>
 							<td th:text="${#temporals.format(p.regDt, 'yyyy-MM-dd')}">2023-01-01</td>
 							<!-- expsr_yn이 실질적인 '승인' 상태를 나타냅니다. -->
-							<td th:text="${p.expsrYn == 1 ? '승인 완료' : '승인 대기'}"></td>
+							<td th:text="${p.expsrYn ? '승인 완료' : '승인 대기'}"></td>
 							<!-- actvtn_yn은 판매자 관리 목록에서의 '활성' 상태입니다. -->
-							<td th:text="${p.actvtnYn == 1 ? '활성' : '비활성'}"></td>
+							<td th:text="${p.actvtnYn ? '활성' : '비활성'}"></td>
 							<td class="text-center action-buttons">
 								<!-- 수정 버튼: 링크는 이전에 만든 컨트롤러 주소 /seller/products/update/{gdsNo}로 변경 -->
 								<a

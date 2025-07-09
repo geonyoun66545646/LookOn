@@ -1,175 +1,246 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{admin/layout/layoutMain}">
-		
-	 <head>
-	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />	
-	 </head>
-	 <!--/* 개발시 추가할 jsfile 영역 정의 */-->
-	 <th:block layout:fragment="jsFile">
-	 </th:block>
-	 
-	 <!--/* 개발시 추가할 스크립트 */-->
-	 <th:block layout:fragment="jsScript">	 
-	 </th:block>
-	 <!-- 추가할 페이지 contents -->
-	 <th:block layout:fragment="contents">
-	 	<main class="main-content">
-	    <h1 class="h3 mb-4 font-weight-bold">상품 카테고리관리</h1>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout/layoutMain}">
+
+<head>
+<meta name="description" content="한국스마트정보교육원 ksmybatis" />
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/css/customadminpagecss/categorylist.css}">
+</head>
+
+<th:block layout:fragment="customTitle">
+	<title th:text="${title}"></title>
+</th:block>
+
+<th:block layout:fragment="contents">
+	<main class="main-content">
+		<section class="content-header">
+			<h2 class="content-title">상품 승인 관리</h2>
+		</section>
+
+		<div class="card mb-4">
+			<div class="card-body">
+                <form id="searchForm" th:action="@{/adminpage/productadmin/adminProductManagement}"
+					method="get" th:object="${searchCriteria}">
+					<div class="row gx-3 align-items-end">
+						<div class="col-lg-4 mb-2">
+							<label class="form-label">검색 분류</label>
+							<select class="form-select" name="searchKey">
+								<option value="gdsNm" th:selected="*{searchKey == 'gdsNm'}">상품명</option>
+								<option value="selUserNo"
+									th:selected="*{searchKey == 'selUserNo'}">판매자ID</option>
+								<option value="storeName"
+									th:selected="*{searchKey == 'storeName'}">브랜드명</option>
+							</select>
+						</div>
+						<div class="col-lg-5 mb-2">
+							<label class="form-label">검색 키워드</label>
+							<input type="text" class="form-control" name="searchValue"
+								th:value="*{searchValue}" placeholder="검색어를 입력하세요">
+						</div>
+						<div class="col-lg-3 mb-2">
+							<button type="button" class="btn btn-primary btn-block" id="searchBtn">검색</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<div class="card mb-4">
+			<div class="card-header py-3">
+				<h6 class="m-0 font-weight-bold text-primary">승인 대기 상품 목록</h6>
+			</div>
+			<div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+					<div>
+						<span class="font-weight-bold">[ 전체 상품 <span
+							class="text-primary" th:text="${pagination.totalCount}">0</span>건
+							]
+						</span>
+					</div>
+					</div>
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover text-center" id="dataTable" width="100%" cellspacing="0">
+						<thead class="thead-light">
+							<tr>
+								<th>상품번호</th>
+								<th>상품명</th>
+								<th>판매자ID</th>
+								<th>브랜드명</th>
+								<th>신청일</th>
+								<th>상태</th>
+								<th>관리</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								th:if="${pagination.list != null and !pagination.list.isEmpty()}"
+								th:each="product : ${pagination.list}">
+								<td th:text="${product.gdsNo}"></td>
+								<td th:text="${product.gdsNm}"></td>
+								<td th:text="${product.selUserNo}"></td>
+								<td th:text="${product.storeConm}"></td>
+								<td
+									th:text="${#temporals.format(product.regDt, 'yyyy-MM-dd HH:mm')}"></td>
+								<td>
+									<span class="badge"
+										  th:text="${product.aprvSttsCd}"
+										  th:classappend="${product.aprvSttsCd == '승인' ? 'bg-success' : (product.aprvSttsCd == '반려' ? 'bg-danger' : 'bg-warning')}">
+									</span>
+								</td>
+								<td>
+								    <form th:action="@{/adminpage/productadmin/approveProduct}" method="post" style="display: inline;">
+								        <input type="hidden" name="gdsNo" th:value="${product.gdsNo}">
+								        <button type="submit" class="btn btn-success btn-sm">승인</button>
+								    </form> 
+								    <!-- ⭐ 수정: 반려 버튼 클릭 시 모달을 띄우는 JavaScript 함수 호출 -->
+								    <button type="button" class="btn btn-danger btn-sm reject-btn" th:data-gds-no="${product.gdsNo}">반려</button>
+								</td>
+							</tr>
+							<tr
+								th:if="${pagination.list == null or pagination.list.isEmpty()}">
+								<td colspan="7" class="text-center">승인 대기 중인 상품이 없습니다.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<nav th:if="${pagination.totalCount > 0}" class="d-flex justify-content-center mt-4" aria-label="Page navigation">
+			<ul class="pagination">
+				<li class="page-item"
+					th:classappend="${!pagination.hasPreviousBlock} ? 'disabled'">
+                    <a class="page-link page-num" href="#"
+					th:data-page="${pagination.startPage - 1}">«</a>
+				</li>
+				<li class="page-item"
+					th:each="pageNumber : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+					th:classappend="${pageNumber == pagination.currentPage} ? 'active'">
+                    <a class="page-link page-num" href="#"
+					th:data-page="${pageNumber}"
+					th:text="${pageNumber}"></a>
+				</li>
+				<li class="page-item"
+					th:classappend="${!pagination.hasNextBlock} ? 'disabled'">
+                    <a class="page-link page-num" href="#"
+					th:data-page="${pagination.endPage + 1}">»</a>
+				</li>
+			</ul>
+		</nav>
+	</main>
 	
-	    <!-- 검색 필터 카드 (기존과 동일) -->
-	    <div class="card mb-4">
-	        <div class="card-body">
-	            <table class="table table-bordered filter-table">
-	                <tbody>
-	                    <tr>
-	                        <th>분류</th>
-	                        <td>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkAll" checked>
-	                                <label class="form-check-label" for="checkAll">전체</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkActive" checked>
-	                                <label class="form-check-label" for="checkActive">활동 계정</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkDormant" checked>
-	                                <label class="form-check-label" for="checkDormant">휴면 계정</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkWithdrawn" checked>
-	                                <label class="form-check-label" for="checkWithdrawn">탈퇴 계정</label>
-	                            </div>
-	                        </td>
-	                    </tr>
-	                    <tr>
-	                        <th>기간</th>
-	                        <td>
-	                            <div class="form-row align-items-center">
-	                                <div class="col-auto">
-	                                    <input type="date" class="form-control form-control-sm" value="2025-03-16">
-	                                </div>
-	                                <div class="col-auto">-</div>
-	                                <div class="col-auto">
-	                                    <input type="date" class="form-control form-control-sm" value="2025-06-16">
-	                                </div>
-	                            </div>
-	                        </td>
-	                    </tr>
-	                    <tr>
-	                        <th>검색 키워드</th>
-	                        <td>
-	                            <div class="input-group">
-	                                <div class="input-group-prepend">
-	                                    <select class="custom-select custom-select-sm" style="width: 150px;">
-	                                        <option selected>전체</option>
-	                                        <option value="1">ID</option>
-	                                        <option value="2">이름</option>
-	                                        <option value="3">이메일</option>
-	                                        <option value="4">상태</option>
-	                                        <option value="5">성별</option>
-	                                    </select>
-	                                </div>
-	                                <input type="text" class="form-control form-control-sm">
-	                            </div>
-	                        </td>
-	                    </tr>
-	                </tbody>
-	            </table>
-	            <div class="text-center mt-3">
-	                <button class="btn btn-dark" style="width: 120px;">검색</button>
+	<!-- 반려 모달 -->
+	<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+	    <div class="modal-dialog">
+	        <div class="modal-content">
+	            <div class="modal-header">
+	                <h5 class="modal-title" id="rejectModalLabel">상품 반려 사유 선택</h5>
+	                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	            </div>
+	            <form id="rejectForm" th:action="@{/adminpage/productadmin/rejectProduct}" method="post">
+	                <div class="modal-body">
+	                    <input type="hidden" name="gdsNo" id="modalGdsNo">
+	                    <p>반려할 상품: <strong id="modalProductName"></strong> (<span id="modalProductGdsNo"></span>)</p>
+	                    
+	                    <h6>사유 선택:</h6>
+	                    <div id="rejectReasonsContainer">
+	                        <!-- 반려 사유 체크박스들이 여기에 동적으로 로드됩니다 -->
+	                    </div>
+	                    
+	                    <div class="mb-3 mt-3">
+	                        <label for="managerComment" class="form-label">추가 상세 내용 (선택 사항):</label>
+	                        <textarea class="form-control" id="managerComment" name="managerComment" rows="3"></textarea>
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+	                    <button type="submit" class="btn btn-danger">반려 처리</button>
+	                </div>
+	            </form>
 	        </div>
 	    </div>
+	</div>	
+</th:block>
 
-    <!-- 회원 목록 테이블 카드 -->
-    <div class="card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <span class="font-weight-bold">[ 검색 결과 <span class="text-primary">183</span>건 ]</span>
+<th:block layout:fragment="jsScript">
+	<script>
+		$(document).ready(function() {
+			// 검색 및 페이지네이션 기능
+			function submitSearch(page) {
+				const formData = $('#searchForm').serialize();
+				// 페이지 번호를 URL에 포함시킴
+				window.location.href = `[[@{/adminpage/productadmin/adminProductManagement}]]?currentPage=${page}&${formData}`;
+			}
 
-                    <!-- ▼▼▼ 1. 상태 변경 기능 버튼 추가 ▼▼▼ -->
-                    <div class="btn-group ml-3">
-                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            선택한 회원 상태 변경
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">활동중으로 변경</a>
-                            <a class="dropdown-item" href="#">휴면으로 변경</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#">탈퇴 처리</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex">
-                    <select class="custom-select custom-select-sm mr-2" style="width: 150px;">
-                        <option selected>최신 가입일순</option>
-                        <option value="1">오래된 가입일순</option>
-                    </select>
-                    <select class="custom-select custom-select-sm" style="width: 120px;">
-                        <option value="1">15개씩 보기</option>
-                        <option selected>30개씩 보기</option>
-                        <option value="2">50개씩 보기</option>
-                        <option value="3">100개씩 보기</option>
-                    </select>
-                </div>
-            </div>
+			// 검색 버튼 클릭 이벤트
+			$('#searchBtn').on('click', function() {
+				submitSearch(1); // 검색 버튼을 누르면 항상 1페이지부터 조회
+			});
 
-            <table class="table table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th><div class="form-check"><input class="form-check-input" type="checkbox" id="checkAllRows"></div></th>
-                        <th>ID</th>
-                        <th>이름</th>
-                        <th>성별</th>
-                        <th>이메일</th>
-                        <th>휴대폰 번호</th>
-                        <th>주소</th>
-                        <th>상태</th>
-                        <th>가입 일자</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- ▼▼▼ 2. 체크박스 중앙 정렬 및 컬럼 개수 수정 ▼▼▼ -->
-                    <tr>
-                        <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
-                        <td>user01</td>
-                        <td>김성주</td>
-                        <td>남</td>
-                        <td>sungju@test.com</td>
-                        <td>010-1111-1111</td>
-                        <td>서울시 강남구</td>
-                        <td>활동중</td>
-                        <td>2024-05-21</td>
-                    </tr>
-                    <tr>
-                        <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
-                        <td>user02</td>
-                        <td>정성훈</td>
-                        <td>남</td>
-                        <td>seanghun@test.com</td>
-                        <td>010-2222-2222</td>
-                        <td>경기도 성남시</td>
-                        <td>휴면</td>
-                        <td>2024-05-20</td>
-                    </tr>
-                </tbody>
-            </table>
+			// 페이지 번호 링크 클릭 이벤트
+			// .pagination 클래스에 이벤트 위임 (동적으로 추가될 요소에 대한 클릭 처리)
+			$('.pagination').on('click', '.page-num', function(e) {
+				e.preventDefault(); // 기본 링크 동작 방지
+				const page = $(this).data('page');
+				submitSearch(page);
+			});
+			
+			// '반려' 버튼 클릭 시 모달 띄우기
+            $('.reject-btn').on('click', function() {
+                const gdsNo = $(this).data('gds-no');
+                // 현재 행의 상품명 가져오기 (예시, 실제 HTML 구조에 따라 달라질 수 있음)
+                const gdsNm = $(this).closest('tr').find('td:nth-child(2)').text(); 
+                
+                $('#modalGdsNo').val(gdsNo);
+                $('#modalProductName').text(gdsNm);
+                $('#modalProductGdsNo').text(gdsNo);
+                $('#managerComment').val(''); // 기존 입력 내용 초기화
+                $('#rejectReasonsContainer').empty(); // 사유 목록 초기화
 
-            <nav class="d-flex justify-content-center mt-4" aria-label="Page navigation">
-                <ul class="pagination">
-                    <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">다음</a></li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-</main>
-	 </th:block>	
+                // Ajax 요청으로 반려 사유 목록 로드
+                $.ajax({
+                    url: '[[@{/adminpage/productadmin/rejectProductForm}]]',
+                    type: 'GET',
+                    data: { gdsNo: gdsNo }, 
+                    success: function(response) {
+                        if (response.rejectReasons && response.rejectReasons.length > 0) {
+                            response.rejectReasons.forEach(function(reason) {
+                                const checkboxHtml = `
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="rejectReasonCodes" value="${reason.aprvRjctRsnCd}" id="reason_${reason.aprvRjctRsnCd}">
+                                        <label class="form-check-label" for="reason_${reason.aprvRjctRsnCd}">
+                                            ${reason.aprvRjctDtlCn}
+                                        </label>
+                                    </div>
+                                `;
+                                $('#rejectReasonsContainer').append(checkboxHtml);
+                            });
+                        } else {
+                            $('#rejectReasonsContainer').append('<p>선택 가능한 반려 사유가 없습니다.</p>');
+                        }
+                        // ⭐⭐⭐ 이 부분이 Bootstrap 4 문법으로 수정되었습니다 ⭐⭐⭐
+                        $('#rejectModal').modal('show');
+                    },
+                    error: function(xhr, status, error) {
+                        alert('반려 사유를 불러오는 데 실패했습니다.');
+                        console.error('Error loading reject reasons:', error);
+                    }
+                });
+            });
+
+            // (선택 사항) 반려 폼 제출 전 유효성 검사
+            $('#rejectForm').on('submit', function(e) {
+                const selectedReasons = $('input[name="rejectReasonCodes"]:checked').length;
+                const comment = $('#managerComment').val().trim();
+
+                if (selectedReasons === 0 && comment === '') {
+                    alert('반려 사유를 하나 이상 선택하거나 상세 내용을 입력해주세요.');
+                    e.preventDefault(); // 폼 제출 막기
+                }
+            });
+        });
+	</script>
+</th:block>
 </html>

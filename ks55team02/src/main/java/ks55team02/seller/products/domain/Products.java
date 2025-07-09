@@ -33,7 +33,9 @@ public class Products {
     private Integer maxPurchaseQty;
 
     private String storeName;
-
+    
+    private String aprvRjctHstryCd; 
+    
     private Integer totalStockQuantity;
     private Boolean isSoldOut;
 

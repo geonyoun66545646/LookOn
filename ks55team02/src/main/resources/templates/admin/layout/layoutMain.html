@@ -10,7 +10,7 @@
         <!-- Favicon -->
         <link rel="shortcut icon" type="image/x-icon" th:href="@{/admincss/assets/imgs/theme/favicon.svg}" />
         <!-- Template CSS -->
-        <link href="/admincss/assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+        <link th:href="@{/admincss/assets/css/main.css?v=1.1}" rel="stylesheet" type="text/css" />
         
          <th:block layout:fragment="customCss"></th:block>
         
@@ -18,7 +18,7 @@
 	<body>
 		<div class="screen-overlay"></div>
 		
-		<!--/* 
+		<!--/* a
 			~{논리경로} : prefix /src/main/resources/templates/ subfix: .html
 			/src/main/resources/templates/admin/fragments/aside.html 
 		*/-->
@@ -51,7 +51,7 @@
         <th:block layout:fragment="jsFile"></th:block>
         
         <!-- Main Script -->
-        <script th:src="@{/admincss/assets/js/main.js?v=1.1}" type="text/javascript"></script>
+        <script th:href="@{/admincss/assets/js/main.js?v=1.1}" type="text/javascript"></script>
        
         <!--/* 개발시 추가할 스크립트 영역 정의 */-->
         <th:block layout:fragment="jsScript"></th:block>	

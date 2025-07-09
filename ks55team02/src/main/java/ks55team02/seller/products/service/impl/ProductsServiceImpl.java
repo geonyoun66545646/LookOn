@@ -58,7 +58,12 @@ public class ProductsServiceImpl implements ProductsService {
         product.setActvtnYn(true);
         product.setExpsrYn(false);
         productsMapper.addProduct(product);
-
+        
+        // 신규등록시, 승인반려 테이블에 대기상태 추가
+        String newHistoryCode = productsMapper.getMaxApprovalHistoryCode();
+        product.setAprvRjctHstryCd(newHistoryCode); // Products 도메인에 aprvRjctHstryCd 필드가 있어야 합니다.
+        productsMapper.addInitialApprovalHistory(product);
+        
         // 2. 이미지 파일 저장 (공통 헬퍼 메소드 호출)
         saveProductImages(request, gdsNo);
         

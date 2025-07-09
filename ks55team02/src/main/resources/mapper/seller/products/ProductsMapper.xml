@@ -170,6 +170,23 @@
 	
 	
 	<!-- ===================== 상품 등록(Create) 관련 쿼리 ===================== -->
+	<!-- 새로운 승인 이력 코드(aprv_rjct_hstry_cd) 생성 -->
+	<select id="getMaxApprovalHistoryCode" resultType="string">
+	    SELECT
+	        CASE
+	            WHEN COUNT(aprv_rjct_hstry_cd) = 0 THEN 'hist_1'
+	            ELSE CONCAT('hist_', COALESCE(MAX(CAST(SUBSTRING_INDEX(aprv_rjct_hstry_cd, '_', -1) AS UNSIGNED)), 0) + 1)
+	        END
+	    FROM
+	        product_approval_history
+	</select>
+	<!-- 상품 등록 시 '대기' 상태의 승인 이력 삽입 -->
+	<insert id="addInitialApprovalHistory" parameterType="ks55team02.seller.products.domain.Products">
+	    INSERT INTO product_approval_history 
+	        (aprv_rjct_hstry_cd, gds_no, aprv_stts_cd, prcs_dt, aprv_rjct_cycl)
+	    VALUES 
+	        (#{aprvRjctHstryCd}, #{gdsNo}, '대기', NOW(), 1)
+	</insert>
 	
 	<!-- 새 상품 코드(gds_no) 생성 -->
 	<select id="getMaxProductCode" resultType="string">
