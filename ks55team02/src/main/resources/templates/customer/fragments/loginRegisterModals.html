@@ -12,51 +12,46 @@
 	                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 			                    <span aria-hidden="true"><i class="icon-close"></i></span>
 			                </button>
-			
-			                <div class="form-box">
-			                    <div class="form-tab">
-			                        <ul class="nav nav-pills nav-fill" role="tablist">
-			                            <li class="nav-item">
-			                                <a class="nav-link active" id="signin-tab" data-toggle="tab" href="#signin" role="tab" aria-controls="signin" aria-selected="true">로그인</a>
-			                            </li>
-			                            <li class="nav-item">
-			                                <a class="nav-link" id="register-tab" data-toggle="tab" href="#register" role="tab" aria-controls="register" aria-selected="false">회원가입</a>
-			                            </li>
-			                        </ul>
-			                        <div class="tab-content" id="tab-content-5">
-			                        
 			                            <!-- 로그인 탭 -->
-			                            
-										<div class="tab-pane fade show active" id="signin" role="tabpanel" aria-labelledby="signin-tab">
-                                            <form id="login-form">
-                                            <input type="hidden" id="redirectUrl" name="redirectUrl" th:value="${currentUrl}">
-                                                <div class="form-group">
-                                                    <label for="login-id">ID를 입력 해주세요.</label>
-                                                    <input type="text" class="form-control" id="login-id" name="userLgnId" required>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="login-pw">비밀번호를 입력 해주세요.</label>
-                                                    <input type="password" class="form-control" id="login-pw" name="userPswdEncptVal" required>
-                                                </div>
-                                                <div class="form-footer">
-                                                    <button type="button" id="login-btn" class="btn btn-outline-primary-2">
-                                                        <span>로그인</span>
-                                                        <i class="icon-long-arrow-right"></i>
-                                                    </button>
-                                                    <div th:if="${session.loginUser != null}">
-	                                                    <a id="logout-btn" class="btn btn-outline-primary-2" th:href="@{/customer/logout}">
-	                                                        <span>로그 아웃</span>
-	                                                        <i class="icon-long-arrow-right"></i>
-	                                                    </a>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-			
-			                            <!-- ================= 회원가입 탭 김성주 할일(유효성검사 및 ajax 진행 안함) ================= -->
-			                            <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
-				                        	<form id="joinForm" novalidate>
-											    <!-- 1. 아이디 -->
+			                            <div class="form-box">
+									    <!-- [수정] 비로그인 상태일 때만 탭 구조 전체를 보여줍니다. -->
+									    <th:block th:if="${session.loginUser == null}">
+									        <div class="form-tab">
+									            <ul class="nav nav-pills nav-fill" role="tablist">
+									                <li class="nav-item">
+									                    <a class="nav-link active" id="signin-tab" data-toggle="tab" href="#signin" role="tab" aria-controls="signin" aria-selected="true">로그인</a>
+									                </li>
+									                <li class="nav-item">
+									                    <a class="nav-link" id="register-tab" data-toggle="tab" href="#register" role="tab" aria-controls="register" aria-selected="false">회원가입</a>
+									                </li>
+									            </ul>
+									            <div class="tab-content" id="tab-content-5">
+									                <!-- 로그인 탭 -->
+									                <div class="tab-pane fade show active" id="signin" role="tabpanel" aria-labelledby="signin-tab">
+									                    <form id="login-form">
+									                        <input type="hidden" id="redirectUrl" name="redirectUrl" th:value="${currentUrl}">
+									                        <div class="form-group">
+									                            <label for="login-id">ID를 입력 해주세요.</label>
+									                            <input type="text" class="form-control" id="login-id" name="userLgnId" required>
+									                        </div>
+									                        <div class="form-group">
+									                            <label for="login-pw">비밀번호를 입력 해주세요.</label>
+									                            <input type="password" class="form-control" id="login-pw" name="userPswdEncptVal" required>
+									                        </div>
+									                        <div class="form-footer">
+									                            <button type="button" id="login-btn" class="btn btn-outline-primary-2">
+									                                <span>로그인</span>
+									                                <i class="icon-long-arrow-right"></i>
+									                            </button>
+									                        </div>
+									                    </form>
+									                </div>
+									
+									                <!-- 회원가입 탭 -->
+									                <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+									                    <!-- ... (기존 회원가입 폼 코드는 여기에 그대로 두면 됩니다) ... -->
+									                    <form id="joinForm" novalidate>
+									                        <!-- 1. 아이디 -->
 											    <div class="form-group">
 												    <label for="reg-id">아이디 <span class="text-danger">*</span></label>
 												    <!-- input-group과 button을 제거하고 input만 남김 -->
@@ -163,17 +158,29 @@
 											            <i class="icon-long-arrow-right"></i>
 											        </button>
 											    </div>
-											</form>
-			                            </div>
+									                    </form>
+									                </div>
+									            </div><!-- End .tab-content -->
+									        </div><!-- End .form-tab -->
+									    </th:block>
+									
+									    <!-- [수정] 로그인 상태일 때는 탭 구조 없이 이 부분만 보여줍니다. -->
+									    <th:block th:if="${session.loginUser != null}">
+									        <div class="text-center" style="padding: 2rem 0;">
+									            <h3><span th:text="${session.loginUser.userNcnm}">지성</span>님, 환영합니다.</h3>
+									            <p class="mt-2">이미 로그인되어 있습니다.</p>
+									            <a th:href="@{/customer/logout}" class="btn btn-outline-primary-2 mt-4">
+									                <span>로그 아웃</span>
+									                <i class="icon-long-arrow-right"></i>
+									            </a>
+									        </div>
+									    </th:block>
 			                        </div>
 			                    </div>
 			                </div>
 	                    </div>
 	                </div>
 	            </div>
-	        </div>
-	    </div>
-	
 	    <!-- 여기에 다른 공용 모달(예: 알림 모달)을 추가할 수도 있음 -->
 	    <!--
 	    <div th:fragment="alertModalFragment">

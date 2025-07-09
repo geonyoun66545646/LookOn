@@ -3,6 +3,7 @@ package ks55team02.customer.login.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +30,17 @@ public class LoginController {
     // 로그인 처리를 위한 POST 요청을 받는 메소드
     @PostMapping("/login")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> loginProcess(@RequestBody Login loginInfo, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> loginProcess(@RequestBody Login loginInfo, HttpServletRequest request, HttpSession session) {
 
+    	if (session.getAttribute("loginUser") != null) {
+            log.warn("이미 로그인된 사용자의 중복 로그인 시도 차단. IP: {}", request.getRemoteAddr());
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "already_logged_in");
+            response.put("message", "이미 로그인되어 있습니다.");
+            // 이미 로그인된 상태이므로 OK(200) 대신 다른 상태 코드(예: 409 Conflict)를 보내는 것도 좋음
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response); 
+        }
+    	
         // 1. 클라이언트의 IP 주소 가져오기
         String clientIp = request.getRemoteAddr();
         loginInfo.setIpAddress(clientIp);
@@ -80,6 +90,13 @@ public class LoginController {
     	session.invalidate();
     	
     	log.info("========== 로그아웃 메소드 실행됨 ==========");
-    	return "redirect:/"; 
+    	return "redirect:/main"; 
+    }
+    
+    @GetMapping("/clearLoginInterceptorSession")
+    @ResponseBody
+    public void clearLoginInterceptorSession(HttpSession session) {
+        session.removeAttribute("authAlert");
+        session.removeAttribute("redirectUrlAfterLogin");
     }
 }
