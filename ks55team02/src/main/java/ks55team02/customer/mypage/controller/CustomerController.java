@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class CustomerController {
 	
-	@GetMapping("/mypage")
+	@GetMapping("/customer/mypage")
 	public String CustomerMyPageController() {
 		
 		return "customer/mypage/customerMyPage";
