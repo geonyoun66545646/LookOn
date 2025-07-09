@@ -34,14 +34,14 @@
 							<li><a
 								th:href="@{/customer/products(category='new-products')}"
 								class="lookon-nav-link">신상</a></li>
-							<li><a href="#" class="lookon-nav-link">커뮤니티</a></li>
-							<li><a href="#" class="lookon-nav-link">피드</a></li>
+							<li><a th:href="@{/customer/post/postList}" class="lookon-nav-link">커뮤니티</a></li>
+							<li><a th:href="@{/customer/feed/feedList}" class="lookon-nav-link">피드</a></li>
 
 						</ul>
 					</nav>
 				</div>
 				<div class="lookon-user-action-menu">
-					<a th:href="@{/mypage}"><i class="far fa-user"></i></a> <a href="#"
+					<a th:href="@{/customer/mypage}"><i class="far fa-user"></i></a> <a href="#"
 						class="lookon-action-link" data-toggle="modal"
 						data-target="#signin-modal"> <i class="far fa-heart"></i> <span
 						class="lookon-badge">3</span>

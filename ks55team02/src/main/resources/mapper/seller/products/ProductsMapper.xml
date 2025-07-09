@@ -81,11 +81,23 @@
 		<result column="expsr_yn" property="expsrYn" />
 		<result column="actvtn_yn" property="actvtnYn" />
 		<result column="thumbnail_image_path" property="thumbnailImagePath" />
+		<result column="latestApprovalStatus" property="latestApprovalStatus" />
 		<association property="productCategory" javaType="ks55team02.seller.products.domain.ProductCategory">
 			<id property="categoryId" column="ctgry_no" />
 			<result property="categoryName" column="ctgry_nm" />
 		</association>
 	</resultMap>
+	
+	<!-- 특정 카테고리에 속한 모든 상품을 비노출 처리 -->
+    <update id="deactivateProductsByCategoryId" parameterType="string">
+        UPDATE
+            products
+        SET
+            expsr_yn = false,
+            mdfcn_dt = CURRENT_TIMESTAMP
+        WHERE
+            ctgry_no = #{categoryId}
+    </update>
 	
 	<!-- ===================== 상품 삭제(Update) 관련 쿼리 ===================== -->
 
@@ -159,6 +171,23 @@
 	
 	
 	<!-- ===================== 상품 등록(Create) 관련 쿼리 ===================== -->
+	<!-- 새로운 승인 이력 코드(aprv_rjct_hstry_cd) 생성 -->
+	<select id="getMaxApprovalHistoryCode" resultType="string">
+	    SELECT
+	        CASE
+	            WHEN COUNT(aprv_rjct_hstry_cd) = 0 THEN 'hist_1'
+	            ELSE CONCAT('hist_', COALESCE(MAX(CAST(SUBSTRING_INDEX(aprv_rjct_hstry_cd, '_', -1) AS UNSIGNED)), 0) + 1)
+	        END
+	    FROM
+	        product_approval_history
+	</select>
+	<!-- 상품 등록 시 '대기' 상태의 승인 이력 삽입 -->
+	<insert id="addInitialApprovalHistory" parameterType="ks55team02.seller.products.domain.Products">
+	    INSERT INTO product_approval_history 
+	        (aprv_rjct_hstry_cd, gds_no, aprv_stts_cd, prcs_dt, aprv_rjct_cycl)
+	    VALUES 
+	        (#{aprvRjctHstryCd}, #{gdsNo}, '대기', NOW(), 1)
+	</insert>
 	
 	<!-- 새 상품 코드(gds_no) 생성 -->
 	<select id="getMaxProductCode" resultType="string">
@@ -275,27 +304,37 @@
 
 	<!-- 판매자/스토어별 상품 목록 조회 -->
 	<select id="getProductsBySellerAndStore" parameterType="map" resultMap="productsResultMap">
-		SELECT
-			p.gds_no, p.store_id, p.ctgry_no, p.gds_nm, p.bas_prc, p.dscnt_rt,
-			(p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
-			p.reg_dt, p.expsr_yn, p.actvtn_yn, pc.ctgry_nm,
-			(
-				SELECT pi.img_file_path_nm
-				FROM ks55team02db.product_images pi
-				WHERE pi.gds_no = p.gds_no AND pi.img_type = 1
-				ORDER BY pi.img_indct_sn ASC
-				LIMIT 1
-			) AS thumbnail_image_path
-		FROM
-			ks55team02db.products p
-		LEFT JOIN
-			ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
-		WHERE
-			p.sel_user_no = #{selUserNo}
-			AND p.store_id = #{storeId}
-			AND p.actvtn_yn = true
-		ORDER BY
-			p.reg_dt DESC
+	    SELECT
+	        p.gds_no, p.store_id, p.ctgry_no, p.gds_nm, p.bas_prc, p.dscnt_rt,
+	        (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
+	        p.reg_dt, p.expsr_yn, p.actvtn_yn, pc.ctgry_nm,
+	        (
+	            SELECT pi.img_file_path_nm
+	            FROM ks55team02db.product_images pi
+	            WHERE pi.gds_no = p.gds_no AND pi.img_type = 1
+	            ORDER BY pi.img_indct_sn ASC
+	            LIMIT 1
+	        ) AS thumbnail_image_path,
+	        
+	        -- ⭐ 추가: product_approval_history에서 최신 aprv_stts_cd를 가져옵니다.
+	        (
+	            SELECT pah.aprv_stts_cd
+	            FROM ks55team02db.product_approval_history pah
+	            WHERE pah.gds_no = p.gds_no
+	            ORDER BY pah.prcs_dt DESC, pah.aprv_rjct_cycl DESC
+	            LIMIT 1
+	        ) AS latestApprovalStatus
+	        
+	    FROM
+	        ks55team02db.products p
+	    LEFT JOIN
+	        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+	    WHERE
+	        p.sel_user_no = #{selUserNo}
+	        AND p.store_id = #{storeId}
+	        AND p.actvtn_yn = true
+	    ORDER BY
+	        p.reg_dt DESC
 	</select>
 
 	<!-- (관리자용) 모든 상품 목록 조회 -->

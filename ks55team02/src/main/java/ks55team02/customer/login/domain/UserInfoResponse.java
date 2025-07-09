@@ -34,4 +34,9 @@ public class UserInfoResponse {
     // ===== user_security_settings 테이블 정보 =====
     private String lastPswdChgDt; 			// 마지막 비밀번호 변경 일시
     private Boolean mfaUseYn;				// 2단계인증 사용 여부
+    
+    // ===== user_follows 테이블 정보, 추가로 게시글 갯수까지 =====
+    private int postCount;
+    private int followerCount;
+    private int followingCount;
 }

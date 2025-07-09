@@ -7,5 +7,7 @@ import ks55team02.customer.register.domain.UserJoinRequest;
 @Service
 public interface CustomerRegisterService {
 
+	
+	
 	void joinUser(UserJoinRequest userJoinRequest);
 }

@@ -24,6 +24,46 @@
     margin-top: 20px; /* 위(20px) 여백 추가 */
 }
 
+/* [추가] 탭과 아이콘을 감싸는 헤더 컨테이너 */
+.feed-header {
+    display: flex;                 /* Flexbox 레이아웃 적용 */
+    justify-content: space-between; /* 양쪽 끝으로 요소를 정렬 */
+    align-items: center;           /* 수직 중앙 정렬 */
+    margin-bottom: 20px;           /* 아래쪽 여백 */
+    border-bottom: 1px solid #eee; /* 기존 탭 메뉴의 밑줄을 이곳으로 이동 */
+}
+
+/* 기존 탭 메뉴의 밑줄은 제거 (부모가 가지므로) */
+.feed-tabs ul {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+
+/* [추가] 오른쪽 아이콘 버튼 영역 */
+.feed-actions {
+    display: flex;
+    gap: 10px; /* 아이콘 사이의 간격 */
+}
+
+/* [추가] 개별 아이콘 버튼 스타일 */
+.action-btn {
+    color: #333; /* 아이콘 색상 */
+    padding: 8px;
+    display: block;
+}
+
+.action-btn:hover {
+    color: #000; /* 마우스 올렸을 때 색상 */
+}
+
+/* SVG 아이콘의 크기를 제어 */
+.action-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor; /* a 태그의 color 속성을 따라가도록 설정 */
+}
+
 /* 1. 상단 탭 메뉴 */
 .feed-tabs ul {
     display: flex;
