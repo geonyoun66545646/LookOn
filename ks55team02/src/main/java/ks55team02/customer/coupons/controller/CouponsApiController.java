@@ -35,12 +35,9 @@ public class CouponsApiController {
 		LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
 
 		if (loginUser == null) {
-			// 비로그인 상태일 경우, userNo를 null로 전달하여 서비스 내부에서 처리하게 함
-			log.warn("API 호출 - 발급 가능 쿠폰 조회: 비로그인 사용자");
-			// 서비스에 userNo를 null로 넘겨 비로그인 상태임을 알림 (서비스에서 isIssuable=false, message="로그인 후 확인 가능" 처리)
-			CustomerPagination<Coupons> availableCouponsPage = couponsService.getAvailableCoupons(null, keyword,
-					sortOrder, page);
-			return new ResponseEntity<>(availableCouponsPage, HttpStatus.OK);
+			// ★★★ 이 부분을 수정합니다. 로그인되지 않은 사용자에게 401 Unauthorized를 반환합니다. ★★★
+			log.warn("API 호출 - 발급 가능 쿠폰 조회: 비로그인 사용자. 401 Unauthorized 반환.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 상태 코드만 반환
 		}
 
 		String userNo = loginUser.getUserNo();
@@ -103,7 +100,8 @@ public class CouponsApiController {
 			return ResponseEntity.badRequest().body(Map.of("message", e.getMessage())); // 예외 메시지를 그대로 반환
 		} catch (Exception e) {
 			log.error("쿠폰 발급 중 시스템 오류 발생: {}", e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "쿠폰 발급 중 시스템 오류가 발생했습니다."));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(Map.of("message", "쿠폰 발급 중 시스템 오류가 발생했습니다."));
 		}
 	}
 }

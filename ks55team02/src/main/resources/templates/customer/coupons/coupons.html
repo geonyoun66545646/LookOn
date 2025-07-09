@@ -112,74 +112,86 @@ document.addEventListener('DOMContentLoaded', function() {
     // 2. 핵심 로직 함수 (데이터 로딩 및 화면 그리기)
     // ===================================================================
 
+// ... (loadCoupons 함수 시작) ...
+
     /**
- * 현재 상태(currentState)를 기반으로 쿠폰 데이터를 로드하는 메인 함수
- */
-function loadCoupons() {
-    // --- 디버그 로그 시작 ---
-    console.log(">>> loadCoupons 함수 시작 <<<");
-    console.log("현재 상태 (currentState):", currentState);
-    // --- 디버그 로그 끝 ---
+     * 현재 상태(currentState)를 기반으로 쿠폰 데이터를 로드하는 메인 함수
+     */
+    function loadCoupons() {
+        console.log(">>> loadCoupons 함수 시작 <<<");
+        console.log("현재 상태 (currentState):", currentState);
 
-    // 현재 선택된 탭에 따라 API 주소와 화면을 그릴 함수를 결정
-    const isMyCouponsTab = currentState.tab === 'my';
-    const apiUrl = isMyCouponsTab ? '/api/coupons/my' : '/api/coupons/available';
-    const renderFunction = isMyCouponsTab ? renderMyCoupons : renderAvailableCoupons;
+        const isMyCouponsTab = currentState.tab === 'my';
+        const apiUrl = isMyCouponsTab ? '/api/coupons/my' : '/api/coupons/available';
+        const renderFunction = isMyCouponsTab ? renderMyCoupons : renderAvailableCoupons;
 
-    console.log("요청할 API URL:", apiUrl); // 디버그 로그
-
-    // 서버에 보낼 URL 파라미터를 조합
-    const params = new URLSearchParams({
-        keyword: currentState.keyword,
-        sortOrder: currentState.sortOrder,
-        page: currentState.page
-    });
-    console.log("요청 파라미터:", params.toString()); // 디버그 로그
-
-    // 데이터를 불러오기 전, 로딩 메시지 표시
-    couponListContainer.innerHTML = '<li><p class="text-center p-5">로딩 중...</p></li>';
-
-    // fetch API를 이용한 비동기(AJAX) 요청
-    fetch(`${apiUrl}?${params.toString()}`)
-        .then(response => {
-            console.log(">>> fetch 응답 받음 (HTTP 상태):", response.status, response.statusText); // 디버그 로그
-            if (!response.ok) {
-                // HTTP 상태 코드가 2xx 범위가 아닌 경우 (예: 401 Unauthorized, 400 Bad Request)
-                // 서버에서 보낸 에러 메시지를 파싱하여 던짐
-                return response.json().then(errorData => {
-                    console.error("Fetch 에러 - 서버 응답:", errorData); // 디버그 로그
-                    throw new Error(errorData.message || '서버 응답에 문제가 있습니다.');
-                });
-            }
-            return response.json();
-        })
-        .then(pageData => {
-            console.log(">>> fetch 응답 JSON 파싱 완료, pageData:", pageData); // 디버그 로그
-
-            // 1. 쿠폰 목록 그리기
-            renderFunction(couponListContainer, pageData.list); // 이 부분이 renderAvailableCoupons 또는 renderMyCoupons 호출
-            console.log(">>> renderFunction 호출 완료 <<<"); // 디버그 로그
-
-            // 2. 페이지네이션 그리기 (공용 부품 호출)
-            // assuming renderPagination is defined elsewhere in your code
-            paginationContainer.innerHTML = renderPagination(pageData);
-
-            // 3. 전체 개수 및 탭별 개수 업데이트
-            totalCountEl.textContent = `전체 ${pageData.totalCount}개`;
-            if (isMyCouponsTab) {
-                myCouponsCountEl.textContent = `(${pageData.totalCount})`;
-            } else {
-                availableCouponsCountEl.textContent = `(${pageData.totalCount})`;
-            }
-            console.log("개수 업데이트 완료:", `전체 ${pageData.totalCount}개`); // 디버그 로그
-        })
-        .catch(error => {
-            console.error('쿠폰 데이터를 불러오는 중 오류 발생:', error); // 디버그 로그
-            couponListContainer.innerHTML = '<li><p class="text-center p-5">데이터를 불러오는 데 실패했습니다.</p></li>';
+        console.log("요청할 API URL:", apiUrl);
+        const params = new URLSearchParams({
+            keyword: currentState.keyword,
+            sortOrder: currentState.sortOrder,
+            page: currentState.page
         });
+        console.log("요청 파라미터:", params.toString());
+        couponListContainer.innerHTML = '<li><p class="text-center p-5">로딩 중...</p></li>';
 
-    console.log(">>> loadCoupons 함수 종료 <<<"); // 디버그 로그
-}
+        fetch(`${apiUrl}?${params.toString()}`)
+            .then(response => {
+                console.log(">>> fetch 응답 받음 (HTTP 상태):", response.status, response.statusText);
+                
+                // ★★★ 401 Unauthorized 상태인 경우 로그인 모달 처리 ★★★
+                if (response.status === 401) {
+                    // SweetAlert로 로그인 필요 안내 메시지 표시
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '로그인이 필요합니다',
+                        text: '쿠폰 정보를 확인하려면 로그인해주세요.',
+                        showConfirmButton: false, // 확인 버튼 없음
+                        timer: 2000 // 2초 후 자동으로 닫힘
+                    }).then(() => {
+                        // ★★★ 이 부분에 다른 팀원이 구현해놓은 로그인 모달창을 띄우는 코드를 넣으세요. ★★★
+                        // 예시: showLoginModal(); // 전역 함수로 정의된 경우
+                        // 예시: $('#loginModal').modal('show'); // jQuery & Bootstrap 모달
+                        // 예시: document.getElementById('loginModal').style.display = 'block'; // 순수 JS 모달
+                        
+                        console.log("로그인 모달창을 띄워야 합니다. 여기에 해당 함수 호출 코드를 넣어주세요.");
+                        // 로그인 모달창을 띄우는 구체적인 코드는 팀원이 구현한 방식에 따라 달라집니다.
+                    });
+                    // 더 이상 JSON 파싱이나 다른 에러 처리를 진행하지 않도록 에러를 던져 체인을 끊습니다.
+                    throw new Error('UNAUTHORIZED_ACCESS'); 
+                }
+
+                // HTTP 상태 코드가 2xx 범위가 아닌 경우 (400, 500 등)
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        console.error("Fetch 에러 - 서버 응답:", errorData);
+                        throw new Error(errorData.message || '서버 응답에 문제가 있습니다.');
+                    });
+                }
+                return response.json();
+            })
+            .then(pageData => {
+                console.log(">>> fetch 응답 JSON 파싱 완료, pageData:", pageData);
+                renderFunction(couponListContainer, pageData.list);
+                paginationContainer.innerHTML = renderPagination(pageData);
+                totalCountEl.textContent = `전체 ${pageData.totalCount}개`;
+                if (isMyCouponsTab) {
+                    myCouponsCountEl.textContent = `(${pageData.totalCount})`;
+                } else {
+                    availableCouponsCountEl.textContent = `(${pageData.totalCount})`;
+                }
+                console.log("개수 업데이트 완료:", `전체 ${pageData.totalCount}개`);
+            })
+            .catch(error => {
+                // 'UNAUTHORIZED_ACCESS' 에러는 여기서 다시 SweetAlert를 띄우지 않도록 처리
+                if (error.message === 'UNAUTHORIZED_ACCESS') {
+                    console.log("인증되지 않은 접근, 로그인 모달 처리 완료.");
+                } else {
+                    console.error('쿠폰 데이터를 불러오는 중 오류 발생:', error);
+                    couponListContainer.innerHTML = '<li><p class="text-center p-5">데이터를 불러오는 데 실패했습니다.</p></li>';
+                }
+            });
+        console.log(">>> loadCoupons 함수 종료 <<<");
+    }
 
 //... (renderMyCoupons 함수 시작) ...
 
@@ -321,7 +333,7 @@ function renderMyCoupons(container, coupons) {
             })
             .catch(error => {
                 console.error('발급 가능 쿠폰 개수 조회 오류:', error);
-                availableCouponsCountEl.textContent = '(?)';
+                availableCouponsCountEl.textContent = '';
             });
     }
     
