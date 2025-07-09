@@ -5,7 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+/**
+ * 이 어노테이션이 붙은 DTO의 필드는 암/복호화 대상으로 지정됩니다.
+ */
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Encrypt {
+public @interface EncryptedField {
 }

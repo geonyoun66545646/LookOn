@@ -39,4 +39,7 @@ public class UserJoinRequest {
     // 9. 선택적 동의 항목 (폼에 체크박스가 있다면 포함)
     private Boolean pushNtfctnRcptnAgreYn;
     private Boolean emlRcptnAgreYn;
+    
+    // 10. 생년월일
+    private String userBrdt;
 }

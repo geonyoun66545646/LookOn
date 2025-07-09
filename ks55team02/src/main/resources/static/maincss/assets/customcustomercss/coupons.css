@@ -338,3 +338,23 @@ body {
     font-size: 14px !important; /* 버튼 폰트 크기 조정 */
     padding: 8px 16px !important; /* 버튼 패딩 조정 */
 }
+    
+    /* ★★★ 발급 불가 버튼 (disabled 클래스가 적용된 경우) 스타일 ★★★ */
+.coupon-download-btn.disabled {
+    background-color: #c4a282; /* 발급 불가 버튼의 고정 색상 */
+    color: #ffffff;             /* 텍스트 색상 (발급 불가 버튼의 텍스트 색상을 원하는 대로 설정) */
+    cursor: not-allowed;        /* 마우스 커서를 '금지' 모양으로 변경 */
+    opacity: 0.5;               /* 약간 투명하게 하여 비활성화 느낌 강조 (선택 사항) */
+    pointer-events: auto;       /* JavaScript 클릭 이벤트를 받기 위해 필요 (중요!) */
+    /* transition: none; */     /* (선택 사항) 기본 버튼에 transition이 있다면 비활성화 시 제거 */
+}
+
+/* ★★★ 발급 불가 버튼에 마우스를 올려도 색상 변화가 없도록 처리 (호버 효과 무시) ★★★ */
+.coupon-download-btn.disabled:hover {
+    background-color: #c4a282; /* 호버 시에도 동일한 색상 유지 */
+    /* 기존 호버 스타일을 재정의하여 적용되지 않도록 합니다. */
+} 
+.coupon-download-btn:hover,
+.coupon-download-btn:focus {
+    color: #ffffff;
+}

@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import ks55team02.admin.common.domain.SearchCriteria;
+import ks55team02.systems.crypto.annotation.EncryptedField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -25,15 +26,28 @@ public class UserList extends SearchCriteria {
 	private String userNo; // 회원 고유번호 (PK)
 	private String mbrGrdCd; // 회원 등급 코드
 	private String userLgnId; // 회원 로그인 ID
+	
+	@EncryptedField
 	private String userNm; // 회원 이름
+	
 	private String userPswdEncptVal; // 비밀번호 암호화 값 (조회 시에는 사용되지 않음)
 	private String genderSeCd; // 성별 구분 코드 ('m', 'f' 등)
+	
+	@EncryptedField
 	private String emlAddr; // 이메일 주소
+	
+	@EncryptedField
 	private String telno; // 전화번호
+	
 	private LocalDate userBrdt; // 회원 생년월일
 	private String zipCd; // 우편번호
+	
+	@EncryptedField
 	private String addr; // 주소
+	
+	@EncryptedField
 	private String daddr; // 상세 주소
+	
 	private String userNcnm; // 닉네임
 	private String userStatus; // 회원 상태 (예: '정상', '휴면', '탈퇴' 등)
 	private LocalDateTime joinDt; // 가입일
