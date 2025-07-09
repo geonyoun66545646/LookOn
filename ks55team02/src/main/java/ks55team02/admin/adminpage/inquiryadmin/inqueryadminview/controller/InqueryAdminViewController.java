@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/adminpage/inquiryadmin")
 public class InqueryAdminViewController {
 
-	// 문의 및 신고 관리자
-	@GetMapping("/inqueryAdminView")
+	// 문의 관리
+	@GetMapping("/inquiryAdminView")
 	public String inquiryAdminRepotController() {
 		
 		return "admin/adminpage/inquiryadmin/inqueryAdminView";

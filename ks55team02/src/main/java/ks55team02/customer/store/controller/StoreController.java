@@ -47,19 +47,5 @@ public class StoreController {
 		return "customer/store/appStoreView";
 	}
 	
-	@GetMapping("/appStore2")
-	public String getAppStore2(/* @RequestParam("userNo") */String userNo ,Model model, HttpSession session) {
-		
-		String targetUserNo = getCurrentUserId(session); // 직접 getCurrentUserId의 값을 가져와 사용
-		UserList userInfo = appStoreService.getUserInfo(targetUserNo); // 이 값을 서비스 메소드에 전달
-		
-		// 빈 AppStore 객체 (폼 초기화)
-		model.addAttribute("appStore2", new AppStore());
-		// userInfo 객체를 모델에 추가
-		model.addAttribute("userInfo", userInfo);
-		model.addAttribute("title", "상점신청 페이지");
-		return "customer/store/appStore2View";
-	}
-	
 
 }

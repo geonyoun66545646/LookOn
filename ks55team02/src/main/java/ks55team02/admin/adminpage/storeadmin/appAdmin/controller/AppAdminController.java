@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Controller
-@RequestMapping("/adminpage/storeadmin")
+@RequestMapping("/adminpage/storeAdmin")
 @RequiredArgsConstructor
 @Log4j2
 public class AppAdminController {
