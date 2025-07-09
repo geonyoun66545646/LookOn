@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{admin/layout/layoutMain}">
+		
+	<th:block layout:fragment="contents">
+	 	<main class="main-content">
+	        <section class="content-header">
+                <!-- isUpdate와 같은 변수가 없으므로 title을 직접 사용 -->
+	            <h2 class="content-title" th:text="${title}"></h2>
+	            <div>
+	                <a th:href="@{/adminpage/productadmin/adminCategoryManagement}" class="btn btn-light rounded font-sm mr-5 text-body hover-up">목록으로</a>
+	                <button type="submit" form="categoryForm" class="btn btn-primary btn-block">등록하기</button>
+	            </div>
+	        </section>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4>카테고리 정보</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- form의 action과 object를 설정 -->
+                            <form id="categoryForm" th:action="@{/adminpage/productadmin/addCategory}" th:object="${productCategory}" method="post">
+                                <div class="mb-4">
+                                    <label for="categoryId" class="form-label">카테고리 ID</label>
+                                    <input type="text" placeholder="예: cat_new" class="form-control" id="categoryId" th:field="*{categoryId}" required>
+                                    <small class="form-text text-muted">영문, 숫자, 언더스코어(_)만 사용 가능하며, 중복될 수 없습니다.</small>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="categoryName" class="form-label">카테고리명</label>
+                                    <input type="text" placeholder="예: 신규 상품" class="form-control" id="categoryName" th:field="*{categoryName}" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label">상위 카테고리 (선택)</label>
+                                    <select class="form-select" th:field="*{parentCategoryId}">
+                                        <option value="">-- 상위 카테고리 없음 (1차 카테고리로 등록) --</option>
+                                        <option th:each="cat : ${topLevelCategories}"
+                                                th:value="${cat.categoryId}"
+                                                th:text="${cat.categoryName}"></option>
+                                    </select>
+                                    <small class="form-text text-muted">상위 카테고리를 선택하면 2차 카테고리로 등록됩니다.</small>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</main>
+	</th:block>	
+</html>

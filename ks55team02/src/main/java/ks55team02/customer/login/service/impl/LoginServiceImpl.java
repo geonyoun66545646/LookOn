@@ -11,6 +11,7 @@ import ks55team02.customer.login.domain.Login;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.customer.login.mapper.LoginMapper;
 import ks55team02.customer.login.service.LoginService;
+import ks55team02.systems.crypto.utils.PasswordEncryptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,8 +57,10 @@ public class LoginServiceImpl  implements LoginService{
         String inputPassword = loginInfo.getUserPswdEncptVal();
         String dbPassword = userInfoFromDb.getUserPswdEncptVal();
         
+        boolean isPasswordMatch = PasswordEncryptor.checkPassword(inputPassword, dbPassword);
+        
         // 4-1. 비밀번호 불일치 (로그인 실패 처리)
-        if (!inputPassword.equals(dbPassword)) {
+        if (!isPasswordMatch) {
             log.info("비밀번호가 일치하지 않습니다. ID: {}", userId);
             
             // 1. 로그인 실패 횟수 1 증가
@@ -99,9 +102,20 @@ public class LoginServiceImpl  implements LoginService{
             );
         
         
-        HttpSession session = request.getSession(); // 파라미터로 받은 request 사용
-        session.setAttribute("loginUser", sessionUser);
-        log.info("세션에 사용자 정보 저장 완료. sessionUser: {}", sessionUser);
+        // 1. 현재 사용 중인 세션을 가져온다. (없으면 새로 생성하지 않음)
+        HttpSession oldSession = request.getSession(false);
+        if (oldSession != null) {
+            // 2. 기존 세션이 있다면, 그 세션을 무효화(파기)한다.
+            log.info("기존 세션 무효화. Session ID: {}", oldSession.getId());
+            oldSession.invalidate();
+        }
+
+        // 3. 완전히 새로운 세션을 생성한다. (true: 없으면 반드시 새로 생성)
+        HttpSession newSession = request.getSession(true);
+        
+        // 4. 새로운 세션에 로그인 사용자 정보를 저장한다.
+        newSession.setAttribute("loginUser", sessionUser);
+        log.info("새로운 세션 생성 및 사용자 정보 저장 완료. New Session ID: {}", newSession.getId());
         
         return userInfoFromDb;
     }

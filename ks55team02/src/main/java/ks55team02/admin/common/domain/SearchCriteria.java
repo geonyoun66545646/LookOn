@@ -21,4 +21,7 @@ public class SearchCriteria {
     private String searchKey;
     private String searchValue;
     private List<String> filterConditions;
+    
+    // ⭐ 추가: 카테고리 레벨 필터링 (예: [1, 2])
+    private List<Integer> levels; 
 }

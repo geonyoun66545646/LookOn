@@ -15,7 +15,7 @@ import java.util.Map;
 public class ProductSearchServiceImpl implements ProductSearchService {
 
     private final ProductSearchMapper productSearchMapper;
-
+    
     @Override
     public List<Products> getAllActiveProductsForCustomer() {
         return productSearchMapper.getAllActiveProductsForCustomer();
