@@ -9,6 +9,7 @@
 	</head>
 	
 	<th:block layout:fragment="jsFile">
+		<script th:src="@{/maincss/assets/js/customer/feedList.js}"></script>
 	</th:block>
 	
 	<th:block layout:fragment="jsScript">
@@ -83,75 +84,31 @@
 		        </select>
 		    </div>
 		
-		    <!-- 4. 콘텐츠 그리드 -->
+			<!-- 4. 콘텐츠 그리드 -->
 			<section class="feed-grid">
-			    <!-- 아래 .feed-item을 12개로 늘려 실제 그리드 형태를 확인합니다. -->
-			    <article class="feed-item">
-			        <a href="#">
-			            <img src="https://cdn.san.chosun.com/news/photo/202306/22829_84345_2951.jpg" alt="피드 이미지 1">
+			    <!-- th:each를 사용하여 서버에서 받은 feedList로 반복문 실행 -->
+			    <article class="feed-item" th:each="feed : ${feedList}">
+			        <!-- 상세 페이지로 이동하는 링크. feedSn을 경로 변수로 사용 -->
+			        <a th:href="@{/customer/feed/feedDetail/{feedSn}(feedSn=${feed.feedSn})}">
+			            <!-- 대표 이미지가 없는 경우 기본 이미지 표시. Safe Navigation(?.) 사용 -->
+			            <img th:src="${feed.representativeImage?.imgFilePathNm != null ? feed.representativeImage.imgFilePathNm : '/images/default-feed.png'}" alt="피드 대표 이미지">
 			            <div class="item-overlay">
-			                <span class="likes">♥ 1.2k</span>
+			                <!-- 좋아요 수 동적 표시 -->
+			                <span class="likes" th:text="|♥ ${feed.likeCount}|">♥ 0</span>
 			            </div>
 			        </a>
+			        <!-- 작성자 정보 표시 영역 (피드 아이템 카드 하단이나 상단에 추가 가능) -->
+			        <div class="feed-writer-info">
+			            <!-- 프로필 이미지가 없으므로, 닉네임만 표시 -->
+			            <span th:text="${feed.writerInfo?.userNcnm}">작성자 닉네임</span>
+			        </div>
 			    </article>
-			    <article class="feed-item">
-			        <a href="#">
-			            <img src="https://img2.yna.co.kr/etc/inner/KR/2022/05/13/AKR20220513056600009_01_i_P2.jpg" alt="피드 이미지 2">
-			            <div class="item-overlay">
-			                <span class="likes">♥ 980</span>
-			            </div>
-			        </a>
-			    </article>
-			    <article class="feed-item">
-			        <a href="#">
-			            <img src="https://thumb.mt.co.kr/06/2018/10/2018103116293296706_1.jpg" alt="피드 이미지 3">
-			            <div class="item-overlay">
-			                <span class="likes">♥ 2.5k</span>
-			            </div>
-			        </a>
-			    </article>
-			    <article class="feed-item">
-			        <a href="#">
-			            <img src="https://i.pinimg.com/736x/42/12/92/421292336af0cf1196867e16b6f059ad.jpg" alt="피드 이미지 4">
-			            <div class="item-overlay">
-			                <span class="likes">♥ 3.1k</span>
-			            </div>
-			        </a>
-			    </article>
-			    <article class="feed-item">
-			        <a href="#">
-			            <img src="https://dcimg1.dcinside.com/viewimage.php?id=3eb4de21e9d73ab360b8dab04785736f&no=24b0d769e1d32ca73de98ffa11d02831b6424c6cf1a53deda4aa5f5480c905885059a892c6654d09573f3bdba0bb2400613ca5f62c1026922a6027c353afbee680e90444012da50bb2264bd2889e8d9246c8309f67a2677c28d7cd5c" alt="피드 이미지 5">
-			            <div class="item-overlay">
-			                <span class="likes">♥ 854</span>
-			            </div>
-			        </a>
-			    </article>
-			    <article class="feed-item">
-			        <a href="#">
-			            <img src="https://i.pinimg.com/736x/af/79/22/af7922f12c8ab680451b8013ed75de4b.jpg" alt="피드 이미지 6">
-			            <div class="item-overlay">
-			                <span class="likes">♥ 1.8k</span>
-			            </div>
-			        </a>
-			    </article>
-			    <article class="feed-item">
-			        <a href="#">
-			            <img src="https://image-cdn.hypb.st/https%3A%2F%2Fkr.hypebeast.com%2Ffiles%2F2019%2F08%2Fyoung-n-sang-2020-spring-summer-lookbook-4.jpg?q=75&w=800&cbr=1&fit=max" alt="피드 이미지 7">
-			            <div class="item-overlay">
-			                <span class="likes">♥ 5.2k</span>
-			            </div>
-			        </a>
-			    </article>
-			    <article class="feed-item">
-			        <a href="#">
-			            <img src="https://img3.daumcdn.net/thumb/R658x0.q70/?fname=https://t1.daumcdn.net/news/202202/11/i_dkorea/20220211063928457elcn.jpeg" alt="피드 이미지 8">
-			            <div class="item-overlay">
-			                <span class="likes">♥ 770</span>
-			            </div>
-			        </a>
-			    </article>
-			    <!-- 필요하다면 더 많은 feed-item을 추가하여 테스트할 수 있습니다. -->
 			</section>
+			
+			<!-- 로딩 인디케이터 -->
+			<div id="loading-indicator" style="display: none; text-align: center; padding: 20px;">
+			    <p>Loading...</p>
+			</div>
 		</main>
 	</th:block>
 	

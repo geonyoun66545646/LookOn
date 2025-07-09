@@ -58,4 +58,26 @@
     height: 100%;
     display: block;
     object-fit: cover; 
+    transition: transform 0.3s ease;
+}
+
+.feed-item:hover img {
+    transform: scale(1.05); /* 마우스를 올리면 이미지가 살짝 확대됨 */
+}
+
+/* 마우스 올렸을 때 나타나는 오버레이 (기존과 동일, 확인용) */
+.feed-item .item-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    color: white;
+    padding: 20px 10px 10px 10px;
+    opacity: 0; /* 평소에는 숨김 */
+    transition: opacity 0.3s;
+    font-weight: bold;
+}
+.feed-item:hover .item-overlay {
+    opacity: 1; /* 마우스 올리면 나타남 */
 }

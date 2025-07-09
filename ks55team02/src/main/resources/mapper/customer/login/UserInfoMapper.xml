@@ -25,6 +25,11 @@
         <result column="last_prfl_mdfcn_dt" 		property="lastPrflMdfcnDt"/>
         <result column="last_pswd_chg_dt" 			property="lastPswdChgDt"/>
         <result column="mfa_use_yn" 				property="mfaUseYn"/>
+        
+        <!-- user_follows 테이블 정보, 추가로 게시글 갯수까지  -->
+        <result column="post_count" 				property="postCount" />
+        <result column="follower_count" 			property="followerCount" />
+        <result column="following_count" 			property="followingCount" />
     </resultMap>
 
     <select id="findUserInfoByUserNo" parameterType="String" resultMap="userInfoResultMap">
@@ -47,7 +52,19 @@
             p.push_ntfctn_rcptn_agre_yn,
             p.eml_rcptn_agre_yn,
             s.last_pswd_chg_dt,
-            s.mfa_use_yn
+            s.mfa_use_yn,
+            (
+                SELECT COUNT(*) FROM feeds f 
+                WHERE f.wrtr_user_no = u.user_no AND f.del_dt IS NULL
+            ) AS post_count,
+            (
+                SELECT COUNT(*) FROM user_follows uf_follower 
+                WHERE uf_follower.flwed_user_no = u.user_no
+            ) AS follower_count,
+            (
+                SELECT COUNT(*) FROM user_follows uf_following 
+                WHERE uf_following.flwr_user_no = u.user_no
+            ) AS following_count
         FROM
             users AS u
         LEFT JOIN

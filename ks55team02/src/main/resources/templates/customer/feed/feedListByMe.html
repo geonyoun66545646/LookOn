@@ -3,57 +3,58 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{customer/layout/layoutMain}">
 	<head>
-	<meta charset="UTF-8">
 		<title>마이피드</title>
 		<link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/FeedListByMe.css}">
 	</head>
 	
 	<th:block layout:fragment="jsFile">
+		<script th:src="@{/maincss/assets/js/customer/feedListByMe.js}"></script>
 	</th:block>
 	
 	<th:block layout:fragment="jsScript">
 	</th:block>
 	
 	<th:block layout:fragment="contents">
-	    <div class="my-feed-container">
+	    <!-- th:object를 사용하여 userInfo 객체를 컨텍스트로 지정 -->
+	    <div class="my-feed-container" th:object="${userInfo}">
 	
 	        <!-- ======================================================= -->
-	        <!-- 1. 프로필 정보 영역 -->
+	        <!-- 1. 프로필 정보 영역 (Thymeleaf 적용) -->
 	        <!-- ======================================================= -->
 	        <section class="profile-section">
 	            <!-- 프로필 이미지 -->
 	            <div class="profile-image">
-	                <!-- 임시 프로필 이미지 경로 -->
-	                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREwQQpb3XOTXuvhRFPQVbHvcv5B9kRzIvTlg&s" alt="프로필 이미지">
+	                <!-- prflImg가 null이거나 비어있으면 기본 이미지, 아니면 사용자 이미지 표시 -->
+	                <img th:src="*{prflImg != null && !prflImg.isEmpty() ? prflImg : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREwQQpb3XOTXuvhRFPQVbHvcv5B9kRzIvTlg&s'}" alt="프로필 이미지">
 	            </div>
 	
 	            <!-- 프로필 정보 및 버튼 -->
 	            <div class="profile-info-wrapper">
 	                <div class="profile-details">
-	                    <!-- 하드코딩된 닉네임과 소개 -->
-	                    <h2 class="profile-nickname">눈부신라임키홀더</h2>
-	                    <p class="profile-bio">좋아하는 스타일이나 브랜드를 간단한 소개로 적어보세요.</p>
+	                    <!-- 닉네임과 자기소개 표시 -->
+	                    <h2 class="profile-nickname" th:text="*{userNcnm}">눈부신라임키홀더</h2>
+	                    <p class="profile-bio" th:text="*{selfIntroCn != null ? selfIntroCn : '좋아하는 스타일이나 브랜드를 간단한 소개로 적어보세요.'}">좋아하는 스타일이나 브랜드를 간단한 소개로 적어보세요.</p>
 	                </div>
 	
-	                <!-- 하드코딩된 팔로워/팔로잉 통계 -->
+	                <!-- 팔로워/팔로잉 통계 표시 -->
 	                <div class="profile-stats">
 	                    <ul>
 	                        <li>
-	                            <span class="stat-count">8</span>
+	                            <span class="stat-count" th:text="*{postCount}">8</span>
 	                            <span class="stat-label">게시물</span>
 	                        </li>
 	                        <li>
-	                            <span class="stat-count">1,234</span>
+	                            <span class="stat-count" th:text="*{followerCount}">1,234</span>
 	                            <span class="stat-label">팔로워</span>
 	                        </li>
 	                        <li>
-	                            <span class="stat-count">56</span>
+	                            <span class="stat-count" th:text="*{followingCount}">56</span>
 	                            <span class="stat-label">팔로잉</span>
 	                        </li>
 	                    </ul>
 	                </div>
 	
-	                <!-- 프로필 액션 버튼 (href는 임시로 '#' 처리) -->
+	                <!-- 프로필 액션 버튼 (href는 실제 프로필 수정 페이지 경로로 변경해야 함) -->
 	                <div class="profile-actions">
 	                    <a href="#" class="btn btn-profile-edit">프로필 수정</a>
 	                </div>
@@ -61,7 +62,7 @@
 	        </section>
 	
 	        <!-- ======================================================= -->
-	        <!-- 2. 콘텐츠 탭 영역 -->
+	        <!-- 2. 콘텐츠 탭 영역 (변경 없음) -->
 	        <!-- ======================================================= -->
 	        <nav class="content-tabs">
 	            <ul>
@@ -70,38 +71,29 @@
 	        </nav>
 	
 	        <!-- ======================================================= -->
-	        <!-- 3. 본인 게시물 그리드 영역 (하드코딩) -->
+	        <!-- 3. 본인 게시물 그리드 영역 (Thymeleaf 적용) -->
 	        <!-- ======================================================= -->
-	        <section class="feed-grid">
-	            <!-- 디자인 확인을 위한 하드코딩된 예시 아이템들 -->
-	            <article class="feed-item">
-	                <a href="#"><img src="https://image.fmkorea.com/files/attach/new3/20230113/4477817/5378609358/5397528097/b1b5bba3ac284e5ca435a30c193f9535.jpeg" alt="피드 이미지 1"></a>
+	        <section class="feed-grid" th:fragment="feedListFragment">
+	            <!-- th:each를 사용하여 feedList를 순회 -->
+	            <article class="feed-item" th:each="feed : ${feedList}">
+	                <!-- 피드 상세 페이지로 이동하는 링크. feedSn을 경로 변수로 사용 -->
+	                <a th:href="@{/customer/feed/feedDetail/{feedSn}(feedSn=${feed.feedSn})}">
+	                	<!-- 대표 이미지가 있을 경우에만 표시. 없을 경우 기본 이미지 표시 -->
+	                	<img th:if="${feed.representativeImage != null}" th:src="${feed.representativeImage.imgFilePathNm}" th:alt="${feed.representativeImage.imgAltTxtCn}">
+	                	<img th:unless="${feed.representativeImage != null}" src="/path/to/default/image.jpg" alt="기본 이미지">
+	                	
+                        <div class="item-overlay">
+							<!-- 좋아요 수 표시 -->
+							<span class="likes" th:text="'♥ ' + ${feed.likeCount}">♥ 18</span>
+	                	</div>
+	                </a>
 	            </article>
-	            <article class="feed-item">
-	                <a href="#"><img src="https://s.gae9.com/trend/795ba26623f1c13c.orig" alt="피드 이미지 2"></a>
-	            </article>
-	            <article class="feed-item">
-	                <a href="#"><img src="https://dcimg1.dcinside.com/viewimage.php?id=20bb&no=24b0d769e1d32ca73cea86fa11d0283109283bc9014f0198adabe86cfac96ab7833dbf466aa475b7ef9d225011bc1eef1ef9582138670ecd99ea0b06521d8ca86ffe99916ba66012ed27" alt="피드 이미지 3"></a>
-	            </article>
-	            <article class="feed-item">
-	                <a href="#"><img src="https://dcimg1.dcinside.com/viewimage.php?no=24b0d769e1d32ca73ceb87fa11d028310dffe6fa47565f9311496be5ca5555c71024588fcdfa52b8e1820490519d30df024cd927481171e9199b8ab6e0074c4388278e3b50cdc150cedc8e3bcc05140ac879" alt="피드 이미지 4"></a>
-	            </article>
-	            <article class="feed-item">
-	                <a href="#"><img src="https://dcimg1.dcinside.com/viewimage.php?id=20bb&no=24b0d769e1d32ca73ded83fa11d0283177940c12fe472eea84be03aa996612ac6f1ba2cbd73006a21462811b136d427cdf2b060b759115320fc2f986248cd08acc067bfb270da0e6fc7e7b23d6d14e7bdf6cd810364b00" alt="피드 이미지 5"></a>
-	            </article>
-	            <article class="feed-item">
-	                <a href="#"><img src="https://mblogthumb-phinf.pstatic.net/20160119_157/mikity17_1453214882397sobCy_JPEG/2.jpg?type=w800" alt="피드 이미지 6"></a>
-	            </article>
-	            <article class="feed-item">
-	                <a href="#"><img src="https://dcimg1.dcinside.com/viewimage.php?id=20bb&no=24b0d769e1d32ca73cea85fa11d028312761dde02683c10dd92af59f50cf2b36e7b78739a1623783056f38c0cd297b1672e914957c40fa79226002104b3b" alt="피드 이미지 7"></a>
-	            </article>
-	            <article class="feed-item">
-	                <a href="#"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-sHk7dpVdJ1PScaSi-u-ywg4FVPhZAWPwaA&s" alt="피드 이미지 8"></a>
-	            </article>
+                <!-- 피드가 하나도 없을 경우 메시지 표시 -->
+                <div th:if="${#lists.isEmpty(feedList)}">
+                    <p>작성한 피드가 없습니다.</p>
+                </div>
 	        </section>
 	
 	    </div>
 	</th:block>
-	
-
 </html>
