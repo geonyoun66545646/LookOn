@@ -9,6 +9,23 @@ import ks55team02.seller.products.domain.ProductCategory;
 
 @Mapper
 public interface ProductCategoryMapper {
+
+	// 카테고리 ID로 카운트 (중복 체크용)
+    int countCategoryById(String categoryId);
+
+    // 카테고리 이름으로 카운트 (중복 체크용)
+    int countCategoryByName(String categoryName);
+
+    // 카테고리 정보 수정
+    void updateCategory(ProductCategory productCategory);
+    
+	/*카테고리 활성화*/
+    void activateCategory(String categoryId);
+    
+	/*카테고리 비활성화*/
+	void deactivateCategory(String categoryId);
+
+	/*카테고리 추가*/
 	void addCategory(ProductCategory productCategory);
 
 	/**

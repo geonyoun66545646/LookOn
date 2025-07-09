@@ -21,7 +21,11 @@ public interface ProductsMapper {
     void insertProductOptionValue(ProductOptionValue value);
     void insertProductStatus(ProductStatus productStatus);
     void insertStatusOptionMapping(StatusOptionMapping mapping);
+    
+	/* */
+    void deactivateProductsByCategoryId(String categoryId);
 
+    
     // 상품 수정
     /**
      * 상품의 기본 정보를 수정합니다.

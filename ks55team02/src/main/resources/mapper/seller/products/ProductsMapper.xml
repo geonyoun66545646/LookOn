@@ -87,6 +87,17 @@
 		</association>
 	</resultMap>
 	
+	<!-- 특정 카테고리에 속한 모든 상품을 비노출 처리 -->
+    <update id="deactivateProductsByCategoryId" parameterType="string">
+        UPDATE
+            products
+        SET
+            expsr_yn = false,
+            mdfcn_dt = CURRENT_TIMESTAMP
+        WHERE
+            ctgry_no = #{categoryId}
+    </update>
+	
 	<!-- ===================== 상품 삭제(Update) 관련 쿼리 ===================== -->
 
 	<!-- 상품 비활성화 (소프트 삭제) -->

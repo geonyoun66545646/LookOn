@@ -1,4 +1,4 @@
-package ks55team02.admin.adminpage.productadmin.admincategorymanagement.controller;
+package ks55team02.admin.adminpage.productadmin.adminproductsmanagement.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
