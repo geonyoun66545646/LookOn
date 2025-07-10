@@ -65,6 +65,14 @@ public interface PaymentMapper {
      * @return 업데이트된 행의 수
      */
     int updateUserCouponToUsed(@Param("userCpnId") String userCpnId);
+    
+    /**
+     * 사용 가능한 쿠폰 목록을 조회합니다.
+     * `use_yn` 컬럼이 'Y'이고 유효 기간 내에 있는 쿠폰만 가져온다고 가정합니다.
+     * @param userNo 사용자 식별자
+     * @return 쿠폰 목록 (Map 형태로 반환)
+     */
+    List<Map<String, Object>> selectUserCoupons(@Param("userNo") String userNo);
 
 
 }
