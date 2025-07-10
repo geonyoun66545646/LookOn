@@ -44,6 +44,7 @@
 		<result column="gds_expln" property="gdsExpln" />
         <result column="bas_prc" property="basPrc" jdbcType="DECIMAL"/>
 		<result column="dscnt_rt" property="dscntRt" />
+		<result column="last_sel_prc" property="lastSelPrc" jdbcType="DECIMAL"/>
         <result column="min_purchase_qty" property="minPurchaseQty"/>
         <result column="max_purchase_qty" property="maxPurchaseQty"/>
         <result column="ctgry_no" property="ctgryNo"/>
@@ -368,6 +369,7 @@
 			gds_expln,
             bas_prc,
             dscnt_rt,
+            (bas_prc * (1 - IFNULL(dscnt_rt / 100.0, 0.00))) AS last_sel_prc,
             min_purchase_qty,
             max_purchase_qty,
             ctgry_no,
@@ -378,7 +380,6 @@
 		WHERE
 			gds_no = #{gdsNo}
 	</select>
-	
 	
 	<!-- ===================== 유틸리티 쿼리 ===================== -->
 	
