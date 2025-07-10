@@ -153,7 +153,7 @@
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 16px;
+    padding: 10px 15px;
     margin-bottom: 2rem;
 }
 
@@ -665,3 +665,6 @@
 .product-content{
 	display: none;
 }
+/* .product-option-price-preview {
+    display: none;
+} */

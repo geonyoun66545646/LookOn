@@ -55,7 +55,7 @@ public class CustomerProductController {
         put("기타 패턴", "background-image: repeating-linear-gradient(45deg, #ccc 0, #ccc 5px, #eee 5px, #eee 10px);");
         put("기타 색상", "background-color: #eee; border: 1px dashed #999;"); put("default", "background-color: #ccc;");
     }};
-    
+
     // 브랜드 검색 API (자동완성용)
     @GetMapping("/api/brands/search")
     @ResponseBody
