@@ -21,20 +21,20 @@
 
 		<div class="product-filter-bar">
 			<div class="filter-controls">
-				<button class="filter-main-button app-modal-trigger">상품 필터</button>
-				<button class="filter-button" data-filter-group="gender"
-					data-gender="M"
-					th:classappend="${currentGender == 'M' ? 'active' : ''}">남</button>
-				<button class="filter-button" data-filter-group="gender"
-					data-gender="F"
-					th:classappend="${currentGender == 'F' ? 'active' : ''}">여</button>
-				<button class="filter-dropdown modal-trigger" data-modal-tab="color">컬러</button>
-				<button class="filter-dropdown modal-trigger" data-modal-tab="price">가격</button>
-				<button class="filter-dropdown modal-trigger" data-modal-tab="size">사이즈</button>
-				<button class="filter-dropdown modal-trigger" data-modal-tab="brand">브랜드</button>
-				<button class="filter-dropdown modal-trigger"
-					data-modal-tab="discount">할인율</button>
-				<button class="filter-dropdown modal-trigger" data-modal-tab="type">상품유형</button>
+				<!-- 메인 필터 버튼: 클릭 시 모달이 열리고 기본 탭(컬러)이 표시됨 -->
+    <button class="filter-main-button app-modal-trigger" data-modal-tab="color">상품 필터</button>
+    
+    <!-- 성별 필터 버튼: 모달을 열지 않고 즉시 필터링 적용 -->
+    <button class="filter-button" data-filter-group="gender" data-gender="M" th:classappend="${currentGender == 'M' ? 'active' : ''}">남</button>
+    <button class="filter-button" data-filter-group="gender" data-gender="F" th:classappend="${currentGender == 'F' ? 'active' : ''}">여</button>
+    
+    <!-- 각 항목별 필터 버튼: 클릭 시 모달이 열리고 해당 탭이 표시됨 -->
+    <button class="filter-dropdown app-modal-trigger" data-modal-tab="color">컬러</button>
+    <button class="filter-dropdown app-modal-trigger" data-modal-tab="price">가격</button>
+    <button class="filter-dropdown app-modal-trigger" data-modal-tab="size">사이즈</button>
+    <button class="filter-dropdown app-modal-trigger" data-modal-tab="brand">브랜드</button>
+    <button class="filter-dropdown app-modal-trigger" data-modal-tab="discount">할인율</button>
+    <button class="filter-dropdown app-modal-trigger" data-modal-tab="type">상품유형</button>
 			</div>
 
 			<div class="sort-control filter-button">
@@ -270,6 +270,7 @@
 				</div>
 
 				<div class="app-modal-tab-pane" id="brand-pane">
+				
 					<h3 class="app-tab-pane-title">브랜드</h3>
 					<div class="app-brand-search-wrapper">
 						<input type="text" class="app-brand-search-input"
@@ -283,13 +284,15 @@
 							</svg>
 						</button>
 					</div>
-					<div class="app-filter-options-grid app-brand-options">
-						<label class="app-filter-option" th:each="brand : ${allBrands}">
-							<input type="checkbox" name="brand" th:value="${brand.storeId}"
-							th:checked="${#lists.contains(selectedBrands, brand.storeId)}">
-							<span class="brand-name">[[${brand.storeConm}]]<small>[[${brand.storeConm}]]</small></span>
-						</label>
-					</div>
+					
+					<div class="app-filter-options-grid app-brand-options" id="brandListContainer">
+				        <label class="app-filter-option" th:each="brand : ${allBrands}">
+				            <input type="checkbox" name="brand" th:value="${brand.storeId}"
+				                   th:checked="${#lists.contains(selectedBrands, brand.storeId)}">
+				            <span class="brand-name">[[${brand.storeConm}]]</span>
+				        </label>
+				    </div>
+					
 				</div>
 
 				<div class="app-modal-tab-pane" id="type-pane">
