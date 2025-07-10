@@ -36,7 +36,11 @@ public class ProductsServiceImpl implements ProductsService {
     private final FilesUtils filesUtils;
     private final AdminProductManagementMapper adminProductManagementMapper;
 
-
+    @Override
+    public List<Stores> searchBrands(String keyword) {
+        return storeMapper.searchStoresByKeyword(keyword);
+    }
+    
     @Override
     @Transactional
     public void addProduct(ProductRegistrationRequest request) {

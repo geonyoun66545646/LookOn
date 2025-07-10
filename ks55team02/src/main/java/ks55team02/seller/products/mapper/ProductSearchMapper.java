@@ -7,7 +7,10 @@ import java.util.Map;
 
 @Mapper
 public interface ProductSearchMapper {
-
+	
+	List<Products> getSaleProducts();
+    List<Products> getNewProducts();
+	
     /**
      * 다양한 필터 및 정렬 조건에 따라 상품 목록을 조회합니다.
      * @param paramMap 필터링 및 정렬, 페이지네이션 정보가 담긴 Map

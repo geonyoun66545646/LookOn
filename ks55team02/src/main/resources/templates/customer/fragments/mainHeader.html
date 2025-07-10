@@ -27,16 +27,14 @@
 					</button>
 					<nav class="lookon-primary-navigation">
 						<ul class="lookon-nav-list">
-							<li><a th:href="@{/customer/products(category='best')}"
-								class="lookon-nav-link">베스트</a></li>
-							<li><a th:href="@{/customer/products(category='sale')}"
-								class="lookon-nav-link">세일</a></li>
-							<li><a
-								th:href="@{/customer/products(category='new-products')}"
+							<li><a th:href="@{/customer/products}"
+								class="lookon-nav-link">전체상품</a></li>
+							<li><a th:href="@{/customer/products(type='sale')}"
+								class="lookon-nav-link">할인</a></li>
+							<li><a th:href="@{/customer/products(type='new-products')}"
 								class="lookon-nav-link">신상</a></li>
 							<li><a th:href="@{/customer/post/postList}" class="lookon-nav-link">커뮤니티</a></li>
 							<li><a th:href="@{/customer/feed/feedList}" class="lookon-nav-link">피드</a></li>
-
 						</ul>
 					</nav>
 				</div>

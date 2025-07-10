@@ -13,7 +13,12 @@ import java.util.List;
  */
 public interface ProductsService {
 	
-	
+	/**
+     * 키워드로 브랜드를 검색합니다.
+     * @param keyword 검색어
+     * @return 검색된 브랜드 목록
+     */
+    List<Stores> searchBrands(String keyword);
 	
 	/**
      * 특정 상품을 비활성화(소프트 삭제) 합니다.
