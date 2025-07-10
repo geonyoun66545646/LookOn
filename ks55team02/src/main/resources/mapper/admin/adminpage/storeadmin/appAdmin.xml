@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ks55team02.admin.adminpage.storeadmin.appAdmin.mapper.AppAdminMapper">
 
-		<resultMap id="appAdminResultMap" 		type="ks55team02.admin.adminpage.storeadmin.appAdmin.domain.AppAdmin">
+	<resultMap id="appAdminResultMap" 		type="ks55team02.admin.adminpage.storeadmin.appAdmin.domain.AppAdmin">
         <id property="aplyId" 					column="aply_id"/>
 		<result property="aplyUserNo" 			column="aply_user_no"/>
 		<result property="storeNm" 				column="store_nm"/>
@@ -25,11 +25,62 @@
 		<result property="aprvRjctRsn" 			column="aprv_rjct_rsn"/>
 		<result property="userNm" 				column="user_nm"/>
 		
-		</resultMap>
+	</resultMap>
 		
-		
-		<select id="getAppAdminList" resultMap="appAdminResultMap">
-		<!-- /* 상점 신청 조회 */ -->
+	<select id="getAppAdminCount" parameterType="ks55team02.admin.adminpage.storeadmin.appAdmin.domain.AppAdmin" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			store_application sa
+		INNER JOIN
+			users u ON sa.aply_user_no = u.user_no
+		<where>
+			<if test="searchValue != null and searchValue != ''">
+				<choose>
+					<when test="searchKey == 'aplyId'">
+						sa.aply_id LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'storeNm'">
+						sa.store_nm LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'userNm'">
+						u.user_nm LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'aplyStts'">
+						sa.aply_stts LIKE CONCAT('%', #{searchValue}, '%')
+					</when>					
+					<when test="searchKey == 'aplyUserNo'">
+						sa.aply_user_no LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == null or searchKey == ''">
+						(
+							sa.aply_id LIKE CONCAT('%', #{searchValue}, '%') OR
+							sa.store_nm LIKE CONCAT('%', #{searchValue}, '%') OR
+							u.user_nm LIKE CONCAT('%', #{searchValue}, '%') OR
+							sa.aply_user_no LIKE CONCAT('%', #{searchValue}, '%')
+						)
+					</when>
+				</choose>
+			</if>
+			<if test="startDate != null and endDate != null">
+				AND sa.ctrt_aply_ymd BETWEEN #{startDate} AND #{endDate}
+			</if>
+			<if test="filterConditions != null and filterConditions.size > 0">
+				AND sa.aply_stts IN
+				<foreach item="condition" collection="filterConditions" open="(" separator="," close=")">
+					#{condition}
+				</foreach>
+			</if>
+			<if test="levels != null and levels.size > 0">
+				AND sa.some_level_column IN
+				<foreach item="level" collection="levels" open="(" separator="," close=")">
+					#{level}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	
+	<select id="getAppAdminList" parameterType="ks55team02.admin.adminpage.storeadmin.appAdmin.domain.AppAdmin" resultMap="appAdminResultMap">
 		SELECT
 		    sa.aply_id,
 		    sa.store_nm,
@@ -42,12 +93,62 @@
 		    store_application sa
 		INNER JOIN
 		    users u ON sa.aply_user_no = u.user_no
+		<where>
+			<if test="searchValue != null and searchValue != ''">
+				<choose>
+					<when test="searchKey == 'aplyId'">
+						sa.aply_id LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'storeNm'">
+						sa.store_nm LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'userNm'">
+						u.user_nm LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'aplyStts'">
+						sa.aply_stts LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'aplyUserNo'">
+						sa.aply_user_no LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == null or searchKey == ''">
+						(
+							sa.aply_id LIKE CONCAT('%', #{searchValue}, '%') OR
+			                sa.store_nm LIKE CONCAT('%', #{searchValue}, '%') OR
+			                u.user_nm LIKE CONCAT('%', #{searchValue}, '%') OR
+			                sa.aply_user_no LIKE CONCAT('%', #{searchValue}, '%')
+			            )
+					</when>
+					
+				</choose>
+			</if>
+			<if test="startDate != null and endDate != null">
+				AND sa.ctrt_aply_ymd BETWEEN #{startDate} AND #{endDate}
+			</if>
+			<if test="filterConditions != null and filterConditions.size > 0">
+				AND sa.aply_stts IN
+				<foreach item="condition" collection="filterConditions" open="(" separator="," close=")">
+					#{condition}
+				</foreach>
+			</if>
+			<if test="levels != null and levels.size > 0">
+				AND sa.some_level_column IN
+				<foreach item="level" collection="levels" open="(" separator="," close=")">
+					#{level}
+				</foreach>
+			</if>
+		</where>
 		ORDER BY
-		    CAST(REGEXP_SUBSTR(sa.aply_id, '[0-9]+') AS UNSIGNED) DESC;
-		</select>
+		    <if test="sortOrder != null and sortOrder != ''">
+		        ${sortOrder}
+		    </if>
+		    <if test="sortOrder == null or sortOrder == ''">
+		        CAST(REGEXP_SUBSTR(sa.aply_id, '[0-9]+') AS UNSIGNED) DESC
+		    </if>
+		LIMIT #{pageSize} OFFSET #{offset}
+	</select>
 		
-		<select id="getAppAdminById" parameterType="String" resultMap="appAdminResultMap">
-		<!-- /* 신청 아이디로 특정 정보 조회 */ -->
+	<select id="getAppAdminById" parameterType="String" resultMap="appAdminResultMap">
 		SELECT 
 			sa.aply_id, 
 			sa.aply_user_no, 
@@ -74,16 +175,6 @@
 			on sa.aply_user_no = u.user_no
 		where
 			sa.aply_id = #{aplyId}
-		</select>
+	</select>
 	
 </mapper>
-
-
-
-
-
-
-
-
-
-

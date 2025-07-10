@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
 import ks55team02.admin.adminpage.useradmin.userlist.domain.UserList;
@@ -20,19 +19,20 @@ public class StoreController {
 	
 	private final AppStoreService appStoreService;
 
+	// 스토어 메인
 	@GetMapping("/storeMain")
 	public String storeMain() {
 		
 		return "customer/store/storeMainView";
 	}
 	
-	
+		// 로그인된 사용자 불러오는 메서드
 	private String getCurrentUserId(HttpSession session) {
 		// 실제 구현에서는 세션에서 현재 로그인된 사용자의 ID를 가져와야 합니다.
 		return "user_no_185"; // 예시
 	}
 	
-	
+	// 상점 신청
 	@GetMapping("/appStore")
 	public String getAppStore(/* @RequestParam("userNo") */String userNo ,Model model, HttpSession session) {
 		

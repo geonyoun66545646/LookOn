@@ -1,0 +1,43 @@
+@charset "UTF-8";
+
+.list-btn,.add-btn{
+	 display: inline-block; /* 버튼처럼 보이게 */
+    padding: 6px 12px;
+    cursor: pointer;
+    color: #c96;
+    background-image: none;
+    font-size: 14px;
+    line-height: 20px; /* 텍스트 세로 정렬 */
+    text-align: center;
+    vertical-align: middle;
+    margin: 0;
+    border : 1px solid #c96;
+}
+
+.list-btn:hover,.add-btn:hover{
+	color: #fff;
+    background-color: #c96;
+    border-color: #c96;
+    box-shadow: none;
+}
+
+.bottom-container { /* 텍스트와 버튼을 감싸는 컨테이너 */
+    display: flex; 
+    justify-content: space-between; /* 텍스트와 버튼을 양쪽으로 떨어뜨림 */
+    align-items: center; /* 텍스트와 버튼을 세로 중앙에 정렬 (옵션) */
+    /* 필요에 따라 높이를 지정하여 space-between이 적용되도록 할 수 있습니다. */
+    /* height: 100px; 또는 min-height: 100px; */
+}
+
+.bottom-message {
+    display: flex;
+    flex-direction: column; /* 텍스트는 위아래로 쌓이게 */
+    /* align-items: center; /* 이 줄은 이제 필요 없습니다. (왼쪽 정렬을 위해) */ 
+    /* margin-bottom: 20px; /* 이 줄도 이제 필요 없습니다. */
+}
+
+.bottom-btn {
+    display: flex;
+    /* justify-content: center; /* 이 줄은 이제 필요 없습니다. (오른쪽 정렬을 위해) */ 
+    gap: 30px;
+}

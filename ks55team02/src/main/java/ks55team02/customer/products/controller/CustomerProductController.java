@@ -1,24 +1,32 @@
 package ks55team02.customer.products.controller;
 
-import ks55team02.seller.products.domain.*;
-import ks55team02.seller.products.service.ProductCategoryService;
-import ks55team02.seller.products.service.ProductsService;
-import ks55team02.seller.products.service.ProductSearchService;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.stream.Collectors;
+import ks55team02.customer.store.domain.ProductReview;
+import ks55team02.customer.store.service.ReviewService;
+import ks55team02.seller.products.domain.ProductCategory;
+import ks55team02.seller.products.domain.ProductImage;
+import ks55team02.seller.products.domain.ProductImageType;
+import ks55team02.seller.products.domain.ProductOptionValue;
+import ks55team02.seller.products.domain.Products;
+import ks55team02.seller.products.service.ProductCategoryService;
+import ks55team02.seller.products.service.ProductSearchService;
+import ks55team02.seller.products.service.ProductsService;
+import ks55team02.seller.stores.domain.Stores;
+import lombok.RequiredArgsConstructor;
 
 
 @Controller
@@ -28,8 +36,9 @@ public class CustomerProductController {
 	private final ProductCategoryService productCategoryService;
     private final ProductsService productsService;
     private final ProductSearchService productSearchService;
-
-    // ColorOption DTO 및 COLOR_STYLE_MAP은 그대로 유지
+    // 리뷰를 위해 삽입 (ljs)
+    private final ReviewService reviewService; 
+    
     public static class ColorOption {
         private String name; private String style;
         public ColorOption(String name, String style) { this.name = name; this.style = style; }
@@ -47,30 +56,72 @@ public class CustomerProductController {
         put("기타 색상", "background-color: #eee; border: 1px dashed #999;"); put("default", "background-color: #ccc;");
     }};
 
+    // 브랜드 검색 API (자동완성용)
+    @GetMapping("/api/brands/search")
+    @ResponseBody
+    public ResponseEntity<List<Stores>> searchBrandsApi(@RequestParam("keyword") String keyword) {
+        List<Stores> searchedBrands = productsService.searchBrands(keyword);
+        return ResponseEntity.ok(searchedBrands);
+    }
+    
     @GetMapping(value = {"/customer", "/customer/"})
     public String customerHomeView() {
         return "/customer/main";
     }
 
     @GetMapping("/customer/products")
-    public String productMainView(Model model, @RequestParam(name = "category", required = false) String category) {
-        String title = "전체 상품 목록";
+    public String productMainView(Model model, 
+                                  @RequestParam(name = "type", required = false) String type) {
+        
+        String title = "전체 상품";
         String breadCrumbTitle = "상품";
         List<Products> productList;
 
-        if (category != null && !category.isEmpty()) {
-            switch (category) {
-                case "best": title = "베스트 상품"; breadCrumbTitle = "베스트"; break;
-                case "sale": title = "세일 상품"; breadCrumbTitle = "세일"; break;
-                case "new-products": title = "신상 상품"; breadCrumbTitle = "신상"; break;
-            }
+        if ("sale".equals(type)) {
+            title = "세일 상품";
+            breadCrumbTitle = "세일";
+            productList = productSearchService.getSaleProducts();
+        } else if ("new-products".equals(type)) {
+            title = "신상 상품";
+            breadCrumbTitle = "신상";
+            productList = productSearchService.getNewProducts();
+        } else {
+            productList = productSearchService.getAllActiveProductsForCustomer();
         }
-        productList = productSearchService.getAllActiveProductsForCustomer();
         
         model.addAttribute("breadCrumbExists", true);
         model.addAttribute("breadCrumbTitle", breadCrumbTitle);
         model.addAttribute("title", title);
         model.addAttribute("productList", productList);
+        
+        // ⭐⭐⭐ 이 부분을 통째로 추가합니다! (필터 툴바를 위한 데이터) ⭐⭐⭐
+        // 필터 상태 유지를 위한 'selected' 변수들을 비어있는 상태로 모델에 추가
+        model.addAttribute("currentCategoryId", null);
+        model.addAttribute("currentGender", null);
+        model.addAttribute("currentSortBy", "new"); // 기본 정렬
+        model.addAttribute("selectedColors", new ArrayList<>());
+        model.addAttribute("selectedSizes", new ArrayList<>());
+        model.addAttribute("selectedBrands", new ArrayList<>());
+        model.addAttribute("selectedStyles", new ArrayList<>());
+        model.addAttribute("selectedDiscountRates", new ArrayList<>());
+        model.addAttribute("selectedMinPrice", null);
+        model.addAttribute("selectedMaxPrice", null);
+        model.addAttribute("selectedPriceRange", "all");
+        model.addAttribute("selectedIncludeSoldOut", false);
+        
+        // 필터 모달에 필요한 전체 옵션 목록 추가
+        List<ProductOptionValue> rawColorOptionValues = productsService.getAllProductColors();
+        List<ColorOption> allColorOptions = new ArrayList<>();
+        if (rawColorOptionValues != null) {
+            for (ProductOptionValue pov : rawColorOptionValues) {
+                allColorOptions.add(new ColorOption(pov.getVlNm(), COLOR_STYLE_MAP.getOrDefault(pov.getVlNm(), COLOR_STYLE_MAP.get("default"))));
+            }
+        }
+        model.addAttribute("allColorOptions", allColorOptions);
+        model.addAttribute("allApparelSizes", productsService.getAllApparelSizes());
+        model.addAttribute("allShoeSizes", productsService.getAllShoeSizes());
+        model.addAttribute("allBrands", productsService.getAllBrands());
+        // ⭐⭐⭐ 여기까지 추가 완료 ⭐⭐⭐
 
         return "customer/productMain";
     }
@@ -173,7 +224,6 @@ public class CustomerProductController {
         return "customer/productMain";
     }
 
-    // ⭐⭐⭐ 이 부분이 수정되었습니다. ⭐⭐⭐
     @GetMapping("/products/categories/primary")
     @ResponseBody
     public List<ProductCategory> getPrimaryCategories() {
@@ -202,6 +252,9 @@ public class CustomerProductController {
         ProductImage thumbnailImage = allImages.stream().filter(img -> img.getImgType() == ProductImageType.THUMBNAIL).findFirst().orElse(allImages.stream().filter(img -> img.getImgType() == ProductImageType.MAIN).findFirst().orElse(null));
         List<ProductImage> mainGalleryImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.MAIN).sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
         List<ProductImage> detailImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.DETAIL).sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
+        // 리뷰 추가(ljs)
+        List<ProductReview> reviews = reviewService.getReviewsByProductCode(productCode); // productCode로 리뷰 조회
+        model.addAttribute("reviews", reviews);
         
         model.addAttribute("thumbnailImage", thumbnailImage);
         model.addAttribute("mainGalleryImages", mainGalleryImages);

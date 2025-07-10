@@ -236,5 +236,20 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("쿠폰 '{}' 적용 완료. 원본 금액: {}, 최종 금액: {}", couponCode, originalAmount, discountedAmount);
         return discountedAmount;
     }
+    
+    
+    /**
+     * 특정 사용자가 사용 가능한 쿠폰 목록을 조회합니다.
+     * @param userNo 사용자 식별자
+     * @return 사용 가능한 쿠폰 목록
+     */
+    @Override
+    public List<Map<String, Object>> getUserCoupons(String userNo) {
+        log.info("사용자 '{}'의 쿠폰 목록 조회를 시작합니다.", userNo);
+        // PaymentMapper에 getUserCouponsByUseNo 메소드가 있다고 가정
+        List<Map<String, Object>> coupons = paymentMapper.selectUserCoupons(userNo);
+        log.info("사용자 '{}'의 조회된 쿠폰 수: {}", userNo, coupons != null ? coupons.size() : 0);
+        return coupons;
+    }
 
 }

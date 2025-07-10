@@ -36,7 +36,11 @@ public class ProductsServiceImpl implements ProductsService {
     private final FilesUtils filesUtils;
     private final AdminProductManagementMapper adminProductManagementMapper;
 
-
+    @Override
+    public List<Stores> searchBrands(String keyword) {
+        return storeMapper.searchStoresByKeyword(keyword);
+    }
+    
     @Override
     @Transactional
     public void addProduct(ProductRegistrationRequest request) {
@@ -171,26 +175,26 @@ public class ProductsServiceImpl implements ProductsService {
 
     @Override
     public List<ProductOptionValue> getAllProductColors() {
-		 List<String> rawColorNames = productOptionMapper.getDistinctProductOptionValueNamesByType("색상");
-		Set<String> uniqueColorNames = new HashSet<>();
-		if (rawColorNames != null) {
-			for (String colorName : rawColorNames) {
-				uniqueColorNames.add(colorName.trim());
-			}
-		}
-		List<String> sortedUniqueColorNames = uniqueColorNames.stream().sorted().collect(Collectors.toList());
-		List<ProductOptionValue> colorOptions = new ArrayList<>();
-		for (String colorName : sortedUniqueColorNames) {
-			ProductOptionValue pov = new ProductOptionValue();
-			pov.setVlNm(colorName);
-			colorOptions.add(pov);
-		}
-		return colorOptions;
+         List<String> rawColorNames = productOptionMapper.getDistinctProductOptionValueNamesByType("색상");
+        Set<String> uniqueColorNames = new HashSet<>();
+        if (rawColorNames != null) {
+            for (String colorName : rawColorNames) {
+                uniqueColorNames.add(colorName.trim());
+            }
+        }
+        List<String> sortedUniqueColorNames = uniqueColorNames.stream().sorted().collect(Collectors.toList());
+        List<ProductOptionValue> colorOptions = new ArrayList<>();
+        for (String colorName : sortedUniqueColorNames) {
+            ProductOptionValue pov = new ProductOptionValue();
+            pov.setVlNm(colorName);
+            colorOptions.add(pov);
+        }
+        return colorOptions;
     }
 
     @Override
     public List<ProductOptionValue> getAllApparelSizes() {
-    	List<ProductOptionValue> allSizes = productOptionMapper.getAllProductOptionValuesByType("사이즈");
+        List<ProductOptionValue> allSizes = productOptionMapper.getAllProductOptionValuesByType("사이즈");
         Pattern includePattern = Pattern.compile("^(XS|S|M|L|XL|2XL|\\d{2,3})$", Pattern.CASE_INSENSITIVE);
         List<Pattern> excludePatterns = List.of(
             Pattern.compile("^\\d{1,3}(\\.\\d)?$"),
@@ -202,7 +206,7 @@ public class ProductsServiceImpl implements ProductsService {
 
     @Override
     public List<ProductOptionValue> getAllShoeSizes() {
-    	List<ProductOptionValue> allSizes = productOptionMapper.getAllProductOptionValuesByType("사이즈");
+        List<ProductOptionValue> allSizes = productOptionMapper.getAllProductOptionValuesByType("사이즈");
         Pattern includePattern = Pattern.compile("^\\d{1,3}(\\.\\d)?$");
         List<Pattern> excludePatterns = List.of(
             Pattern.compile("^(XS|S|M|L|XL|2XL|\\d{2,3})$", Pattern.CASE_INSENSITIVE),
@@ -213,18 +217,18 @@ public class ProductsServiceImpl implements ProductsService {
 
     @Override
     public List<ProductOptionValue> getAllFashionSizes() {
-    	List<ProductOptionValue> allSizes = productOptionMapper.getAllProductOptionValuesByType("사이즈");
+        List<ProductOptionValue> allSizes = productOptionMapper.getAllProductOptionValuesByType("사이즈");
         Pattern includePattern = Pattern.compile("^(FREE|단일)$", Pattern.CASE_INSENSITIVE);
         List<String> customOrder = List.of("FREE", "단일");
         return processAndFilterAndSortSizes(allSizes, includePattern, null, customOrder);
     }
 
-	@Override
-	public List<Stores> getAllBrands() {
-		return storeMapper.getAllStores();
-	}
+    @Override
+    public List<Stores> getAllBrands() {
+        return storeMapper.getAllStores();
+    }
 
-	private void saveProductImages(ProductRegistrationRequest request, String gdsNo) {
+    private void saveProductImages(ProductRegistrationRequest request, String gdsNo) {
         int imgIndctSn = 1;
         imgIndctSn = saveAndRegisterImage(request.getThumbnailImage(), gdsNo, request.getSelUserNo(), imgIndctSn, ProductImageType.THUMBNAIL);
         imgIndctSn = saveAndRegisterImage(request.getMainImage(), gdsNo, request.getSelUserNo(), imgIndctSn, ProductImageType.MAIN);
@@ -255,70 +259,70 @@ public class ProductsServiceImpl implements ProductsService {
     }
 
     private void saveOptionsAndStock(ProductRegistrationRequest request, String gdsNo) {
-		Map<String, String> genderOptionValueMap = new HashMap<>();
-		Map<String, String> colorOptionValueMap = new HashMap<>();
-		Map<String, String> sizeOptionValueMap = new HashMap<>();
+        Map<String, String> genderOptionValueMap = new HashMap<>();
+        Map<String, String> colorOptionValueMap = new HashMap<>();
+        Map<String, String> sizeOptionValueMap = new HashMap<>();
         String creatorNo = request.getSelUserNo();
 
-		int optOrder = 1;
+        int optOrder = 1;
         if (StringUtils.hasText(request.getGenderOption())) {
-			genderOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "성별", "S", optOrder++, List.of(request.getGenderOption()));
-		}
-		if (request.getColorOptions() != null && !request.getColorOptions().isEmpty()) {
-			List<String> uniqueColorOptions = request.getColorOptions().stream().distinct().collect(Collectors.toList());
-			colorOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "색상", "S", optOrder++, uniqueColorOptions);
-		}
-		if (request.getSizeOptions() != null && !request.getSizeOptions().isEmpty()) {
-			List<String> uniqueSizeOptions = request.getSizeOptions().stream().distinct().collect(Collectors.toList());
-			sizeOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "사이즈", "S", optOrder++, uniqueSizeOptions);
-		}
+            genderOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "성별", "S", optOrder++, List.of(request.getGenderOption()));
+        }
+        if (request.getColorOptions() != null && !request.getColorOptions().isEmpty()) {
+            List<String> uniqueColorOptions = request.getColorOptions().stream().distinct().collect(Collectors.toList());
+            colorOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "색상", "S", optOrder++, uniqueColorOptions);
+        }
+        if (request.getSizeOptions() != null && !request.getSizeOptions().isEmpty()) {
+            List<String> uniqueSizeOptions = request.getSizeOptions().stream().distinct().collect(Collectors.toList());
+            sizeOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "사이즈", "S", optOrder++, uniqueSizeOptions);
+        }
 
-		if (request.getProductOptionCombinations() != null && !request.getProductOptionCombinations().isEmpty()) {
-			for (ProductCombinationData combinationData : request.getProductOptionCombinations()) {
-				String gdsSttsNo = productsMapper.getMaxStatusNo();
-				insertProductStatus(gdsSttsNo, gdsNo, creatorNo, combinationData.getQuantity());
+        if (request.getProductOptionCombinations() != null && !request.getProductOptionCombinations().isEmpty()) {
+            for (ProductCombinationData combinationData : request.getProductOptionCombinations()) {
+                String gdsSttsNo = productsMapper.getMaxStatusNo();
+                insertProductStatus(gdsSttsNo, gdsNo, creatorNo, combinationData.getQuantity());
 
-				String genderOptValueId = genderOptionValueMap.get(combinationData.getOptVlNo1());
-				String colorOptValueId = colorOptionValueMap.get(combinationData.getOptVlNo2());
-				String sizeOptValueId = sizeOptionValueMap.get(combinationData.getOptVlNo3());
+                String genderOptValueId = genderOptionValueMap.get(combinationData.getOptVlNo1());
+                String colorOptValueId = colorOptionValueMap.get(combinationData.getOptVlNo2());
+                String sizeOptValueId = sizeOptionValueMap.get(combinationData.getOptVlNo3());
 
-				if (StringUtils.hasText(genderOptValueId)) insertStatusOptionMapping(gdsSttsNo, genderOptValueId, creatorNo);
-				if (StringUtils.hasText(colorOptValueId)) insertStatusOptionMapping(gdsSttsNo, colorOptValueId, creatorNo);
-				if (StringUtils.hasText(sizeOptValueId)) insertStatusOptionMapping(gdsSttsNo, sizeOptValueId, creatorNo);
-			}
-		} else {
-			String gdsSttsNo = productsMapper.getMaxStatusNo();
-			insertProductStatus(gdsSttsNo, gdsNo, creatorNo, request.getStockQuantity());
-		}
+                if (StringUtils.hasText(genderOptValueId)) insertStatusOptionMapping(gdsSttsNo, genderOptValueId, creatorNo);
+                if (StringUtils.hasText(colorOptValueId)) insertStatusOptionMapping(gdsSttsNo, colorOptValueId, creatorNo);
+                if (StringUtils.hasText(sizeOptValueId)) insertStatusOptionMapping(gdsSttsNo, sizeOptValueId, creatorNo);
+            }
+        } else {
+            String gdsSttsNo = productsMapper.getMaxStatusNo();
+            insertProductStatus(gdsSttsNo, gdsNo, creatorNo, request.getStockQuantity());
+        }
     }
 
-	private Map<String, String> insertOptionAndValue(String gdsNo, String creatorNo, String optionName, String choiceType, int order, List<String> values) {
-		Map<String, String> generatedOptionValueIds = new HashMap<>();
+    private Map<String, String> insertOptionAndValue(String gdsNo, String creatorNo, String optionName, String choiceType, int order, List<String> values) {
+        Map<String, String> generatedOptionValueIds = new HashMap<>();
         String optNo = productsMapper.getMaxOptionNo();
 
-		ProductOption option = new ProductOption();
-		option.setOptNo(optNo);
-		option.setGdsNo(gdsNo);
-		option.setCreatrNo(creatorNo);
-		option.setOptNm(optionName);
-		option.setSnglMtplChcSeCd(choiceType);
-		option.setOptIndctSn(order);
-		option.setActvtnYn(true);
-		productsMapper.insertProductOption(option);
+        ProductOption option = new ProductOption();
+        option.setOptNo(optNo);
+        option.setGdsNo(gdsNo);
+        option.setCreatrNo(creatorNo);
+        option.setOptNm(optionName);
+        option.setSnglMtplChcSeCd(choiceType);
+        option.setOptIndctSn(order);
+        option.setActvtnYn(true);
+        productsMapper.insertProductOption(option);
 
-		for (String val : values) {
-			ProductOptionValue value = new ProductOptionValue();
-			String optVlNo = productsMapper.getMaxOptionValueNo();
-			value.setOptVlNo(optVlNo);
-			value.setOptNo(optNo);
-			value.setCreatrNo(creatorNo);
-			value.setVlNm(val);
-			value.setActvtnYn(true);
-			productsMapper.insertProductOptionValue(value);
-			generatedOptionValueIds.put(val, optVlNo);
-		}
-		return generatedOptionValueIds;
-	}
+        for (String val : values) {
+            ProductOptionValue value = new ProductOptionValue();
+            String optVlNo = productsMapper.getMaxOptionValueNo();
+            value.setOptVlNo(optVlNo);
+            value.setOptNo(optNo);
+            value.setCreatrNo(creatorNo);
+            value.setVlNm(val);
+            value.setActvtnYn(true);
+            productsMapper.insertProductOptionValue(value);
+            generatedOptionValueIds.put(val, optVlNo);
+        }
+        return generatedOptionValueIds;
+    }
 
     private void insertProductStatus(String gdsSttsNo, String gdsNo, String creatorNo, Integer quantity) {
         ProductStatus productStatus = new ProductStatus();
@@ -347,7 +351,14 @@ public class ProductsServiceImpl implements ProductsService {
         Set<String> seenVlNames = new HashSet<>();
         List<ProductOptionValue> filteredAndUnique = new ArrayList<>();
         if (allSizes == null) return filteredAndUnique;
+
         for (ProductOptionValue pov : allSizes) {
+            // NullPointerException 방지를 위한 추가 null 체크
+            if (pov == null || pov.getVlNm() == null) {
+            	log.debug("디버그: ProductOptionValue 객체 또는 vlNm이 null입니다. 해당 항목을 건너뜁니다.");
+                continue; // null인 항목은 건너뛰기
+            }
+
             String trimmedVlNm = pov.getVlNm().trim();
             if (includePattern != null && !includePattern.matcher(trimmedVlNm).matches()) continue;
             boolean excluded = false;
@@ -362,9 +373,12 @@ public class ProductsServiceImpl implements ProductsService {
             if (excluded) continue;
             if (seenVlNames.add(trimmedVlNm)) filteredAndUnique.add(pov);
         }
+        
         filteredAndUnique.sort((s1, s2) -> {
-            String s1Val = s1.getVlNm().trim();
-            String s2Val = s2.getVlNm().trim();
+            // 정렬 로직 내에서도 null 체크 강화 (혹시 모르니)
+            String s1Val = (s1 != null && s1.getVlNm() != null) ? s1.getVlNm().trim() : "";
+            String s2Val = (s2 != null && s2.getVlNm() != null) ? s2.getVlNm().trim() : "";
+
             if (customOrder != null && !customOrder.isEmpty()) {
                 int index1 = customOrder.indexOf(s1Val.toUpperCase());
                 int index2 = customOrder.indexOf(s2Val.toUpperCase());

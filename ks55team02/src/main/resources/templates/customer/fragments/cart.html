@@ -4,6 +4,7 @@
       layout:decorate="~{customer/layout/layoutMain}">
 <head>
     <title>장바구니</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <th:block layout:fragment="contents">
@@ -50,9 +51,9 @@
 			            			<div class="cart-discount">
 			            				<form action="#">
 			            					<div class="input-group">
-				        						<input type="text" class="form-control" required placeholder="coupon code">
+				        						<input type="text" class="form-control" placeholder="coupon code" style="display: none;">
 				        						<div class="input-group-append">
-													<button class="btn btn-outline-primary-2" type="submit"><i class="icon-long-arrow-right"></i></button>
+													<button class="btn btn-outline-primary-2" type="submit" style="display: none;"><i class="icon-long-arrow-right"></i></button>
 												</div>
 			        						</div>
 			            				</form>
@@ -60,7 +61,7 @@
 
 			            			<a href="#" class="btn btn-outline-dark-2"><span>UPDATE CART</span><i class="icon-refresh"></i></a>
 		            			</div>
-	                		</div>
+                                </div>
 
 	                		<aside class="col-lg-3">
 	                			<div class="summary summary-cart">
@@ -71,6 +72,10 @@
                                             <tr class="summary-subtotal">
                                                 <td>Subtotal:</td>
                                                 <td>₩<span id="subtotal_amount">0.00</span></td>
+                                            </tr>
+                                            <tr id="discountRow" style="display: none;">
+                                                <td>쿠폰 할인:</td>
+                                                <td><span class="text-danger" id="discountAmountDisplay">- ₩0</span></td>
                                             </tr>
                                             <tr class="summary-total">
                                                 <td>Total:</td>
@@ -115,110 +120,211 @@
                 return price.toLocaleString('ko-KR');
             }
 
-            // 1. 세션 스토리지에서 장바구니 데이터 가져오기
-            const cartData = JSON.parse(sessionStorage.getItem('cart_data'));
+            // 세션 스토리지에서 장바구니 데이터 가져오기 (전역 변수로 선언)
+            let cartData = JSON.parse(sessionStorage.getItem('cart_data')) || { products: [] };
             const $tbody = $('#cart-body');
 
-            console.log("불러온 세션 장바구니:", cartData); // ✅ 디버깅용 로그
+            // 쿠폰 적용을 위한 변수들 초기화
+            let currentOriginalTotal = 0; // 장바구니의 원래 총액 (할인 미적용)
+            window.currentDiscountedAmount = 0; // 최종 할인된 금액 (결제 페이지로 넘길 값)
 
-            // 2. 장바구니 데이터를 기반으로 HTML 동적 생성
-            if (cartData && cartData.products && cartData.products.length > 0) {
-                cartData.products.forEach(product => {
-                    const itemTotal = product.price * product.quantity;
-                    const newRow = $(`
-                        <tr data-price="${product.price}" data-id="${product.id}">
-                            <td class="product-col">
-                                <div class="product">
-                                    <figure class="product-media">
-                                        <a href="#"><img src="${product.image}" alt="Product image" style="width: 60px; height: auto;"></a>
-                                    </figure>
-                                    <h3 class="product-title">
-                                        <a href="#">${product.name}</a>
-                                    </h3>
-                                </div>
-                            </td>
-                            <td class="price-col">₩${formatPrice(product.price)}</td>
-                            <td class="quantity-col">
-                                <div class="cart-product-quantity">
-                                    <input type="number" class="form-control qty-input" value="${product.quantity}" min="1" max="10" step="1" required>
-                                </div>
-                            </td>
-                            <td class="total-col item-total">₩${formatPrice(itemTotal)}</td>
-                            <td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
-                        </tr>
-                    `);
-                    $tbody.append(newRow);
-                });
-            } else {
-                $tbody.append(`<tr><td colspan="5" class="text-center">장바구니에 담긴 상품이 없습니다.</td></tr>`);
+            // UI 요소 참조
+            const discountAmountDisplay = document.getElementById('discountAmountDisplay');
+            const discountRow = document.getElementById('discountRow');
+            const summarySubtotalAmount = document.getElementById('subtotal_amount');
+            const summaryFinalTotalAmount = document.getElementById('final_total_amount');
+
+            // 장바구니 데이터를 기반으로 HTML 동적 생성
+            function renderCartItems() {
+                $tbody.empty(); // 기존 내용을 비웁니다.
+                if (cartData.products && cartData.products.length > 0) {
+                    cartData.products.forEach(product => {
+                        const itemTotal = product.price * product.quantity;
+                        const newRow = $(`
+                            <tr data-price="${product.price}" data-id="${product.id}">
+                                <td class="product-col">
+                                    <div class="product">
+                                        <figure class="product-media">
+                                            <a href="#"><img src="${product.image}" alt="Product image" style="width: 60px; height: auto;"></a>
+                                        </figure>
+                                        <h3 class="product-title">
+                                            <a href="#">${product.name}</a>
+                                        </h3>
+                                    </div>
+                                </td>
+                                <td class="price-col">₩${formatPrice(product.price)}</td>
+                                <td class="quantity-col">
+                                    <div class="cart-product-quantity">
+                                        <input type="number" class="form-control qty-input" value="${product.quantity}" min="1" max="10" step="1" required>
+                                    </div>
+                                </td>
+                                <td class="total-col item-total">₩${formatPrice(itemTotal)}</td>
+                                <td class="remove-col"><button class="btn-remove"><i class="icon-close"></i></button></td>
+                            </tr>
+                        `);
+                        $tbody.append(newRow);
+                    });
+                } else {
+                    $tbody.append(`<tr><td colspan="5" class="text-center">장바구니에 담긴 상품이 없습니다.</td></tr>`);
+                }
             }
 
-            // 3. 장바구니 총액 계산 및 업데이트 함수
+            // 장바구니 총액 계산 및 업데이트 함수 (쿠폰 미적용 상태의 총액을 기반으로 함)
             function updateCartTotals() {
                 let subtotal = 0;
-                // 화면의 각 상품 row를 순회하며 총액 계산
                 $('table.table-cart tbody tr[data-id]').each(function() {
                     const $row = $(this);
                     const unitPrice = parseFloat($row.data('price')) || 0;
                     const quantity = parseInt($row.find('.qty-input').val()) || 0;
                     const itemTotal = unitPrice * quantity;
 
-                    // 개별 상품 합계 업데이트
                     $row.find('.item-total').text('₩' + formatPrice(itemTotal));
                     subtotal += itemTotal;
                 });
 
-                // 최종 합계 업데이트
-                $('#subtotal_amount').text(formatPrice(subtotal));
-                $('#final_total_amount').text(formatPrice(subtotal));
+                currentOriginalTotal = subtotal; // 쿠폰 미적용 상태의 총액 저장
+
+                // UI 업데이트 (원본 총액 표시)
+                if (summarySubtotalAmount) summarySubtotalAmount.textContent = `${formatPrice(currentOriginalTotal)}`;
+                
+                // 쿠폰이 적용되지 않은 상태로 초기화 (또는 쿠폰 적용 취소 시)
+                window.currentDiscountedAmount = currentOriginalTotal; // 할인 초기화
+                if (summaryFinalTotalAmount) summaryFinalTotalAmount.textContent = `${formatPrice(currentOriginalTotal)}`;
+                
+                if (discountAmountDisplay) discountAmountDisplay.textContent = `- ₩0`;
+                if (discountRow) discountRow.style.display = 'none';
+
+                // 만약 쿠폰이 이전에 적용되었다면, 총액 변경 시 자동으로 재적용 시도
+                const appliedCouponCode = sessionStorage.getItem('applied_coupon_code'); // 적용된 쿠폰 코드 가져오기
+                if (appliedCouponCode) {
+                    performCouponApplication(appliedCouponCode);
+                }
             }
 
-            // 4. 세션 스토리지 데이터 업데이트 함수
+            // 세션 스토리지 데이터 업데이트 함수
             function updateSessionStorage() {
-                const currentCartData = JSON.parse(sessionStorage.getItem('cart_data')) || { products: [] };
-                const updatedProducts = [];
-
+                cartData.products = []; // 현재 UI의 상품으로 업데이트
                 $('table.table-cart tbody tr[data-id]').each(function() {
                     const $row = $(this);
                     const id = $row.data('id');
                     const quantity = parseInt($row.find('.qty-input').val());
+                    const price = parseFloat($row.data('price'));
+                    const name = $row.find('.product-title a').text();
+                    const image = $row.find('.product-media img').attr('src');
 
-                    // 현재 cartData.products 배열에서 해당 id를 가진 상품을 찾아서 업데이트
-                    // `productDetailCart.js`에서 저장할 때 id에 상품명, 색상, 사이즈를 모두 포함하여 고유하게 만들었기 때문에
-                    // 여기서는 단순히 id로 찾으면 됩니다.
-                    const product = currentCartData.products.find(p => p.id === id);
-                    if (product) {
-                        product.quantity = quantity;
-                        updatedProducts.push(product);
-                    }
+                    cartData.products.push({ id: id, quantity: quantity, price: price, name: name, image: image });
                 });
+                sessionStorage.setItem('cart_data', JSON.stringify(cartData));
+            }
 
-                currentCartData.products = updatedProducts;
-                sessionStorage.setItem('cart_data', JSON.stringify(currentCartData));
-                console.log("세션 스토리지 업데이트 완료:", currentCartData);
+            // 쿠폰 적용 API 호출 및 UI 업데이트 함수
+            async function performCouponApplication(couponCode) {
+                const userNo = "user01"; // TODO: 실제 사용자 인증 정보에서 가져오도록 수정
+
+                try {
+                    const response = await fetch('/api/calculateDiscount', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            originalAmount: currentOriginalTotal, // 장바구니 총액 사용
+                            pblcnCpnCd: couponCode,
+                            userNo: userNo
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json(); // 에러 응답도 JSON으로 파싱 시도
+                        throw new Error(errorData.message || '쿠폰 적용에 실패했습니다.');
+                    }
+
+                    const data = await response.json();
+                    const discountedAmount = data.discountedAmount;
+                    const discountAmount = currentOriginalTotal - discountedAmount;
+
+                    window.currentDiscountedAmount = discountedAmount;
+                    sessionStorage.setItem('applied_coupon_code', couponCode); // 성공적으로 적용된 쿠폰 코드 저장
+
+                    // UI 업데이트
+                    if (discountAmountDisplay) discountAmountDisplay.textContent = `- ₩${formatPrice(Math.round(discountAmount))}`;
+                    if (discountRow) discountRow.style.display = 'table-row';
+                    
+                    if (summaryFinalTotalAmount) summaryFinalTotalAmount.textContent = `${formatPrice(Math.round(discountedAmount))}`;
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: '적용 완료!',
+                        text: '쿠폰이 성공적으로 적용되었습니다.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                } catch (error) {
+                    console.error('쿠폰 적용 오류:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: '적용 실패',
+                        text: error.message || '쿠폰 적용 중 오류가 발생했습니다.',
+                        confirmButtonText: '확인'
+                    });
+                    // 오류 시 할인 정보 초기화 및 원래 금액으로 되돌리기
+                    window.currentDiscountedAmount = currentOriginalTotal;
+                    sessionStorage.removeItem('applied_coupon_code'); // 실패했으므로 적용된 쿠폰 제거
+                    if (discountAmountDisplay) discountAmountDisplay.textContent = `- ₩0`;
+                    if (discountRow) discountRow.style.display = 'none';
+                    if (summaryFinalTotalAmount) summaryFinalTotalAmount.textContent = `${formatPrice(currentOriginalTotal)}`;
+                }
             }
 
 
-            // 5. 이벤트 핸들러 (수량 변경, 상품 삭제)
+            // 이벤트 핸들러 (수량 변경, 상품 삭제)
             $tbody.on('change input', '.qty-input', function() {
-                updateCartTotals();
-                updateSessionStorage(); // 수량 변경 시 세션 스토리지 업데이트
+                updateCartTotals(); // 수량 변경 시 총액 업데이트 및 쿠폰 재적용 시도
+                updateSessionStorage(); // 세션 스토리지 업데이트
             });
 
             $tbody.on('click', '.btn-remove', function() {
                 $(this).closest('tr').remove();
-                updateCartTotals();
-                updateSessionStorage(); // 상품 삭제 시 세션 스토리지 업데이트
+                updateCartTotals(); // 상품 삭제 시 총액 업데이트 및 쿠폰 재적용 시도
+                updateSessionStorage(); // 세션 스토리지 업데이트
 
-                // 장바구니가 비었는지 확인 후 메시지 표시
                 if ($('table.table-cart tbody tr[data-id]').length === 0) {
                      $tbody.html(`<tr><td colspan="5" class="text-center">장바구니에 담긴 상품이 없습니다.</td></tr>`);
+                     // 장바구니가 비면 쿠폰 정보도 초기화
+                     window.currentDiscountedAmount = 0;
+                     sessionStorage.removeItem('applied_coupon_code');
+                     if (summarySubtotalAmount) summarySubtotalAmount.textContent = `0.00`;
+                     if (summaryFinalTotalAmount) summaryFinalTotalAmount.textContent = `0.00`;
+                     if (discountAmountDisplay) discountAmountDisplay.textContent = `- ₩0`;
+                     if (discountRow) discountRow.style.display = 'none';
                 }
             });
 
-            // 페이지 최초 로드 시 총액 계산 실행
-            updateCartTotals();
+            // 페이지 최초 로드 시 장바구니 렌더링 및 총액 계산 실행
+            renderCartItems(); // 장바구니 상품을 먼저 화면에 그립니다.
+            updateCartTotals(); // 그려진 상품 기반으로 초기 총액 계산 및 UI 업데이트
+
+            // coupons.html에서 넘어온 쿠폰 자동 적용 로직
+            const storedCouponCode = sessionStorage.getItem('selected_coupon_code');
+            const storedCouponName = sessionStorage.getItem('selected_coupon_name'); // 쿠폰 이름도 가져옴
+
+            if (storedCouponCode) {
+                Swal.fire({
+                    icon: 'info',
+                    title: '쿠폰 적용 대기',
+                    text: `'${storedCouponName}' 쿠폰이 자동으로 적용됩니다.`,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    performCouponApplication(storedCouponCode); // API 호출 함수 직접 호출
+                    sessionStorage.removeItem('selected_coupon_code'); // 사용 후 제거
+                    sessionStorage.removeItem('selected_coupon_name');
+                });
+            } else {
+                // 저장된 쿠폰이 없거나 제거되었으면, 적용된 쿠폰 정보도 초기화 (혹시 모를 잔여 데이터 방지)
+                sessionStorage.removeItem('applied_coupon_code');
+            }
         });
+        
     </script>
 </th:block>
 
