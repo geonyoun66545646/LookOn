@@ -1,11 +1,13 @@
 package ks55team02.customer.coupons.mapper;
 
-import ks55team02.util.CustomerPagination;
-import ks55team02.customer.coupons.domain.Coupons;
-import ks55team02.customer.coupons.domain.UserCoupons;
-import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import ks55team02.customer.coupons.domain.Coupons;
+import ks55team02.customer.coupons.domain.UserCoupons;
 
 @Mapper
 public interface CouponsMapper {
@@ -91,6 +93,13 @@ public interface CouponsMapper {
      */
     int countYearlyIssuedCoupon(String userNo, String couponId);
 
+    /**
+     * 특정 사용자가 특정 공개 쿠폰을 현재 '활성 상태' (사용되지 않았거나 만료되지 않은)로 보유하고 있는지 개수를 조회합니다.
+     * @param userNo 사용자 번호
+     * @param pblcnCpnId 공개 쿠폰 ID
+     * @return 활성 상태로 보유 중인 쿠폰 개수 (0 또는 1)
+     */
+    int countActiveUserCouponByCouponId(@Param("userNo") String userNo, @Param("pblcnCpnId") String pblcnCpnId);
     
     
 

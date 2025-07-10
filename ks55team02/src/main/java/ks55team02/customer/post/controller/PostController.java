@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import ks55team02.customer.post.domain.Board;
-import ks55team02.customer.post.domain.Interaction;
+import ks55team02.customer.post.domain.PostInteraction;
 import ks55team02.customer.post.domain.Post;
 import ks55team02.customer.post.service.BoardService;
 import ks55team02.customer.post.service.PostService;
@@ -34,7 +34,7 @@ public class PostController {
 	// 추천수 증가
 	@PostMapping("/interactionInsert")
 	@ResponseBody
-	public Map<String, Object> insertInteraction(Interaction interaction) {
+	public Map<String, Object> insertInteraction(PostInteraction interaction) {
 		Map<String, Object> response = new HashMap<>();
 	    try {
 	        postService.insertInterCount(interaction);

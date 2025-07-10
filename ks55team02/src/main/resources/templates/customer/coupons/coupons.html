@@ -273,23 +273,36 @@ function renderMyCoupons(container, coupons) {
              const periodText = `발급 가능 기간: ${issueStart} ~ ${issueEnd}`;
 
    
-                 // =================================================================================
-                 // ★★★ 핵심 기능 구현 및 상태 판단 로직 ★★★
-                 const isButtonDisabled = !coupon.issuable; // isIssuable이 false면 버튼 비활성화 (true/false 반전)
-                 let buttonText = '쿠폰 받기';
-                 let buttonClass = 'coupon-download-btn';
-                 let buttonAttrs = `data-coupon-id="${coupon.pblcnCpnId}"`; // data-coupon-id 속성 유지
+          // =================================================================================
+             // ★★★ 핵심 기능 구현 및 상태 판단 로직 ★★★
+             let buttonText = '쿠폰 받기';
+             let buttonClass = 'coupon-download-btn';
+             let buttonAttrs = `data-coupon-id="${coupon.pblcnCpnId}"`; // data-coupon-id 속성 유지
+             let isButtonDisabled = false; // 기본은 활성화
 
-                 if (isButtonDisabled) { // 이 블록 안에서 수정합니다.
-                     buttonClass += ' disabled'; // CSS로 비활성화 스타일 적용을 위한 클래스 추가
-                     
-
-                     // ★★★ 이 아랫부분을 아래처럼 수정합니다. ★★★
-                     buttonText = '발급 불가'; // 모든 비활성화 버튼 텍스트를 '발급 불가'로 통일
-                     // 기존의 if (coupon.statusMessage) { ... } else { ... } 블록은 이제 필요 없습니다.
-                 }
-                 // =================================================================================
-
+             // 백엔드에서 `coupon.issuable` 외에 `coupon.isOwned` (사용자가 이미 소유했는지)와 같은 명시적인 필드를 제공하면 더 좋습니다.
+             // 현재는 `statusMessage`를 활용하여 이미 소유한 경우를 분리해봅니다.
+             // 백엔드에서 'ALREADY_OWNED'와 같은 명확한 코드를 `statusMessage`에 포함해주거나
+             // 별도의 `coupon.statusCode` 필드를 주면 훨씬 안정적입니다.
+             
+             if (coupon.issuable === false) {
+                isButtonDisabled = true; // 프론트엔드에서 disabled 클래스 추가를 위한 플래그
+                if (coupon.statusMessage && coupon.statusMessage.includes('이미 발급받았습니다')) {
+                    buttonText = '보유 쿠폰';
+                    buttonClass = 'coupon-download-btn disabled owned-coupon';
+                    // 백엔드에서 받은 메시지를 title 속성에 추가 (마우스 오버 시 표시)
+                    buttonAttrs += ` title="${coupon.statusMessage}"`; // <-- 이 부분이 제대로 동작해야 합니다.
+                } else {
+                    buttonText = '발급 불가';
+                    buttonClass = 'coupon-download-btn disabled unavailable-coupon';
+                    // 백엔드에서 받은 메시지를 title 속성에 추가 (마우스 오버 시 표시)
+                    if (coupon.statusMessage) {
+                        buttonAttrs += ` title="${coupon.statusMessage}"`; // <-- 이 부분도 마찬가지입니다.
+                    } else {
+                        buttonAttrs += ` title="쿠폰 발급 조건을 충족하지 않습니다."`; // 기본 메시지
+                    }
+                }
+            }
              // ... (renderAvailableCoupons 함수 내부 끝) ...
              // --- 최종 버튼 상태 정보 디버그 출력 ---
              console.log("  isButtonDisabled (프론트엔드 계산 결과):", isButtonDisabled);
@@ -298,20 +311,19 @@ function renderMyCoupons(container, coupons) {
              console.log("  최종 버튼 HTML 속성:", buttonAttrs);
              // --- 디버그 정보 끝 ---
 
-             html += `
-                 <li class="coupon-item">
-                     <div class="coupon-details">
-                         <span class="coupon-percentage">${discount}</span>
-                         <span class="coupon-name">${coupon.cpnNm}</span>
-                         <span class="coupon-conditions">
-                             ${coupon.minOrdrAmt.toLocaleString()}원 이상 구매 시, 최대 ${coupon.maxDscntAmt.toLocaleString()}원 할인
-                         </span>
-                         <span class="coupon-period">${periodText}</span>
-                     </div>
-                     <button class="${buttonClass}" ${buttonAttrs}>
-                         ${buttonText}
-                     </button>
-                 </li>
+             html += ` 
+                 <li class="coupon-item"> 
+                     <div class="coupon-details"> 
+                         <span class="coupon-percentage">${discount}</span> 
+                         <span class="coupon-name">${coupon.cpnNm}</span> 
+                         <span class="coupon-conditions"> 
+                             ${coupon.minOrdrAmt.toLocaleString()}원 이상 구매 시, 최대 ${coupon.maxDscntAmt.toLocaleString()}원 할인 
+                         </span> 
+                         <span class="coupon-period">${periodText}</span> 
+                     </div> 
+                     <button class="${buttonClass}" ${buttonAttrs}> ${buttonText} 
+                     </button> 
+                 </li> 
              `;
          });
 
@@ -405,19 +417,32 @@ function renderMyCoupons(container, coupons) {
     couponListContainer.addEventListener('click', function(event) {
         const downloadBtn = event.target.closest('.coupon-download-btn');
         
-        // 1. 클릭된 요소가 'coupon-download-btn'이 아니면 무시
         if (!downloadBtn) return; 
 
-     // ★★★ 이 부분을 수정합니다. downloadBtn.disabled -> downloadBtn.classList.contains('disabled') ★★★
-        if (downloadBtn.classList.contains('disabled')) { // 버튼에 'disabled' 클래스가 있는지 확인
+        if (downloadBtn.classList.contains('disabled')) { // 버튼이 비활성화 상태인 경우
+            // ★★★ 이 부분을 아래와 같이 수정하세요 ★★★
+            const titleMessage = downloadBtn.getAttribute('title'); // 버튼의 title 속성 값 (백엔드의 statusMessage)
+
+            let swalText = '알 수 없는 이유로 쿠폰 발급이 불가합니다.'; // 기본 메시지
+
+            if (titleMessage && titleMessage.includes('이미 발급받았습니다')) {
+                swalText = '이미 보유하신 쿠폰입니다.'; // '보유 쿠폰'인 경우
+            } else if (titleMessage) {
+                // '리뷰 작성 내역이 없습니다.', '생일 주간이 아닙니다.' 등 조건 미충족 메시지
+                swalText = '조건이 부합하지 않아 쿠폰을 발급할 수 없습니다. \n(' + titleMessage + ')'; // 상세 사유 추가
+            } else {
+                swalText = '발급이 불가능합니다.'; // 기본 발급 불가 메시지
+            }
+
             Swal.fire({
-                icon: 'info',
+                icon: 'error',
                 title: '쿠폰 발급 불가',
-                text: '조건이 맞지 않아 쿠폰을 발급할 수 없습니다.',
+                text: swalText, // 위에서 결정된 텍스트 사용
             });
+            // ★★★ 수정 끝 ★★★
             return; 
         }
-        // ★★★ 수정 끝 ★★★
+
 
 
         // 3. 이 아래 코드는 '활성화된' 버튼을 클릭했을 때만 실행됩니다.
@@ -454,6 +479,16 @@ function renderMyCoupons(container, coupons) {
                         .then(data => {
                             // 발급 성공 SweetAlert 표시
                             Swal.fire('발급 완료!', data.message, 'success');
+                            
+                         // ★★★ 이 아랫부분에 추가 ★★★
+                            const clickedButton = event.target.closest('.coupon-download-btn'); // 클릭된 버튼을 다시 참조
+                            if (clickedButton) {
+                                clickedButton.textContent = '발급 완료'; // 텍스트를 '발급 완료'로 변경
+                                clickedButton.classList.remove('can-issue', 'unavailable-coupon', 'owned-coupon', 'disabled'); // 기존 상태 클래스 및 disabled 제거
+                                clickedButton.classList.add('issued-success'); // 발급 완료 스타일 클래스 추가
+                                clickedButton.removeAttribute('title'); 
+                            }
+                            // ★★★ 추가 끝 ★★★
                             
                             // UI 상태 업데이트: 쿠폰 목록 및 보유 쿠폰 개수 새로고침
                             loadCoupons(); 

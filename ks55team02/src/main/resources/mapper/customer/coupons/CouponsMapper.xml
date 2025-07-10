@@ -194,16 +194,20 @@
 	<select id="isBirthdayWeek" resultType="boolean">
 		SELECT CASE
 		WHEN
-		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-', DATE_FORMAT(u.user_brdt,
+		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-',
+		DATE_FORMAT(u.user_brdt,
 		'%m-%d')), '%Y-%m-%d'))) &lt;= 3
 		OR
-		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()) - 1, '-', DATE_FORMAT(u.user_brdt,
+		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()) - 1, '-',
+		DATE_FORMAT(u.user_brdt,
 		'%m-%d')), '%Y-%m-%d'))) &lt;= 3
 		OR
-		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()) + 1, '-', DATE_FORMAT(u.user_brdt,
+		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()) + 1, '-',
+		DATE_FORMAT(u.user_brdt,
 		'%m-%d')), '%Y-%m-%d'))) &lt;= 3
 		THEN TRUE
-		ELSE FALSE
+		ELSE
+		FALSE
 		END AS is_in_birthday_week
 		FROM users u
 		WHERE u.user_no = #{userNo}
@@ -246,6 +250,16 @@
 		AND pblcn_cpn_id =
 		#{couponId}
 		AND YEAR(cpn_give_dt) = YEAR(NOW())
+	</select>
+
+
+	<select id="countActiveUserCouponByCouponId" parameterType="map"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM user_coupons uc
+		WHERE uc.user_no = #{userNo}
+		AND uc.pblcn_cpn_id = #{pblcnCpnId}
+		AND uc.use_yn = 0 AND uc.indiv_expry_dt >= CURDATE();
 	</select>
 
 

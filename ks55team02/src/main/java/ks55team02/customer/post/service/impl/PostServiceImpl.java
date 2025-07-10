@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ks55team02.customer.post.domain.Comment;
-import ks55team02.customer.post.domain.Interaction;
+import ks55team02.customer.post.domain.PostComment;
+import ks55team02.customer.post.domain.PostInteraction;
 import ks55team02.customer.post.domain.Post;
 import ks55team02.customer.post.mapper.PostMapper;
 import ks55team02.customer.post.service.PostService;
@@ -24,7 +24,7 @@ public class PostServiceImpl implements PostService {
 
 	// 추천수 증가
 	@Override
-	public void insertInterCount(Interaction interaction) {
+	public void insertInterCount(PostInteraction interaction) {
 		Integer interMaxNum = postMapper.selectMaxInterNumber();
 		int nextNum = interMaxNum + 1;
 		String newInterNum = String.format("pst_itrct_%d", nextNum);
@@ -51,7 +51,7 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public Post selectPostDetailByPostSn(String pstSn) {
 		Post post = postMapper.selectPostDetailByPstSn(pstSn);
-		List<Comment> comment = postMapper.selectCommentListByPstSn(pstSn);
+		List<PostComment> comment = postMapper.selectCommentListByPstSn(pstSn);
 		post.setComment(comment);
 		postMapper.updateViewCount(pstSn);
 		return post;
@@ -91,7 +91,7 @@ public class PostServiceImpl implements PostService {
 	
 	// 댓글 등록
 	@Override
-	public void insertComment(Comment comment) {
+	public void insertComment(PostComment comment) {
 		Integer commentMaxNum = postMapper.selectMaxCommentNumber();
 		int nextNum = commentMaxNum + 1;
 		String newCommentNum = String.format("cmnt_%d", nextNum);
@@ -106,7 +106,7 @@ public class PostServiceImpl implements PostService {
 	
 	// 댓글 수정
 	@Override
-	public void updateComment(Comment comment) {
+	public void updateComment(PostComment comment) {
 		int result = postMapper.updateComment(comment);
 		String updateResult = "댓글 수정 실패";
 		if(result > 0) updateResult = "댓글 수정 성공";

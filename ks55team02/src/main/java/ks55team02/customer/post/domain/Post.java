@@ -23,5 +23,5 @@ public class Post {
 	private int interCnt;
 	
 	private UserList userInfo;
-	private List<Comment> comment;
+	private List<PostComment> comment;
 }

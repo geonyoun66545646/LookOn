@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ks55team02.customer.post.domain.Comment;
+import ks55team02.customer.post.domain.PostComment;
 import ks55team02.customer.post.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +23,7 @@ public class PostRestController {
     
     // 댓글 수정
     @PostMapping("/updateComment")
-    public Map<String, Object> updateComment(@RequestBody Comment comment) {
+    public Map<String, Object> updateComment(@RequestBody PostComment comment) {
     	
     	Map<String, Object> response = new HashMap<>();
     	
@@ -39,7 +39,7 @@ public class PostRestController {
     
 	// 댓글 작성
 	@PostMapping("/insertComment")
-	public Map<String, Object> insertComment(Comment comment) {
+	public Map<String, Object> insertComment(PostComment comment) {
 		
 		Map<String, Object> response = new HashMap<>();
 

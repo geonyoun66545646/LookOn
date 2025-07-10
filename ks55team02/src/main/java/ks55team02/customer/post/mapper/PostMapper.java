@@ -5,8 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import ks55team02.customer.post.domain.Comment;
-import ks55team02.customer.post.domain.Interaction;
+import ks55team02.customer.post.domain.PostComment;
+import ks55team02.customer.post.domain.PostInteraction;
 import ks55team02.customer.post.domain.Post;
 
 @Mapper
@@ -16,7 +16,7 @@ public interface PostMapper {
 	Integer selectMaxInterNumber();
 	
 	// 추천수 증가
-	int insertInterCount(Interaction interaction);
+	int insertInterCount(PostInteraction interaction);
 
 	// 게시글 조회수 증가
 	int updateViewCount(String pstSn);
@@ -34,7 +34,7 @@ public interface PostMapper {
 	Post selectPostDetailByPstSn(String pstSn);
 	
 	// 특정 게시글의 댓글 목록 조회
-	List<Comment> selectCommentListByPstSn(String pstSn);
+	List<PostComment> selectCommentListByPstSn(String pstSn);
 	
 	// 게시글 일련번호 생성
 	Integer selectMaxPostNumber();
@@ -46,7 +46,7 @@ public interface PostMapper {
 	Integer selectMaxCommentNumber();
 	
 	// 댓글 등록
-	int insertComment(Comment comment);
+	int insertComment(PostComment comment);
 	
 	// 게시글 수정
 	int updatePost(Post post);
@@ -55,7 +55,7 @@ public interface PostMapper {
 	int deletePost(@Param("pstSn") String pstSn);
 	
 	// 댓글 수정
-	int updateComment(Comment comment);
+	int updateComment(PostComment comment);
 	
 	// 댓글 삭제
 	int deleteComment(@Param("pstCmntSn") String pstCmntSn);

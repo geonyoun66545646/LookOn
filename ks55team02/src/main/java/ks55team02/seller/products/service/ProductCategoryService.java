@@ -7,6 +7,17 @@ import java.util.Map;
 
 public interface ProductCategoryService {
 	
+	/*활성*/
+	void activateCategory(String categoryId);
+	
+	/* */
+	boolean isCategoryIdExists(String categoryId);
+    boolean isCategoryNameExists(String categoryName);
+    void updateCategory(ProductCategory productCategory);
+	
+	/* */
+	void deactivateCategoryAndRelatedProducts(String categoryId);
+	
 	Map<String, Object> getCategoryList(SearchCriteria searchCriteria);
 	
 	void addCategory(ProductCategory productCategory);

@@ -1,5 +1,7 @@
 package ks55team02.seller.products.service.impl;
 
+import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory;
+import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.mapper.AdminProductManagementMapper;
 import ks55team02.seller.products.domain.*;
 import ks55team02.seller.products.domain.ProductRegistrationRequest.ProductCombinationData;
 import ks55team02.seller.products.mapper.ProductOptionMapper;
@@ -11,6 +13,8 @@ import ks55team02.util.FileDetail;
 import ks55team02.util.FilesUtils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -23,20 +27,23 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductsServiceImpl implements ProductsService {
 
-    // --- 의존성 주입 ---
     private final ProductsMapper productsMapper;
     private final ProductOptionMapper productOptionMapper;
     private final StoreMapper storeMapper;
     private final FilesUtils filesUtils;
+    private final AdminProductManagementMapper adminProductManagementMapper;
 
-    // --- 상품 CUD (생성, 수정, 삭제) ---
-
+    @Override
+    public List<Stores> searchBrands(String keyword) {
+        return storeMapper.searchStoresByKeyword(keyword);
+    }
+    
     @Override
     @Transactional
     public void addProduct(ProductRegistrationRequest request) {
-        // 1. 상품 PK 생성 및 기본 정보 설정
         String gdsNo = productsMapper.getMaxProductCode();
         request.setGdsNo(gdsNo);
 
@@ -45,6 +52,7 @@ public class ProductsServiceImpl implements ProductsService {
         product.setStoreId(request.getStoreId());
         product.setCtgryNo(StringUtils.hasText(request.getProductCategory2()) ? request.getProductCategory2() : request.getProductCategory1());
         product.setSelUserNo(request.getSelUserNo());
+        product.setCreatrNo(request.getSelUserNo());
         product.setGdsNm(request.getProductName());
         product.setGdsExpln(request.getProductDescription());
         product.setBasPrc(request.getBasePrice() != null ? request.getBasePrice().intValue() : 0);
@@ -54,18 +62,26 @@ public class ProductsServiceImpl implements ProductsService {
         request.calculateFinalPrice();
         product.setLastSelPrc(request.getFinalPrice() != null ? request.getFinalPrice().intValue() : 0);
         product.setRegDt(LocalDateTime.now());
-        // 신규 등록 시, 판매자에게는 보이고(활성), 구매자에게는 안보임(비노출/승인대기)
         product.setActvtnYn(true);
         product.setExpsrYn(false);
         productsMapper.addProduct(product);
 
-        // 2. 이미지 파일 저장 (공통 헬퍼 메소드 호출)
+        // ⭐ 상품 등록 시 'aprv_rjct_cycl'은 항상 1로 시작 ⭐
+        String newHistoryCode = productsMapper.getMaxApprovalHistoryCode();
+        ProductApprovalHistory initialHistory = new ProductApprovalHistory();
+        initialHistory.setAprvRjctHstryCd(newHistoryCode);
+        initialHistory.setGdsNo(gdsNo);
+        initialHistory.setPrcsMngrId(request.getSelUserNo()); // 판매자 ID를 처리자로 설정
+        initialHistory.setAprvSttsCd("대기");
+        initialHistory.setPrcsDt(LocalDateTime.now());
+        initialHistory.setAprvRjctCycl(1); // 최초 등록은 무조건 1차수
+        initialHistory.setMngrCmntCn("판매자 상품 등록으로 인한 최초 승인 대기");
+        adminProductManagementMapper.insertProductApprovalHistory(initialHistory);
+
         saveProductImages(request, gdsNo);
-        
-        // 3. 옵션 및 재고 정보 저장 (공통 헬퍼 메소드 호출)
         saveOptionsAndStock(request, gdsNo);
     }
-    
+
     @Override
     @Transactional
     public void updateProduct(ProductRegistrationRequest request) {
@@ -74,7 +90,9 @@ public class ProductsServiceImpl implements ProductsService {
             throw new IllegalArgumentException("상품 수정을 위한 상품 ID가 없습니다.");
         }
 
-        // 1. 상품 기본 정보 업데이트
+        String selUserNo = request.getSelUserNo();
+
+        // 1. 상품 기본 정보 업데이트 (현재 코드와 동일)
         Products product = new Products();
         product.setGdsNo(gdsNo);
         product.setCtgryNo(StringUtils.hasText(request.getProductCategory2()) ? request.getProductCategory2() : request.getProductCategory1());
@@ -86,20 +104,42 @@ public class ProductsServiceImpl implements ProductsService {
         product.setMaxPurchaseQty(request.getMaxPurchase());
         request.calculateFinalPrice();
         product.setLastSelPrc(request.getFinalPrice() != null ? request.getFinalPrice().intValue() : 0);
-        // TODO: 수정자 정보는 실제 로그인된 사용자 정보로 설정
-        // product.setMdfrNo(loggedInUserId);
+        product.setMdfrNo(selUserNo);
         productsMapper.updateProduct(product);
 
-        // 2. 기존 연관 데이터 비활성화
+        // 2. 기존 연관 데이터 비활성화 (현재 코드와 동일)
         productsMapper.deactivateImagesByGdsNo(gdsNo);
         productsMapper.deactivateOptionsByGdsNo(gdsNo);
         productsMapper.deactivateStatusByGdsNo(gdsNo);
-        
-        // 3. 수정된 정보로 새로 INSERT
+
+        // 3. 수정된 정보로 새로 INSERT (현재 코드와 동일)
         saveProductImages(request, gdsNo);
         saveOptionsAndStock(request, gdsNo);
-        
-        // 4. 승인 상태 변경 로직 (향후 추가될 위치)
+
+        // 4. 재승인 절차: 새로운 차수 계산 방식 변경
+        // ⭐ ⭐ ⭐ 이 부분 수정 ⭐ ⭐ ⭐
+        // 판매자가 수정 제출하는 경우 (재승인 요청), 이는 새로운 "시도"를 의미합니다.
+        // 따라서 기존의 승인/반려 이력 중 가장 높은 차수에 +1을 해야 합니다.
+        int newCycle = adminProductManagementMapper.getLatestApprovalCycle(gdsNo) + 1;
+
+        String newHistoryCode = productsMapper.getMaxApprovalHistoryCode();
+        ProductApprovalHistory history = new ProductApprovalHistory();
+        history.setAprvRjctHstryCd(newHistoryCode);
+        history.setGdsNo(gdsNo);
+        history.setPrcsMngrId(selUserNo);
+        history.setAprvSttsCd("대기");
+        history.setPrcsDt(LocalDateTime.now());
+        history.setAprvRjctCycl(newCycle); // 새로운 시도이므로 기존 차수 + 1
+        history.setMngrCmntCn("판매자 수정 요청으로 인한 재승인 대기 중");
+        adminProductManagementMapper.insertProductApprovalHistory(history);
+        log.info(">>>>>> [Service][updateProduct] 상품 수정으로 인한 새 '대기' 이력 생성. gdsNo: {}, Cycle: {}", gdsNo, newCycle);
+
+        // 상품 노출 상태를 false로 변경 (현재 코드와 동일)
+        Map<String, Object> productParams = new HashMap<>();
+        productParams.put("gdsNo", gdsNo);
+        productParams.put("managerId", selUserNo);
+        productParams.put("exposure", false);
+        adminProductManagementMapper.updateProductExposure(productParams);
     }
 
     @Override
@@ -109,8 +149,6 @@ public class ProductsServiceImpl implements ProductsService {
         paramMap.put("selUserNo", selUserNo);
         productsMapper.deactivateProduct(paramMap);
     }
-
-    // --- 상품 조회 (Read) ---
 
     @Override
     public List<Products> getProductsBySellerAndStore(String selUserNo, String storeId) {
@@ -129,8 +167,6 @@ public class ProductsServiceImpl implements ProductsService {
     public Products getProductDetailWithImages(String gdsNo) {
         return productsMapper.getProductDetailWithImages(gdsNo);
     }
-
-    // --- 유틸리티 및 필터용 옵션 조회 ---
 
     @Override
     public boolean isProductCodeDuplicated(String productCode) {
@@ -155,7 +191,7 @@ public class ProductsServiceImpl implements ProductsService {
 		}
 		return colorOptions;
     }
-    
+
     @Override
     public List<ProductOptionValue> getAllApparelSizes() {
     	List<ProductOptionValue> allSizes = productOptionMapper.getAllProductOptionValuesByType("사이즈");
@@ -192,9 +228,7 @@ public class ProductsServiceImpl implements ProductsService {
 		return storeMapper.getAllStores();
 	}
 
-    // --- Private Helper Methods ---
-
-    private void saveProductImages(ProductRegistrationRequest request, String gdsNo) {
+	private void saveProductImages(ProductRegistrationRequest request, String gdsNo) {
         int imgIndctSn = 1;
         imgIndctSn = saveAndRegisterImage(request.getThumbnailImage(), gdsNo, request.getSelUserNo(), imgIndctSn, ProductImageType.THUMBNAIL);
         imgIndctSn = saveAndRegisterImage(request.getMainImage(), gdsNo, request.getSelUserNo(), imgIndctSn, ProductImageType.MAIN);
@@ -203,7 +237,7 @@ public class ProductsServiceImpl implements ProductsService {
 
     private int saveAndRegisterImage(List<MultipartFile> files, String gdsNo, String creatorNo, int startSn, ProductImageType imageType) {
         if (files == null || files.isEmpty()) return startSn;
-        
+
         int currentSn = startSn;
         for (MultipartFile file : files) {
             if (file != null && !file.isEmpty()) {
@@ -223,53 +257,53 @@ public class ProductsServiceImpl implements ProductsService {
         }
         return currentSn;
     }
-    
+
     private void saveOptionsAndStock(ProductRegistrationRequest request, String gdsNo) {
 		Map<String, String> genderOptionValueMap = new HashMap<>();
 		Map<String, String> colorOptionValueMap = new HashMap<>();
 		Map<String, String> sizeOptionValueMap = new HashMap<>();
-        String selUserNo = request.getSelUserNo();
+        String creatorNo = request.getSelUserNo();
 
 		int optOrder = 1;
         if (StringUtils.hasText(request.getGenderOption())) {
-			genderOptionValueMap = insertOptionAndValue(gdsNo, selUserNo, "성별", "S", optOrder++, List.of(request.getGenderOption()));
+			genderOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "성별", "S", optOrder++, List.of(request.getGenderOption()));
 		}
 		if (request.getColorOptions() != null && !request.getColorOptions().isEmpty()) {
 			List<String> uniqueColorOptions = request.getColorOptions().stream().distinct().collect(Collectors.toList());
-			colorOptionValueMap = insertOptionAndValue(gdsNo, selUserNo, "색상", "S", optOrder++, uniqueColorOptions);
+			colorOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "색상", "S", optOrder++, uniqueColorOptions);
 		}
 		if (request.getSizeOptions() != null && !request.getSizeOptions().isEmpty()) {
 			List<String> uniqueSizeOptions = request.getSizeOptions().stream().distinct().collect(Collectors.toList());
-			sizeOptionValueMap = insertOptionAndValue(gdsNo, selUserNo, "사이즈", "S", optOrder++, uniqueSizeOptions);
+			sizeOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "사이즈", "S", optOrder++, uniqueSizeOptions);
 		}
 
 		if (request.getProductOptionCombinations() != null && !request.getProductOptionCombinations().isEmpty()) {
 			for (ProductCombinationData combinationData : request.getProductOptionCombinations()) {
 				String gdsSttsNo = productsMapper.getMaxStatusNo();
-				insertProductStatus(gdsSttsNo, gdsNo, selUserNo, combinationData.getQuantity());
+				insertProductStatus(gdsSttsNo, gdsNo, creatorNo, combinationData.getQuantity());
 
 				String genderOptValueId = genderOptionValueMap.get(combinationData.getOptVlNo1());
 				String colorOptValueId = colorOptionValueMap.get(combinationData.getOptVlNo2());
 				String sizeOptValueId = sizeOptionValueMap.get(combinationData.getOptVlNo3());
 
-				if (StringUtils.hasText(genderOptValueId)) insertStatusOptionMapping(gdsSttsNo, genderOptValueId, selUserNo);
-				if (StringUtils.hasText(colorOptValueId)) insertStatusOptionMapping(gdsSttsNo, colorOptValueId, selUserNo);
-				if (StringUtils.hasText(sizeOptValueId)) insertStatusOptionMapping(gdsSttsNo, sizeOptValueId, selUserNo);
+				if (StringUtils.hasText(genderOptValueId)) insertStatusOptionMapping(gdsSttsNo, genderOptValueId, creatorNo);
+				if (StringUtils.hasText(colorOptValueId)) insertStatusOptionMapping(gdsSttsNo, colorOptValueId, creatorNo);
+				if (StringUtils.hasText(sizeOptValueId)) insertStatusOptionMapping(gdsSttsNo, sizeOptValueId, creatorNo);
 			}
-		} else { 
+		} else {
 			String gdsSttsNo = productsMapper.getMaxStatusNo();
-			insertProductStatus(gdsSttsNo, gdsNo, selUserNo, request.getStockQuantity());
+			insertProductStatus(gdsSttsNo, gdsNo, creatorNo, request.getStockQuantity());
 		}
     }
-    
-	private Map<String, String> insertOptionAndValue(String gdsNo, String userNo, String optionName, String choiceType, int order, List<String> values) {
+
+	private Map<String, String> insertOptionAndValue(String gdsNo, String creatorNo, String optionName, String choiceType, int order, List<String> values) {
 		Map<String, String> generatedOptionValueIds = new HashMap<>();
         String optNo = productsMapper.getMaxOptionNo();
 
 		ProductOption option = new ProductOption();
 		option.setOptNo(optNo);
 		option.setGdsNo(gdsNo);
-		option.setCreatrNo(userNo);
+		option.setCreatrNo(creatorNo);
 		option.setOptNm(optionName);
 		option.setSnglMtplChcSeCd(choiceType);
 		option.setOptIndctSn(order);
@@ -281,7 +315,7 @@ public class ProductsServiceImpl implements ProductsService {
 			String optVlNo = productsMapper.getMaxOptionValueNo();
 			value.setOptVlNo(optVlNo);
 			value.setOptNo(optNo);
-			value.setCreatrNo(userNo);
+			value.setCreatrNo(creatorNo);
 			value.setVlNm(val);
 			value.setActvtnYn(true);
 			productsMapper.insertProductOptionValue(value);
@@ -290,23 +324,23 @@ public class ProductsServiceImpl implements ProductsService {
 		return generatedOptionValueIds;
 	}
 
-    private void insertProductStatus(String gdsSttsNo, String gdsNo, String selUserNo, Integer quantity) {
+    private void insertProductStatus(String gdsSttsNo, String gdsNo, String creatorNo, Integer quantity) {
         ProductStatus productStatus = new ProductStatus();
         productStatus.setGdsSttsNo(gdsSttsNo);
         productStatus.setGdsNo(gdsNo);
-        productStatus.setCreatrNo(selUserNo);
+        productStatus.setCreatrNo(creatorNo);
         int stock = (quantity != null) ? quantity : 0;
         productStatus.setSelPsbltyQntty(stock);
         productStatus.setSldoutYn(stock <= 0);
         productStatus.setActvtnYn(true);
         productsMapper.insertProductStatus(productStatus);
     }
-    
-    private void insertStatusOptionMapping(String gdsSttsNo, String optVlNo, String selUserNo) {
+
+    private void insertStatusOptionMapping(String gdsSttsNo, String optVlNo, String creatorNo) {
         StatusOptionMapping mapping = new StatusOptionMapping();
         mapping.setGdsSttsNo(gdsSttsNo);
         mapping.setOptVlNo(optVlNo);
-        mapping.setCreatrNo(selUserNo);
+        mapping.setCreatrNo(creatorNo);
         mapping.setActvtnYn(true);
         productsMapper.insertStatusOptionMapping(mapping);
     }

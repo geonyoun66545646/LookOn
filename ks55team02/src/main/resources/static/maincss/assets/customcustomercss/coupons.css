@@ -318,43 +318,91 @@ body {
 
 /* SweetAlert 창 크기 및 폰트 크기 조정 */
 .swal2-popup {
-    width: 400px !important; /* 예시 이미지와 비슷한 너비 */
-    font-size: 16px !important; /* 기본 폰트 크기 약간 증가 */
+	width: 400px !important; /* 예시 이미지와 비슷한 너비 */
+	font-size: 16px !important; /* 기본 폰트 크기 약간 증가 */
 }
-
 
 .swal2-title {
-    font-size: 20px !important; /* 제목 폰트 크기 조정 */
+	font-size: 20px !important; /* 제목 폰트 크기 조정 */
 }
-
 
 .swal2-content {
-    font-size: 14px !important; /* 내용 폰트 크기 조정 */
+	font-size: 14px !important; /* 내용 폰트 크기 조정 */
 }
 
-
-.swal2-confirm,
-.swal2-cancel {
-    font-size: 14px !important; /* 버튼 폰트 크기 조정 */
-    padding: 8px 16px !important; /* 버튼 패딩 조정 */
-}
-    
-    /* ★★★ 발급 불가 버튼 (disabled 클래스가 적용된 경우) 스타일 ★★★ */
-.coupon-download-btn.disabled {
-    background-color: #c4a282; /* 발급 불가 버튼의 고정 색상 */
-    color: #ffffff;             /* 텍스트 색상 (발급 불가 버튼의 텍스트 색상을 원하는 대로 설정) */
-    cursor: not-allowed;        /* 마우스 커서를 '금지' 모양으로 변경 */
-    opacity: 0.5;               /* 약간 투명하게 하여 비활성화 느낌 강조 (선택 사항) */
-    pointer-events: auto;       /* JavaScript 클릭 이벤트를 받기 위해 필요 (중요!) */
-    /* transition: none; */     /* (선택 사항) 기본 버튼에 transition이 있다면 비활성화 시 제거 */
+.swal2-confirm, .swal2-cancel {
+	font-size: 14px !important; /* 버튼 폰트 크기 조정 */
+	padding: 8px 16px !important; /* 버튼 패딩 조정 */
 }
 
-/* ★★★ 발급 불가 버튼에 마우스를 올려도 색상 변화가 없도록 처리 (호버 효과 무시) ★★★ */
-.coupon-download-btn.disabled:hover {
-    background-color: #c4a282; /* 호버 시에도 동일한 색상 유지 */
-    /* 기존 호버 스타일을 재정의하여 적용되지 않도록 합니다. */
-} 
-.coupon-download-btn:hover,
-.coupon-download-btn:focus {
-    color: #ffffff;
+.coupon-download-btn:hover, .coupon-download-btn:focus {
+	color: #ffffff;
+}
+
+/* --- 쿠폰 버튼 공통 스타일 --- */
+.coupon-download-btn {
+	/* flexbox를 사용하여 버튼 내부 텍스트/아이콘을 중앙에 정렬합니다. */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px 15px;
+	border: none;
+	border-radius: 5px;
+	font-size: 0.9em;
+	font-weight: bold;
+	color: white; /* 텍스트 색상 (모든 상태에 공통) */
+	text-decoration: none; /* `<a>` 태그로 버튼을 구현할 경우 밑줄 제거 */
+	transition: background-color 0.3s ease, opacity 0.3s ease;
+	/* 색상/투명도 변화 시 부드러운 전환 효과 */
+	min-width: 100px; /* 버튼의 최소 너비를 설정하여 일관된 모양 유지 */
+	white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 */
+}
+
+/* --- 1. 발급 가능 상태 ('쿠폰 받기' 버튼) --- */
+.coupon-download-btn.can-issue {
+	background-color: #ff9900; /* 활성화된 주황색 */
+	cursor: pointer; /* 마우스 커서를 클릭 가능 모양으로 */
+	opacity: 1; /* 불투명하게 */
+}
+/* '쿠폰 받기' 버튼 호버 시 스타일 */
+.coupon-download-btn.can-issue:hover {
+	background-color: #e68a00; /* 호버 시 약간 더 어둡게 */
+}
+
+/* --- 2. 보유 쿠폰 상태 (페이지 로드 시 이미 보유 중인 경우 또는 발급 완료 후) --- */
+.coupon-download-btn.owned-coupon {
+	background-color: #94cafc; /* 파란색 */
+	cursor: default; /* 마우스 커서를 기본 모양으로 (클릭은 가능하게) */
+	opacity: 0.8; /* 약간 흐리게 하여 비활성 느낌 */
+	/* pointer-events: none; <-- 이 줄이 있다면 삭제하세요! 클릭 이벤트 방지됨 */
+}
+/* '보유 쿠폰' 버튼은 호버 효과 없음 */
+.coupon-download-btn.owned-coupon:hover {
+	background-color: #94cafc; /* 호버 시에도 색상 유지 */
+}
+
+/* --- 3. 발급 불가 상태 (조건 미충족, 만료 등) --- */
+.coupon-download-btn.unavailable-coupon {
+	background-color: #6c757d; /* 회색 (차분하고 비활성 느낌) */
+	cursor: default; /* 마우스 커서를 기본 모양으로 (클릭은 가능하게) */
+	opacity: 0.7; /* 더 흐리게 하여 확실한 비활성 느낌 */
+	/* pointer-events: none; <-- 이 줄이 있다면 삭제하세요! 클릭 이벤트 방지됨 */
+}
+/* '발급 불가' 버튼은 호버 효과 없음 */
+.coupon-download-btn.unavailable-coupon:hover {
+	background-color: #6c757d; /* 호버 시에도 색상 유지 */
+}
+
+/* --- 4. 발급 완료 상태 (사용자가 '쿠폰 받기'를 눌러 발급 성공 후 즉시 변경되는 상태) --- */
+/* 이 상태는 '보유 쿠폰'이 되기 전의 임시적인 성공 상태를 나타낼 때 유용합니다. */
+/* 실제로는 '보유 쿠폰'과 동일하게 처리될 수 있으므로, .owned-coupon과 유사하게 설정하거나 통합할 수 있습니다. */
+.coupon-download-btn.issued-success {
+	background-color: #28a745; /* 초록색 (성공을 의미) */
+	cursor: default;
+	opacity: 0.8;
+	/* pointer-events: none; <-- 이 줄이 있다면 삭제하세요! 클릭 이벤트 방지됨 */
+}
+/* '발급 완료' 버튼은 호버 효과 없음 */
+.coupon-download-btn.issued-success:hover {
+	background-color: #28a745; /* 호버 시에도 색상 유지 */
 }
