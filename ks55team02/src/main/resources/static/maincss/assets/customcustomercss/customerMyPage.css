@@ -1,37 +1,28 @@
-@charset "UTF-8";
-/* 기본 폰트 및 공통 스타일 */
 .mypage-w-style {
     font-family: '돋움', Dotum, sans-serif;
     color: #555;
     background-color: #fff;
 }
 .mypage-w-style .container {
-    max-width: 1200px;
+    max-width: 1200px; /* 기존 컨테이너 최대 너비 유지 */
     margin: 0 auto;
     padding: 0 20px;
 }
-/* 수정: .mypage-w-style 로 범위를 한정하여 헤더에 영향이 가지 않도록 합니다. */
 .mypage-w-style a { text-decoration: none; color: inherit; }
 .mypage-w-style ul { list-style: none; padding: 0; margin: 0; }
 
 /* 1. 페이지 상단 타이틀 */
 .mypage-w-style .page-title-area {
-    text-align: center;
-    padding: 50px 0;
+    padding: 0; /* page-title-area 자체의 상하 패딩 제거. user-summary-box가 자체 패딩을 가짐 */
+    margin-top: 20px;
+    margin-bottom: 20px; /* user-summary-box와 네비게이션 사이 간격 */
 }
-.mypage-w-style .page-title-area h2 {
-    font-size: 36px;
-    font-weight: 500;
-    letter-spacing: 5px;
-    color: #333;
-    margin: 0 0 10px 0;
-}
-.mypage-w-style .page-title-area .breadcrumbs {
-    font-size: 11px;
-    color: #999;
+/* .page-title-area 안에 user-summary-box가 있다면, 그 box가 컨텐츠를 감쌈 */
+.mypage-w-style .page-title-area .user-summary-box {
+    margin-top: 0; /* 이전에 .user-summary-box에 적용된 상단 마진 제거 */
 }
 
-/* 2. 마이페이지 네비게이션 메뉴 */
+/* 2. 마이페이지 네비게이션 메뉴 (기존 유지) */
 .mypage-w-style .mypage-nav-container {
     border-top: 2px solid #333;
     border-bottom: 1px solid #e9e9e9;
@@ -45,7 +36,6 @@
     flex: 1;
     text-align: center;
 }
-/* 수정: .main-nav li a 로 범위를 더 명확하게 지정 */
 .mypage-w-style .main-nav li a {
     display: block;
     padding: 15px 0;
@@ -65,7 +55,6 @@
 .mypage-w-style .nav-column:last-child {
     border-right: none;
 }
-/* 수정: .nav-column ul li a 로 범위를 더 명확하게 지정 */
 .mypage-w-style .nav-column ul li a {
     display: block;
     font-size: 12px;
@@ -75,88 +64,169 @@
     text-decoration: underline;
 }
 
-/* 3. 회원 정보 요약 박스 */
+/* 3. 회원 정보 요약 박스 (프로필 영역) */
 .mypage-w-style .user-summary-box {
     display: flex;
     align-items: center;
     background-color: #f7f7f7;
-    padding: 30px;
-    margin-bottom: 60px;
+    padding: 30px; /* 상하좌우 패딩으로 여백 확보 */
+    border-radius: 8px; /* 모서리 둥글게 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 은은한 그림자 */
+    margin-bottom: 30px; /* 네비게이션과의 간격 */
 }
 .mypage-w-style .user-greeting {
     flex: 3;
     display: flex;
     align-items: center;
 }
-.mypage-w-style .w-people-logo {
-    width: 90px;
-    height: 90px;
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    color: #777;
-    margin-right: 30px;
-    flex-shrink: 0;
-}
-.mypage-w-style .welcome-msg {
-    margin: 0 0 10px 0;
-    display: flex;
-    align-items: center;
-}
-.mypage-w-style .welcome-msg strong {
-    font-size: 18px;
-    color: #000;
-}
-.mypage-w-style .btn-member-benefit {
-    border: 1px solid #ccc;
-    font-size: 11px;
-    padding: 4px 8px;
-    margin-left: 10px;
-}
-.mypage-w-style .membership-status, .mypage-w-style .order-date-info {
-    font-size: 12px;
-    margin: 5px 0;
-}
-.mypage-w-style .order-date-info { color: #999; }
+/* .w-people-logo 스타일은 더 이상 사용되지 않으므로 제거 또는 주석 처리 유지 */
 
-.mypage-w-style .user-coupon, .mypage-w-style .user-point {
-    flex: 1;
-    text-align: center;
-    position: relative;
+/* .my-feed-container는 .profile-section을 감싸는 불필요한 레이어일 수 있습니다. */
+/* HTML 구조상 .user-greeting > .my-feed-container > .profile-section 이므로 my-feed-container의 영향을 제거합니다. */
+.mypage-w-style .my-feed-container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
 }
-.mypage-w-style .user-coupon::before {
+
+/* 프로필 섹션 전체 레이아웃 (스크린샷에 맞춰 조정) */
+.mypage-w-style .profile-section {
+    display: flex;
+    align-items: center; /* 프로필 이미지와 옆 정보 섹션을 세로 중앙에 정렬 */
+    gap: 20px; /* 이미지와 텍스트 사이 간격 줄임 */
+    padding: 0; /* user-summary-box의 padding이 있으므로 여기서는 패딩을 0으로 */
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: none; /* border-bottom 제거 (user-summary-box에 포함됨) */
+    background-color: transparent; /* 배경색 투명으로 */
+    box-shadow: none; /* 그림자 효과 제거 */
+    border-radius: 0; /* 모서리 둥글게 제거 (user-summary-box에 의해 이미 처리될 수 있음) */
+}
+
+/* 프로필 이미지 컨테이너 (원형, 크기 조절의 핵심) */
+.mypage-w-style .profile-image {
+    width: 80px; /* 스크린샷에 보이는 크기에 맞춰 80px */
+    height: 80px; /* 스크린샷에 보이는 크기에 맞춰 80px */
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 프로필 이미지 태그 자체 */
+.mypage-w-style .profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 프로필 정보 텍스트 부분 감싸는 div (닉네임, 자기소개, 통계) */
+.mypage-w-style .profile-info-wrapper {
+    flex-grow: 1; /* 남은 공간 모두 차지 */
+    display: flex; /* 내부 요소들을 flex로 관리 */
+    flex-direction: column; /* 세로 방향으로 나열 */
+    justify-content: center; /* 세로 중앙 정렬 */
+}
+
+/* 닉네임, 자기소개, 통계 스타일 재정의 (세부 조절) */
+.mypage-w-style .profile-nickname {
+    font-size: 1.5em; /* 닉네임 글자 크기 (예: 24px) */
+    font-weight: bold;
+    margin: 0 0 5px; /* 하단 마진 조절 */
+    color: #333;
+}
+.mypage-w-style .profile-bio {
+    color: #888;
+    margin-bottom: 5px; /* 통계와의 간격 줄임 */
+    font-size: 0.9em; /* 자기소개 글자 크기 */
+    line-height: 1.4;
+}
+.mypage-w-style .profile-stats ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 15px; /* 각 통계 항목 간 간격 더 줄임 */
+}
+.mypage-w-style .profile-stats li {
+    text-align: left; /* 스크린샷에서 숫자가 왼쪽 정렬됨 */
+}
+.mypage-w-style .profile-stats .stat-count {
+    display: block;
+    font-size: 1.0em; /* 숫자 크기 */
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 2px; /* 숫자 아래 간격 */
+}
+.mypage-w-style .profile-stats .stat-label {
+    display: block;
+    color: #666;
+}
+
+.mypage-w-style .my-feed-link-section {
+    flex: 1; /* user-summary-box 내에서 남은 공간을 차지 (flex:1) */
+    display: flex;
+    align-items: center; /* 세로 중앙 정렬 */
+    justify-content: space-around; /* 링크 항목들 사이 공간 균등 배분 */
+    /* background-color: lightblue; /* 디버깅용 */
+}
+
+.mypage-w-style .my-feed-link-item {
+    flex: 1; /* 각 링크 항목이 공간 균등하게 차지 */
+    text-align: center;
+    position: relative; /* 세로 구분선을 위한 relative */
+}
+
+/* 첫 번째 항목 앞에만 세로 구분선 추가 */
+.mypage-w-style .my-feed-link-item.first::before {
     content: '';
     position: absolute;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
     width: 1px;
-    height: 60px;
-    border-left: 1px dotted #ccc;
+    height: 60px; /* 세로 구분선 높이 조절 */
+    border-left: 1px dotted #ccc; /* 점선 스타일 */
 }
-.mypage-w-style .user-coupon span, .mypage-w-style .user-point span {
+
+.mypage-w-style .my-feed-link-item a {
+    display: block; /* 링크 영역 확장 */
+    padding: 10px 0; /* 링크 내부 패딩 */
+}
+
+.mypage-w-style .my-feed-link-item .link-label {
     display: block;
-    font-size: 13px;
-    margin-bottom: 10px;
+    font-size: 13px; /* "쿠폰" 라벨과 유사한 크기 */
+    margin-bottom: 5px; /* 라벨과 GO 사이 간격 */
+    color: #666;
 }
-.mypage-w-style .user-coupon strong, .mypage-w-style .user-point strong {
-    font-size: 32px;
+
+.mypage-w-style .my-feed-link-item .link-text {
+    display: block;
+    font-size: 32px; /* "쿠폰 개수"와 유사한 크기 */
     font-weight: 500;
     color: #000;
 }
-.mypage-w-style .user-coupon strong small, .mypage-w-style .user-point strong small {
-    font-size: 16px;
+
+.mypage-w-style .my-feed-link-item .link-small-text {
+    font-size: 16px; /* "개" "P"와 유사한 크기 */
     font-weight: normal;
 }
 
-/* 4. 최근 주문내역 */
+/* ========================================================= */
+/* 4. 최근 주문내역 스타일 (원래 customerMyPage.css에 있던 내용 복원) */
+/* ========================================================= */
 .mypage-w-style .recent-orders-section {
     margin-bottom: 100px;
+    padding: 20px; /* 추가: 섹션 자체의 내부 패딩 */
+    background-color: #ffffff; /* 추가: 섹션 배경색 */
+    border-radius: 8px; /* 추가: 모서리 둥글게 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 추가: 그림자 */
 }
 .mypage-w-style .section-header {
     display: flex;
@@ -164,6 +234,7 @@
     align-items: baseline;
     border-bottom: 2px solid #333;
     padding-bottom: 10px;
+    margin-bottom: 20px; /* 추가: 헤더와 테이블 사이 간격 */
 }
 .mypage-w-style .section-header h3 {
     font-size: 20px;
@@ -172,6 +243,8 @@
 }
 .mypage-w-style .more-link {
     font-size: 12px;
+    color: #666; /* 추가: 링크 색상 */
+    font-weight: bold; /* 추가: 글꼴 두께 */
 }
 .mypage-w-style .order-table {
     width: 100%;
@@ -186,8 +259,14 @@
 .mypage-w-style .order-table th {
     background-color: #f7f7f7;
     font-weight: normal;
+    color: #333; /* 추가: 헤더 텍스트 색상 */
 }
 .mypage-w-style .order-table td[colspan="7"] {
     padding: 50px 0;
     color: #999;
+    text-align: center; /* 추가: 중앙 정렬 */
+}
+/* 테이블 헤더 글꼴 크기 등 조절 (선택 사항) */
+.mypage-w-style .order-table thead th {
+    font-size: 13px; /* 헤더 글자 크기 조금 크게 */
 }
