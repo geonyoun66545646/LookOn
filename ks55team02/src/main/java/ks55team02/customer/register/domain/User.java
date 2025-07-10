@@ -8,7 +8,6 @@ import lombok.Data;
 
 @Data
 public class User {
-
 	    private String 			userNo;
 	    private String 			mbrGrdCd; // 회원 가입시 기본값: grd_cd_3
 	    private String 			userLgnId;
