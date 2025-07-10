@@ -31,7 +31,7 @@
 			            <!-- 프로필 이미지 -->
 			            <div class="profile-image">
 			                <!-- prflImg가 null이거나 비어있으면 기본 이미지, 아니면 사용자 이미지 표시 -->
-			                <img th:src="*{prflImg != null && !prflImg.isEmpty() ? prflImg : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREwQQpb3XOTXuvhRFPQVbHvcv5B9kRzIvTlg&s'}" alt="프로필 이미지">
+			                <img th:src="*{prflImg != null && !prflImg.isEmpty() ? prflImg : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGjTFyPcQd4MSd0UdvwNcpaCjmt13HhgyhWw&s'}" alt="프로필 이미지">
 			            </div>
 			
 			            <!-- 프로필 정보 및 버튼 -->
@@ -106,6 +106,7 @@
                 <div class="nav-column">
                     <ul>
                         <li><a href="#">마이피드</a></li>
+                        <li><a th:href="@{/customer/chat}">채팅</a></li>
                     </ul>
                 </div>
                 <div class="nav-column">
