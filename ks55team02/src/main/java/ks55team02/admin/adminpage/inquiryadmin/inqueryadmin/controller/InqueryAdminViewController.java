@@ -1,4 +1,4 @@
-package ks55team02.admin.adminpage.inquiryadmin.inqueryadminview.controller;
+package ks55team02.admin.adminpage.inquiryadmin.inqueryadmin.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
