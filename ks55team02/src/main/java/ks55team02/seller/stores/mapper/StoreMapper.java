@@ -9,6 +9,13 @@ public interface StoreMapper {
 	
 	Stores getStoreById(String storeId);
 	
+	/**
+     * 검색어와 일치하는 브랜드(상점) 목록을 조회합니다.
+     * @param keyword 검색어
+     * @return 검색된 브랜드 목록
+     */
+    List<Stores> searchStoresByKeyword(String keyword);
+	
     /**
      * 모든 활성화된 브랜드(상점) 목록을 조회합니다.
      * @return 상점 목록

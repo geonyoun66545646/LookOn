@@ -270,6 +270,7 @@
 				</div>
 
 				<div class="app-modal-tab-pane" id="brand-pane">
+				
 					<h3 class="app-tab-pane-title">브랜드</h3>
 					<div class="app-brand-search-wrapper">
 						<input type="text" class="app-brand-search-input"
@@ -283,13 +284,15 @@
 							</svg>
 						</button>
 					</div>
-					<div class="app-filter-options-grid app-brand-options">
-						<label class="app-filter-option" th:each="brand : ${allBrands}">
-							<input type="checkbox" name="brand" th:value="${brand.storeId}"
-							th:checked="${#lists.contains(selectedBrands, brand.storeId)}">
-							<span class="brand-name">[[${brand.storeConm}]]<small>[[${brand.storeConm}]]</small></span>
-						</label>
-					</div>
+					
+					<div class="app-filter-options-grid app-brand-options" id="brandListContainer">
+				        <label class="app-filter-option" th:each="brand : ${allBrands}">
+				            <input type="checkbox" name="brand" th:value="${brand.storeId}"
+				                   th:checked="${#lists.contains(selectedBrands, brand.storeId)}">
+				            <span class="brand-name">[[${brand.storeConm}]]</span>
+				        </label>
+				    </div>
+					
 				</div>
 
 				<div class="app-modal-tab-pane" id="type-pane">

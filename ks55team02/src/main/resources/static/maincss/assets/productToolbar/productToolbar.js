@@ -41,7 +41,49 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===============================================
     // 2. 함수 정의 (Function Definitions)
     // ===============================================
+	
+	/**
+	     * 키워드로 브랜드를 비동기 검색하고, 결과를 브랜드 목록 컨테이너에 렌더링합니다.
+	     * @param {string} keyword - 검색할 키워드
+	     */
+	    function searchBrandsAjax(keyword) {
+	        $.ajax({
+	            url: '/api/brands/search', // Controller에 만든 API 엔드포인트
+	            type: 'GET',
+	            data: { keyword: keyword },
+	            success: function(brands) {
+	                const $brandListContainer = $('#brandListContainer');
+	                $brandListContainer.empty(); // 기존 목록을 모두 비움
 
+	                if (brands && brands.length > 0) {
+	                    brands.forEach(brand => {
+	                        // 현재 URL 파라미터를 읽어와서, 이미 선택된 브랜드인지 확인
+	                        const queryParams = new URLSearchParams(window.location.search);
+	                        const selectedBrands = queryParams.getAll('brand');
+	                        const isChecked = selectedBrands.includes(brand.storeId);
+	                        
+	                        // 새로운 브랜드 라벨 HTML 생성
+	                        const newLabel = `
+	                            <label class="app-filter-option">
+	                                <input type="checkbox" name="brand" value="${brand.storeId}" ${isChecked ? 'checked' : ''}>
+	                                <span class="brand-name">${brand.storeConm}</span>
+	                            </label>
+	                        `;
+	                        $brandListContainer.append(newLabel);
+	                    });
+	                } else {
+	                    $brandListContainer.append('<p class="text-muted text-center">검색 결과가 없습니다.</p>');
+	                }
+	            },
+	            error: function() {
+	                // 에러 발생 시 처리
+	                const $brandListContainer = $('#brandListContainer');
+	                $brandListContainer.empty();
+	                $brandListContainer.append('<p class="text-danger text-center">브랜드 목록을 불러오는 데 실패했습니다.</p>');
+	            }
+	        });
+	    }
+	
     /**
      * 필터 모달 열기
      */
@@ -480,7 +522,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===============================================
     // 3. 이벤트 리스너 등록 (Event Listeners)
     // ===============================================
+	
+	// --- 브랜드 검색 및 자동완성 로직 (AJAX 방식) ---
+    let searchTimer; // 디바운싱을 위한 타이머 변수
+    const $brandSearchInput = $('.app-brand-search-input');
 
+    $brandSearchInput.on('keyup', function() {
+        clearTimeout(searchTimer); // 이전 타이머를 취소
+        const keyword = $(this).val();
+
+        // 300ms 디바운싱: 사용자가 타이핑을 멈춘 후 0.3초가 지나면 검색 실행
+        searchTimer = setTimeout(() => {
+            searchBrandsAjax(keyword); // 위에서 만든 AJAX 함수 호출
+        }, 300);
+    });
+	
     // 모달 열기/닫기
     modalTriggers.forEach(trigger => trigger.addEventListener('click', openModal));
 

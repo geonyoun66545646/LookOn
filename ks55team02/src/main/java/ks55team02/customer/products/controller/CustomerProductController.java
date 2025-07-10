@@ -1,24 +1,30 @@
 package ks55team02.customer.products.controller;
 
-import ks55team02.seller.products.domain.*;
-import ks55team02.seller.products.service.ProductCategoryService;
-import ks55team02.seller.products.service.ProductsService;
-import ks55team02.seller.products.service.ProductSearchService;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.stream.Collectors;
+import ks55team02.seller.products.domain.ProductCategory;
+import ks55team02.seller.products.domain.ProductImage;
+import ks55team02.seller.products.domain.ProductImageType;
+import ks55team02.seller.products.domain.ProductOptionValue;
+import ks55team02.seller.products.domain.Products;
+import ks55team02.seller.products.service.ProductCategoryService;
+import ks55team02.seller.products.service.ProductSearchService;
+import ks55team02.seller.products.service.ProductsService;
+import ks55team02.seller.stores.domain.Stores;
+import lombok.RequiredArgsConstructor;
 
 
 @Controller
@@ -28,8 +34,7 @@ public class CustomerProductController {
 	private final ProductCategoryService productCategoryService;
     private final ProductsService productsService;
     private final ProductSearchService productSearchService;
-
-    // ColorOption DTO 및 COLOR_STYLE_MAP은 그대로 유지
+    
     public static class ColorOption {
         private String name; private String style;
         public ColorOption(String name, String style) { this.name = name; this.style = style; }
@@ -46,7 +51,15 @@ public class CustomerProductController {
         put("기타 패턴", "background-image: repeating-linear-gradient(45deg, #ccc 0, #ccc 5px, #eee 5px, #eee 10px);");
         put("기타 색상", "background-color: #eee; border: 1px dashed #999;"); put("default", "background-color: #ccc;");
     }};
-
+    
+    // 브랜드 검색 API (자동완성용)
+    @GetMapping("/api/brands/search")
+    @ResponseBody
+    public ResponseEntity<List<Stores>> searchBrandsApi(@RequestParam("keyword") String keyword) {
+        List<Stores> searchedBrands = productsService.searchBrands(keyword);
+        return ResponseEntity.ok(searchedBrands);
+    }
+    
     @GetMapping(value = {"/customer", "/customer/"})
     public String customerHomeView() {
         return "/customer/main";
@@ -173,7 +186,6 @@ public class CustomerProductController {
         return "customer/productMain";
     }
 
-    // ⭐⭐⭐ 이 부분이 수정되었습니다. ⭐⭐⭐
     @GetMapping("/products/categories/primary")
     @ResponseBody
     public List<ProductCategory> getPrimaryCategories() {
