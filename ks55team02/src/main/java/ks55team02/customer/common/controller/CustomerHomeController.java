@@ -48,8 +48,8 @@ public class CustomerHomeController {
 		return "customer/fragments/shippmentStts";
 	}
 	
-	@GetMapping(value = {"/premiumAdd"})
-	public String premiumAddView() {
-		return "admin/fragments/premiumAdd";
-	}
+//	@GetMapping(value = {"/premiumAdd"})
+//	public String premiumAddView() {
+//		return "admin/adminpage/storeadmin/premiumAdd";
+//	}
 }

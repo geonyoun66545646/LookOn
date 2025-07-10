@@ -45,4 +45,10 @@ public interface PremiumAddMapper {
     int deleteSubscriptionPlan(@Param("sbscrPlanId") String sbscrPlanId);
     
     
+    
+    List<PremiumAddDTO> getAllPremiumAdds();
+    
+    int registerSubscriptionPlan(PremiumAddDTO premiumAddDTO);
+    
+    
 }
