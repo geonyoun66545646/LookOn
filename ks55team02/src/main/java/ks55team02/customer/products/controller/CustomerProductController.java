@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import ks55team02.customer.store.domain.ProductReview;
+import ks55team02.customer.store.service.ReviewService;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.domain.ProductImage;
 import ks55team02.seller.products.domain.ProductImageType;
@@ -34,6 +36,8 @@ public class CustomerProductController {
 	private final ProductCategoryService productCategoryService;
     private final ProductsService productsService;
     private final ProductSearchService productSearchService;
+    // 리뷰를 위해 삽입 (ljs)
+    private final ReviewService reviewService; 
     
     public static class ColorOption {
         private String name; private String style;
@@ -51,7 +55,7 @@ public class CustomerProductController {
         put("기타 패턴", "background-image: repeating-linear-gradient(45deg, #ccc 0, #ccc 5px, #eee 5px, #eee 10px);");
         put("기타 색상", "background-color: #eee; border: 1px dashed #999;"); put("default", "background-color: #ccc;");
     }};
-    
+
     // 브랜드 검색 API (자동완성용)
     @GetMapping("/api/brands/search")
     @ResponseBody
@@ -248,6 +252,9 @@ public class CustomerProductController {
         ProductImage thumbnailImage = allImages.stream().filter(img -> img.getImgType() == ProductImageType.THUMBNAIL).findFirst().orElse(allImages.stream().filter(img -> img.getImgType() == ProductImageType.MAIN).findFirst().orElse(null));
         List<ProductImage> mainGalleryImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.MAIN).sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
         List<ProductImage> detailImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.DETAIL).sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
+        // 리뷰 추가(ljs)
+        List<ProductReview> reviews = reviewService.getReviewsByProductCode(productCode); // productCode로 리뷰 조회
+        model.addAttribute("reviews", reviews);
         
         model.addAttribute("thumbnailImage", thumbnailImage);
         model.addAttribute("mainGalleryImages", mainGalleryImages);

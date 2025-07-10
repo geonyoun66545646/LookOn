@@ -2,9 +2,13 @@ package ks55team02.admin.adminpage.storeadmin.appAdmin.domain;
 
 import java.time.LocalDateTime;
 
+import ks55team02.admin.common.domain.SearchCriteria;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 @Data
-public class AppAdmin {
+@EqualsAndHashCode(callSuper = true)
+public class AppAdmin extends SearchCriteria  {
 	private String 			aplyId;             // 신청 ID (aply_id)
 	private String 			aplyUserNo;         // 신청자 (aply_user_no)
 	private String 			storeNm;            // 상점명 (store_nm)
@@ -20,7 +24,7 @@ public class AppAdmin {
 	private int 			ctrtTermVal;        // 계약 기간 (ctrt_term_val)
 	private String 			rvwMngrNo;          // 검토(승인) 관리자 (rvw_mngr_no)
 	private String 			mngrNm;             // 매니저명 (mngr_nm)
-	private String 			mngrEml;        // 매니저 이메일 (mngr_eml_addr)
+	private String 			mngrEml;        	// 매니저 이메일 (mngr_eml_addr)
 	private String 			mngrTelNo;          // 매니저 연락처 (mngr_tel_no)
 	private String 			bplcAddr;           // 사업장 주소 (bplc_addr)
 	private String 			aplyStts;           // 신청(승인) 상태 (aply_stts)

@@ -142,7 +142,6 @@
             uc.use_yn AS useYn,
             uc.use_rsn_src_cn AS useRsnSrcCn,
             uc.issu_rsn_src_cn AS issuRsnSrcCn,
-
             c.pblcn_cpn_cd AS pblcnCpnCd,
             c.cpn_nm AS cpnNm,
             c.dscnt_tp_cd AS dscntTpCd,  c.dscnt_vl AS dscntVl,

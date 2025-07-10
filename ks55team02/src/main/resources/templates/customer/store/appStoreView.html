@@ -10,6 +10,7 @@
         <th:block layout:fragment="contents">
             <main class="main">
         <div class="container">
+            <div th:replace="~{customer/fragments/brnoModal :: brnoModalFragment}"></div>
                 <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
                     <div class="container">
                         <h1 class="page-title">스토어신청<span>Store</span></h1>
@@ -23,26 +24,54 @@
                             <li class="breadcrumb-item active" aria-current="page">Checkout</li>
                         </ol>
                     </div>
-                </nav>
+                </nav>  
+                
+               <div class="summary" id="container-body"> 
+               	<div class="row">
+              	 <div class="col-lg-12 mx-auto"> <div class="row justify-content-center mt-5"> 
+              		 <div class="col-lg-10"> 
+             	 		 <div class="row"> 
+              				 <div class="col-md-2"> 
+                               <div class="nav flex-column nav-pills me-3 border border-secondary rounded" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                                   <a class="nav-link active" id="tab1" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">신청자 정보 입력</a>
+                                   <a class="nav-link" id="tab2" data-bs-toggle="pill" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">스토어 정보 입력</a>
+                                   <a class="nav-link" id="tab3" data-bs-toggle="pill" data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">제출 서류</a>
+                               </div>
+                           </div>
 
-                <div class="container">
-                    <h2 class="checkout-title">신청 정보</h2>
-                    <div class="summary" id="cotainer-body">
-                        <form action="#">
-                            
-                                <div class="row">
-                                    <div class="col-lg-4">
-                                        <label>신청자 ID</label>
-                                        <div class="user-info" th:text="${userInfo.userLgnId}"></div>
-                                        <label>신청자 이름</label>
-                                        <div class="user-info" th:text="${userInfo.userNm}"></div>
-                                        <label>신청자 연락처</label>
-                                        <div class="user-info" th:text="${userInfo.telno}"></div>
-                                        <label>수수료 비율</label>
+                           <div class="col-md-10">
+                               <div class="tab-content tab-content-border" id="v-pills-tabContent">
+                                   
+                                   <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                                       <h6>신청자 정보</h6>
+                                       <div class="row mb-3"> 
+                                           <div class="col-lg-6">
+                                               <label>신청자 ID</label>
+                                               <div class="user-info" th:text="${userInfo.userLgnId}"></div>
+                                               <label>신청자 이름</label>
+                                               <div class="user-info" th:text="${userInfo.userNm}"></div>
+                                               <label>신청자 연락처</label>
+                                               <div class="user-info" th:text="${userInfo.telno}"></div>
+                                           </div>
+                                           <div class="col-lg-6">                                        
+                                               <label>예금 주</label>                                                 
+                                               <input type="text" class="form-control">                                                                                 
+                                               <label>계좌 은행</label>
+                                               <input type="text" class="form-control">                                                                                     
+                                               <label>계좌번호</label>
+                                               <input type="text" class="form-control">
+                                           </div>
+                                       </div>
+                                   </div>
+
+                                   <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                                       <h6>스토어 정보</h6>
+                                       <div class="row mb-3"> 
+                                       <div class="col-lg-6">
+                                           
+                                        <label>스토어 명</label>
                                         <input type="text" class="form-control">
-                                    </div>
-
-                                    <div class="col-lg-4">
+                                        
                                         <label>매니저 명</label>
                                         <input type="text" class="form-control">
 
@@ -51,83 +80,61 @@
 
                                         <label>매니저 이메일</label>
                                         <input type="text" class="form-control">
-
-                                        <label>스토어 명</label>
+                                        
+                                         <label>스토어 한줄 소개</label>                                      
                                         <input type="text" class="form-control">
-                                    </div>
-
-                                    <div class="col-lg-4">
-                                        <div class="address-container">
+                                        
+                                         <label>수수료 비율</label>
+                                        <input type="text" class="form-control">
+                                          </div>
+                                          
+                                           <div class="col-lg-6">                                        
+                                              <div class="address-container">
                                             <label>스토어 주소</label>
                                             <input type="button" onclick="sample2_execDaumPostcode()" value="우편번호 찾기" class="address-btn">
                                         </div>
-                                        <input type="text" id="sample2_postcode" placeholder="우편번호">
-                                        <input type="text" id="sample2_address" placeholder="주소">
+                                        <input type="text" id="sample2_postcode" placeholder="우편번호" readonly="readonly">
+                                        <input type="text" id="sample2_address" placeholder="주소" readonly="readonly">
                                         <input type="text" id="sample2_detailAddress" placeholder="상세주소">
-
                                         <div id="layer">
                                             <img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" onclick="closeDaumPostcode()" alt="닫기 버튼">
                                         </div>
-
+                                        
                                         <label>계약 신청일</label>
                                         <input type="text" class="form-control" >
 
-                                        <label>계약 기간일</label>
+                                        <label>계약 기간</label>
                                         <input type="text" class="form-control">
-                                    </div>
-                                </div>
-                                    <div class="col-lg-12">
-                                <div class="row">
                                         
-         <div class="col-lg-6">
-         
-         
-                  <form action="#">
-									    <label class="checkout-title">사업자등록번호 조회</label>
-									    <div id="brnoStatusForm"> 
-									    <label for="brno"></label>
-									        <input class="brno-input" type="text" id="brno" name="brno" placeholder="'-' 없이 10자리 숫자를 입력하세요." pattern="[0-9]{10}" title="숫자 10자리를 입력해주세요." required>
-									        <button type="submit" id="checkBrnoButton">조회</button> 
-									        </div> 
-									        <label>조회한 사업자등록번호</label> 
-									        <p><strong id="queriedBrno"></strong></p>
-									        <label>사업자등록번호 조회 결과</label>
-									        <div id="apiResponseContainer"> 
-									        <div id="statusResults" class="container">
-									        </div>
-									    </div>
-									    <p class="re-btn">
-									    <button type="button" onclick="resetBrnoForm()" class="btn btn-outline-secondary">다시 조회하기</button>
-									    </p>
-										</form>
-         
-                         
-                                        <label>스토어 소개</label>
-                                        <div class="text-container">
-                                            <textarea class="text-box"></textarea>
-                                        </div>                                                                                          			               
-				                                    
-				                                    </div>
-				                                    
-                               
-                                               <div class="col-lg-6"><!-- 테이블 반절 -->
-                                                   <div class="row">
-                                               <div class="col-lg-6 acc1">
-                                                  <label>예금 주</label>                                                 
+                                        <label>구독 기간</label>
                                         <input type="text" class="form-control">
-                                                 </div>    
-                                          
-                                                 <div class="col-lg-6 acc2">               
-                                                     <label>계좌 은행</label>
-                                        <input type="text" class="form-control">
-                                                 
-                                                </div>
-                                                <label>계좌번호</label>
-                                        <input type="text" class="form-control">
-                                                
-                                                
-                                                
-                                        <div id="table-head">
+                                        
+                                        <!-- 사업자등록번호 조회 -->
+                                       <form action="#" onsubmit="return false;">
+                                            <label class="checkout-title">사업자등록번호 조회</label>
+                                            <div id="brnoStatusForm"> 
+                                                <label for="brno"></label>
+                                                <input class="brno-input" type="text" id="brno" name="brno" placeholder="'-' 없이 10자리 숫자를 입력하세요." pattern="[0-9]{10}" title="숫자 10자리를 입력해주세요." required>
+                                                <button type="submit" id="checkBrnoButton">조회</button> 
+                                            </div> 
+                                            <p class="re-btn">
+                                                <button type="button" onclick="resetBrnoForm()" class="btn re-input">다시 입력하기</button>
+                                            </p>
+                                        </form>
+
+                                        
+                                        
+                                        </div>                 
+                                           </div>
+                                  
+                                   </div><!-- 모달 끝 -->
+                                       
+
+                                   <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
+                                       <h6>제출 요구 서류</h6>
+                                       <div class="row mb-3"> 
+                                           <div class="col-lg-12">
+                                                   <div id="table-head">
                                             <label>첨부 파일</label>
                                         </div>
                                         <table class="table table-reg">
@@ -260,24 +267,39 @@
                                                     </td>
                                                 </tr>
                                             </tbody>
-                                        </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                                        </table>										 
+										    </div>
+										</div>
+
+										</div>
+										        
+										       
+										   
+										</div>
+                                           </div>                                                               
+                                   </div>                                
+                                       </div>
+                                   </div>
+							 </div>
                         </div>
-                    </div>
+                        </div>
+							 
                         <div class="button-wrapper">
-                            <button type="button" class="btn btn-outline-primary-2 btn-order btn-block" id="submitApplication"> <span class="btn-text">제출 하기</span>
+                            <button type="button" class="btn btn-outline-primary-2 btn-order btn-block" id="submitApplication" onclick="confirmReload();">
+                            <span class="btn-text">제출 하기</span>
                                 <span class="btn-hover-text">제출 하기</span>
                             </button>
                         </div>
-                	        </div>
+                        </div>
+                        
+							 
             </main>
         </th:block>
 
 
         <th:block layout:fragment="jsFile">
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+            
             <script th:src="@{/maincss/assets/js/home_specific.js}"></script>
             <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
         </th:block>
@@ -435,15 +457,16 @@
                 }
 
                 /* 사업자 등록정보 조회 */
-                 /* 사업자등록번호 휴폐업 조회 AJAX 로직 */
-                const checkBrnoButton = document.getElementById('checkBrnoButton'); // 새로 추가된 ID로 버튼을 가져옴
+                const checkBrnoButton = document.getElementById('checkBrnoButton');
                 const brnoInput = document.getElementById('brno');
-                const queriedBrnoSpan = document.getElementById('queriedBrno');
-                const apiResponseContainer = document.getElementById('apiResponseContainer');
+                
+                // **모달 인스턴스 생성 시 'brnoModal' ID 사용**
+                const brnoModal = new bootstrap.Modal(document.getElementById('brnoModal')); 
+                const modalApiResponseContainer = document.getElementById('modalApiResponseContainer'); 
 
                 if (checkBrnoButton) {
-                    checkBrnoButton.addEventListener('click', function(event) { // click 이벤트로 변경
-                        event.preventDefault(); // 페이지 새로고침 방지
+                    checkBrnoButton.addEventListener('click', function(event) {
+                        event.preventDefault();
 
                         const brno = brnoInput.value;
 
@@ -451,8 +474,6 @@
                             alert('사업자등록번호를 입력해주세요.');
                             return;
                         }
-
-                        queriedBrnoSpan.textContent = brno; // 조회된 번호 표시
 
                         fetch(`/api/brno/status?brno=${brno}`)
                             .then(response => {
@@ -465,46 +486,79 @@
                                 return response.json();
                             })
                             .then(data => {
-                                console.log('국세청 API 응답:', data); 
+                                console.log('국세청 API 응답:', data);
 
                                 let html = '';
                                 if (data && data.data && data.data.length > 0) {
+                                    html += '<p>조회된 사업자등록번호: <strong>' + brno + '</strong></p>';
                                     html += '<table><thead><tr><th>사업자번호</th><th>상태</th><th>상태 코드</th><th>과세 유형</th><th>폐업일자</th></tr></thead><tbody>';
                                     data.data.forEach(result => {
                                         html += `<tr><td>${result.b_no}</td><td>${result.b_stt}</td><td>${result.b_stt_cd}</td><td>${result.tax_type}</td><td>${result.end_dt || '해당 없음'}</td></tr>`;
                                     });
                                     html += '</tbody></table>';
                                 } else {
+                                    html += '<p>조회된 사업자등록번호: <strong>' + brno + '</strong></p>';
                                     html += '<div class="error-message"><p>조회 결과가 없습니다. 사업자등록번호를 확인해주세요.</p></div>';
                                 }
-                                apiResponseContainer.innerHTML = html;
+                                modalApiResponseContainer.innerHTML = html;
+                                brnoModal.show(); // 올바른 변수명으로 모달 띄우기**
                             })
                             .catch(error => {
                                 console.error('Fetch 에러:', error);
-                                apiResponseContainer.innerHTML = `<div class="error-message"><p>네트워크 오류 또는 예상치 못한 오류가 발생했습니다.</p><p>${error.message}</p></div>`;
+                                modalApiResponseContainer.innerHTML = `<div class="error-message"><p>네트워크 오류 또는 예상치 못한 오류가 발생했습니다.</p><p>${error.message}</p></div>`;
+                                brnoModal.show(); // 오류 시에도 올바른 변수명으로 모달 띄우기**
                             });
                     });
                 }
 
-                // "다시 조회하기" 버튼을 위한 함수 (기존과 동일)
+                // "다시 입력하기" 버튼을 위한 함수
                 function resetBrnoForm() {
                     document.getElementById('brno').value = '';
-                    document.getElementById('queriedBrno').textContent = '';
-                    document.getElementById('apiResponseContainer').innerHTML = '';
+                    modalApiResponseContainer.innerHTML = ''; // 모달 내부 내용 초기화
+                    // **필요하다면, 모달이 열려있을 경우 닫는 로직 추가 (선택 사항)**
+                    // brnoModal.hide(); // 이 줄을 추가하여 다시 입력 시 모달을 닫을 수 있습니다.
                 }
+                
+                /* 버튼 기능만 삽입 수정 필요 */
+   				 function confirmReload() {
+   			        if (confirm("새로고침을 하시겠습니까?")) {
+   			            location.reload();
+   			        }
+   			    }
+                
+                /* 탭 버튼 활성화 */
+                
+                document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('#tab1, #tab2, #tab3, #tab4'); // 모든 탭 요소를 선택
 
-                // 신청 하기 버튼 클릭 이벤트 (기존과 동일)
-                const submitButton = document.getElementById('submitApplication');
-                if (submitButton) {
-                    submitButton.addEventListener('click', function(event) {
-                        if (!validateForm()) {
-                            event.preventDefault();
-                        } else {
-                            alert('스토어 신청이 성공적으로 제출되었습니다!');
-                        }
-                    });
-                }
-           
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // 1. 현재 활성화된 탭에서 'active-tab' 클래스 제거
+            tabs.forEach(t => t.classList.remove('active-tab'));
+
+            // 2. 클릭된 탭에 'active-tab' 클래스 추가
+            this.classList.add('active-tab');
+
+            // --- 추가: 탭 내용 변경 로직 (필요하다면 여기에 구현) ---
+            // 예: 탭 클릭 시 특정 div의 내용을 보여주거나 숨기는 로직
+            // const tabContentId = this.dataset.targetContent; // data-target-content="tabContent1" 같은 속성 사용
+            // document.querySelectorAll('.tab-content').forEach(content => {
+            //     if (content.id === tabContentId) {
+            //         content.style.display = 'block';
+            //     } else {
+            //         content.style.display = 'none';
+            //     }
+            // });
+        });
+    });
+
+    // --- 페이지 로드 시 기본 활성화 탭 설정 (선택 사항) ---
+    // 예: 페이지 로드 시 첫 번째 탭이 기본으로 활성화되도록 설정
+    if (tabs.length > 0) {
+        tabs[0].classList.add('active-tab');
+        // 그리고 해당 탭 내용도 보이도록 초기 설정
+    }
+});
             </script>
         </th:block>
     </body>
