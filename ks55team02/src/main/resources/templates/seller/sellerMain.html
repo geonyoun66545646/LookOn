@@ -19,7 +19,7 @@
 	<!-- 추가할 페이지 contents -->
 	<th:block layout:fragment="contents">
                     <div>
-                        <h2 class="content-title card-title" th:text="${store.storeConm +'  상점관리'}">상점 관리</h2>
+                        <h2 class="content-title card-title" th:text="${store.storeConm +'님  스토어관리'}">스토어 관리</h2>
                         <p></p>
                     </div>
                     
@@ -38,31 +38,32 @@
 				    <div class="col-xl-10 col-lg-12">
                         <div class="card mb-4">
                             <article class="card-body" >
-                                <h3 class="card-title" >상점 소개</h3>
+                                <h3 class="card-title" >스토어 소개</h3>
                                 <div th:text="${store.storeIntroCn}"></div>
                                 <canvas id="myChart" height="120px" ></canvas>
                             </article>
-                        </div>
-                       
-                    </div>
-                    
-                </div>
-                    
-                <div class="row">
-                <div class="col-lg-3">
-                        <div class="card card-body mb-4">
-                            <article class="icontext">
-                               <div th:if="${hasSubscription}">
-						            <p>구독 시작일: <span th:text="${earliestSubscriptionStartDate}"></span></p>
-						            <p>구독 종료일: <span th:text="${latestSubscriptionEndDate}"></span></p>
-						        </div>
-						        <!-- hasSubscription이 false일 경우 (구독 기록이 없거나 유효하지 않을 때) -->
-						        <div th:unless="${hasSubscription}">
-						            <p>현재 구독 기록이 없습니다.</p>
-						        </div>
-                            </article>
-                        </div>
-                    </div>
+                        </div>                      
+                    </div>                    
+                </div>           
+                	<div class="row">
+               			<div class="col-lg-3">
+					    <div class="card card-body mb-4">
+					        <article class="icontext">
+					            <span class="icon icon-sm rounded-circle bg-primary-light" th:text="${sbscrPrchsNocs * 30} + '일'"></span>
+					            <div class="text">
+					                <div th:if="${hasSubscription}">
+					                    <h6 class="mb-1 card-title text-start">구독 시작일:</h6>
+					                    <span class="d-block text-end pe-3" th:text="${earliestSubscriptionStartDate}"></span>
+					                    <h6 class="mb-1 card-title text-start">구독 종료일:</h6>
+					                    <span class="d-block text-end pe-3" th:text="${latestSubscriptionEndDate}"></span>
+					                </div>
+					                <div th:unless="${hasSubscription}">
+					                    <p class="mb-0">현재 구독 기록이 없습니다.</p>
+					                </div>
+					            </div>
+					        </article>
+					    </div>
+					</div>
                     <div class="col-lg-3">
                         <div class="card card-body mb-4">
                             <article class="icontext">

@@ -90,7 +90,8 @@
         SELECT
             s.store_id,                              -- 상점 ID
             MIN(sp.sbscr_bgng_dt) AS earliest_sbscr_bgng_dt, -- 가장 빠른 구독 시작일
-            MAX(sp.sbscr_end_dt) AS latest_sbscr_end_dt     -- 가장 늦은 구독 종료일
+            MAX(sp.sbscr_end_dt) AS latest_sbscr_end_dt,     -- 가장 늦은 구독 종료일
+           	sbscr_prchs_nocs
         FROM
             subscription_payments AS sp
         JOIN

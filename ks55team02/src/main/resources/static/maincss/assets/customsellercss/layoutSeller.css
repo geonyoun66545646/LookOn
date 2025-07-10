@@ -7,3 +7,15 @@
     display: block; 
 }
 
+.card{
+	min-height: 9rem !important;
+}
+.icontext span{
+	font-size : 18px !important;
+}
+
+.icontext{
+	width : 100% !important;
+	box-sizing: border-box; /* padding이나 border가 width에 포함되도록 */
+    /* 만약 display:flex 가 이미 있다면 justify-content: space-between; 도 확인 */
+}

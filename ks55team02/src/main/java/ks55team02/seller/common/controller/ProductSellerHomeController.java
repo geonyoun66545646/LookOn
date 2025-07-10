@@ -40,16 +40,18 @@ public class ProductSellerHomeController {
          if (subscription == null || subscription.isEmpty() || subscription.get("earliest_sbscr_bgng_dt") == null) {
              log.info("상점 ID {}에 대한 구독 기록이 없거나 유효한 기간 정보가 없습니다.", storeId);
              model.addAttribute("hasSubscription", false);
+             model.addAttribute("sbscrPrchsNocs", 0); 
          } else {
              model.addAttribute("hasSubscription", true);
              model.addAttribute("earliestSubscriptionStartDate", subscription.get("earliest_sbscr_bgng_dt"));
              model.addAttribute("latestSubscriptionEndDate", subscription.get("latest_sbscr_end_dt"));
+             model.addAttribute("sbscrPrchsNocs", subscription.get("sbscr_prchs_nocs"));
          }
 
          // 뷰로 전달할 데이터를 Model에 추가합니다.
          model.addAttribute("title", "상점 상세 정보");
          model.addAttribute("store", store); // 조회된 Store DTO 객체
-
+         
          // 상점 로고 이미지 경로도 필요하다면 여기서 추가적으로 조회하여 모델에 담을 수 있습니다.
          // String storeLogoPath = storeMngService.getStoreLogoPathById(storeId);
          // model.addAttribute("storeLogoPath", storeLogoPath);
