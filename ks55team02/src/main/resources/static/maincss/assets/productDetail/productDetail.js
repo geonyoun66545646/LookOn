@@ -207,9 +207,24 @@ $(document).ready(function() {
         console.log("위시리스트 버튼 클릭됨.");
     });
 
-    $('.btn-cart').on('click', function(e) {
+/* ============================== 장바구니 시작 ============================== */
+$('.btn-cart').on('click', function(e) {
         e.preventDefault();
         console.log("장바구니 버튼 클릭됨.");
+
+        const productName = $('.product-details .product-title').text().trim();
+        const productImageSrc = $('.product-main-image img').attr('src'); 
+
+        // ⭐ 콘솔 로그 추가: 가져온 상품명과 이미지 경로 확인 ⭐
+        console.log("장바구니 추가 시도 - 가져온 상품명:", productName);
+        console.log("장바구니 추가 시도 - 가져온 상품 이미지:", productImageSrc);
+
+
+        if (!productName || !productImageSrc) {
+            console.error("장바구니 추가에 필요한 상품 정보(이름 또는 이미지)를 가져올 수 없습니다.");
+            alert("상품 정보를 가져오는 데 문제가 발생했습니다. 브라우저 개발자 도구의 콘솔을 확인해주세요.");
+            return;
+        }
 
         if (selectedOptions.length === 0) {
             alert('최소 하나 이상의 옵션을 추가해주세요.');
@@ -217,30 +232,78 @@ $(document).ready(function() {
             return;
         }
 
-        let allItemsAdded = true;
+		// cart_data를 세션 스토리지에서 불러오거나, 없으면 빈 객체로 초기화합니다.
+		let cartData = JSON.parse(sessionStorage.getItem('cart_data')) || { products: [] };
+
+        // ⭐ 콘솔 로그 추가: 현재 selectedOptions 배열 내용 확인 ⭐
+        console.log("장바구니에 추가될 현재 selectedOptions:", selectedOptions);
+
+
+        let itemsAddedOrUpdatedCount = 0; 
+
         selectedOptions.forEach(option => {
-            const cartKey = `cart_${currentProductId}_${option.color.replace(/\s+/g, '_')}_${option.size.replace(/\s+/g, '_')}`;
-            if (localStorage.getItem(cartKey)) {
-                alert(`[${option.color} ${option.size}] 옵션은 이미 장바구니에 있습니다.`);
-                allItemsAdded = false; 
-                console.log(`장바구니 추가 실패: [${option.color} ${option.size}] 이미 존재.`);
+            const uniqueItemId = `${productName}_${option.color.replace(/\s+/g, '_')}_${option.size.replace(/\s+/g, '_')}`;
+
+            // 이 로직은 `cartData = { products: [] }`로 변경했기 때문에 항상 새로운 항목으로 추가됩니다.
+            // 만약 동일 상품의 동일 옵션을 여러 번 추가하려 하면 quantity가 누적됩니다.
+            const existingItemInCart = cartData.products.find(p => p.id === uniqueItemId);
+
+            if (existingItemInCart) {
+                // 기존 장바구니에 동일 ID의 상품이 있다면 수량만 업데이트 (이 경우, `selectedOptions` 내에서만 의미)
+                const newQuantity = existingItemInCart.quantity + option.quantity;
+                if (newQuantity <= 10) { 
+                    existingItemInCart.quantity = newQuantity;
+                    itemsAddedOrUpdatedCount++;
+                    console.log(`장바구니 항목 업데이트 (현재 추가되는 옵션 내): ${uniqueItemId}, 새 수량: ${existingItemInCart.quantity}`);
+                } else {
+                    alert(`"${option.color} / ${option.size}" 옵션은 장바구니에 최대 10개까지만 담을 수 있습니다. 현재 ${existingItemInCart.quantity}개, 추가 요청 ${option.quantity}개`);
+                    console.log(`장바구니 항목 업데이트 실패 (수량 초과): ${uniqueItemId}`);
+                }
             } else {
-                localStorage.setItem(cartKey, JSON.stringify({
-                    productId: currentProductId, 
-                    color: option.color,
-                    size: option.size,
+                // 새로운 항목으로 장바구니에 추가
+                const newItem = {
+                    id: uniqueItemId, 
+                    name: `${productName} ${option.color} ${option.size}`,
+                    price: baseProductPrice,
                     quantity: option.quantity,
-                    price: baseProductPrice // 개별 옵션 아이템의 가격은 기본 상품 가격
-                }));
-                console.log(`장바구니에 추가됨: ${option.color} ${option.size}`);
+                    image: productImageSrc 
+                };
+                cartData.products.push(newItem);
+                itemsAddedOrUpdatedCount++;
+                // ⭐ 콘솔 로그 추가: 새로 장바구니에 추가되는 항목의 상세 정보 ⭐
+                console.log("장바구니에 새로 추가되는 항목:", newItem);
             }
         });
-        
-        if (allItemsAdded) {
-             alert('장바구니에 추가되었습니다.');
-             console.log("모든 항목 장바구니에 추가 완료.");
+
+        try {
+            sessionStorage.setItem('cart_data', JSON.stringify(cartData));
+            console.log("세션 스토리지에 최종 장바구니 데이터 저장 성공:", JSON.parse(sessionStorage.getItem('cart_data')));
+
+            selectedOptions = []; 
+            updateOptionsDisplay(); 
+
+            if (itemsAddedOrUpdatedCount > 0) { 
+                 if (confirm('장바구니에 상품이 추가되었습니다. 장바구니로 이동하시겠습니까?')) {
+                     // 이 경로는 실제 서버 환경에 맞게 조정해야 합니다.
+                     // 예: /customer/cart.html 또는 /cart.html
+                     window.location.href = '/cart'; 
+                 }
+            } else {
+                alert("장바구니에 추가된 상품이 없습니다.");
+            }
+           
+        } catch (error) {
+            console.error("세션 스토리지에 장바구니 데이터 저장 중 오류 발생:", error);
+            alert("장바구니에 상품을 담는 중 오류가 발생했습니다. 브라우저 설정을 확인해주세요.");
         }
+		console.log("장바구니 추가 시도 - 가져온 상품명 : ", productName);
+			console.log("장바구니에 새로 추가되는 항목:", newItem);
+			console.log("세션 스토리지에 최종 장바구니 데이터 저장 성공:", JSON.parse(sessionStorage.getItem('cart_data')));
     });
+	
+	
+	
+/* ============================== 장바구니 끝 =============================== */
 
     // 페이지 로드 시 초기화
     updateCurrentSelectionPricePreview(); // 페이지 로드 시 "옵션을 모두 선택해주세요." 표시

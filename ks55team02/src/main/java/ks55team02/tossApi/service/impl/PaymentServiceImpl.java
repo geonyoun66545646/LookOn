@@ -34,7 +34,41 @@ public class PaymentServiceImpl implements PaymentService {
         // TODO: 이 부분에 orderData Map을 OrderDTO로 변환하여
         //       Mapper를 통해 DB의 orders, order_items 테이블에 INSERT하는 로직을 구현해야 합니다.
         log.info("saveOrder 서비스 호출. orderId: {}", orderData.get("ordrNo"));
-        log.warn("<<<<< saveOrder: 실제 DB 저장 로lic 구현이 필요합니다. >>>>>");
+
+        // orders 테이블에 데이터 삽입 (PaymentMapper.xml에 insertOrder 쿼리 필요)
+        // 예시:
+        // paymentMapper.insertOrder(orderData); // orderData 맵을 직접 넘기거나 DTO로 변환하여 넘깁니다.
+
+        // order_items 테이블에 데이터 삽입 (PaymentMapper.xml에 insertOrderItem 쿼리 필요)
+        // orderData.get("products") 등으로 상품 목록을 가져와 반복문을 돌며 저장
+        // List<Map<String, Object>> products = (List<Map<String, Object>>) orderData.get("products");
+        // if (products != null) {
+        //     for (Map<String, Object> product : products) {
+        //         product.put("ordrNo", orderData.get("ordrNo")); // 주문 상품에도 주문번호 설정
+        //         paymentMapper.insertOrderItem(product); // 각 상품 정보를 저장
+        //     }
+        // }
+
+        // 여기에 DB 저장 로직을 실제 구현해야 합니다. (Mapper 호출)
+        // 예시:
+        Map<String, Object> order = new HashMap<>();
+        order.put("ordrNo", orderData.get("ordrNo"));
+        order.put("totalAmount", orderData.get("totalAmount"));
+        order.put("userNo", orderData.get("userNo")); // 사용자 ID가 orderData에 있어야 함
+        order.put("orderStatus", "ORDER_COMPLETED"); // 주문 상태 코드
+        order.put("orderDate", ZonedDateTime.now(ZoneId.of("Asia/Seoul"))); // 현재 시간
+        
+        // paymentMapper.insertOrder(order); // 주문 테이블에 삽입하는 Mapper 메소드 호출
+        log.info("주문 데이터 저장 로직 구현 필요: {}", order);
+
+        List<Map<String, Object>> products = (List<Map<String, Object>>) orderData.get("products");
+        if (products != null) {
+            for (Map<String, Object> product : products) {
+                product.put("ordrNo", orderData.get("ordrNo"));
+                // paymentMapper.insertOrderItem(product); // 주문 상품 테이블에 삽입하는 Mapper 메소드 호출
+                log.info("주문 상품 데이터 저장 로직 구현 필요: {}", product);
+            }
+        }
     }
     
     
@@ -60,9 +94,33 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public String createOrder(Map<String, Object> orderData) {
-        // ... 주문 생성 로직 구현 ...
-        log.info("createOrder 구현 필요");
-        return "order_" + UUID.randomUUID().toString().replace("-", ""); // 임시 주문 ID 생성
+        log.info("PaymentService.createOrder 호출. 받은 데이터: {}", orderData);
+
+        // ★★★ 주문번호(ordrNo) 서버에서 생성 ★★★
+        // 기존: String ordrNo = UUID.randomUUID().toString(); // 고유한 주문번호 생성 예시
+        // 변경: PaymentMapper를 통해 DB에서 다음 주문 번호를 가져옵니다.
+        String ordrNo = paymentMapper.selectNextOrderId(); // <--- 이 부분을 이렇게 수정합니다.
+        log.info("생성된 새로운 주문 번호: {}", ordrNo); // 생성된 주문 번호 로그 추가
+
+        orderData.put("ordrNo", ordrNo); // 생성된 주문번호를 orderData에 추가
+
+        // 사용자 번호 (userNo)는 로그인된 사용자 세션에서 가져와야 할 수 있습니다.
+        // 현재 orderData에 userNo가 없다면, 클라이언트에서 보내주거나
+        // 서버에서 사용자 인증 정보를 통해 가져와서 orderData에 추가해야 합니다.
+        // 예시: String userNo = (String) session.getAttribute("userNo");
+        // orderData.put("userNo", userNo);
+
+        // ★★★ orderData에서 필요한 정보를 추출하여 OrderDTO 등으로 변환 후 DB에 저장 ★★★
+        // 이전에 언급된 saveOrder 메소드를 활용하거나 여기에 직접 구현합니다.
+        try {
+            saveOrder(orderData); // 주문 정보 및 상품 목록을 DB에 저장하는 로직 호출
+            log.info("주문번호 {}로 주문 생성 및 DB 저장 완료.", ordrNo);
+        } catch (Exception e) {
+            log.error("주문번호 {} DB 저장 중 오류 발생: {}", ordrNo, e.getMessage(), e);
+            throw new RuntimeException("주문 저장 중 오류 발생", e); // 예외 다시 던지기
+        }
+
+        return ordrNo; // 생성된 주문번호 반환
     }
 
     @Override
@@ -110,4 +168,73 @@ public class PaymentServiceImpl implements PaymentService {
         
         return result;
     }
+    
+    /**
+     * ★★★ 여기를 구현합니다 ★★★
+     * 쿠폰 코드를 적용하여 할인된 최종 결제 금액을 계산합니다.
+     * 실제 쿠폰 조회 및 유효성 검증 로직이 들어갑니다.
+     * @param originalAmount 원본 결제 금액
+     * @param couponCode 적용할 쿠폰 코드
+     * @param userNo 쿠폰을 사용하는 사용자 번호 (사용자별 쿠폰 유효성 검증 시 필요)
+     * @return 쿠폰이 적용된 최종 할인 금액
+     */
+    @Override
+    public Long calculateDiscountedAmount(Long originalAmount, String couponCode, String userNo) {
+        if (couponCode == null || couponCode.isEmpty()) {
+            log.info("쿠폰 코드가 제공되지 않았습니다. 원본 금액 {} 반환.", originalAmount);
+            return originalAmount;
+        }
+
+        // 1. PaymentMapper를 통해 사용자의 쿠폰 상세 정보를 조회합니다.
+        Map<String, Object> couponDetails = paymentMapper.getUserCouponDetails(userNo, couponCode);
+
+        Long discountedAmount = originalAmount; // 기본값은 원본 금액
+
+        if (couponDetails != null && (Boolean) couponDetails.get("useYn")) { // 사용 가능한 쿠폰인지 확인
+            String discountType = (String) couponDetails.get("dscntTpCd"); // 할인 유형 (RATE 또는 FIXED)
+            Number discountValueNum = (Number) couponDetails.get("dscntVl"); // 할인 값
+            Long minOrderAmount = ((Number) couponDetails.get("minOrdrAmt")).longValue(); // 최소 주문 금액
+            Long maxDiscountAmount = ((Number) couponDetails.get("maxDscntAmt")).longValue(); // 최대 할인 금액
+
+            // 최소 주문 금액 조건을 만족하는지 확인
+            if (originalAmount < minOrderAmount) {
+                log.warn("쿠폰 '{}'은 최소 주문 금액({}원) 미만으로 적용할 수 없습니다. 현재 금액: {}원", couponCode, minOrderAmount, originalAmount);
+                return originalAmount; // 쿠폰 적용 없이 원본 금액 반환
+            }
+
+            if (discountType != null && discountValueNum != null) {
+                if ("RATE".equals(discountType)) { // 비율 할인
+                    double discountRate = discountValueNum.doubleValue();
+                    long discount = (long) (originalAmount * (discountRate / 100.0));
+                    
+                    // 최대 할인 금액 제한 적용
+                    if (maxDiscountAmount > 0 && discount > maxDiscountAmount) {
+                        discount = maxDiscountAmount;
+                    }
+                    discountedAmount = originalAmount - discount;
+                } else if ("FIXED".equals(discountType)) { // 고정 금액 할인
+                    long discount = discountValueNum.longValue();
+                    
+                    // 최대 할인 금액 제한은 고정 금액 할인에서는 일반적으로 사용되지 않으나, 정책에 따라 추가 가능
+                    // if (maxDiscountAmount > 0 && discount > maxDiscountAmount) {
+                    //     discount = maxDiscountAmount;
+                    // }
+                    discountedAmount = originalAmount - discount;
+                }
+            } else {
+                log.warn("쿠폰 '{}'의 할인 유형 또는 할인 값이 유효하지 않습니다. 원본 금액 반환.", couponCode);
+            }
+        } else {
+            log.warn("쿠폰 '{}'을 찾을 수 없거나 유효하지 않습니다. 원본 금액 반환.", couponCode);
+        }
+
+        // 최종 금액이 0보다 작아지지 않도록 처리
+        if (discountedAmount < 0) {
+            discountedAmount = 0L;
+        }
+        
+        log.info("쿠폰 '{}' 적용 완료. 원본 금액: {}, 최종 금액: {}", couponCode, originalAmount, discountedAmount);
+        return discountedAmount;
+    }
+
 }
