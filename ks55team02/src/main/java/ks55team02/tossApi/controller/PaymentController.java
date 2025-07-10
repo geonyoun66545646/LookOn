@@ -1,5 +1,8 @@
 package ks55team02.tossApi.controller;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -157,7 +160,7 @@ public class PaymentController {
 	/**
 	 * 쿠폰 적용 및 할인 금액을 계산하는 API
 	 */
-	@PostMapping("/api/calculate-discount")
+	@PostMapping("/api/calculateDiscount")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> calculateDiscount(@RequestBody Map<String, Object> requestData,
 			HttpSession session) { // 세션에서 사용자 ID를 얻거나, requestData에 포함하여 받습니다.
@@ -204,4 +207,6 @@ public class PaymentController {
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	
 }
