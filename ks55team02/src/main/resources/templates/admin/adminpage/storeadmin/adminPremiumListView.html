@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 구독 플랜 목록</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* 카드 내부 스타일링 */
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* 플랜 리스트 컨테이너 */
+        .plan-list-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        /* 개별 플랜 카드 */
+        .plan-card {
+            flex: 1 1 300px; /* 최소 300px, 가능한 공간에 맞춰 확장 */
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* 플랜 정보 스타일 */
+        .plan-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .plan-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 8px;
+        }
+        
+        .plan-period {
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+        
+        .plan-desc {
+            color: #555;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+        
+        .plan-date {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        
+        /* 버튼 그룹 */
+        .plan-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* 반응형 조정 */
+        @media (max-width: 768px) {
+            .plan-card {
+                flex: 1 1 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="contents">
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">구독 플랜 목록</h2>
+                <p>등록된 구독 플랜 목록을 확인하고 관리할 수 있습니다.</p>
+            </div>
+            <div>
+                <a th:href="@{/adminpage/storeadmin/premiumAdd}" class="btn btn-primary">
+                    <i class="material-icons md-add"></i> 새 플랜 등록
+                </a>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <!-- 플랜 리스트 컨테이너 -->
+                <div class="plan-list-container">
+                    <!-- 플랜이 없는 경우 -->
+                    <div th:if="${#lists.isEmpty(plans)}" class="w-100 text-center py-5">
+                        등록된 구독 플랜이 없습니다.
+                    </div>
+                    
+                    <!-- 플랜 리스트 -->
+                    <div th:each="plan : ${plans}" class="plan-card">
+                        <div class="plan-name" th:text="${plan.sbscrPlanNm}"></div>
+                        <div class="plan-price" 
+                             th:text="${#numbers.formatCurrency(plan.sbscrPlanPrc)} + '원'"></div>
+                        <div class="plan-period">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            <span th:text="${plan.sbscrPlanTermVal} + '일 구독'"></span>
+                        </div>
+                        <div class="plan-desc" th:text="${plan.sbscrPlanExpln}"></div>
+                        <div class="plan-date">
+                            <i class="fas fa-clock me-2"></i>
+                            <span th:text="${#temporals.format(plan.sbscrPlanCrtDt, 'yyyy-MM-dd HH:mm')}"></span>
+                        </div>
+                        <div class="plan-actions">
+							<!--
+								<a th:href="@{/adminpage/storeadmin/premiumModify/{id}(id=${plan.sbscrPlanId})}" 
+	                               class="btn btn-sm btn-outline-primary">
+	                                <i class="fas fa-edit me-1"></i> 수정
+	                            </a> 
+                            -->
+                            <a href="#" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-edit me-1"></i> 수정
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash-alt me-1"></i> 삭제
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</th:block>
+</body>
+</html>
