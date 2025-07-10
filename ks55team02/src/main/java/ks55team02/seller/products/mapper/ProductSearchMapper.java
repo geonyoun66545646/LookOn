@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Mapper
 public interface ProductSearchMapper {
-	
+	List<Products> getRecentProductsForMain(int limit);
 	List<Products> getSaleProducts();
     List<Products> getNewProducts();
 	
