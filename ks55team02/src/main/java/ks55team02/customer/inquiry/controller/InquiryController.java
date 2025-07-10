@@ -58,7 +58,7 @@ public class InquiryController {
     }
 
     // 자주묻는 질문 페이지
-    @GetMapping("/frequentlyAskedQuestions")
+    @GetMapping("/FAQ")
     public String frequentlyAskedQuestionsView() {
         return "customer/inquiry/frequentlyAskedQuestionsView";
     }

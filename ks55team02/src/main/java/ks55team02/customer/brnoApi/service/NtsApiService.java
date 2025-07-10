@@ -1,5 +1,6 @@
 package ks55team02.customer.brnoApi.service;
 
+import java.net.URLDecoder;
 import java.net.URLEncoder; // URLEncoder 클래스 임포트
 import java.nio.charset.StandardCharsets; // StandardCharsets 클래스 임포트
 import java.util.Collections;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -67,7 +69,7 @@ public class NtsApiService {
         // 특히 서비스 키에 +, /, = 등의 특수문자가 포함될 경우 이 과정이 필수적입니다.
         String encodedServiceKey;
         try {
-            encodedServiceKey = URLEncoder.encode(serviceKey, StandardCharsets.UTF_8.toString());
+            encodedServiceKey = URLEncoder.encode("F+q3vYQQ5IfWC/sf7bavxmaBbjXdFXl80vQFZMfYGlEsLDUdYAIkfHmW4XkD4s/iJjS6Yc/xP6WTECH4Uw2SDA==", StandardCharsets.UTF_8.toString());
             logger.info("인코딩된 서비스 키: {}", encodedServiceKey); // 디버깅을 위해 인코딩된 키를 로그로 출력
         } catch (Exception e) {
             // 인코딩 중 오류가 발생하면 로그를 남기고 RuntimeException을 Mono.error로 반환합니다.
@@ -79,9 +81,11 @@ public class NtsApiService {
         return webClient.post() // HTTP POST 메소드 지정
                 .uri(uriBuilder -> uriBuilder
                         .path(STATUS_ENDPOINT) // "/status" 엔드포인트 경로 지정
-                        .queryParam("serviceKey", encodedServiceKey) // 인코딩된 서비스 키를 쿼리 파라미터로 추가
+                        .queryParam("serviceKey", "F%2Bq3vYQQ5IfWC%2Fsf7bavxmaBbjXdFXl80vQFZMfYGlEsLDUdYAIkfHmW4XkD4s%2FiJjS6Yc%2FxP6WTECH4Uw2SDA%3D%3D") // 인코딩된 서비스 키를 쿼리 파라미터로 추가
                         .build()) // URI 빌드 완료
-                .contentType(MediaType.APPLICATION_JSON) // 요청 본문이 JSON 형식임을 명시하는 Content-Type 헤더 설정
+                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)       // 응답은 JSON으로 받겠다고 명시
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) // 요청 본문은 JSON임을 명시
+                .header(HttpHeaders.AUTHORIZATION, "*/*")
                 .bodyValue(requestBody) // 요청 본문으로 NtsApiRequestDto 객체를 전달
                 .retrieve() // 응답을 가져옵니다.
                 // HTTP 상태 코드가 에러(4xx, 5xx)인 경우 처리 로직을 정의합니다.

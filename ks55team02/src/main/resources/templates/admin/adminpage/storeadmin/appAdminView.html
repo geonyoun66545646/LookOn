@@ -9,50 +9,58 @@
         <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/appAdminView.css}">
     </th:block>
 	 </head>
-	 <!--/* 개발시 추가할 jsfile 영역 정의 */-->
+	 
 	 <th:block layout:fragment="jsFile">
 	 </th:block>
 	 
-	 <!--/* 개발시 추가할 스크립트 */-->
 	 <th:block layout:fragment="jsScript">	 
 	 </th:block>
-	 <!-- 추가할 페이지 contents -->
+	 
 	 <th:block layout:fragment="contents">
 		<main class="main-content">
 		    <section class="content-header">
 		        <h2 class="content-title">상점 신청 내용</h2>
 		    </section>	
-		    <!-- 1. 검색 필터 카드 -->
+		    
 		    <div class="card mb-4">
 		        <div class="card-body">
+		            <form id="searchForm" th:action="@{/adminpage/storeadmin/appAdmin}" method="get">
+		                <input type="hidden" name="currentPage" th:value="${searchCriteria.currentPage}" id="currentPageInput"/>
+		                <input type="hidden" name="pageSize" th:value="${searchCriteria.pageSize}" id="pageSizeInput"/>
+		                <input type="hidden" name="sortOrder" th:value="${searchCriteria.sortOrder}" id="sortOrderInput"/>
+		                <input type="hidden" name="filterConditions" th:value="${#strings.arrayJoin(searchCriteria.filterConditions, ',')}" id="filterConditionsInput"/>
+		
 		                <div class="row gx-3">
 		                    <div class="col-lg-12">
-		                    	<!-- 회원 상태 분류 -->
-		                        <label class="form-label">분류</label>
+		                    	<label class="form-label">분류</label>
 		                        <div class="d-flex align-items-center">
 		                            <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAdminList" value="접수" checked>
+		                                	   name="appAdminList" value="접수" 
+		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '접수')}">
 		                                <label class="form-check-label">접수</label>
 		                            </div>
 		                            <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAdminList" value="보류" checked>
+		                                	   name="appAdminList" value="보류" 
+		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '보류')}">
 		                                <label class="form-check-label">보류</label>
 		                            </div>
 		                            <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAdminList" value="승인" checked>
+		                                	   name="appAdminList" value="승인" 
+		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '승인')}">
 		                                <label class="form-check-label">승인</label>
 		                            </div>
 		                             <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAdminList" value="반려" checked>
+		                                	   name="appAdminList" value="반려" 
+		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '반려')}">
 		                                <label class="form-check-label">반려</label>
 		                            </div>
 		                            <div class="form-check me-4">
 		                            <input class="form-check-input" type="checkbox"
-		                            	   id="filterCheckAll" checked>
+		                            	   id="filterCheckAll">
 		                            <label class="form-check-label">전체선택</label>
 		                            </div>
 		                        </div>
@@ -63,78 +71,72 @@
 		                    <div class="col-lg-4">
 		                        <label class="form-label">기간</label>
 		                        <div class="d-flex">
-		                            <input type="date" class="form-control" name="startDate" value="2020-03-16">
+		                            <input type="date" class="form-control" name="startDate" th:value="${searchCriteria.startDate}">
 		                            <span class="mx-2 d-flex align-items-center">-</span>
-		                            <input type="date" class="form-control" name="endDate" value="2025-06-16">
+		                            <input type="date" class="form-control" name="endDate" th:value="${searchCriteria.endDate}">
 		                        </div>
 		                    </div>
 		                    <div class="col-lg-4">
 		                        <label class="form-label">검색 키워드</label>
 		                        <div class="input-group">
 		                            <select class="form-select" name="searchKey" style="max-width: 120px; background-color: #fff;">
-		                                <option value="" selected>전체</option>
-		                                <option value="">신청 아이디</option>
-		                                <option value="">상점 명</option>
-		                                <option value="">신청자 이름</option>
-		                                <option value="">신청자 아이디</option>
+		                                <option value="" th:selected="${searchCriteria.searchKey == null or searchCriteria.searchKey == ''}">전체</option>
+		                                <option value="aplyId" th:selected="${searchCriteria.searchKey == 'aplyId'}">신청 아이디</option>
+		                                <option value="storeNm" th:selected="${searchCriteria.searchKey == 'storeNm'}">상점 명</option>
+		                                <option value="userNm" th:selected="${searchCriteria.searchKey == 'userNm'}">신청자 이름</option>
+		                                <option value="aplyUserNo" th:selected="${searchCriteria.searchKey == 'aplyUserNo'}">신청자 아이디</option>
 		                            </select>
-		                            <input type="text" class="form-control" name="searchValue" placeholder="검색어를 입력하세요">
+		                            <input type="text" class="form-control" name="searchValue" placeholder="검색어를 입력하세요" th:value="${searchCriteria.searchValue}">
 		                        </div>
 		                    </div>
 		                    <div class="col-lg-2">
-		                        <button class="btn btn-primary btn-block" type="button" id="searchBtn">검색</button>
+		                        <button class="btn btn-primary btn-block" type="submit" id="searchBtn">검색</button>
 		                    </div>
 		                </div>
-		        </div>
-		    </div> <!-- card end// -->
-		
-		    <!-- 2. 회원 목록 테이블 카드 -->
-		    <div class="card" id="appListContainer" th:fragment="appListFragment">
+		            </form> </div>
+		    </div> <div class="card" id="appListContainer" th:fragment="appListFragment">
 		        <div class="card-body">
 		            <div class="row gx-3 align-items-center mb-4">
 		                <div class="col-md-6">
-		                	<!-- 조회된 회원 검색수 -->
-		                    <div class="search-result-info">
-		                        총 <b class="text-brand" th:text="${totalCount}"></b> 건의 회원이 검색되었습니다.
+		                	<div class="search-result-info">
+		                        총 <b class="text-brand" th:text="${pagination.totalRecordCount}"></b> 건의 회원이 검색되었습니다.
 		                    </div>
 		                </div>
 		                <div class="col-md-6 text-md-end">
-		                	<!-- 회원 상태 변경 -->
-		                    <div class="btn-group me-2">
+		                	<div class="btn-group me-2">
 		                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
 		                            선택한 회원 상태 변경
 		                        </button>
 		                        <div class="dropdown-menu status">
-		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="활동">
+		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="접수">
 		                            	<span class="badge-dot bg-primary"></span>접수
 		                            </a>
-		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="휴면">
+		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="보류">
 		                            	<span class="badge-dot bg-warning"></span>보류
 		                            </a>
-		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="탈퇴">
+		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="승인">
 		                            	<span class="badge-dot bg-success"></span>승인
 		                            </a>
-		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="탈퇴">
+		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="반려">
 		                            	<span class="badge-dot bg-danger"></span>반려
 		                            </a>
 		                        </div>
 		                    </div>
-		                    <!-- 회원 조회 분류 키워드 -->
-		                  <!--   <div class="d-inline-block">
-		                        <select class="form-select d-inline-block" id="sortOrder" name="sortOrder" style="width: auto;">
-								    <option value="joinDtDesc" th:selected="${searchCriteria.sortOrder == 'joinDtDesc'}">최신 가입일순</option>
-								    <option value="joinDtAsc" th:selected="${searchCriteria.sortOrder == 'joinDtAsc'}">오래된 가입일순</option>
+		                    <div class="d-inline-block">
+		                        <select class="form-select d-inline-block" id="sortOrderSelect" name="sortOrder" style="width: auto;">
+								    <option value="ctrtAplyYmdDesc" th:selected="${searchCriteria.sortOrder == 'ctrtAplyYmdDesc'}">최신 신청일순</option>
+								    <option value="ctrtAplyYmdAsc" th:selected="${searchCriteria.sortOrder == 'ctrtAplyYmdAsc'}">오래된 신청일순</option>
+                                    <option value="aplyIdDesc" th:selected="${searchCriteria.sortOrder == 'aplyIdDesc'}">신청ID (내림차순)</option>
+                                    <option value="aplyIdAsc" th:selected="${searchCriteria.sortOrder == 'aplyIdAsc'}">신청ID (오름차순)</option>
 								</select>
-		                        <select class="form-select d-inline-block" id="pageSize" name="pageSize" style="width: auto;">
+		                        <select class="form-select d-inline-block" id="pageSizeSelect" name="pageSize" style="width: auto;">
 		                            <option value="10" th:selected="${searchCriteria.pageSize == 10}">10개씩 보기</option>
 		                            <option value="30" th:selected="${searchCriteria.pageSize == 30}">30개씩 보기</option>
 		                            <option value="50" th:selected="${searchCriteria.pageSize == 50}">50개씩 보기</option>
 		                        </select>
-		                    </div> -->
+		                    </div>
 		                </div>
-		            </div> <!-- row end// -->
-		
-		            <div class="table-responsive">
+		            </div> <div class="table-responsive">
 				    <table class="table table-hover member-table">
 				        <thead>
 				            <tr class="text-center">
@@ -176,11 +178,10 @@
 				        </tbody>
 				    </table>
 				</div>
-		            <!-- 페이지네이션 -->
-		            <nav class="mt-4" aria-label="Page navigation" th:if="${totalCount > 0}">
+		            <nav class="mt-4" aria-label="Page navigation" th:if="${pagination.totalRecordCount > 0}">
 					    <ul class="pagination justify-content-center">
-					        <li class="page-item" th:if="${pagination.currentPage > 1}">
-					            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage - 1}">이전</a>
+					        <li class="page-item" th:if="${pagination.existPrevBlock}">
+					            <a class="page-link page-num" href="#" th:data-page="${pagination.startPage - 1}">이전</a>
 					        </li>
 					        
 					        <li class="page-item" th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
@@ -188,32 +189,115 @@
 					            <a class="page-link page-num" href="#" th:text="${page}" th:data-page="${page}"></a>
 					        </li>
 					        
-					        <li class="page-item" th:if="${pagination.currentPage < pagination.totalPageCount}">
-					            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage + 1}">다음</a>
+					        <li class="page-item" th:if="${pagination.existNextBlock}">
+					            <a class="page-link page-num" href="#" th:data-page="${pagination.endPage + 1}">다음</a>
 					        </li>
 					    </ul>
 					</nav>
-		        </div> <!-- card-body end// -->
-		    </div> <!-- card end// -->
-		</main>
+		        </div> </div> </main>
 	 </th:block>
 	 <th:block layout:fragment="jsFile">
 	 </th:block>	
 	 <th:block layout:fragment="jsScript">
-	 <script>
+	 <script th:inline="javascript">
+	 /*<![CDATA[*/
 	 const mainContent = $('main.main-content');
-	  // [테이블] 헤더 체크박스로 전체 선택/해제
-	        mainContent.on('click', '#checkAll', function() {
-	            $('.member-check').prop('checked', $(this).is(':checked'));
-	        });
-	
-	        // [테이블] 개별 체크박스 선택 시, 헤더 체크박스 상태 동기화
-	        mainContent.on('click', '.member-check', () => {
-	            const totalChecks = $('.member-check').length;
-	            const checkedChecks = $('.member-check:checked').length;
-	            $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
-	        });
-	    </script>
-	 </th:block>	
-   
+	 const searchForm = $('#searchForm');
+	 const currentPageInput = $('#currentPageInput');
+	 const pageSizeInput = $('#pageSizeInput');
+	 const sortOrderInput = $('#sortOrderInput');
+	 const filterConditionsInput = $('#filterConditionsInput');
+     const statusCheckboxes = $('.status-check');
+	 const filterCheckAll = $('#filterCheckAll');
+
+	 // 검색 폼 제출 함수
+	 function submitSearchForm() {
+         // 분류 조건 업데이트
+         const selectedStatuses = [];
+         statusCheckboxes.each(function() {
+             if ($(this).is(':checked')) {
+                 selectedStatuses.push($(this).val());
+             }
+         });
+         filterConditionsInput.val(selectedStatuses.join(',')); // 콤마로 구분된 문자열로 저장
+         
+	 	searchForm.submit();
+	 }
+	 
+	 // [테이블] 헤더 체크박스로 전체 선택/해제
+	 mainContent.on('click', '#checkAll', function() {
+	     $('.member-check').prop('checked', $(this).is(':checked'));
+	 });
+
+	 // [테이블] 개별 체크박스 선택 시, 헤더 체크박스 상태 동기화
+	 mainContent.on('click', '.member-check', () => {
+	     const totalChecks = $('.member-check').length;
+	     const checkedChecks = $('.member-check:checked').length;
+	     $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
+	 });
+
+	 // 페이지 번호 클릭 시
+	 mainContent.on('click', '.page-num', function(e) {
+	     e.preventDefault(); // 기본 링크 동작 방지
+	     currentPageInput.val($(this).data('page'));
+	     submitSearchForm();
+	 });
+
+	 // 페이지 크기 변경 시
+	 $('#pageSizeSelect').on('change', function() {
+	     pageSizeInput.val($(this).val());
+	     currentPageInput.val(1); // 페이지 크기 변경 시 1페이지로 이동
+	     submitSearchForm();
+	 });
+
+	 // 정렬 순서 변경 시
+	 $('#sortOrderSelect').on('change', function() {
+	     sortOrderInput.val($(this).val());
+	     currentPageInput.val(1); // 정렬 변경 시 1페이지로 이동
+	     submitSearchForm();
+	 });
+
+     // 분류 체크박스 상태 변경 시 (개별 체크박스)
+     statusCheckboxes.on('change', function() {
+         const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+         filterCheckAll.prop('checked', allChecked);
+         // 개별 체크박스 변경 시 바로 폼 제출 (필요에 따라 주석 처리하여 검색 버튼으로 제출하게 할 수 있음)
+         submitSearchForm();
+     });
+
+     // '전체선택' 체크박스 클릭 시
+     filterCheckAll.on('change', function() {
+         statusCheckboxes.prop('checked', $(this).is(':checked'));
+         submitSearchForm();
+     });
+
+     // 페이지 로드 시 '전체선택' 체크박스 상태 초기화
+     $(document).ready(function() {
+         const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+         filterCheckAll.prop('checked', allChecked);
+
+         // filterConditionsInput에서 값을 가져와 체크박스 초기화
+         const initialFilterConditions = filterConditionsInput.val();
+         if (initialFilterConditions) {
+             const conditionsArray = initialFilterConditions.split(',');
+             statusCheckboxes.each(function() {
+                 if (conditionsArray.includes($(this).val())) {
+                     $(this).prop('checked', true);
+                 } else {
+                     $(this).prop('checked', false);
+                 }
+             });
+             // 초기 로드 시 전체선택 상태도 맞춰줌
+             const currentAllChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+             filterCheckAll.prop('checked', currentAllChecked);
+         } else {
+             // filterConditionsInput이 비어있으면 (즉, 필터가 없을 때) 모든 체크박스를 선택된 상태로
+             statusCheckboxes.prop('checked', true);
+             filterCheckAll.prop('checked', true);
+         }
+     });
+
+	 /*]]>*/
+	 </script>	
+   </th:block>	
 </html>
