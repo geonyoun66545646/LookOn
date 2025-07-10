@@ -6,7 +6,7 @@ import ks55team02.admin.adminpage.useradmin.userlist.domain.UserList;
 import lombok.Data;
 
 @Data
-public class Comment {
+public class PostComment {
 	private String pstCmntSn;
 	private String pstSn;
 	private String wrtrUserNo;
