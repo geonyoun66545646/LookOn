@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.store.mapper.ReviewMapper">
+
+    <resultMap id="productReviewResultMap" type="ks55team02.customer.store.domain.ProductReview">
+        <id property="reviewId" column="review_id"/>
+        <result property="ordrDtlArtclNo" column="ordr_dtl_artcl_no"/>
+        <result property="prchsrUserNo" column="prchsr_user_no"/>
+        <result property="gdsNo" column="gds_no"/>
+        <result property="ordrNo" column="ordr_no"/>
+        <result property="evlScr" column="evl_scr"/>
+        <result property="reviewCn" column="review_cn"/>
+        <result property="wrtYmd" column="wrt_ymd"/>
+        <result property="reviewStts" column="review_stts"/>
+        <result property="lastMdfcnDt" column="last_mdfcn_dt"/>
+        <result property="delDt" column="del_dt"/>
+        <result property="delPrcrNo" column="del_prcr_no"/>
+        <result property="helpdCnt" column="helpd_cnt"/>
+        <result property="starRating" column="star_rating"/>
+    </resultMap>
+
+    <resultMap id="reviewImageResultMap" type="ks55team02.customer.store.domain.ReviewImage">
+        <id property="reviewImgId" column="review_img_id"/>
+        <result property="reviewId" column="review_id"/>
+        <result property="imgId" column="img_id"/>
+        <result property="ord" column="ord"/>
+        <association property="storeImage" javaType="ks55team02.seller.products.domain.ProductImage">
+            <id property="imgId" column="img_id"/>
+            <result property="gdsNo" column="gds_no"/> <result property="imgPath" column="img_path"/> <result property="imgOrgNm" column="img_org_nm"/>
+            <result property="imgUuidNm" column="img_uuid_nm"/>
+        </association>
+    </resultMap>
+
+
+    <select id="selectReviewsByProductCode" parameterType="String" resultMap="productReviewResultMap">
+        SELECT
+            review_id,
+            ordr_dtl_artcl_no,
+            prchsr_user_no,
+            gds_no,
+            ordr_no,
+            evl_scr,
+            review_cn,
+            wrt_ymd,
+            review_stts,
+            last_mdfcn_dt,
+            del_dt,
+            del_prcr_no,
+            helpd_cnt,
+            star_rating
+        FROM
+            product_reviews
+        WHERE
+            gds_no = #{gdsNo}
+        AND
+            review_stts = '정상' -- 정상 상태의 리뷰만 조회
+        ORDER BY
+            wrt_ymd DESC; -- 최신순 정렬
+    </select>
+
+    <select id="selectReviewImagesByReviewId" parameterType="String" resultMap="reviewImageResultMap">
+        SELECT
+            ri.review_img_id,
+            ri.review_id,
+            ri.img_id,
+            ri.ord,
+            si.img_file_path_nm AS img_path, -- store_images 테이블의 실제 이미지 경로 컬럼명에 맞게 수정
+            si.img_org_nm, -- store_images 테이블의 이미지 원본명 컬럼명에 맞게 수정
+            si.img_uuid_nm -- store_images 테이블의 이미지 UUID명 컬럼명에 맞게 수정
+        FROM
+            review_images ri
+        JOIN
+            store_images si ON ri.img_id = si.img_id
+        WHERE
+            ri.review_id = #{reviewId}
+        ORDER BY
+            ri.ord ASC;
+    </select>
+
+</mapper>
