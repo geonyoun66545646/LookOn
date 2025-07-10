@@ -1,21 +1,32 @@
 package ks55team02.seller.products.service.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+
 import ks55team02.seller.products.domain.Products;
 import ks55team02.seller.products.mapper.ProductSearchMapper;
 import ks55team02.seller.products.service.ProductSearchService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class ProductSearchServiceImpl implements ProductSearchService {
 
     private final ProductSearchMapper productSearchMapper;
+    
+    @Override
+    public List<Products> getSaleProducts() {
+        return productSearchMapper.getSaleProducts();
+    }
+
+    @Override
+    public List<Products> getNewProducts() {
+        return productSearchMapper.getNewProducts();
+    }
     
     @Override
     public List<Products> getAllActiveProductsForCustomer() {

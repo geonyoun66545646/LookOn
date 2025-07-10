@@ -66,24 +66,58 @@ public class CustomerProductController {
     }
 
     @GetMapping("/customer/products")
-    public String productMainView(Model model, @RequestParam(name = "category", required = false) String category) {
-        String title = "전체 상품 목록";
+    public String productMainView(Model model, 
+                                  @RequestParam(name = "type", required = false) String type) {
+        
+        String title = "전체 상품";
         String breadCrumbTitle = "상품";
         List<Products> productList;
 
-        if (category != null && !category.isEmpty()) {
-            switch (category) {
-                case "best": title = "베스트 상품"; breadCrumbTitle = "베스트"; break;
-                case "sale": title = "세일 상품"; breadCrumbTitle = "세일"; break;
-                case "new-products": title = "신상 상품"; breadCrumbTitle = "신상"; break;
-            }
+        if ("sale".equals(type)) {
+            title = "세일 상품";
+            breadCrumbTitle = "세일";
+            productList = productSearchService.getSaleProducts();
+        } else if ("new-products".equals(type)) {
+            title = "신상 상품";
+            breadCrumbTitle = "신상";
+            productList = productSearchService.getNewProducts();
+        } else {
+            productList = productSearchService.getAllActiveProductsForCustomer();
         }
-        productList = productSearchService.getAllActiveProductsForCustomer();
         
         model.addAttribute("breadCrumbExists", true);
         model.addAttribute("breadCrumbTitle", breadCrumbTitle);
         model.addAttribute("title", title);
         model.addAttribute("productList", productList);
+        
+        // ⭐⭐⭐ 이 부분을 통째로 추가합니다! (필터 툴바를 위한 데이터) ⭐⭐⭐
+        // 필터 상태 유지를 위한 'selected' 변수들을 비어있는 상태로 모델에 추가
+        model.addAttribute("currentCategoryId", null);
+        model.addAttribute("currentGender", null);
+        model.addAttribute("currentSortBy", "new"); // 기본 정렬
+        model.addAttribute("selectedColors", new ArrayList<>());
+        model.addAttribute("selectedSizes", new ArrayList<>());
+        model.addAttribute("selectedBrands", new ArrayList<>());
+        model.addAttribute("selectedStyles", new ArrayList<>());
+        model.addAttribute("selectedDiscountRates", new ArrayList<>());
+        model.addAttribute("selectedMinPrice", null);
+        model.addAttribute("selectedMaxPrice", null);
+        model.addAttribute("selectedPriceRange", "all");
+        model.addAttribute("selectedIncludeSoldOut", false);
+        
+        // 필터 모달에 필요한 전체 옵션 목록 추가
+        List<ProductOptionValue> rawColorOptionValues = productsService.getAllProductColors();
+        List<ColorOption> allColorOptions = new ArrayList<>();
+        if (rawColorOptionValues != null) {
+            for (ProductOptionValue pov : rawColorOptionValues) {
+                allColorOptions.add(new ColorOption(pov.getVlNm(), COLOR_STYLE_MAP.getOrDefault(pov.getVlNm(), COLOR_STYLE_MAP.get("default"))));
+            }
+        }
+        model.addAttribute("allColorOptions", allColorOptions);
+        model.addAttribute("allApparelSizes", productsService.getAllApparelSizes());
+        model.addAttribute("allShoeSizes", productsService.getAllShoeSizes());
+        model.addAttribute("allBrands", productsService.getAllBrands());
+        // ⭐⭐⭐ 여기까지 추가 완료 ⭐⭐⭐
 
         return "customer/productMain";
     }
