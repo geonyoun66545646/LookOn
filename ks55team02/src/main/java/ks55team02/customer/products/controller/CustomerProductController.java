@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ks55team02.customer.store.domain.ProductReview;
 import ks55team02.customer.store.service.ReviewService;
@@ -70,63 +71,29 @@ public class CustomerProductController {
     }
 
     @GetMapping("/customer/products")
-    public String productMainView(Model model, 
-                                  @RequestParam(name = "type", required = false) String type) {
+    public String productMainView(
+            @RequestParam(name = "type", required = false) String type,
+            RedirectAttributes redirectAttributes) {
         
-        String title = "전체 상품";
-        String breadCrumbTitle = "상품";
-        List<Products> productList;
+        // ⭐ 수정: 모든 요청을 '/customer/products/list'로 리다이렉트 시키면서
+        // 필요한 파라미터를 쿼리 스트링으로 붙여줍니다.
 
         if ("sale".equals(type)) {
-            title = "세일 상품";
-            breadCrumbTitle = "세일";
-            productList = productSearchService.getSaleProducts();
-        } else if ("new-products".equals(type)) {
-            title = "신상 상품";
-            breadCrumbTitle = "신상";
-            productList = productSearchService.getNewProducts();
-        } else {
-            productList = productSearchService.getAllActiveProductsForCustomer();
+            // '할인' 메뉴 클릭 시, sortBy와 discountRate를 리다이렉트 파라미터로 추가
+            redirectAttributes.addAttribute("sortBy", "discountDesc");
+            redirectAttributes.addAttribute("discountRate", "1"); // 1% 이상 할인
+        } 
+        else if ("new-products".equals(type)) {
+            // '신상' 메뉴 클릭 시, isNewProductPage 파라미터를 추가
+            redirectAttributes.addAttribute("isNewProductPage", "true");
         }
+        // '전체상품'의 경우, 아무 파라미터도 추가하지 않으면
+        // getFilteredAndSortedProductsView의 기본값(sortBy='new')이 적용됩니다.
         
-        model.addAttribute("breadCrumbExists", true);
-        model.addAttribute("breadCrumbTitle", breadCrumbTitle);
-        model.addAttribute("title", title);
-        model.addAttribute("productList", productList);
-        
-        // ⭐⭐⭐ 이 부분을 통째로 추가합니다! (필터 툴바를 위한 데이터) ⭐⭐⭐
-        // 필터 상태 유지를 위한 'selected' 변수들을 비어있는 상태로 모델에 추가
-        model.addAttribute("currentCategoryId", null);
-        model.addAttribute("currentGender", null);
-        model.addAttribute("currentSortBy", "new"); // 기본 정렬
-        model.addAttribute("selectedColors", new ArrayList<>());
-        model.addAttribute("selectedSizes", new ArrayList<>());
-        model.addAttribute("selectedBrands", new ArrayList<>());
-        model.addAttribute("selectedStyles", new ArrayList<>());
-        model.addAttribute("selectedDiscountRates", new ArrayList<>());
-        model.addAttribute("selectedMinPrice", null);
-        model.addAttribute("selectedMaxPrice", null);
-        model.addAttribute("selectedPriceRange", "all");
-        model.addAttribute("selectedIncludeSoldOut", false);
-        
-        // 필터 모달에 필요한 전체 옵션 목록 추가
-        List<ProductOptionValue> rawColorOptionValues = productsService.getAllProductColors();
-        List<ColorOption> allColorOptions = new ArrayList<>();
-        if (rawColorOptionValues != null) {
-            for (ProductOptionValue pov : rawColorOptionValues) {
-                allColorOptions.add(new ColorOption(pov.getVlNm(), COLOR_STYLE_MAP.getOrDefault(pov.getVlNm(), COLOR_STYLE_MAP.get("default"))));
-            }
-        }
-        model.addAttribute("allColorOptions", allColorOptions);
-        model.addAttribute("allApparelSizes", productsService.getAllApparelSizes());
-        model.addAttribute("allShoeSizes", productsService.getAllShoeSizes());
-        model.addAttribute("allBrands", productsService.getAllBrands());
-        // ⭐⭐⭐ 여기까지 추가 완료 ⭐⭐⭐
-
-        return "customer/productMain";
+        return "redirect:/customer/products/list";
     }
 
-    @GetMapping({"/products", "/products/category/{categoryId}", "/customer/products/list", "/products/list"})
+    @GetMapping({"/products/category/{categoryId}", "/customer/products/list"})
     @SuppressWarnings("unchecked")
     public String getFilteredAndSortedProductsView(
             Model model,
@@ -143,7 +110,9 @@ public class CustomerProductController {
             @RequestParam(name = "discountRate", required = false) List<String> discountRates,
             @RequestParam(name = "includeSoldOut", required = false, defaultValue = "false") boolean includeSoldOut,
             @RequestParam(name = "currentPage", defaultValue = "1") int currentPage,
-            @PathVariable(value = "categoryId", required = false) String pathCategoryId) {
+            @PathVariable(value = "categoryId", required = false) String pathCategoryId,
+            @RequestParam(name = "isNewProductPage", required = false) Boolean isNewProductPage
+    		){
 
         if (pathCategoryId != null && !pathCategoryId.isEmpty()) {
             categoryId = pathCategoryId;
@@ -156,6 +125,7 @@ public class CustomerProductController {
         filterParams.put("gender", gender); filterParams.put("minPrice", minPrice); filterParams.put("maxPrice", maxPrice);
         filterParams.put("priceRange", priceRange); filterParams.put("colors", colors); filterParams.put("sizes", sizes);
         filterParams.put("brands", brands); filterParams.put("styles", styles); filterParams.put("discountRates", discountRates);
+        filterParams.put("isNewProductPage", isNewProductPage);
         filterParams.put("includeSoldOut", includeSoldOut);
 
         ProductCategory currentCategory = null;
