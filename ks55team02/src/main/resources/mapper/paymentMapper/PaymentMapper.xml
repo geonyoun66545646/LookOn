@@ -37,6 +37,35 @@
         <result column="user_name"   		property="userName"/>
     </resultMap>
     
+    <!-- 쿠폰테이블 -->
+	<resultMap type="ks55team02.customer.coupons.domain.Coupons" id="CouponDetailsMap">
+        <id     column="user_cpn_id"        property="userCpnId"/>
+        <result column="user_no"            property="userNo"/>
+        <result column="pblcn_cpn_id"       property="pblcnCpnId"/>
+        <result column="use_yn"             property="useYn"/>
+        <result column="cpn_give_dt"        property="cpnGiveDt"/>
+        <result column="indiv_expry_dt"     property="indivExpryDt"/>
+        <result column="use_dt"             property="useDt"/>
+        <result column="cpn_mdfcn_dt"       property="cpnMdfcnDt"/>
+        <result column="issu_rsn_src_cn"    property="issuRsnSrcCn"/>
+    </resultMap>
+     
+     <!-- 유저보유 쿠폰 테이블 -->
+     <resultMap type="ks55team02.customer.coupons.domain.UserCoupons" id="UserCouponDetailsMap">   
+        <id 	column="pblcn_cpn_cd"       	property="pblcnCpnCd"/>
+        <result column="cpn_nm"             	property="cpnNm"/>
+        <result column="dscnt_vl"           	property="dscntVl"/>
+        <result column="min_ordr_amt"       	property="minOrdrAmt"/>
+        <result column="max_dscnt_amt"      	property="maxDscntAmt"/>
+        <result column="vld_bgng_dt"        	property="vldBgngDt"/>
+        <result column="vld_end_dt"         	property="vldEndDt"/>
+        <result column="tot_use_lmt_nmtm"   	property="totUseLmtNmtm"/>
+        <result column="user_per_use_lmt_nmtm" 	property="userPerUseLmtNmtm"/>
+        <result column="actvtn_yn"          	property="actvtnYn"/>
+        <result column="reissue_cycle"      	property="reissueCycle"/>
+        <result column="issue_condition_type" 	property="issueConditionType"/>
+    </resultMap>
+    
     <!-- [추가] 'ORD' + '날짜' + '일련번호' 형식의 다음 주문 번호를 조회 / 새로운 주문 번호를 생성 -->
 	<select id="selectNextOrderId" resultType="String">
 	    SELECT CONCAT(
@@ -100,5 +129,54 @@
             #{stlmHstryId}, #{stlmId}, #{hstryCrtDt}, #{hstryMdfcnDt}
         )
     </insert>
+    
+    <!-- ========================== 쿠폰 ========================== -->
+    <select id="getUserCouponDetails" parameterType="map" resultType="map">
+        SELECT
+            uc.user_cpn_id AS userCpnId,
+            uc.pblcn_cpn_id AS pblcnCpnId,
+            uc.user_no AS userNo,
+            uc.issue_dt AS issueDt,
+            uc.use_dt AS useDt,
+            uc.indiv_expry_dt AS indivExpryDt,
+            uc.use_yn AS useYn,
+            uc.use_rsn_src_cn AS useRsnSrcCn,
+            uc.issu_rsn_src_cn AS issuRsnSrcCn,
+
+            c.pblcn_cpn_cd AS pblcnCpnCd,
+            c.cpn_nm AS cpnNm,
+            c.dscnt_tp_cd AS dscntTpCd,  c.dscnt_vl AS dscntVl,
+            c.min_ordr_amt AS minOrdrAmt,
+            c.max_dscnt_amt AS maxDscntAmt,
+            c.vld_bgng_dt AS vldBgngDt,
+            c.vld_end_dt AS vldEndDt,
+            c.tot_use_lmt_nmtm AS totUseLmtNmtm,
+            c.user_per_use_lmt_nmtm AS userPerUseLmtNmtm,
+            c.actvtn_yn AS actvtnYn,
+            c.reissue_cycle AS reissueCycle,
+            c.issue_condition_type AS issueConditionType
+        FROM
+            user_coupons uc
+        JOIN
+            coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+        WHERE
+            uc.user_no = #{userNo}
+            AND c.pblcn_cpn_cd = #{pblcnCpnCd}
+            AND uc.use_yn = 0  -- 아직 사용하지 않은 쿠폰 (MySQL Tinyint 0은 false)
+            AND (uc.indiv_expry_dt IS NULL OR uc.indiv_expry_dt > NOW()) -- 개별 만료일이 없거나 만료일이 현재보다 큰 경우
+            AND (c.vld_end_dt IS NULL OR c.vld_end_dt > NOW()) -- 전체 쿠폰 만료일이 없거나 만료일이 현재보다 큰 경우
+            AND c.actvtn_yn = 1 -- 활성화된 쿠폰만
+    </select>
+
+    <!-- 특정 사용자 쿠폰(user_cpn_id)의 사용 여부(use_yn)와 사용 일시(use_dt)를 '사용 완료'로 업데이트 -->
+    <update id="updateUserCouponToUsed" parameterType="String">
+        UPDATE user_coupons
+        SET
+            use_yn = 0, -- 사용 완료 (0)
+            use_dt = NOW()
+        WHERE
+            user_cpn_id = #{userCpnId}
+            AND use_yn = 1 -- 아직 사용하지 않은 상태일 때만 업데이트
+    </update>
 
 </mapper>

@@ -45,5 +45,16 @@ public interface PaymentService {
      * @param orderData 주문 관련 데이터 (주문 ID 포함)
      */
     void saveOrder(Map<String, Object> orderData);
+    
+    /**
+     * ★★★ 여기를 추가합니다 ★★★
+     * 쿠폰 코드를 적용하여 할인된 최종 결제 금액을 계산합니다.
+     *
+     * @param originalAmount 원본 결제 금액
+     * @param couponCode 적용할 쿠폰 코드
+     * @param userNo 쿠폰을 사용하는 사용자 번호 (사용자별 쿠폰 유효성 검증 시 필요)
+     * @return 쿠폰이 적용된 최종 할인 금액
+     */
+    Long calculateDiscountedAmount(Long originalAmount, String couponCode, String userNo);
 
 }
