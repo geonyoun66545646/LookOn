@@ -1,175 +1,103 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{admin/layout/layoutMain}">
-		
-	 <head>
-	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />	
-	 </head>
-	 <!--/* 개발시 추가할 jsfile 영역 정의 */-->
-	 <th:block layout:fragment="jsFile">
-	 </th:block>
-	 
-	 <!--/* 개발시 추가할 스크립트 */-->
-	 <th:block layout:fragment="jsScript">	 
-	 </th:block>
-	 <!-- 추가할 페이지 contents -->
-	 <th:block layout:fragment="contents">
-	 	<main class="main-content">
-	    <h1 class="h3 mb-4 font-weight-bold">구독권 발급</h1>
-	
-	    <!-- 검색 필터 카드 (기존과 동일) -->
-	    <div class="card mb-4">
-	        <div class="card-body">
-	            <table class="table table-bordered filter-table">
-	                <tbody>
-	                    <tr>
-	                        <th>분류</th>
-	                        <td>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkAll" checked>
-	                                <label class="form-check-label" for="checkAll">전체</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkActive" checked>
-	                                <label class="form-check-label" for="checkActive">활동 계정</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkDormant" checked>
-	                                <label class="form-check-label" for="checkDormant">휴면 계정</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkWithdrawn" checked>
-	                                <label class="form-check-label" for="checkWithdrawn">탈퇴 계정</label>
-	                            </div>
-	                        </td>
-	                    </tr>
-	                    <tr>
-	                        <th>기간</th>
-	                        <td>
-	                            <div class="form-row align-items-center">
-	                                <div class="col-auto">
-	                                    <input type="date" class="form-control form-control-sm" value="2025-03-16">
-	                                </div>
-	                                <div class="col-auto">-</div>
-	                                <div class="col-auto">
-	                                    <input type="date" class="form-control form-control-sm" value="2025-06-16">
-	                                </div>
-	                            </div>
-	                        </td>
-	                    </tr>
-	                    <tr>
-	                        <th>검색 키워드</th>
-	                        <td>
-	                            <div class="input-group">
-	                                <div class="input-group-prepend">
-	                                    <select class="custom-select custom-select-sm" style="width: 150px;">
-	                                        <option selected>전체</option>
-	                                        <option value="1">ID</option>
-	                                        <option value="2">이름</option>
-	                                        <option value="3">이메일</option>
-	                                        <option value="4">상태</option>
-	                                        <option value="5">성별</option>
-	                                    </select>
-	                                </div>
-	                                <input type="text" class="form-control form-control-sm">
-	                            </div>
-	                        </td>
-	                    </tr>
-	                </tbody>
-	            </table>
-	            <div class="text-center mt-3">
-	                <button class="btn btn-dark" style="width: 120px;">검색</button>
-	            </div>
-	        </div>
-	    </div>
+<html xmlns:th="http://www.thymeleaf.org/"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout/layoutMain}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 - 구독권 등록</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link
+	href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+	<th:block layout:fragment="contents">
+		<section class="content-main">
+			<div class="content-header">
+				<div>
+					<h2 class="content-title card-title">구독 플랜 등록</h2>
+					<p>판매자가 구매할 수 있는 새로운 구독 플랜을 등록합니다.</p>
+				</div>
+			</div>
 
-    <!-- 회원 목록 테이블 카드 -->
-    <div class="card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <span class="font-weight-bold">[ 검색 결과 <span class="text-primary">183</span>건 ]</span>
+			<div class="card mb-4">
+				<div class="card-body">
+					<h2 class="card-title mb-4">새 구독 플랜 정보</h2>
+					<form th:action="@{/adminpage/storeadmin/premiumAdd/new}" method="post">
+						<div class="mb-3">
+							<label for="sbscr-plan-nm" class="form-label">구독 플랜명</label> <input
+								type="text" id="sbscr-plan-nm" name="sbscrPlanNm"
+								class="form-control" placeholder="예: 프리미엄 구독 코인" required>
+						</div>
 
-                    <!-- ▼▼▼ 1. 상태 변경 기능 버튼 추가 ▼▼▼ -->
-                    <div class="btn-group ml-3">
-                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            선택한 회원 상태 변경
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">활동중으로 변경</a>
-                            <a class="dropdown-item" href="#">휴면으로 변경</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#">탈퇴 처리</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex">
-                    <select class="custom-select custom-select-sm mr-2" style="width: 150px;">
-                        <option selected>최신 가입일순</option>
-                        <option value="1">오래된 가입일순</option>
-                    </select>
-                    <select class="custom-select custom-select-sm" style="width: 120px;">
-                        <option value="1">15개씩 보기</option>
-                        <option selected>30개씩 보기</option>
-                        <option value="2">50개씩 보기</option>
-                        <option value="3">100개씩 보기</option>
-                    </select>
-                </div>
-            </div>
+						<div class="mb-3">
+							<label for="sbscr-plan-term-val" class="form-label">구독 기간
+								(일)</label> <input type="number" id="sbscr-plan-term-val"
+								name="sbscrPlanTermVal" class="form-control" min="1" value="30"
+								required>
+						</div>
 
-            <table class="table table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th><div class="form-check"><input class="form-check-input" type="checkbox" id="checkAllRows"></div></th>
-                        <th>ID</th>
-                        <th>이름</th>
-                        <th>성별</th>
-                        <th>이메일</th>
-                        <th>휴대폰 번호</th>
-                        <th>주소</th>
-                        <th>상태</th>
-                        <th>가입 일자</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- ▼▼▼ 2. 체크박스 중앙 정렬 및 컬럼 개수 수정 ▼▼▼ -->
-                    <tr>
-                        <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
-                        <td>user01</td>
-                        <td>김성주</td>
-                        <td>남</td>
-                        <td>sungju@test.com</td>
-                        <td>010-1111-1111</td>
-                        <td>서울시 강남구</td>
-                        <td>활동중</td>
-                        <td>2024-05-21</td>
-                    </tr>
-                    <tr>
-                        <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
-                        <td>user02</td>
-                        <td>정성훈</td>
-                        <td>남</td>
-                        <td>seanghun@test.com</td>
-                        <td>010-2222-2222</td>
-                        <td>경기도 성남시</td>
-                        <td>휴면</td>
-                        <td>2024-05-20</td>
-                    </tr>
-                </tbody>
-            </table>
+						<div class="mb-3">
+							<label for="sbscr-plan-prc" class="form-label">가격 (원)</label> <input
+								type="number" id="sbscr-plan-prc" name="sbscrPlanPrc"
+								class="form-control" min="0" value="2990000" required>
+						</div>
 
-            <nav class="d-flex justify-content-center mt-4" aria-label="Page navigation">
-                <ul class="pagination">
-                    <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">다음</a></li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-</main>
-	 </th:block>	
+						<div class="mb-3">
+							<label for="sbscr-plan-expln" class="form-label">설명</label>
+							<textarea id="sbscr-plan-expln" name="sbscrPlanExpln"
+								class="form-control" rows="4"
+								placeholder="구독 플랜에 대한 자세한 설명을 입력하세요." required></textarea>
+						</div>
+
+						<button type="submit" class="btn btn-primary submit-button">구독
+							플랜 등록하기</button>
+					</form>
+				</div>
+			</div>
+		</section>
+
+		<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('add-subscription-form');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            
+            // 필수 필드 검증
+            const sbscrPlanNm = document.getElementById('sbscr-plan-nm').value;
+            const sbscrPlanTermVal = document.getElementById('sbscr-plan-term-val').value;
+            const sbscrPlanPrc = document.getElementById('sbscr-plan-prc').value;
+            const sbscrPlanExpln = document.getElementById('sbscr-plan-expln').value;
+
+            if (!sbscrPlanNm || !sbscrPlanTermVal || !sbscrPlanPrc || !sbscrPlanExpln) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '입력 오류',
+                    text: '모든 필드를 입력해주세요.'
+                });
+                return;
+            }
+
+            // 확인 다이얼로그
+            Swal.fire({
+                title: '구독 플랜을 등록하시겠습니까?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '네, 등록합니다!',
+                cancelButtonText: '취소'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 폼 제출 (서버로 데이터 전송)
+                    form.submit();
+                }
+            });
+        });
+    });
+    </script>
+	</th:block>
+</body>
 </html>

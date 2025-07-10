@@ -44,8 +44,10 @@
             sbscr_plan_expln,
             sbscr_plan_crt_dt,
             sbscr_plan_mdfcn_dt
-        FROM subscription_plans
-        ORDER BY sbscr_plan_crt_dt DESC
+        FROM 
+        	subscription_plans
+        ORDER BY 
+        	sbscr_plan_crt_dt DESC
     </select>
 
     <!-- findSubscriptionPlanById 쿼리에 premiumAddresultMap을 적용합니다. -->

@@ -72,8 +72,4 @@ public class CustomerHomeController {
 	public String premiumAddView() {
 		return "admin/fragments/premiumAdd";
 	}
-//	@GetMapping(value= {"/paymentHistory"})
-//	public String paymentHistoryView() {
-//		return "customer/fragments/paymentHistory";
-//	}
 }
