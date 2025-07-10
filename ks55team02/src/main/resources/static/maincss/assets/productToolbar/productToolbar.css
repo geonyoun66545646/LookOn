@@ -494,70 +494,68 @@ label {
 }
 
 /* --- 가격 탭 스타일 --- */
-.app-price-direct-input {
-	margin-top: 20px;
-	display: flex;
-	align-items: center;
-	gap: 8px;
-}
-.app-price-input {
-	flex-grow: 1;
-	width: 100%;
-	padding: 10px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	text-align: right;
-	font-size: 0.9em;
-}
-.price-input-divider {
-	color: #888;
-}
-.app-apply-price-button {
-	padding: 10px 15px;
-	border: 1px solid #ddd;
-	background-color: #f5f5f5;
-	border-radius: 4px;
-	cursor: pointer;
-	white-space: nowrap;
+.modal-content-body { /* 이 클래스명은 실제 모달 구조에 맞게 변경해주세요 */
+    max-height: calc(100vh - Xpx); /* 모달 헤더, 푸터 등을 제외한 높이 계산 */
+    overflow-y: auto;
+    padding-bottom: 20px; /* 푸터와 겹치지 않도록 여유 공간 */
 }
 
-/* --- 브랜드 탭 스타일 --- */
+
 .app-brand-search-wrapper {
-	position: relative;
-	margin-bottom: 20px;
+    position: sticky; /* 스크롤 시 상단에 고정 */
+    z-index: 10; /* 다른 요소 위에 오도록 z-index 설정 */
+    background-color: #fff; /* 스크롤 시 뒤 내용이 비치지 않도록 배경색 지정 */
+    padding-bottom: 20px; /* 기존 margin-bottom 유지 */
+    margin-bottom: 0; /* 원래 margin-bottom은 sticky 요소에는 적합하지 않으므로 0으로 */
 }
+
 .app-brand-search-input {
-	width: 100%;
-	padding: 12px 40px 12px 15px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	font-size: 1em;
-	box-sizing: border-box;
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    box-sizing: border-box;
 }
+
 .app-brand-search-button {
-	position: absolute;
-	right: 10px;
-	top: 50%;
-	transform: translateY(-50%);
-	background: none;
-	border: none;
-	padding: 5px;
-	cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-80%);
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
 }
+
 .brand-name {
-	display: flex;
-	flex-direction: column;
-	line-height: 1.3;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
 }
+
 .brand-name small {
-	font-size: 0.85em;
-	color: #888;
-	margin-top: 2px;
+    font-size: 0.85em;
+    color: #888;
+    margin-top: 2px;
 }
+
 .app-brand-options {
-	max-height: 300px; /* 브랜드 목록이 길 경우 스크롤 */
-	overflow-y: auto;
+    /* max-height: 300px; 제거 */
+    /* overflow-y: auto; 제거 */
+    padding-top: 20px; /* 브랜드 목록 상단에 여백 추가 */
+    border-top: 1px solid #eee; /* 브랜드 목록 상단 구분선 */
 }
+
+.app-filter-options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px 10px;
+    margin-bottom: 25px;
+}
+
+
 
 
 /* 2-3. 모달 푸터 */
@@ -711,6 +709,7 @@ label {
 
 /* selected-filter-tag 자체의 디자인을 모달스럽게 조정 (필요하다면) */
 .selected-filter-tag {
+	font-weight: 400;
     display: inline-flex;
     align-items: center;
     background-color: #f0f0f0; /* 밝은 배경색 */
