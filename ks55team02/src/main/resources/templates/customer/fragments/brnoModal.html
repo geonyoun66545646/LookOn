@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>사업자등록번호 조회 모달</title> </head>
+<body>
+
+    <div th:fragment="brnoModalFragment">
+        <div class="modal fade" id="brnoModal" tabindex="-1" aria-labelledby="brnoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                        <h5 class="modal-title" id="brnoModalLabel">사업자등록번호 조회 결과</h5>
+                    <div class="modal-body col-lg-10 mx-auto">
+                        <div id="modalApiResponseContainer"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="close-btn" data-bs-dismiss="modal">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
