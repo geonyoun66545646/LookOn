@@ -232,8 +232,8 @@ $('.btn-cart').on('click', function(e) {
             return;
         }
 
-        // ⭐⭐⭐ 중요 수정 부분: 장바구니에 기존 데이터를 불러오지 않고 항상 새롭게 시작합니다. ⭐⭐⭐
-        let cartData = { products: [] }; // 이전에 sessionStorage.getItem('cart_data')를 사용하던 부분을 변경
+		// cart_data를 세션 스토리지에서 불러오거나, 없으면 빈 객체로 초기화합니다.
+		let cartData = JSON.parse(sessionStorage.getItem('cart_data')) || { products: [] };
 
         // ⭐ 콘솔 로그 추가: 현재 selectedOptions 배열 내용 확인 ⭐
         console.log("장바구니에 추가될 현재 selectedOptions:", selectedOptions);

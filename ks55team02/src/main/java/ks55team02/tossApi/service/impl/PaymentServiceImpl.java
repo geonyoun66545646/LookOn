@@ -97,7 +97,11 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("PaymentService.createOrder 호출. 받은 데이터: {}", orderData);
 
         // ★★★ 주문번호(ordrNo) 서버에서 생성 ★★★
-        String ordrNo = UUID.randomUUID().toString(); // 고유한 주문번호 생성 예시
+        // 기존: String ordrNo = UUID.randomUUID().toString(); // 고유한 주문번호 생성 예시
+        // 변경: PaymentMapper를 통해 DB에서 다음 주문 번호를 가져옵니다.
+        String ordrNo = paymentMapper.selectNextOrderId(); // <--- 이 부분을 이렇게 수정합니다.
+        log.info("생성된 새로운 주문 번호: {}", ordrNo); // 생성된 주문 번호 로그 추가
+
         orderData.put("ordrNo", ordrNo); // 생성된 주문번호를 orderData에 추가
 
         // 사용자 번호 (userNo)는 로그인된 사용자 세션에서 가져와야 할 수 있습니다.
@@ -164,4 +168,73 @@ public class PaymentServiceImpl implements PaymentService {
         
         return result;
     }
+    
+    /**
+     * ★★★ 여기를 구현합니다 ★★★
+     * 쿠폰 코드를 적용하여 할인된 최종 결제 금액을 계산합니다.
+     * 실제 쿠폰 조회 및 유효성 검증 로직이 들어갑니다.
+     * @param originalAmount 원본 결제 금액
+     * @param couponCode 적용할 쿠폰 코드
+     * @param userNo 쿠폰을 사용하는 사용자 번호 (사용자별 쿠폰 유효성 검증 시 필요)
+     * @return 쿠폰이 적용된 최종 할인 금액
+     */
+    @Override
+    public Long calculateDiscountedAmount(Long originalAmount, String couponCode, String userNo) {
+        if (couponCode == null || couponCode.isEmpty()) {
+            log.info("쿠폰 코드가 제공되지 않았습니다. 원본 금액 {} 반환.", originalAmount);
+            return originalAmount;
+        }
+
+        // 1. PaymentMapper를 통해 사용자의 쿠폰 상세 정보를 조회합니다.
+        Map<String, Object> couponDetails = paymentMapper.getUserCouponDetails(userNo, couponCode);
+
+        Long discountedAmount = originalAmount; // 기본값은 원본 금액
+
+        if (couponDetails != null && (Boolean) couponDetails.get("useYn")) { // 사용 가능한 쿠폰인지 확인
+            String discountType = (String) couponDetails.get("dscntTpCd"); // 할인 유형 (RATE 또는 FIXED)
+            Number discountValueNum = (Number) couponDetails.get("dscntVl"); // 할인 값
+            Long minOrderAmount = ((Number) couponDetails.get("minOrdrAmt")).longValue(); // 최소 주문 금액
+            Long maxDiscountAmount = ((Number) couponDetails.get("maxDscntAmt")).longValue(); // 최대 할인 금액
+
+            // 최소 주문 금액 조건을 만족하는지 확인
+            if (originalAmount < minOrderAmount) {
+                log.warn("쿠폰 '{}'은 최소 주문 금액({}원) 미만으로 적용할 수 없습니다. 현재 금액: {}원", couponCode, minOrderAmount, originalAmount);
+                return originalAmount; // 쿠폰 적용 없이 원본 금액 반환
+            }
+
+            if (discountType != null && discountValueNum != null) {
+                if ("RATE".equals(discountType)) { // 비율 할인
+                    double discountRate = discountValueNum.doubleValue();
+                    long discount = (long) (originalAmount * (discountRate / 100.0));
+                    
+                    // 최대 할인 금액 제한 적용
+                    if (maxDiscountAmount > 0 && discount > maxDiscountAmount) {
+                        discount = maxDiscountAmount;
+                    }
+                    discountedAmount = originalAmount - discount;
+                } else if ("FIXED".equals(discountType)) { // 고정 금액 할인
+                    long discount = discountValueNum.longValue();
+                    
+                    // 최대 할인 금액 제한은 고정 금액 할인에서는 일반적으로 사용되지 않으나, 정책에 따라 추가 가능
+                    // if (maxDiscountAmount > 0 && discount > maxDiscountAmount) {
+                    //     discount = maxDiscountAmount;
+                    // }
+                    discountedAmount = originalAmount - discount;
+                }
+            } else {
+                log.warn("쿠폰 '{}'의 할인 유형 또는 할인 값이 유효하지 않습니다. 원본 금액 반환.", couponCode);
+            }
+        } else {
+            log.warn("쿠폰 '{}'을 찾을 수 없거나 유효하지 않습니다. 원본 금액 반환.", couponCode);
+        }
+
+        // 최종 금액이 0보다 작아지지 않도록 처리
+        if (discountedAmount < 0) {
+            discountedAmount = 0L;
+        }
+        
+        log.info("쿠폰 '{}' 적용 완료. 원본 금액: {}, 최종 금액: {}", couponCode, originalAmount, discountedAmount);
+        return discountedAmount;
+    }
+
 }

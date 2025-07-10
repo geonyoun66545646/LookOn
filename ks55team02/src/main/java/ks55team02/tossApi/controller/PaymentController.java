@@ -69,41 +69,52 @@ public class PaymentController {
 	 * (★★★ 로직 수정 ★★★) 결제 성공 시 호출되는 메서드.
 	 */
 	@GetMapping("/payment/success")
-	public String paymentSuccess(@RequestParam String paymentKey, @RequestParam String orderId,
-			@RequestParam Long amount, Model model, HttpSession session) {
+	public String paymentSuccess(@RequestParam String paymentKey,
+	                             @RequestParam String orderId,
+	                             @RequestParam Long amount,
+	                             Model model,
+	                             HttpSession session) {
+	    log.info("결제 성공 콜백 수신. PaymentKey: {}, OrderId: {}, Amount: {}", paymentKey, orderId, amount);
+	    try {
+	        // 1. 토스페이먼츠 API에 결제 승인 요청
+	        Map<String, Object> paymentDetails = paymentService.confirmTossPayment(paymentKey, orderId, amount);
 
-		try {
-			// 1. 결제 승인 로직 실행
-			log.info("실제 결제 승인 로직 실행. PaymentKey: {}", paymentKey);
-			// paymentService.confirmTossPayment 메소드는 실제 Toss API와 통신하여 결제를 승인하고,
-			// 결제 상세 정보를 Map 형태로 반환해야 합니다.
-			Map<String, Object> paymentDetails = paymentService.confirmTossPayment(paymentKey, orderId, amount);
+	        // 2. 세션에서 상품 목록 가져오기 시도 (기존 로직 유지)
+	        String sessionKey = orderId + "_products";
+	        Object sessionData = session.getAttribute(sessionKey);
 
-			// 2. 세션에서 상품 목록 가져오기
-			String sessionKey = orderId + "_products";
-			Object sessionData = session.getAttribute(sessionKey);
+	        List<Map<String, Object>> orderedProducts = null;
 
-			if (sessionData instanceof List) {
-				List<Map<String, Object>> orderedProducts = (List<Map<String, Object>>) sessionData;
-				model.addAttribute("orderedProducts", orderedProducts);
-				log.info("세션에서 상품 목록 조회 성공. Key: {}", sessionKey);
-				session.removeAttribute(sessionKey); // 세션에서 상품 목록 제거
-			} else {
-				log.warn("세션에서 상품 목록을 찾을 수 없습니다. Key: {}. 이 경우 DB에서 주문 상세 내역을 조회해야 합니다.", sessionKey);
-				// TODO: 실제 서비스에서는 세션에 없을 경우 DB에서 주문 상세 내역을 조회하여 모델에 추가해야 합니다.
-			}
+	        if (sessionData instanceof List) {
+	            orderedProducts = (List<Map<String, Object>>) sessionData;
+	            log.info("세션에서 상품 목록 조회 성공. Key: {}", sessionKey);
+	            session.removeAttribute(sessionKey); // 세션에서 상품 목록 제거
+	        } else {
+	            // TODO: 실제 서비스에서는 세션에 없을 경우 DB에서 주문 상세 내역을 조회하여 모델에 추가해야 합니다.
+	            // 2-1. 세션에 상품 목록이 없을 경우 DB에서 주문 상세 내역 조회 (추가된 로직)
+	            log.warn("세션에서 상품 목록을 찾을 수 없습니다. Key: {}. DB에서 주문 상세 내역을 조회합니다.", sessionKey);
+	            Map<String, Object> latestOrderDetails = paymentService.getLatestOrderDetailsForUser(orderId); // orderId로 조회하도록 수정 필요, userNo가 아닌
+	            if (latestOrderDetails != null && latestOrderDetails.containsKey("orderedProducts")) {
+	                orderedProducts = (List<Map<String, Object>>) latestOrderDetails.get("orderedProducts");
+	                log.info("DB에서 주문 상세 내역(상품 목록) 조회 성공. OrderId: {}", orderId);
+	            } else {
+	                log.error("DB에서도 주문 상세 내역(상품 목록)을 찾을 수 없습니다. OrderId: {}", orderId);
+	            }
+	        }
+	        
+	        model.addAttribute("orderedProducts", orderedProducts); // 조회된 상품 목록 모델에 추가
 
-			// ★★★ 3. 모델에 "orders" 라는 이름으로 결제 정보를 담습니다. ★★★
-			model.addAttribute("orders", paymentDetails);
+	        // ★★★ 3. 모델에 "orders" 라는 이름으로 결제 정보를 담습니다. ★★★
+	        model.addAttribute("orders", paymentDetails);
 
-			// 4. 결제 완료 페이지로 이동
-			return "customer/fragments/paymentSuccess"; // paymentSuccess.html이 렌더링됩니다.
+	        // 4. 결제 완료 페이지로 이동
+	        return "customer/fragments/paymentSuccess"; // paymentSuccess.html이 렌더링됩니다.
 
-		} catch (Exception e) {
-			log.error("결제 처리 중 오류 발생", e);
-			model.addAttribute("errorMessage", e.getMessage());
-			return "customer/fragments/paymentFail"; // paymentFail.html이 렌더링됩니다.
-		}
+	    } catch (Exception e) {
+	        log.error("결제 처리 중 오류 발생", e);
+	        model.addAttribute("errorMessage", e.getMessage());
+	        return "customer/fragments/paymentFail"; // paymentFail.html이 렌더링됩니다.
+	    }
 	}
 
 	/**
@@ -118,6 +129,50 @@ public class PaymentController {
 		model.addAttribute("errorMessage", message);
 
 		return "customer/fragments/paymentFail";
+	}
+	
+	/**
+	 * ★★★ 여기를 추가합니다 ★★★
+	 * 쿠폰 적용을 요청하여 할인된 금액을 반환하는 API 엔드포인트
+	 * POST 요청으로, 원본 금액, 쿠폰 코드, 사용자 ID를 받습니다.
+	 */
+	@PostMapping("/api/payment/apply-coupon")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> applyCoupon(
+			@RequestBody Map<String, Object> requestData,
+			HttpSession session) { // 세션에서 사용자 ID를 얻거나, requestData에 포함하여 받습니다.
+		
+		Long originalAmount = ((Number) requestData.get("originalAmount")).longValue();
+		String couponCode = (String) requestData.get("couponCode");
+		// 실제 사용자 ID는 세션에서 가져오거나, 로그인 정보를 통해 얻어야 합니다.
+		// 여기서는 임시로 "user001"로 설정하거나, requestData에서 받을 수 있습니다.
+		String userNo = (String) session.getAttribute("userNo"); // 예시: 세션에서 사용자 ID 가져오기
+		if (userNo == null) {
+			userNo = (String) requestData.get("userNo"); // 요청 본문에서 사용자 ID를 받을 수도 있습니다.
+			if (userNo == null) {
+				// 사용자 ID가 없는 경우에 대한 처리 (예: 비회원 할인 불가 또는 기본 사용자)
+				log.warn("쿠폰 적용 요청에 userNo가 없습니다. 비회원 처리 또는 에러.");
+				userNo = "guest"; // 임시 처리
+			}
+		}
+
+		log.info("API 호출: 쿠폰 적용 요청. 원본 금액: {}, 쿠폰 코드: {}, 사용자: {}", originalAmount, couponCode, userNo);
+		
+		Map<String, Object> response = new HashMap<>();
+		try {
+			Long discountedAmount = paymentService.calculateDiscountedAmount(originalAmount, couponCode, userNo);
+			response.put("success", true);
+			response.put("originalAmount", originalAmount);
+			response.put("couponCode", couponCode);
+			response.put("discountedAmount", discountedAmount);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+
+		} catch (Exception e) {
+			log.error("쿠폰 적용 중 오류 발생", e);
+			response.put("success", false);
+			response.put("message", "쿠폰 적용 중 오류가 발생했습니다: " + e.getMessage());
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 }
