@@ -52,12 +52,14 @@
                 <div class="col-lg-3">
                         <div class="card card-body mb-4">
                             <article class="icontext">
-                                <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
-                                <div class="text">
-                                    <h6 class="mb-1 card-title">구독 기간</h6>
-                                    <span></span>
-                                    <span class="text-sm"> Based in your local time. </span>
-                                </div>
+                               <div th:if="${hasSubscription}">
+						            <p>구독 시작일: <span th:text="${earliestSubscriptionStartDate}"></span></p>
+						            <p>구독 종료일: <span th:text="${latestSubscriptionEndDate}"></span></p>
+						        </div>
+						        <!-- hasSubscription이 false일 경우 (구독 기록이 없거나 유효하지 않을 때) -->
+						        <div th:unless="${hasSubscription}">
+						            <p>현재 구독 기록이 없습니다.</p>
+						        </div>
                             </article>
                         </div>
                     </div>
