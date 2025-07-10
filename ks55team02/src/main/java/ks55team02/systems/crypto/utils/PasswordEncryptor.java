@@ -5,6 +5,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class PasswordEncryptor {
 	
 	private static final String ALGORITHM = "SHA-256";
