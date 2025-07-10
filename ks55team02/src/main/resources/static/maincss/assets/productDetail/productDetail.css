@@ -630,3 +630,38 @@
         min-width: initial !important;
     }
 }
+/* 가격 전체를 감싸는 섹션 */
+.product-price-section {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.original-price {
+    font-size: 1.6rem; /* 16px */
+    color: #999;
+    text-decoration: line-through; /* 취소선 */
+}
+
+/* 최종 가격 라인 (할인율 + 할인가) */
+.final-price-wrapper {
+    display: flex;
+    align-items: baseline; /* 텍스트 베이스라인 정렬 */
+    gap: 1rem; /* 할인율과 가격 사이 간격 */
+}
+
+/* 할인율 텍스트 스타일 */
+.discount-rate {
+    font-size: 2.2rem; /* 22px, 더 크게 */
+    font-weight: 700;
+    color: #c96; /* 빨간색으로 강조 */
+}
+
+/* 최종 가격 텍스트 스타일 */
+.final-price {
+    font-size: 2.4rem; /* 24px, 가장 크게 */
+    font-weight: 500;
+    color: #333;
+}
+.product-content{
+	display: none;
+}

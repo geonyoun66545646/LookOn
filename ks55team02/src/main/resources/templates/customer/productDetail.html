@@ -2,56 +2,56 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport"
-		content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title
-		th:text="${product?.gdsNm ?: 'Molla - Bootstrap eCommerce Template'}"></title>
-	<meta name="keywords" content="HTML5 Template">
-	<meta name="description" th:content="${product?.gdsExpln ?: '상품 상세 정보'}">
-	<meta name="author" content="p-themes">
-	
-	<link rel="apple-touch-icon" sizes="180x180"
-		th:href="@{/maincss/assets/images/icons/apple-touch-icon.png}">
-	<link rel="icon" type="image/png" sizes="32x32"
-		th:href="@{/maincss/assets/images/icons/favicon-32x32.png}">
-	<link rel="icon" type="image/png" sizes="16x16"
-		th:href="@{/maincss/assets/images/icons/favicon-16x16.png}">
-	<link rel="manifest"
-		th:href="@{/maincss/assets/images/icons/site.webmanifest}">
-	<link rel="mask-icon"
-		th:href="@{/maincss/assets/images/icons/safari-pinned-tab.svg}"
-		color="#666666">
-	<link rel="shortcut icon"
-		th:href="@{/maincss/assets/images/icons/favicon.ico}">
-	<meta name="apple-mobile-web-app-title" content="Molla">
-	<meta name="application-name" content="Molla">
-	<meta name="msapplication-TileColor" content="#cc9999">
-	<meta name="msapplication-config"
-		th:content="@{/maincss/assets/images/icons/browserconfig.xml}">
-	<meta name="theme-color" content="#ffffff">
-	
-	<link rel="stylesheet"
-		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-		integrity="sha512-..." crossorigin="anonymous"
-		referrerpolicy="no-referrer" />
-	<link rel="stylesheet"
-		th:href="@{/maincss/assets/css/bootstrap.min.css}">
-	<link rel="stylesheet"
-		th:href="@{/maincss/assets/css/plugins/owl-carousel/owl.carousel.css}">
-	<link rel="stylesheet"
-		th:href="@{/maincss/assets/css/plugins/magnific-popup/magnific-popup.css}">
-	<link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
-	<link rel="stylesheet"
-		th:href="@{/maincss/assets/css/plugins/nouislider/nouislider.css}">
-	<link rel="stylesheet"
-		th:href="@{/maincss/assets/productDetail/productDetail.css}">
-	<link rel="stylesheet"
-		th:href="@{/maincss/assets/mainHeader/mainHeader.css}">
-	<link rel="stylesheet"
-		th:href="@{/maincss/assets/categoryFilterModal/categoryFilterModal.css}">
-	
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title
+	th:text="${product?.gdsNm ?: 'Molla - Bootstrap eCommerce Template'}"></title>
+<meta name="keywords" content="HTML5 Template">
+<meta name="description" th:content="${product?.gdsExpln ?: '상품 상세 정보'}">
+<meta name="author" content="p-themes">
+
+<link rel="apple-touch-icon" sizes="180x180"
+	th:href="@{/maincss/assets/images/icons/apple-touch-icon.png}">
+<link rel="icon" type="image/png" sizes="32x32"
+	th:href="@{/maincss/assets/images/icons/favicon-32x32.png}">
+<link rel="icon" type="image/png" sizes="16x16"
+	th:href="@{/maincss/assets/images/icons/favicon-16x16.png}">
+<link rel="manifest"
+	th:href="@{/maincss/assets/images/icons/site.webmanifest}">
+<link rel="mask-icon"
+	th:href="@{/maincss/assets/images/icons/safari-pinned-tab.svg}"
+	color="#666666">
+<link rel="shortcut icon"
+	th:href="@{/maincss/assets/images/icons/favicon.ico}">
+<meta name="apple-mobile-web-app-title" content="Molla">
+<meta name="application-name" content="Molla">
+<meta name="msapplication-TileColor" content="#cc9999">
+<meta name="msapplication-config"
+	th:content="@{/maincss/assets/images/icons/browserconfig.xml}">
+<meta name="theme-color" content="#ffffff">
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+	integrity="sha512-..." crossorigin="anonymous"
+	referrerpolicy="no-referrer" />
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/css/bootstrap.min.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/css/plugins/owl-carousel/owl.carousel.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/css/plugins/magnific-popup/magnific-popup.css}">
+<link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/css/plugins/nouislider/nouislider.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/productDetail/productDetail.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/mainHeader/mainHeader.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/categoryFilterModal/categoryFilterModal.css}">
+
 
 </head>
 
@@ -113,7 +113,6 @@
 													alt="No images available">
 											</div>
 										</div>
-
 									</div>
 								</div>
 							</div>
@@ -173,11 +172,27 @@
 											id="review-link">( 2 리뷰 )</a>
 									</div>
 
+
 									<!-- 5. 가격 -->
-									<div class="product-price"
-										th:data-price="${product?.basPrc ?: 0}">
-										<span
-											th:text="${#numbers.formatDecimal(product?.basPrc ?: 0, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+									<div class="product-price-section">
+										<!-- 원가 표시: 할인율(dscntRt)이 0보다 클 경우에만 표시하고, 취소선 스타일 적용 -->
+										<div class="original-price-wrapper"
+											th:if="${product.dscntRt != null and product.dscntRt > 0}">
+											<span class="original-price"
+												th:text="${#numbers.formatDecimal(product.basPrc, 0, 'COMMA', 0, 'POINT')} + '원'">279,000원</span>
+										</div>
+
+										<!-- 최종 가격 라인: 할인율과 최종가격을 한 줄에 표시 -->
+										<div class="final-price-wrapper">
+											<!-- 할인율: 할인율이 있을 경우에만 빨간색으로 강조하여 표시 -->
+											<span class="discount-rate"
+												th:if="${product.dscntRt != null and product.dscntRt > 0}"
+												th:text="${#numbers.formatInteger(product.dscntRt, 0)} + '%'">20%</span>
+
+											<!-- 최종가: 항상 표시 -->
+											<span class="final-price"
+												th:text="${#numbers.formatDecimal(product.lastSelPrc, 0, 'COMMA', 0, 'POINT')} + '원'">222,990원</span>
+										</div>
 									</div>
 
 									<!-- 6. 상품 설명 -->
@@ -187,24 +202,30 @@
 											vitae luctus metus libero eu augue.</p>
 									</div>
 
-									<!-- 7. 옵션 선택 -->
-									<div th:each="option : ${product?.productOptions}">
-										<div th:if="${option.actvtnYn}" class="details-filter-row"
-											th:classappend="${option.optNm == '색상' ? 'details-row-color' : (option.optNm == '사이즈' ? 'details-row-size' : '')}">
-											<label th:for="${'option-select-' + option.optNo}"
-												th:text="${option.optNm} + ':'"></label>
-											<div class="select-custom">
-												<select th:name="${option.optNm}"
-													th:id="${'option-select-' + option.optNo}"
-													class="form-control product-option-select">
-													<option value="" selected disabled
-														th:text="${option.optNm + ' 선택'}"></option>
-													<option th:each="optionValue : ${option.optionValues}"
-														th:if="${optionValue.actvtnYn}"
-														th:value="${optionValue.optVlNo}"
-														th:data-color="${option.optNm == '색상' and optionValue.clrCd != null ? optionValue.clrCd : ''}"
-														th:text="${optionValue.vlNm}">옵션 값 이름</option>
-												</select>
+									<!-- 7. 옵션 선택 (수정됨) -->
+									<!-- product.productOptions 리스트가 존재하고 비어있지 않을 때만 이 영역을 표시 -->
+									<div
+										th:if="${product.productOptions != null and !#lists.isEmpty(product.productOptions)}">
+										<div th:each="option : ${product.productOptions}">
+											<!-- ⭐ 수정: 옵션 이름이 '성별'이 아닐 때만 이 div를 렌더링합니다. -->
+											<div th:if="${option.actvtnYn and option.optNm != '성별'}"
+												class="details-filter-row"
+												th:classappend="${option.optNm == '색상' ? 'details-row-color' : (option.optNm == '사이즈' ? 'details-row-size' : '')}">
+
+												<label th:for="${'option-select-' + option.optNo}"
+													th:text="${option.optNm} + ':'"></label>
+												<div class="select-custom">
+													<select th:name="${option.optNm}"
+														th:id="${'option-select-' + option.optNo}"
+														class="form-control product-option-select">
+														<option value="" selected disabled
+															th:text="${option.optNm + ' 선택'}"></option>
+														<option th:each="optionValue : ${option.optionValues}"
+															th:if="${optionValue.actvtnYn}"
+															th:value="${optionValue.optVlNo}"
+															th:text="${optionValue.vlNm}"></option>
+													</select>
+												</div>
 											</div>
 										</div>
 									</div>
