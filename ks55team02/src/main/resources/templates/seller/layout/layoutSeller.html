@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+	<head>
+		<meta charset="utf-8" />
+        <title th:text="${title}">Nest Dashboard</title>
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <meta name="description" content="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!-- Favicon -->
+        <link rel="shortcut icon" type="image/x-icon" th:href="@{/admincss/assets/imgs/theme/favicon.svg}" />
+        <!-- Template CSS -->
+        <link th:href="@{/admincss/assets/css/main.css?v=1.1}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/maincss/assets/customsellercss/layoutSeller.css}" rel="stylesheet" type="text/css" />
+        
+         <th:block layout:fragment="customCss"></th:block>
+        
+	</head>
+	<body>
+		<div class="screen-overlay"></div>
+		
+		<!--/* a
+			~{논리경로} : prefix /src/main/resources/templates/ subfix: .html
+			/src/main/resources/templates/admin/fragments/aside.html 
+		*/-->
+		<!-- aside start -->
+		<aside th:replace="~{seller/fragments/asideSeller :: asideSellerFragments}"></aside>
+		<!-- aside and -->
+		
+		<main class="main-wrap">
+			<!-- header start -->
+				<header th:replace="~{seller/fragments/headerSeller :: headerSellerFragments}"></header>
+			<!-- header and -->
+			<section class="content-main">
+				<!-- contents start -->
+				<th:block layout:fragment="contents">
+					
+				</th:block>
+				<!-- contents and -->
+			</section>
+			<!-- footer start -->	
+				<footer th:replace="~{seller/fragments/footerSeller :: footerSellserFragments}"></footer>
+			<!-- footer and -->
+		</main>
+		<script th:src="@{/admincss/assets/js/vendors/jquery-3.6.0.min.js}"></script>
+		<script th:src="@{/admincss/assets/js/vendors/bundle.min.js}"></script>
+        <script th:src="@{/admincss/assets/js/vendors/select2.min.js}"></script>
+        <script th:src="@{/admincss/assets/js/vendors/perfect-scrollbar.js}"></script>
+        <script th:src="@{/admincss/assets/js/vendors/jquery.fullscreen.min.js}"></script>
+        
+        <!--/* 개발시 추가할 스크립트 파일 영역 정의 */-->
+        <th:block layout:fragment="jsFile"></th:block>
+        
+        <!-- Main Script -->
+        <script th:src="@{/admincss/assets/js/main.js?v=1.1}" type="text/javascript"></script>
+       
+        <!--/* 개발시 추가할 스크립트 영역 정의 */-->
+        <th:block layout:fragment="jsScript"></th:block>	
+	</body>
+</html>
