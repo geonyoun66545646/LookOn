@@ -249,29 +249,58 @@
             // '배송지 등록/변경' 버튼의 메인 이벤트 리스너
             registerAddressBtn.addEventListener('click', showAddressForm);
 
-            // 쿠폰 적용 로직
-            document.getElementById('apply-coupon-btn').addEventListener('click', async function() {
-                const couponCodeInput = document.getElementById('coupon-code-input');
-                const couponCode = couponCodeInput.value.trim();
-                
-                if (!couponCode) {
-                    alert('쿠폰 코드를 입력해주세요.');
-                    return;
-                }
+            // 쿠폰 관련 로직 시작
+            const couponSelect = document.getElementById('coupon-select');
 
+            // 1. 사용자 쿠폰 목록을 불러오는 함수 (가정: /api/user/coupons 엔드포인트)
+            async function fetchUserCoupons() {
+                const userNo = "user01"; // TODO: 실제 사용자 인증 정보에서 가져오도록 수정
+                try {
+                    // 쿠폰 목록을 가져오는 새로운 API 호출 (백엔드에 구현되어야 함)
+                    const response = await fetch(`/api/user/coupons?userNo=${userNo}`);
+                    if (!response.ok) {
+                        throw new Error('쿠폰 목록을 불러오는데 실패했습니다.');
+                    }
+                    const coupons = await response.json();
+                    
+                    // select 박스에 옵션 추가
+                    couponSelect.innerHTML = '<option value="">쿠폰 선택</option>'; // 기본 옵션 유지
+                    coupons.forEach(coupon => {
+                        const option = document.createElement('option');
+                        option.value = coupon.pblcnCpnCd; // 쿠폰 코드를 값으로 사용
+                        option.textContent = `${coupon.cpnNm} - ${coupon.dcntRte}% 할인`; // 쿠폰 이름과 할인율 표시
+                        couponSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('쿠폰 목록 로드 오류:', error);
+                    alert('쿠폰 목록을 불러오는데 문제가 발생했습니다.');
+                }
+            }
+
+            // 2. 쿠폰 선택 시 할인 계산 및 화면 업데이트 함수
+            async function applySelectedCoupon() {
+                const selectedCouponCode = couponSelect.value;
                 const cartData = JSON.parse(sessionStorage.getItem('cart_data'));
                 const originalAmount = cartData.total;
                 const userNo = "user01"; // TODO: 실제 사용자 인증 정보에서 가져오도록 수정
-                
+
+                if (!selectedCouponCode) { // 쿠폰을 선택하지 않은 경우 (초기 "쿠폰 선택" 옵션)
+                    window.currentDiscountedAmount = originalAmount;
+                    document.getElementById('checkoutTotal').textContent = `₩${Math.round(originalAmount).toLocaleString('ko-KR')}`;
+                    document.getElementById('discountAmountDisplay').textContent = `₩0`;
+                    document.getElementById('discountRow').style.display = 'none';
+                    return; // 함수 종료
+                }
+
                 try {
-                    const response = await fetch('/api/calculateDiscount', { // 새 API 엔드포인트 호출
+                    const response = await fetch('/api/apply-coupon', { // 기존 apply-coupon 엔드포인트 사용
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
                             originalAmount: originalAmount,
-                            pblcnCpnCd: couponCode,
+                            couponCode: selectedCouponCode, // 선택된 쿠폰 코드 전송
                             userNo: userNo
                         })
                     });
@@ -285,24 +314,37 @@
                     const discountedAmount = data.discountedAmount;
                     const discountAmount = originalAmount - discountedAmount;
 
-                    window.currentDiscountedAmount = discountedAmount; // 최종 할인 금액 전역 변수에 저장
+                    window.currentDiscountedAmount = discountedAmount;
 
-                    // 화면 업데이트
                     document.getElementById('checkoutTotal').textContent = `₩${Math.round(discountedAmount).toLocaleString('ko-KR')}`;
                     document.getElementById('discountAmountDisplay').textContent = `₩${Math.round(discountAmount).toLocaleString('ko-KR')}`;
-                    document.getElementById('discountRow').style.display = 'table-row'; // 할인 금액 행 표시
+                    document.getElementById('discountRow').style.display = 'table-row';
                     
                     alert('쿠폰이 성공적으로 적용되었습니다!');
 
                 } catch (error) {
                     console.error('쿠폰 적용 오류:', error);
                     alert(error.message);
-                    window.currentDiscountedAmount = originalAmount; // 오류 발생 시 원본 금액으로 리셋
+                    // 오류 발생 시 선택된 쿠폰 초기화 또는 기존 금액으로 복원
+                    couponSelect.value = ""; // "쿠폰 선택"으로 되돌리기
+                    window.currentDiscountedAmount = originalAmount;
                     document.getElementById('checkoutTotal').textContent = `₩${Math.round(originalAmount).toLocaleString('ko-KR')}`;
                     document.getElementById('discountAmountDisplay').textContent = `₩0`;
-                    document.getElementById('discountRow').style.display = 'none'; // 할인 금액 행 숨김
+                    document.getElementById('discountRow').style.display = 'none';
                 }
-            });
+            }
+
+            // 3. select 박스 변경 이벤트 리스너
+            couponSelect.addEventListener('change', applySelectedCoupon);
+
+            // 4. 페이지 로드 시 쿠폰 목록 불러오기
+            fetchUserCoupons();
+            // 쿠폰 목록을 불러온 후, 기본적으로 "쿠폰 선택"이 되어있으므로, initial totalAmount로 currentDiscountedAmount가 설정됩니다.
+            // 이 부분은 DOMContentLoaded의 초기화 로직에서 처리되므로 추가 호출 필요 없음.
+
+            // 기존 'apply-coupon-btn' 관련 로직은 제거 (select 박스로 대체됨)
+            // document.getElementById('apply-coupon-btn').addEventListener('click', async function() { ... });
+
         });
 	</script>
 
@@ -510,9 +552,10 @@ input[type="text"] {
 														<td>쿠폰:</td>
 														<td>
 															<div class="coupon-input-group">
-																<input type="text" id="coupon-code-input" class="form-control" placeholder="쿠폰 코드 입력">
-																<button type="button" id="apply-coupon-btn" class="btn btn-primary btn-sm">적용</button>
-															</div>
+																<select id="coupon-select" class="form-control">
+                                                                    <option value="">쿠폰 선택</option>
+                                                                    </select>
+																</div>
 														</td>
 													</tr>
 													<tr id="discountRow" style="display: none;"> <td>할인 금액:</td>
@@ -676,8 +719,8 @@ input[type="text"] {
 	        }
 	    });
 	</script>
-		<script th:inline="javascript">
-/*<![CDATA[*/
+	<script th:inline="javascript">
+	/*<![CDATA[*/
 	
 	document.getElementById("payment-button").addEventListener("click", async function() { // async 함수로 변경
     // 1. 배송지 정보가 제대로 입력되었는지 확인 (저장된 요약 정보 기준)

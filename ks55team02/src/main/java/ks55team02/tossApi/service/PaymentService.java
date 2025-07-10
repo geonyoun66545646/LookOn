@@ -56,5 +56,13 @@ public interface PaymentService {
      * @return 쿠폰이 적용된 최종 할인 금액
      */
     Long calculateDiscountedAmount(Long originalAmount, String couponCode, String userNo);
+    
+    /**
+     * ★★★ 여기를 추가합니다 ★★★
+     * 특정 사용자가 사용 가능한 쿠폰 목록을 조회합니다.
+     * @param userNo 사용자 식별자
+     * @return 사용 가능한 쿠폰 목록
+     */
+    List<Map<String, Object>> getUserCoupons(String userNo);
 
 }
