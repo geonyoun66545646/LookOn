@@ -43,7 +43,7 @@ public class ReviewController {
         if (productReview.getReviewId() == null || productReview.getReviewId().isEmpty()) {
             productReview.setReviewId("review_" + System.currentTimeMillis()); // 임시 리뷰 ID
         }
-        productReview.setReviewStts("정상"); // 초기 상태 설정 (필요에 따라)
+        productReview.setReviewStts(true); // 초기 상태 설정 (필요에 따라)
         // wrtYmd는 @CreationTimestamp 등으로 DB에서 자동 생성되거나 서비스에서 설정
 
         // TODO: ReviewService에 addReview 메서드를 추가하고 호출

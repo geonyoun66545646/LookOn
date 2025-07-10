@@ -271,11 +271,19 @@
 								href="#product-shipping-tab" role="tab"
 								aria-controls="product-shipping-tab" aria-selected="false">배송
 									및 반품</a></li>
-							<li class="nav-item"><a class="nav-link"
-								id="product-review-link" data-toggle="tab"
-								href="#product-review-tab" role="tab"
-								aria-controls="product-review-tab" aria-selected="false">리뷰
-									(2)</a></li>
+						<li class="nav-item">
+						<!-- 리뷰 개수 -->
+						    <a class="nav-link"
+						        id="product-review-link"
+						        data-toggle="tab"
+						        href="#product-review-tab"
+						        role="tab"
+						        aria-controls="product-review-tab"
+						        aria-selected="false">
+						        리뷰 (<span th:text="${reviews != null ? reviews.size() : 0}">0</span>)
+						    </a>
+						    <!-- 리뷰 개수 -->
+						</li>
 						</ul>
 					</div>
 					<div class="tab-content">
@@ -382,107 +390,15 @@
 							</div>
 						</div>
 						
-						<!-- 리뷰  -->
+						<!-- 리뷰 조각 -->
 						<div class="tab-pane fade" id="product-review-tab" role="tabpanel"
-							aria-labelledby="product-review-link">
-							<div class="reviews">
-								<div class="container">
-									<h3>리뷰 (2)</h3>
-									<div class="review">
-										<div class="row no-gutters">
-											<div class="col-auto">
-												<h4>
-													<a href="#">Samanta J.</a>
-												</h4>
-												<div class="ratings-container">
-													<div class="ratings">
-														<div class="ratings-val" style="width: 80%;"></div>
-													</div>
-												</div>
-												<span class="review-date">6일 전</span>
-											</div>
-											<div class="col">
-												<h4>좋아요, 완벽한 사이즈</h4>
-
-												<div class="review-content">
-													<p>Lorem ipsum dolor sit amet, consectetur adipisicing
-														elit. Ducimus cum dolores assumenda asperiores facilis
-														porro reprehenderit animi culpa atque blanditiis commodi
-														perspiciatis doloremque, possimus, explicabo, autem fugit
-														beatae quae voluptas!</p>
-												</div>
-												<div class="review-action">
-													<a href="#"><i class="icon-thumbs-up"></i>도움이 됨 (2)</a> <a
-														href="#"><i class="icon-thumbs-down"></i>도움이 안 됨 (0)</a>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="review">
-										<div class="row no-gutters">
-											<div class="col-auto">
-												<h4>
-													<a href="#">John Doe</a>
-												</h4>
-												<div class="ratings-container">
-													<div class="ratings">
-														<div class="ratings-val" style="width: 100%;"></div>
-													</div>
-												</div>
-												<span class="review-date">5일 전</span>
-											</div>
-											<div class="col">
-												<h4>매우 좋음</h4>
-
-												<div class="review-content">
-													<p>Sed, molestias, tempore? Ex dolor esse iure hic
-														veniam laborum blanditiis laudantium iste amet. Cum non
-														voluptate eos enim, ab cumque nam, modi, quas iure illum
-														repellendus, blanditiis perspiciatis beatae!</p>
-												</div>
-												<div class="review-action">
-													<a href="#"><i class="icon-thumbs-up"></i>도움이 됨 (0)</a> <a
-														href="#"><i class="icon-thumbs-down"></i>도움이 안 됨 (0)</a>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="add-review">
-										<h3>리뷰 작성</h3>
-										<form action="#">
-											<div class="form-group">
-												<label for="review-name">이름 *</label> <input type="text"
-													class="form-control" id="review-name" required>
-											</div>
-											<div class="form-group">
-												<label for="review-email">이메일 *</label> <input type="email"
-													class="form-control" id="review-email" required>
-											</div>
-											<div class="form-group">
-												<label for="review-rating">평점 *</label>
-												<div class="ratings-container">
-													<div class="ratings">
-														<div class="ratings-val" style="width: 0%;"></div>
-														<span class="tooltip-text"></span>
-													</div>
-												</div>
-											</div>
-											<div class="form-group">
-												<label for="review-title">제목 *</label> <input type="text"
-													class="form-control" id="review-title" required>
-											</div>
-											<div class="form-group">
-												<label for="review-content">내용 *</label>
-												<textarea class="form-control" id="review-content" cols="30"
-													rows="10" required></textarea>
-											</div>
-											<button type="submit" class="btn btn-outline-primary-2">
-												<span>리뷰 제출</span> <i class="icon-long-arrow-right"></i>
-											</button>
-										</form>
-									</div>
-								</div>
-							</div>
+						    aria-labelledby="product-review-link">
+						    <div class="reviews">
+						        <div class="container">
+						            <div th:replace="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">
+						                </div>
+						        </div>
+						    </div>
 						</div><!-- 리뷰 끝 -->
 					</div>
 				</div>
