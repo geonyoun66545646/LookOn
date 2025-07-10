@@ -2,6 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ks55team02.customer.register.mapper.CustomerRegisterMapper">
 
+	<resultMap id="userPasswordMigrationResultMap" type="ks55team02.customer.register.domain.User">
+        <id property="userNo" column="user_no"/>
+        <result property="userLgnId" column="user_lgn_id"/>
+        <result property="userPswdEncptVal" column="user_pswd_encpt_val"/>
+    </resultMap>
+    
 	<!-- 아이디 중복 확인 -->
     <select id="idCheck" parameterType="String" resultType="boolean">
         SELECT 
