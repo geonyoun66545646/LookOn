@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="ks55team02.seller.common.mapper.StoreMngMapper">
+  
+  <!-- 상점 리저트 맵  -->
+  <resultMap id="storeResultMap" 			type="ks55team02.seller.common.domain.Store">
+        <id property="storeId" 				column="store_id"/> 		<!-- 상점 ID -->
+        <result property="aplyId" 			column="aply_id"/> 			<!-- 신청 ID -->
+        <result property="storeConm" 		column="store_conm"/> 		<!-- 상점 상호명 -->
+        <result property="storeIntroCn" 	column="store_intro_cn"/>	<!-- 상점 소개 -->
+        <result property="storeLogoImg" 	column="store_logo_img"/> 	<!-- 상점 로고 이미지 파일 -->
+        <result property="storeStts" 		column="store_stts"/> 		<!-- 상점 상태 -->
+        <result property="infoMdfcnDt" 		column="info_mdfcn_dt"/> 	<!-- 정보 수정일시 -->
+        <result property="inactvtnDt" 		column="inactvtn_dt"/> 		<!-- 비활성화 일시 -->
+        <result property="delPrcrYn" 		column="del_prcr_yn"/> 		<!-- 폐쇄 여부 -->
+    </resultMap>
+    
+    <!-- 구독 리저트 맵  -->
+   <resultMap id="storeSettlementResultMap" 	type="ks55team02.seller.common.domain.StoreSettlement">
+	    <id column="store_clcln_id" 			property="storeClclnId"/>       <!-- 상점 정산 ID (테이블의 기본 키) -->
+	    <result column="store_id"				property="storeId"/>            <!-- 상점 ID (정산 대상 상점의 식별자) -->
+	    <result column="plcy_id" 				property="plcyId"/>             <!-- 수수료 정책 ID (적용된 수수료 정책의 식별자) -->
+	    <result column="tot_sel_amt" 			property="totSelAmt"/>          <!-- 총 판매 금액 (정산 기간 동안의 총 판매액) -->
+	    <result column="sel_fee_rt" 			property="selFeeRt"/>           <!-- 판매 수수료율 (적용된 판매 수수료 비율) -->
+	    <result column="clcln_amt" 				property="clclnAmt"/>           <!-- 정산 금액 (실제로 상점에 지급될 금액) -->
+	    <result column="actno_id" 				property="actnoId"/>            <!-- 계좌 번호 ID (정산 금액이 입금될 계좌의 식별자) -->
+	    <result column="clcln_prcs_ymd" 		property="clclnPrcsYmd"/>       <!-- 정산 처리 일자 (정산이 처리된 날짜) -->
+	    <result column="clcln_stts_cd" 			property="clclnSttsCd"/>        <!-- 정산 상태 코드 (정산의 현재 상태, 예: 완료, 대기) -->
+	</resultMap>
+
+	<!-- 구독 결제 리저트 맵 -->
+	<resultMap id="subscriptionPaymentResultMap" type="ks55team02.seller.common.domain.SubscriptionPayments">
+	    <id column="sbscr_stlm_id" 				property="sbscrStlmId"/>        <!-- 구독권 결제 ID (테이블의 기본 키) -->
+	    <result column="user_no" 				property="userNo"/>             <!-- 사용자 번호 (구독 결제를 한 사용자의 식별자) -->
+	    <result column="sbscr_plan_id" 			property="sbscrPlanId"/>        <!-- 구독 플랜 ID (구매한 구독 플랜의 식별자) -->
+	    <result column="sbscr_prchs_nocs" 		property="sbscrPrchsNocs"/>     <!-- 구독 구매 개수 (구매한 구독권의 수량) -->
+	    <result column="sbscr_bgng_dt" 			property="sbscrBgngDt"/>        <!-- 구독 시작 일시 (구독 서비스 이용 시작 날짜) -->
+	    <result column="sbscr_end_dt" 			property="sbscrEndDt"/>         <!-- 구독 종료 일시 (구독 서비스 이용 종료 날짜) -->
+	    <result column="sbscr_tot_stlm_amt" 	property="sbscrTotStlmAmt"/>    <!-- 총 결제 금액 (해당 구독권 구매에 대한 총 결제 금액) -->
+	    <result column="sbscr_stlm_mthd_cd" 	property="sbscrStlmMthdCd"/>    <!-- 결제 수단 코드 (결제에 사용된 수단의 유형) -->
+	    <result column="sbscr_stlm_stts_cd" 	property="sbscrStlmSttsCd"/>    <!-- 결제 상태 코드 (결제의 현재 상태, 예: 결제완료, 결제실패) -->
+	    <result column="pg_dlng_id" 			property="pgDlngId"/>           <!-- PG 거래 ID (PG사에서 발급한 거래 식별자) -->
+	    <result column="pg_co_info" 			property="pgCoInfo"/>           <!-- PG사 정보 (결제를 처리한 PG사 이름) -->
+	    <result column="stlm_cmptn_dt" 			property="stlmCmptnDt"/>        <!-- 결제 완료 일시 (결제가 최종적으로 완료된 시간) -->
+	    <result column="stlm_dmnd_dt" 			property="stlmDmndDt"/>         <!-- 결제 요청 일시 (결제가 처음 요청된 시간) -->
+	</resultMap>
+    
+    
+    
+     <select id="getStoreList" resultMap="storeResultMap">
+        SELECT
+            store_id,
+            aply_id,
+            store_conm,
+            store_intro_cn,
+            store_logo_img,
+            store_stts,
+            info_mdfcn_dt,
+            inactvtn_dt,
+            del_prcr_yn
+        FROM
+            stores
+        ORDER BY
+            store_id ASC
+    </select>
+    
+    <select id="getStoreInfoById" resultMap="storeResultMap">
+    	 SELECT
+            store_id,
+            aply_id,
+            store_conm,
+            store_intro_cn,
+            store_logo_img,
+            store_stts,
+            info_mdfcn_dt,
+            inactvtn_dt,
+            del_prcr_yn
+        FROM
+            stores
+		where
+			store_id = #{storeId}
+    </select>
+    
+    <!-- /* 아이디로 구독 기간 조회*/ -->
+    <select id="getStoreSubscriptionByStoreId"
+            resultType="map" parameterType="string">
+        SELECT
+            s.store_id,                              -- 상점 ID
+            MIN(sp.sbscr_bgng_dt) AS earliest_sbscr_bgng_dt, -- 가장 빠른 구독 시작일
+            MAX(sp.sbscr_end_dt) AS latest_sbscr_end_dt,     -- 가장 늦은 구독 종료일
+           	sbscr_prchs_nocs
+        FROM
+            subscription_payments AS sp
+        JOIN
+            users AS u ON sp.user_no = u.user_no
+        JOIN
+            store_application AS sa ON u.user_no = sa.aply_user_no
+        JOIN
+            stores AS s ON sa.aply_id = s.aply_id
+        WHERE
+            s.store_id = #{storeId}
+        GROUP BY
+            s.store_id;
+    </select>
+    
+    
+  
+  
+  </mapper>

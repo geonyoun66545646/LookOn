@@ -16,9 +16,15 @@ $(() => {
 
         $.ajax({
             url: deleteUrl,
-            type: 'DELETE'
-        }).done(result => {
-            location.href = '/customer/post/postList';
+            type: 'DELETE',
+			dataType: 'json'
+        }).done(response => {
+			if (response.result === 'success') {
+			    alert('게시글이 삭제되었습니다.');
+			    location.href = '/customer/post/postList';
+			} else {
+			    alert('삭제에 실패했습니다.');
+			}
         }).fail(error => {
             console.error("삭제 실패: ", error);
             alert('삭제에 실패했습니다.');
@@ -127,9 +133,14 @@ $(() => {
     	
     	$.ajax({
     		url: deleteUrl,
-    		type: 'DELETE'
-    	}).done(result => {
-    		window.location.reload();
+    		type: 'DELETE',
+			dataType: 'json'
+    	}).done(response => {
+			if (response.result === 'success') {
+			    window.location.reload();
+			} else {
+			    alert('댓글 삭제에 실패했습니다.');
+			}
     	}).fail(error => {
             console.error("삭제 실패: ", error);
             alert('삭제에 실패했습니다.');
@@ -141,8 +152,12 @@ $(() => {
         e.preventDefault();
         
         const $btn = $(e.currentTarget);
+		
+		if (!$btn.data('post-interaction-insert-url')) {
+		    return;
+		}
+		
         const insertUrl = $btn.data('post-interaction-insert-url');
-        // 수정 1: HTML의 data-* 속성 이름은 소문자로 접근하는 것이 표준입니다. (interaction-pstsn -> interactionPstsn)
         const pstSn = $btn.data('interaction-pstsn');
         const userNo = $btn.data('interaction-userno');
         
@@ -161,10 +176,11 @@ $(() => {
                 window.location.reload();
             } else {
                 // 실패 시 서버가 보낸 메시지를 알림창에 표시합니다.
-				console.log("추천 실패");
+				 alert(response.message || '이미 추천하셨거나, 처리 중 오류가 발생했습니다.');
             }
         }).fail(error => {
             console.error("추천 실패", error);
+			alert('추천 처리 중 오류가 발생했습니다.');
         });
     });
 });

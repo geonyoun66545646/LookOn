@@ -19,13 +19,6 @@ public class AppAdminServiceImpl implements AppAdminService{
 	
 	private final AppAdminMapper appAdminMapper;
 	
-	// 신청 목록 조회
-	@Override
-	public List<AppAdmin> getAppAdminList() {
-		List<AppAdmin> appAdminList = appAdminMapper.getAppAdminList();
-		
-		return appAdminList;
-	}
 	
 /**
  * 상점 신청 전체 개수 조회 (검색 조건 포함)
@@ -43,10 +36,12 @@ public int getAppAdminCount(AppAdmin appAdmin) {
  * @param appAdmin 페이지네이션 및 검색 조건을 담고 있는 AppAdmin 객체 (SearchCriteria 상속)
  * @return 상점 신청 목록
  */
+ // AppAdminService 인터페이스의 메서드를 오버라이드합니다.
 @Override // AppAdminService 인터페이스의 메서드를 오버라이드합니다.
-public List<AppAdmin> getAppAdminList(AppAdmin appAdmin) {
-    log.info("서비스: getAppAdminList 호출 - 페이지네이션/검색 조건: {}", appAdmin);
-    return appAdminMapper.getAppAdminList(appAdmin);
+public List<AppAdmin> getAppAdminList(AppAdmin appAdmin, int limitStart, int pageSize) { //
+    log.info("서비스: getAppAdminList 호출 - 페이지네이션/검색 조건: {}, limitStart: {}, pageSize: {}", appAdmin, limitStart, pageSize); //
+    // 매퍼 호출 시 limitStart와 pageSize를 함께 전달
+    return appAdminMapper.getAppAdminList(appAdmin, limitStart, pageSize); //
 }
 
 /**

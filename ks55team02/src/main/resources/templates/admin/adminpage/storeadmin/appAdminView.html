@@ -27,6 +27,7 @@
 		            <form id="searchForm" th:action="@{/adminpage/storeadmin/appAdmin}" method="get">
 		                <input type="hidden" name="currentPage" th:value="${searchCriteria.currentPage}" id="currentPageInput"/>
 		                <input type="hidden" name="pageSize" th:value="${searchCriteria.pageSize}" id="pageSizeInput"/>
+		                <input type="hidden" name="sortKey" th:value="${searchCriteria.sortKey}" id="sortKeyInput"/>
 		                <input type="hidden" name="sortOrder" th:value="${searchCriteria.sortOrder}" id="sortOrderInput"/>
 		                <input type="hidden" name="filterConditions" th:value="${#strings.arrayJoin(searchCriteria.filterConditions, ',')}" id="filterConditionsInput"/>
 		
@@ -123,11 +124,11 @@
 		                        </div>
 		                    </div>
 		                    <div class="d-inline-block">
-		                        <select class="form-select d-inline-block" id="sortOrderSelect" name="sortOrder" style="width: auto;">
-								    <option value="ctrtAplyYmdDesc" th:selected="${searchCriteria.sortOrder == 'ctrtAplyYmdDesc'}">최신 신청일순</option>
-								    <option value="ctrtAplyYmdAsc" th:selected="${searchCriteria.sortOrder == 'ctrtAplyYmdAsc'}">오래된 신청일순</option>
-                                    <option value="aplyIdDesc" th:selected="${searchCriteria.sortOrder == 'aplyIdDesc'}">신청ID (내림차순)</option>
-                                    <option value="aplyIdAsc" th:selected="${searchCriteria.sortOrder == 'aplyIdAsc'}">신청ID (오름차순)</option>
+		                        <select class="form-select d-inline-block" id="sortOrderSelect" style="width: auto;">
+								    <option value="" data-sort-key="ctrtAplyYmd" data-sort-order="DESC" th:selected="${searchCriteria.sortKey == 'ctrtAplyYmd' and searchCriteria.sortOrder == 'DESC'}">최신 신청일순</option>
+								    <option value="" data-sort-key="ctrtAplyYmd" data-sort-order="ASC" th:selected="${searchCriteria.sortKey == 'ctrtAplyYmd' and searchCriteria.sortOrder == 'ASC'}">오래된 신청일순</option>
+                                    <option value="" data-sort-key="aplyId" data-sort-order="DESC" th:selected="${searchCriteria.sortKey == 'aplyId' and searchCriteria.sortOrder == 'DESC'}">신청ID (내림차순)</option>
+                                    <option value="" data-sort-key="aplyId" data-sort-order="ASC" th:selected="${searchCriteria.sortKey == 'aplyId' and searchCriteria.sortOrder == 'ASC'}">신청ID (오름차순)</option>
 								</select>
 		                        <select class="form-select d-inline-block" id="pageSizeSelect" name="pageSize" style="width: auto;">
 		                            <option value="10" th:selected="${searchCriteria.pageSize == 10}">10개씩 보기</option>
@@ -205,6 +206,7 @@
 	 const searchForm = $('#searchForm');
 	 const currentPageInput = $('#currentPageInput');
 	 const pageSizeInput = $('#pageSizeInput');
+	 const sortKeyInput = $('#sortKeyInput'); // 새로 추가된 hidden input 변수 선언
 	 const sortOrderInput = $('#sortOrderInput');
 	 const filterConditionsInput = $('#filterConditionsInput');
      const statusCheckboxes = $('.status-check');
@@ -252,7 +254,9 @@
 
 	 // 정렬 순서 변경 시
 	 $('#sortOrderSelect').on('change', function() {
-	     sortOrderInput.val($(this).val());
+	     const selectedOption = $(this).find('option:selected');
+	     sortKeyInput.val(selectedOption.data('sort-key'));    // data-sort-key 값 설정
+	     sortOrderInput.val(selectedOption.data('sort-order')); // data-sort-order 값 설정
 	     currentPageInput.val(1); // 정렬 변경 시 1페이지로 이동
 	     submitSearchForm();
 	 });
@@ -295,6 +299,25 @@
              statusCheckboxes.prop('checked', true);
              filterCheckAll.prop('checked', true);
          }
+         
+         // 페이지 로드 시 정렬 select box 초기 선택값 설정
+         const initialSortKey = /*[[${searchCriteria.sortKey}]]*/ ''; // Thymeleaf 값 가져오기
+         const initialSortOrder = /*[[${searchCriteria.sortOrder}]]*/ ''; // Thymeleaf 값 가져오기
+
+         $('#sortOrderSelect option').each(function() {
+             const optionSortKey = $(this).data('sort-key');
+             const optionSortOrder = $(this).data('sort-order');
+
+             if (optionSortKey === initialSortKey && optionSortOrder === initialSortOrder) {
+                 $(this).prop('selected', true);
+                 return false; // 일치하는 것을 찾았으니 루프 종료
+             }
+         });
+         
+         // Hidden input에도 초기값을 설정 (필요한 경우)
+         // searchCriteria에 sortKey와 sortOrder가 이미 설정되어 있으므로 별도 설정 필요 없음
+         // sortKeyInput.val(initialSortKey); 
+         // sortOrderInput.val(initialSortOrder);
      });
 
 	 /*]]>*/
