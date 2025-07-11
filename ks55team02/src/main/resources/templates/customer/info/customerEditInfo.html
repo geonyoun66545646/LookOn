@@ -47,7 +47,17 @@
                                 </div>
                                 <div class="form-group">
                                     <label>이메일</label>
-                                    <input type="email" id="userEmail">
+                                    <input type="text" id="userEmail" class="form-control">
+    								<span class="error-message" id="emailError">유효한 이메일 형식이 아닙니다</span>
+                                </div>
+                                <div class="form-group">
+                                    <label>생년월일</label>
+                                    <input type="email" id="userBrdt" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>전화번호</label>
+                                    <input type="text" id="userTelNo" class="form-control">
+    								<span class="error-message" id="telError">10~11자리 숫자만 입력해주세요</span>
                                 </div>
                                 <div class="form-group">
                                     <label>주소</label>
@@ -67,19 +77,26 @@
                         <!-- [탭 2] 프로필 관리 -->
                         <div id="manage-profile" class="tab-pane">
                             <h3>프로필 관리</h3>
-                            <form class="profile-form">
+                            <form id="profile-update-form" class="profile-form" enctype="multipart/form-data">
                                 <div class="form-group">
                                     <label>프로필 사진</label>
-                                    <input type="file">
-                                    <small>10MB 이하의 JPG, PNG 파일만 업로드 가능합니다.</small>
-                                </div>
-                                <div class="form-group">
-                                    <label>닉네임</label>
-                                    <input type="text" id="userNickname" placeholder="사용할 닉네임을 입력하세요">
-                                </div>
-                                <div class="form-actions">
-                                    <button type="submit" class="btn-primary">저장하기</button>
-                                </div>
+							            <img id="profileImagePreview" src="" style="display: none; width: 100px;">
+							            <input type="file" id="profileImageInput" accept="image/*">
+							        </div>
+							
+							        <!-- 닉네임 -->
+							        <div class="form-group">
+							            <label>닉네임 *</label>
+							            <input type="text" id="userNickname" required>
+							            <span class="error-text" id="nicknameError"></span>
+							        </div>
+							
+							        <!-- 자기소개 -->
+							        <div class="form-group">
+							            <label>자기소개</label>
+							            <textarea id="userSelfIntro" rows="3"></textarea>
+							        </div>
+							        <button type="submit" class="btn-primary">저장하기</button>
                             </form>
                         </div>
 
@@ -140,24 +157,34 @@
             .done(userInfo => {
                 console.log("사용자 정보 로드 성공:", userInfo);
 
-                // [탭 1: 회원정보 수정] 폼 채우기
+                // [탭 1] 회원정보 수정 폼 채우기
                 $('#userId').val(userInfo.userLgnId);
                 $('#userName').val(userInfo.userNm);
                 $('#userEmail').val(userInfo.emlAddr);
+                $('#userTelNo').val(userInfo.telno);
                 $('#userZipCode').val(userInfo.zipCd);
                 $('#userAddress').val(userInfo.addr);
                 $('#userDetailAddress').val(userInfo.daddr);
-                
-                // [탭 2: 프로필 관리] 폼 채우기
-                $('#userNickname').val(userInfo.userNcnm);
+                $('#userBrdt').val(userInfo.userBrdt?.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'));
 
-                // 여기에 추가적으로 필요한 다른 정보들을 채우는 코드를 작성합니다.
-                // 예: 프로필 이미지 미리보기, 2단계 인증 체크박스 상태 등
+                // [탭 2] 프로필 관리 폼 채우기
+                $('#userNickname').val(userInfo.userNcnm);
+                $('#userSelfIntro').val(userInfo.selfIntroCn);
+
+                // 프로필 이미지 설정
+                if (userInfo.prflImg) {
+                    $('#profileImagePreview').attr('src', userInfo.prflImg);
+                } else {
+                    $('#profileImagePreview').attr('src', '/images/default-profile.png');
+                }
+                
+                // 초기 데이터 유효성 검사
+                validateEmail(userInfo.emlAddr);
+                validateTelno(userInfo.telno);
             })
             .fail(xhr => {
                 if (xhr.status === 401) {
                     alert('로그인 후 이용해주세요.');
-                    // 실제 로그인 페이지 URL로 수정해야 합니다.
                     window.location.href = '/customer/login'; 
                 } else {
                     alert('정보를 불러오는 중 오류가 발생했습니다.');
@@ -165,44 +192,136 @@
                 }
             });
         };
-        
+
+        function searchZipCode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    $('#userZipCode').val(data.zonecode);
+                    $('#userAddress').val(data.roadAddress || data.jibunAddress);
+                    $('#userDetailAddress').focus();
+                }
+            }).open();
+        }
+
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const $error = $('#emailError');
+            if (email && !regex.test(email)) { $error.show(); return false; } 
+            else { $error.hide(); return true; }
+        }
+
+        function validateTelno(telno) {
+            const regex = /^010-?\d{3,4}-?\d{4}$/;
+            const $error = $('#telError');
+            if (telno && !regex.test(telno)) { $error.text("휴대폰 번호 형식(010-1234-5678)을 확인해주세요.").show(); return false; } 
+            else { $error.hide(); return true; }
+        }
+
+        function updateUserInfo(e) {
+            e.preventDefault();
+            
+            const isEmailValid = validateEmail($('#userEmail').val());
+            const isTelValid = validateTelno($('#userTelNo').val());
+            if (!isEmailValid || !isTelValid) return;
+            
+            const requestData = {
+                userNm: $('#userName').val(),
+                emlAddr: $('#userEmail').val(),
+                telno: $('#userTelNo').val().replace(/-/g, ''),
+                zipCd: $('#userZipCode').val(),
+                addr: $('#userAddress').val(),
+                daddr: $('#userDetailAddress').val()
+            };
+
+            $.ajax({
+                type: 'PUT',
+                url: '/api/v1/mypage/info',
+                contentType: 'application/json',
+                data: JSON.stringify(requestData)
+            })
+            .done(response => {
+                alert('회원정보가 성공적으로 수정되었습니다.');
+                loadMyInfo();
+            })
+            .fail(xhr => {
+                const response = xhr.responseJSON;
+                alert('오류: ' + (response?.message || '정보 수정에 실패했습니다.'));
+            });
+        }
+
+        // [수정] 프로필 관리 폼 제출 처리 (AJAX 로직 완성)
+        function updateProfileInfo(e) {
+            e.preventDefault();
+            const formData = new FormData(document.getElementById('profile-update-form'));
+
+            // ▼▼▼ 빠져있던 AJAX 호출 로직을 완성합니다. ▼▼▼
+            $.ajax({
+                type: 'PUT',
+                url: '/api/v1/mypage/profile',
+                data: formData,
+                processData: false,  // FormData 사용 시 필수
+                contentType: false   // FormData 사용 시 필수
+            })
+            .done(response => {
+                alert('프로필이 성공적으로 저장되었습니다.');
+                loadMyInfo(); // 수정 후 최신 정보 다시 로드
+            })
+            .fail(xhr => {
+                const response = xhr.responseJSON;
+                alert('오류: ' + (response?.message || '프로필 저장에 실패했습니다.'));
+            });
+        } // ▼▼▼ 여기에 닫는 괄호 '}'를 추가하여 함수를 올바르게 종료합니다. ▼▼▼
+
+        // 페이지 초기화
         $(document).ready(function() {
+            // [회원정보 수정 탭] 이벤트 바인딩
+            $('#userEmail').on('blur', function() { validateEmail($(this).val()); });
+            $('#userTelNo').on('blur', function() { validateTelno($(this).val()); });
+            $('.address-group button').on('click', searchZipCode);
+            $('#edit-info form').on('submit', updateUserInfo);
+
+            // [프로필 관리 탭] 이벤트 바인딩
+            $('#profile-update-form').on('submit', updateProfileInfo);
             
-            // 페이지 로드 시 URL을 확인하여 올바른 탭 열기
-            function activateTabFromUrl() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const tab = urlParams.get('tab');
-
-                let targetHref = '#edit-info'; // 기본 탭
-
-                if (tab === 'profile') {
-                    targetHref = '#manage-profile';
-                } else if (tab === 'security') {
-                    targetHref = '#security-settings';
+            // 파일 선택 시 이미지 미리보기 기능
+            $('#profileImageInput').on('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#profileImagePreview').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
                 }
-                
-                const targetLink = $('.profile-sidebar a[href="' + targetHref + '"]');
-                
-                if (targetLink.length > 0) {
-                    targetLink.click();
-                } else {
-                    $('.profile-sidebar a[href="#edit-info"]').click();
-                }
-            }
-            
-            // 사이드바 메뉴 클릭 이벤트
-            $('.profile-sidebar a').on('click', function(e) {
-                e.preventDefault(); 
-
-                $('.profile-sidebar li').removeClass('active');
-                $('.tab-pane').removeClass('active');
-
-                $(this).parent('li').addClass('active');
-                $($(this).attr('href')).addClass('active'); 
             });
 
-            // 페이지 로드 시 탭 활성화 함수 실행
+            // 사이드바 탭 전환 이벤트
+            $('.profile-sidebar a').on('click', function(e) {
+                e.preventDefault();
+                const targetId = $(this).attr('href');
+                $('.profile-sidebar li, .tab-pane').removeClass('active');
+                $(this).parent().addClass('active');
+                $(targetId).addClass('active');
+            });
+
+            // URL 파라미터에 따라 초기 탭 설정
+            function activateTabFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const tabId = urlParams.get('tab');
+                if (tabId) {
+                    // click() 대신 클래스를 직접 조작하여 불필요한 이벤트 발생 방지
+                    $('.profile-sidebar li, .tab-pane').removeClass('active');
+                    $(`.profile-sidebar a[href="#${tabId}"]`).parent().addClass('active');
+                    $(`#${tabId}`).addClass('active');
+                } else {
+                    // 기본 탭 활성화
+                    $('.profile-sidebar li:first-child, .tab-pane:first-child').addClass('active');
+                }
+            }
+
+            // 초기 실행
             loadMyInfo();
+            activateTabFromUrl();
         });
         </script>
     </th:block>

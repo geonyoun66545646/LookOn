@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration("systemWebConfig")
@@ -13,6 +14,11 @@ public class WebConfig implements WebMvcConfigurer{
 
     @Value("${file.path}")
     private String fileRealPath;
+    
+    @Value("${profile.image.path}")
+    private String profileImagePath;  // 프로필 이미지 전용 경로
+
+	private String sanitizedProfilePath;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -38,6 +44,15 @@ public class WebConfig implements WebMvcConfigurer{
                 .addResolver(new PathResourceResolver());
 
         WebMvcConfigurer.super.addResourceHandlers(registry);
+        
+        // 3. 프로필 이미지 전용 경로 (수정)
+        registry.addResourceHandler("/profiles/**")
+                .addResourceLocations(osPrefix + sanitizedProfilePath)
+                .setCachePeriod(3600)
+                .resourceChain(true)
+                .addResolver(new PathResourceResolver());
+
+        log.info("프로필 이미지 리소스 위치: {}", osPrefix + sanitizedProfilePath);
     }
 
     public String getOSFilePath() {

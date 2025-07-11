@@ -1,0 +1,178 @@
+/* mainSlide.css */
+
+/* 페이지 스크롤바 제거 (요청사항) */
+html, body {
+    overflow-x: hidden;
+}
+
+.main-page-slider-container .slide-content h3 {
+    margin: 0 0 5px 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fdfdfd;
+}
+
+.main-page-slider-container .slide-content p {
+    margin: 0;
+    font-size: 14px;
+    color: #fdfdfd;
+}
+
+/* 메인 슬라이더 전체 컨테이너 */
+.main-page-slider-container {
+    width: 100%;
+    max-width: 1200px; 
+    padding: 40px 0;
+    margin: 0 auto; /* 중앙 정렬 */
+}
+
+/* Swiper.js가 직접 제어하는 영역 */
+.main-page-slider-container .main-page-swiper {
+    width: 100%;
+    height: 450px;
+    overflow: visible; 
+}
+
+/* 개별 슬라이드 아이템 */
+.main-page-slider-container .swiper-slide {
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.4s ease;
+    background-color: #f0f0f0;
+}
+
+.main-page-slider-container .swiper-slide::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    transition: background-color 0.4s ease;
+    z-index: 1;
+}
+
+.main-page-slider-container .swiper-slide-active::after {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.main-page-slider-container .swiper-slide-active {
+    transform: scale(1.02);
+    z-index: 2;
+}
+
+.main-page-slider-container .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 슬라이드 하단 텍스트 콘텐츠 */
+.main-page-slider-container .slide-content {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    padding: 25px;
+    box-sizing: border-box;
+    color: white;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
+    z-index: 3;
+}
+
+.main-page-slider-container .slide-content h3 {
+    margin: 0 0 5px 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.main-page-slider-container .slide-content p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* 컨트롤 버튼 영역 */
+.main-page-slider-container .main-swiper-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 25px;
+    gap: 15px;
+}
+
+/* Swiper 기본 클래스에 대한 스타일 (부모로 범위 한정) */
+.main-page-slider-container .swiper-pagination-progressbar {
+    position: static;
+    width: 100%;
+    height: 3px;
+    background: #e0e0e0;
+}
+.main-page-slider-container .swiper-pagination-progressbar-fill {
+    background: #000;
+}
+.main-page-slider-container .swiper-button-prev,
+.main-page-slider-container .swiper-button-next {
+    position: static;
+    width: auto; height: auto;
+    margin: 0;
+    color: #000;
+}
+.main-page-slider-container .swiper-button-prev::after,
+.main-page-slider-container .swiper-button-next::after {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+.main-page-slider-container .swiper-autoplay-button {
+    background: none; border: none; cursor: pointer;
+    width: 20px; height: 20px;
+    padding: 0; color: #000; font-size: 1.2rem;
+    display: flex; justify-content: center; align-items: center;
+}
+.main-page-slider-container .swiper-autoplay-button.paused .icon-pause { display: none; }
+.main-page-slider-container .swiper-autoplay-button:not(.paused) .icon-play { display: none; }
+
+
+/* 상품 영역 */
+/* 전체 섹션 배경 및 패딩 */
+.weekly-best-section {
+    background-color: #f8f8f8;
+    padding-top: 30px;
+    padding-bottom: 20px;
+}
+
+/* 내부 컨텐츠 컨테이너 */
+.weekly-best-container {
+    /* 기존 부트스트랩 .container 스타일을 따른다고 가정 */
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* 제목 영역 */
+.weekly-best-heading {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.weekly-best-title {
+    font-size: 2.4rem; /* title-lg에 해당하는 크기 */
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* '더보러가기' 버튼 영역 */
+.weekly-best-more-link {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+/* 예시: 상품 이미지에 적용될 CSS */
+.product-image { /* 상품 이미지를 감싸는 div 또는 img 태그 자체에 이 클래스를 부여한다고 가정 */
+    width: 250px; /* 원하는 너비 */
+    height: 275px; /* 원하는 높이 */
+    object-fit: cover; /* 이미지가 잘리더라도 비율을 유지하며 컨테이너를 채웁니다. */
+    /* object-fit: contain; 는 이미지 비율을 유지하며 컨테이너에 맞춰집니다. (빈 공간 생길 수 있음) */
+    /* object-fit: fill; 는 이미지를 늘리거나 줄여 컨테이너를 채웁니다. (이미지 왜곡될 수 있음) */
+}

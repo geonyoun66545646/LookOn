@@ -96,7 +96,6 @@
 								        <input type="hidden" name="gdsNo" th:value="${product.gdsNo}">
 								        <button type="submit" class="btn btn-success btn-sm">승인</button>
 								    </form> 
-								    <!-- ⭐ 수정: 반려 버튼 클릭 시 모달을 띄우는 JavaScript 함수 호출 -->
 								    <button type="button" class="btn btn-danger btn-sm reject-btn" th:data-gds-no="${product.gdsNo}">반려</button>
 								</td>
 							</tr>
@@ -133,7 +132,6 @@
 		</nav>
 	</main>
 	
-	<!-- 반려 모달 -->
 	<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
 	    <div class="modal-dialog">
 	        <div class="modal-content">
@@ -148,8 +146,7 @@
 	                    
 	                    <h6>사유 선택:</h6>
 	                    <div id="rejectReasonsContainer">
-	                        <!-- 반려 사유 체크박스들이 여기에 동적으로 로드됩니다 -->
-	                    </div>
+	                        </div>
 	                    
 	                    <div class="mb-3 mt-3">
 	                        <label for="managerComment" class="form-label">추가 상세 내용 (선택 사항):</label>
@@ -222,19 +219,14 @@
 								$('#rejectReasonsContainer').append('<p>선택 가능한 반려 사유가 없습니다.</p>');
 							}
 
-							// ⭐⭐ 수정: Bootstrap 5 방식으로 모달 호출 ⭐⭐
+							// ⭐⭐ Bootstrap 5 방식으로 모달 호출 ⭐⭐
+							// layoutMain에서 bootstrap.bundle.min.js가 올바르게 로드되면 'bootstrap' 객체는 자동으로 정의됩니다.
 							const rejectModalElement = document.getElementById('rejectModal');
-                            // 인스턴스를 한 번만 생성하거나, 매번 필요할 때 새로 생성해도 됨 (여기서는 매번 새로 생성해도 무방)
                             const rejectModal = new bootstrap.Modal(rejectModalElement, {
-                                backdrop: 'static', // 외부 클릭으로 닫히지 않게
-                                keyboard: false     // Esc 키로 닫히지 않게
+                                backdrop: 'static',
+                                keyboard: false
                             });
                             rejectModal.show();
-
-                            console.log("모달 요소:", rejectModalElement);
-                            // Bootstrap 5에서는 $.fn.modal이 없을 수 있으므로 이 로그는 불필요하거나 오류를 낼 수 있음
-                            // console.log("jQuery 모달 함수 존재 여부:", typeof $.fn.modal);
-
 						},
 						error: function(xhr, status, error) {
 							alert('반려 사유를 불러오는 데 실패했습니다.');
