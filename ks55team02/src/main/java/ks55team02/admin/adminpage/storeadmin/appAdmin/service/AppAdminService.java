@@ -6,9 +6,6 @@ import ks55team02.admin.adminpage.storeadmin.appAdmin.domain.AppAdmin;
 
 public interface AppAdminService {
 	
-	// 전체 신청 조회 (기존에 인자 없는 메서드도 있었으므로 유지)
-	List<AppAdmin> getAppAdminList(); 
-
 	// 상점 신청 상세, 신청ID로 정보를 조회
 	AppAdmin getAppAdminById(String aplyId);
 
@@ -24,6 +21,6 @@ public interface AppAdminService {
      * @param appAdmin 페이지네이션 및 검색 조건을 담고 있는 AppAdmin 객체 (SearchCriteria 상속)
      * @return 상점 신청 목록
      */
-    List<AppAdmin> getAppAdminList(AppAdmin appAdmin); // 메서드 구현 부분 제거
+    List<AppAdmin> getAppAdminList(AppAdmin appAdmin, int limitStart, int pageSize);
 
 }
