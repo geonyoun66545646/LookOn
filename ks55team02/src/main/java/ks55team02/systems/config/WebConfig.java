@@ -45,14 +45,6 @@ public class WebConfig implements WebMvcConfigurer{
 
         WebMvcConfigurer.super.addResourceHandlers(registry);
         
-        // 3. 프로필 이미지 전용 경로 (수정)
-        registry.addResourceHandler("/profiles/**")
-                .addResourceLocations(osPrefix + sanitizedProfilePath)
-                .setCachePeriod(3600)
-                .resourceChain(true)
-                .addResolver(new PathResourceResolver());
-
-        log.info("프로필 이미지 리소스 위치: {}", osPrefix + sanitizedProfilePath);
     }
 
     public String getOSFilePath() {
