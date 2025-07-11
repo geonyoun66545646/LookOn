@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="ks55team02.admin.adminpage.storeadmin.premiumadd.mapper.PremiumAddMapper">
+  
+	<resultMap type="ks55team02.admin.adminpage.storeadmin.premiumadd.domain.PremiumAddDTO"  id="premiumAddresultMap">
+	    <id     column="sbscr_plan_id"        property="sbscrPlanId"/>
+	    <result column="sbscr_plan_nm"        property="sbscrPlanNm"/>
+	    <result column="sbscr_plan_prc"       property="sbscrPlanPrc"/>
+	    <result column="sbscr_plan_term_val"  property="sbscrPlanTermVal"/>
+	    <result column="sbscr_plan_expln"     property="sbscrPlanExpln"/>
+	    <result column="sbscr_plan_crt_dt"    property="sbscrPlanCrtDt"/>
+	    <result column="sbscr_plan_mdfcn_dt"  property="sbscrPlanMdfcnDt"/>
+	</resultMap>
+	
+	<insert id="insertSubscriptionPlan" parameterType="ks55team02.admin.adminpage.storeadmin.premiumadd.domain.PremiumAddDTO">
+        INSERT INTO subscription_plans (
+            sbscr_plan_id,
+            sbscr_plan_nm,
+            sbscr_plan_prc,
+            sbscr_plan_term_val,
+            sbscr_plan_expln,
+            sbscr_plan_crt_dt
+        )
+        VALUES (
+            #{sbscrPlanId},
+            #{sbscrPlanNm},
+            #{sbscrPlanPrc},
+            #{sbscrPlanTermVal},
+            #{sbscrPlanExpln},
+            NOW() <!-- 생성 일시를 DB에서 자동 설정 -->
+        )
+    </insert>
+
+    <!-- findAllSubscriptionPlans 쿼리에 premiumAddresultMap을 적용합니다. -->
+    <select id="findAllSubscriptionPlans" resultMap="premiumAddresultMap">
+        SELECT
+            sbscr_plan_id,
+            sbscr_plan_nm,
+            sbscr_plan_prc,
+            sbscr_plan_term_val,
+            sbscr_plan_expln,
+            sbscr_plan_crt_dt,
+            sbscr_plan_mdfcn_dt
+        FROM 
+        	subscription_plans
+        ORDER BY 
+        	sbscr_plan_crt_dt DESC
+    </select>
+
+    <!-- findSubscriptionPlanById 쿼리에 premiumAddresultMap을 적용합니다. -->
+    <select id="findSubscriptionPlanById" resultMap="premiumAddresultMap">
+        SELECT
+            sbscr_plan_id,
+            sbscr_plan_nm,
+            sbscr_plan_prc,
+            sbscr_plan_term_val,
+            sbscr_plan_expln,
+            sbscr_plan_crt_dt,
+            sbscr_plan_mdfcn_dt
+        FROM subscription_plans
+        WHERE sbscr_plan_id = #{sbscrPlanId}
+    </select>
+
+    <update id="updateSubscriptionPlan" parameterType="ks55team02.admin.adminpage.storeadmin.premiumadd.domain.PremiumAddDTO">
+        UPDATE subscription_plans
+        SET
+            sbscr_plan_nm = #{sbscrPlanNm},
+            sbscr_plan_prc = #{sbscrPlanPrc},
+            sbscr_plan_term_val = #{sbscrPlanTermVal},
+            sbscr_plan_expln = #{sbscrPlanExpln},
+            sbscr_plan_mdfcn_dt = NOW() <!-- 수정 일시를 DB에서 자동 설정 -->
+        WHERE sbscr_plan_id = #{sbscrPlanId}
+    </update>
+
+    <delete id="deleteSubscriptionPlan">
+        DELETE FROM subscription_plans
+        WHERE sbscr_plan_id = #{sbscrPlanId}
+    </delete>
+	
+    </mapper>

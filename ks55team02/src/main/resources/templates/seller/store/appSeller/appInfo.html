@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}"> <head>
+         <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/appStoreView.css}">
+    <title>상점 신청 페이지</title>
+</head>
+<body>
+    <th:block layout:fragment="contents">
+    
+		   <main class="main">
+        	<div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+        		<div class="container">
+        			<h1 class="page-title">상점신청<span>Store</span></h1>
+        		</div><!-- End .container -->
+        	</div><!-- End .page-header -->
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+                    </ol>
+                </div><!-- End .container -->
+            </nav><!-- End .breadcrumb-nav -->
+
+            <div class="page-content">
+            	
+	                <div class="container">
+	                <h2 class="checkout-title">신청 정보</h2><!-- End .checkout-title -->
+	                <div class="summary" id="cotainer-body">
+            			<form action="#">
+		                	<div class="row">
+		                		<div class="col-lg-3">
+	            						<label>신청자 ID</label>
+	            						<input type="text" class="form-control" readonly="readonly">
+	            						<label>신청자 이름</label>
+	            						<input type="text" class="form-control" readonly="readonly">
+	            						<label>신청자 연락처</label>
+	            						<input type="text" class="form-control" readonly="readonly">
+	            						
+		                				<label>상점 명</label>
+	            						<input type="text" class="form-control">
+
+	            						<label>계약 신청일</label>
+	            						<input type="text" class="form-control" required>
+
+	            						<label>계약 기간일</label>
+	            						<input type="text" class="form-control">
+
+	            						
+		                		</div><!-- End .col-lg-9 -->
+		                		<div class="col-lg-3">
+		                			
+		                				<label>매니저 명</label>
+	            						<input type="text" class="form-control">
+	            						
+		                				<label>매니저 연락처</label>
+	            						<input type="text" class="form-control">
+
+	            						<label>매니저 이메일</label>
+	            						<input type="text" class="form-control">
+
+	            						<label>사업장 주소</label>
+	            						<input type="text" class="form-control" required>
+
+	            						<label>수수료 비율</label>
+	            						<input type="text" class="form-control" required>
+	            						
+		                		</div><!-- End .col-lg-9 -->
+		                		<aside class="col-lg-6">
+		                				<div id="table-head">
+		                				<label>첨부 파일</label>
+		                				</div>
+		                				<table class="table table-reg">
+		                					<thead>
+		                						<tr class="table-head">
+		                							<th>필요 문서</th>
+		                							<th>첨부된 문서</th>
+		                							<th>첨부 하기</th>
+		                							<th>취소</th>
+		                						</tr>
+		                					</thead>
+									
+		                					<tbody>
+		                						<tr>
+		                							<td>사업자 등록증</td>
+		                							<td id="attachedDocName1">
+		                							<div class="fileName"></div>
+		                							</td>		                					
+		                							<td>
+		                							  <div class="file-upload-container">
+													    <label for="file-upload-1" class="custom-file-upload">
+														    파일 선택
+														</label>
+														<input  id="file-upload-1" type="file"/>
+														</div>
+													</td>
+													<td>													
+														<button type="button" class="btn-cancel-file" id="cancel-file-1">취소</button>											
+													</td>
+		                						</tr>
+		                						<tr>
+		                							<td>통신 판매업 신고증</td>		                							
+		                							<td id="attachedDocName2">
+		                							<div class="fileName"></div>
+		                							</td>
+		                							<td>
+														<div class="file-upload-container">
+													    <label for="file-upload-2" class="custom-file-upload">
+														    파일 선택
+														</label>
+														<input id="file-upload-2" type="file"/>
+														</div>
+													</td>
+													<td>
+														<button type="button" class="btn-cancel-file" id="cancel-file-2">취소</button>													
+													</td>
+		                						</tr>
+		                						<tr>
+		                							<td>판매상품 관련 증빙</td>
+		                							<td id="attachedDocName3">
+		                							<div class="fileName"></div>
+		                							</td>
+		                							<td><div class="file-upload-container">
+													    <label for="file-upload-3" class="custom-file-upload">
+														    파일 선택
+														</label>
+														<input id="file-upload-3" type="file"/>
+														</div>
+														</td>
+														<td>
+														<button type="button" class="btn-cancel-file" id="cancel-file-3">취소</button>
+														</td>
+		                						</tr>
+		                						<tr>
+		                							<td>주민등록증 사본</td>
+		                							<td id="attachedDocName4">
+		                							<div class="fileName"></div>
+		                							</td>
+		                							<td><div class="file-upload-container">
+													    <label for="file-upload-4" class="custom-file-upload">
+														    파일 선택
+														</label>
+														<input id="file-upload-4" type="file"/>
+														</div>
+														</td>
+														<td>
+														<button type="button" class="btn-cancel-file" id="cancel-file-4">취소</button>
+														</td>
+		                						</tr>
+		                						<tr>
+		                							<td>통장 사본</td>		                							
+		                							<td id="attachedDocName5">
+		                							<div class="fileName"></div>
+		                							</td>
+		                							<td><div class="file-upload-container">
+													    <label for="file-upload-5" class="custom-file-upload">
+														    파일 선택
+														</label>
+														<input id="file-upload-5" type="file"/>
+														</div>
+														</td>
+														<td>
+														<button type="button" class="btn-cancel-file" id="cancel-file-5">취소</button>
+														</td>
+		                						</tr>
+		                						<tr>
+		                							<td>기타 서류</td>
+		                							<td id="attachedDocNameETC">
+		                							<div class="fileName"></div>
+		                							</td>
+		                							<td><div class="file-upload-container">
+													    <label for="file-upload-6" class="custom-file-upload">
+														    파일 선택
+														</label>
+														<input id="file-upload-6" type="file"/>
+														</div>
+														</td>
+														<td>
+														<button type="button" class="btn-cancel-file" id="cancel-file-6">취소</button>														
+														</td>
+		                						</tr>
+
+		                						<!-- End .summary-total -->
+		                					</tbody>
+		                				</table><!-- End .table table-summary -->		         										     
+		                				
+		                			
+		                		</aside><!-- End .col-lg-3 -->
+		                	</div><!-- End .row -->
+            			</form>
+	                </div><!-- End .container -->
+	                 <div class="button-wrapper">
+	                <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
+	                	<span class="btn-text">신청 하기</span>
+             			<span class="btn-hover-text">신청 하기</span>
+            		</button>
+            		</div>
+	                </div>
+                
+            </div><!-- End .page-content -->
+        </main><!-- End .main -->
+
+    </th:block>
+
+    <th:block layout:fragment="jsFile">
+    </th:block>
+
+    <th:block layout:fragment="jsScript">
+        <script>
+            // 홈 페이지 전용 JavaScript 코드
+            console.log("홈 페이지 스크립트 실행!");
+            	
+            document.addEventListener('DOMContentLoaded', function(){
+				//모든 file input필드를 가져옵니다.
+				const fileInputs = document.querySelectorAll('input[type="file"]');
+				
+				fileInputs.forEach(function(inputElement){
+					// 각 input 요소에 해당하는 취소 버튼을 찾습니다.
+					const inputIdNum = inputElement.id.split('-').pop();
+					const cancelButton = document.getElementById('cancel-file-'+inputIdNum);
+					
+					
+					//1. 파일 선택 시.
+				inputElement.addEventListener('change', function(){
+					// 선택된 파일유무 확인
+						// input 요소의 부모 td 찾습니다
+						const currentTd = this.closest('td');
+						//현재 td의 이전 td를 찾습니다
+						const prevTd = currentTd.previousElementSibling;
+						// div fileName을 찾음
+						const fileDiv = prevTd ? prevTd.querySelector('.fileName'):null;
+						
+					if(this.files && this.files.length >0){
+						const fileName = this.files[0].name;
+						
+						if(fileDiv){
+							// fileName에 파일명으로 업데이트 합니다
+							fileDiv.textContent = fileName;
+						}
+						if(cancelButton){
+							cancelButton.style.background = 'red';
+							
+						}						
+					}else{
+						//파일 선택이 취소되었을 경우, 해당 div의 텍스트를 비웁니다
+						if(fileDiv){
+							fileDiv.textContent='';
+						}
+						if(cancelButton){
+							cancelButton.style.background = 'grey';
+						}
+						}
+					});
+					// 2. 취소버튼 클릭 시.
+						if(cancelButton){
+							cancelButton.addEventListener('click',function(){
+								// 해당 파일의 입력 필드 초기화
+								inputElement.value='';
+								
+								const currentTd=inputElement.closest('td');
+								const prevTd = currentTd.previousElementSibling;
+								
+								// 파일명 영역 초기화
+								const fileDiv = prevTd ? prevTd.querySelector('.fileName') : null;
+								if(fileDiv){
+									fileDiv.textContent="";
+								}
+								//취소버튼 숨김
+								this.style.background= 'grey';
+								
+							})
+						}
+					
+	            });
+			
+            });
+        </script>
+    </th:block>
+</body>
+</html>

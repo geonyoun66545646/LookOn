@@ -1,5 +1,7 @@
 package ks55team02.customer.register.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import ks55team02.customer.register.domain.User;
@@ -32,5 +34,12 @@ public interface CustomerRegisterMapper {
     
     // USER_PROFILE 테이블에 회원 프로필 정보 삽입
     void addUserProfile(UserProfile userProfile);
-    
+// 
+// 	// 비밀번호 마이그레이션을 위해 모든 사용자 정보 조회
+//    // user_no, user_lgn_id, user_pswd_encpt_val 필드를 User 객체로 매핑하여 반환
+//    List<User> findAllUsersForPasswordMigration();
+//
+//    // 특정 사용자의 비밀번호만 업데이트
+//    // User 객체를 받아서 user_no를 기준으로 user_pswd_encpt_val을 업데이트
+//    int updateUserPassword(User user);
 }

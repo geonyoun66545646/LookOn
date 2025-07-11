@@ -4,15 +4,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import ks55team02.customer.post.domain.Comment;
+import ks55team02.customer.post.domain.PostComment;
 import ks55team02.customer.post.domain.Post;
-import ks55team02.customer.post.domain.Interaction;
+import ks55team02.customer.post.domain.PostInteraction;
 
 @Service
 public interface PostService {
 	
 	// 추천수 증가
-	void insertInterCount(Interaction interaction);
+	void insertInterCount(PostInteraction interaction);
 
 	// 게시판 글 목록 조회
 	List<Post> selectPostListByBoardCd(String bbsClsfCd, int offset, int size);
@@ -27,7 +27,7 @@ public interface PostService {
 	void insertPost(Post post);
 	
 	// 댓글 등록 
-	void insertComment(Comment comment);
+	void insertComment(PostComment comment);
 
 	// 게시글 수정
 	void updatePost(Post post);
@@ -36,7 +36,7 @@ public interface PostService {
 	void deletePost(String pstSn);
 	
 	// 댓글 수정
-	void updateComment(Comment comment);
+	void updateComment(PostComment comment);
 
 	// 댓글 삭제
 	void deleteComment(String pstCmntSn);

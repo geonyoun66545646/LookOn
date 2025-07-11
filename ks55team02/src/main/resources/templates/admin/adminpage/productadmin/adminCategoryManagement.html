@@ -1,175 +1,246 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{admin/layout/layoutMain}">
-		
-	 <head>
-	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />	
-	 </head>
-	 <!--/* 개발시 추가할 jsfile 영역 정의 */-->
-	 <th:block layout:fragment="jsFile">
-	 </th:block>
-	 
-	 <!--/* 개발시 추가할 스크립트 */-->
-	 <th:block layout:fragment="jsScript">	 
-	 </th:block>
-	 <!-- 추가할 페이지 contents -->
-	 <th:block layout:fragment="contents">
-	 	<main class="main-content">
-	    <h1 class="h3 mb-4 font-weight-bold">상품카테고리관리</h1>
-	
-	    <!-- 검색 필터 카드 (기존과 동일) -->
-	    <div class="card mb-4">
-	        <div class="card-body">
-	            <table class="table table-bordered filter-table">
-	                <tbody>
-	                    <tr>
-	                        <th>분류</th>
-	                        <td>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkAll" checked>
-	                                <label class="form-check-label" for="checkAll">전체</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkActive" checked>
-	                                <label class="form-check-label" for="checkActive">활동 계정</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkDormant" checked>
-	                                <label class="form-check-label" for="checkDormant">휴면 계정</label>
-	                            </div>
-	                            <div class="form-check form-check-inline">
-	                                <input class="form-check-input" type="checkbox" id="checkWithdrawn" checked>
-	                                <label class="form-check-label" for="checkWithdrawn">탈퇴 계정</label>
-	                            </div>
-	                        </td>
-	                    </tr>
-	                    <tr>
-	                        <th>기간</th>
-	                        <td>
-	                            <div class="form-row align-items-center">
-	                                <div class="col-auto">
-	                                    <input type="date" class="form-control form-control-sm" value="2025-03-16">
-	                                </div>
-	                                <div class="col-auto">-</div>
-	                                <div class="col-auto">
-	                                    <input type="date" class="form-control form-control-sm" value="2025-06-16">
-	                                </div>
-	                            </div>
-	                        </td>
-	                    </tr>
-	                    <tr>
-	                        <th>검색 키워드</th>
-	                        <td>
-	                            <div class="input-group">
-	                                <div class="input-group-prepend">
-	                                    <select class="custom-select custom-select-sm" style="width: 150px;">
-	                                        <option selected>전체</option>
-	                                        <option value="1">ID</option>
-	                                        <option value="2">이름</option>
-	                                        <option value="3">이메일</option>
-	                                        <option value="4">상태</option>
-	                                        <option value="5">성별</option>
-	                                    </select>
-	                                </div>
-	                                <input type="text" class="form-control form-control-sm">
-	                            </div>
-	                        </td>
-	                    </tr>
-	                </tbody>
-	            </table>
-	            <div class="text-center mt-3">
-	                <button class="btn btn-dark" style="width: 120px;">검색</button>
-	            </div>
-	        </div>
-	    </div>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout/layoutMain}">
 
-    <!-- 회원 목록 테이블 카드 -->
-    <div class="card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <span class="font-weight-bold">[ 검색 결과 <span class="text-primary">183</span>건 ]</span>
+<head>
+<meta name="description" content="한국스마트정보교육원 ksmybatis" />
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/css/customadminpagecss/categorylist.css}">
+</head>
 
-                    <!-- ▼▼▼ 1. 상태 변경 기능 버튼 추가 ▼▼▼ -->
-                    <div class="btn-group ml-3">
-                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            선택한 회원 상태 변경
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">활동중으로 변경</a>
-                            <a class="dropdown-item" href="#">휴면으로 변경</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#">탈퇴 처리</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex">
-                    <select class="custom-select custom-select-sm mr-2" style="width: 150px;">
-                        <option selected>최신 가입일순</option>
-                        <option value="1">오래된 가입일순</option>
-                    </select>
-                    <select class="custom-select custom-select-sm" style="width: 120px;">
-                        <option value="1">15개씩 보기</option>
-                        <option selected>30개씩 보기</option>
-                        <option value="2">50개씩 보기</option>
-                        <option value="3">100개씩 보기</option>
-                    </select>
-                </div>
-            </div>
+<!-- adminCategoryManagement.html -->
 
-            <table class="table table-hover">
-                <thead class="thead-light">
-                    <tr>
-                        <th><div class="form-check"><input class="form-check-input" type="checkbox" id="checkAllRows"></div></th>
-                        <th>ID</th>
-                        <th>이름</th>
-                        <th>성별</th>
-                        <th>이메일</th>
-                        <th>휴대폰 번호</th>
-                        <th>주소</th>
-                        <th>상태</th>
-                        <th>가입 일자</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- ▼▼▼ 2. 체크박스 중앙 정렬 및 컬럼 개수 수정 ▼▼▼ -->
-                    <tr>
-                        <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
-                        <td>user01</td>
-                        <td>김성주</td>
-                        <td>남</td>
-                        <td>sungju@test.com</td>
-                        <td>010-1111-1111</td>
-                        <td>서울시 강남구</td>
-                        <td>활동중</td>
-                        <td>2024-05-21</td>
-                    </tr>
-                    <tr>
-                        <td><div class="form-check"><input class="form-check-input" type="checkbox"></div></td>
-                        <td>user02</td>
-                        <td>정성훈</td>
-                        <td>남</td>
-                        <td>seanghun@test.com</td>
-                        <td>010-2222-2222</td>
-                        <td>경기도 성남시</td>
-                        <td>휴면</td>
-                        <td>2024-05-20</td>
-                    </tr>
-                </tbody>
-            </table>
+<!-- 검색 폼 -->
+<th:block layout:fragment="contents">
+	<main class="main-content">
+		<section class="content-header">
+			<h2 class="content-title">상품 카테고리 관리</h2>
+		</section>
 
-            <nav class="d-flex justify-content-center mt-4" aria-label="Page navigation">
-                <ul class="pagination">
-                    <li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">다음</a></li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-</main>
-	 </th:block>	
+		<!-- 1. 검색 필터 카드 -->
+		<div class="card mb-4">
+			<div class="card-body">
+				<form id="categorySearchForm">
+					<!-- 분류 체크박스 영역 -->
+					<div class="row gx-3">
+						<div class="col-lg-12">
+							<label class="form-label font-weight-bold">분류</label>
+							<div class="d-flex align-items-center">
+								<div class="form-check form-check-inline">
+									<!-- ⭐ 수정: param 대신 searchCriteria 객체를 사용 -->
+									<input class="form-check-input level-check" type="checkbox"
+										name="levels" value="1" id="level1"
+										th:checked="${searchCriteria.levels != null and #lists.contains(searchCriteria.levels, 1)}">
+									<label class="form-check-label" for="level1">1차 카테고리</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<!-- ⭐ 수정: param 대신 searchCriteria 객체를 사용하고, 값 비교 시 '2'가 아닌 숫자 2를 사용 -->
+									<input class="form-check-input level-check" type="checkbox"
+										name="levels" value="2" id="level2"
+										th:checked="${searchCriteria.levels != null and #lists.contains(searchCriteria.levels, 2)}">
+									<label class="form-check-label" for="level2">2차 카테고리</label>
+								</div>
+								<div class="form-check me-4">
+									<input class="form-check-input" type="checkbox"
+										id="checkAllLevels"> <label class="form-check-label"
+										for="checkAllLevels">전체선택</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<hr>
+					<!-- 기간 및 검색 키워드 영역 -->
+					<div class="row gx-3 align-items-end">
+						<div class="col-lg-4">
+							<label class="form-label">등록일자</label>
+							<div class="d-flex">
+								<input type="date" class="form-control" name="startDate"
+									th:value="${#temporals.format(searchCriteria.startDate, 'yyyy-MM-dd')}">
+								<span class="mx-2 d-flex align-items-center">-</span> <input
+									type="date" class="form-control" name="endDate"
+									th:value="${#temporals.format(searchCriteria.endDate, 'yyyy-MM-dd')}">
+							</div>
+						</div>
+						<div class="col-lg-4">
+							<label class="form-label">검색 키워드</label>
+							<div class="input-group">
+								<select class="form-select" name="searchKey"
+									style="max-width: 120px;">
+									<option value="all"
+										th:selected="${#strings.equals(param.searchKey, 'all')}">전체</option>
+									<option value="categoryName"
+										th:selected="${#strings.equals(param.searchKey, 'categoryName')}">카테고리명</option>
+									<option value="categoryId"
+										th:selected="${#strings.equals(param.searchKey, 'categoryId')}">카테고리ID</option>
+								</select> <input type="text" class="form-control" name="searchValue"
+									th:value="${param.searchValue}" placeholder="검색어를 입력하세요">
+							</div>
+						</div>
+						<div class="col-lg-2">
+							<button class="btn btn-primary btn-block" type="button"
+								id="searchBtn">검색</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- 카테고리 목록 테이블 카드 -->
+		<div class="card">
+			<div class="card-body">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<div>
+						<!-- TODO: 총 카테고리 개수 동적으로 표시 -->
+						<span class="font-weight-bold">[ 전체 카테고리 <span
+							class="text-primary" th:text="${pagination.totalRecordCount}">0</span>건
+							]
+						</span>
+					</div>
+					<div>
+						<!-- TODO: 카테고리 추가 모달을 띄우는 버튼으로 변경 예정 -->
+						<a th:href="@{/adminpage/productadmin/addCategory}" class="btn btn-primary">신규 카테고리 추가</a>
+					</div>
+				</div>
+
+				<table class="table table-hover text-center">
+					<thead class="thead-light">
+						<tr>
+							<th><div class="form-check">
+									<input class="form-check-input" type="checkbox"
+										id="checkAllRows">
+								</div></th>
+							<th>카테고리 ID</th>
+							<th>상위 카테고리 ID</th>
+							<th>카테고리명</th>
+							<th>레벨</th>
+							<th>활성 여부</th>
+							<th>등록일자</th>
+							<th>수정/비활성</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- categoryList가 비어있지 않으면 루프를 돌며 데이터를 출력 -->
+						<tr th:if="${not #lists.isEmpty(categoryList)}"
+							th:each="category : ${categoryList}">
+							<td><div class="form-check">
+									<input class="form-check-input" type="checkbox"
+										th:value="${category.categoryId}">
+								</div></td>
+							<td th:text="${category.categoryId}"></td>
+							<td th:text="${category.parentCategoryId ?: '-'}"></td>
+							<td th:text="${category.categoryName}"></td>
+							<!-- 상위 카테고리가 없으면 '-' 표시 -->
+							<td th:text="${category.categoryLevel}"></td>
+							<td>
+								<span class="badge"
+									  th:text="${category.activationYn ? '활성' : '비활성'}"
+									  th:classappend="${category.activationYn ? 'bg-success' : 'bg-danger'}">
+								</span>
+							</td>
+							<td th:text="${#temporals.format(category.regDate, 'yyyy-MM-dd')}"></td>
+							<td>
+                                <!-- 수정 버튼은 항상 보임 -->
+                                <a th:href="@{/adminpage/productadmin/updateCategory/{categoryId}(categoryId=${category.categoryId})}" class="btn btn-sm btn-outline-dark">수정</a>
+                                
+                                <!-- ⭐ 활성화 상태일 때 '비활성' 버튼 표시 -->
+                                <form th:if="${category.activationYn}" th:action="@{/adminpage/productadmin/deactivateCategory}" method="post" style="display:inline;">
+                                    <input type="hidden" name="categoryId" th:value="${category.categoryId}" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('이 카테고리를 비활성화 하시겠습니까? 관련된 모든 상품이 사용자에게 노출되지 않습니다.');">비활성</button>
+                                </form>
+                                
+                                <!-- ⭐ 비활성화 상태일 때 '활성' 버튼 표시 -->
+                                <form th:unless="${category.activationYn}" th:action="@{/adminpage/productadmin/activateCategory}" method="post" style="display:inline;">
+                                    <input type="hidden" name="categoryId" th:value="${category.categoryId}" />
+                                    <button type="submit" class="btn btn-sm btn-success"
+                                            onclick="return confirm('이 카테고리를 다시 활성화 하시겠습니까?');">활성</button>
+                                </form>
+                            </td>
+						</tr>
+						<!-- categoryList가 비어있을 경우 메시지 출력 -->
+						<tr th:if="${#lists.isEmpty(categoryList)}">
+							<td colspan="8" class="text-center">등록된 카테고리가 없습니다.</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<!-- 페이지네이션 UI -->
+				<nav th:if="${pagination.totalRecordCount > 0}"
+					class="d-flex justify-content-center mt-4"
+					aria-label="Page navigation">
+					<ul class="pagination">
+						<!-- 이전 페이지 블록 -->
+						<li class="page-item"
+							th:classappend="${!pagination.existPrevBlock ? 'disabled' : ''}">
+							<!-- ⭐ 수정: a 태그에 page-link와 page-num 클래스 추가 --> <a
+							class="page-link page-num" href="#"
+							th:data-page="${pagination.startPage - 1}">이전</a>
+						</li>
+						<!-- 페이지 번호 -->
+						<li class="page-item"
+							th:each="pageNum : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+							th:classappend="${pageNum == pagination.currentPage ? 'active' : ''}">
+							<a class="page-link page-num" href="#" th:data-page="${pageNum}"
+							th:text="${pageNum}"></a>
+						</li>
+						<!-- 다음 페이지 블록 -->
+						<li class="page-item"
+							th:classappend="${!pagination.existNextBlock ? 'disabled' : ''}">
+							<a class="page-link page-num" href="#"
+							th:data-page="${pagination.endPage + 1}">다음</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</main>
+</th:block>
+<th:block layout:fragment="jsScript">
+	<script>
+		$(document)
+				.ready(
+						function() {
+
+							function submitSearch(page) {
+								const formData = $('#categorySearchForm')
+										.serialize();
+								// 페이지 번호를 URL에 포함시킴
+								window.location.href = `[[@{/adminpage/productadmin/adminCategoryManagement}]]?currentPage=${page}&${formData}`;
+							}
+
+							// 검색 버튼 클릭 이벤트
+							$('#searchBtn').on('click', function() {
+								submitSearch(1); // 검색 버튼을 누르면 항상 1페이지부터 조회
+							});
+
+							// 페이지 번호 링크 클릭 이벤트
+							$('.pagination').on('click', '.page-num',
+									function(e) {
+										e.preventDefault();
+										const page = $(this).data('page');
+										submitSearch(page);
+									});
+
+							// --- 분류 체크박스 로직 (기존과 동일) ---
+							$('#checkAllLevels').on(
+									'click',
+									function() {
+										$('.level-check').prop('checked',
+												$(this).prop('checked'));
+									});
+							$('.level-check')
+									.on(
+											'click',
+											function() {
+												const allChecked = $('.level-check').length === $('.level-check:checked').length;
+												$('#checkAllLevels').prop(
+														'checked', allChecked);
+											});
+							const allCheckedOnLoad = $('.level-check').length === $('.level-check:checked').length;
+							$('#checkAllLevels').prop('checked',
+									allCheckedOnLoad);
+						});
+	</script>
+</th:block>
 </html>

@@ -1,39 +1,227 @@
 @charset "UTF-8";
 
+/* 모든 요소에 box-sizing: border-box 적용 (일반적으로 가장 안전하고 권장되는 방법) */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* ======================================================================== */
+/* General Layout & Section Styling                                         */
+/* ======================================================================== */
 .summary {
     padding: 2.5rem 3rem 3rem;
     border: .1rem dashed #d7d7d7;
-    background-color: transparent;;
+    background-color: transparent;
     border-radius: .3rem;
     margin-top: 2rem;
     margin-bottom: 2rem;
 }
 
-.btn-block{
-	width : 15%;
+.button-wrapper {
+    text-align: right;
+   	margin-bottom: 40px;
 }
 
-.table.table-summary thead th{
-	background-color: #f9f9f9;
+.btn-block {
+    width: 15%; /* 이 버튼의 너비는 15%로 고정 */
 }
 
-/* .table-head {
-   	height: 30px;
+/* ======================================================================== */
+/* Table Styling (상점 신청 테이블)                                          */
+/* ======================================================================== */
+.table-reg {
+    text-align: center;
+    table-layout: fixed; /* 테이블 레이아웃을 고정하여 컬럼 너비를 엄격히 제어 */
+    width: 100%; /* 테이블 너비가 부모 컨테이너를 채우도록 */
+}
+
+/* 모든 테이블 헤더(th)의 기본 스타일 */
+.table thead th {
+    height: 40px;
     padding: .85rem 2rem;
     font-size: 1.4rem;
     line-height: 1.5;
     font-weight: 300;
+    color: #777;
     background-color: #fafafa;
     border: 1px solid #ebebeb;
     border-radius: 0;
+    margin-bottom: 2rem;
+    transition: all 0.3s;
     box-shadow: none;
-} */
-
-.table-reg{
-	text-align : center;
+    border-left: none;
+    border-right: none;
 }
 
-.table thead th{
+/* 테이블 헤더의 첫 번째와 마지막 요소에 테두리 추가 */
+.table thead th:first-child {
+    border-left: 1px solid #ebebeb;
+}
+
+.table thead th:last-child {
+    border-right: 1px solid #ebebeb;
+}
+
+/* 모든 테이블 데이터 셀(td)의 기본 스타일 */
+.table td {
+    padding-top: 1.0rem;
+    padding-bottom: 1.0rem;
+    text-align: center; /* div.fileName을 가로 중앙에 정렬 */
+    vertical-align: middle; /* div.fileName을 세로 중앙에 정렬 */
+    color : #666;
+    /* TD 자체에는 더 이상 flex를 적용하지 않습니다. */
+}
+
+/* 테이블 헤더와 바디의 컬럼별 너비 지정 (재조정된 비율) */
+/* 1. '필요 문서' 컬럼 */
+.table-reg thead th:nth-child(1),
+.table-reg tbody td:nth-child(1) {
+    width: 25%;
+}
+
+/* 2. '첨부된 문서' 컬럼 (파일명 표시 TD) */
+.table-reg thead th:nth-child(2),
+.table-reg tbody td:nth-child(2) {
+    width: 40%; /* 이 TD는 div.fileName을 포함하며, div가 오버플로우를 처리 */
+}
+
+/* 3. '첨부 하기' 컬럼 */
+.table-reg thead th:nth-child(3),
+.table-reg tbody td:nth-child(3) {
+    width: 20%;
+}
+
+/* 4. '첨부 취소' 컬럼 */
+.table-reg thead th:nth-child(4),
+.table-reg tbody td:nth-child(4) {
+    width: 15%;
+}
+
+/* ======================================================================== */
+/* File Name Display DIV Styling                                            */
+/* ======================================================================== */
+
+/* <td> 안에 있는 div.fileName에 텍스트 오버플로우 스타일 적용 */
+.fileName {
+    width: 100%; /* 부모 TD의 가용 공간을 꽉 채우도록 */
+    height: 100%; /* 부모 TD의 높이를 채우도록 */
+    
+    white-space: nowrap;      /* 텍스트를 한 줄로 강제 */
+    overflow: hidden;         /* 넘치는 내용 숨김 */
+    text-overflow: ellipsis;  /* 숨겨진 내용을 ...으로 표시 */
+
+    /* div 내부 텍스트를 세로 및 가로 중앙에 정렬 */
+    display: flex;
+    align-items: center;      /* 세로 중앙 정렬 */
+    justify-content: center;  /* 가로 중앙 정렬 */
+}
+
+/* ======================================================================== */
+/* File Upload & Cancel Button Styling                                      */
+/* ======================================================================== */
+
+/* 파일 입력 필드는 숨김 */
+input[type="file"] {
+    display: none;
+}
+
+/* 사용자 정의 '파일 선택' 버튼 스타일 */
+.custom-file-upload {
+    display: inline-block; /* 버튼처럼 보이게 */
+    padding: 6px 12px;
+    cursor: pointer;
+    color: #c96;
+    background-image: none;
+    font-size: 14px;
+    line-height: 20px; /* 텍스트 세로 정렬 */
+    text-align: center;
+    vertical-align: middle;
+    margin: 0;
+    border : 1px solid #c96;
+}
+
+/* '취소' 버튼 스타일 */
+.btn-cancel-file {
+    margin-left: 10px; /* 파일 선택 버튼과의 간격 */
+    padding: 6px 12px;
+    background-color: grey; /* 빨간색 배경 */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 20px;
+    vertical-align: middle;
+    transition: background-color 0.3s ease;
+}
+
+
+/* ======================================================================== */
+/* Other Specific Button Styles                                             */
+/* ======================================================================== */
+.btn-attachment {
+    color: #c96;
+    background-color: transparent;
+    background-image: none;
+    border-color: #c96;
+    box-shadow: none;
+    padding: 10px;
+    padding-right: 10px;
+}
+
+/* 파일 선택 호버 */
+.custom-file-upload:hover {
+  	color: #fff;
+    background-color: #c96;
+    border-color: #c96;
+    box-shadow: none;
+}
+
+.user-info{
+height: 40px;
+    padding: .85rem 2rem;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    font-weight: 300;
+    color: #777;
+    background-color: #fafafa;
+    border: 1px solid #ebebeb;
+    border-radius: 0;
+    margin-bottom: 2rem;
+    transition: all 0.3s;
+    box-shadow: none;
+}
+
+/* ======================================================================== */
+/* 주소 api                                                                  */
+/* ======================================================================== */
+
+/* appStoreView.css 또는 새로운 CSS 파일 */
+
+/* #layer (Daum Postcode 레이어) */
+#layer {
+    display: none; /* HTML에 있던 인라인 스타일 */
+    position: fixed; /* HTML에 있던 인라인 스타일 */
+    overflow: hidden; /* HTML에 있던 인라인 스타일 */
+    z-index: 1; /* HTML에 있던 인라인 스타일 */
+    -webkit-overflow-scrolling: touch; /* HTML에 있던 인라인 스타일 */
+}
+
+/* #btnCloseLayer (Daum Postcode 닫기 버튼) */
+#btnCloseLayer {
+    cursor: pointer; /* HTML에 있던 인라인 스타일 */
+    position: absolute; /* HTML에 있던 인라인 스타일 */
+    right: -3px; /* HTML에 있던 인라인 스타일 */
+    top: -3px; /* HTML에 있던 인라인 스타일 */
+    z-index: 1; /* HTML에 있던 인라인 스타일 */
+}
+/* 주소찾기 입력창 */
+#sample2_postcode, 
+#sample2_address, 
+#sample2_detailAddress, 
+#sample2_extraAddress{
+	display: block;
+    width: 100%;
 	height: 40px;
     padding: .85rem 2rem;
     font-size: 1.4rem;
@@ -46,64 +234,245 @@
     margin-bottom: 2rem;
     transition: all 0.3s;
     box-shadow: none;
-    border-left : none;
-    border-right: none;
 }
-
-.table thead th:first-child {
-  border-left: 1px solid #ebebeb;
-}
-
-/* 마지막 TH 요소의 오른쪽 테두리만 다시 추가 */
-.table thead th:last-child {
-  border-right: 1px solid #ebebeb;
-}
-
-.table td {
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
-    text-align : center;
-}
-
- .button-wrapper{
- 	text-align : right;
- }
- 
- .btn-attachment{
- 	color: #c96;
+/* 주소찾기 버튼 */
+.address-btn{
+	color: #c96;
     background-color: transparent;
     background-image: none;
+    border: 1px solid #c96;
+    box-shadow: none;
+    margin-bottom : 7px;
+}
+/* 주소찾기 버튼 호버  */
+.address-btn:hover{
+    color: #fff;
+    background-color: #c96;
     border-color: #c96;
     box-shadow: none;
-	padding : 10px;
-	padding-right:10px;
+}
+.address-container{
+	display:flex;
+	justify-content: space-between;
+	
+}
+.text-container{
+	position: relative;
+	display: block;
+    width: 100%;
+    height: auto;
+    min-height : 150px;
+    padding: .85rem 2rem;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    font-weight: 300;
+    color: #777;
+    background-color: #fafafa;
+    border: 1px solid #ebebeb;
+    border-radius: 0;
+    margin-bottom: 2rem;
+    transition: all 0.3s;
+    box-shadow: none;
+}
+.text-box{
+	min-height: 150px; /* 최소 높이를 150px로 설정 */
+    width: 100%; /* 너비는 부모에 맞춰 100% */
+    padding: 10px;
+    box-sizing: border-box; /* 패딩 포함 */
+    resize: vertical; /* 사용자가 세로로만 크기 조절 가능하도록 */
+    overflow: auto; /* 내용이 넘칠 경우 스크롤바 생성 */
+    margin-top: 10px;
+}
+/* ======================================================================== */
+/* 사업자 등록 번호 조회 															*/
+/* ======================================================================== */
+.checkout-title{
+    color: #666;
+    font-weight: 300;
+    font-size: 1.4rem;
+    margin: 0 0 1.1rem;
+}
+
+.brno-input{
+	padding: 6px 16px;
+    font-size: 14px;
+    line-height: 20px;
+    border: 1px solid #ccc;
+    height: 38px; /* 버튼과 동일한 높이로 설정 (예시 값) */
+    box-sizing: border-box; /* 패딩과 보더가 width/height에 포함되도록 설정 */
+    flex-grow: 1; /* 부모가 flex일 때 남은 공간을 채우도록 설정 */
+    background-color: #fafafa;
+    border: 1px solid #ebebeb;
+    color: #777;
+    margin-bottom: 2rem;
+}
+
+#brnoStatusForm{
+	display: flex; /* 자식 요소들을 가로로 나열 */
+    align-items: center; /* 자식 요소들을 수직 중앙 정렬 */
+}
+#checkBrnoButton{
+ 	display: inline-flex; /* 텍스트를 가로로 정렬하고 버튼 내부 콘텐츠를 중앙에 놓기 위해 flex 사용 */
+    align-items: center; /* 버튼 내부 텍스트를 수직 중앙 정렬 */
+    justify-content: center; /* 버튼 내부 텍스트를 수평 중앙 정렬 */
+    padding: 6px 30px;
+    background : transparent;
+    cursor: pointer;
+    color: #c96;
+    background-image: none;
+    font-size: 14px;
+    /* line-height: 20px; (display:flex를 사용하면 line-height는 텍스트 자체의 높이에만 영향을 줍니다.) */
+    text-align: center; /* (display:flex를 사용하면 justify-content가 더 효과적입니다.) */
+    vertical-align: middle; /* (display:flex를 사용하면 align-items가 더 효과적입니다.) */
+    margin: 0;
+    border: 1px solid #c96;
+    box-sizing: border-box; /* 패딩과 보더가 width/height에 포함되도록 설정 */
+    height: 38px; /* 입력 필드의 높이와 유사하게 조절 (예시 값) */
+    margin-bottom: 2rem;
+}
+#checkBrnoButton:hover{
+	color: #fff;
+    background-color: #c96;
+    border-color: #c96;
+    box-shadow: none;
+}
+
+#queriedBrno,#apiResponseContainer{
+	display: block;
+    width: 100%;
+	height: 40px;
+    padding: .85rem 2rem;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    font-weight: 300;
+    color: #777;
+    background-color: #fafafa;
+    border: 1px solid #ebebeb;
+    border-radius: 0;
+    margin-bottom: 2rem;
+    transition: all 0.3s;
+    box-shadow: none;
+}
+
+.re-input{
+	color: #c96 !important;
+    background-color: transparent !important;
+    background-image: none;
+    border: 1px solid #c96;
+    box-shadow: none;
+    margin-bottom : 7px;
+    font-size: 14px; /* 예시: 원하는 폰트 크기로 조절 */
+    padding: 0.15rem 0.4rem; /* 예시: 원하는 패딩으로 조절 */
+    width: auto;
+}
+.re-input:hover{
+	color: #fff !important;
+    background-color: #c96 !important;
+    border-color: #c96;
+    box-shadow: none;
+}
+
+.re-btn{
+	text-align : right;
+}
+
+.tab-pane fade show active{
+	width:100%;
+}
+
+/* ======================================================================== */
+/* 탭박스 															*/
+/* ======================================================================== */
+
+.tab-content-border {
+            border: 1px solid #dee2e6; /* 탭 내용에 테두리 추가 */
+            border-top: none; /* 상단 테두리는 없앰 */
+            padding: 1.5rem; /* 탭 내용 안쪽 여백 */
+            border-radius: 0.25rem; /* 모서리 둥글게 */
+            border-top-left-radius: 0; /* 좌상단은 직각 */
+}
+ .nav-pills .nav-link {
+            border-radius: 0.25rem 0 0 0.25rem;
  }
  
- -- ------
-    /* 사용자에게 보여질 커스텀 버튼 스타일 */
-    .custom-file-upload-button {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        border-radius: 5px;
-        cursor: pointer;
-        text-align: center;
-        transition: background-color 0.3s ease;
-    }
+ .border-secondary{
+	border : none !important;
+}
 
-    .custom-file-upload-button:hover {
-        background-color: #0056b3;
-    }
+ /* 탭박스 조절 */
+/* 1. 기본 상태 */
+#tab1, #tab2, #tab3, #tab4 {
+    color: #c96;
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid #c96;
+    box-shadow: none;
+    margin-bottom: 15px; /* 이 값은 기존과 동일 */
+    /* 트랜지션 추가: 부드러운 효과를 위해 */
+    transition: all 0.3s ease; 
+}
 
-    /* 선택된 파일 이름을 표시할 영역 */
-    #fileNameDisplay {
-        margin-left: 10px;
-        font-style: italic;
-        color: #555;
-    }
- 
- 
- 
- 
- 
+/* 2. 호버 상태 */
+#tab1:hover, #tab2:hover, #tab3:hover, #tab4:hover {
+    color: #fff !important; /* !important는 다른 규칙보다 우선합니다. */
+    background-color: #c96 !important; /* !important는 다른 규칙보다 우선합니다. */
+    border-color: #c96;
+    box-shadow: none;
+    cursor: pointer; /* 마우스 오버 시 포인터 변경 */
+}
+
+/* 3. 클릭 시 호버 상태 유지 (활성화 상태) */
+/* 이 부분은 JavaScript와 함께 사용되어야 합니다. */
+/* 클릭 시 해당 탭에 'active-tab' 또는 'is-selected'와 같은 클래스가 추가된다고 가정합니다. */
+#tab1.active-tab, #tab2.active-tab, #tab3.active-tab, #tab4.active-tab {
+    color: #fff !important;
+    background-color: #c96 !important;
+    border-color: #c96;
+    box-shadow: none;
+}
+
+
+.tab-content-border{
+	color: #c96;
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid #c96;
+    box-shadow: none;
+}
+
+/* ======================================================================== */
+/* 모달												               			*/
+/* ======================================================================== */
+
+.modal-title{
+	margin : 15px;
+}
+.modal-body{
+	display: block;
+    width: 100%;
+	height: auto;
+    padding: .85rem 2rem;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    font-weight: 300;
+    color: #777;
+    background-color: #fafafa;
+    border: 1px solid #ebebeb;
+    border-radius: 0;
+    margin-bottom: 2rem;
+    transition: all 0.3s;
+    box-shadow: none;
+}
+.modal-header{
+	justify-content: flex-end !important;
+	background :   #777;
+}
+.close-btn{
+	color: #c96;
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid #c96;
+    box-shadow: none;
+    margin-bottom : 7px;
+    width:15%
+}

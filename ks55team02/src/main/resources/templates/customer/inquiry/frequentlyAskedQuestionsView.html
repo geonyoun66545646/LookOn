@@ -3,7 +3,8 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{customer/layout/layoutMain}">
 <head>
-    <title>홈 페이지</title>
+    <title>FAQ</title>
+    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/faq.css}">
 </head>
 <body>
     <th:block layout:fragment="contents">
@@ -14,8 +15,7 @@
         		</div></div><nav aria-label="breadcrumb" class="breadcrumb-nav">
                 <div class="container">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Pages</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/main}">Home</a></li>
                         <li class="breadcrumb-item active" aria-current="page">FAQ</li>
                     </ol>
                 </div></nav><div class="page-content">
@@ -134,17 +134,24 @@
 					            <div class="card-body">
 					                결제가 완료되면 고객님의 이메일로 주문 확인 메일이 발송됩니다. 또한, [마이 페이지 > 주문/배송 조회]에서도 주문 상태가 '결제 완료'로 변경된 것을 확인하실 수 있습니다. 만약 30분 이내에 확인이 되지 않는다면 고객센터로 문의해 주세요.
 					            </div></div></div></div></div></div><div class="cta cta-display bg-image pt-4 pb-4" style="background-image: url(assets/images/backgrounds/cta/bg-7.jpg);">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-md-10 col-lg-9 col-xl-7">
-                            <div class="row no-gutters flex-column flex-sm-row align-items-sm-center">
-                                <div class="col">
-                                    <h3 class="cta-title text-black">더 궁금한 점이 있으신가요?</h3><p class="cta-desc text-black">언제든지 문의해 주세요!</p></div><div class="col-auto">
-                                    <a href="contact.html" class="btn btn-outline-black"><span>문의하기</span><i class="icon-long-arrow-right"></i></a>
-                                </div></div></div></div></div></div></main></th:block>
+              <div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12"> <div class="bottom-container">
+                <div class="bottom-message">
+                    <h3 class="cta-title text-black">더 궁금한 점이 있으신가요?</h3>
+                    <p class="cta-desc text-black">언제든지 문의해 주세요!</p>
+                </div>
+                <div class="bottom-btn">
+                    <a th:href="@{/customer/inquiry/inquiryList}" class="list-btn"><span>문의 목록</span><i class="icon-long-arrow-right"></i></a>
+                    <a th:href="@{/customer/inquiry/addInquiry}" class="add-btn"><span>문의 하기</span><i class="icon-long-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div></div></main></th:block>
 
     <th:block layout:fragment="jsFile">
-        <script th:src="@{/maincss/assets/js/home_specific.js}"></script>
+        
     </th:block>
 
     <th:block layout:fragment="jsScript">

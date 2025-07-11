@@ -16,7 +16,7 @@ body {
    ========================================================================== */
 
 .post-detail-area {
-    max-width: 800px; /* 게시글 내용 최대 너비 */
+    max-width: 62%; /* 게시글 내용 최대 너비 */
     margin: 30px auto; /* 상하 30px, 좌우 자동 중앙 정렬 */
     padding: 30px; /* 내부 여백 */
     background-color: #fff; /* 흰색 배경 */
@@ -126,6 +126,11 @@ body {
     background-color: #c82333; /* 삭제 버튼 호버 배경색 */
 }
 
+.post-interaction {
+	text-align: center;
+}
+
+
 /* ==========================================================================
    Responsive Adjustments
    ========================================================================== */
@@ -171,8 +176,8 @@ body {
    ========================================================================== */
    
   .comments-section {
-    max-width: 800px; /* 게시글 영역과 동일한 최대 너비 */
-    margin: 30px auto 0 auto; /* 게시글 영역 하단에 붙이고 중앙 정렬 */
+    max-width: 62%; /* 게시글 영역과 동일한 최대 너비 */
+    margin: 30px auto; /* 게시글 영역 하단에 붙이고 중앙 정렬 */
     padding: 20px;
     background-color: #fff;
     border: 1px solid #dee2e6;

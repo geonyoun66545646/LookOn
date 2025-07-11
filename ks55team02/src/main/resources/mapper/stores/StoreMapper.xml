@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace를 새로 만든 StoreMapper.java 인터페이스 경로와 일치시킵니다. -->
+<mapper namespace="ks55team02.seller.stores.mapper.StoreMapper">
+
+	<!-- ================== ResultMap ================== -->
+	<resultMap id="storesResultMap" type="ks55team02.seller.stores.domain.Stores">
+		<id property="storeId" column="store_id" />
+		<result property="storeConm" column="store_conm" />
+		<result property="storeLogoImg" column="store_logo_img" />
+		<result property="delPrcrYn" column="del_prcr_yn" />
+	</resultMap>
+	
+	<!-- 키워드로 브랜드(상점) 검색 -->
+    <select id="searchStoresByKeyword" parameterType="string" resultMap="storesResultMap">
+        SELECT
+            store_id,
+            store_conm,
+            store_logo_img
+        FROM
+            ks55team02db.stores
+        WHERE
+            store_stts = 'operating'
+            AND del_prcr_yn = FALSE
+            <if test="keyword != null and keyword != ''">
+                AND store_conm LIKE CONCAT(#{keyword}, '%')
+            </if>
+        ORDER BY
+            store_conm;
+    </select>
+	
+	<select id="getStoreById" parameterType="string" resultMap="storesResultMap">
+	    SELECT
+	        store_id,
+	        store_conm,
+	        store_logo_img
+	    FROM
+	        stores
+	    WHERE
+	        store_id = #{storeId};
+	</select>
+	
+	<select id="getAllStores" resultMap="storesResultMap">
+		/* 모든 브랜드(상점) 목록 조회 */
+		SELECT
+			store_id,
+			store_conm,
+			store_logo_img,
+			del_prcr_yn
+		FROM
+			ks55team02db.stores
+		WHERE store_stts = 'operating' AND del_prcr_yn = FALSE
+		ORDER BY store_conm;
+	</select>
+
+</mapper>

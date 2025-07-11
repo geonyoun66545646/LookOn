@@ -170,6 +170,31 @@
 	        (#{userNo}, #{userNo}, NOW(), 0, 'ADMIN_ACTIVATED')
 	    </foreach>
 	</insert>
+	<!--/* user_no로 특정 유저 반환 */  -->
+	<select id="getUserByUserNo" parameterType="string" resultMap="userResultMap">
+	SELECT
+	    user_no,
+	    mbr_grd_cd,
+	    user_lgn_id,
+	    user_nm,
+	    user_pswd_encpt_val,
+	    gender_se_cd,
+	    eml_addr,
+	    telno,
+	    user_brdt,
+	    zip_cd,
+	    addr,
+	    daddr,
+	    user_ncnm,
+	    user_status,
+	    join_dt,
+	    whdwl_dt,
+	    last_info_mdfcn_dt
+	FROM
+  		users
+   where 
+   		user_no=#{userNo}
+	</select>
     
 </mapper>
 

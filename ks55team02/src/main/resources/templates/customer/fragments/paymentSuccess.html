@@ -96,45 +96,41 @@
                         <th style="width: 30%; text-align: right;">가격</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- th:each를 사용해 상품 목록 반복 -->
-                    <tr th:each="product : ${orderedProducts}">
-                        <td th:text="${product.name}">Beige knitted elastic runner shoes</td>
-                        <td style="text-align: right;" th:text="${product.quantity}">2</td>
-                        <!-- toFixed(2)와 유사한 포맷팅, 필요에 따라 수정 -->
-                        <td style="text-align: right;" th:text="${'$' + #numbers.formatDecimal(product.total, 1, 2)}">$168.00</td>
-                    </tr>
-                </tbody>
+				<!-- paymentSuccess.html 의 상품 목록 테이블 부분 -->
+				<tbody>
+				    <!-- th:each를 사용해 상품 목록 반복 -->
+				    <tr th:each="product : ${orderedProducts}">
+				        <td th:text="${product.name}">Beige knitted elastic runner shoes</td>
+				        <td style="text-align: right;" th:text="${product.quantity}">2</td>
+				        <!-- ↓↓↓ 이 부분을 수정하면 좋습니다 ↓↓↓ -->
+				        <td style="text-align: right;" th:text="${#numbers.formatInteger(product.total, 0, 'COMMA') + '원'}">168,000원</td>
+				    </tr>
+				</tbody>
             </table>
             
             <!-- 결제 정보 요약 테이블 -->
             <table class="order-summary-table">
-                <tbody>
-                    <tr>
-                        <th>주문 번호</th>
-                        <td th:text="${payment.orderId}">order_20231027123456</td>
-                    </tr>
-                    <!-- 주문명은 상품 목록이 있으므로 생략하거나 유지할 수 있습니다.
-                    <tr>
-                        <th>주문명</th>
-                        <td th:text="${payment.orderName}">상품명 외 1건</td>
-                    </tr>
-                    -->
-                    <tr>
-					    <th>총 결제 금액</th>
-					    <!-- [최종 수정] payment.amount -> payment.totalAmount 로 변경합니다. -->
-					    <td th:text="${#numbers.formatInteger(payment.totalAmount, 0, 'COMMA') + '원'}">50,000원</td>
-					</tr>
-                    <tr>
-                        <th>결제 수단</th>
-                        <td th:text="${payment.method}">신용카드</td>
-                    </tr>
-                    <tr>
-                        <th>결제 승인일시</th>
-                        <td th:text="${#temporals.format(payment.approvedAt, 'yyyy-MM-dd HH:mm:ss')}">2023-10-27 12:35:00</td>
-                    </tr>
-                </tbody>
-            </table>
+			    <tbody>
+			        <tr>
+			            <th>주문 번호</th>
+			            <!-- Controller에서 payment.orderId로 데이터를 보내므로 paymentInfo가 아닌 payment를 사용해야 합니다. -->
+			            <td th:text="${orders.orderId}"></td>
+			        </tr>
+			        <tr>
+			            <th>총 결제 금액</th>
+			            <!-- Controller에서 payment.totalAmount로 데이터를 보내므로 paymentInfo가 아닌 payment를 사용해야 합니다. -->
+			            <td th:text="${#numbers.formatInteger(orders.amount, 0, 'COMMA') + '원'}">50,000원</td>
+			        </tr>
+			        <tr>
+			            <th>결제 수단</th>
+			            <td th:text="${orders.method}">신용카드</td>
+			        </tr>
+			        <tr>
+			            <th>결제 승인일시</th>
+			            <td th:text="${#temporals.format(orders.approvedAt, 'yyyy-MM-dd HH:mm:ss')}">2023-10-27 12:35:00</td>
+			        </tr>
+			    </tbody>
+			</table>
 
             <!-- ================================================== -->
             <!--   ↑↑↑ 여기까지 수정 또는 교체 ↑↑↑   -->
@@ -142,8 +138,8 @@
             
             <!-- 다음 행동을 유도하는 버튼 -->
             <div class="action-buttons">
-                <a th:href="@{/my-page/orders}" class="btn btn-primary">주문 내역 확인</a>
-                <a th:href="@{/}" class="btn btn-outline-primary-2">쇼핑 계속하기</a>
+                <a th:href="@{/paymentHistory}" class="btn btn-primary">주문 내역 확인</a>
+                <a th:href="@{/productDetail}" class="btn btn-outline-primary-2">쇼핑 계속하기</a>
             </div>
         </div>
     </div>

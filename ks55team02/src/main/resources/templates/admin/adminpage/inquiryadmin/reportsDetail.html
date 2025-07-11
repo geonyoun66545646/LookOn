@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}">
+
+<head>
+    <meta name="description" content="사용자 신고 상세 처리 페이지" />
+    <title>신고 상세 처리</title>
+    </head>
+
+<th:block layout:fragment="jsFile">
+    </th:block>
+
+<th:block layout:fragment="jsScript">
+</th:block>
+
+<th:block layout:fragment="contents">
+    <main class="main-content">
+        <section class="content-header">
+            <h2 class="content-title">신고 상세 처리</h2>
+            <div>
+                <a href="#" class="btn btn-light rounded font-sm mr-5 text-body hover-up">목록으로</a>
+                <button type="submit" form="reportProcessingAndHistoryForm" class="btn btn-primary btn-block" disabled>처리 완료</button>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="reportTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#reportInfo" type="button" role="tab" aria-controls="reportInfo" aria-selected="true" href="#reportInfo">신고 기본 정보</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="process-tab" data-bs-toggle="tab" data-bs-target="#reportProcess" type="button" role="tab" aria-controls="reportProcess" aria-selected="false" href="#reportProcess">신고 처리 (입력)</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#reportHistory" type="button" role="tab" aria-controls="reportHistory" aria-selected="false" href="#reportHistory">처리 이력 목록</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="reportTabsContent">
+
+                        <div class="tab-pane fade show active" id="reportInfo" role="tabpanel" aria-labelledby="info-tab">
+                            <h5 class="mt-4 mb-3">접수된 신고의 상세 내용</h5>
+                            <form> <div class="mb-4 form-group">
+                                    <label for="dclrId" class="form-label">신고 ID</label>
+                                    <input type="text" class="form-control" id="dclrId" name="dclrId" value="DCLR_20230710_001" readonly>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="dclrUserNo" class="form-label">신고한 사용자 ID</label>
+                                    <input type="text" class="form-control" id="dclrUserNo" name="dclrUserNo" value="user_honggildong" readonly>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="dclrTrgtTypeCd" class="form-label">신고 대상 타입</label>
+                                    <input type="text" class="form-control" id="dclrTrgtTypeCd" name="dclrTrgtTypeCd" value="CONTENT" readonly>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="dclrTrgtUserNo" class="form-label">신고 대상 사용자 ID</label>
+                                    <input type="text" class="form-control" id="dclrTrgtUserNo" name="dclrTrgtUserNo" value="user_badguy" readonly>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="dclrTrgtContsId" class="form-label">신고 대상 콘텐츠 ID</label>
+                                    <input type="text" class="form-control" id="dclrTrgtContsId" name="dclrTrgtContsId" value="CONTS_POST_123" readonly>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="dclrRsnCd" class="form-label">신고 사유</label>
+                                    <input type="text" class="form-control" id="dclrRsnCd" name="dclrRsnCd" value="욕설/비방 (RSN_ABUSE)" readonly>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="dtlDclrRsnCn" class="form-label">상세 신고 사유</label>
+                                    <textarea class="form-control" id="dtlDclrRsnCn" name="dtlDclrRsnCn" rows="4" readonly>해당 사용자가 게시글에 반복적으로 매우 심한 욕설을 사용하고 있습니다. 조치 부탁드립니다.</textarea>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="dclrRcptDt" class="form-label">신고 접수 일시</label>
+                                    <input type="datetime-local" class="form-control" id="dclrRcptDt" name="dclrRcptDt" value="2023-07-10T10:30" readonly>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="reportProcess" role="tabpanel" aria-labelledby="process-tab">
+                            <h5 class="mt-4 mb-3">신고 처리 정보 입력 및 새로운 이력 기록</h5>
+                            <form id="reportProcessingAndHistoryForm" action="#" method="post">
+                                <div class="mb-4 form-group">
+                                    <label for="prcsSttsCd" class="form-label">현재 처리 상태</label>
+                                    <select class="form-select" id="prcsSttsCd" name="prcsSttsCd">
+                                        <option value="PENDING">처리 대기</option>
+                                        <option value="IN_PROGRESS">처리 중</option>
+                                        <option value="COMPLETED" selected>처리 완료</option>
+                                        <option value="REJECTED">반려</option>
+                                    </select>
+                                    <small class="form-text text-muted">신고의 현재 처리 상태를 변경합니다.</small>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="dclrPrcsRsltCn" class="form-label">최종 처리 결과 내용</label>
+                                    <textarea class="form-control" id="dclrPrcsRsltCn" name="dclrPrcsRsltCn" rows="4" placeholder="신고 처리 결과를 요약하여 입력해주세요."></textarea>
+                                    <small class="form-text text-muted">사용자에게 보여질 최종 처리 결과 내용입니다.</small>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="prcsPicMngrNo" class="form-label">처리 담당 관리자 ID</label>
+                                    <input type="text" class="form-control" id="prcsPicMngrNo" name="prcsPicMngrNo" value="admin_user_001" readonly>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="prcsCmptnDt" class="form-label">처리 완료 일시</label>
+                                    <input type="datetime-local" class="form-control" id="prcsCmptnDt" name="prcsCmptnDt" value="2023-07-10T15:00" readonly>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <h5>새로운 처리 이력 기록</h5>
+                                <input type="hidden" name="dclrIdForHistory" value="DCLR_20230710_001">
+                                <div class="mb-4 form-group">
+                                    <label for="historyUserNo" class="form-label">이력 기록자 ID</label>
+                                    <input type="text" class="form-control" id="historyUserNo" name="historyUserNo" value="admin_user_001" readonly>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="actnCn" class="form-label">조치 내용</label>
+                                    <textarea class="form-control" id="actnCn" name="actnCn" rows="3" placeholder="예: 해당 사용자 3일 계정 정지, 게시글 삭제 요청"></textarea>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="prcsDsctnMemoCn" class="form-label">내부 처리 메모</label>
+                                    <textarea class="form-control" id="prcsDsctnMemoCn" name="prcsDsctnMemoCn" rows="3" placeholder="예: 내부 논의 후 결정, 관련 부서 전달 완료"></textarea>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="bfrSttsCd" class="form-label">이전 상태</label>
+                                    <input type="text" class="form-control" id="bfrSttsCd" name="bfrSttsCd" value="PENDING" readonly>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="crntSttsCd" class="form-label">현재 상태 (이력)</label>
+                                    <input type="text" class="form-control" id="crntSttsCd" name="crntSttsCd" value="COMPLETED" readonly>
+                                </div>
+                                <div class="mb-4 form-group">
+                                    <label for="historyPrcsDt" class="form-label">이력 기록 일시</label>
+                                    <input type="datetime-local" class="form-control" id="historyPrcsDt" name="historyPrcsDt" value="2023-07-10T15:00" readonly>
+                                </div>
+
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-success" disabled>새 이력 기록</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="reportHistory" role="tabpanel" aria-labelledby="history-tab">
+                            <h5 class="mt-4 mb-3">이 신고의 모든 처리 이력</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>이력 ID</th>
+                                            <th>처리 일시</th>
+                                            <th>처리자</th>
+                                            <th>조치 내용</th>
+                                            <th>내부 메모</th>
+                                            <th>이전 상태</th>
+                                            <th>현재 상태</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>HST_001</td>
+                                            <td>2023-07-10 14:00</td>
+                                            <td>admin_user_001</td>
+                                            <td>게시글 삭제 요청</td>
+                                            <td>내부 가이드라인에 따라 처리</td>
+                                            <td>PENDING</td>
+                                            <td>IN_PROGRESS</td>
+                                        </tr>
+                                        <tr>
+                                            <td>HST_002</td>
+                                            <td>2023-07-10 15:00</td>
+                                            <td>admin_user_001</td>
+                                            <td>사용자 3일 계정 정지</td>
+                                            <td>관련 부서 전달 및 조치 완료</td>
+                                            <td>IN_PROGRESS</td>
+                                            <td>COMPLETED</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</th:block>
+</html>

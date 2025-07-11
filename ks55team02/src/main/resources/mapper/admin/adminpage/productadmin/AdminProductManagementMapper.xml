@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.admin.adminpage.productadmin.adminproductsmanagement.mapper.AdminProductManagementMapper">
+
+    <resultMap id="adminProductViewResultMap" type="ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.AdminProductView">
+        <result property="gdsNo"      column="gds_no" />
+        <result property="gdsNm"      column="gds_nm" />
+        <result property="storeConm"  column="store_conm" />
+        <result property="selUserNo"  column="sel_user_no" />
+        <result property="aprvSttsCd" column="aprv_stts_cd" />
+        <result property="regDt"      column="reg_dt" />
+        <result property="aprvRjctCycl" column="aprv_rjct_cycl" />
+    </resultMap>
+
+    <resultMap id="approvalCriteriaResultMap" type="ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ApprovalCriteria">
+        <id property="aprvRjctRsnCd" column="aprv_rjct_rsn_cd"/>
+        <result property="crtMngrId" column="crt_mngr_id"/>
+        <result property="aprvRjctDtlCn" column="aprv_rjct_dtl_cn"/>
+        <result property="aprvRjctRsn" column="aprv_rjct_rsn"/>
+        <result property="aplcnTrgtId" column="aplcn_trgt_id"/>
+        <result property="aplcnYn" column="aplcn_yn"/>
+    </resultMap>
+
+	<select id="getLatestHistoryByGdsNo" parameterType="string" resultType="ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory">
+	    SELECT *
+	    FROM product_approval_history
+	    WHERE gds_no = #{gdsNo}
+	    ORDER BY prcs_dt DESC, aprv_rjct_cycl DESC
+	    LIMIT 1
+	</select>
+	
+	<select id="getLatestApprovedOrRejectedHistoryByGdsNo" parameterType="string" resultType="ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory">
+	    SELECT *
+	    FROM product_approval_history
+	    WHERE gds_no = #{gdsNo}
+	      AND aprv_stts_cd IN ('승인', '반려')
+	    ORDER BY prcs_dt DESC, aprv_rjct_cycl DESC
+	    LIMIT 1
+	</select>
+	
+    <insert id="insertProductApprovalHistory" parameterType="ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory">
+        INSERT INTO product_approval_history
+            (aprv_rjct_hstry_cd, gds_no, prcs_mngr_id, aprv_stts_cd, prcs_dt, rjct_rsn, aprv_rjct_cycl, mngr_cmnt_cn)
+        VALUES
+            (#{aprvRjctHstryCd}, #{gdsNo}, #{prcsMngrId}, #{aprvSttsCd}, NOW(), #{rjctRsn}, #{aprvRjctCycl}, #{mngrCmntCn})
+    </insert>
+
+    <insert id="insertProductRejectReasonMappings" parameterType="java.util.List">
+        INSERT INTO product_rjct_rsn_hstry_mapping
+            (aprv_rjct_hstry_cd, aprv_rjct_rsn_cd, creatr_no, crt_ymd)
+        VALUES
+        <foreach collection="list" item="mapping" separator=",">
+            (#{mapping.aprvRjctHstryCd}, #{mapping.aprvRjctRsnCd}, #{mapping.creatrNo}, NOW())
+        </foreach>
+    </insert>
+	
+    <select id="getLatestApprovalCycle" parameterType="string" resultType="int">
+	    SELECT COALESCE(MAX(aprv_rjct_cycl), 0)
+	    FROM product_approval_history
+	    WHERE gds_no = #{gdsNo};
+	</select>
+	
+	<select id="getApprovalCriteriaList" resultMap="approvalCriteriaResultMap">
+        SELECT
+            aprv_rjct_rsn_cd,
+            aprv_rjct_dtl_cn,
+            aprv_rjct_rsn,
+            aplcn_trgt_id,
+            aplcn_yn
+        FROM
+            product_approval_criteria
+        WHERE
+            aprv_rjct_rsn = '반려'
+            AND aplcn_yn = 1
+            AND aplcn_trgt_id = 'PRODUCT';
+    </select>
+	
+    <sql id="searchConditionsOnly"> 
+        pah.aprv_rjct_hstry_cd = (
+            SELECT aprv_rjct_hstry_cd FROM product_approval_history
+            WHERE gds_no = p.gds_no ORDER BY prcs_dt DESC, aprv_rjct_cycl DESC LIMIT 1
+        )
+        AND pah.aprv_stts_cd = '대기' 
+        
+        <if test="searchCriteria.searchValue != null and !searchCriteria.searchValue.isEmpty()">
+            <choose>
+                <when test="'gdsNm'.equals(searchCriteria.searchKey)">
+                    AND p.gds_nm LIKE CONCAT('%', #{searchCriteria.searchValue}, '%')
+                </when>
+                <when test="'selUserNo'.equals(searchCriteria.searchKey)">
+                    AND p.sel_user_no LIKE CONCAT('%', #{searchCriteria.searchValue}, '%')
+                </when>
+                <when test="'storeName'.equals(searchCriteria.searchKey)">
+                    AND s.store_conm LIKE CONCAT('%', #{searchCriteria.searchValue}, '%')
+                </when>
+            </choose>
+        </if>
+        <if test="searchCriteria.startDate != null">
+            AND p.reg_dt >= #{searchCriteria.startDate}
+        </if>
+        <if test="searchCriteria.endDate != null">
+            <![CDATA[
+                AND p.reg_dt <= DATE_ADD(#{searchCriteria.endDate}, INTERVAL 1 DAY - INTERVAL 1 SECOND)
+            ]]>
+        </if>
+    </sql>
+
+    <select id="countAdminProducts" parameterType="map" resultType="int">
+        SELECT COUNT(p.gds_no)
+        FROM products AS p
+        JOIN stores AS s ON p.store_id = s.store_id
+        JOIN product_approval_history AS pah ON p.gds_no = pah.gds_no
+        <where> 
+            <include refid="searchConditionsOnly" />
+        </where>
+    </select>
+
+    <select id="getAdminProductList" parameterType="map" resultMap="adminProductViewResultMap">
+        SELECT
+            p.gds_no,
+            p.gds_nm,
+            s.store_conm,
+            p.sel_user_no,
+            pah.aprv_stts_cd,
+            pah.aprv_rjct_cycl,
+            p.reg_dt
+        FROM
+            products AS p
+        JOIN
+            stores AS s ON p.store_id = s.store_id
+        JOIN
+            product_approval_history AS pah ON p.gds_no = pah.gds_no
+        <where> 
+            <include refid="searchConditionsOnly" />
+        </where>
+        ORDER BY
+            p.reg_dt DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <update id="updateProductApprovalStatus" parameterType="map">
+	    UPDATE product_approval_history
+	    SET aprv_stts_cd = #{newStatus}, prcs_mngr_id = #{managerId}, prcs_dt = NOW(), mngr_cmnt_cn = '관리자에 의해 승인 처리되었습니다.'
+	    WHERE gds_no = #{gdsNo} AND aprv_stts_cd = '대기'
+	</update>
+	
+	
+	
+    <select id="getLatestPendingHistoryByGdsNo" parameterType="string" 
+        resultType="ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory"
+        useCache="false">
+	        SELECT *
+		    FROM product_approval_history
+		    WHERE gds_no = #{gdsNo}
+		      AND aprv_stts_cd = '대기'
+		    ORDER BY prcs_dt DESC, aprv_rjct_cycl DESC
+		    LIMIT 1
+	</select>
+	
+	<update id="updateProductApprovalStatusAndCommentByHistoryCode" parameterType="map">
+	    UPDATE product_approval_history
+	    SET
+	        aprv_stts_cd = #{newStatus},
+	        prcs_dt = NOW(),
+	        mngr_cmnt_cn = #{mngrCmntCn},
+	        prcs_mngr_id = #{managerId},
+	        <if test="rjctRsn != null">
+	            aprv_rjct_rsn = #{rjctRsn}
+	        </if>
+	    WHERE
+	        aprv_rjct_hstry_cd = #{aprvRjctHstryCd}
+	        AND gds_no = #{gdsNo}
+	</update>
+	
+	<update id="updateProductApprovalHistoryStatusAndComment" parameterType="ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory">
+	    UPDATE product_approval_history
+	    SET
+	        aprv_stts_cd = #{aprvSttsCd},
+	        prcs_dt = NOW(), mngr_cmnt_cn = #{mngrCmntCn},
+	        aprv_rjct_rsn = #{rjctRsn}, prcs_mngr_id = #{prcsMngrId} WHERE
+	        aprv_rjct_hstry_cd = #{aprvRjctHstryCd}
+	        AND gds_no = #{gdsNo}
+	</update>
+
+    <update id="updateProductExposure" parameterType="map">
+        UPDATE products
+        SET expsr_yn = #{exposure}, mdfcn_dt = NOW(), mdfr_no = #{managerId}
+        WHERE gds_no = #{gdsNo}
+    </update>
+
+</mapper>

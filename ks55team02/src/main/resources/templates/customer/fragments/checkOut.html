@@ -1,80 +1,106 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{customer/layout/layoutMain}">  
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{customer/layout/layoutMain}">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>결제 확인</title>
-    <meta name="keywords" content="HTML5 Template">
-    <meta name="description" content="Molla - Bootstrap eCommerce Template">
-    <meta name="author" content="p-themes">
-    
-    <!-- Toss Payments SDK (head 최상단에 위치) -->
-    <script src="https://js.tosspayments.com/v1"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>결제 확인</title>
+<meta name="keywords" content="HTML5 Template">
+<meta name="description" content="Molla - Bootstrap eCommerce Template">
+<meta name="author" content="p-themes">
 
-    <!-- 카카오 우편번호 서비스 -->
-    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    
-    <style>
-        /* 요청하신 배송지 폼을 위한 전용 스타일 */
-        .address-form-wrapper {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            border: 1px solid #e9e9e9;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        .address-form-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .address-form-group label {
-            width: 140px;
-            flex-shrink: 0;
-            font-size: 1.4rem;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 0;
-        }
-        .address-form-group .form-control {
-            height: 40px;
-        }
-        .address-form-group .input-group {
-            display: flex;
-            flex-grow: 1;
-        }
-        .address-form-group .input-group .form-control {
-            flex: 1 1 auto;
-        }
-        .address-form-group .input-group span {
-            padding: 0 10px;
-            color: #ccc;
-        }
-        .address-form-group .btn-search-postcode {
-            margin-left: 10px;
-            white-space: nowrap;
-            background-color: #f8f9fa;
-            border-color: #dee2e6;
-            height: 40px; /* 수정: 입력창과 높이를 동일하게 설정 */
-        }
+<script src="https://js.tosspayments.com/v1"></script>
 
-        #address-entry-form .form-group {
-            margin-bottom: 1rem;
-        }
-    </style>
+<link
+	href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+	rel="stylesheet">
 
-	<script>
+<script
+	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+<style>
+/* 요청하신 배송지 폼을 위한 전용 스타일 */
+.address-form-wrapper {
+	width: 100%;
+	max-width: 600px;
+	margin: 0 auto;
+	border: 1px solid #e9e9e9;
+	padding: 20px;
+	border-radius: 5px;
+}
+
+.address-form-group {
+	display: flex;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.address-form-group label {
+	width: 140px;
+	flex-shrink: 0;
+	font-size: 1.4rem;
+	font-weight: 500;
+	color: #333;
+	margin-bottom: 0;
+}
+
+.address-form-group .form-control {
+	height: 40px;
+}
+
+.address-form-group .input-group {
+	display: flex;
+	flex-grow: 1;
+}
+
+.address-form-group .input-group .form-control {
+	flex: 1 1 auto;
+}
+
+.address-form-group .input-group span {
+	padding: 0 10px;
+	color: #ccc;
+}
+
+.address-form-group .btn-search-postcode {
+	margin-left: 10px;
+	white-space: nowrap;
+	background-color: #f8f9fa;
+	border-color: #dee2e6;
+	height: 40px; /* 수정: 입력창과 높이를 동일하게 설정 */
+}
+
+#address-entry-form .form-group {
+	margin-bottom: 1rem;
+}
+
+/* 추가된 스타일 */
+.coupon-input-group {
+    display: flex;
+    margin-bottom: 15px;
+}
+.coupon-input-group input {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+.coupon-input-group button {
+    white-space: nowrap;
+}
+</style>
+
+<script>
         document.addEventListener('DOMContentLoaded', function () {
             const registerAddressBtn = document.getElementById('register-address-btn');
             const addressDisplay = document.getElementById('address-display');
             const originalAddressDisplayContent = addressDisplay.innerHTML; // 초기 상태 저장
+
+            // 전역 변수로 할인 적용된 최종 금액을 저장
+            // 페이지 로드 시에는 원본 totalAmount로 초기화 (초기화는 아래 DOMContentLoaded 스크립트에서 진행)
+            let currentDiscountedAmount = 0; 
 
             // 주소 입력 폼을 표시하는 함수
             function showAddressForm() {
@@ -101,7 +127,7 @@
                             </div>
                         </div>
                         <div class="address-form-group">
-                            <label></label>
+                            <label>상세주소 *</label>
                             <div class="input-group">
                                 <input type="text" id="detail-address" class="form-control" placeholder="상세주소 입력">
                             </div>
@@ -189,19 +215,19 @@
             // 주소 저장 및 요약 표시 함수
             function saveAddress() {
                 // --- 유효성 검사 ---
+                const shippingName = document.getElementById('shipping-name').value.trim(); // 배송지명 추가
                 const postcode = document.getElementById('postcode').value.trim();
                 const detailAddress = document.getElementById('detail-address').value.trim();
                 const phone1_1 = document.getElementById('phone1-1').value.trim();
                 const phone1_2 = document.getElementById('phone1-2').value.trim();
                 const phone1_3 = document.getElementById('phone1-3').value.trim();
 
-                if (!postcode || !detailAddress || !phone1_1 || !phone1_2 || !phone1_3) {
+                if (!postcode || !detailAddress || !phone1_1 || !phone1_2 || !phone1_3 || !shippingName) { // 배송지명도 필수
                     alert('필수 항목(*)을 모두 입력해주세요.');
                     return;
                 }
 
                 // --- 데이터 수집 ---
-                const shippingName = document.getElementById('shipping-name').value.trim();
                 const mainAddress = document.getElementById('main-address').value;
                 const fullAddress = `${mainAddress} ${detailAddress}`;
                 const phone1 = `${phone1_1}-${phone1_2}-${phone1_3}`;
@@ -211,7 +237,7 @@
                 addressDisplay.innerHTML = `
                     <div class="address-info" style="width: 100%; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
                         <p style="margin-bottom: 8px;"><strong>${shippingName || '기본 배송지'}</strong></p>
-                        <p style="margin-bottom: 8px;"><span id="display-recipient"></span> 연락처 : <span id="display-phone">${phone1}</span></p>
+                        <p style="margin-bottom: 8px;"><span id="display-recipient">${shippingName}</span> 연락처 :  <span id="display-phone">${phone1}</span></p>
                         <p style="margin-bottom: 8px;">(<span id="display-postcode">${postcode}</span>) <span id="display-address">${fullAddress}</span></p>
                         ${deliveryRequest ? `<p style="color: #868e96; margin-bottom: 0;">요청사항: <span id="display-request">${deliveryRequest}</span></p>` : ''}
                     </div>
@@ -222,271 +248,426 @@
 
             // '배송지 등록/변경' 버튼의 메인 이벤트 리스너
             registerAddressBtn.addEventListener('click', showAddressForm);
+
+            // 쿠폰 관련 로직 시작
+            const couponSelect = document.getElementById('coupon-select');
+
+            // 1. 사용자 쿠폰 목록을 불러오는 함수 (가정: /api/user/coupons 엔드포인트)
+            async function fetchUserCoupons() {
+                const userNo = "user01"; // TODO: 실제 사용자 인증 정보에서 가져오도록 수정
+                try {
+                    // 쿠폰 목록을 가져오는 새로운 API 호출 (백엔드에 구현되어야 함)
+                    const response = await fetch(`/api/user/coupons?userNo=${userNo}`);
+                    if (!response.ok) {
+                        throw new Error('쿠폰 목록을 불러오는데 실패했습니다.');
+                    }
+                    const coupons = await response.json();
+                    
+                    // select 박스에 옵션 추가
+                    couponSelect.innerHTML = '<option value="">쿠폰 선택</option>'; // 기본 옵션 유지
+                    coupons.forEach(coupon => {
+                        const option = document.createElement('option');
+                        option.value = coupon.pblcnCpnCd; // 쿠폰 코드를 값으로 사용
+                        option.textContent = `${coupon.cpnNm} - ${coupon.dcntRte}% 할인`; // 쿠폰 이름과 할인율 표시
+                        couponSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('쿠폰 목록 로드 오류:', error);
+                    alert('쿠폰 목록을 불러오는데 문제가 발생했습니다.');
+                }
+            }
+
+            // 2. 쿠폰 선택 시 할인 계산 및 화면 업데이트 함수
+            async function applySelectedCoupon() {
+                const selectedCouponCode = couponSelect.value;
+                const cartData = JSON.parse(sessionStorage.getItem('cart_data'));
+                const originalAmount = cartData.total;
+                const userNo = "user01"; // TODO: 실제 사용자 인증 정보에서 가져오도록 수정
+
+                if (!selectedCouponCode) { // 쿠폰을 선택하지 않은 경우 (초기 "쿠폰 선택" 옵션)
+                    window.currentDiscountedAmount = originalAmount;
+                    document.getElementById('checkoutTotal').textContent = `₩${Math.round(originalAmount).toLocaleString('ko-KR')}`;
+                    document.getElementById('discountAmountDisplay').textContent = `₩0`;
+                    document.getElementById('discountRow').style.display = 'none';
+                    return; // 함수 종료
+                }
+
+                try {
+                    const response = await fetch('/api/apply-coupon', { // 기존 apply-coupon 엔드포인트 사용
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            originalAmount: originalAmount,
+                            couponCode: selectedCouponCode, // 선택된 쿠폰 코드 전송
+                            userNo: userNo
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || '쿠폰 적용에 실패했습니다.');
+                    }
+
+                    const data = await response.json();
+                    const discountedAmount = data.discountedAmount;
+                    const discountAmount = originalAmount - discountedAmount;
+
+                    window.currentDiscountedAmount = discountedAmount;
+
+                    document.getElementById('checkoutTotal').textContent = `₩${Math.round(discountedAmount).toLocaleString('ko-KR')}`;
+                    document.getElementById('discountAmountDisplay').textContent = `₩${Math.round(discountAmount).toLocaleString('ko-KR')}`;
+                    document.getElementById('discountRow').style.display = 'table-row';
+                    
+                    alert('쿠폰이 성공적으로 적용되었습니다!');
+
+                } catch (error) {
+                    console.error('쿠폰 적용 오류:', error);
+                    alert(error.message);
+                    // 오류 발생 시 선택된 쿠폰 초기화 또는 기존 금액으로 복원
+                    couponSelect.value = ""; // "쿠폰 선택"으로 되돌리기
+                    window.currentDiscountedAmount = originalAmount;
+                    document.getElementById('checkoutTotal').textContent = `₩${Math.round(originalAmount).toLocaleString('ko-KR')}`;
+                    document.getElementById('discountAmountDisplay').textContent = `₩0`;
+                    document.getElementById('discountRow').style.display = 'none';
+                }
+            }
+
+            // 3. select 박스 변경 이벤트 리스너
+            couponSelect.addEventListener('change', applySelectedCoupon);
+
+            // 4. 페이지 로드 시 쿠폰 목록 불러오기
+            fetchUserCoupons();
+            // 쿠폰 목록을 불러온 후, 기본적으로 "쿠폰 선택"이 되어있으므로, initial totalAmount로 currentDiscountedAmount가 설정됩니다.
+            // 이 부분은 DOMContentLoaded의 초기화 로직에서 처리되므로 추가 호출 필요 없음.
+
+            // 기존 'apply-coupon-btn' 관련 로직은 제거 (select 박스로 대체됨)
+            // document.getElementById('apply-coupon-btn').addEventListener('click', async function() { ... });
+
         });
 	</script>
-	
-    <script th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey=0ab7f19c8492cbdd75c80c0e6d922e48&libraries=services'}"></script>
-    <script>
+
+<script
+	th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey=0ab7f19c8492cbdd75c80c0e6d922e48&libraries=services'}"></script>
+<script>
 	 	// checkout.html 최상단에 추가
 	    if (!sessionStorage.getItem('cart_data')) {
 	      alert("장바구니가 비었습니다!");
 	      window.location.href = '/cart.html'; // 강제 리디렉션
 	    }
     </script>
-    <style>
-    	/* 기본 스타일 */
-	    body { font-family: 'Poppins', sans-serif;} /* 폰트 적용 */
-	    .form-group { margin-bottom: 15px; }
-	    input[type="text"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-	    
-    	.checkout-container {
-		    width: 100%;
-		    max-width: 800px;
-		    background-color: #ffffff;
-		    border: 1px solid #e9ecef;
-		    border-radius: 8px;
-		    padding: 24px;
-		    box-sizing: border-box;
-		}
-		
-		.section {
-		    margin-bottom: 20px;
-		}
-		
-		/* 헤더 (제목과 버튼) */
-		.section-header {
-		    display: flex;
-		    justify-content: space-between;
-		    align-items: center;
-		    margin-bottom: 16px;
-		}
-		
-		.section-header h2 {
-		    font-size: 20px;
-		    font-weight: bold;
-		    margin: 0;
-		}
-		
-		#register-address-btn {
-		    font-size: 14px;
-		    padding: 8px 12px;
-		    border-radius: 4px;
-		    cursor: pointer;
-		}
-		
-		/* 배송지 표시 영역 */
-		#address-display {
-		    min-height: 100px; /* 내용이 없을 때도 높이 유지 */
-		    display: flex;
-		    flex-direction: column;
-		    justify-content: center;
-		    align-items: center;       
-            padding: 20px;
-            border-radius: 5px;
-		}
-		
-		/* 초기 안내 메시지 스타일 */
-		.address-content-placeholder p {
-		    margin: 4px 0;
-		    color: #868e96;
-		    font-size: 15px;
-		}
-		
-		/* 구분선 */
-		.divider {
-		    border: none;
-		    border-top: 1px solid #e9ecef;
-		    margin: 24px 0;
-		}
-		.order-product-item {
-		    display: flex;
-		    align-items: center;
-		    padding: 1.5rem 0;
-		    border-bottom: 1px solid #e9ecef;
-		}
-		.order-product-item:last-child {
-		    border-bottom: none;
-		}
-		.order-product-image {
-		    width: 80px;
-		    height: 80px;
-		    margin-right: 20px;
-		}
-		.order-product-image img {
-		    width: 100%;
-		    height: 100%;
-		    object-fit: cover;
-		    border-radius: 4px;
-		}
-		.order-product-details {
-		    flex-grow: 1;
-		}
-		.order-product-name {
-		    font-weight: 500;
-		    font-size: 1.6rem;
-		    margin: 0 0 0.5rem 0;
-		    color: #333;
-		}
-		.order-product-info {
-		    font-size: 1.4rem;
-		    color: #666;
-		}
-		.order-product-price {
-		    font-size: 1.6rem;
-		    font-weight: 600;
-		    color: #333;
-		    min-width: 100px;
-		    text-align: right;
-		}
-    </style>
+<style>
+/* 기본 스타일 */
+body {
+	font-family: 'Poppins', sans-serif;
+} /* 폰트 적용 */
+.form-group {
+	margin-bottom: 15px;
+}
+
+input[type="text"] {
+	width: 100%;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.checkout-container {
+	width: 100%;
+	max-width: 800px;
+	background-color: #ffffff;
+	border: 1px solid #e9ecef;
+	border-radius: 8px;
+	padding: 24px;
+	box-sizing: border-box;
+}
+
+.section {
+	margin-bottom: 20px;
+}
+
+/* 헤더 (제목과 버튼) */
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+}
+
+.section-header h2 {
+	font-size: 20px;
+	font-weight: bold;
+	margin: 0;
+}
+
+#register-address-btn {
+	font-size: 14px;
+	padding: 8px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+/* 배송지 표시 영역 */
+#address-display {
+	min-height: 100px; /* 내용이 없을 때도 높이 유지 */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 20px;
+	border-radius: 5px;
+}
+
+/* 초기 안내 메시지 스타일 */
+.address-content-placeholder p {
+	margin: 4px 0;
+	color: #868e96;
+	font-size: 15px;
+}
+
+/* 구분선 */
+.divider {
+	border: none;
+	border-top: 1px solid #e9ecef;
+	margin: 24px 0;
+}
+
+.order-product-item {
+	display: flex;
+	align-items: center;
+	padding: 1.5rem 0;
+	border-bottom: 1px solid #e9ecef;
+}
+
+.order-product-item:last-child {
+	border-bottom: none;
+}
+
+.order-product-image {
+	width: 80px;
+	height: 80px;
+	margin-right: 20px;
+}
+
+.order-product-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 4px;
+}
+
+.order-product-details {
+	flex-grow: 1;
+}
+
+.order-product-name {
+	font-weight: 500;
+	font-size: 1.6rem;
+	margin: 0 0 0.5rem 0;
+	color: #333;
+}
+
+.order-product-info {
+	font-size: 1.4rem;
+	color: #666;
+}
+
+.order-product-price {
+	font-size: 1.6rem;
+	font-weight: 600;
+	color: #333;
+	min-width: 100px;
+	text-align: right;
+}
+</style>
 </head>
 
 <body>
-<th:block layout:fragment="contents">
-    <div class="page-wrapper">
+	<th:block layout:fragment="contents">
+		<div class="page-wrapper">
 
-        <main class="main">
-        	<div class="page-header text-center" style="background-image: url('maincss/assets/images/page-header-bg.jpg')">
-        		<div class="container">
-        			<h1 class="page-title">Checkout<span>Shop</span></h1>
-        		</div></div><nav aria-label="breadcrumb" class="breadcrumb-nav">
-                <div class="container">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#">Shop</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Checkout</li>
-                    </ol>
-                </div></nav><div class="page-content">
-            	<div class="checkout">
-	                <div class="container">
-            			<div class="checkout-discount">
-            				<form action="#">
-        						<input type="text" class="form-control" required id="checkout-discount-input">
-            					<label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label>
-            				</form>
-            			</div>
-            			
-            			<form action="#">
-		                	<div class="row">
-		                		<div class="col-lg-9">
-		                			<div class="checkout-container">
-								        <div class="section">
-								            <div class="section-header">
-								                <h2>배송지</h2>
-								                <button type="button" id="register-address-btn" class="btn btn-outline-primary btn-sm">배송지 등록</button>
-								            </div>
-								            <div id="address-display" class="address-content-placeholder">
-								                <p>등록된 배송지가 없습니다.</p>
-								                <p>배송지를 등록해 주세요.</p>
-								            </div>
-								        </div>
-								
-								        <hr class="divider">
-								
-								        <div class="section">
-								            <div class="section-header">
-								                <h2>주문 상품</h2>
-								            </div>
-								            
-								            <!-- 주문 상품 목록이 표시될 컨테이너 -->
-								            <div id="order-product-list-container">
-								                <!-- JavaScript가 여기에 상품 목록을 동적으로 추가할 것입니다. -->
-								            </div>
-								        </div>
-									</div>
-								    <!-- <script src="maincss/assets/js/script.js"></script>   -->
-							    </div>
-							    <aside class="col-lg-3">
-		                			<div class="summary">
-		                				<h3 class="summary-title">Your Order</h3><table class="table table-summary">
-										  <tbody id="checkoutProducts">
-										    </tbody>
-										  	<tbody> 
-											  	<tr class="summary-subtotal"> 
-											  		<td>Subtotal:</td>
-											    	<td id="checkoutSubtotal">₩0</td>
-											   	</tr>
-											   	<tr class="summary-total"> 
-											   		<td>Total:</td>
-											     	<td id="checkoutTotal">₩0</td>
-											   	</tr>
-									    	</tbody>
-										</table>
-										
-										<div id="payment-section" style="margin-bottom: 20px;"></div>
-										<button id="payment-button" type="button" class="btn btn-outline-primary-2 btn-order btn-block">
-		                					<span class="btn-text">Place Order</span>
-		                					<span class="btn-hover-text">Proceed to Checkout</span>
-		                				</button>
+			<main class="main">
+				<div class="page-header text-center"
+					style="background-image: url('maincss/assets/images/page-header-bg.jpg')">
+					<div class="container">
+						<h1 class="page-title">
+							Checkout<span>Shop</span>
+						</h1>
+					</div>
+				</div>
+				<nav aria-label="breadcrumb" class="breadcrumb-nav">
+					<div class="container">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+							<li class="breadcrumb-item"><a href="#">Shop</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Checkout</li>
+						</ol>
+					</div>
+				</nav>
+				<div class="page-content">
+					<div class="checkout">
+						<div class="container">
+							<form action="#">
+								<div class="row">
+									<div class="col-lg-9">
+										<div class="checkout-container">
+											<div class="section">
+												<div class="section-header">
+													<h2>배송지</h2>
+													<button type="button" id="register-address-btn"
+														class="btn btn-outline-primary btn-sm">배송지 등록</button>
+												</div>
+												<div id="address-display"
+													class="address-content-placeholder">
+													<p>등록된 배송지가 없습니다.</p>
+													<p>배송지를 등록해 주세요.</p>
+												</div>
+											</div>
 
-	                				</div>
-	                			</aside>
-                			</div>
-               			</form>
-                			
-	                </div></div></div></main></div><button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+											<hr class="divider">
 
-    <!-- 이하 모바일 메뉴 및 모달 창 HTML은 기존과 동일하므로 생략합니다 -->
-    <!-- ... -->
-    <div class="mobile-menu-overlay"></div><div class="mobile-menu-container">
-        <div class="mobile-menu-wrapper">
-            <span class="mobile-menu-close"><i class="icon-close"></i></span>
+											<div class="section">
+												<div class="section-header">
+													<h2>주문 상품</h2>
+												</div>
 
-            <form action="#" method="get" class="mobile-search">
-                <label for="mobile-search" class="sr-only">Search</label>
-                <input type="search" class="form-control" name="mobile-search" id="mobile-search" placeholder="Search in..." required>
-                <button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
-            </form>
-            
-            <nav class="mobile-nav">
-                <ul class="mobile-menu">
-                    <li class="active">
-                        <a href="index.html">Home</a>
-                    </li>
-                    <li>
-                        <a href="category.html">Shop</a>
-                    </li>
-                    <li>
-                        <a href="product.html" class="sf-with-ul">Product</a>
-                    </li>
-                    <li>
-                        <a href="#">Pages</a>
-                    </li>
-                    <li>
-                        <a href="blog.html">Blog</a>
-                    </li>
-                    <li>
-                        <a href="elements-list.html">Elements</a>
-                    </li>
-                </ul>
-            </nav><div class="social-icons">
-                <a href="#" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
-                <a href="#" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
-                <a href="#" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
-                <a href="#" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
-            </div></div></div>
+												<div id="order-product-list-container">
+													</div>
+											</div>
+										</div>
+										</div>
+									<aside class="col-lg-3">
+										<div class="summary">
+											<h3 class="summary-title">Your Order</h3>
+											<table class="table table-summary">
+												<tbody id="checkoutProducts">
+												</tbody>
+												<tbody>
+													<tr class="summary-subtotal">
+														<td>Subtotal:</td>
+														<td id="checkoutSubtotal">₩0</td>
+													</tr>
+													<tr>
+														<td>쿠폰:</td>
+														<td>
+															<div class="coupon-input-group">
+																<select id="coupon-select" class="form-control">
+                                                                    <option value="">쿠폰 선택</option>
+                                                                    </select>
+																</div>
+														</td>
+													</tr>
+													<tr id="discountRow" style="display: none;"> <td>할인 금액:</td>
+														<td id="discountAmountDisplay">₩0</td>
+													</tr>
+													<tr class="summary-total">
+														<td>Total:</td>
+														<td id="checkoutTotal">₩0</td>
+													</tr>
+												</tbody>
+											</table>
 
-    <script src="maincss/assets/js/jquery.min.js"></script>
-    <script src="maincss/assets/js/bootstrap.bundle.min.js"></script>
-    <script src="maincss/assets/js/jquery.hoverIntent.min.js"></script>
-    <script src="maincss/assets/js/jquery.waypoints.min.js"></script>
-    <script src="maincss/assets/js/superfish.min.js"></script>
-    <script src="maincss/assets/js/owl.carousel.min.js"></script>
-    <script src="maincss/assets/js/bootstrap-input-spinner.js"></script>
-    <script src="maincss/assets/js/main.js"></script>
-    
+											<div id="payment-section" style="margin-bottom: 20px;"></div>
+											<button id="payment-button" type="button"
+												class="btn btn-outline-primary-2 btn-order btn-block">
+												<span class="btn-text">Place Order</span> <span
+													class="btn-hover-text">Proceed to Checkout</span>
+											</button>
+
+										</div>
+									</aside>
+								</div>
+							</form>
+
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<button id="scroll-top" title="Back to Top">
+			<i class="icon-arrow-up"></i>
+		</button>
+
+		<div class="mobile-menu-overlay"></div>
+
+		<div class="mobile-menu-container">
+			<div class="mobile-menu-wrapper">
+				<span class="mobile-menu-close"><i class="icon-close"></i></span>
+
+				<form action="#" method="get" class="mobile-search">
+					<label for="mobile-search" class="sr-only">Search</label> <input
+						type="search" class="form-control" name="mobile-search"
+						id="mobile-search" placeholder="Search in..." required>
+					<button class="btn btn-primary" type="submit">
+						<i class="icon-search"></i>
+					</button>
+				</form>
+
+				<nav class="mobile-nav">
+					<ul class="mobile-menu">
+						<li class="active"><a href="index.html">Home</a></li>
+						<li><a href="category.html">Shop</a></li>
+						<li><a href="product.html" class="sf-with-ul">Product</a></li>
+						<li><a href="#">Pages</a></li>
+						<li><a href="blog.html">Blog</a></li>
+						<li><a href="elements-list.html">Elements</a></li>
+					</ul>
+				</nav>
+				<div class="social-icons">
+					<a href="#" class="social-icon" target="_blank" title="Facebook"><i
+						class="icon-facebook-f"></i></a> <a href="#" class="social-icon"
+						target="_blank" title="Twitter"><i class="icon-twitter"></i></a> <a
+						href="#" class="social-icon" target="_blank" title="Instagram"><i
+						class="icon-instagram"></i></a> <a href="#" class="social-icon"
+						target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
+				</div>
+			</div>
+		</div>
+
+		<script src="maincss/assets/js/jquery.min.js"></script>
+		<script src="maincss/assets/js/bootstrap.bundle.min.js"></script>
+		<script src="maincss/assets/js/jquery.hoverIntent.min.js"></script>
+		<script src="maincss/assets/js/jquery.waypoints.min.js"></script>
+		<script src="maincss/assets/js/superfish.min.js"></script>
+		<script src="maincss/assets/js/owl.carousel.min.js"></script>
+		<script src="maincss/assets/js/bootstrap-input-spinner.js"></script>
+		<script src="maincss/assets/js/main.js"></script>
+
 	<script>
-	    document.addEventListener('DOMContentLoaded', function() {
+		document.addEventListener('DOMContentLoaded', function() {
+			
 	        // 1. 장바구니 데이터 가져오기
 	        const cartDataString = sessionStorage.getItem('cart_data');
 	        if (!cartDataString) {
-	            // alert("장바구니가 비어 있습니다.");
-	            // window.location.href = 'cart.html';
+	            // alert("장바구니가 비었습니다!"); // 주석 처리: 불필요한 알림 제거
+	            window.location.href = 'cart.html'; // 강제 리디렉션
 	            return;
 	        }
 	    
 	        const cartData = JSON.parse(cartDataString);
 	        
+	        // cart.html을 거치지 않거나 데이터 일관성이 없을 경우를 대비하여
+	        // products 배열을 기반으로 subtotal과 total을 다시 계산합니다.
+	        let calculatedSubtotal = 0;
+	        cartData.products.forEach(product => {
+	            // 각 상품 항목의 총 가격을 계산합니다. (단가 * 수량)
+	            product.total = (product.price || 0) * (product.quantity || 0); 
+	            calculatedSubtotal += product.total;
+	        });
+	
+	        cartData.subtotal = calculatedSubtotal;
+	        cartData.total = calculatedSubtotal; // 배송비 등이 없다면 total도 subtotal과 동일
+	        
+	        // ★★★ 이 한 줄을 추가해야 합니다! ★★★
+	        sessionStorage.setItem('cart_data', JSON.stringify(cartData)); 
+	        // 이제 업데이트된 cartData가 sessionStorage에 저장됩니다.
+
+            // 전역 변수로 할인 적용된 최종 금액을 저장
+            // 페이지 로드 시에는 원본 totalAmount로 초기화
+            window.currentDiscountedAmount = cartData.total; 
+	
 	        // --- "Your Order" 섹션 업데이트 ---
 	        const checkoutProductsTbody = document.getElementById('checkoutProducts');
 	        checkoutProductsTbody.innerHTML = '';
@@ -494,28 +675,28 @@
 	    
 	        displayedProducts.forEach(product => {
 	            const row = checkoutProductsTbody.insertRow();
+	            // 이제 product.total은 유효한 숫자입니다.
 	            const formattedTotal = Math.round(product.total).toLocaleString('ko-KR');
-	
 	            row.innerHTML = `
 	                <td>${product.name} × ${product.quantity}</td>
 	                <td>₩${formattedTotal}</td>
 	            `;
 	        });
 	    
+	        // 이제 cartData.subtotal과 cartData.total은 유효한 숫자입니다.
 	        const formattedSubtotal = Math.round(cartData.subtotal).toLocaleString('ko-KR');
 	        const formattedTotal = Math.round(cartData.total).toLocaleString('ko-KR');
 	        
 	        document.getElementById('checkoutSubtotal').textContent = `₩${formattedSubtotal}`;
-	        document.getElementById('checkoutTotal').textContent = `₩${formattedTotal}`;
-	
+	        document.getElementById('checkoutTotal').textContent = `₩${formattedTotal}`; // 초기 Total은 Subtotal과 동일
+	        
 	        // --- "주문 상품" 목록 표시 로직 ---
 	        const productListContainer = document.getElementById('order-product-list-container');
 	        if (productListContainer && cartData.products) {
 	            let productListHtml = ''; 
-	
 	            cartData.products.forEach(product => {
+	                // product.total은 이미 위에서 계산되었습니다.
 	                const formattedPrice = Math.round(product.total).toLocaleString('ko-KR');
-	
 	                productListHtml += `
 	                    <div class="order-product-item">
 	                        <div class="order-product-image">
@@ -538,15 +719,17 @@
 	        }
 	    });
 	</script>
-<script th:inline="javascript">
-/*<![CDATA[*/
+	<script th:inline="javascript">
+	/*<![CDATA[*/
 	
-	document.getElementById("payment-button").addEventListener("click", function() {
+	document.getElementById("payment-button").addEventListener("click", async function() { // async 함수로 변경
     // 1. 배송지 정보가 제대로 입력되었는지 확인 (저장된 요약 정보 기준)
     const postcode = document.querySelector('#display-postcode')?.textContent;
     const address = document.querySelector('#display-address')?.textContent;
-
-    if (!postcode || !address) {
+    const shippingName = document.querySelector('#display-recipient')?.textContent; // 추가: 배송지명
+    const phone1 = document.querySelector('#display-phone')?.textContent; // 추가: 연락처
+    
+    if (!postcode || !address || !shippingName || !phone1) { // 배송지명과 연락처도 필수
         alert('배송지를 먼저 등록해주세요.');
         return;
     }
@@ -554,79 +737,91 @@
     // 2. 서버로 보낼 주문 데이터 조립
     const cartData = JSON.parse(sessionStorage.getItem('cart_data'));
     const deliveryRequest = document.getElementById('display-request')?.textContent || '요청사항 없음';
-    const recipientName = document.getElementById('display-recipient')?.textContent;
     
     // 상세주소와 기본주소를 분리하기 위한 로직 (더 견고하게 만들 수 있음)
-    const fullAddress = address;
-    // 이 부분은 서버와 어떻게 주소를 주고받을지에 따라 조정이 필요합니다.
     // 여기서는 전체 주소를 'address'로 보내고 서버에서 분리한다고 가정합니다.
+    // PaymentController에서 orderData를 Map으로 받고 있으므로, 서버에서 파싱해야 합니다.
+    
+    // 할인 적용된 최종 금액 사용
+    const finalAmount = window.currentDiscountedAmount; 
 
     const orderData = {
         products: cartData.products,
-        totalAmount: cartData.total,
+        totalAmount: finalAmount, // 할인 적용된 최종 금액 사용
         shippingAddress: {
             postcode: postcode,
-            address: fullAddress, // 전체 주소
-            detailAddress: "", // 서버에서 분리하거나, 별도 필드 필요시 추가 로직 구현
-            deliveryRequest: deliveryRequest
+            address: address, // 전체 주소
+            detailAddress: "", // 실제 DB 필드에 맞게 채워주거나 서버에서 분리 필요
+            deliveryRequest: deliveryRequest,
+            recipientName: shippingName, // 수령인 이름 추가
+            phone: phone1 // 연락처 추가
         },
-        customerName: recipientName
+        customerName: shippingName // customerName을 shippingName으로 설정
     };
 
     // 3. AJAX (fetch)를 사용하여 서버에 주문 정보 전송
-    fetch('/api/orders', { 
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('주문 생성에 실패했습니다. 상태 코드: ' + response.status);
-        }
-        return response.json(); 
-    })
-    .then(data => {
-        // 4. 서버로부터 성공 응답 및 주문ID를 받으면 결제 진행
-        if (data.success && data.orderId) {
-            const clientKey = 'test_ck_BX7zk2yd8yPpN1PLNlXprx9POLqK';
-            const tossPayments = TossPayments(clientKey);
-            
-            const orderName = cartData.products.length > 1 
-                ? `${cartData.products[0].name} 외 ${cartData.products.length - 1}건`
-                : cartData.products[0].name;
+    try {
+        const response = await fetch('/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+        });
 
-            tossPayments.requestPayment('카드', {
-                amount: parseInt(orderData.totalAmount),
-                orderId: data.orderId,
-                orderName: orderName,
-                successUrl: window.location.origin + "/payment/success",
-                failUrl: window.location.origin + "/payment/fail",
-                customerName: orderData.customerName
-            })
-            .catch(function (error) {
-                if (error.code === 'USER_CANCEL') {
-                    console.log('사용자가 결제를 취소했습니다.');
-                } else {
-                    console.error("결제 요청 에러:", error);
-                    alert('결제 중 오류가 발생했습니다.');
-                }
-            });
-        } else {
-            alert('서버로부터 올바른 주문 정보를 받지 못했습니다.');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || '주문 생성에 실패했습니다. 상태 코드: ' + response.status);
         }
-    })
-    .catch(error => {
-        console.error('주문 생성 AJAX 오류:', error);
-        alert('주문 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
-    });
+
+        const data = await response.json();
+    	
+    	// 4. 서버로부터 성공 응답 및 주문ID를 받으면 결제 진행
+    	if (data.success && data.ordrNo) {
+    	    const clientKey = 'test_ck_BX7zk2yd8yPpN1PLNlXprx9POLqK';
+    	    const tossPayments = TossPayments(clientKey);
+
+    	    const orderName = cartData.products.length > 1 
+    	        ? `${cartData.products[0].name} 외 ${cartData.products.length - 1}건`
+    	        : cartData.products[0].name;
+
+    	    // ★★★ 여기에 추가할 콘솔 로그들 ★★★
+    	    console.log("============= Toss 결제 요청 파라미터 최종 확인 =============");
+    	    console.log("  amount (결제 금액):", parseInt(finalAmount)); // 할인된 최종 금액
+    	    console.log("  ordrNo (주문 번호):", data.ordrNo);
+    	    console.log("  orderName (주문명):", orderName);
+    	    console.log("  customerName (고객명):", shippingName); // shippingName 사용
+    	    console.log("==========================================================");
+    	    // ★★★ 여기까지 추가 ★★★
+
+    	    tossPayments.requestPayment('카드', {
+    	        amount: parseInt(finalAmount), // 할인된 최종 금액 사용
+    	        orderId: data.ordrNo,
+    	        orderName: orderName,
+    	        successUrl: window.location.origin + "/payment/success",
+    	        failUrl: window.location.origin + "/payment/fail",
+    	        customerName: shippingName // shippingName 사용
+    	    })
+    	    .catch(function (error) {
+    	        if (error.code === 'USER_CANCEL') {
+	                alert('사용자가 결제를 취소했습니다.'); // 사용자에게 알림
+    	            console.log('사용자가 결제를 취소했습니다.');
+    	        } else {
+    	            console.error("결제 요청 에러:", error);
+    	            alert('결제 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류')); // 상세 에러 메시지
+    	        }
+    	    });
+    	} else {
+    	    alert('서버로부터 올바른 주문 정보를 받지 못했습니다.');
+    	}
+    } catch (error) {
+        console.error('주문 생성 AJAX 오류', error);
+        alert('주문 생성 중 오류가 발생했습니다: ' + error.message);
+    }
 });
 /*]]>*/
 </script>
-</th:block>
+	</th:block>
 
 </body>
-
-
 </html>

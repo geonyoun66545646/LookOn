@@ -1,5 +1,7 @@
 package ks55team02.seller.products.domain;
 
+import ks55team02.seller.stores.domain.Stores;
+
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -7,6 +9,8 @@ import java.math.BigDecimal; // Add this import for BigDecimal
 
 @Data
 public class Products {
+	private Stores store; 
+	
     private String gdsNo;
     private String storeId;
     private String ctgryNo;
@@ -29,7 +33,11 @@ public class Products {
     private Integer maxPurchaseQty;
 
     private String storeName;
-
+    
+    private String latestApprovalStatus;
+    
+    private String aprvRjctHstryCd; 
+    
     private Integer totalStockQuantity;
     private Boolean isSoldOut;
 
@@ -45,4 +53,6 @@ public class Products {
     public Boolean getActvtnYn() {
         return this.actvtnYn;
     }
+    
+    private List<ProductStatus> productStatusList;
 }

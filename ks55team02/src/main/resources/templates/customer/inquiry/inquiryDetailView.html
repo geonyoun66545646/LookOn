@@ -20,9 +20,9 @@
             <nav aria-label="breadcrumb" class="breadcrumb-nav">
                 <div class="container">
                     <ol class="breadcrumb">
-                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item">
-                        <a th:href="@{/customer/inquiry/inquiryList}">INQUIRYLIST</a>
+                         <li class="breadcrumb-item"><a th:href="@{/main}">Home</a></li>
+                         <li class="breadcrumb-item"><a th:href="@{/customer/inquiry/FAQ}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/customer/inquiry/inquiryList}">INQUIRYLIST</a>
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">INQUIRY DETAIL</li>
                     </ol>
@@ -83,7 +83,8 @@
     </div>
 </div>
                     <div class="form-group d-flex justify-content-end mt-4 mb-3">
-	   					    <button type="submit" class="btn btn-primary btn-rounded">문의 수정</button>
+                     	    <a href="#" class="btn btn-primary btn-rounded">문의 수정</a> 
+	   				<!-- 	    <button type="submit" class="btn btn-primary btn-rounded">문의 수정</button> -->
                             <a th:href="@{/customer/inquiry/inquiryList}" class="btn btn-outline-secondary btn-rounded ml-2">목록으로</a>
                         </div>
                     </div>

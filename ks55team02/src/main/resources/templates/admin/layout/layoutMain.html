@@ -10,7 +10,7 @@
         <!-- Favicon -->
         <link rel="shortcut icon" type="image/x-icon" th:href="@{/admincss/assets/imgs/theme/favicon.svg}" />
         <!-- Template CSS -->
-        <link href="/admincss/assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+        <link th:href="@{/admincss/assets/css/main.css?v=1.1}" rel="stylesheet" type="text/css" />
         
          <th:block layout:fragment="customCss"></th:block>
         
@@ -18,7 +18,7 @@
 	<body>
 		<div class="screen-overlay"></div>
 		
-		<!--/* 
+		<!--/* a
 			~{논리경로} : prefix /src/main/resources/templates/ subfix: .html
 			/src/main/resources/templates/admin/fragments/aside.html 
 		*/-->
@@ -42,7 +42,7 @@
 			<!-- footer and -->
 		</main>
 		<script th:src="@{/admincss/assets/js/vendors/jquery-3.6.0.min.js}"></script>
-        <script th:src="@{/admincss/assets/js/vendors/bootstrap.bundle.min.js}"></script>
+		<script th:src="@{/admincss/assets/js/vendors/bootstrap.bundle.min.js}"></script>
         <script th:src="@{/admincss/assets/js/vendors/select2.min.js}"></script>
         <script th:src="@{/admincss/assets/js/vendors/perfect-scrollbar.js}"></script>
         <script th:src="@{/admincss/assets/js/vendors/jquery.fullscreen.min.js}"></script>

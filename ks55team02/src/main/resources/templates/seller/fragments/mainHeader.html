@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Molla - 통합 헤더</title>
+</head>
+<body>
+    <header class="lookon-main-header" th:fragment="mainHeaderFragment">
+        <div class="lookon-header-upper-bar">
+            <div class="lookon-header-content-wrapper">
+                <a th:href="@{/main}" class="lookon-brand-logo">LookOn</a>
+                <form th:action="@{/customer/searchResult}" method="get"
+					class="lookon-search-input-area">
+					<i class="fas fa-search lookon-search-icon"></i> <input type="text"
+						name="keyword" class="lookon-search-input-field"
+						placeholder="여기에 검색어를 입력해주세요">
+				</form>
+            </div>
+        </div>
+
+        <div class="lookon-header-lower-bar">
+            <div class="lookon-header-content-wrapper">
+                <div class="lookon-navigation-group">
+                    <button class="lookon-category-menu-button" id="open-category-modal" aria-label="카테고리 메뉴 열기">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <nav class="lookon-primary-navigation">
+                        <ul class="lookon-nav-list">
+                            <li> <a th:href="@{/customer/products(category='best')}" class="lookon-nav-link">베스트</a> </li>
+						    <li> <a th:href="@{/customer/products(category='sale')}" class="lookon-nav-link">세일</a> </li>
+						    <li> <a th:href="@{/customer/products(category='new-products')}" class="lookon-nav-link">신상</a> </li>
+                            <li> <a href="#" class="lookon-nav-link">커뮤니티</a></li>
+                            <li> <a href="#" class="lookon-nav-link">피드</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="lookon-user-action-menu">
+                    <a th:href="@{/mypage}"><i class="far fa-user"></i></a>
+                    <a href="#" class="lookon-action-link" data-toggle="modal" data-target="#signin-modal">
+                        <i class="far fa-heart"></i>
+                        <span class="lookon-badge">3</span>
+                    </a>
+                    <a href="cart.html" class="lookon-action-link">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="lookon-badge">2</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+    </header>
+</body>
+</html>

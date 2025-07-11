@@ -39,7 +39,7 @@
 	    <result column="last_login_dt"      property="lastLoginDt"/>
 	</resultMap>
 	
-	<resultMap id="commentResultMap" type="Comment">
+	<resultMap id="postCommentResultMap" type="PostComment">
 	    <id     column="pst_cmnt_sn"    property="pstCmntSn"/>
 	    <result column="pst_sn"         property="pstSn"/>
 	    <result column="wrtr_user_no"   property="wrtrUserNo"/>
@@ -52,7 +52,7 @@
 	    <result column="user_ncnm"      property="userNcnm"/>
 	</resultMap>
 	
-	<resultMap id="InteractionResultMap" type="Interaction">
+	<resultMap id="postInteractionResultMap" type="PostInteraction">
 		<id 	column="pst_intract_sn" 	property="pstIntractSn"></id>
 		<result column="pst_sn" 			property="pstSn"></result>
 		<result column="user_no" 			property="userNo"></result>
@@ -71,7 +71,7 @@
 	    <association property="userInfo" resultMap="userResultMap"/>
 	</resultMap>
 	
-	<resultMap id="commentListResultMap" type="Comment" extends="commentResultMap">
+	<resultMap id="postCommentListResultMap" type="PostComment" extends="postCommentResultMap">
 		<association property="userInfo" javaType="UserList">
 			<result column="user_ncnm"  property="userNcnm"/>
 		</association>
@@ -87,7 +87,7 @@
 	    	pi.pst_intract_sn REGEXP '^pst_itrct_[0-9]+$';
 	</select>
 	
-	<insert id="insertInterCount" parameterType="Interaction">
+	<insert id="insertInterCount" parameterType="PostInteraction">
 		/* 추천수 증가 */
 		INSERT INTO post_interactions
 			(pst_intract_sn, 
@@ -100,9 +100,9 @@
 			(#{pstIntractSn}, 
 			#{pstSn}, 
 			#{userNo}, 
-			like, 
+			'like', 
 			Now(), 
-			'');
+			null);
 	</insert>
 	
 	<update id="updateViewCount" parameterType="String">
@@ -162,6 +162,7 @@
 		SELECT
 			p.pst_sn,
 			p.bbs_clsf_cd,
+			p.wrtr_user_no,
 			u.user_ncnm,
 			p.pst_ttl,
 			p.pst_cn,
@@ -179,11 +180,12 @@
 			p.pst_sn = #{pstSn};
 	</select>
 	
-	<select id="selectCommentListByPstSn" parameterType="String" resultMap="commentListResultMap">
+	<select id="selectCommentListByPstSn" parameterType="String" resultMap="postCommentListResultMap">
 		/* 특정 게시글의 댓글 목록 조회 */
 		SELECT
 			pc.pst_cmnt_sn,
 			pc.pst_sn,
+			pc.wrtr_user_no,
 			u.user_ncnm,
 			pc.cmnt_cn,
 			pc.crt_dt
@@ -221,7 +223,7 @@
 		VALUES
 		(#{pstSn},
 		#{bbsClsfCd},
-		'user_no_1',
+		#{wrtrUserNo},
 		#{pstTtl},
 		#{pstCn},
 		0,
@@ -241,7 +243,7 @@
 	    	pc.pst_cmnt_sn REGEXP '^cmnt_[0-9]+$';
 	</select>
 	
-	<insert id="insertComment" parameterType="Comment">
+	<insert id="insertComment" parameterType="PostComment">
 		/* 댓글 등록 */
 		INSERT INTO post_comments
 		(pst_cmnt_sn,
@@ -256,7 +258,7 @@
 		VALUES
 		(#{pstCmntSn},
 		#{pstSn},
-		'user_no_1',
+		#{wrtrUserNo},
 		null,
 		#{cmntCn},
 		Now(),
@@ -288,7 +290,7 @@
 			p.pst_sn = TRIM(#{pstSn});
 	</update>
 	
-	<update id="updateComment" parameterType="Comment">
+	<update id="updateComment" parameterType="PostComment">
 		/* 댓글 수정 */
 		UPDATE
 			post_comments pc
