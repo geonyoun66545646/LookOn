@@ -22,7 +22,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 
 /* 전체 레이아웃 컨테이너 */
 .integrated-search-container {
-	max-width: 1400px;
+	max-width: 1200px;
 	margin: 0 auto;
 	padding: 5rem 1.5rem;
 }
@@ -161,8 +161,8 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
     display: flex;
     flex-direction: column; /* ★★★ 아이템을 세로로 쌓도록 변경 (가장 중요) ★★★ */
     align-items: center;   /* 내부 아이템들을 수평 중앙 정렬 */
-    width: 220px;
-    height: 220px !important;
+    width: 180px;
+    height: 180px !important;
     flex-shrink: 0;
     margin: 0;
     border: 1px solid var(--card-border-color);
@@ -170,8 +170,8 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
     background-color: #fff;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     overflow: hidden;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 .product-grid-container .product-card:hover,
@@ -183,10 +183,11 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 /* --- 3. 카드 이미지 공통 스타일 (높이 통일) --- */
 .product-card .card-img-top,
 .search-result-user-card .search-profile-img {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 120px;
     object-fit: cover;
-    margin-top: 1.5rem;
+    margin-top: 10px;
+    padding: 10px;
 }
 
 .search-result-user-card .search-profile-img {
@@ -224,7 +225,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 }
 
 .search-result-user-card .card-title a {
-	font-size : 14pt;
+	font-size : 14px;
     display: block;
     text-align: center;
     padding: 0;
@@ -266,6 +267,7 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 .card-title a {
     text-align: center;
     padding: 0;
+    font-size: 14px;
 }
 
 .shadow-sm {
