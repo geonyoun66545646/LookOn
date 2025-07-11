@@ -101,6 +101,11 @@ public interface CouponsMapper {
      */
     int countActiveUserCouponByCouponId(@Param("userNo") String userNo, @Param("pblcnCpnId") String pblcnCpnId);
     
+    /**
+     * 사용 가능한 사용자 쿠폰 목록 조회
+     * (2025.07.11 gy - checkOut.html에서 사용)
+     */
+    List<UserCoupons> getUserAvailableCoupons(String userNo);
     
 
 }
