@@ -7,7 +7,6 @@
 	<resultMap id="couponsResultMap"
 		type="ks55team02.customer.coupons.domain.Coupons">
 		<result column="pblcn_cpn_id" property="pblcnCpnId" />
-		<result column="pblcn_cpn_cd" property="pblcnCpnCd" />
 		<result column="user_no" property="userNo" />
 		<result column="cpn_nm" property="cpnNm" />
 		<result column="dscnt_vl" property="dscntVl" />

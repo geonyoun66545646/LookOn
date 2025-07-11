@@ -98,48 +98,46 @@
 							<th>수정/삭제</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox" value="CPN_001">
-								</div></td>
-							<td>CPN_001</td>
-							<td>신규 가입 환영 쿠폰</td>
-							<td>10%</td>
-							<td>10,000원</td>
-							<td>5,000원</td>
-							<td>2023-01-01 ~ 2023-12-31</td>
-							<td>1000회</td>
-							<td>1회</td>
-							<td>회원가입</td>
-							<td>없음</td>
-							<td><span class="badge bg-success">활성</span></td>
-							<td>2023-01-01</td>
-							<td><a th:href="@{/adminpage/useradmin/editCoupons}"
-								class="btn btn-sm btn-outline-dark">수정</a> <a href="#"
-								class="btn btn-sm btn-outline-danger">삭제</a></td>
-						</tr>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox" value="CPN_002">
-								</div></td>
-							<td>CPN_002</td>
-							<td>첫 구매 5% 할인</td>
-							<td>5%</td>
-							<td>0원</td>
-							<td>3,000원</td>
-							<td>2023-07-01 ~ 2023-07-31</td>
-							<td>무제한</td>
-							<td>1회</td>
-							<td>첫 구매</td>
-							<td>매월</td>
-							<td><span class="badge bg-danger">비활성</span></td>
-							<td>2023-06-25</td>
-							<td><a th:href="@{/adminpage/useradmin/editCoupons}"
-								class="btn btn-sm btn-outline-dark">수정</a> <a href="#"
-								class="btn btn-sm btn-outline-danger">삭제</a></td>
-						</tr>
-					</tbody>
+					<tbody th:if="${couponsList != null and !couponsList.isEmpty()}">
+    <tr th:each="coupon : ${couponsList}">
+        <td>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" th:value="${coupon.pblcnCpnId}">
+            </div>
+        </td>
+        <td th:text="${coupon.pblcnCpnId}">CPN_CD_001</td>
+        <td th:text="${coupon.cpnNm}">신규 가입 환영 쿠폰</td>
+        <td>
+            [[${#numbers.formatDecimal(coupon.dscntVl, 1, 0)}]]%
+        </td>
+        <td>[[${#numbers.formatDecimal(coupon.minOrdrAmt, 0, 'COMMA', 0, 'POINT')}]]원</td>
+        <td>[[${#numbers.formatDecimal(coupon.maxDscntAmt, 0, 'COMMA', 0, 'POINT')}]]원</td>
+        <td>
+            [[${#temporals.format(coupon.vldBgngDt, 'yyyy-MM-dd')}]] ~ [[${#temporals.format(coupon.vldEndDt, 'yyyy-MM-dd')}]]
+        </td>
+        <td th:text="${coupon.totUseLmtNmtm == 0 ? '무제한' : coupon.totUseLmtNmtm + '회'}">1000회</td>
+        <td th:text="${coupon.userPerUseLmtNmtm} + '회'">1회</td>
+        <td th:text="${coupon.issueConditionType}">회원가입</td>
+        <td th:text="${coupon.reissueCycle}">없음</td>
+        <td>
+            <span th:if="${coupon.actvtnYn}" class="badge bg-success">활성</span>
+            <span th:unless="${coupon.actvtnYn}" class="badge bg-danger">비활성</span>
+        </td>
+        <td>[[${#temporals.format(coupon.crtDt, 'yyyy-MM-dd')}]]</td>
+        <td>
+            <a th:href="@{/adminpage/useradmin/editCoupons}" class="btn btn-sm btn-outline-dark">수정</a>
+            <a href="#" class="btn btn-sm btn-outline-danger">삭제</a>
+        </td>
+    </tr>
+</tbody>
+
+<tbody th:if="${couponsList == null or couponsList.isEmpty()}">
+    <tr>
+        <td colspan="14" class="text-center py-5">
+            조회된 쿠폰 정보가 없습니다.
+        </td>
+    </tr>
+</tbody>
 				</table>
 
 				<nav class="d-flex justify-content-center mt-4"
