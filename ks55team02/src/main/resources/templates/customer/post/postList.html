@@ -26,9 +26,14 @@
 	<!-- 추가할 페이지 contents -->
 	<th:block layout:fragment="contents">
 	    <!-- 사진 2처럼 페이지 타이틀이 나오는 부분을 가정하고 div로 감쌌습니다 -->
-		<div class="container">
+		<div class="container"
+	         th:data-initial-bbsClsfCd="${bbsClsfCd}"
+	         th:data-initial-page="${currentPage}"
+	         th:data-initial-size="${size}"
+	         th:data-initial-keyword="${keyword}">
+	         
 		    <div class="page-title-section">
-		        <h2 th:text="${boardName}" class="page-main-title">게시판 이름</h2>
+		        <h2 th:text="${boardName}" class="page-main-title" id="board-title">게시판 이름</h2>
 		        <h5 class="page-subtitle">게시판의 모든 게시글</h5>
 		    </div>
 		
@@ -65,29 +70,7 @@
 									<th style="width: 14%;">생성일시</th>
 		                        </tr>
 		                    </thead>
-		                    <tbody>
-		                        <th:block th:if="${!#lists.isEmpty(postList)}">
-		                            <tr th:each="p : ${postList}">
-		                                <td th:text="${p.pstSn}">게시글일련번호</td>
-		                                <td class="post-title-cell"> <!-- 제목 셀에 클래스 추가 -->
-		                                    <a th:text="${p.pstTtl}"
-		                                       th:href="@{/customer/post/postView(pstSn=${p.pstSn}, bbsClsfCd=${bbsClsfCd}, page=${currentPage}, size=${size})}"
-		                                       class="post-title-link">게시글제목</a>
-		                                    <span th:if="${p.cmntCnt > 0}">
-		                                    	[<span th:text="${p.cmntCnt}"></span>]
-		                                    </span>
-		                                </td>
-		                                <td th:text="${p.userInfo.userNcnm}">작성자</td>
-		                                <td th:text="${p.interCnt}">추천수</td>
-		                                <td th:text="${p.viewCnt}">조회수</td>
-		                                <td th:text="${ #temporals.format(p.crtDt, 'yyyy-MM-dd') == #temporals.format(#temporals.createNow(), 'yyyy-MM-dd') 
-													? #temporals.format(p.crtDt, 'HH:mm') 
-													: #temporals.format(p.crtDt, 'MM-dd') }">생성일시</td>
-		                            </tr>
-		                        </th:block>
-		                        <tr th:unless="${!#lists.isEmpty(postList)}">
-		                            <td colspan="5">게시글이 존재하지 않습니다.</td> <!-- colspan은 테이블 헤더 개수에 맞게 조정 -->
-		                        </tr>
+		                    <tbody id="post-list-body">
 		                    </tbody>
 		                </table>
 		            </div>
@@ -116,31 +99,8 @@
 		    <!-- card end// -->
 		
 		    <!-- 페이지네이션 영역 -->
-		    <div class="pagination-area">
-				<!-- 페이지네이션 바 (수정 후 예시) -->
-				<nav aria-label="Page navigation">
-				    <ul class="pagination justify-content-center">
-				        
-				        <!-- '이전' 버튼: 현재 페이지가 1보다 클 때만 보임 -->
-				        <li class="page-item" th:if="${currentPage > 1}">
-				            <a class="page-link" th:href="@{/customer/post/postList(page=${currentPage-1}, size=${size}, bbsClsfCd=${bbsClsfCd})}">이전</a>
-				        </li>
-				
-				        <!-- 페이지 번호 목록: startPageNum부터 endPageNum까지 반복 -->
-				        <!-- th:each를 사용하여 계산된 범위만큼만 페이지 번호를 생성합니다. -->
-				        <th:block th:each="pageNum : ${#numbers.sequence(startPageNum, endPageNum)}">
-				            <li class="page-item" th:classappend="${pageNum == currentPage} ? 'active' : ''">
-				                <a class="page-link" th:href="@{/customer/post/postList(page=${pageNum}, size=${size}, bbsClsfCd=${bbsClsfCd})}" th:text="${pageNum}">1</a>
-				            </li>
-				        </th:block>
-				
-				        <!-- '다음' 버튼: 현재 페이지가 마지막 페이지(totalPage)보다 작을 때만 보임 -->
-				        <li class="page-item" th:if="${currentPage < totalPage}">
-				            <a class="page-link" th:href="@{/customer/post/postList(page=${currentPage+1}, size=${size}, bbsClsfCd=${bbsClsfCd})}">다음</a>
-				        </li>
-				
-				    </ul>
-				</nav>
+		    <div class="pagination-area" id="pagination-container">
+
 		    </div>
 			<!-- =================================================================== -->
 			<!-- 임시 검색 및 페이지 크기 조절 컨트롤 (부트스트랩 기반) -->
