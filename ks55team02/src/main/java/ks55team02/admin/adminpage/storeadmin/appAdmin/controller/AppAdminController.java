@@ -46,7 +46,7 @@ public class AppAdminController {
 		                                                // 만약 request parameter로 pageSize가 넘어오지 않았다면 기본값(10)이 사용됨.
 		
 		// 4. 상점 신청(어드민페이지) 목록 조회 (페이지네이션 및 검색 조건 적용)
-		List<AppAdmin> appAdminList = appAdminService.getAppAdminList(appAdmin);
+		List<AppAdmin> appAdminList = appAdminService.getAppAdminList(appAdmin, pagination.getLimitStart(), appAdmin.getPageSize());
 		log.info("컨트롤러: appAdminList 조회 결과 개수: {}", appAdminList.size());
 		
 		model.addAttribute("title", "상점 신청");
