@@ -36,7 +36,7 @@ $(() => {
         $loadingIndicator.show();
 
         $.ajax({
-            url: '/api/feed/list',
+            url: '/customer/feed/list',
             type: 'GET',
             data: { page: currentPage },
             dataType: 'json'

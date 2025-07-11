@@ -31,7 +31,8 @@
 			            <!-- 프로필 이미지 -->
 			            <div class="profile-image">
 			                <!-- prflImg가 null이거나 비어있으면 기본 이미지, 아니면 사용자 이미지 표시 -->
-			                <img th:src="*{prflImg != null && !prflImg.isEmpty() ? prflImg : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGjTFyPcQd4MSd0UdvwNcpaCjmt13HhgyhWw&s'}" alt="프로필 이미지">
+			                <img th:src="@{/uploads/profiles/profiles.jpg}" alt="프로필 이미지">
+			                <!-- th:src="*{prflImg != null && !prflImg.isEmpty() ? prflImg : 'C:\home\teamproject\attachment\profiles\profiles.jpg'} -->
 			            </div>
 			
 			            <!-- 프로필 정보 및 버튼 -->
