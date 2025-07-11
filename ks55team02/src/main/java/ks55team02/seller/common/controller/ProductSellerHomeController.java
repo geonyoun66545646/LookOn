@@ -22,7 +22,7 @@ public class ProductSellerHomeController {
 	
     @GetMapping(value={"", "/"})
 	public String getStoreInfo(/* @RequestParam("storeId") String storeId, */ Model model) {
-    	String storeId ="store_25";
+    	String storeId ="store_4";
 
          // 서비스 계층을 통해 storeId로 상점 정보를 조회합니다.
          Store store = storeMngService.getStoreInfoById(storeId);
@@ -48,9 +48,24 @@ public class ProductSellerHomeController {
              model.addAttribute("sbscrPrchsNocs", subscription.get("sbscr_prchs_nocs"));
          }
 
+         // 3. 상점의 총 판매 금액 조회
+         Long storeSettle = storeMngService.getTotalSettleById(storeId);
+         
+         // 4. 상점의 총 상품 판매 개수 조회
+         Long storeOrdCnt = storeMngService.getTotalOrderById(storeId);
+         
+         // 5. 상점의 총 활성화된 상품 개수
+         Long storeActGds = storeMngService.getActGdsById(storeId);
+         
          // 뷰로 전달할 데이터를 Model에 추가합니다.
          model.addAttribute("title", "상점 상세 정보");
          model.addAttribute("store", store); // 조회된 Store DTO 객체
+         model.addAttribute("storeSettle", storeSettle); // 조회된 Store DTO 객체
+         model.addAttribute("storeOrdCnt", storeOrdCnt); // 조회된 Store DTO 객체
+         model.addAttribute("storeActGds", storeActGds); // 조회된 Store DTO 객체
+         
+         
+         
          
          // 상점 로고 이미지 경로도 필요하다면 여기서 추가적으로 조회하여 모델에 담을 수 있습니다.
          // String storeLogoPath = storeMngService.getStoreLogoPathById(storeId);

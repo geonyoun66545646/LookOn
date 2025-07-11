@@ -11,4 +11,13 @@ public interface StoreMngService {
 	
 	// 특정 상점 ID에 대한 구독 기간 통합 정보를 조회합니다.
 	Map<String, Object> getStoreSubscriptionByStoreId(String storeId);
+	
+	// 특정 상점 ID에 대한 총 판매금액을 조회합니다.
+	Long getTotalSettleById(String storeID);
+	
+	// 특정 상점 ID에 대한 총 상품판매 개수를 조회 합니다.
+	Long getTotalOrderById(String storeID);
+	
+	// 특정 상점 ID에 대한 총 활성화된 등록 상품 개수를 조회 합니다.
+	Long getActGdsById(String storeId);
 }
