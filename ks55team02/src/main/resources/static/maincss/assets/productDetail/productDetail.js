@@ -9,7 +9,70 @@ $(document).ready(function() {
     const selectedOptionsContainer = $('#selectedOptionsContainer');
     const selectedOptionCurrentPriceSpan = $('#selectedOptionCurrentPrice'); 
     let selectedOptions = []; // 선택된 옵션 목록 (배열)
+	const mainImage = document.getElementById('product-detail-zoom');
+    const galleryItems = document.querySelectorAll('.product-detail-gallery-item');
+    const imageCounter = document.querySelector('.product-detail-image-counter span'); // For updating the counter
+    const totalImages = galleryItems.length;
 
+	
+	// 이미지
+	if (imageCounter) {
+	        imageCounter.textContent = totalImages;
+	    }
+
+	    galleryItems.forEach((item, index) => {
+	        item.addEventListener('click', function(e) {
+	            e.preventDefault(); // Prevent default link behavior
+
+	            // Remove 'active' class from all thumbnails
+	            galleryItems.forEach(thumb => thumb.classList.remove('active'));
+
+	            // Add 'active' class to the clicked thumbnail
+	            this.classList.add('active');
+
+	            // Update the main image src and data-zoom-image
+	            const newImageSrc = this.getAttribute('data-image');
+	            const newZoomImageSrc = this.getAttribute('data-zoom-image');
+
+	            mainImage.src = newImageSrc;
+	            mainImage.setAttribute('data-zoom-image', newZoomImageSrc);
+
+	            // Update the image counter
+	            if (imageCounter) {
+	                const currentCountElement = document.querySelector('.product-detail-image-counter');
+	                currentCountElement.innerHTML = `${index + 1}/${totalImages} <i class="icon-arrows"></i>`;
+	            }
+
+	            // (Optional) Reinitialize a zoom library here if you're using one like elevateZoom
+	            // if (typeof $.fn.elevateZoom !== 'undefined') {
+	            //     $(mainImage).elevateZoom({
+	            //         zoomType: "inner",
+	            //         cursor: "crosshair",
+	            //         zoomWindowFadeIn: 500,
+	            //         zoomWindowFadeOut: 500
+	            //     });
+	            // }
+	        });
+	    });
+
+	    // Thumbnail scroll functionality
+	    const thumbnailGallery = document.getElementById('product-detail-zoom-gallery');
+	    const scrollAmount = 100; // Pixels to scroll per click
+
+	    document.querySelector('.product-detail-thumbnail-up').addEventListener('click', function() {
+	        thumbnailGallery.scrollBy({
+	            top: -scrollAmount,
+	            behavior: 'smooth'
+	        });
+	    });
+
+	    document.querySelector('.product-detail-thumbnail-down').addEventListener('click', function() {
+	        thumbnailGallery.scrollBy({
+	            top: scrollAmount,
+	            behavior: 'smooth'
+	        });
+	    });
+	
     // --- 2. 헬퍼 함수 정의 ---
 
     // 가격을 '1,000원' 형태로 포맷팅하는 함수

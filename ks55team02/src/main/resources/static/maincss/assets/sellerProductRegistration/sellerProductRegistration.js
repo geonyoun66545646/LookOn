@@ -29,6 +29,11 @@ $(document).ready(function() {
 	            </div>
 	        `;
 	        $previewContainer.append(imgHtml);
+			
+			// ⭐ 추가: 유지할 이미지 경로를 form에 hidden input으로 추가
+	        $('#productRegistrationForm').append(
+	            `<input type="hidden" class="existing-image-path" name="existingImagePaths" value="${img.imgFilePathNm}" data-image-no="${img.imgNo}">`
+	        );
 	    });
 	}
 
@@ -302,54 +307,72 @@ $(document).ready(function() {
     });
 
     // --- 옵션 조합 생성 및 업데이트 함수 ---
-    function updateOptionCombinations() {
-        var productName = $('#optionProductName').val().trim();
-        var selectedGender = $('#genderOption').val();
-        var selectedColors = [];
-        var selectedSizes = [];
+	function updateOptionCombinations() {
+	    var productName = $('#optionProductName').val().trim();
+	    var selectedGender = $('#genderOption').val();
+	    var selectedColors = [];
+	    var selectedSizes = [];
 
-        $('#colorOptionValues .option-value-btn.active').each(function() {
-            selectedColors.push($(this).data('value'));
-        });
+	    // 활성화된 옵션만 선택
+	    $('#colorOptionValues .option-value-btn.active').each(function() {
+	        selectedColors.push($(this).data('value'));
+	    });
 
-		$('#sizeOptionValues .option-value-btn.active').each(function() {
+	    $('#sizeOptionValues .option-value-btn.active').each(function() {
 	        selectedSizes.push($(this).data('value'));
 	    });
 
-        // 기존에 생성된 숨겨진 옵션 필드 제거 (중복 방지)
-        $('#productRegistrationForm input[name^="productOptionDetails"]').remove();
+	    // 기존 hidden 필드 제거
+		$('#productRegistrationForm').find(
+		  'input[name^="productOptionDetails"], input[name="colorOptions"], input[name="sizeOptions"]'
+		).remove();
 
-        // 선택된 색상 옵션을 숨겨진 input 필드로 추가
-        selectedColors.forEach(function(color) {
-            $('<input>').attr({
-                type: 'hidden',
-                name: 'colorOptions',
-                value: color
-            }).appendTo('#productRegistrationForm');
-        });
+	    // 수정 모드일 때만 선택된 옵션을 hidden 필드로 추가
+	    if (isUpdateMode) {
+	        // 선택된 옵션만 JSON으로 직렬화하여 전송
+	        $('<input>').attr({
+	            type: 'hidden',
+	            name: 'selectedColorOptions',
+	            value: JSON.stringify(selectedColors)
+	        }).appendTo('#productRegistrationForm');
 
-        // 선택된 사이즈 옵션을 숨겨진 input 필드로 추가
-        selectedSizes.forEach(function(size) {
-            $('<input>').attr({
-                type: 'hidden',
-                name: 'sizeOptions',
-                value: size
-            }).appendTo('#productRegistrationForm');
-        });
+	        $('<input>').attr({
+	            type: 'hidden',
+	            name: 'selectedSizeOptions',
+	            value: JSON.stringify(selectedSizes)
+	        }).appendTo('#productRegistrationForm');
+	    } else {
+	        // 등록 모드일 때는 기존 방식 유지
+	        selectedColors.forEach(function(color) {
+	            $('<input>').attr({
+	                type: 'hidden',
+	                name: 'colorOptions',
+	                value: color
+	            }).appendTo('#productRegistrationForm');
+	        });
 
-        var $combinationTableBody = $('#optionCombinationsTableBody');
-        $combinationTableBody.empty();
+	        selectedSizes.forEach(function(size) {
+	            $('<input>').attr({
+	                type: 'hidden',
+	                name: 'sizeOptions',
+	                value: size
+	            }).appendTo('#productRegistrationForm');
+	        });
+	    }
 
-        // 필수 입력 항목 유효성 검사 (조합 생성 전)
-        if (!selectedGender && selectedColors.length === 0 && selectedSizes.length === 0) {
-            $combinationTableBody.append('<tr><td colspan="2" class="text-center text-muted">성별, 색상, 사이즈 옵션을 선택하면 조합이 생성됩니다.</td></tr>');
-            return;
-        }
-        
-        if (!productName) {
-            $combinationTableBody.append('<tr><td colspan="2" class="text-center text-muted">옵션 조합에 사용될 제품명을 입력해주세요.</td></tr>');
-            return;
-        }
+	    // 조합 테이블 생성 로직 (기존과 동일)
+	    var $combinationTableBody = $('#optionCombinationsTableBody');
+	    $combinationTableBody.empty();
+
+	    if (!selectedGender && selectedColors.length === 0 && selectedSizes.length === 0) {
+	        $combinationTableBody.append('<tr><td colspan="2" class="text-center text-muted">성별, 색상, 사이즈 옵션을 선택하면 조합이 생성됩니다.</td></tr>');
+	        return;
+	    }
+	    
+	    if (!productName) {
+	        $combinationTableBody.append('<tr><td colspan="2" class="text-center text-muted">옵션 조합에 사용될 제품명을 입력해주세요.</td></tr>');
+	        return;
+	    }
 
         // 조합 테이블 생성을 위한 임시 배열
         var combinationsForTable = [];
@@ -499,7 +522,8 @@ $(document).ready(function() {
 	            currentIds.push(String(imageNoToDelete));
 	            $deletedIdsInput.val(currentIds.join(','));
 	        }
-	        
+			
+			$(`.existing-image-path[data-image-no="${imageNoToDelete}"]`).remove();
 	        $itemToRemove.remove(); // 화면에서 미리보기 아이템 제거
 	        console.log('삭제할 기존 이미지 ID 목록:', $deletedIdsInput.val());
 

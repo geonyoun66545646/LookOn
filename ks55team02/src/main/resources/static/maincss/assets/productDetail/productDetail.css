@@ -668,3 +668,252 @@
 /* .product-option-price-preview {
     display: none;
 } */
+
+
+/* ----------------------------------------- */
+/* =========================================================================
+   Product Detail Gallery Styles (Prefix: product-detail-)
+   ========================================================================= */
+
+/* Overall container for main image and thumbnails */
+.product-detail-gallery-container {
+    margin-bottom: 30px; /* Adjust as needed */
+    display: flex; /* Ensures columns align properly */
+    align-items: flex-start; /* Align items to the top */
+}
+
+/* Left: Thumbnails Wrapper */
+.product-detail-thumbnails-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center buttons and gallery */
+    padding-right: 15px; /* Spacing between thumbnails and main image */
+}
+
+/* Thumbnails list container */
+.product-detail-image-gallery {
+    width: 100%; /* Take full width of its column */
+    max-height: 500px; /* Adjust this height based on your main image height or desired scroll area */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds max-height */
+    padding: 5px; /* Inner padding for the scroll area */
+    border: 1px solid #f0f0f0; /* Light border around the thumbnail area */
+    border-radius: 5px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    gap: 10px; /* Space between each thumbnail */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #ddd #f1f1f1; /* Firefox */
+}
+
+/* Custom scrollbar for Webkit browsers */
+.product-detail-image-gallery::-webkit-scrollbar {
+    width: 8px;
+}
+.product-detail-image-gallery::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+.product-detail-image-gallery::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 4px;
+}
+.product-detail-image-gallery::-webkit-scrollbar-thumb:hover {
+    background: #bbb;
+}
+
+
+/* Individual thumbnail item */
+.product-detail-gallery-item {
+    display: block;
+    border: 2px solid transparent; /* Default transparent border */
+    border-radius: 5px;
+    overflow: hidden; /* Ensures image fits within rounded corners */
+    transition: border-color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+    background-color: #fff; /* Background for thumb item */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* Subtle shadow */
+}
+
+.product-detail-gallery-item:hover {
+    border-color: #ccc; /* Border on hover */
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Active thumbnail item */
+.product-detail-gallery-item.active {
+    border-color: #333; /* Darker border for active item */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* More prominent shadow for active */
+}
+
+.product-detail-gallery-item img {
+    width: 100%; /* Make image fill its container */
+    height: 80px; /* Fixed height for consistent thumbnail size */
+    object-fit: cover; /* Crop image to cover the area without distortion */
+    display: block; /* Remove extra space below image */
+}
+
+/* Placeholder for no images */
+.product-detail-no-image-placeholder {
+    text-align: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px dashed #ddd;
+    color: #999;
+    font-size: 0.9em;
+    border-radius: 5px;
+}
+.product-detail-no-image-placeholder img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    opacity: 0.7;
+}
+
+/* Thumbnail navigation buttons */
+.product-detail-thumbnail-nav-btn {
+    background: #f8f8f8;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    font-size: 1.2em;
+    color: #555;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    width: 100%; /* Make buttons full width of the column */
+}
+
+.product-detail-thumbnail-nav-btn:hover {
+    background-color: #e5e5e5;
+    border-color: #ccc;
+}
+.product-detail-thumbnail-nav-btn:active {
+    background-color: #ddd;
+    border-color: #bbb;
+}
+
+/* Right: Main Image Wrapper */
+.product-detail-main-image-wrapper {
+    position: relative; /* Needed for absolute positioning of children */
+    padding-left: 15px; /* Spacing from thumbnails */
+}
+
+/* Main image figure */
+.product-detail-main-image {
+    position: relative; /* Needed for absolute positioning of children */
+    margin: 0; /* Remove default figure margin */
+    border: 1px solid #e0e0e0; /* Subtle border */
+    border-radius: 5px;
+    overflow: hidden; /* Ensure rounded corners */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* Soft shadow */
+    background-color: #fff;
+}
+
+.product-detail-main-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Main image expand button */
+.product-detail-btn-gallery {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border-radius: 50%; /* Circular button */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em;
+    transition: background-color 0.3s ease;
+    text-decoration: none; /* Remove underline */
+}
+
+.product-detail-btn-gallery:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff; /* Ensure text color stays white on hover */
+}
+
+/* Image counter */
+.product-detail-image-counter {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 20px; /* Pill shape */
+    font-size: 0.9em;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.product-detail-image-counter i {
+    font-size: 0.8em; /* Adjust icon size within counter */
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    .product-detail-thumbnails-wrapper,
+    .product-detail-main-image-wrapper {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .product-detail-thumbnails-wrapper {
+        order: 2; /* Move thumbnails below main image on small screens */
+        margin-top: 20px;
+    }
+    .product-detail-main-image-wrapper {
+        order: 1; /* Main image first on small screens */
+    }
+    .product-detail-thumbnails-wrapper {
+        /* On small screens, thumbnails might be better horizontally scrollable or just flow */
+        max-height: unset; /* Remove max-height for mobile if desired */
+    }
+    .product-detail-image-gallery {
+        flex-direction: row; /* Change to horizontal flow on small screens */
+        overflow-x: auto; /* Horizontal scroll */
+        overflow-y: hidden;
+        white-space: nowrap; /* Prevent wrapping */
+        gap: 10px;
+        padding: 5px;
+        margin-bottom: 10px; /* Space from buttons */
+    }
+    .product-detail-image-gallery::-webkit-scrollbar {
+        height: 8px; /* Horizontal scrollbar height */
+        width: auto;
+    }
+    .product-detail-gallery-item {
+        flex: 0 0 auto; /* Don't grow, don't shrink, fixed size */
+        width: 80px; /* Fixed width for horizontal thumbnails */
+        height: 80px; /* Same as height of image */
+    }
+    .product-detail-thumbnail-nav-btn {
+        display: none; /* Hide vertical nav buttons on small screens */
+    }
+    .product-detail-image-counter {
+        bottom: 10px;
+        right: 10px;
+        padding: 6px 10px;
+        font-size: 0.8em;
+    }
+    .product-detail-btn-gallery {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1em;
+        top: 10px;
+        right: 10px;
+    }
+}
+
+.product-detail-col-md-6{
+	display: flex;
+}
