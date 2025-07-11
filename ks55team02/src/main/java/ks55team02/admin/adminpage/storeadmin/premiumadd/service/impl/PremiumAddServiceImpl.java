@@ -62,4 +62,16 @@ public class PremiumAddServiceImpl implements PremiumAddService {
     public boolean deleteSubscriptionPlan(String sbscrPlanId) {
         return premiumAddMapper.deleteSubscriptionPlan(sbscrPlanId) == 1; // premiumAddMapper로 변경
     }
+    
+    @Override
+    public PremiumAddDTO getPlanById(String planId) {
+        return premiumAddMapper.getPlanById(planId);
+    }
+
+    @Override
+    public boolean modifySubscriptionPlan(String planId, PremiumAddDTO modifiedPlan) {
+        modifiedPlan.setSbscrPlanId(planId); // ID 설정
+        int result = premiumAddMapper.modifySubscriptionPlan(modifiedPlan);
+        return result > 0;
+    }
 }

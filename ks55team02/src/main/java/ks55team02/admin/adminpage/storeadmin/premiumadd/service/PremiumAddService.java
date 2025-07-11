@@ -40,4 +40,8 @@ public interface PremiumAddService {
      */
     boolean deleteSubscriptionPlan(String sbscrPlanId);
     
+    // 구독권 수정
+    PremiumAddDTO getPlanById(String planId);
+    boolean modifySubscriptionPlan(String planId, PremiumAddDTO modifiedPlan);
+    
 }

@@ -80,4 +80,34 @@ public class PremiumAddController {
             return ResponseEntity.badRequest().body("{\"message\": \"구독 플랜 등록 실패\"}");
         }
     }
+    
+ // 구독 플랜 수정 폼 조회
+    @GetMapping("/premiumModify/{id}")
+    public String showModifyForm(@PathVariable("id") String planId, Model model) {
+        PremiumAddDTO plan = premiumAddService.getPlanById(planId);
+        model.addAttribute("plan", plan);
+        return "admin/adminpage/storeadmin/premiumModify";
+    }
+
+    // 구독 플랜 수정 처리
+    @PostMapping("/premiumModify/{id}")
+    public String processModifyPlan(
+            @PathVariable("id") String planId,
+            @ModelAttribute PremiumAddDTO modifiedPlan,
+            Model model) {
+        
+        try {
+            boolean success = premiumAddService.modifySubscriptionPlan(planId, modifiedPlan);
+            if (success) {
+                return "redirect:/adminpage/storeadmin/list";
+            } else {
+                model.addAttribute("errorMessage", "수정에 실패했습니다.");
+                return "admin/adminpage/storeadmin/premiumModify";
+            }
+        } catch (Exception e) {
+            log.error("구독 플랜 수정 오류", e);
+            model.addAttribute("errorMessage", "서버 오류: " + e.getMessage());
+            return "admin/adminpage/storeadmin/premiumModify";
+        }
+    }
 }
