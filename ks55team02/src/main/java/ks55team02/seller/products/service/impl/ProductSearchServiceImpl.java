@@ -19,6 +19,11 @@ public class ProductSearchServiceImpl implements ProductSearchService {
     private final ProductSearchMapper productSearchMapper;
     
     @Override
+    public List<Products> getRecentProductsForMain(int limit) {
+        return productSearchMapper.getRecentProductsForMain(limit);
+    }
+    
+    @Override
     public List<Products> getSaleProducts() {
         return productSearchMapper.getSaleProducts();
     }

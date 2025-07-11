@@ -8,7 +8,8 @@ import java.util.Map;
 
 @Mapper
 public interface ProductsMapper {
-
+	
+	
 	// --- 상품 등록(Create) 관련 메소드 ---
 	String getMaxProductCode();
 	String getMaxImageNo();

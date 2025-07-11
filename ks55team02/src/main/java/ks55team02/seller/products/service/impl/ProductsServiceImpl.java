@@ -191,38 +191,72 @@ public class ProductsServiceImpl implements ProductsService {
         }
         return colorOptions;
     }
+    
+ // ProductsServiceImpl.java
 
+    // 필터용 의류 사이즈 목록 조회
     @Override
     public List<ProductOptionValue> getAllApparelSizes() {
         List<ProductOptionValue> allSizes = productOptionMapper.getAllProductOptionValuesByType("사이즈");
-        Pattern includePattern = Pattern.compile("^(XS|S|M|L|XL|2XL|\\d{2,3})$", Pattern.CASE_INSENSITIVE);
-        List<Pattern> excludePatterns = List.of(
-            Pattern.compile("^\\d{1,3}(\\.\\d)?$"),
-            Pattern.compile("^(FREE|단일)$", Pattern.CASE_INSENSITIVE)
-        );
-        List<String> customOrder = List.of("XS", "S", "M", "L", "XL", "2XL");
-        return processAndFilterAndSortSizes(allSizes, includePattern, excludePatterns, customOrder);
+        List<String> apparelSizeOrder = List.of("XS", "S", "M", "L", "XL", "2XL", "3XL");
+
+        if (allSizes == null) return new ArrayList<>();
+
+        // vlNm을 기준으로 중복을 제거하고, 정해진 순서대로 정렬합니다.
+        return allSizes.stream()
+                // 1. vlNm이 null이 아니고, 의류 사이즈 목록에 포함된 값만 필터링
+                .filter(pov -> pov.getVlNm() != null && apparelSizeOrder.contains(pov.getVlNm().toUpperCase()))
+                // 2. vlNm 기준으로 중복 제거 (Map을 활용)
+                .collect(Collectors.toMap(
+                        pov -> pov.getVlNm().toUpperCase(), // Key: 사이즈 이름 (대소문자 무관)
+                        pov -> pov,                          // Value: 첫 번째로 발견된 객체
+                        (existing, replacement) -> existing   // 중복 키 발생 시 기존 값 유지
+                ))
+                .values().stream() // 3. 중복 제거된 Map의 값들(ProductOptionValue 객체)만 다시 스트림으로
+                // 4. 정해진 순서대로 정렬
+                .sorted(Comparator.comparingInt(pov -> apparelSizeOrder.indexOf(pov.getVlNm().toUpperCase())))
+                .collect(Collectors.toList());
     }
 
+	// 필터용 신발 사이즈 목록 조회
     @Override
     public List<ProductOptionValue> getAllShoeSizes() {
         List<ProductOptionValue> allSizes = productOptionMapper.getAllProductOptionValuesByType("사이즈");
-        Pattern includePattern = Pattern.compile("^\\d{1,3}(\\.\\d)?$");
-        List<Pattern> excludePatterns = List.of(
-            Pattern.compile("^(XS|S|M|L|XL|2XL|\\d{2,3})$", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("^(FREE|단일)$", Pattern.CASE_INSENSITIVE)
-        );
-        return processAndFilterAndSortSizes(allSizes, includePattern, excludePatterns, null);
+
+        if (allSizes == null) return new ArrayList<>();
+        
+        return allSizes.stream()
+                .filter(pov -> pov.getVlNm() != null && pov.getVlNm().matches("^[0-9]+(\\.[0-9])?$"))
+                .collect(Collectors.toMap(
+                        ProductOptionValue::getVlNm,
+                        pov -> pov,
+                        (existing, replacement) -> existing
+                ))
+                .values().stream()
+                .sorted(Comparator.comparingDouble(pov -> Double.parseDouble(pov.getVlNm())))
+                .collect(Collectors.toList());
     }
 
+	// 필터용 패션잡화 사이즈 목록 조회
     @Override
     public List<ProductOptionValue> getAllFashionSizes() {
         List<ProductOptionValue> allSizes = productOptionMapper.getAllProductOptionValuesByType("사이즈");
-        Pattern includePattern = Pattern.compile("^(FREE|단일)$", Pattern.CASE_INSENSITIVE);
-        List<String> customOrder = List.of("FREE", "단일");
-        return processAndFilterAndSortSizes(allSizes, includePattern, null, customOrder);
-    }
+        List<String> fashionSizeOrder = List.of("FREE", "단일");
+        
+        if (allSizes == null) return new ArrayList<>();
 
+        return allSizes.stream()
+                .filter(pov -> pov.getVlNm() != null && fashionSizeOrder.contains(pov.getVlNm().toUpperCase()))
+                .collect(Collectors.toMap(
+                        pov -> pov.getVlNm().toUpperCase(),
+                        pov -> pov,
+                        (existing, replacement) -> existing
+                ))
+                .values().stream()
+                .sorted(Comparator.comparingInt(pov -> fashionSizeOrder.indexOf(pov.getVlNm().toUpperCase())))
+                .collect(Collectors.toList());
+    }
+    
     @Override
     public List<Stores> getAllBrands() {
         return storeMapper.getAllStores();
@@ -343,55 +377,5 @@ public class ProductsServiceImpl implements ProductsService {
         mapping.setCreatrNo(creatorNo);
         mapping.setActvtnYn(true);
         productsMapper.insertStatusOptionMapping(mapping);
-    }
-
-    private List<ProductOptionValue> processAndFilterAndSortSizes(
-            List<ProductOptionValue> allSizes, Pattern includePattern,
-            List<Pattern> excludePatterns, List<String> customOrder) {
-        Set<String> seenVlNames = new HashSet<>();
-        List<ProductOptionValue> filteredAndUnique = new ArrayList<>();
-        if (allSizes == null) return filteredAndUnique;
-
-        for (ProductOptionValue pov : allSizes) {
-            // NullPointerException 방지를 위한 추가 null 체크
-            if (pov == null || pov.getVlNm() == null) {
-            	log.debug("디버그: ProductOptionValue 객체 또는 vlNm이 null입니다. 해당 항목을 건너뜁니다.");
-                continue; // null인 항목은 건너뛰기
-            }
-
-            String trimmedVlNm = pov.getVlNm().trim();
-            if (includePattern != null && !includePattern.matcher(trimmedVlNm).matches()) continue;
-            boolean excluded = false;
-            if (excludePatterns != null) {
-                for (Pattern excludePattern : excludePatterns) {
-                    if (excludePattern.matcher(trimmedVlNm).matches()) {
-                        excluded = true;
-                        break;
-                    }
-                }
-            }
-            if (excluded) continue;
-            if (seenVlNames.add(trimmedVlNm)) filteredAndUnique.add(pov);
-        }
-        
-        filteredAndUnique.sort((s1, s2) -> {
-            // 정렬 로직 내에서도 null 체크 강화 (혹시 모르니)
-            String s1Val = (s1 != null && s1.getVlNm() != null) ? s1.getVlNm().trim() : "";
-            String s2Val = (s2 != null && s2.getVlNm() != null) ? s2.getVlNm().trim() : "";
-
-            if (customOrder != null && !customOrder.isEmpty()) {
-                int index1 = customOrder.indexOf(s1Val.toUpperCase());
-                int index2 = customOrder.indexOf(s2Val.toUpperCase());
-                if (index1 != -1 && index2 != -1) return Integer.compare(index1, index2);
-                if (index1 != -1) return -1;
-                if (index2 != -1) return 1;
-            }
-            try {
-                return Double.compare(Double.parseDouble(s1Val), Double.parseDouble(s2Val));
-            } catch (NumberFormatException e) {
-                return s1Val.compareTo(s2Val);
-            }
-        });
-        return filteredAndUnique;
     }
 }
