@@ -125,8 +125,9 @@
         </td>
         <td>[[${#temporals.format(coupon.crtDt, 'yyyy-MM-dd')}]]</td>
         <td>
-            <a th:href="@{/adminpage/useradmin/editCoupons}" class="btn btn-sm btn-outline-dark">수정</a>
-            <a href="#" class="btn btn-sm btn-outline-danger">삭제</a>
+            <a th:href="@{/adminpage/useradmin/editCoupons/{id}(id=${coupon.pblcnCpnId})}"
+            class="btn btn-sm btn-outline-dark">수정</a>
+           <a href="javascript:void(0);" th:onclick="confirmDelete([[${coupon.pblcnCpnId}]])" class="btn btn-sm btn-outline-danger">삭제</a>
         </td>
     </tr>
 </tbody>
@@ -156,5 +157,28 @@
 </th:block>
 
 <th:block layout:fragment="jsScript">
-</th:block>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+     <script>
+        function confirmDelete(couponId) {
+            Swal.fire({
+                title: "정말로 삭제하시겠습니까?",
+                text: "이 쿠폰은 비활성화 상태로 변경됩니다.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "삭제",
+                cancelButtonText: "취소"
+            }).then((result) => {
+                // '삭제' 버튼을 눌렀을 경우
+                if (result.isConfirmed) {
+                    // 백엔드에 만들어 둔 삭제 URL로 페이지를 이동시켜 삭제를 실행합니다.
+                    window.location.href = `/adminpage/useradmin/deleteCoupons/${couponId}`;
+                }
+            });
+        }
+    </script>
+    
+    </th:block>
 </html>

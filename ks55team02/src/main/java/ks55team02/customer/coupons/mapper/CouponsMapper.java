@@ -47,6 +47,12 @@ public interface CouponsMapper {
      */
     void issueUserCoupon(UserCoupons userCoupon);
     
+    
+    /**
+     * [추가] 사용 완료된 쿠폰을 재발급 처리 (상태 갱신)
+     */
+    int reissueUserCoupon(UserCoupons userCoupon);
+    
     /**
      * 새로운 사용자 쿠폰 ID를 생성하기 위한 쿼리
      * @return 생성될 다음 사용자 쿠폰 ID (예: USRCPN_055)

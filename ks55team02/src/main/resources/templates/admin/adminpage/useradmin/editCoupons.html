@@ -4,154 +4,168 @@
 	layout:decorate="~{admin/layout/layoutMain}">
 
 <head>
-<meta name="description" content="한국스마트정보교육원 ksmybatis" />
-<title>createCoupons</title>
+<title>쿠폰 정보 수정</title>
 </head>
-<th:block layout:fragment="jsFile">
-</th:block>
 
-<th:block layout:fragment="jsScript">
-</th:block>
 <th:block layout:fragment="contents">
 	<main class="main-content">
-		<section class="content-header">
-			<h2 class="content-title">쿠폰 수정</h2>
-			<div>
-				<a href="#"
-					class="btn btn-light rounded font-sm mr-5 text-body hover-up">목록으로</a>
-				<button type="submit" class="btn btn-primary btn-block" disabled>수정하기</button>
-			</div>
-		</section>
+		<form id="editCouponForm"
+			th:action="@{/adminpage/useradmin/editCoupons}" method="post">
+			<section class="content-header">
+				<h2 class="content-title">쿠폰 정보 수정</h2>
+				<div>
+					<a th:href="@{/adminpage/useradmin/couponsList}"
+						class="btn btn-light rounded font-sm mr-5 text-body hover-up">목록으로</a>
+					<button type="submit" form="editCouponForm" class="btn btn-primary">수정하기</button>
+				</div>
+			</section>
 
-		<div class="row">
-			<div class="col-12">
-				<div class="card mb-4">
-					<div class="card-header">
-						<h4>쿠폰 정보</h4>
+			<div class="card">
+				<div class="card-header">
+					<h4>
+						쿠폰 정보: <span class="text-primary"
+							th:text="${couponInfo.pblcnCpnId}">PBLCPN_001</span>
+					</h4>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label class="form-label">쿠폰명</label> <input type="text"
+									class="form-control" name="cpnNm"
+									th:value="${couponInfo.cpnNm}">
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label class="form-label">할인 값 (%)</label> <input type="number"
+									step="0.01" class="form-control" name="dscntVl"
+									th:value="${couponInfo.dscntVl}">
+							</div>
+						</div>
 					</div>
-					<div class="card-body">
-						<form id="categoryForm" action="#" method="post">
 
+					<div class="row">
+						<div class="col-md-6">
 							<div class="mb-4">
-								<label for="pblcnCpnId" class="form-label">쿠폰 ID</label> <input
-									type="text" class="form-control" id="pblcnCpnId"
-									name="pblcnCpnId" value="CPN_SAMPLE_001" readonly> <small
-									class="form-text text-muted">쿠폰 ID는 수정할 수 없습니다.</small>
+								<label class="form-label">최소 주문 금액</label> <input type="number"
+									class="form-control" name="minOrdrAmt"
+									th:value="${couponInfo.minOrdrAmt}">
 							</div>
-
+						</div>
+						<div class="col-md-6">
 							<div class="mb-4">
-								<label for="cpnNm" class="form-label">쿠폰명</label> <span
-									id="cpnNmFeedback" class="text-danger float-right font-sm"></span>
-								<input type="text" placeholder="예: 첫 구매 웰컴 쿠폰"
-									class="form-control" id="cpnNm" name="cpnNm" required>
-								<small class="form-text text-muted">쿠폰의 이름을 입력해주세요.</small>
+								<label class="form-label">최대 할인 금액</label> <input type="number"
+									class="form-control" name="maxDscntAmt"
+									th:value="${couponInfo.maxDscntAmt}">
 							</div>
-
-							<div class="mb-4">
-								<label for="dscntVl" class="form-label">할인 값</label> <input
-									type="number" step="0.01" class="form-control" id="dscntVl"
-									placeholder="예: 5000 (할인액) 또는 10 (할인율)" name="dscntVl">
-								<small class="form-text text-muted">숫자만 입력 가능합니다 (할인율의
-									경우 0~100).</small>
-							</div>
-
-							<div class="mb-4">
-								<label for="minOrdrAmt" class="form-label">최소 주문 금액</label> <input
-									type="number" class="form-control" id="minOrdrAmt"
-									placeholder="예: 10000" name="minOrdrAmt"> <small
-									class="form-text text-muted">쿠폰 적용을 위한 최소 주문 금액입니다.</small>
-							</div>
-
-							<div class="mb-4">
-								<label for="maxDscntAmt" class="form-label">최대 할인 금액</label> <input
-									type="number" class="form-control" id="maxDscntAmt"
-									placeholder="예: 5000 (할인율 적용 시 최대 할인될 금액)" name="maxDscntAmt">
-								<small class="form-text text-muted">할인율 쿠폰의 경우 최대 할인되는
-									금액입니다.</small>
-							</div>
-
-							<div class="mb-4">
-								<label class="form-label">유효 기간</label>
-								<div class="row">
-									<div class="col-md-6">
-										<input type="date" class="form-control" id="vldBgngDt"
-											name="vldBgngDt" required>
-									</div>
-									<div class="col-md-6">
-										<input type="date" class="form-control" id="vldEndDt"
-											name="vldEndDt" required>
-									</div>
-								</div>
-								<small class="form-text text-muted">쿠폰의 유효 시작일과 종료일을
-									선택해주세요.</small>
-							</div>
-
-							<div class="mb-4">
-								<label for="totUseLmtNmtm" class="form-label">총 발급 제한 횟수</label>
-								<input type="number" class="form-control" id="totUseLmtNmtm"
-									placeholder="예: 1000 (0 입력 시 무제한)" name="totUseLmtNmtm">
-								<small class="form-text text-muted">이 쿠폰이 전체 사용자에게 발급될 수
-									있는 최대 횟수입니다. 0 입력 시 무제한.</small>
-							</div>
-
-							<div class="mb-4">
-								<label for="userPerUseLmtNmtm" class="form-label">사용자당
-									사용 제한 횟수</label> <input type="number" class="form-control"
-									id="userPerUseLmtNmtm" placeholder="예: 1 (0 입력 시 무제한)"
-									name="userPerUseLmtNmtm"> <small
-									class="form-text text-muted">한 사용자가 이 쿠폰을 발급받을 수 있는 최대
-									횟수입니다. 0 입력 시 무제한.</small>
-							</div>
-
-							<div class="mb-4">
-								<label for="issueConditionType" class="form-label">발급 조건
-									타입</label> <select class="form-select" id="issueConditionType"
-									name="issueConditionType">
-									<option value="NONE">없음</option>
-									<option value="SIGN_UP">회원가입</option>
-									<option value="FIRST_PURCHASE">첫 구매</option>
-									<option value="REVIEW">리뷰 작성</option>
-									<option value="BIRTHDAY">생일</option>
-									<option value="REISSUE_MONTHLY">매월 재발급</option>
-									<option value="MANUAL">관리자 수동 발급</option>
-								</select> <small class="form-text text-muted">쿠폰이 어떤 조건으로 발급되는지
-									선택하세요.</small>
-							</div>
-
-							<div class="mb-4">
-								<label for="reissueCycle" class="form-label">재발급 주기</label> <select
-									class="form-select" id="reissueCycle" name="reissueCycle">
-									<option value="NONE">재발급 없음 (1회성)</option>
-									<option value="MONTHLY">매월</option>
-									<option value="YEARLY">매년</option>
-									<option value="UNLIMITED">제한 없음 (조건 충족 시 항상)</option>
-								</select> <small class="form-text text-muted">조건이 충족될 때 쿠폰이 재발급되는
-									주기입니다.</small>
-							</div>
-
-							<div class="mb-4">
-								<label class="form-label">활성 여부</label>
-								<div>
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="radio" name="actvtnYn"
-											id="activeYes" value="1" checked> <label
-											class="form-check-label" for="activeYes">활성화</label>
-									</div>
-									<div class="form-check form-check-inline">
-										<input class="form-check-input" type="radio" name="actvtnYn"
-											id="activeNo" value="0"> <label
-											class="form-check-label" for="activeNo">비활성화</label>
-									</div>
-								</div>
-								<small class="form-text text-muted">이 쿠폰의 활성화 상태를 설정합니다.</small>
-							</div>
-
-						</form>
+						</div>
 					</div>
+
+					<div class="row">
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label class="form-label">유효 시작일</label> <input
+									type="datetime-local" class="form-control" name="vldBgngDt"
+									th:value="${couponInfo.vldBgngDt}">
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label class="form-label">유효 종료일</label> <input
+									type="datetime-local" class="form-control" name="vldEndDt"
+									th:value="${couponInfo.vldEndDt}">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label class="form-label">총 발급 제한 횟수</label> <input
+									type="number" class="form-control" name="totUseLmtNmtm"
+									th:value="${couponInfo.totUseLmtNmtm}">
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label class="form-label">사용자당 사용 제한 횟수</label> <input
+									type="number" class="form-control" name="userPerUseLmtNmtm"
+									th:value="${couponInfo.userPerUseLmtNmtm}">
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label class="form-label">발급 조건 타입</label> <select
+									class="form-select" name="issueConditionType">
+									<option value="NONE"
+										th:selected="${couponInfo.issueConditionType == 'NONE'}">없음</option>
+									<option value="SIGN_UP"
+										th:selected="${couponInfo.issueConditionType == 'SIGN_UP'}">회원가입</option>
+									<option value="FIRST_PURCHASE"
+										th:selected="${couponInfo.issueConditionType == 'FIRST_PURCHASE'}">첫
+										구매</option>
+									<option value="REVIEW"
+										th:selected="${couponInfo.issueConditionType == 'REVIEW'}">리뷰
+										작성</option>
+									<option value="BIRTHDAY"
+										th:selected="${couponInfo.issueConditionType == 'BIRTHDAY'}">생일</option>
+									<option value="REISSUE_MONTHLY"
+										th:selected="${couponInfo.issueConditionType == 'REISSUE_MONTHLY'}">매월
+										재발급</option>
+									<option value="MANUAL"
+										th:selected="${couponInfo.issueConditionType == 'MANUAL'}">관리자
+										수동 발급</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label class="form-label">재발급 주기</label> <select
+									class="form-select" name="reissueCycle">
+									<option value="NONE"
+										th:selected="${couponInfo.reissueCycle == 'NONE'}">재발급
+										없음 (1회성)</option>
+									<option value="MONTHLY"
+										th:selected="${couponInfo.reissueCycle == 'MONTHLY'}">매월</option>
+									<option value="YEARLY"
+										th:selected="${couponInfo.reissueCycle == 'YEARLY'}">매년</option>
+									<option value="UNLIMITED"
+										th:selected="${couponInfo.reissueCycle == 'UNLIMITED'}">제한
+										없음</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<div class="mb-4">
+						<label class="form-label">활성 여부</label>
+						<div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="actvtnYn"
+									id="activeYes" value="true"
+									th:checked="${couponInfo.actvtnYn == true}"> <label
+									class="form-check-label" for="activeYes">활성화</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="actvtnYn"
+									id="activeNo" value="false"
+									th:checked="${couponInfo.actvtnYn == false}"> <label
+									class="form-check-label" for="activeNo">비활성화</label>
+							</div>
+						</div>
+					</div>
+
+					<input type="hidden" name="pblcnCpnId"
+						th:value="${couponInfo.pblcnCpnId}" /> <input type="hidden"
+						name="userNo" th:value="${couponInfo.userNo}" />
+
 				</div>
 			</div>
-		</div>
+		</form>
 	</main>
 </th:block>
-
 </html>
