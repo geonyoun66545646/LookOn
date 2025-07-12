@@ -30,7 +30,8 @@ public class Inquiry {
 	private LocalDateTime  	delDt;
 	private String 	  		delUserNo;
 	private boolean 		delActvtnYn;
-
+	// InquiryUser 타입의 객체를 writerInfo 로 받음.
+	private InquiryUser  	writerInfo ;
 
 	   // inq_ 제거
     public String getInqryIdNum() {

@@ -82,7 +82,7 @@
     </resultMap>
     
     <!-- 상품 -->
-    <resultMap id="productResultMap" 			type="ks55team02.seller.common.domain.Product">
+    <resultMap id="productResultMap" 			type="ks55team02.seller.common.domain.Goods">
         <id property="gdsNo" 					column="gds_no"/> <!-- 상품 번호 (Primary Key) -->
         <result property="storeId" 				column="store_id"/> <!-- 상점 번호 -->
         <result property="ctgryNo" 				column="ctgry_no"/> <!-- 카테고리 번호 -->
@@ -103,6 +103,34 @@
         <result property="maxPurchaseQty"	 	column="max_purchase_qty"/> <!-- 최대 구매 수량 -->
     </resultMap>
     
+    
+  <resultMap id="TopSellingProductResultMap" type="ks55team02.seller.common.domain.TopSellingProduct">
+      <id property="gdsNo" column="gds_no"/>
+
+      <result property="totalSoldQuantity" column="total_sold_quantity"/>
+
+      <association property="ranking" javaType="ks55team02.seller.common.domain.Goods">
+          <id property="gdsNo" column="gds_no"/>
+
+          <result property="storeId" column="store_id"/>
+          <result property="ctgryNo" column="ctgry_no"/>
+          <result property="selUserNo" column="sel_user_no"/>
+          <result property="mdfrNo" column="mdfr_no"/>
+          <result property="delUserNo" column="del_user_no"/>
+          <result property="gdsNm" column="gds_nm"/>
+          <result property="gdsExpln" column="gds_expln"/>
+          <result property="basPrc" column="bas_prc"/>
+          <result property="dscntRt" column="dscnt_rt"/>
+          <result property="lastSelPrc" column="last_sel_prc"/>
+          <result property="regDt" column="reg_dt"/>
+          <result property="mdfcnDt" column="mdfcn_dt"/>
+          <result property="inactvtnDt" column="inactvtn_dt"/>
+          <result property="expsrYn" column="expsr_yn"/>
+          <result property="actvtnYn" column="actvtn_yn"/>
+          <result property="minPurchaseQty" column="min_purchase_qty"/>
+          <result property="maxPurchaseQty" column="max_purchase_qty"/>
+      </association>
+  </resultMap>
    
      <select id="getStoreList" resultMap="storeResultMap">
       <!-- /* 스토어 목록 조회 */ -->
@@ -173,8 +201,9 @@
 			    store_settlements
 			WHERE
 			    store_id = #{storeId};
-   		 </select>
-   		 <select id="getTotalOrderById" resultType="Long" parameterType="string">
+   	</select>
+   		 
+   	<select id="getTotalOrderById" resultType="Long" parameterType="string">
     	<!-- /* 상점별 판매 상품 개수 */ -->
 		  SELECT
 			    SUM(oi.ordr_qntty) AS total_items_sold
@@ -195,4 +224,42 @@
 		    store_id = #{storeId} 
 		    AND actvtn_yn = TRUE;
   		</select>
+  		
+  		
+  		 <select id="getTopSellingProductsByStoreId" resultMap="TopSellingProductResultMap">
+  		 <!-- /* 상점별 제일 많이 팔린 상품 개수 */ -->
+        SELECT
+	        p.gds_no,           -- 상품 번호
+	        p.store_id,         -- 상점 번호
+	        p.ctgry_no,         -- 카테고리 번호
+	        p.sel_user_no,      -- 판매자
+	        p.mdfr_no,          -- 수정자
+	        p.del_user_no,      -- 삭제자
+	        p.gds_nm,           -- 상품명
+	        p.gds_expln,        -- 상품 설명
+	        p.bas_prc,          -- 기본 가격
+	        p.dscnt_rt,         -- 할인율(%)
+	        p.last_sel_prc,     -- 최종 판매가
+	        p.reg_dt,           -- 등록일시
+	        p.mdfcn_dt,         -- 수정일시
+	        p.inactvtn_dt,      -- 비활성 일시
+	        p.expsr_yn,         -- 노출 여부
+	        p.actvtn_yn,        -- 활성화 여부
+	        p.min_purchase_qty, -- 최소 구매 수량
+	        p.max_purchase_qty, -- 최대 구매 수량
+	        COALESCE(SUM(oi.ordr_qntty), 0) AS total_sold_quantity 
+	    FROM
+	        products p  
+	    LEFT JOIN -- LEFT JOIN 
+	        order_items oi ON p.gds_no = oi.gds_no
+	    WHERE
+	        p.store_id = #{storeId}
+	        AND p.actvtn_yn = TRUE
+	    GROUP BY
+	        p.gds_no, p.store_id, p.ctgry_no, p.sel_user_no, p.mdfr_no, p.del_user_no, p.gds_nm, p.gds_expln, p.bas_prc, p.dscnt_rt, p.last_sel_prc, p.reg_dt, p.mdfcn_dt, p.inactvtn_dt, p.expsr_yn, p.actvtn_yn, p.min_purchase_qty, p.max_purchase_qty
+	    ORDER BY
+	        total_sold_quantity DESC
+	    LIMIT 5
+    </select>
+  		
   </mapper>

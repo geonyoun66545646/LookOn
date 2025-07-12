@@ -54,7 +54,7 @@
                                     </td>
                                     <td th:text="${l.inqryTypeCd}"></td>
                                     <td th:text="${l.prcsStts}"></td>
-                                    <td th:text="${l.wrtrId}"></td>
+                                    <td th:text="${l.writerInfo?.userNcnm}"></td>
                                     <td th:text="${#temporals.format(l.regYmd, 'yyyy-MM-dd')}" th:if="${l.regYmd != null}"></td>
                                 </tr>
                             </tbody>

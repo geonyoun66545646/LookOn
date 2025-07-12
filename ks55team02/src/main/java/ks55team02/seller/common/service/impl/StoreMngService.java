@@ -1,8 +1,10 @@
 package ks55team02.seller.common.service.impl;
 
+import java.util.List;
 import java.util.Map;
 
 import ks55team02.seller.common.domain.Store;
+import ks55team02.seller.common.domain.TopSellingProduct;
 
 public interface StoreMngService {
 
@@ -20,4 +22,7 @@ public interface StoreMngService {
 	
 	// 특정 상점 ID에 대한 총 활성화된 등록 상품 개수를 조회 합니다.
 	Long getActGdsById(String storeId);
+	
+	// 특정 상점 ID에 대한 상점별 판매 탑 5 랭킹
+	List<TopSellingProduct> getTopSellingProductsByStoreId(String storeId);
 }

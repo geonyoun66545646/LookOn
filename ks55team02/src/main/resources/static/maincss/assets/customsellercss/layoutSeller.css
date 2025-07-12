@@ -42,3 +42,7 @@
 .sub-box{
 	display : block;
 }
+
+table{
+	text-align : center;
+}

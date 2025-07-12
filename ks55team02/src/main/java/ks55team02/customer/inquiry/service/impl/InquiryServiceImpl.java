@@ -42,8 +42,10 @@ public class InquiryServiceImpl implements InquiryService {
     @Override
     public List<Inquiry> getInquiryList() {
         List<Inquiry> inquiryList = inquiryMapper.getInquiryList();
+       
         return inquiryList;
     }
+    
 
     // 질문 세부
     @Override
