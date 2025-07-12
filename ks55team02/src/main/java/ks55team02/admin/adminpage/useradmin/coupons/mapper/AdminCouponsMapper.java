@@ -10,4 +10,22 @@ import java.util.Map; // import 추가
 public interface AdminCouponsMapper {
     // 모든 쿠폰 데이터 조회
     List<AdminCoupons> getCouponsList();
+    
+ // [추가] 신규 쿠폰 등록
+    int addCoupon(AdminCoupons adminCoupons);
+    
+ // [추가] 가장 마지막에 등록된 쿠폰 ID를 조회
+    String getLastCouponId();
+    
+    // [추가] 쿠폰 정보 수정
+    int updateCoupon(AdminCoupons adminCoupons);
+    
+ // [추가] ID로 특정 쿠폰 정보 조회
+    AdminCoupons getCouponById(String pblcnCpnId);
+    
+    // [추가] 쿠폰 삭제 (비활성화 처리)
+    int deleteCoupon(String pblcnCpnId);
+    
+    
+    
 }
