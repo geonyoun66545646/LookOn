@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,10 +17,13 @@ import org.springframework.web.multipart.MultipartFile;
 import ks55team02.customer.inquiry.domain.Inquiry;
 import ks55team02.customer.inquiry.domain.InquiryImage;
 import ks55team02.customer.inquiry.domain.InquiryOption;
+import ks55team02.customer.inquiry.domain.InquiryTargetOption;
 import ks55team02.customer.inquiry.mapper.InquiryImageMapper;
 import ks55team02.customer.inquiry.mapper.InquiryMapper;
 import ks55team02.customer.inquiry.service.InquiryService;
+import ks55team02.customer.store.domain.Store;
 import ks55team02.customer.store.domain.StoreImage;
+import ks55team02.customer.store.mapper.CustomerStoreMapper;
 import ks55team02.customer.store.mapper.StoreImageMapper;
 import ks55team02.util.FileDetail;
 import ks55team02.util.FilesUtils;
@@ -37,6 +41,9 @@ public class InquiryServiceImpl implements InquiryService {
     private final InquiryImageMapper inquiryImageMapper;
     private final StoreImageMapper storeImageMapper;
     private final FilesUtils filesUtils;
+   
+    @Qualifier("customerStoreMapper")
+    private final CustomerStoreMapper customerStoreMapper;
 
     // 질문 목록 (페이징 없는 버전)
     @Override
@@ -198,8 +205,23 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
     @Override
-    public List<InquiryOption> getInquiryTypeOptions() {
+    public List<InquiryOption> getAdminInquiryTypeOptions() {
         // InquiryOption enum의 모든 상수를 리스트로 반환합니다.
-        return Arrays.asList(InquiryOption.values());
+    	 return Arrays.asList(InquiryOption.PRODUCT, InquiryOption.DELIVERY, InquiryOption.SNS, InquiryOption.ETC);
     }
+    
+    @Override
+    public List<InquiryTargetOption> getInquiryTargetOptions() { // 추가
+        return Arrays.asList(InquiryTargetOption.values());
+    }
+
+    @Override
+    public List<Store> getStoreList() {
+        List<Store> storeList = customerStoreMapper.getAllStores(); // 실제 상점 목록 조회
+        return customerStoreMapper.getAllStores();
+    }
+    
+    
+    
+    
 }

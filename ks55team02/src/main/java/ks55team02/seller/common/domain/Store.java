@@ -2,9 +2,16 @@ package ks55team02.seller.common.domain;
 
 import java.time.LocalDateTime;
 
-import lombok.Data;
+import org.apache.ibatis.type.Alias;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
+@Alias("SellerStoreDomain") 
 public class Store {
 
     private String 				storeId; // 상점 ID
