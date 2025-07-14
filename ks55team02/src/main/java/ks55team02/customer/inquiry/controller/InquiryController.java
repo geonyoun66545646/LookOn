@@ -1,7 +1,5 @@
 package ks55team02.customer.inquiry.controller;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +43,7 @@ public class InquiryController {
      * @return 로그인된 사용자 ID (현재는 'user_no_1000'으로 고정)
      */
     private String getCurrentUserId(HttpSession session) {
-        // 현재는 user_no_1000이 로그인 되어있다고 가정.
+        // 현재는 user_no_100이 로그인 되어있다고 가정.
         log.info("[임시] 현재 로그인된 사용자 ID: user_no_100"); // 로그 추가
         return "user_no_100";
 

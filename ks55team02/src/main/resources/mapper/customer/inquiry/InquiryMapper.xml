@@ -64,7 +64,7 @@
         #{prvtYn},
         #{prcsStts},
         #{prcsUserNo},
-        #{mdfcnYmd},  <!-- mdfcnYmd는 DDL에 ON UPDATE CURRENT_TIMESTAMP이므로, null로 두면 자동 업데이트됨 -->
+        #{mdfcnYmd},  
         #{delDt},
         #{delUserNo},
         #{delActvtnYn})
@@ -131,7 +131,6 @@
             i.del_dt,
             i.del_user_no,
             i.del_actvtn_yn,
-            -- Users Table Columns for writerInfo association
             u.user_no,
             u.mbr_grd_cd,
             u.user_lgn_id,
@@ -173,7 +172,6 @@
             i.del_dt, 
             i.del_user_no, 
             i.del_actvtn_yn,
-            -- Users Table Columns for writerInfo association
             u.user_no,
             u.mbr_grd_cd,
             u.user_lgn_id,
