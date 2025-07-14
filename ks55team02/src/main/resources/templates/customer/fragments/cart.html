@@ -121,6 +121,7 @@
             }
 
             // 세션 스토리지에서 장바구니 데이터 가져오기 (전역 변수로 선언)
+            // 초기에는 sessionStorage에서 가져오지만, 페이지 로드 시 서버 데이터로 덮어씌워짐.
             let cartData = JSON.parse(sessionStorage.getItem('cart_data')) || { products: [] };
             const $tbody = $('#cart-body');
 
@@ -201,7 +202,7 @@
                 }
             }
 
-            // 세션 스토리지 데이터 업데이트 함수
+            // 세션 스토리지 데이터 업데이트 함수 (UI 변경 후 호출)
             function updateSessionStorage() {
                 cartData.products = []; // 현재 UI의 상품으로 업데이트
                 $('table.table-cart tbody tr[data-id]').each(function() {
@@ -275,6 +276,61 @@
                 }
             }
 
+            // =========================================================
+            // 새로운 함수 추가: 서버로부터 장바구니 데이터를 가져와 렌더링
+            // =========================================================
+            function fetchCartDataFromServer() {
+                $.ajax({
+                    url: '/api/cart', // CartController의 장바구니 목록 조회 API 엔드포인트
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        // 서버에서 받아온 데이터를 cartData 객체에 저장
+                        // CartController.java의 /api/cart GET 메서드가 List<CartDTO>를 반환한다고 가정
+                        const serverCartItems = response;
+
+                        // CartDTO를 클라이언트의 cartData.products 형식에 맞게 변환
+                        const formattedCartProducts = serverCartItems.map(item => ({
+                            id: item.gdsNo + '_' + item.optNo + (item.storeId ? '_' + item.storeId : ''), // 고유 ID 조합
+                            name: item.gdsNm + (item.optNm ? ' (' + item.optNm + ')' : ''), // 상품명 + 옵션명
+                            price: item.gdsPrc, // 상품 단가
+                            quantity: item.quantity, // 수량
+                            image: item.gdsImg || `/path/to/default/image.jpg` // TODO: 서버에서 이미지 경로도 같이 넘겨주면 좋음. 없으면 임시 경로
+                        }));
+
+                        cartData.products = formattedCartProducts; // 전역 cartData에 할당
+                        
+                        // 화면 렌더링 및 총액 계산
+                        renderCartItems();
+                        updateCartTotals();
+
+                        // 서버에서 받아온 데이터를 sessionStorage에도 업데이트 (옵션)
+                        sessionStorage.setItem('cart_data', JSON.stringify(cartData));
+
+                        // 만약 쿠폰이 이전에 적용되었다면, 총액 변경 시 자동으로 재적용 시도
+                        const appliedCouponCode = sessionStorage.getItem('applied_coupon_code'); // 적용된 쿠폰 코드 가져오기
+                        if (appliedCouponCode) {
+                            performCouponApplication(appliedCouponCode);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('장바구니 데이터를 불러오는 데 실패했습니다:', error);
+                        // 장바구니 데이터 로드 실패 시에도 빈 장바구니로 초기화
+                        cartData.products = [];
+                        renderCartItems();
+                        updateCartTotals();
+                        Swal.fire({
+                            icon: 'error',
+                            title: '오류 발생',
+                            text: '장바구니 데이터를 불러오는 중 오류가 발생했습니다.',
+                            confirmButtonText: '확인'
+                        });
+                        // 오류 발생 시 적용된 쿠폰 정보도 초기화
+                        sessionStorage.removeItem('applied_coupon_code');
+                    }
+                });
+            }
+
 
             // 이벤트 핸들러 (수량 변경, 상품 삭제)
             $tbody.on('change input', '.qty-input', function() {
@@ -299,11 +355,10 @@
                 }
             });
 
-            // 페이지 최초 로드 시 장바구니 렌더링 및 총액 계산 실행
-            renderCartItems(); // 장바구니 상품을 먼저 화면에 그립니다.
-            updateCartTotals(); // 그려진 상품 기반으로 초기 총액 계산 및 UI 업데이트
+            // 페이지 최초 로드 시 장바구니 데이터 서버에서 가져와 렌더링
+            fetchCartDataFromServer(); // <-- 이 부분이 핵심 변경 사항
 
-            // coupons.html에서 넘어온 쿠폰 자동 적용 로직
+            // coupons.html에서 넘어온 쿠폰 자동 적용 로직 (서버 데이터 로드 후 실행되도록 위치 변경)
             const storedCouponCode = sessionStorage.getItem('selected_coupon_code');
             const storedCouponName = sessionStorage.getItem('selected_coupon_name'); // 쿠폰 이름도 가져옴
 

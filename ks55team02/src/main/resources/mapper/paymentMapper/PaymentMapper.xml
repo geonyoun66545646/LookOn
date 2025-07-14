@@ -167,6 +167,35 @@
             AND c.actvtn_yn = 1 -- 활성화된 쿠폰만
     </select>
 
+	<select id="selectUserCoupons" parameterType="String" resultType="java.util.HashMap">
+        SELECT
+            uc.user_cpn_id,        -- 사용자 쿠폰 ID (프론트엔드 option value)
+            uc.pblcn_cpn_id,       -- 발행 쿠폰 ID
+            c.cpn_nm,              -- 쿠폰명 (프론트엔드 option text)
+            c.dscnt_vl,            -- 할인율 값 (프론트엔드 dataset.discount)
+            c.min_ordr_amt,        -- 최소 주문 금액 (프론트엔드 dataset.minOrder)
+            c.max_dscnt_amt,       -- 최대 할인 금액 (프론트엔드 dataset.maxDiscount)
+            uc.indiv_expry_dt,     -- 개별 만료 일시 (필요시)
+            c.vld_end_dt           -- 발행 쿠폰 유효 종료 일시 (필요시)
+        FROM
+            user_coupons uc        -- 사용자 보유 쿠폰 테이블
+        JOIN
+            coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id -- 발행 쿠폰 테이블과 조인
+        WHERE
+            uc.user_no = #{userNo}   -- 특정 사용자 번호에 해당하는 쿠폰
+            AND uc.use_yn = 1        -- 사용 여부가 '1' (사용 가능)인 쿠폰
+            AND c.actvtn_yn = 1      -- 발행 쿠폰이 활성 상태인 쿠폰
+            AND (
+                -- 개별 만료일이 설정되어 있으면 개별 만료일 기준으로 유효성 검사
+                (uc.indiv_expry_dt IS NOT NULL AND uc.indiv_expry_dt >= NOW())
+                OR
+                -- 개별 만료일이 없으면 발행 쿠폰의 유효 종료일 기준으로 유효성 검사
+                (uc.indiv_expry_dt IS NULL AND c.vld_end_dt >= NOW())
+            )
+        ORDER BY
+            c.cpn_nm ASC -- 쿠폰명을 기준으로 정렬 (선택 사항)
+    </select>
+
     <!-- 특정 사용자 쿠폰(user_cpn_id)의 사용 여부(use_yn)와 사용 일시(use_dt)를 '사용 완료'로 업데이트 -->
     <update id="updateUserCouponToUsed" parameterType="String">
         UPDATE user_coupons

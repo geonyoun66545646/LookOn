@@ -35,12 +35,7 @@ public class PaymentController {
 	// 이 필드는 그대로 유지합니다.
 	@Value("${toss.client-key}")
     private String tossClientKey;
-
-	// 장바구니
-	@GetMapping(value = {"/cart"})
-	public String shippmentSttsView() {
-		return "customer/fragments/cart";
-	}
+	
 	
 	// 결제
 	@GetMapping("/checkout")

@@ -130,43 +130,55 @@ $(document).ready(function() {
     });
     
     // 장바구니 버튼 클릭 이벤트
-    $('.btn-cart').on('click', function(e) {
-        e.preventDefault();
-        const productName = $('.product-details .product-title').text().trim();
-        const productImageSrc = $('.product-main-image img').attr('src'); 
+	$('.btn-cart').on('click', function(e) {
+	        e.preventDefault(); // 기본 링크 동작 방지
 
-        if (selectedOptions.length === 0) {
-            alert('최소 하나 이상의 옵션을 추가해주세요.');
-            return;
-        }
+	        // 로그인 상태 확인 (productDetail.html에서 정의한 isLoggedIn 변수 사용)
+	        if (typeof isLoggedIn === 'undefined' || !isLoggedIn) { 
+	            alert('로그인이 필요합니다. 장바구니에 상품을 추가하려면 로그인해주세요.'); // <-- 이 부분 수정
+	            // alert 창은 확인 버튼을 누를 때까지 코드를 블로킹합니다.
+	            // 확인 후 로그인 페이지로 이동하려면 별도 확인 절차가 필요합니다.
+	            // 간단히 로그인 페이지로 이동시키거나, 사용자에게 직접 이동을 안내할 수 있습니다.
+	            window.location.href = '/main'; // 예시 URL (실제 로그인 페이지 URL로 변경하세요)
+	            return; // 로그인 필요 메시지를 띄우고 함수 종료
+	        }
 
-		let cartData = JSON.parse(sessionStorage.getItem('cart_data')) || { products: [] };
+	        // 로그인되어 있다면, 기존 장바구니 추가 로직 실행
+	        const productName = $('.product-details .product-title').text().trim();
+	        const productImageSrc = $('.product-main-image img').attr('src'); 
 
-        selectedOptions.forEach(option => {
-            const uniqueItemId = `${productName}_${option.color}_${option.size}`;
-            const existingItemInCart = cartData.products.find(p => p.id === uniqueItemId);
+	        if (selectedOptions.length === 0) {
+	            alert('최소 하나 이상의 옵션을 추가해주세요.');
+	            return;
+	        }
 
-            if (existingItemInCart) {
-                existingItemInCart.quantity += option.quantity;
-            } else {
-                const basePrice = getBaseProductPrice(); // ⭐ 장바구니에 담을 때도 최신 가격을 가져옴
-                cartData.products.push({
-                    id: uniqueItemId, 
-                    name: `${productName} ${option.color} ${option.size}`,
-                    price: basePrice,
-                    quantity: option.quantity,
-                    image: productImageSrc 
-                });
-            }
-        });
+			let cartData = JSON.parse(sessionStorage.getItem('cart_data')) || { products: [] };
 
-        sessionStorage.setItem('cart_data', JSON.stringify(cartData));
-        selectedOptions = []; 
-        updateOptionsDisplay(); 
-        if (confirm('장바구니에 상품이 추가되었습니다. 장바구니로 이동하시겠습니까?')) {
-            window.location.href = '/cart'; 
-        }
-    });
+	        selectedOptions.forEach(option => {
+	            const uniqueItemId = `${productName}_${option.color}_${option.size}`;
+	            const existingItemInCart = cartData.products.find(p => p.id === uniqueItemId);
+
+	            if (existingItemInCart) {
+	                existingItemInCart.quantity += option.quantity;
+	            } else {
+	                const basePrice = getBaseProductPrice(); 
+	                cartData.products.push({
+	                    id: uniqueItemId, 
+	                    name: `${productName} ${option.color} ${option.size}`,
+	                    price: basePrice,
+	                    quantity: option.quantity,
+	                    image: productImageSrc 
+	                });
+	            }
+	        });
+
+	        sessionStorage.setItem('cart_data', JSON.stringify(cartData));
+	        selectedOptions = []; 
+	        updateOptionsDisplay(); 
+	        if (confirm('장바구니에 상품이 추가되었습니다. 장바구니로 이동하시겠습니까?')) {
+	            window.location.href = '/cart'; 
+	        }
+	    });
 	
 	
 	/* ========================== 구매하기 버튼 2025.07.11 gy ========================== */

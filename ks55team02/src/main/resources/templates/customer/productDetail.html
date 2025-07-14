@@ -652,21 +652,30 @@
         <!-- main.js도 layoutProductDetail.html에 이미 있습니다. -->
     </th:block>
 
-    <!-- 이 페이지에만 필요한 인라인 스크립트를 layout:fragment="jsScript" 안에 넣습니다. -->
+	<!-- 2025.07.14 gy 수정 -->
     <th:block layout:fragment="jsScript">
-        <script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
-        <script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
-        <script>
-            function copyShareLink() {
-                const el = document.createElement('textarea');
-                el.value = window.location.href;
-                document.body.appendChild(el);
-                el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
-                alert('링크가 복사되었습니다!');
-            }
-        </script>
-    </th:block>
+    <script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
+    <script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
+    <script>
+        // ⭐ 이 부분이 핵심 수정입니다. ⭐
+        // 컨트롤러에서 Model에 추가된 isLoggedIn 값을 받아와 JavaScript 변수에 할당합니다.
+        // /*[[${isLoggedIn}]]*/는 Thymeleaf의 인라인(inlining) 문법으로,
+        // 서버에서 렌더링될 때 실제 'true' 또는 'false' 값으로 대체됩니다.
+        let isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+
+        // 디버깅을 위해 콘솔에 출력 (개발 완료 후 제거 가능)
+        console.log("isLoggedIn status (from Model via Session):", isLoggedIn);
+
+        function copyShareLink() {
+            const el = document.createElement('textarea');
+            el.value = window.location.href;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert('링크가 복사되었습니다!');
+        }
+    </script>
+</th:block>
 </body>
 </html>
