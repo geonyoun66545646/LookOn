@@ -34,7 +34,10 @@ public interface ProductsMapper {
 
 	// 최초 승인 이력을 추가하는 메소드
 	void addInitialApprovalHistory(Products product);
-
+	
+	// 특정상품 모든 이밎 조회
+	List<ProductImage> getProductImagesByGdsNo(String gdsNo);
+	
 	/* */
 	void deactivateProductsByCategoryId(String categoryId);
 

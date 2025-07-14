@@ -25,6 +25,8 @@
 <link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
 <link rel="stylesheet"
 	th:href="@{/maincss/assets/sellerProductRegistration/sellerProductRegistration.css}">
+<link rel="stylesheet"
+	href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
 </head>
 <body>
@@ -420,16 +422,17 @@
 		</div>
 	</div>
 	<script th:inline="javascript">
-        /* <![CDATA[ */
-        const isUpdateMode = /*[[${isUpdate}]]*/ false;
-        const productData = /*[[${productData}]]*/ null;
-        const selectedCategory1 = /*[[${productRegistrationRequest.productCategory1}]]*/ null;
-        const selectedCategory2 = /*[[${productRegistrationRequest.productCategory2}]]*/ null;
-        /* ]]> */
-    </script>
+		/* <![CDATA[ */
+		const isUpdateMode = /*[[${isUpdate}]]*/false;
+		const productData = /*[[${productData}]]*/null;
+		const selectedCategory1 = /*[[${productRegistrationRequest.productCategory1}]]*/null;
+		const selectedCategory2 = /*[[${productRegistrationRequest.productCategory2}]]*/null;
+		/* ]]> */
+	</script>
 	<script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
 	<script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 	<script
 		th:src="@{/maincss/assets/sellerProductRegistration/sellerProductRegistration.js}"></script>
 </body>
