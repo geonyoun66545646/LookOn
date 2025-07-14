@@ -25,7 +25,85 @@ $(() => {
                 page: currentPage
             }
         })
-        .done(responseHtml => {
+        .done(responseHtml => {		$(() => {
+		    let currentPage = 1;
+		    let isLoading = false;
+		    let hasNext = true; 
+
+		    const createFeedItemHtml = (feed) => {
+		        const defaultImageUrl = '/uploads/feeds/default_feed_image.jpg'; // 실제 기본 이미지 경로로 확인/수정 필요
+		        const imageUrl = feed.representativeImage ? feed.representativeImage.imgFilePathNm : defaultImageUrl;
+		        const imageAlt = feed.representativeImage ? feed.representativeImage.imgAltTxtCn : '기본 이미지';
+		        
+		        return `
+		            <article class="feed-item">
+		                <a href="/customer/feed/feedDetail/${feed.feedSn}">
+		                    <img src="${imageUrl}" alt="${imageAlt}">
+		                    <div class="item-overlay">
+		                        <span class="likes">♥ ${feed.likeCount}</span>
+		                    </div>
+		                </a>
+		            </article>
+		        `;
+		    };
+
+		    const renderFeeds = (feeds) => {
+		        const container = $('#feed-grid-container');
+		        if (currentPage === 1 && feeds.length === 0) {
+		            container.html('<div class="no-feeds" style="text-align:center; padding: 20px;"><p>작성한 피드가 없습니다.</p></div>');
+		            return;
+		        }
+		        feeds.forEach(feed => {
+		            container.append(createFeedItemHtml(feed));
+		        });
+		    };
+
+		    const loadNextPage = () => {
+		        if (isLoading || !hasNext) {
+		            return;
+		        }
+		        isLoading = true;
+		        $('#loading-indicator').show();
+
+		        $.ajax({
+		            url: '/customer/feed/my-feed', // 새로 만든 RestController의 API 엔드포인트
+		            type: 'GET',
+		            data: { page: currentPage },
+		            dataType: 'json'
+		        })
+		        .done(response => {
+		            // 서버 응답이 성공(2xx)인 경우
+		            renderFeeds(response.feedList); 
+		            hasNext = response.hasNext;     
+		            currentPage++;                  
+		        })
+		        .fail((jqXHR) => {
+		            console.error('피드 로딩 중 오류 발생:', jqXHR.statusText);
+		            // 401 Unauthorized 오류 시, 로그인 페이지로 리다이렉트
+		            if (jqXHR.status === 401) {
+		                alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+		                window.location.href = '/customer/login/login?redirectUrl=/customer/feed/feedListByMe';
+		            }
+		        })
+		        .always(() => {
+		            isLoading = false;
+		            $('#loading-indicator').hide();
+		        });
+		    };
+
+		    const onScroll = () => {
+		        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
+		            if (hasNext) {
+		                loadNextPage();
+		            }
+		        }
+		    };
+
+		    $(window).on('scroll', onScroll);
+		    
+		    // 페이지 첫 로드 시, 첫 페이지 데이터 가져오기
+		    loadNextPage();
+		});
             // responseHtml이 비어있으면 더 이상 데이터가 없는 것으로 간주
             
             // 받아온 HTML 조각(자식 요소들)을 기존 그리드에 추가
