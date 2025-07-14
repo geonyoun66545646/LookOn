@@ -429,45 +429,97 @@ $(document).ready(function() {
     }
 
     // --- 이미지 업로드 미리보기 (상품 썸네일) ---
-    function handleImageUpload(inputElement, previewContainerId, maxImages, isThumbnail = false) {
-        var $previewContainer = $(previewContainerId);
-        var $fileInputLabel = $(inputElement).next('.custom-file-label').find('.file-name');
-        $previewContainer.empty();
-        $previewContainer.removeClass('has-images');
+	function handleImageUpload(inputElement, previewContainerId, maxImages, isThumbnail = false) {
+	    const $previewContainer = $(previewContainerId);
+	    const $fileInputLabel = $(inputElement).next('.custom-file-label').find('.file-name');
+	    const files = inputElement.files;
 
-        var files = inputElement.files;
-        if (files.length === 0) {
-            $fileInputLabel.text(isThumbnail ? '상품 썸네일 업로드 (1장)' : 
-                             (maxImages === 15 ? '대표 이미지 업로드 (최소 1장, 최대 15장)' : 
-                              '상세 페이지 이미지 업로드 (최소 1장, 최대 20장)'));
-            $previewContainer.append('<p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>');
-            return;
-        }
+	    // --- 1. 썸네일 교체 로직 (가장 중요한 부분) ---
+	    if (isThumbnail) {
+	        // 기존 썸네일 미리보기를 찾습니다.
+	        const $existingThumbnail = $previewContainer.find('.image-upload-item.existing-image');
+	        
+	        // 만약 기존 썸네일이 있다면...
+	        if ($existingThumbnail.length > 0) {
+	            // 해당 썸네일의 고유 ID를 가져옵니다.
+	            const imageNoToDelete = $existingThumbnail.find('.remove-btn').data('existing-image-no');
+	            
+	            // ✅ 삭제 목록에 자동으로 추가합니다. (가장 핵심적인 로직)
+	            // 중복 추가를 방지하기 위해 이미 목록에 있는지 확인합니다.
+	            if ($(`#deleted-images-container input[value="${imageNoToDelete}"]`).length === 0) {
+	                $('#deleted-images-container').append(
+	                    `<input type="hidden" name="deletedImageIds" value="${imageNoToDelete}">`
+	                );
+	                console.log('새 썸네일 선택으로 인해 기존 썸네일 자동 삭제 처리:', imageNoToDelete);
+	            }
+	        }
+	        // 썸네일은 항상 미리보기 영역을 완전히 비우고 새로 시작합니다.
+	        $previewContainer.empty();
+	        $previewContainer.removeClass('has-images');
+	    } else {
+	        // 썸네일이 아닐 경우 (대표/상세 이미지), 새로 추가됐던 미리보기만 제거합니다.
+	        $previewContainer.find('.image-upload-item:not(.existing-image)').remove();
+	    }
 
-        $previewContainer.addClass('has-images');
-        var filesToProcess = Array.from(files).slice(0, maxImages);
 
-        // Update file input label
-        var fileNames = Array.from(files).map(file => file.name).join(', ');
-        $fileInputLabel.text(fileNames.length > 50 ? fileNames.substring(0, 50) + '...' : fileNames);
+	    // 만약 선택된 파일이 없다면 함수를 종료합니다.
+	    if (files.length === 0) {
+	        if ($previewContainer.find('.existing-image').length === 0) {
+	            $previewContainer.removeClass('has-images').append('<p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>');
+	        }
+	        $fileInputLabel.text(isThumbnail ? '상품 썸네일 업로드 (1장)' :
+	                         (maxImages === 15 ? '대표 이미지 업로드 (최소 1장, 최대 15장)' :
+	                          '상세 페이지 이미지 업로드 (최소 1장, 최대 20장)'));
+	        return;
+	    }
 
-        filesToProcess.forEach((file, index) => {
-            if (file.type.startsWith('image/')) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var imgClass = (previewContainerId === '#mainImagePreview' && index === 0) ? 'main-image' : '';
-                    var imgHtml = `
-                        <div class="image-upload-item ${imgClass}">
-                            <img src="${e.target.result}" alt="${file.name}">
-                            <button type="button" class="remove-btn" data-file-index="${index}" data-target-input="${inputElement.id}">x</button>
-                        </div>
-                    `;
-                    $previewContainer.append(imgHtml);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
+	    // --- 2. 컨테이너 상태 업데이트 및 파일 처리 (이하 로직은 대부분 동일) ---
+	    if (!$previewContainer.hasClass('has-images')) {
+	        $previewContainer.addClass('has-images');
+	        $previewContainer.find('p').remove();
+	    }
+	    
+	    // 허용된 최대치만큼만 파일을 처리합니다.
+	    const existingImageCount = isThumbnail ? 0 : $previewContainer.find('.existing-image').length;
+	    const availableSlots = maxImages - existingImageCount;
+	    if (availableSlots <= 0) {
+	        alert(`이 영역에는 더 이상 이미지를 추가할 수 없습니다. (최대 ${maxImages}개)`);
+	        inputElement.value = ''; // 파일 선택 취소
+	        return;
+	    }
+	    
+	    const filesToProcess = Array.from(files).slice(0, availableSlots);
+	    
+	    // input의 파일 목록을 실제 업로드할 파일들로 교체
+	    const dataTransfer = new DataTransfer();
+	    filesToProcess.forEach(file => dataTransfer.items.add(file));
+	    inputElement.files = dataTransfer.files;
+
+	    // --- 3. 파일 이름 레이블 및 미리보기 생성 ---
+	    const fileNames = Array.from(inputElement.files).map(file => file.name).join(', ');
+	    $fileInputLabel.text(fileNames.length > 50 ? fileNames.substring(0, 50) + '...' : fileNames);
+
+	    filesToProcess.forEach((file, index) => {
+	        if (file.type.startsWith('image/')) {
+	            const reader = new FileReader();
+	            reader.onload = function(e) {
+	                const isMainImage = previewContainerId === '#mainImagePreview' &&
+	                                    $previewContainer.find('.existing-image').length === 0 &&
+	                                    index === 0;
+	                const imgClass = isMainImage ? 'main-image' : '';
+
+	                const imgHtml = `
+	                    <div class="image-upload-item ${imgClass}">
+	                        <img src="${e.target.result}" alt="${file.name}">
+	                        <button type="button" class="remove-btn" data-file-index="${index}" data-target-input="${inputElement.id}">x</button>
+	                    </div>
+	                `;
+	                $previewContainer.append(imgHtml);
+	            };
+	            reader.readAsDataURL(file);
+	        }
+	    });
+	}
     
     // --- 이미지 업로드 change 이벤트 리스너 ---
     $('#thumbnailImageUpload').on('change', function() {
@@ -505,6 +557,10 @@ $(document).ready(function() {
             $(inputElement).trigger('change');
         }
     });
+	
+	
+	// ✅ 전체를 이 코드로 교체해주세요.
+
 	// 이미지 미리보기 삭제 버튼
 	$(document).on('click', '.image-upload-item .remove-btn', function() {
 	    const $itemToRemove = $(this).closest('.image-upload-item');
@@ -512,20 +568,26 @@ $(document).ready(function() {
 	    const $previewContainer = $itemToRemove.parent();
 
 	    if ($itemToRemove.hasClass('existing-image')) {
-	        // --- 1. '기존 이미지'를 삭제하는 경우 ---
+	        // --- 1. '기존 이미지'를 삭제하는 경우 (수정된 로직) ---
 	        const imageNoToDelete = $(this).data('existing-image-no');
-	        const $deletedIdsInput = $('#deletedImageIds');
 	        
-	        // 삭제할 이미지 ID 목록을 관리하는 hidden input에 ID 추가
-	        const currentIds = $deletedIdsInput.val() ? $deletedIdsInput.val().split(',') : [];
-	        if (!currentIds.includes(String(imageNoToDelete))) {
-	            currentIds.push(String(imageNoToDelete));
-	            $deletedIdsInput.val(currentIds.join(','));
+	        // ✅ 수정된 부분:
+	        // 'deletedImageIds'라는 name을 가진 hidden input을 동적으로 추가합니다.
+	        // 이미 추가된 ID는 중복으로 추가하지 않도록 체크합니다.
+	        if ($(`#deleted-images-container input[value="${imageNoToDelete}"]`).length === 0) {
+	            $('#deleted-images-container').append(
+	                `<input type="hidden" name="deletedImageIds" value="${imageNoToDelete}">`
+	            );
 	        }
-			
-			$(`.existing-image-path[data-image-no="${imageNoToDelete}"]`).remove();
-	        $itemToRemove.remove(); // 화면에서 미리보기 아이템 제거
-	        console.log('삭제할 기존 이미지 ID 목록:', $deletedIdsInput.val());
+	        
+	        // 화면에서 관련 요소들 제거
+	        $(`.existing-image-path[data-image-no="${imageNoToDelete}"]`).remove();
+	        $itemToRemove.remove();
+	        
+	        console.log('삭제하기 위해 추가된 이미지 ID:', imageNoToDelete);
+	        console.log('현재 삭제될 ID 목록 (form 전송 시):', 
+	            $('#deleted-images-container').find('input[name="deletedImageIds"]').map(function() { return this.value; }).get()
+	        );
 
 	    } else if (inputId) {
 	        // --- 2. '새로 추가한 이미지'를 삭제하는 경우 (기존 로직과 동일) ---
@@ -534,7 +596,13 @@ $(document).ready(function() {
 	        
 	        // FileList에서 해당 인덱스의 파일을 제거
 	        const currentFiles = Array.from(inputElement.files);
-	        const newFiles = currentFiles.filter((file, i) => i !== fileIndex);
+	        // data-file-index를 기준으로 필터링합니다.
+	        const newFiles = currentFiles.filter((file, i) => {
+	            // 새로 추가된 파일의 remove 버튼에는 data-file-index가 있습니다.
+	            // 이 인덱스와 일치하지 않는 파일만 남깁니다.
+	            return i !== fileIndex;
+	        });
+	        
 	        const dataTransfer = new DataTransfer();
 	        newFiles.forEach(file => dataTransfer.items.add(file));
 	        inputElement.files = dataTransfer.files;
@@ -553,18 +621,18 @@ $(document).ready(function() {
 	                  '상세 페이지 이미지 업로드 (최소 1장, 최대 20장)'))
 	            );
 	        }
+
+	        // 남은 '새로 추가된 이미지'들의 인덱스를 다시 정렬 (중요)
+	        $previewContainer.find('.image-upload-item:not(.existing-image)').each(function(newIndex) {
+	            $(this).find('.remove-btn').data('file-index', newIndex);
+	        });
 	    }
 	    
-	    // --- 3. 공통: 미리보기 컨테이너 상태 및 인덱스 업데이트 ---
+	    // --- 3. 공통: 미리보기 컨테이너 상태 업데이트 ---
 	    // 남은 미리보기 아이템이 없으면 "클릭 또는 파일을..." 문구 표시
 	    if ($previewContainer.children('.image-upload-item').length === 0) {
 	        $previewContainer.removeClass('has-images').append('<p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>');
 	    }
-
-	    // 남은 '새로 추가된 이미지'들의 인덱스를 다시 정렬 (중요)
-	    $previewContainer.find('.image-upload-item:not(.existing-image)').each(function(newIndex) {
-	        $(this).find('.remove-btn').data('file-index', newIndex);
-	    });
 	});
 
     // 하단 버튼 액션
