@@ -33,16 +33,7 @@
 		<!-- 단, <header th:replace...>와 <footer th:replace...> 등은 제거합니다. -->
 		<!-- 그리고 <div class="page-wrapper">, <main class="main"> 태그도 레이아웃에서 이미 제공하므로 제거합니다. -->
 
-		<nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
-			<div class="container d-flex align-items-center">
-				<ol class="breadcrumb">
-					<li class="breadcrumb-item"><a th:href="@{/}">홈</a></li>
-					<li class="breadcrumb-item"><a th:href="@{/customer/products}">상품</a></li>
-					<li class="breadcrumb-item active" aria-current="page"
-						th:text="${product?.gdsNm ?: '상세 보기'}"></li>
-				</ol>
-			</div>
-		</nav>
+		
 
 		<div class="page-content">
 			<div class="container">
@@ -293,7 +284,7 @@
 
 
 		<!-- 여기에 비슷한 상품목록을 넣고싶음 -->
-		<div class="container"
+		<div class="container-bottom"
 			th:if="${similarProducts != null and not #lists.isEmpty(similarProducts)}">
 			<h2 class="title text-center mb-4">비슷한 상품</h2>
 			<!-- owl-carousel 기반의 프래그먼트를 사용 -->
