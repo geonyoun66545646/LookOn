@@ -92,7 +92,7 @@ public class ProductsServiceImpl implements ProductsService {
 
         String selUserNo = request.getSelUserNo();
 
-        // 1. 상품 기본 정보 업데이트 (현재 코드와 동일)
+        // 1. 상품 기본 정보 업데이트
         Products product = new Products();
         product.setGdsNo(gdsNo);
         product.setCtgryNo(StringUtils.hasText(request.getProductCategory2()) ? request.getProductCategory2() : request.getProductCategory1());
@@ -107,21 +107,27 @@ public class ProductsServiceImpl implements ProductsService {
         product.setMdfrNo(selUserNo);
         productsMapper.updateProduct(product);
 
-        // 2. 기존 연관 데이터 비활성화 (현재 코드와 동일)
-        productsMapper.deactivateImagesByGdsNo(gdsNo);
-        productsMapper.deactivateOptionsByGdsNo(gdsNo);
-        productsMapper.deactivateStatusByGdsNo(gdsNo);
-
-        // 3. 수정된 정보로 새로 INSERT (현재 코드와 동일)
+        // 2. 기존 연관 데이터 삭제 (순서 중요!)
+        // 2-1. 상태-옵션 매핑 먼저 삭제
+        productsMapper.deleteStatusOptionMappingsByGdsNo(gdsNo);
+        // 2-2. 옵션 값 삭제
+        productsMapper.deleteOptionValuesByGdsNo(gdsNo);
+        // 2-3. 옵션 삭제
+        productsMapper.deleteOptionsByGdsNo(gdsNo);
+        // 2-4. 상태 삭제
+        productsMapper.deleteStatusByGdsNo(gdsNo);
+        
+        // 2-5. 이미지 처리: 삭제 요청된 이미지만 삭제
+        if (request.getDeletedImageIds() != null && !request.getDeletedImageIds().isEmpty()) {
+            productsMapper.deleteImagesByImageNos(request.getDeletedImageIds());
+        }
+        
+        // 3. 수정된 정보로 새로 INSERT
         saveProductImages(request, gdsNo);
         saveOptionsAndStock(request, gdsNo);
 
-        // 4. 재승인 절차: 새로운 차수 계산 방식 변경
-        // ⭐ ⭐ ⭐ 이 부분 수정 ⭐ ⭐ ⭐
-        // 판매자가 수정 제출하는 경우 (재승인 요청), 이는 새로운 "시도"를 의미합니다.
-        // 따라서 기존의 승인/반려 이력 중 가장 높은 차수에 +1을 해야 합니다.
+        // 4. 재승인 절차
         int newCycle = adminProductManagementMapper.getLatestApprovalCycle(gdsNo) + 1;
-
         String newHistoryCode = productsMapper.getMaxApprovalHistoryCode();
         ProductApprovalHistory history = new ProductApprovalHistory();
         history.setAprvRjctHstryCd(newHistoryCode);
@@ -129,12 +135,11 @@ public class ProductsServiceImpl implements ProductsService {
         history.setPrcsMngrId(selUserNo);
         history.setAprvSttsCd("대기");
         history.setPrcsDt(LocalDateTime.now());
-        history.setAprvRjctCycl(newCycle); // 새로운 시도이므로 기존 차수 + 1
+        history.setAprvRjctCycl(newCycle);
         history.setMngrCmntCn("판매자 수정 요청으로 인한 재승인 대기 중");
         adminProductManagementMapper.insertProductApprovalHistory(history);
-        log.info(">>>>>> [Service][updateProduct] 상품 수정으로 인한 새 '대기' 이력 생성. gdsNo: {}, Cycle: {}", gdsNo, newCycle);
 
-        // 상품 노출 상태를 false로 변경 (현재 코드와 동일)
+        // 5. 상품 노출 상태를 false로 변경
         Map<String, Object> productParams = new HashMap<>();
         productParams.put("gdsNo", gdsNo);
         productParams.put("managerId", selUserNo);
@@ -299,18 +304,50 @@ public class ProductsServiceImpl implements ProductsService {
         String creatorNo = request.getSelUserNo();
 
         int optOrder = 1;
+        
+        // 1. 성별 옵션 처리 (변경 없음)
         if (StringUtils.hasText(request.getGenderOption())) {
-            genderOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "성별", "S", optOrder++, List.of(request.getGenderOption()));
+            genderOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "성별", "S", optOrder++, 
+                List.of(request.getGenderOption()));
         }
-        if (request.getColorOptions() != null && !request.getColorOptions().isEmpty()) {
-            List<String> uniqueColorOptions = request.getColorOptions().stream().distinct().collect(Collectors.toList());
-            colorOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "색상", "S", optOrder++, uniqueColorOptions);
+        
+        // 2. 색상 옵션 처리 - 수정 모드에서는 productOptionCombinations에서 색상 추출
+        List<String> colorOptionsToSave = new ArrayList<>();
+        if (request.getProductOptionCombinations() != null && !request.getProductOptionCombinations().isEmpty()) {
+            colorOptionsToSave = request.getProductOptionCombinations().stream()
+                .map(ProductCombinationData::getOptVlNo2)
+                .filter(StringUtils::hasText)
+                .distinct()
+                .collect(Collectors.toList());
+        } else if (request.getColorOptions() != null) { // 등록 모드일 경우
+            colorOptionsToSave = request.getColorOptions().stream()
+                .distinct()
+                .collect(Collectors.toList());
         }
-        if (request.getSizeOptions() != null && !request.getSizeOptions().isEmpty()) {
-            List<String> uniqueSizeOptions = request.getSizeOptions().stream().distinct().collect(Collectors.toList());
-            sizeOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "사이즈", "S", optOrder++, uniqueSizeOptions);
+        
+        if (!colorOptionsToSave.isEmpty()) {
+            colorOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "색상", "S", optOrder++, colorOptionsToSave);
+        }
+        
+        // 3. 사이즈 옵션 처리 - 색상과 동일한 방식
+        List<String> sizeOptionsToSave = new ArrayList<>();
+        if (request.getProductOptionCombinations() != null && !request.getProductOptionCombinations().isEmpty()) {
+            sizeOptionsToSave = request.getProductOptionCombinations().stream()
+                .map(ProductCombinationData::getOptVlNo3)
+                .filter(StringUtils::hasText)
+                .distinct()
+                .collect(Collectors.toList());
+        } else if (request.getSizeOptions() != null) { // 등록 모드일 경우
+            sizeOptionsToSave = request.getSizeOptions().stream()
+                .distinct()
+                .collect(Collectors.toList());
+        }
+        
+        if (!sizeOptionsToSave.isEmpty()) {
+            sizeOptionValueMap = insertOptionAndValue(gdsNo, creatorNo, "사이즈", "S", optOrder++, sizeOptionsToSave);
         }
 
+        // 4. 재고 정보 처리 (기존 로직 유지)
         if (request.getProductOptionCombinations() != null && !request.getProductOptionCombinations().isEmpty()) {
             for (ProductCombinationData combinationData : request.getProductOptionCombinations()) {
                 String gdsSttsNo = productsMapper.getMaxStatusNo();

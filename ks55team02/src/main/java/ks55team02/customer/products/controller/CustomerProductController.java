@@ -146,16 +146,10 @@ public class CustomerProductController {
                 }
             }
         } else {
-            String defaultTopLevelCategoryIdForToolbar = productCategoryService.getTopLevelCategoryIdByName("상의");
-            if (defaultTopLevelCategoryIdForToolbar != null) {
-                Map<String, Object> defaultCategoryData = productCategoryService.getCategoryHierarchy(defaultTopLevelCategoryIdForToolbar);
-                parentCategoryName = (String) defaultCategoryData.get("parentCategoryName");
-                parentCategoryId = (String) defaultCategoryData.get("parentCategoryId");
-                subCategories = (List<ProductCategory>) defaultCategoryData.get("subCategories");
-            } else {
-                parentCategoryName = "전체 상품";
-                subCategories = productCategoryService.getAllProductCategories();
-            }
+        	// ⭐ 수정: categoryId가 없을 때는 '전체' 상태로 두고, 하위 카테고리에 모든 1차 카테고리를 표시
+            parentCategoryName = "전체 상품";
+            // subCategories에 모든 최상위(1차) 카테고리 목록을 담습니다.
+            subCategories = productCategoryService.getAllTopLevelCategories();
         }
         
         Map<String, Object> productsResult = productSearchService.getFilteredAndSortedProducts(categoryId, sortBy, filterParams, currentPage);
@@ -222,9 +216,19 @@ public class CustomerProductController {
         ProductImage thumbnailImage = allImages.stream().filter(img -> img.getImgType() == ProductImageType.THUMBNAIL).findFirst().orElse(allImages.stream().filter(img -> img.getImgType() == ProductImageType.MAIN).findFirst().orElse(null));
         List<ProductImage> mainGalleryImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.MAIN).sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
         List<ProductImage> detailImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.DETAIL).sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
+        
         // 리뷰 추가(ljs)
         List<ProductReview> reviews = reviewService.getReviewsByProductCode(productCode); // productCode로 리뷰 조회
-        model.addAttribute("reviews", reviews);
+        
+        
+        if (product.getCtgryNo() != null) {
+            List<Products> similarProducts = productSearchService.getSimilarProducts(product.getCtgryNo(), product.getGdsNo(), 10);
+            model.addAttribute("similarProducts", similarProducts);
+        }
+        
+        
+        // 리뷰 추가(ljs)
+        model.addAttribute("reviews", reviews);       
         
         model.addAttribute("thumbnailImage", thumbnailImage);
         model.addAttribute("mainGalleryImages", mainGalleryImages);

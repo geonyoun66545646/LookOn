@@ -10,7 +10,8 @@ public interface ProductSearchMapper {
 	List<Products> getRecentProductsForMain(int limit);
 	List<Products> getSaleProducts();
     List<Products> getNewProducts();
-	
+    List<Products> getSimilarProducts(Map<String, Object> params);
+
     /**
      * 다양한 필터 및 정렬 조건에 따라 상품 목록을 조회합니다.
      * @param paramMap 필터링 및 정렬, 페이지네이션 정보가 담긴 Map

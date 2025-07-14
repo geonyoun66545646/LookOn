@@ -45,27 +45,14 @@ public interface ProductsMapper {
 	 * @param product 수정할 정보가 담긴 Products 객체
 	 */
 	void updateProduct(Products product);
-
-	/**
-	 * 특정 상품에 속한 모든 이미지를 비활성화 처리합니다.
-	 * 
-	 * @param gdsNo 상품 ID
-	 */
-	void deactivateImagesByGdsNo(String gdsNo);
-
-	/**
-	 * 특정 상품에 속한 모든 옵션을 비활성화 처리합니다.
-	 * 
-	 * @param gdsNo 상품 ID
-	 */
-	void deactivateOptionsByGdsNo(String gdsNo);
-
-	/**
-	 * 특정 상품에 속한 모든 재고/상태 정보를 비활성화 처리합니다.
-	 * 
-	 * @param gdsNo 상품 ID
-	 */
-	void deactivateStatusByGdsNo(String gdsNo);
+	
+	// 수정시 기존정보 삭제
+	void deleteStatusOptionMappingsByGdsNo(String gdsNo);
+	void deleteOptionValuesByGdsNo(String gdsNo);
+	void deleteImagesByGdsNo(String gdsNo);
+    void deleteOptionsByGdsNo(String gdsNo);
+    void deleteStatusByGdsNo(String gdsNo);
+    void deleteImagesByImageNos(List<String> imageNoList);
 
 	// -- 상품 삭제
 	/**

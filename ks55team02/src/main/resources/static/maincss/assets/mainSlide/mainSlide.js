@@ -19,8 +19,8 @@ window.addEventListener('load', function() {
             type: 'progressbar',
         },
         navigation: {
-            nextEl: '.main-page-slider-container .swiper-button-prev',
-            prevEl: '.main-page-slider-container .swiper-button-next', // 오타 수정: prev/next 위치
+			nextEl: '.main-page-slider-container .swiper-button-next', // 수정됨: '다음' 버튼은 '.swiper-button-next'
+			            prevEl: '.main-page-slider-container .swiper-button-prev', // 수정됨: '이전' 버튼은 '.swiper-button-prev'
         },
         slidesPerView: 1.5,
         spaceBetween: 15,
