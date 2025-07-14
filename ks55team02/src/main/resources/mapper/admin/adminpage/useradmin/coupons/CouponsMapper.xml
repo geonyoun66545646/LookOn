@@ -24,29 +24,7 @@
 			property="issueConditionType" />
 	</resultMap>
 
-	<!-- 모든 쿠폰 데이터 조회 (간단한 버전) -->
-	<select id="getCouponsList" resultMap="couponsResultMap">
-		SELECT
-		pblcn_cpn_id,
-		user_no,
-		cpn_nm,
-		dscnt_vl,
-		min_ordr_amt,
-		max_dscnt_amt,
-		vld_bgng_dt,
-		vld_end_dt,
-		tot_use_lmt_nmtm,
-		user_per_use_lmt_nmtm,
-		actvtn_yn,
-		crt_dt,
-		mdfcn_dt,
-		reissue_cycle,
-		issue_condition_type
-		FROM
-		coupons
-		ORDER BY
-		pblcn_cpn_id ASC
-	</select>
+
 
 	<insert id="addCoupon"
 		parameterType="ks55team02.admin.adminpage.useradmin.coupons.domain.AdminCoupons">
@@ -85,7 +63,8 @@
 	</insert>
 
 	<select id="getLastCouponId" resultType="String">
-		SELECT MAX(pblcn_cpn_id) FROM coupons;
+		SELECT MAX(pblcn_cpn_id)
+		FROM coupons;
 	</select>
 
 	<update id="updateCoupon"
@@ -93,15 +72,19 @@
 		UPDATE coupons
 		SET
 		cpn_nm = #{cpnNm},
-		dscnt_vl = #{dscntVl},
+		dscnt_vl =
+		#{dscntVl},
 		min_ordr_amt = #{minOrdrAmt},
-		max_dscnt_amt = #{maxDscntAmt},
+		max_dscnt_amt =
+		#{maxDscntAmt},
 		vld_bgng_dt = #{vldBgngDt},
 		vld_end_dt = #{vldEndDt},
 		tot_use_lmt_nmtm = #{totUseLmtNmtm},
-		user_per_use_lmt_nmtm = #{userPerUseLmtNmtm},
+		user_per_use_lmt_nmtm =
+		#{userPerUseLmtNmtm},
 		actvtn_yn = #{actvtnYn},
-		reissue_cycle = #{reissueCycle},
+		reissue_cycle =
+		#{reissueCycle},
 		issue_condition_type = #{issueConditionType}
 		WHERE
 		pblcn_cpn_id = #{pblcnCpnId};
@@ -116,13 +99,47 @@
 		WHERE
 		pblcn_cpn_id = #{pblcnCpnId};
 	</select>
-	
+
 	<update id="deleteCoupon" parameterType="String">
-    UPDATE coupons
-    SET
-        actvtn_yn = 0
-    WHERE
-        pblcn_cpn_id = #{pblcnCpnId};
-</update>
+		UPDATE coupons
+		SET
+		actvtn_yn = 0
+		WHERE
+		pblcn_cpn_id = #{pblcnCpnId};
+	</update>
+
+	<select id="getCouponsList"
+		parameterType="ks55team02.admin.common.domain.SearchCriteria"
+		resultMap="couponsResultMap">
+		SELECT * FROM coupons
+		<include refid="searchFragment" />
+		ORDER BY CAST(SUBSTRING_INDEX(pblcn_cpn_id, '_', -1) AS UNSIGNED)
+		ASC, pblcn_cpn_id ASC
+		LIMIT #{offset}, #{pageSize}
+	</select>
+
+	<select id="getCouponsCount"
+		parameterType="ks55team02.admin.common.domain.SearchCriteria"
+		resultType="int">
+		SELECT COUNT(*) FROM coupons
+		<include refid="searchFragment" />
+	</select>
+
+	<sql id="searchFragment">
+		<where>
+			<if
+				test="searchKey != null and searchValue != null and searchValue != ''">
+				<choose>
+					<when test="'cpnNm'.equals(searchKey)">
+						AND cpn_nm LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="'pblcnCpnId'.equals(searchKey)">
+						AND pblcn_cpn_id LIKE CONCAT('%', #{searchValue},
+						'%')
+					</when>
+				</choose>
+			</if>
+		</where>
+	</sql>
 
 </mapper>
