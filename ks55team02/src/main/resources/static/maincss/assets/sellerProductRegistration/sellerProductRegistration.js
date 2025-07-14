@@ -440,55 +440,69 @@ $(document).ready(function() {
 
 
 	function handleImageUpload(inputElement, previewContainerId, maxImages, isThumbnail = false) {
-		const $previewContainer = $(previewContainerId);
-		const $fileInputLabel = $(inputElement).next('.custom-file-label').find('.file-name');
+			const $previewContainer = $(previewContainerId);
+			const $fileInputLabel = $(inputElement).next('.custom-file-label').find('.file-name');
 
-		// --- 썸네일은 무조건 1장만 유지 ---
-		if (isThumbnail) {
-			$previewContainer.empty();
-			$('#productRegistrationForm .existing-image-path[data-image-type="THUMBNAIL"]').remove();
-
-			// ❗ inputElement.files 강제로 비우기
-			inputElement.value = '';
-		} else {
-			$previewContainer.empty();
-		}
-
-		$previewContainer.removeClass('has-images');
-
-		const files = inputElement.files;
-		if (files.length === 0) {
-			$fileInputLabel.text(isThumbnail ? '상품 썸네일 업로드 (1장)' :
-				(maxImages === 15 ? '대표 이미지 업로드 (최소 1장, 최대 15장)' :
-					'상세 페이지 이미지 업로드 (최소 1장, 최대 20장)'));
-			$previewContainer.append('<p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>');
-			return;
-		}
-
-		$previewContainer.addClass('has-images');
-		const filesToProcess = Array.from(files).slice(0, maxImages);
-
-		const fileNames = filesToProcess.map(file => file.name).join(', ');
-		$fileInputLabel.text(fileNames.length > 50 ? fileNames.substring(0, 50) + '...' : fileNames);
-
-		filesToProcess.forEach((file, index) => {
-			if (file.type.startsWith('image/')) {
-				const reader = new FileReader();
-				reader.onload = function(e) {
-					const imgHtml = `
-	                    <div class="image-upload-item">
-	                        <img src="${e.target.result}" alt="${file.name}">
-	                        <button type="button" class="remove-btn" data-file-index="${index}" data-target-input="${inputElement.id}">x</button>
-	                    </div>
-	                `;
-					$previewContainer.append(imgHtml);
-				};
-				reader.readAsDataURL(file);
+			if (isThumbnail) {
+				// 썸네일은 '교체' 작업이므로, 기존 썸네일이 있다면 삭제 목록에 추가합니다.
+				const $existingThumb = $previewContainer.find('.image-upload-item.existing-image');
+				if ($existingThumb.length > 0) {
+					// 'x' 버튼을 가상으로 클릭하여 삭제 처리(hidden input 생성) 로직을 실행합니다.
+					$existingThumb.find('.remove-btn').trigger('click');
+				}
+				// 그 다음, 미리보기 영역을 완전히 비웁니다.
+				$previewContainer.empty();
+			} else {
+				// 대표/상세 이미지는 '추가' 작업입니다.
+				// 따라서 기존 미리보기는 유지하고, "파일을 여기에..." 라는 placeholder 텍스트만 제거합니다.
+				$previewContainer.find('p.text-center').remove();
 			}
-		});
 
-		$previewContainer.sortable({ items: '.image-upload-item' });
-	}
+			// --- 여기서부터는 새 파일 처리 로직 (공통) ---
+			$previewContainer.removeClass('has-images');
+			const files = inputElement.files;
+			if (files.length === 0) {
+				$fileInputLabel.text(isThumbnail ? '상품 썸네일 업로드 (1장)' :
+					(maxImages === 15 ? '대표 이미지 업로드 (최소 1장, 최대 15장)' :
+						'상세 페이지 이미지 업로드 (최소 1장, 최대 20장)'));
+				$previewContainer.append('<p class="text-center">클릭 또는 파일을 여기에 끌어다 놓으세요.</p>');
+				return;
+			}
+
+			$previewContainer.addClass('has-images');
+			// 새로 추가되는 파일 수와 기존 파일 수를 합쳐 최대 개수를 넘지 않도록 제한합니다.
+			const currentImageCount = $previewContainer.find('.image-upload-item').length;
+			const remainingSlots = maxImages - currentImageCount;
+			if (remainingSlots <= 0) {
+				alert(`이미지는 최대 ${maxImages}장까지 등록할 수 있습니다.`);
+				inputElement.value = ''; // 파일 선택 취소
+				return;
+			}
+			
+			const filesToProcess = Array.from(files).slice(0, remainingSlots);
+
+			const fileNames = filesToProcess.map(file => file.name).join(', ');
+			$fileInputLabel.text(fileNames.length > 50 ? fileNames.substring(0, 50) + '...' : fileNames);
+
+			filesToProcess.forEach((file, index) => {
+				if (file.type.startsWith('image/')) {
+					const reader = new FileReader();
+					reader.onload = function(e) {
+						const imgHtml = `
+							<div class="image-upload-item">
+								<img src="${e.target.result}" alt="${file.name}">
+								<button type="button" class="remove-btn" data-file-index="${index}" data-target-input="${inputElement.id}">x</button>
+							</div>
+						`;
+						// 기존 내용에 이어서 추가합니다.
+						$previewContainer.append(imgHtml);
+					};
+					reader.readAsDataURL(file);
+				}
+			});
+
+			$previewContainer.sortable({ items: '.image-upload-item' });
+		}
 
 	// ⭐ 추가: 미리보기 영역을 sortable로 활성화 (드래그앤드롭)
 	$('#thumbnailImagePreview, #mainImagePreview, #detailImagePreview').sortable({
@@ -542,24 +556,24 @@ $(document).ready(function() {
 		const $previewContainer = $itemToRemove.parent();
 
 		if ($itemToRemove.hasClass('existing-image')) {
-					const imageNoToDelete = String($(this).data('existing-image-no'));
+			const imageNoToDelete = String($(this).data('existing-image-no'));
 
-					const alreadyExists = $(`input[name="deletedImageIds"][value="${imageNoToDelete}"]`).length > 0;
+			const alreadyExists = $(`input[name="deletedImageIds"][value="${imageNoToDelete}"]`).length > 0;
 
-					if (!alreadyExists) {
-						const hiddenInput = $('<input>')
-											.attr('type', 'hidden')
-											.attr('name', 'deletedImageIds')
-											.val(imageNoToDelete);
-						$('#productRegistrationForm').append(hiddenInput);
-					}
+			if (!alreadyExists) {
+				const hiddenInput = $('<input>')
+					.attr('type', 'hidden')
+					.attr('name', 'deletedImageIds')
+					.val(imageNoToDelete);
+				$('#productRegistrationForm').append(hiddenInput);
+			}
 
-					if (productData && productData.productImages) {
-						productData.productImages = productData.productImages.filter(img => String(img.imgNo) !== imageNoToDelete);
-					}
+			if (productData && productData.productImages) {
+				productData.productImages = productData.productImages.filter(img => String(img.imgNo) !== imageNoToDelete);
+			}
 
-					$(`.existing-image-path[data-image-no="${imageNoToDelete}"]`).remove();
-					$itemToRemove.remove();
+			$(`.existing-image-path[data-image-no="${imageNoToDelete}"]`).remove();
+			$itemToRemove.remove();
 
 
 
