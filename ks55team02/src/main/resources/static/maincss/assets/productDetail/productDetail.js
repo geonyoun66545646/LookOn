@@ -167,6 +167,55 @@ $(document).ready(function() {
             window.location.href = '/cart'; 
         }
     });
+	
+	
+	/* ========================== 구매하기 버튼 2025.07.11 gy ========================== */
+	
+	// 구매하기 버튼 클릭 이벤트 수정 (confirm alert 추가)
+	$('.btn-buy-now').on('click', function(e) {
+	    e.preventDefault(); // 기본 링크 동작 방지
+
+	    const productName = $('.product-details .product-title').text().trim();
+	    const productImageSrc = $('.product-main-image img').attr('src'); 
+	    
+	    // productDetail.html에서 선언된 전역 변수 currentProductGdsNo 사용을 가정
+	    const productGdsNo = typeof currentProductGdsNo !== 'undefined' ? currentProductGdsNo : null; 
+
+	    if (selectedOptions.length === 0) {
+	        alert('구매하시려면 최소 하나 이상의 옵션을 선택해주세요.');
+	        return;
+	    }
+
+	    // ⭐ 바로 구매하시겠습니까? confirm alert 추가 ⭐
+	    if (confirm('선택하신 상품을 바로 구매하시겠습니까?')) {
+	        let buyNowData = [];
+
+	        selectedOptions.forEach(option => {
+	            const uniqueItemId = `${productName}_${option.color}_${option.size}`;
+	            const basePrice = getBaseProductPrice(); 
+	            buyNowData.push({
+	                id: uniqueItemId, 
+	                gdsNo: productGdsNo, // 상품의 실제 고유 번호 (백엔드 처리에 필요)
+	                name: `${productName} ${option.color} ${option.size}`,
+	                price: basePrice,
+	                quantity: option.quantity,
+	                image: productImageSrc,
+	                color: option.color, // 색상 옵션 값
+	                size: option.size // 사이즈 옵션 값
+	            });
+	        });
+
+	        // sessionStorage에 구매할 상품 데이터 저장
+	        sessionStorage.setItem('buy_now_data', JSON.stringify(buyNowData));
+	        
+	        // checkout.html 페이지로 이동
+	        window.location.href = '/checkout';
+	    } else {
+	        // 사용자가 '취소'를 누른 경우
+	        console.log("구매하기 취소됨.");
+	    }
+	});
+
 
     console.log("페이지 로드 시 초기화 완료.");
 });

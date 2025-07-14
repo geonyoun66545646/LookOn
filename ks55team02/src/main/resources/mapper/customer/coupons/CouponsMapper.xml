@@ -7,7 +7,6 @@
 	<resultMap id="couponsResultMap"
 		type="ks55team02.customer.coupons.domain.Coupons">
 		<result column="pblcn_cpn_id" property="pblcnCpnId" />
-		<result column="pblcn_cpn_cd" property="pblcnCpnCd" />
 		<result column="user_no" property="userNo" />
 		<result column="cpn_nm" property="cpnNm" />
 		<result column="dscnt_vl" property="dscntVl" />
@@ -262,6 +261,39 @@
 		AND uc.use_yn = 0 AND uc.indiv_expry_dt >= CURDATE();
 	</select>
 
+
+	<!-- 2025.07.11 gy 결제할 때 보유하고 있는 쿠폰 조회 -->
+	<select id="getUserAvailableCoupons" parameterType="String" resultMap="userCouponsResultMap">
+		/* 사용자가 보유한 쿠폰 목록 조회 */
+		SELECT
+			uc.user_cpn_id,
+			uc.user_no,
+			uc.pblcn_cpn_id,
+			uc.use_yn,
+			uc.cpn_give_dt,
+			uc.indiv_expry_dt,
+			uc.use_dt,
+			uc.cpn_mdfcn_dt,
+			uc.issu_rsn_src_cn,
+			c.cpn_nm,
+			c.dscnt_vl,
+			c.min_ordr_amt,
+			c.max_dscnt_amt,
+			c.vld_bgng_dt,
+			c.vld_end_dt,
+			c.issue_condition_type,
+			c.reissue_cycle
+		FROM
+			user_coupons uc
+		JOIN
+			coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+		WHERE
+			uc.user_no = #{userNo}
+			AND uc.use_yn = 0
+			AND (uc.indiv_expry_dt IS NULL OR uc.indiv_expry_dt > NOW())
+		ORDER BY
+			uc.cpn_give_dt DESC
+    </select>
 
 
 </mapper>

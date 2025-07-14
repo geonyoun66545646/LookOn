@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,23 @@ public class PaymentController {
 
 	@Autowired
 	private PaymentService paymentService;
+	
+	// 이 필드는 그대로 유지합니다.
+	@Value("${toss.client-key}")
+    private String tossClientKey;
+
+	// 장바구니
+	@GetMapping(value = {"/cart"})
+	public String shippmentSttsView() {
+		return "customer/fragments/cart";
+	}
+	
+	// 결제
+	@GetMapping("/checkout")
+	public String customerCheckOutView(Model model) {
+		model.addAttribute("tossClientKey", tossClientKey);
+		return "customer/fragments/checkOut";
+	}
 
 	/**
 	 * 프론트엔드에서 주문 정보를 받아 주문을 생성하고 세션에 상품 정보를 저장하는 API
