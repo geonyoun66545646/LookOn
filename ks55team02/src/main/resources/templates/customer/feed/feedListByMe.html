@@ -4,7 +4,7 @@
       layout:decorate="~{customer/layout/layoutMain}">
 	<head>
 		<title>마이피드</title>
-		<link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/FeedListByMe.css}">
+		<link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/feedListByMe.css}">
 	</head>
 	
 	<th:block layout:fragment="jsFile">
@@ -25,7 +25,8 @@
 	            <!-- 프로필 이미지 -->
 	            <div class="profile-image">
 	                <!-- prflImg가 null이거나 비어있으면 기본 이미지, 아니면 사용자 이미지 표시 -->
-	                <img th:src="*{prflImg != null && !prflImg.isEmpty() ? prflImg : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREwQQpb3XOTXuvhRFPQVbHvcv5B9kRzIvTlg&s'}" alt="프로필 이미지">
+<!-- 	                <img th:src="*{prflImg != null && !prflImg.isEmpty() ? prflImg : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREwQQpb3XOTXuvhRFPQVbHvcv5B9kRzIvTlg&s'}" alt="프로필 이미지"> -->
+	                <img th:src="@{/uploads/profiles/profiles.jpg}" alt="프로필 이미지">
 	            </div>
 	
 	            <!-- 프로필 정보 및 버튼 -->
@@ -73,27 +74,12 @@
 	        <!-- ======================================================= -->
 	        <!-- 3. 본인 게시물 그리드 영역 (Thymeleaf 적용) -->
 	        <!-- ======================================================= -->
-	        <section class="feed-grid" th:fragment="feedListFragment">
-	            <!-- th:each를 사용하여 feedList를 순회 -->
-	            <article class="feed-item" th:each="feed : ${feedList}">
-	                <!-- 피드 상세 페이지로 이동하는 링크. feedSn을 경로 변수로 사용 -->
-	                <a th:href="@{/customer/feed/feedDetail/{feedSn}(feedSn=${feed.feedSn})}">
-	                	<!-- 대표 이미지가 있을 경우에만 표시. 없을 경우 기본 이미지 표시 -->
-	                	<img th:if="${feed.representativeImage != null}" th:src="${feed.representativeImage.imgFilePathNm}" th:alt="${feed.representativeImage.imgAltTxtCn}">
-	                	<img th:unless="${feed.representativeImage != null}" src="/path/to/default/image.jpg" alt="기본 이미지">
-	                	
-                        <div class="item-overlay">
-							<!-- 좋아요 수 표시 -->
-							<span class="likes" th:text="'♥ ' + ${feed.likeCount}">♥ 18</span>
-	                	</div>
-	                </a>
-	            </article>
-                <!-- 피드가 하나도 없을 경우 메시지 표시 -->
-                <div th:if="${#lists.isEmpty(feedList)}">
-                    <p>작성한 피드가 없습니다.</p>
-                </div>
+	        <section class="feed-grid" id="feed-grid-container">
+
 	        </section>
-	
+	        <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;">
+	            <p>로딩 중...</p>
+	        </div>
 	    </div>
 	</th:block>
 </html>
