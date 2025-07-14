@@ -142,7 +142,37 @@ public class ProductsServiceImpl implements ProductsService {
 			// DB에서 이미지 정보 삭제
 			productsMapper.deleteImagesByImageNos(request.getDeletedImageIds());
 		}
-
+		
+		// ⭐⭐⭐⭐⭐ [3단계: 순서 업데이트 로직 추가] 시작 ⭐⭐⭐⭐⭐
+	    // (B) 기존 이미지 순서 업데이트
+	    int nextSortKey = 1; // 이미지 순번(img_indct_sn)은 1부터 다시 시작
+	    
+	    boolean isNewThumbnailUploaded = request.getThumbnailImage() != null && !request.getThumbnailImage().isEmpty() && !request.getThumbnailImage().get(0).isEmpty();
+	    if (isNewThumbnailUploaded) {
+	        // 새 썸네일이 업로드되면, 기존 썸네일은 무조건 삭제합니다. (순서 업데이트 불필요)
+	        productsMapper.deleteImagesByGdsNoAndType(gdsNo, ProductImageType.THUMBNAIL);
+	    } else {
+	        // 새 썸네일이 없다면, 기존 썸네일의 순서만 1로 업데이트합니다.
+	        List<ProductImage> thumbs = productsMapper.getProductImagesByGdsNoAndType(gdsNo, ProductImageType.THUMBNAIL);
+	        if (thumbs != null && !thumbs.isEmpty() && thumbs.get(0) != null) {
+	            productsMapper.updateImageOrder(thumbs.get(0).getImgNo(), nextSortKey++);
+	        }
+	    }
+	    // 대표 이미지 순서 업데이트
+	    if (request.getImageOrderMain() != null) {
+	        for (String imgNo : request.getImageOrderMain()) {
+	            productsMapper.updateImageOrder(imgNo, nextSortKey++);
+	        }
+	    }
+	    
+	    // 상세 이미지 순서 업데이트
+	    if (request.getImageOrderDetail() != null) {
+	        for (String imgNo : request.getImageOrderDetail()) {
+	            productsMapper.updateImageOrder(imgNo, nextSortKey++);
+	        }
+	    }
+	    // ⭐⭐⭐⭐⭐ [3단계: 로직 추가] 끝 ⭐⭐⭐⭐⭐
+		
 		// 3. 새로 추가된 파일들만 저장
 		saveProductImages(request, gdsNo);
 		saveOptionsAndStock(request, gdsNo);
@@ -296,6 +326,7 @@ public class ProductsServiceImpl implements ProductsService {
 			return startSn;
 
 		int currentSn = startSn;
+		/*ddddddddddddddddd여기부터*/
 		for (MultipartFile file : files) {
 			if (file != null && !file.isEmpty()) {
 				FileDetail fileDetail = filesUtils.saveFile(file, "products");

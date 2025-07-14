@@ -42,6 +42,11 @@ public class ProductRegistrationRequest {
  private List<String> selectedColorOptions;
  private List<String> selectedSizeOptions;
 
+//⭐⭐⭐⭐⭐ [2단계: 필드 추가] 시작 ⭐⭐⭐⭐⭐
+ private List<String> imageOrderMain;
+ private List<String> imageOrderDetail;
+ // ⭐⭐⭐⭐⭐ [2단계: 필드 추가] 끝 ⭐⭐⭐⭐⭐
+ 
  // 옵션 조합별 재고 (이 부분은 Map<String, Integer> 등으로 복합적으로 받아야 할 수 있음)
  // 예: "빨강_M": 10, "파랑_L": 5
  // 여기서는 일단 단순화하여, 각 조합은 서비스 로직에서 생성한다고 가정합니다.

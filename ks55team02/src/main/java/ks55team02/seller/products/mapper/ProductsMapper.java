@@ -22,7 +22,33 @@ public interface ProductsMapper {
 	void insertProductOptionValue(ProductOptionValue value);
 	void insertProductStatus(ProductStatus productStatus);
 	void insertStatusOptionMapping(StatusOptionMapping mapping);
+	
+	// ⭐⭐⭐⭐⭐ [추가 시작] ⭐⭐⭐⭐⭐
 
+    /**
+     * 특정 이미지의 순서(img_indct_sn)를 업데이트합니다.
+     * @param imgNo 순서를 변경할 이미지의 고유 ID
+     * @param order 새로 지정할 순번
+     */
+    void updateImageOrder(String imgNo, int order);
+
+    /**
+     * 특정 상품의 특정 타입에 해당하는 모든 이미지를 조회합니다.
+     * @param gdsNo 상품의 고유 ID
+     * @param imageType 조회할 이미지 타입 (THUMBNAIL, MAIN, DETAIL)
+     * @return 해당 타입의 이미지 목록
+     */
+    List<ProductImage> getProductImagesByGdsNoAndType(String gdsNo, ProductImageType imageType);
+
+    /**
+     * 특정 상품의 특정 타입에 해당하는 모든 이미지를 삭제합니다. (주로 썸네일 교체 시 사용)
+     * @param gdsNo 상품의 고유 ID
+     * @param imageType 삭제할 이미지 타입
+     */
+    void deleteImagesByGdsNoAndType(String gdsNo, ProductImageType imageType);
+
+    // ⭐⭐⭐⭐⭐ [추가 끝] ⭐⭐⭐⭐⭐
+	
 	// 새로 추가: 최근 반려된 이력 조회
     ProductApprovalHistory getLatestRejectedHistory(String gdsNo);
     

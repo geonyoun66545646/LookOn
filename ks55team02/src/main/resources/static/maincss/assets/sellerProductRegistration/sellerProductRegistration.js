@@ -920,7 +920,40 @@ $(document).ready(function() {
 			});
 			return false;
 		}
+		
+		// ⭐⭐⭐⭐⭐ [1단계: 순서 정보 생성 코드 추가] 시작 ⭐⭐⭐⭐⭐
+		    // 1. 기존에 있던 순서 정보 hidden input들을 모두 제거 (중복 방지)
+		    $('input[name="imageOrderMain"], input[name="imageOrderDetail"]').remove();
 
+		    // 2. '대표 이미지'들의 최종 순서(ID 목록)를 수집
+		    const imageOrderMain = [];
+		    $('#mainImagePreview .image-upload-item.existing-image').each(function() {
+		        imageOrderMain.push($(this).find('.remove-btn').data('existing-image-no'));
+		    });
+
+		    // 3. '상세 이미지'들의 최종 순서(ID 목록)를 수집
+		    const imageOrderDetail = [];
+		    $('#detailImagePreview .image-upload-item.existing-image').each(function() {
+		        imageOrderDetail.push($(this).find('.remove-btn').data('existing-image-no'));
+		    });
+
+		    // 4. 수집된 순서 정보를 폼에 hidden input으로 추가 (배열을 콤마로 연결)
+		    if (imageOrderMain.length > 0) {
+		        $('<input>').attr({
+		            type: 'hidden',
+		            name: 'imageOrderMain', // 서버에서 받을 이름
+		            value: imageOrderMain.join(',')
+		        }).appendTo('#productRegistrationForm');
+		    }
+		    if (imageOrderDetail.length > 0) {
+		        $('<input>').attr({
+		            type: 'hidden',
+		            name: 'imageOrderDetail', // 서버에서 받을 이름
+		            value: imageOrderDetail.join(',')
+		        }).appendTo('#productRegistrationForm');
+		    }
+		    // ⭐⭐⭐⭐⭐ [1단계: 코드 추가] 끝 ⭐⭐⭐⭐⭐
+		
 		console.log("폼 제출: 모든 유효성 검사 통과");
 		this.submit();
 	});
