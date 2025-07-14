@@ -23,7 +23,7 @@ import ks55team02.customer.mypage.service.MyPageService;
 public class MyPageApiController {
 
 	private final MyPageService myPageService;
-	private final FileStorageService fileStorageService;
+//	private final FileStorageService fileStorageService;
 
     @PutMapping("/info")
     public ResponseEntity<Map<String, Object>> updateUserInfo(
@@ -61,9 +61,9 @@ public class MyPageApiController {
         return ResponseEntity.ok(Map.of("success", true, "message", "프로필이 성공적으로 저장되었습니다."));
     }
     
-    public MyPageApiController(MyPageService myPageService, FileStorageService fileStorageService) {
+    public MyPageApiController(MyPageService myPageService) {
         this.myPageService = myPageService;
-        this.fileStorageService = fileStorageService; // ✅ 명시적 주입
+//        this.fileStorageService = fileStorageService; // ✅ 명시적 주입
     }
     @ExceptionHandler(IOException.class)
     public ResponseEntity<?> handleFileUploadError() {

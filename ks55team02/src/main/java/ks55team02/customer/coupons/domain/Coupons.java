@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 public class Coupons {
     private String pblcnCpnId;
-    private String pblcnCpnCd;
     private String userNo;
     private String cpnNm;
     private double dscntVl;

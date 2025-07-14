@@ -249,89 +249,114 @@
             // '배송지 등록/변경' 버튼의 메인 이벤트 리스너
             registerAddressBtn.addEventListener('click', showAddressForm);
 
-            // 쿠폰 관련 로직 시작
+        	 // 쿠폰 관련 로직 시작
             const couponSelect = document.getElementById('coupon-select');
 
-            // 1. 사용자 쿠폰 목록을 불러오는 함수 (가정: /api/user/coupons 엔드포인트)
-            async function fetchUserCoupons() {
-                const userNo = "user01"; // TODO: 실제 사용자 인증 정보에서 가져오도록 수정
-                try {
-                    // 쿠폰 목록을 가져오는 새로운 API 호출 (백엔드에 구현되어야 함)
-                    const response = await fetch(`/api/user/coupons?userNo=${userNo}`);
-                    if (!response.ok) {
-                        throw new Error('쿠폰 목록을 불러오는데 실패했습니다.');
-                    }
-                    const coupons = await response.json();
-                    
-                    // select 박스에 옵션 추가
-                    couponSelect.innerHTML = '<option value="">쿠폰 선택</option>'; // 기본 옵션 유지
-                    coupons.forEach(coupon => {
-                        const option = document.createElement('option');
-                        option.value = coupon.pblcnCpnCd; // 쿠폰 코드를 값으로 사용
-                        option.textContent = `${coupon.cpnNm} - ${coupon.dcntRte}% 할인`; // 쿠폰 이름과 할인율 표시
-                        couponSelect.appendChild(option);
-                    });
-                } catch (error) {
-                    console.error('쿠폰 목록 로드 오류:', error);
-                    alert('쿠폰 목록을 불러오는데 문제가 발생했습니다.');
-                }
-            }
+        	// 1. 사용자 쿠폰 목록을 불러오는 함수
+			async function fetchUserCoupons() {
+			    try {
+			        const response = await fetch('/customer/api/user/coupons', {
+			            credentials: 'include',
+			            headers: {
+			                'Content-Type': 'application/json'
+			            }
+			        });
+			
+			        if (!response.ok) {
+			            if (response.status === 401) {
+			                console.log("로그인이 필요합니다");
+			                return;
+			            }
+			            throw new Error(`쿠폰 조회 실패: ${response.status}`);
+			        }
+			
+			        const coupons = await response.json();
+			        renderCouponOptions(coupons);
+			    } catch (error) {
+			        console.error("쿠폰 조회 오류:", error);
+			        renderCouponOptions([]);
+			    }			    
+			    
+			}
+			
+			function renderCouponOptions(coupons) {
+			    const couponSelect = document.getElementById('coupon-select');
+			    couponSelect.innerHTML = '<option value="">쿠폰 선택</option>';
 
-            // 2. 쿠폰 선택 시 할인 계산 및 화면 업데이트 함수
-            async function applySelectedCoupon() {
-                const selectedCouponCode = couponSelect.value;
+			    if (!coupons || coupons.length === 0) {
+			        const option = document.createElement('option');
+			        option.value = "";
+			        option.textContent = "사용 가능한 쿠폰이 없습니다";
+			        option.disabled = true;
+			        couponSelect.appendChild(option);
+			        return;
+			    }
+
+			    coupons.forEach(coupon => {
+			        const option = document.createElement('option');
+			        option.value = coupon.userCpnId || coupon.pblcnCpnId; // 서버 응답에 맞는 ID 필드 사용
+			        
+			        // 쿠폰 이름 표시 (서버 응답 구조에 따라 접근 방식 변경)
+			        option.textContent = coupon.coupon?.cpnNm || coupon.cpnNm || '쿠폰';
+			        
+			        // 할인 정보 설정 (서버 응답 구조 확인 필요)
+			        option.dataset.discount = coupon.coupon?.dscntVl || coupon.dscntVl || 0;
+			        option.dataset.minOrder = coupon.coupon?.minOrdrAmt || coupon.minOrdrAmt || 0;
+			        option.dataset.maxDiscount = coupon.coupon?.maxDscntAmt || coupon.maxDscntAmt || 0;
+			        
+			        couponSelect.appendChild(option);
+			    });
+			}
+
+		
+         // 2. 쿠폰 선택 시 할인 계산 및 화면 업데이트 함수
+            function applySelectedCoupon() {
+                const selectedOption = couponSelect.options[couponSelect.selectedIndex];
                 const cartData = JSON.parse(sessionStorage.getItem('cart_data'));
                 const originalAmount = cartData.total;
-                const userNo = "user01"; // TODO: 실제 사용자 인증 정보에서 가져오도록 수정
-
-                if (!selectedCouponCode) { // 쿠폰을 선택하지 않은 경우 (초기 "쿠폰 선택" 옵션)
+                
+                if (!selectedOption.value) { // 쿠폰을 선택하지 않은 경우
                     window.currentDiscountedAmount = originalAmount;
-                    document.getElementById('checkoutTotal').textContent = `₩${Math.round(originalAmount).toLocaleString('ko-KR')}`;
-                    document.getElementById('discountAmountDisplay').textContent = `₩0`;
-                    document.getElementById('discountRow').style.display = 'none';
-                    return; // 함수 종료
+                    updateOrderSummary(originalAmount, 0);
+                    return;
                 }
 
-                try {
-                    const response = await fetch('/api/apply-coupon', { // 기존 apply-coupon 엔드포인트 사용
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            originalAmount: originalAmount,
-                            couponCode: selectedCouponCode, // 선택된 쿠폰 코드 전송
-                            userNo: userNo
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || '쿠폰 적용에 실패했습니다.');
-                    }
-
-                    const data = await response.json();
-                    const discountedAmount = data.discountedAmount;
-                    const discountAmount = originalAmount - discountedAmount;
-
-                    window.currentDiscountedAmount = discountedAmount;
-
-                    document.getElementById('checkoutTotal').textContent = `₩${Math.round(discountedAmount).toLocaleString('ko-KR')}`;
-                    document.getElementById('discountAmountDisplay').textContent = `₩${Math.round(discountAmount).toLocaleString('ko-KR')}`;
-                    document.getElementById('discountRow').style.display = 'table-row';
-                    
-                    alert('쿠폰이 성공적으로 적용되었습니다!');
-
-                } catch (error) {
-                    console.error('쿠폰 적용 오류:', error);
-                    alert(error.message);
-                    // 오류 발생 시 선택된 쿠폰 초기화 또는 기존 금액으로 복원
-                    couponSelect.value = ""; // "쿠폰 선택"으로 되돌리기
+                const discountRate = parseFloat(selectedOption.getAttribute('data-discount'));
+                const minOrderAmount = parseFloat(selectedOption.getAttribute('data-min-order'));
+                const maxDiscountAmount = parseFloat(selectedOption.getAttribute('data-max-discount'));
+                
+                // 최소 주문 금액 체크
+                if (originalAmount < minOrderAmount) {
+                    alert(`이 쿠폰은 최소 주문 금액 ${minOrderAmount.toLocaleString()}원 이상일 때 사용 가능합니다.`);
+                    couponSelect.value = "";
                     window.currentDiscountedAmount = originalAmount;
-                    document.getElementById('checkoutTotal').textContent = `₩${Math.round(originalAmount).toLocaleString('ko-KR')}`;
-                    document.getElementById('discountAmountDisplay').textContent = `₩0`;
-                    document.getElementById('discountRow').style.display = 'none';
+                    updateOrderSummary(originalAmount, 0);
+                    return;
                 }
+
+                // 할인 금액 계산
+                let discountAmount = originalAmount * discountRate;
+                
+                // 최대 할인 금액 체크
+                if (maxDiscountAmount > 0 && discountAmount > maxDiscountAmount) {
+                    discountAmount = maxDiscountAmount;
+                }
+                
+                const discountedAmount = originalAmount - discountAmount;
+                window.currentDiscountedAmount = discountedAmount;
+                
+                updateOrderSummary(discountedAmount, discountAmount);
+                alert('쿠폰이 성공적으로 적용되었습니다!');
+            }
+
+            // 주문 요약 업데이트 함수
+            function updateOrderSummary(discountedAmount, discountAmount) {
+                document.getElementById('checkoutTotal').textContent = 
+                    `₩${Math.round(discountedAmount).toLocaleString('ko-KR')}`;
+                document.getElementById('discountAmountDisplay').textContent = 
+                    `₩${Math.round(discountAmount).toLocaleString('ko-KR')}`;
+                document.getElementById('discountRow').style.display = 
+                    discountAmount > 0 ? 'table-row' : 'none';
             }
 
             // 3. select 박스 변경 이벤트 리스너
@@ -339,6 +364,7 @@
 
             // 4. 페이지 로드 시 쿠폰 목록 불러오기
             fetchUserCoupons();
+            
             // 쿠폰 목록을 불러온 후, 기본적으로 "쿠폰 선택"이 되어있으므로, initial totalAmount로 currentDiscountedAmount가 설정됩니다.
             // 이 부분은 DOMContentLoaded의 초기화 로직에서 처리되므로 추가 호출 필요 없음.
 
@@ -548,18 +574,21 @@ input[type="text"] {
 														<td>Subtotal:</td>
 														<td id="checkoutSubtotal">₩0</td>
 													</tr>
+													
 													<tr>
-														<td>쿠폰:</td>
-														<td>
-															<div class="coupon-input-group">
-																<select id="coupon-select" class="form-control">
-                                                                    <option value="">쿠폰 선택</option>
-                                                                    </select>
-																</div>
-														</td>
+													    <td>쿠폰 : </td>
+													    <td>
+													        <div class="coupon-input-group">
+													            <select id="coupon-select" class="form-control">
+													                <option value="">쿠폰 선택</option>
+													                </select>
+													        </div>
+													    </td>
 													</tr>
-													<tr id="discountRow" style="display: none;"> <td>할인 금액:</td>
-														<td id="discountAmountDisplay">₩0</td>
+													
+													<tr id="discountRow" style="display: none;">
+													    <td>할인 금액:</td>
+													    <td id="discountAmountDisplay">₩0</td>
 													</tr>
 													<tr class="summary-total">
 														<td>Total:</td>
@@ -660,7 +689,6 @@ input[type="text"] {
 	        cartData.subtotal = calculatedSubtotal;
 	        cartData.total = calculatedSubtotal; // 배송비 등이 없다면 total도 subtotal과 동일
 	        
-	        // ★★★ 이 한 줄을 추가해야 합니다! ★★★
 	        sessionStorage.setItem('cart_data', JSON.stringify(cartData)); 
 	        // 이제 업데이트된 cartData가 sessionStorage에 저장됩니다.
 
@@ -721,6 +749,58 @@ input[type="text"] {
 	</script>
 	<script th:inline="javascript">
 	/*<![CDATA[*/
+		
+		function copyShareLink() {
+            const el = document.createElement('textarea');
+            el.value = window.location.href;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert('링크가 복사되었습니다!');
+        }
+
+        $(document).ready(function() {
+            // 사용자 보유 쿠폰을 가져와 드롭다운에 채우는 함수
+            function loadUserCoupons() {
+                $.ajax({
+                    url: '/customer/api/user/coupons', // CouponsController의 API 엔드포인트
+                    type: 'GET',
+                    success: function(response) {
+                        const couponSelect = $('#coupon-select'); // 올바른 ID로 선택
+                        couponSelect.empty(); // 기존 옵션 비우기
+                        couponSelect.append('<option value="">쿠폰 선택</option>'); // 기본 옵션 추가
+
+                        if (response && response.length > 0) {
+                            response.forEach(function(userCoupon) {
+                                if (userCoupon.coupon && userCoupon.coupon.cpnNm) {
+                                    const optionText = userCoupon.coupon.cpnNm + ' (' + userCoupon.coupon.dscntVl + '% 할인)'; // 쿠폰 이름과 할인율 표시
+                                    const optionValue = userCoupon.userCpnId; // 사용자가 보유한 쿠폰 ID
+                                    couponSelect.append($('<option>', {
+                                        value: optionValue,
+                                        text: optionText
+                                    }));
+                                }
+                            });
+                        } else {
+                            couponSelect.append('<option value="">사용 가능한 쿠폰이 없습니다.</option>');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("쿠폰을 불러오는 중 오류 발생:", error);
+                        $('#coupon-select').empty().append('<option value="">쿠폰을 불러올 수 없습니다.</option>'); // 오류 시 메시지 표시
+                    }
+                });
+            }
+
+            // 페이지 로드 시 쿠폰 목록 불러오기
+            loadUserCoupons();
+
+            // 추가적으로 필요한 스크립트 작성
+        });
+        
+     /* ======================================================================================================================== */ 
+     
 	
 	document.getElementById("payment-button").addEventListener("click", async function() { // async 함수로 변경
     // 1. 배송지 정보가 제대로 입력되었는지 확인 (저장된 요약 정보 기준)
@@ -819,6 +899,7 @@ input[type="text"] {
         alert('주문 생성 중 오류가 발생했습니다: ' + error.message);
     }
 });
+	
 /*]]>*/
 </script>
 	</th:block>

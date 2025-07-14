@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{admin/layout/layoutMain}">
+<head>
+    <title>구독 플랜 수정</title>
+</head>
+<body>
+<th:block layout:fragment="contents">
+    <section class="content-main">
+        <div class="content-header">
+            <h2 class="content-title card-title">구독 플랜 수정</h2>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <form th:action="@{/adminpage/storeadmin/premiumModify/{id}(id=${plan.sbscrPlanId})}" 
+                      method="post">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">플랜명</label>
+                        <input type="text" class="form-control" 
+                               name="sbscrPlanNm" th:value="${plan.sbscrPlanNm}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">기간 (일)</label>
+                        <input type="number" class="form-control" 
+                               name="sbscrPlanTermVal" th:value="${plan.sbscrPlanTermVal}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">가격 (원)</label>
+                        <input type="number" class="form-control" 
+                               name="sbscrPlanPrc" th:value="${plan.sbscrPlanPrc}" required>
+                    </div>
+                    
+                    
+                    <div class="mb-3">
+                        <label class="form-label">설명</label>
+                        <textarea class="form-control" name="sbscrPlanExpln"
+                                  rows="4" th:text="${plan.sbscrPlanExpln}" required></textarea>
+                    </div>
+                    
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">수정 완료</button>
+                        <a th:href="@{/adminpage/storeadmin/list}" class="btn btn-secondary">취소</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</th:block>
+</body>
+</html>

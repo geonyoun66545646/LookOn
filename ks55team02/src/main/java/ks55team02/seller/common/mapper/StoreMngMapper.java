@@ -1,11 +1,13 @@
 package ks55team02.seller.common.mapper;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import ks55team02.seller.common.domain.Store;
+import ks55team02.seller.common.domain.TopSellingProduct;
 
 @Mapper
 public interface StoreMngMapper {
@@ -19,5 +21,14 @@ public interface StoreMngMapper {
 	
 	// 새로 추가된 메서드 (요약된 구독 기간)
     Map<String, Object> getStoreSubscriptionByStoreId(String storeId);
+    
+  //#{storeId} @param으로 받음
+  	Long getTotalSettleById(@Param("storeId") String storeId);
 
+  	Long getTotalOrderById(@Param("storeId") String storeId);
+  	
+  	Long getActGdsById(@Param("storeId") String storeId);
+  	
+  	// 상점별 판매 랭킹
+  	List<TopSellingProduct> getTopSellingProductsByStoreId(@Param("storeId") String storeId);
 }

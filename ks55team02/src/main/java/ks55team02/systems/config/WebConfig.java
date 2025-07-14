@@ -15,10 +15,8 @@ public class WebConfig implements WebMvcConfigurer{
     @Value("${file.path}")
     private String fileRealPath;
     
-    @Value("${profile.image.path}")
-    private String profileImagePath;  // 프로필 이미지 전용 경로
-
-	private String sanitizedProfilePath;
+//    @Value("${profile.image.path}")
+//    private String profileImagePath;  // 프로필 이미지 전용 경로
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

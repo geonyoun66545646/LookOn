@@ -21,16 +21,6 @@ public class CustomerHomeController {
 	// ⭐ 2. final 키워드 추가: 생성자 주입의 대상임을 명시
     private final ProductSearchService productSearchService;
 	
-	// 이 필드는 그대로 유지합니다.
-	@Value("${toss.client-key}")
-    private String tossClientKey;
-
-	@GetMapping("/checkout")
-	public String customerCheckOutView(Model model) {
-		model.addAttribute("tossClientKey", tossClientKey);
-		return "customer/fragments/checkOut";
-	}
-	
     // ⭐ 3. customerHomeView 메소드에 데이터 조회 로직 추가
 	@GetMapping(value= {"/main","/main/"})
     public String customerHomeView(Model model, HttpServletRequest request) {
@@ -58,18 +48,10 @@ public class CustomerHomeController {
         return "customer/main";
     }
 	
-	@GetMapping(value= {"/cart"})
-	public String customerCartView() {
-		return "customer/fragments/cart";
-	}
-	
+	// 배송 조회 화면
 	@GetMapping(value = {"/shippmentStts"})
 	public String shippmentSttsView() {
 		return "customer/fragments/shippmentStts";
 	}
 	
-	@GetMapping(value = {"/premiumAdd"})
-	public String premiumAddView() {
-		return "admin/fragments/premiumAdd";
-	}
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller; // @RestController가 아닌 @
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import jakarta.servlet.http.HttpSession;
 import ks55team02.orderProduct.service.OrderService;
 
 /**
@@ -31,6 +32,7 @@ public class OrderController {
         // 1. 테스트를 위해 사용자 번호를 직접 지정합니다.
         // TODO: 실제 로그인 기능 구현 후 Spring Security에서 사용자 정보를 가져와야 합니다.
         String userNoForQuery = "temp-user-01";
+        
         log.warn("<<<<< 테스트 모드: 사용자 '{}'의 최근 주문 내역을 조회합니다. >>>>>", userNoForQuery);
 
         try {

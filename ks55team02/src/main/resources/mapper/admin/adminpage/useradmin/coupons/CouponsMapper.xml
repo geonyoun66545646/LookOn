@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ks55team02.admin.adminpage.useradmin.coupons.mapper.AdminCouponsMapper">
+
+	<resultMap id="couponsResultMap"
+		type="ks55team02.admin.adminpage.useradmin.coupons.domain.AdminCoupons">
+		<id column="pblcn_cpn_id" property="pblcnCpnId" />
+		<result column="user_no" property="userNo" />
+		<result column="cpn_nm" property="cpnNm" />
+		<result column="dscnt_vl" property="dscntVl" />
+		<result column="min_ordr_amt" property="minOrdrAmt" />
+		<result column="max_dscnt_amt" property="maxDscntAmt" />
+		<result column="vld_bgng_dt" property="vldBgngDt" />
+		<result column="vld_end_dt" property="vldEndDt" />
+		<result column="tot_use_lmt_nmtm" property="totUseLmtNmtm" />
+		<result column="user_per_use_lmt_nmtm"
+			property="userPerUseLmtNmtm" />
+		<result column="actvtn_yn" property="actvtnYn" />
+		<result column="crt_dt" property="crtDt" />
+		<result column="mdfcn_dt" property="mdfcnDt" />
+		<result column="reissue_cycle" property="reissueCycle" />
+		<result column="issue_condition_type"
+			property="issueConditionType" />
+	</resultMap>
+
+	<!-- 모든 쿠폰 데이터 조회 (간단한 버전) -->
+	<select id="getCouponsList" resultMap="couponsResultMap">
+		SELECT
+		pblcn_cpn_id,
+		user_no,
+		cpn_nm,
+		dscnt_vl,
+		min_ordr_amt,
+		max_dscnt_amt,
+		vld_bgng_dt,
+		vld_end_dt,
+		tot_use_lmt_nmtm,
+		user_per_use_lmt_nmtm,
+		actvtn_yn,
+		crt_dt,
+		mdfcn_dt,
+		reissue_cycle,
+		issue_condition_type
+		FROM
+		coupons
+		ORDER BY
+		pblcn_cpn_id ASC
+	</select>
+
+	<insert id="addCoupon"
+		parameterType="ks55team02.admin.adminpage.useradmin.coupons.domain.AdminCoupons">
+		INSERT INTO coupons
+		(
+		pblcn_cpn_id,
+		user_no,
+		cpn_nm,
+		dscnt_vl,
+		min_ordr_amt,
+		max_dscnt_amt,
+		vld_bgng_dt,
+		vld_end_dt,
+		tot_use_lmt_nmtm,
+		user_per_use_lmt_nmtm,
+		actvtn_yn,
+		reissue_cycle,
+		issue_condition_type
+		)
+		VALUES
+		(
+		#{pblcnCpnId},
+		#{userNo},
+		#{cpnNm},
+		#{dscntVl},
+		#{minOrdrAmt},
+		#{maxDscntAmt},
+		#{vldBgngDt},
+		#{vldEndDt},
+		#{totUseLmtNmtm},
+		#{userPerUseLmtNmtm},
+		#{actvtnYn},
+		#{reissueCycle},
+		#{issueConditionType}
+		);
+	</insert>
+
+	<select id="getLastCouponId" resultType="String">
+		SELECT MAX(pblcn_cpn_id) FROM coupons;
+	</select>
+
+	<update id="updateCoupon"
+		parameterType="ks55team02.admin.adminpage.useradmin.coupons.domain.AdminCoupons">
+		UPDATE coupons
+		SET
+		cpn_nm = #{cpnNm},
+		dscnt_vl = #{dscntVl},
+		min_ordr_amt = #{minOrdrAmt},
+		max_dscnt_amt = #{maxDscntAmt},
+		vld_bgng_dt = #{vldBgngDt},
+		vld_end_dt = #{vldEndDt},
+		tot_use_lmt_nmtm = #{totUseLmtNmtm},
+		user_per_use_lmt_nmtm = #{userPerUseLmtNmtm},
+		actvtn_yn = #{actvtnYn},
+		reissue_cycle = #{reissueCycle},
+		issue_condition_type = #{issueConditionType}
+		WHERE
+		pblcn_cpn_id = #{pblcnCpnId};
+	</update>
+
+	<select id="getCouponById" parameterType="String"
+		resultMap="couponsResultMap">
+		SELECT
+		*
+		FROM
+		coupons
+		WHERE
+		pblcn_cpn_id = #{pblcnCpnId};
+	</select>
+	
+	<update id="deleteCoupon" parameterType="String">
+    UPDATE coupons
+    SET
+        actvtn_yn = 0
+    WHERE
+        pblcn_cpn_id = #{pblcnCpnId};
+</update>
+
+</mapper>
