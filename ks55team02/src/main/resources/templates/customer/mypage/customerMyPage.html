@@ -66,13 +66,13 @@
 		        </div>
 		        <div class="my-feed-link-section">
 				        <div class="my-feed-link-item first">
-				            <a th:href="@{/customer/myPage/myFeeds}">
+				            <a th:href="@{/customer/feed/feedListByMe}">
 				                <span class="link-label">내 피드 가기</span>
 				                <strong class="link-text">GO<small class="link-small-text"></small></strong>
 				            </a>
 				        </div>
 				        <div class="my-feed-link-item">
-				            <a th:href="@{/feeds}">
+				            <a th:href="@{/customer/feed/feedList}">
 				                <span class="link-label">전체 피드 가기</span>
 				                <strong class="link-text">GO<small class="link-small-text"></small></strong>
 				            </a>
@@ -106,7 +106,7 @@
                 </div>
                 <div class="nav-column">
                     <ul>
-                        <li><a href="#">마이피드</a></li>
+                        <li><a th:href="@{/customer/feed/feedListByMe}">마이피드</a></li>
                         <li><a th:href="@{/customer/chat}">채팅</a></li>
                     </ul>
                 </div>

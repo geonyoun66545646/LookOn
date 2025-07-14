@@ -19,6 +19,15 @@ public class ProductSearchServiceImpl implements ProductSearchService {
     private final ProductSearchMapper productSearchMapper;
     
     @Override
+    public List<Products> getSimilarProducts(String categoryId, String currentGdsNo, int limit) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("categoryId", categoryId);
+        params.put("currentGdsNo", currentGdsNo);
+        params.put("limit", limit);
+        return productSearchMapper.getSimilarProducts(params);
+    }
+    
+    @Override
     public List<Products> getRecentProductsForMain(int limit) {
         return productSearchMapper.getRecentProductsForMain(limit);
     }

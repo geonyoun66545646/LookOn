@@ -89,6 +89,39 @@
 		</association>
 	</resultMap>
 	
+	<!-- 상태-옵션 매핑 삭제 추가 -->
+	<delete id="deleteStatusOptionMappingsByGdsNo" parameterType="string">
+	    DELETE som FROM status_option_mappings som
+	    JOIN product_status ps ON som.gds_stts_no = ps.gds_stts_no
+	    WHERE ps.gds_no = #{gdsNo}
+	</delete>
+	
+	<!-- 옵션 값 삭제 쿼리 수정 -->
+	<delete id="deleteOptionValuesByGdsNo" parameterType="string">
+	    DELETE pov FROM product_option_values pov
+	    JOIN product_options po ON pov.opt_no = po.opt_no
+	    WHERE po.gds_no = #{gdsNo}
+	</delete>
+	
+	<!-- 옵션 삭제 쿼리 유지 -->
+	<delete id="deleteOptionsByGdsNo" parameterType="string">
+	    DELETE FROM product_options WHERE gds_no = #{gdsNo}
+	</delete>
+	
+	<!-- 상태 삭제 쿼리 유지 -->
+	<delete id="deleteStatusByGdsNo" parameterType="string">
+	    DELETE FROM product_status WHERE gds_no = #{gdsNo}
+	</delete>
+	
+	<!-- 이미지 개별 삭제용 -->
+	<delete id="deleteImagesByImageNos" parameterType="java.util.List">
+	    DELETE FROM product_images
+	    WHERE img_no IN
+	    <foreach item="imgNo" collection="list" open="(" separator="," close=")">
+	        #{imgNo}
+	    </foreach>
+	</delete>
+
 	<!-- 특정 카테고리에 속한 모든 상품을 비노출 처리 -->
     <update id="deactivateProductsByCategoryId" parameterType="string">
         UPDATE
