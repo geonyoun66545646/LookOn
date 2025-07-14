@@ -205,7 +205,7 @@ public class InquiryServiceImpl implements InquiryService {
     }
 
     @Override
-    public List<InquiryOption> getAdminInquiryTypeOptions() {
+    public List<InquiryOption> getAdminInquiryOptions() {
         // InquiryOption enum의 모든 상수를 리스트로 반환합니다.
     	 return Arrays.asList(InquiryOption.PRODUCT, InquiryOption.DELIVERY, InquiryOption.SNS, InquiryOption.ETC);
     }

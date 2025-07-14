@@ -8,9 +8,17 @@ $(document).ready(function () {
     const $form = $('#inquiryForm');
 
     // options passed from Thymeleaf
-    const allInquiryOptions = window.allInquiryOptions || [];
-    const adminInquiryOptions = window.adminInquiryOptions || [];
-
+    //const allInquiryOptions = window.allInquiryOptions || [];
+    //const adminInquiryOptions = window.adminInquiryOptions || [];
+	const $inquiryOptions = $('#inqryTypeCd').find("option");
+	const inquiryOptions = [];
+	$inquiryOptions.each((idx, element)=> {
+		 const value = $(element).val();
+		 const text = $(element).text();
+		 if(value) inquiryOptions.push({value, text})
+	});
+	
+	
     function populateInquiryTypeOptions(optionsData) {
         $inquiryTypeSelect.empty().append('<option value="">선택하세요</option>');
         optionsData.forEach(option => {
@@ -19,18 +27,21 @@ $(document).ready(function () {
     }
 
     function updateFormState(selectedTarget, selectedStoreId) {
+        // 상점 선택 드롭다운 및 관련 row 처리
         if (selectedTarget === 'STORE') {
             $inquiryStoreSelect.prop('disabled', false).attr('required', 'required');
             $storeSelectRow.show();
-        } else {
+        } else { // 'ADMIN'이거나 다른 값일 경우
             $inquiryStoreSelect.prop('disabled', true).val('').removeAttr('required');
+            $storeSelectRow.hide(); // 'STORE'가 아니면 숨김
         }
 
+        // 문의 유형 드롭다운 처리
         if (selectedTarget === 'ADMIN') {
-            populateInquiryTypeOptions(adminInquiryOptions);
+            populateInquiryTypeOptions(inquiryOptions);
             $inquiryTypeSelect.prop('disabled', false).attr('required', 'required');
         } else if (selectedTarget === 'STORE' && selectedStoreId !== '') {
-            populateInquiryTypeOptions(allInquiryOptions);
+            populateInquiryTypeOptions(inquiryOptions);
             $inquiryTypeSelect.prop('disabled', false).attr('required', 'required');
         } else {
             populateInquiryTypeOptions([]);
@@ -39,6 +50,7 @@ $(document).ready(function () {
     }
 
     // 초기 상태 설정
+    // 페이지 로드 시 현재 선택된 값에 따라 폼 상태 업데이트
     updateFormState($inquiryTargetSelect.val(), $inquiryStoreSelect.val());
 
     $inquiryTargetSelect.on('change', function () {

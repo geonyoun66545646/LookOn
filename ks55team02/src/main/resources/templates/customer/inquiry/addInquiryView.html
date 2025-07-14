@@ -43,7 +43,8 @@
 										    <option value="">선택하세요</option>
 										    <option th:each="option : ${inquiryTargetOptions}"
 										            th:value="${option.name()}"     
-										            th:text="${option.getTargetOption()}"></option> </select>
+										            th:text="${option.getTargetOption()}"></option>
+										</select>
                                     </td>
                                 </tr>
                                 <tr class="inquiry-row" id="storeSelectRow" >
@@ -59,9 +60,13 @@
                                    <tr class="inquiry-row">
                                    	<th scope="row">문의 유형</th>
                                    	<td colspan="2" class ="type-column" >
-                                   	<select id="inqryTypeCd" name="inqryTypeCd" class="form-control required">
-                                   			<option value="">선택하세요</option>
-                                   			</select>
+                                   		<select id="inqryTypeCd" name="inqryTypeCd" class="form-control required">
+                                   			<option value="">선택하세요!</option>
+                                   			<option th:if="${inquiryOption != null}" 
+                                   					th:each="l : ${inquiryOption}" 
+                                   					th:value="${l.name()}" 
+                                   					th:text="${l.inquiryOption}" ></option>
+                               			</select>
                                     </td>
                                     <td>
                                     	<div class="custom-control custom-checkbox ml-3">
@@ -108,14 +113,12 @@
         </main>
     </th:block>
 
-   <th:block layout:fragment="jsScript">
-  <script th:inline="javascript">
-    window.allInquiryOptions = /*[[${#lists.map(T(ks55team02.customer.inquiry.domain.InquiryOption).values(), option -> {'value': option.name(), 'text': option.inquiryOption})}]]*/ [];
-    window.adminInquiryOptions = /*[[${#lists.map(adminInquiryOptions, option -> {'value': option.name(), 'text': option.inquiryOption})}]]*/ [];
-</script>
+ <th:block layout:fragment="jsScript">
+    <script th:inline="javascript">
+        
+    </script>
 
-<script th:src="@{/js/customerjs/addInquiryView.js}"></script>
-   
-</th:block> 
+    <script th:src="@{/js/customerjs/addInquiryView.js}"></script>
+</th:block>
 </body>
 </html>

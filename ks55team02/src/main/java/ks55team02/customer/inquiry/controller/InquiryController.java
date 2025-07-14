@@ -1,5 +1,7 @@
 package ks55team02.customer.inquiry.controller;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +46,7 @@ public class InquiryController {
      */
     private String getCurrentUserId(HttpSession session) {
         // 현재는 user_no_1000이 로그인 되어있다고 가정.
-        log.info("[임시] 현재 로그인된 사용자 ID: user_no_1000"); // 로그 추가
+        log.info("[임시] 현재 로그인된 사용자 ID: user_no_100"); // 로그 추가
         return "user_no_100";
 
         /*
@@ -136,8 +138,9 @@ public class InquiryController {
         model.addAttribute("inquiryTargetOptions", inquiryTargetOptions);
         
         // 관리자 문의 유형 옵션( 상품, 배송, SNS, 기타)
-        List<InquiryOption> adminInquiryOptions = inquiryService.getAdminInquiryTypeOptions();
+        List<InquiryOption> adminInquiryOptions = inquiryService.getAdminInquiryOptions();
         model.addAttribute("adminInquiryOptions", adminInquiryOptions);
+        model.addAttribute("inquiryOption", InquiryOption.values());
         
         // 상점 목록 추가(상점 문의)
         List<Store> storeList = inquiryService.getStoreList();

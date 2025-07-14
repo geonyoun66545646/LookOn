@@ -32,7 +32,7 @@ public interface InquiryService {
      * 문의 유형 옵션 리스트를 조회합니다.
      * @return 문의 유형 옵션 리스트
      */
-    List<InquiryOption> getAdminInquiryTypeOptions();
+    List<InquiryOption> getAdminInquiryOptions();
     
     /**
      * 상점 목록을 조회합니다.

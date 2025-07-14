@@ -1,5 +1,6 @@
 package ks55team02.customer.inquiry.domain;
 
+
 public enum InquiryOption {
 		PRODUCT("상품"),
 	    DELIVERY("배송"),
