@@ -2,7 +2,7 @@ package ks55team02.customer.coupons.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
+import org.apache.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,29 +11,25 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpSession;
 import ks55team02.customer.coupons.domain.UserCoupons;
-import ks55team02.customer.coupons.service.CouponsService;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequestMapping(value="/customer")
 @Slf4j
 public class CouponsController {
-	
-
-	@GetMapping("/coupons")
-    public String customerCoupons() {
-        return "customer/coupons/coupons"; // templates/customer/coupons/coupons.html
-    }
-	
-	// 2025.07.11 gy
-	private final CouponsService couponsService;	
-	
-	// 2025.07.11 gy
-    public CouponsController(CouponsService couponsService) {
-        this.couponsService = couponsService;
-    }
     
- // 2025.07.11 gy
+    /**
+     * 사용자 쿠폰함 페이지(뷰)를 반환합니다.
+     * @return templates/customer/coupons/coupons.html
+     */
+    @GetMapping("/coupons")
+    public String customerCouponsPage() {
+        log.info("사용자 쿠폰함 페이지 요청");
+		return "customer/coupons/coupons";
+	}
+    
+    
+    /* 2025.07.11 gy / CouponsController
     // 새로운 API 엔드포인트 추가
     // 현재 로그인 사용자의 쿠폰 조회 API
     @GetMapping("/api/user/coupons")
@@ -59,6 +55,7 @@ public class CouponsController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    */
 
-	
+    
 }

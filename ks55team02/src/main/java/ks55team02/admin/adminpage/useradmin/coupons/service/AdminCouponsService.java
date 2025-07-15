@@ -1,31 +1,23 @@
 package ks55team02.admin.adminpage.useradmin.coupons.service;
 
+import ks55team02.admin.adminpage.useradmin.coupons.domain.AdminCoupons;
+import ks55team02.admin.adminpage.useradmin.coupons.domain.AdminCouponsSearch;
+
 import java.util.List;
 import java.util.Map;
-import ks55team02.admin.adminpage.useradmin.coupons.domain.AdminCoupons;
-import ks55team02.admin.common.domain.SearchCriteria;
 
 public interface AdminCouponsService {
 
-    // 쿠폰 목록 조회
-	Map<String, Object> getCouponsList(SearchCriteria searchCriteria);    
- // [추가] 신규 쿠폰 등록
+    Map<String, Object> getCouponsList(AdminCouponsSearch search);
     void addCoupon(AdminCoupons adminCoupons);
-    
- // [추가] 쿠폰 정보 수정
     void updateCoupon(AdminCoupons adminCoupons);
-    
-    /**
-     * ======================================================
-     * [추가] ID로 특정 쿠폰 정보 조회
-     * ======================================================
-     */
     AdminCoupons getCouponById(String pblcnCpnId);
-    
-    // [추가] 쿠폰 삭제
     void deleteCoupon(String pblcnCpnId);
-
-
     
+    // 일괄 삭제 메소드 선언
+    void batchDeleteCoupons(List<String> pblcnCpnIdList);
+    
+    // [신규] 선택 활성화 메소드 시그니처 추가
+    void batchActivateCoupons(List<String> pblcnCpnIdList);
     
 }
