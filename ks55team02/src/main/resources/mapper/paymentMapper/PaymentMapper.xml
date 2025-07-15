@@ -206,5 +206,19 @@
             user_cpn_id = #{userCpnId}
             AND use_yn = 1 -- 아직 사용하지 않은 상태일 때만 업데이트
     </update>
+    
+    <!--  특정 사용자의 가장 최근 주문 ID (ordr_no)를 조회합니다.
+    주문 테이블(orders)의 등록일시(reg_dt 또는 order_date)를 기준으로 내림차순 정렬 후 1개만 가져옵니다. -->
+    <select id="findLatestOrderIdByUserNo" parameterType="String" resultType="String">
+	    SELECT
+	        ordr_no
+	    FROM
+	        orders
+	    WHERE
+	        user_no = #{userNo}
+	    ORDER BY
+	        ordr_dt DESC
+	    LIMIT 1
+	</select>
 
 </mapper>

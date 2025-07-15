@@ -2,7 +2,6 @@ package ks55team02.customer.cart.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,7 +11,6 @@ import ks55team02.customer.cart.service.CartService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -20,19 +18,13 @@ public class CartServiceImpl implements CartService{
 
 	private static final Logger log = LoggerFactory.getLogger(CartServiceImpl.class);
 
-    @Autowired
+//    @Autowired
     private CartMapper cartMapper;
 
-    /**
-     * 사용자 번호로 장바구니 목록 조회
-     * @param userNo 사용자 번호
-     * @return 해당 사용자의 장바구니 항목 목록 (CartDTO 타입)
-     */
-    @Override
-    public List<CartDTO> getCartItemsByUserNo(String userNo) {
-        log.info("서비스: 사용자 '{}'의 장바구니 조회", userNo);
-        return cartMapper.selectCartItemsByUserNo(userNo);
+    public CartServiceImpl(CartMapper cartMapper) {
+        this.cartMapper = cartMapper;
     }
+
 
     /**
      * 장바구니에 상품 추가 또는 수량 증가
@@ -63,7 +55,7 @@ public class CartServiceImpl implements CartService{
         } else {
             // 3. 존재하지 않는 경우: 새로운 항목 추가
         	CartDTO newCartDTO = new CartDTO();
-        	newCartDTO.setCartItemId(UUID.randomUUID().toString()); // camelCase 필드 접근
+        	newCartDTO.setCartItemId(generateNewCartItemId()); // camelCase 필드 접근
         	newCartDTO.setUserNo(userNo); // camelCase 필드 접근
         	newCartDTO.setGdsNo(gdsNo); // camelCase 필드 접근
         	newCartDTO.setStoreId(storeId); // camelCase 필드 접근
@@ -130,5 +122,41 @@ public class CartServiceImpl implements CartService{
         log.info("서비스: 사용자 '{}'의 장바구니 비우기 시도", userNo);
         cartMapper.clearCartByUserNo(userNo);
         log.info("서비스: 사용자 '{}'의 장바구니 비우기 성공", userNo);
+    }
+    
+    /**
+     * 새로운 cart_item_id를 'cart_id_숫자' 형식으로 생성합니다.
+     * 기존 ID 중 가장 큰 숫자 다음 번호를 사용하며, 없을 경우 81부터 시작합니다.
+     * @return 새로 생성된 cart_item_id 문자열
+     */
+    private String generateNewCartItemId() {
+        String maxIdStr = cartMapper.getMaxCartItemId(); //
+        int nextNum; //
+
+        if (maxIdStr != null) { //
+            try { //
+                nextNum = Integer.parseInt(maxIdStr) + 1; //
+            } catch (NumberFormatException e) { //
+                // 만약 maxIdStr이 숫자로 변환 불가능한 경우 (예: "cart_id_abc") 처리
+                log.error("getMaxCartItemId 결과가 숫자로 변환될 수 없습니다: {}", maxIdStr, e);
+                // 기본값으로 시작하거나 다른 예외 처리 로직 추가
+                nextNum = 81; // 오류 발생 시에도 81부터 시작하도록 폴백
+            }
+        } else { //
+            nextNum = 81; // 80번까지 있으므로 81부터 시작
+        }
+
+        return "cart_id_" + nextNum; //
+    }
+    
+    /**
+     * 사용자 번호로 장바구니 목록 조회
+     * @param userNo 사용자 번호
+     * @return 해당 사용자의 장바구니 항목 목록 (CartDTO 타입)
+     */
+    @Override
+    public List<CartDTO> getCartItemsByUserNo(String userNo) {
+        log.info("서비스: 사용자 '{}'의 장바구니 조회", userNo);
+        return cartMapper.selectCartItemsByUserNo(userNo);
     }
 }

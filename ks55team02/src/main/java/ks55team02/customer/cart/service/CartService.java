@@ -2,11 +2,9 @@ package ks55team02.customer.cart.service;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import ks55team02.customer.cart.domain.CartDTO;
 
-@Service
+//@Service
 public interface CartService {
 
 	/**
@@ -46,4 +44,6 @@ public interface CartService {
      * @param userNo 사용자 번호
      */
     void clearCart(String userNo);
+    
+  
 }

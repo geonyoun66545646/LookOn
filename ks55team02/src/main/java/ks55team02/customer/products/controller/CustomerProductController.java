@@ -217,7 +217,8 @@ public class CustomerProductController {
 
         if (product == null || !Boolean.TRUE.equals(product.getExpsrYn()) || !Boolean.TRUE.equals(product.getActvtnYn())) {
             return "redirect:/error/404";
-        }
+        }  
+        
         model.addAttribute("product", product);
 
         List<ProductImage> allImages = product.getProductImages();
@@ -230,9 +231,9 @@ public class CustomerProductController {
         
         model.addAttribute("thumbnailImage", thumbnailImage);
         model.addAttribute("mainGalleryImages", mainGalleryImages);
-        model.addAttribute("detailImages", detailImages);
+        model.addAttribute("detailImages", detailImages);    
         
-     // ⭐ 이 부분을 컨트롤러에 추가해야 합니다. ⭐
+        // ⭐ 이 부분을 컨트롤러에 추가해야 합니다. ⭐
         // 세션에서 LoginUser 객체를 가져와 로그인 여부를 확인합니다.
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         boolean isLoggedIn = (loginUser != null); // LoginUser 객체가 존재하면 로그인된 것으로 간주

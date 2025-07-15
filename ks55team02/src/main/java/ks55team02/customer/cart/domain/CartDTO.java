@@ -104,4 +104,5 @@ public class CartDTO {
 	}
 	// public BigDecimal getOptPrc() { return optPrc; } // 제거
 	// public void setOptPrc(BigDecimal optPrc) { this.optPrc = optPrc; } // 제거
+	
 }

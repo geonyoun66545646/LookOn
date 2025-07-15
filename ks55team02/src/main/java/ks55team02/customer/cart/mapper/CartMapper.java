@@ -59,4 +59,7 @@ public interface CartMapper {
      * @param userNo 사용자 번호
      */
     void clearCartByUserNo(String userNo);
+    
+    // TODO: 추가할 메서드 - 가장 큰 cart_item_id의 숫자 부분 조회
+    String getMaxCartItemId(); // 예: "cart_id_80" 또는 "80"을 반환하도록 처리
 }

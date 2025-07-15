@@ -4,528 +4,104 @@
 	layout:decorate="~{customer/layout/layoutMain}">
 
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>결제 확인</title>
-<meta name="keywords" content="HTML5 Template">
-<meta name="description" content="Molla - Bootstrap eCommerce Template">
-<meta name="author" content="p-themes">
+    <title>주문/결제</title>
+    <!-- Toss Payments SDK -->
+    <script src="https://js.tosspayments.com/v1"></script>
+    <!-- Daum Postcode API -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-<script src="https://js.tosspayments.com/v1"></script>
-
-<link
-	href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-	rel="stylesheet">
-
-<script
-	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-
-<style>
-/* 요청하신 배송지 폼을 위한 전용 스타일 */
-.address-form-wrapper {
-	width: 100%;
-	max-width: 600px;
-	margin: 0 auto;
-	border: 1px solid #e9e9e9;
-	padding: 20px;
-	border-radius: 5px;
-}
-
-.address-form-group {
-	display: flex;
-	align-items: center;
-	margin-bottom: 12px;
-}
-
-.address-form-group label {
-	width: 140px;
-	flex-shrink: 0;
-	font-size: 1.4rem;
-	font-weight: 500;
-	color: #333;
-	margin-bottom: 0;
-}
-
-.address-form-group .form-control {
-	height: 40px;
-}
-
-.address-form-group .input-group {
-	display: flex;
-	flex-grow: 1;
-}
-
-.address-form-group .input-group .form-control {
-	flex: 1 1 auto;
-}
-
-.address-form-group .input-group span {
-	padding: 0 10px;
-	color: #ccc;
-}
-
-.address-form-group .btn-search-postcode {
-	margin-left: 10px;
-	white-space: nowrap;
-	background-color: #f8f9fa;
-	border-color: #dee2e6;
-	height: 40px; /* 수정: 입력창과 높이를 동일하게 설정 */
-}
-
-#address-entry-form .form-group {
-	margin-bottom: 1rem;
-}
-
-/* 추가된 스타일 */
-.coupon-input-group {
-    display: flex;
-    margin-bottom: 15px;
-}
-.coupon-input-group input {
-    flex-grow: 1;
-    margin-right: 10px;
-}
-.coupon-input-group button {
-    white-space: nowrap;
-}
-</style>
-
-<script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const registerAddressBtn = document.getElementById('register-address-btn');
-            const addressDisplay = document.getElementById('address-display');
-            const originalAddressDisplayContent = addressDisplay.innerHTML; // 초기 상태 저장
-
-            // 전역 변수로 할인 적용된 최종 금액을 저장
-            // 페이지 로드 시에는 원본 totalAmount로 초기화 (초기화는 아래 DOMContentLoaded 스크립트에서 진행)
-            let currentDiscountedAmount = 0; 
-
-            // 주소 입력 폼을 표시하는 함수
-            function showAddressForm() {
-                addressDisplay.innerHTML = `
-                <div class="address-form-wrapper">
-                    <form id="address-entry-form">
-                        <div class="address-form-group">
-                            <label for="shipping-name">배송지명</label>
-                            <div class="input-group">
-                                <input type="text" id="shipping-name" class="form-control">
-                            </div>
-                        </div>                    
-                        <div class="address-form-group">
-                            <label for="postcode">배송지 *</label>
-                            <div class="input-group">
-                                <input type="text" id="postcode" class="form-control" readonly style="max-width: 120px;">
-                                <button type="button" id="search-postcode-btn" class="btn btn-search-postcode">우편번호 검색</button>
-                            </div>
-                        </div>
-                        <div class="address-form-group">
-                            <label></label>
-                            <div class="input-group">
-                                <input type="text" id="main-address" class="form-control" readonly>
-                            </div>
-                        </div>
-                        <div class="address-form-group">
-                            <label>상세주소 *</label>
-                            <div class="input-group">
-                                <input type="text" id="detail-address" class="form-control" placeholder="상세주소 입력">
-                            </div>
-                        </div>
-                        <div class="address-form-group">
-                            <label for="phone1-1">연락처1 *</label>
-                            <div class="input-group">
-                                <input type="tel" id="phone1-1" class="form-control" maxlength="3">
-                                <span>-</span>
-                                <input type="tel" id="phone1-2" class="form-control" maxlength="4">
-                                <span>-</span>
-                                <input type="tel" id="phone1-3" class="form-control" maxlength="4">
-                            </div>
-                        </div>
-                        <div class="address-form-group">
-                            <label for="phone2-1">연락처2</label>
-                            <div class="input-group">
-                                <input type="tel" id="phone2-1" class="form-control" maxlength="3">
-                                <span>-</span>
-                                <input type="tel" id="phone2-2" class="form-control" maxlength="4">
-                                <span>-</span>
-                                <input type="tel" id="phone2-3" class="form-control" maxlength="4">
-                            </div>
-                        </div>
-                        <div class="address-form-group">
-                            <label></label>
-                            <div class="input-group">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input" id="set-default-address">
-                                    <label class="custom-control-label" for="set-default-address">기본배송지로 등록</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="address-form-group">
-                           <label></label>
-                           <div class="input-group">
-                                <select id="delivery-request" class="form-control">
-                                    <option value="">배송시 요청사항을 선택해 주세요</option>
-                                    <option value="부재시 경비실에 맡겨주세요">부재시 경비실에 맡겨주세요</option>
-                                    <option value="부재시 전화 또는 문자 주세요">부재시 전화 또는 문자 주세요</option>
-                                    <option value="배송 전 연락주세요">배송 전 연락주세요</option>
-                                    <option value="택배함에 넣어주세요">택배함에 넣어주세요</option>
-                                    <option value="파손위험 상품, 배송 주의해주세요">파손위험 상품, 배송 주의해주세요</option>
-                                </select>
-                           </div>
-                        </div>
-                        <div class="text-center" style="margin-top: 20px;">
-                            <button type="button" id="save-address-btn" class="btn btn-primary">저장</button>
-                            <button type="button" id="cancel-address-btn" class="btn btn-light" style="margin-left: 10px;">취소</button>
-                        </div>
-                    </form>
-                </div>
-                `;
-                addressDisplay.classList.remove('address-content-placeholder');
-
-                // 폼 내부 버튼들에 이벤트 리스너 추가
-                document.getElementById('search-postcode-btn').addEventListener('click', execDaumPostcode);
-                document.getElementById('save-address-btn').addEventListener('click', saveAddress);
-                document.getElementById('cancel-address-btn').addEventListener('click', () => {
-                    addressDisplay.innerHTML = originalAddressDisplayContent;
-                    addressDisplay.classList.add('address-content-placeholder');
-                });
+    <th:block layout:fragment="cssFile">
+        <style>
+            .checkout-container {
+                border: 1px solid #e9ecef;
+                border-radius: 8px;
+                padding: 24px;
             }
-
-            // 카카오 우편번호 API 실행 함수
-            function execDaumPostcode() {
-                new daum.Postcode({
-                    oncomplete: function(data) {
-                        let fullAddress = data.address;
-                        let extraAddress = '';
-
-                        if (data.addressType === 'R') {
-                            if (data.bname !== '') { extraAddress += data.bname; }
-                            if (data.buildingName !== '') { extraAddress += (extraAddress !== '' ? ', ' + data.buildingName : data.buildingName); }
-                            fullAddress += (extraAddress !== '' ? ' (' + extraAddress + ')' : '');
-                        }
-                        
-                        document.getElementById('postcode').value = data.zonecode;
-                        document.getElementById('main-address').value = fullAddress;
-                        document.getElementById('detail-address').focus();
-                    }
-                }).open();
+            .section {
+                margin-bottom: 24px;
             }
-
-            // 주소 저장 및 요약 표시 함수
-            function saveAddress() {
-                // --- 유효성 검사 ---
-                const shippingName = document.getElementById('shipping-name').value.trim(); // 배송지명 추가
-                const postcode = document.getElementById('postcode').value.trim();
-                const detailAddress = document.getElementById('detail-address').value.trim();
-                const phone1_1 = document.getElementById('phone1-1').value.trim();
-                const phone1_2 = document.getElementById('phone1-2').value.trim();
-                const phone1_3 = document.getElementById('phone1-3').value.trim();
-
-                if (!postcode || !detailAddress || !phone1_1 || !phone1_2 || !phone1_3 || !shippingName) { // 배송지명도 필수
-                    alert('필수 항목(*)을 모두 입력해주세요.');
-                    return;
-                }
-
-                // --- 데이터 수집 ---
-                const mainAddress = document.getElementById('main-address').value;
-                const fullAddress = `${mainAddress} ${detailAddress}`;
-                const phone1 = `${phone1_1}-${phone1_2}-${phone1_3}`;
-                const deliveryRequest = document.getElementById('delivery-request').value;
-
-                // --- 요약 정보 표시 ---
-                addressDisplay.innerHTML = `
-                    <div class="address-info" style="width: 100%; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
-                        <p style="margin-bottom: 8px;"><strong>${shippingName || '기본 배송지'}</strong></p>
-                        <p style="margin-bottom: 8px;"><span id="display-recipient">${shippingName}</span> 연락처 :  <span id="display-phone">${phone1}</span></p>
-                        <p style="margin-bottom: 8px;">(<span id="display-postcode">${postcode}</span>) <span id="display-address">${fullAddress}</span></p>
-                        ${deliveryRequest ? `<p style="color: #868e96; margin-bottom: 0;">요청사항: <span id="display-request">${deliveryRequest}</span></p>` : ''}
-                    </div>
-                `;
-                // 버튼 텍스트 변경
-                registerAddressBtn.textContent = '배송지 변경';
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 10px;
             }
-
-            // '배송지 등록/변경' 버튼의 메인 이벤트 리스너
-            registerAddressBtn.addEventListener('click', showAddressForm);
-
-        	 // 쿠폰 관련 로직 시작
-            const couponSelect = document.getElementById('coupon-select');
-
-        	// 1. 사용자 쿠폰 목록을 불러오는 함수
-			async function fetchUserCoupons() {
-			    try {
-			        const response = await fetch('/customer/api/user/coupons', {
-			            credentials: 'include',
-			            headers: {
-			                'Content-Type': 'application/json'
-			            }
-			        });
-			
-			        if (!response.ok) {
-			            if (response.status === 401) {
-			                console.log("로그인이 필요합니다");
-			                return;
-			            }
-			            throw new Error(`쿠폰 조회 실패: ${response.status}`);
-			        }
-			
-			        const coupons = await response.json();
-			        renderCouponOptions(coupons);
-			    } catch (error) {
-			        console.error("쿠폰 조회 오류:", error);
-			        renderCouponOptions([]);
-			    }			    
-			    
-			}
-			
-			function renderCouponOptions(coupons) {
-			    const couponSelect = document.getElementById('coupon-select');
-			    couponSelect.innerHTML = '<option value="">쿠폰 선택</option>';
-
-			    if (!coupons || coupons.length === 0) {
-			        const option = document.createElement('option');
-			        option.value = "";
-			        option.textContent = "사용 가능한 쿠폰이 없습니다";
-			        option.disabled = true;
-			        couponSelect.appendChild(option);
-			        return;
-			    }
-
-			    coupons.forEach(coupon => {
-			        const option = document.createElement('option');
-			        option.value = coupon.userCpnId || coupon.pblcnCpnId; // 서버 응답에 맞는 ID 필드 사용
-			        
-			        // 쿠폰 이름 표시 (서버 응답 구조에 따라 접근 방식 변경)
-			        option.textContent = coupon.coupon?.cpnNm || coupon.cpnNm || '쿠폰';
-			        
-			        // 할인 정보 설정 (서버 응답 구조 확인 필요)
-			        option.dataset.discount = coupon.coupon?.dscntVl || coupon.dscntVl || 0;
-			        option.dataset.minOrder = coupon.coupon?.minOrdrAmt || coupon.minOrdrAmt || 0;
-			        option.dataset.maxDiscount = coupon.coupon?.maxDscntAmt || coupon.maxDscntAmt || 0;
-			        
-			        couponSelect.appendChild(option);
-			    });
-			}
-
-		
-         // 2. 쿠폰 선택 시 할인 계산 및 화면 업데이트 함수
-            function applySelectedCoupon() {
-                const selectedOption = couponSelect.options[couponSelect.selectedIndex];
-                const cartData = JSON.parse(sessionStorage.getItem('cart_data'));
-                const originalAmount = cartData.total;
-                
-                if (!selectedOption.value) { // 쿠폰을 선택하지 않은 경우
-                    window.currentDiscountedAmount = originalAmount;
-                    updateOrderSummary(originalAmount, 0);
-                    return;
-                }
-
-                const discountRate = parseFloat(selectedOption.getAttribute('data-discount'));
-                const minOrderAmount = parseFloat(selectedOption.getAttribute('data-min-order'));
-                const maxDiscountAmount = parseFloat(selectedOption.getAttribute('data-max-discount'));
-                
-                // 최소 주문 금액 체크
-                if (originalAmount < minOrderAmount) {
-                    alert(`이 쿠폰은 최소 주문 금액 ${minOrderAmount.toLocaleString()}원 이상일 때 사용 가능합니다.`);
-                    couponSelect.value = "";
-                    window.currentDiscountedAmount = originalAmount;
-                    updateOrderSummary(originalAmount, 0);
-                    return;
-                }
-
-                // 할인 금액 계산
-                let discountAmount = originalAmount * discountRate;
-                
-                // 최대 할인 금액 체크
-                if (maxDiscountAmount > 0 && discountAmount > maxDiscountAmount) {
-                    discountAmount = maxDiscountAmount;
-                }
-                
-                const discountedAmount = originalAmount - discountAmount;
-                window.currentDiscountedAmount = discountedAmount;
-                
-                updateOrderSummary(discountedAmount, discountAmount);
-                alert('쿠폰이 성공적으로 적용되었습니다!');
+            .section-header h2 {
+                font-size: 1.8rem;
+                font-weight: 600;
+                margin: 0;
             }
-
-            // 주문 요약 업데이트 함수
-            function updateOrderSummary(discountedAmount, discountAmount) {
-                document.getElementById('checkoutTotal').textContent = 
-                    `₩${Math.round(discountedAmount).toLocaleString('ko-KR')}`;
-                document.getElementById('discountAmountDisplay').textContent = 
-                    `₩${Math.round(discountAmount).toLocaleString('ko-KR')}`;
-                document.getElementById('discountRow').style.display = 
-                    discountAmount > 0 ? 'table-row' : 'none';
+            #address-display {
+                min-height: 100px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                background-color: #f8f9fa;
+                padding: 20px;
+                border-radius: 5px;
             }
-
-            // 3. select 박스 변경 이벤트 리스너
-            couponSelect.addEventListener('change', applySelectedCoupon);
-
-            // 4. 페이지 로드 시 쿠폰 목록 불러오기
-            fetchUserCoupons();
-            
-            // 쿠폰 목록을 불러온 후, 기본적으로 "쿠폰 선택"이 되어있으므로, initial totalAmount로 currentDiscountedAmount가 설정됩니다.
-            // 이 부분은 DOMContentLoaded의 초기화 로직에서 처리되므로 추가 호출 필요 없음.
-
-            // 기존 'apply-coupon-btn' 관련 로직은 제거 (select 박스로 대체됨)
-            // document.getElementById('apply-coupon-btn').addEventListener('click', async function() { ... });
-
-        });
-	</script>
-
-<script
-	th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey=0ab7f19c8492cbdd75c80c0e6d922e48&libraries=services'}"></script>
-<script>
-	 	// checkout.html 최상단에 추가
-	    if (!sessionStorage.getItem('cart_data')) {
-	      alert("장바구니가 비었습니다!");
-	      window.location.href = '/cart.html'; // 강제 리디렉션
-	    }
-    </script>
-<style>
-/* 기본 스타일 */
-body {
-	font-family: 'Poppins', sans-serif;
-} /* 폰트 적용 */
-.form-group {
-	margin-bottom: 15px;
-}
-
-input[type="text"] {
-	width: 100%;
-	padding: 8px;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-}
-
-.checkout-container {
-	width: 100%;
-	max-width: 800px;
-	background-color: #ffffff;
-	border: 1px solid #e9ecef;
-	border-radius: 8px;
-	padding: 24px;
-	box-sizing: border-box;
-}
-
-.section {
-	margin-bottom: 20px;
-}
-
-/* 헤더 (제목과 버튼) */
-.section-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 16px;
-}
-
-.section-header h2 {
-	font-size: 20px;
-	font-weight: bold;
-	margin: 0;
-}
-
-#register-address-btn {
-	font-size: 14px;
-	padding: 8px 12px;
-	border-radius: 4px;
-	cursor: pointer;
-}
-
-/* 배송지 표시 영역 */
-#address-display {
-	min-height: 100px; /* 내용이 없을 때도 높이 유지 */
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	padding: 20px;
-	border-radius: 5px;
-}
-
-/* 초기 안내 메시지 스타일 */
-.address-content-placeholder p {
-	margin: 4px 0;
-	color: #868e96;
-	font-size: 15px;
-}
-
-/* 구분선 */
-.divider {
-	border: none;
-	border-top: 1px solid #e9ecef;
-	margin: 24px 0;
-}
-
-.order-product-item {
-	display: flex;
-	align-items: center;
-	padding: 1.5rem 0;
-	border-bottom: 1px solid #e9ecef;
-}
-
-.order-product-item:last-child {
-	border-bottom: none;
-}
-
-.order-product-image {
-	width: 80px;
-	height: 80px;
-	margin-right: 20px;
-}
-
-.order-product-image img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	border-radius: 4px;
-}
-
-.order-product-details {
-	flex-grow: 1;
-}
-
-.order-product-name {
-	font-weight: 500;
-	font-size: 1.6rem;
-	margin: 0 0 0.5rem 0;
-	color: #333;
-}
-
-.order-product-info {
-	font-size: 1.4rem;
-	color: #666;
-}
-
-.order-product-price {
-	font-size: 1.6rem;
-	font-weight: 600;
-	color: #333;
-	min-width: 100px;
-	text-align: right;
-}
-</style>
+            .address-content-placeholder p {
+                color: #868e96;
+                font-size: 1.5rem;
+                margin: 0;
+            }
+            .order-product-item {
+                display: flex;
+                align-items: center;
+                padding: 1.5rem 0;
+                border-bottom: 1px solid #e9ecef;
+            }
+            .order-product-item:last-child {
+                border-bottom: none;
+            }
+            .order-product-image img {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 4px;
+                margin-right: 1.5rem;
+            }
+            .order-product-details {
+                flex-grow: 1;
+            }
+            .order-product-name {
+                font-weight: 500;
+                font-size: 1.6rem;
+                margin-bottom: 0.5rem;
+            }
+            .order-product-info {
+                font-size: 1.4rem;
+                color: #666;
+            }
+            .order-product-price {
+                font-size: 1.6rem;
+                font-weight: 600;
+            }
+            .address-form-wrapper { width: 100%; margin: 0 auto; border: 1px solid #e9e9e9; padding: 20px; border-radius: 5px; }
+            .address-form-group { display: flex; align-items: center; margin-bottom: 12px; }
+            .address-form-group label { width: 120px; flex-shrink: 0; }
+            .address-form-group .input-group { display: flex; flex-grow: 1; }
+        </style>
+    </th:block>
 </head>
 
 <body>
 	<th:block layout:fragment="contents">
 		<div class="page-wrapper">
-
 			<main class="main">
 				<div class="page-header text-center"
-					style="background-image: url('maincss/assets/images/page-header-bg.jpg')">
+					style="background-image: url('/maincss/assets/images/page-header-bg.jpg')">
 					<div class="container">
-						<h1 class="page-title">
-							Checkout<span>Shop</span>
-						</h1>
+						<h1 class="page-title">Checkout<span>Shop</span></h1>
 					</div>
 				</div>
 				<nav aria-label="breadcrumb" class="breadcrumb-nav">
 					<div class="container">
 						<ol class="breadcrumb">
-							<li class="breadcrumb-item"><a href="index.html">Home</a></li>
+							<li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
 							<li class="breadcrumb-item"><a href="#">Shop</a></li>
 							<li class="breadcrumb-item active" aria-current="page">Checkout</li>
 						</ol>
@@ -534,375 +110,235 @@ input[type="text"] {
 				<div class="page-content">
 					<div class="checkout">
 						<div class="container">
-							<form action="#">
-								<div class="row">
-									<div class="col-lg-9">
-										<div class="checkout-container">
-											<div class="section">
-												<div class="section-header">
-													<h2>배송지</h2>
-													<button type="button" id="register-address-btn"
-														class="btn btn-outline-primary btn-sm">배송지 등록</button>
-												</div>
-												<div id="address-display"
-													class="address-content-placeholder">
-													<p>등록된 배송지가 없습니다.</p>
-													<p>배송지를 등록해 주세요.</p>
-												</div>
+							<div class="row">
+								<div class="col-lg-8">
+									<div class="checkout-container">
+										<!-- 배송지 섹션 -->
+										<div class="section">
+											<div class="section-header">
+												<h2>배송 정보</h2>
+												<button type="button" id="register-address-btn" class="btn btn-outline-primary btn-sm">배송지 등록/변경</button>
 											</div>
-
-											<hr class="divider">
-
-											<div class="section">
-												<div class="section-header">
-													<h2>주문 상품</h2>
-												</div>
-
-												<div id="order-product-list-container">
-													</div>
+											<div id="address-display" class="address-content-placeholder">
+												<p>배송지를 등록해 주세요.</p>
 											</div>
 										</div>
-										</div>
-									<aside class="col-lg-3">
-										<div class="summary">
-											<h3 class="summary-title">Your Order</h3>
-											<table class="table table-summary">
-												<tbody id="checkoutProducts">
-												</tbody>
-												<tbody>
-													<tr class="summary-subtotal">
-														<td>Subtotal:</td>
-														<td id="checkoutSubtotal">₩0</td>
-													</tr>
-													
-													<tr>
-													    <td>쿠폰 : </td>
-													    <td>
-													        <div class="coupon-input-group">
-													            <select id="coupon-select" class="form-control">
-													                <option value="">쿠폰 선택</option>
-													                </select>
-													        </div>
-													    </td>
-													</tr>
-													
-													<tr id="discountRow" style="display: none;">
-													    <td>할인 금액:</td>
-													    <td id="discountAmountDisplay">₩0</td>
-													</tr>
-													<tr class="summary-total">
-														<td>Total:</td>
-														<td id="checkoutTotal">₩0</td>
-													</tr>
-												</tbody>
-											</table>
 
-											<div id="payment-section" style="margin-bottom: 20px;"></div>
-											<button id="payment-button" type="button"
-												class="btn btn-outline-primary-2 btn-order btn-block">
-												<span class="btn-text">Place Order</span> <span
-													class="btn-hover-text">Proceed to Checkout</span>
-											</button>
-
+										<!-- 주문 상품 섹션 -->
+										<div class="section">
+											<div class="section-header">
+												<h2>주문 상품</h2>
+											</div>
+											<div id="order-product-list-container">
+												<!-- 주문 상품 목록이 여기에 동적으로 추가됩니다. -->
+											</div>
 										</div>
-									</aside>
+									</div>
 								</div>
-							</form>
 
+								<!-- 주문 요약 사이드바 -->
+								<aside class="col-lg-4">
+									<div class="summary">
+										<h3 class="summary-title">주문 요약</h3>
+										<table class="table table-summary">
+											<tbody>
+												<tr class="summary-subtotal">
+													<td>총 상품 금액:</td>
+													<td id="checkoutSubtotal">₩0</td>
+												</tr>
+												<!-- 쿠폰 적용은 나중에 구현 -->
+												<tr class="summary-total">
+													<td>최종 결제 금액:</td>
+													<td id="checkoutTotal">₩0</td>
+												</tr>
+											</tbody>
+										</table>
+										<button id="payment-button" type="button" class="btn btn-outline-primary-2 btn-order btn-block">
+											결제하기
+										</button>
+									</div>
+								</aside>
+							</div>
 						</div>
 					</div>
 				</div>
 			</main>
 		</div>
+	</th:block>
 
-		<button id="scroll-top" title="Back to Top">
-			<i class="icon-arrow-up"></i>
-		</button>
+	<th:block layout:fragment="jsScript">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
 
-		<div class="mobile-menu-overlay"></div>
+            // 'cart_data' 대신 올바른 키 이름인 'buy_now_data'로 데이터를 가져옵니다.
+            const buyNowDataString = sessionStorage.getItem('buy_now_data');
 
-		<div class="mobile-menu-container">
-			<div class="mobile-menu-wrapper">
-				<span class="mobile-menu-close"><i class="icon-close"></i></span>
+            if (!buyNowDataString) {
+                alert("결제할 상품 정보가 없습니다. 장바구니로 이동합니다.");
+                window.location.href = '/cart'; // 장바구니 페이지로 강제 이동
+                return;
+            }
 
-				<form action="#" method="get" class="mobile-search">
-					<label for="mobile-search" class="sr-only">Search</label> <input
-						type="search" class="form-control" name="mobile-search"
-						id="mobile-search" placeholder="Search in..." required>
-					<button class="btn btn-primary" type="submit">
-						<i class="icon-search"></i>
-					</button>
-				</form>
+            const productsToCheckout = JSON.parse(buyNowDataString);
+            let subtotal = 0;
+            productsToCheckout.forEach(p => {
+                subtotal += (p.price || 0) * (p.quantity || 1);
+            });
 
-				<nav class="mobile-nav">
-					<ul class="mobile-menu">
-						<li class="active"><a href="index.html">Home</a></li>
-						<li><a href="category.html">Shop</a></li>
-						<li><a href="product.html" class="sf-with-ul">Product</a></li>
-						<li><a href="#">Pages</a></li>
-						<li><a href="blog.html">Blog</a></li>
-						<li><a href="elements-list.html">Elements</a></li>
-					</ul>
-				</nav>
-				<div class="social-icons">
-					<a href="#" class="social-icon" target="_blank" title="Facebook"><i
-						class="icon-facebook-f"></i></a> <a href="#" class="social-icon"
-						target="_blank" title="Twitter"><i class="icon-twitter"></i></a> <a
-						href="#" class="social-icon" target="_blank" title="Instagram"><i
-						class="icon-instagram"></i></a> <a href="#" class="social-icon"
-						target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
-				</div>
-			</div>
-		</div>
+            const productListContainer = document.getElementById('order-product-list-container');
+            const checkoutSubtotalElem = document.getElementById('checkoutSubtotal');
+            const checkoutTotalElem = document.getElementById('checkoutTotal');
+            
+            productListContainer.innerHTML = productsToCheckout.map(p => `
+            <div class="order-product-item">
+                <div class="order-product-details" style="margin-left: 0;">
+                    <h3 class="order-product-name">${p.name || '상품명 없음'}</h3>
+                    <div class="order-product-info">수량: ${p.quantity || 1}개</div>
+                </div>
+                <div class="order-product-price">₩${((p.price || 0) * (p.quantity || 1)).toLocaleString()}</div>
+            </div>
+        `).join('');
 
-		<script src="maincss/assets/js/jquery.min.js"></script>
-		<script src="maincss/assets/js/bootstrap.bundle.min.js"></script>
-		<script src="maincss/assets/js/jquery.hoverIntent.min.js"></script>
-		<script src="maincss/assets/js/jquery.waypoints.min.js"></script>
-		<script src="maincss/assets/js/superfish.min.js"></script>
-		<script src="maincss/assets/js/owl.carousel.min.js"></script>
-		<script src="maincss/assets/js/bootstrap-input-spinner.js"></script>
-		<script src="maincss/assets/js/main.js"></script>
+        // 주문 요약 정보를 화면에 그립니다.
+        checkoutSubtotalElem.textContent = `₩${subtotal.toLocaleString()}`;
+        checkoutTotalElem.textContent = `₩${subtotal.toLocaleString()}`;
 
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			
-	        // 1. 장바구니 데이터 가져오기
-	        const cartDataString = sessionStorage.getItem('cart_data');
-	        if (!cartDataString) {
-	            // alert("장바구니가 비었습니다!"); // 주석 처리: 불필요한 알림 제거
-	            window.location.href = 'cart.html'; // 강제 리디렉션
-	            return;
-	        }
-	    
-	        const cartData = JSON.parse(cartDataString);
-	        
-	        // cart.html을 거치지 않거나 데이터 일관성이 없을 경우를 대비하여
-	        // products 배열을 기반으로 subtotal과 total을 다시 계산합니다.
-	        let calculatedSubtotal = 0;
-	        cartData.products.forEach(product => {
-	            // 각 상품 항목의 총 가격을 계산합니다. (단가 * 수량)
-	            product.total = (product.price || 0) * (product.quantity || 0); 
-	            calculatedSubtotal += product.total;
-	        });
-	
-	        cartData.subtotal = calculatedSubtotal;
-	        cartData.total = calculatedSubtotal; // 배송비 등이 없다면 total도 subtotal과 동일
-	        
-	        sessionStorage.setItem('cart_data', JSON.stringify(cartData)); 
-	        // 이제 업데이트된 cartData가 sessionStorage에 저장됩니다.
 
-            // 전역 변수로 할인 적용된 최종 금액을 저장
-            // 페이지 로드 시에는 원본 totalAmount로 초기화
-            window.currentDiscountedAmount = cartData.total; 
-	
-	        // --- "Your Order" 섹션 업데이트 ---
-	        const checkoutProductsTbody = document.getElementById('checkoutProducts');
-	        checkoutProductsTbody.innerHTML = '';
-	        const displayedProducts = cartData.products.slice(0, 2); 
-	    
-	        displayedProducts.forEach(product => {
-	            const row = checkoutProductsTbody.insertRow();
-	            // 이제 product.total은 유효한 숫자입니다.
-	            const formattedTotal = Math.round(product.total).toLocaleString('ko-KR');
-	            row.innerHTML = `
-	                <td>${product.name} × ${product.quantity}</td>
-	                <td>₩${formattedTotal}</td>
-	            `;
-	        });
-	    
-	        // 이제 cartData.subtotal과 cartData.total은 유효한 숫자입니다.
-	        const formattedSubtotal = Math.round(cartData.subtotal).toLocaleString('ko-KR');
-	        const formattedTotal = Math.round(cartData.total).toLocaleString('ko-KR');
-	        
-	        document.getElementById('checkoutSubtotal').textContent = `₩${formattedSubtotal}`;
-	        document.getElementById('checkoutTotal').textContent = `₩${formattedTotal}`; // 초기 Total은 Subtotal과 동일
-	        
-	        // --- "주문 상품" 목록 표시 로직 ---
-	        const productListContainer = document.getElementById('order-product-list-container');
-	        if (productListContainer && cartData.products) {
-	            let productListHtml = ''; 
-	            cartData.products.forEach(product => {
-	                // product.total은 이미 위에서 계산되었습니다.
-	                const formattedPrice = Math.round(product.total).toLocaleString('ko-KR');
-	                productListHtml += `
-	                    <div class="order-product-item">
-	                        <div class="order-product-image">
-	                            <img src="${product.image || 'https://via.placeholder.com/80'}" alt="${product.name}">
-	                        </div>
-	                        <div class="order-product-details">
-	                            <h3 class="order-product-name">${product.name}</h3>
-	                            <div class="order-product-info">
-	                                수량: ${product.quantity}개
-	                            </div>
-	                        </div>
-	                        <div class="order-product-price">
-	                            ₩${formattedPrice}
-	                        </div>
-	                    </div>
-	                `;
-	            });
-	            
-	            productListContainer.innerHTML = productListHtml;
-	        }
-	    });
-	</script>
-	<script th:inline="javascript">
-	/*<![CDATA[*/
-		
-		function copyShareLink() {
-            const el = document.createElement('textarea');
-            el.value = window.location.href;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            alert('링크가 복사되었습니다!');
-        }
+            // =================================================================
+            // 2. 배송지 관련 로직 (수정 없음)
+            // =================================================================
+            const registerAddressBtn = document.getElementById('register-address-btn');
+            const addressDisplay = document.getElementById('address-display');
+            const originalAddressDisplayContent = addressDisplay.innerHTML;
 
-        $(document).ready(function() {
-            // 사용자 보유 쿠폰을 가져와 드롭다운에 채우는 함수
-            function loadUserCoupons() {
-                $.ajax({
-                    url: '/customer/api/user/coupons', // CouponsController의 API 엔드포인트
-                    type: 'GET',
-                    success: function(response) {
-                        const couponSelect = $('#coupon-select'); // 올바른 ID로 선택
-                        couponSelect.empty(); // 기존 옵션 비우기
-                        couponSelect.append('<option value="">쿠폰 선택</option>'); // 기본 옵션 추가
+            registerAddressBtn.addEventListener('click', showAddressForm);
 
-                        if (response && response.length > 0) {
-                            response.forEach(function(userCoupon) {
-                                if (userCoupon.coupon && userCoupon.coupon.cpnNm) {
-                                    const optionText = userCoupon.coupon.cpnNm + ' (' + userCoupon.coupon.dscntVl + '% 할인)'; // 쿠폰 이름과 할인율 표시
-                                    const optionValue = userCoupon.userCpnId; // 사용자가 보유한 쿠폰 ID
-                                    couponSelect.append($('<option>', {
-                                        value: optionValue,
-                                        text: optionText
-                                    }));
-                                }
-                            });
-                        } else {
-                            couponSelect.append('<option value="">사용 가능한 쿠폰이 없습니다.</option>');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("쿠폰을 불러오는 중 오류 발생:", error);
-                        $('#coupon-select').empty().append('<option value="">쿠폰을 불러올 수 없습니다.</option>'); // 오류 시 메시지 표시
-                    }
+            function showAddressForm() {
+                addressDisplay.innerHTML = `
+                <div class="address-form-wrapper">
+                    <form id="address-entry-form">
+                        <div class="address-form-group"><label for="shipping-name">받는 사람 *</label><input type="text" id="shipping-name" class="form-control"></div>
+                        <div class="address-form-group"><label>주소 *</label><div class="input-group"><input type="text" id="postcode" class="form-control" readonly><button type="button" id="search-postcode-btn" class="btn btn-light">우편번호</button></div></div>
+                        <div class="address-form-group"><label></label><input type="text" id="main-address" class="form-control" readonly></div>
+                        <div class="address-form-group"><label></label><input type="text" id="detail-address" class="form-control" placeholder="상세주소 입력"></div>
+                        <div class="address-form-group"><label>연락처 *</label><input type="tel" id="phone" class="form-control" placeholder="'-' 없이 숫자만 입력"></div>
+                        <div class="address-form-group"><label for="delivery-request">배송 요청사항</label><select id="delivery-request" class="form-control"><option value="요청사항 없음">요청사항 없음</option><option value="문 앞에 놓아주세요">문 앞에 놓아주세요</option><option value="경비실에 맡겨주세요">경비실에 맡겨주세요</option></select></div>
+                        <div class="text-center mt-3"><button type="button" id="save-address-btn" class="btn btn-primary">저장</button><button type="button" id="cancel-address-btn" class="btn btn-secondary ml-2">취소</button></div>
+                    </form>
+                </div>`;
+                
+                document.getElementById('search-postcode-btn').addEventListener('click', execDaumPostcode);
+                document.getElementById('save-address-btn').addEventListener('click', saveAddress);
+                document.getElementById('cancel-address-btn').addEventListener('click', () => {
+                    addressDisplay.innerHTML = originalAddressDisplayContent;
                 });
             }
 
-            // 페이지 로드 시 쿠폰 목록 불러오기
-            loadUserCoupons();
+            function execDaumPostcode() {
+                new daum.Postcode({
+                    oncomplete: function(data) {
+                        document.getElementById('postcode').value = data.zonecode;
+                        document.getElementById('main-address').value = data.address;
+                        document.getElementById('detail-address').focus();
+                    }
+                }).open();
+            }
 
-            // 추가적으로 필요한 스크립트 작성
+            function saveAddress() {
+                const recipientName = document.getElementById('shipping-name').value.trim();
+                const postcode = document.getElementById('postcode').value.trim();
+                const mainAddress = document.getElementById('main-address').value.trim();
+                const detailAddress = document.getElementById('detail-address').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const deliveryRequest = document.getElementById('delivery-request').value;
+
+                if (!recipientName || !postcode || !detailAddress || !phone) {
+                    alert('필수 항목(*)을 모두 입력해주세요.');
+                    return;
+                }
+
+                const fullAddress = `${mainAddress} ${detailAddress}`;
+                addressDisplay.innerHTML = `
+                    <div style="width:100%; text-align:left; padding:1rem;">
+                        <p><strong>받는 사람:</strong> <span id="display-recipient">${recipientName}</span></p>
+                        <p><strong>연락처:</strong> <span id="display-phone">${phone}</span></p>
+                        <p><strong>주소:</strong> (<span id="display-postcode">${postcode}</span>) <span id="display-address">${fullAddress}</span></p>
+                        <p><strong>요청사항:</strong> <span id="display-request">${deliveryRequest}</span></p>
+                    </div>`;
+                registerAddressBtn.textContent = '배송지 변경';
+            }
+
+            // =================================================================
+            // 3. 결제 버튼 로직 (수정 없음)
+            // =================================================================
+            const paymentButton = document.getElementById("payment-button");
+            paymentButton.addEventListener("click", async function() {
+                const postcodeElem = document.querySelector('#display-postcode');
+                if (!postcodeElem) {
+                    alert('배송지를 먼저 등록해주세요.');
+                    return;
+                }
+
+                const orderName = productsToCheckout.length > 1 
+                    ? `${productsToCheckout[0].name} 외 ${productsToCheckout.length - 1}건`
+                    : productsToCheckout[0].name;
+
+                const orderData = {
+                    products: productsToCheckout.map(p => ({ gdsNo: p.gdsNo, quantity: p.quantity, price: p.price, name: p.name })),
+                    totalAmount: subtotal,
+                    shippingAddress: {
+                        recipientName: document.querySelector('#display-recipient').textContent,
+                        phone: document.querySelector('#display-phone').textContent,
+                        postcode: postcodeElem.textContent,
+                        address: document.querySelector('#display-address').textContent,
+                        deliveryRequest: document.querySelector('#display-request').textContent,
+                    },
+                    customerName: document.querySelector('#display-recipient').textContent
+                };
+
+                try {
+                    paymentButton.disabled = true;
+                    paymentButton.textContent = "주문 처리 중...";
+
+                    const response = await fetch('/api/orders', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(orderData)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('주문 생성에 실패했습니다.');
+                    }
+                    const data = await response.json();
+
+                    if (data.success && data.ordrNo) {
+                        const clientKey = 'test_ck_BX7zk2yd8yPpN1PLNlXprx9POLqK';
+                        const tossPayments = TossPayments(clientKey);
+                        
+                        tossPayments.requestPayment('카드', {
+                            amount: data.amount,
+                            orderId: data.ordrNo,
+                            orderName: orderName,
+                            customerName: data.customerName,
+                            successUrl: `${window.location.origin}/payment/success`,
+                            failUrl: `${window.location.origin}/payment/fail`,
+                        }).catch(function (error) {
+                            if (error.code !== 'USER_CANCEL') {
+                                alert('결제 중 오류가 발생했습니다: ' + error.message);
+                            }
+                        });
+                    } else {
+                        alert('서버로부터 올바른 주문 정보를 받지 못했습니다.');
+                    }
+                } catch (error) {
+                    alert('주문 처리 중 오류가 발생했습니다: ' + error.message);
+                } finally {
+                    paymentButton.disabled = false;
+                    paymentButton.textContent = "결제하기";
+                }
+            });
         });
-        
-     /* ======================================================================================================================== */ 
-     
-	
-	document.getElementById("payment-button").addEventListener("click", async function() { // async 함수로 변경
-    // 1. 배송지 정보가 제대로 입력되었는지 확인 (저장된 요약 정보 기준)
-    const postcode = document.querySelector('#display-postcode')?.textContent;
-    const address = document.querySelector('#display-address')?.textContent;
-    const shippingName = document.querySelector('#display-recipient')?.textContent; // 추가: 배송지명
-    const phone1 = document.querySelector('#display-phone')?.textContent; // 추가: 연락처
-    
-    if (!postcode || !address || !shippingName || !phone1) { // 배송지명과 연락처도 필수
-        alert('배송지를 먼저 등록해주세요.');
-        return;
-    }
-
-    // 2. 서버로 보낼 주문 데이터 조립
-    const cartData = JSON.parse(sessionStorage.getItem('cart_data'));
-    const deliveryRequest = document.getElementById('display-request')?.textContent || '요청사항 없음';
-    
-    // 상세주소와 기본주소를 분리하기 위한 로직 (더 견고하게 만들 수 있음)
-    // 여기서는 전체 주소를 'address'로 보내고 서버에서 분리한다고 가정합니다.
-    // PaymentController에서 orderData를 Map으로 받고 있으므로, 서버에서 파싱해야 합니다.
-    
-    // 할인 적용된 최종 금액 사용
-    const finalAmount = window.currentDiscountedAmount; 
-
-    const orderData = {
-        products: cartData.products,
-        totalAmount: finalAmount, // 할인 적용된 최종 금액 사용
-        shippingAddress: {
-            postcode: postcode,
-            address: address, // 전체 주소
-            detailAddress: "", // 실제 DB 필드에 맞게 채워주거나 서버에서 분리 필요
-            deliveryRequest: deliveryRequest,
-            recipientName: shippingName, // 수령인 이름 추가
-            phone: phone1 // 연락처 추가
-        },
-        customerName: shippingName // customerName을 shippingName으로 설정
-    };
-
-    // 3. AJAX (fetch)를 사용하여 서버에 주문 정보 전송
-    try {
-        const response = await fetch('/api/orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(orderData)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || '주문 생성에 실패했습니다. 상태 코드: ' + response.status);
-        }
-
-        const data = await response.json();
-    	
-    	// 4. 서버로부터 성공 응답 및 주문ID를 받으면 결제 진행
-    	if (data.success && data.ordrNo) {
-    	    const clientKey = 'test_ck_BX7zk2yd8yPpN1PLNlXprx9POLqK';
-    	    const tossPayments = TossPayments(clientKey);
-
-    	    const orderName = cartData.products.length > 1 
-    	        ? `${cartData.products[0].name} 외 ${cartData.products.length - 1}건`
-    	        : cartData.products[0].name;
-
-    	    // ★★★ 여기에 추가할 콘솔 로그들 ★★★
-    	    console.log("============= Toss 결제 요청 파라미터 최종 확인 =============");
-    	    console.log("  amount (결제 금액):", parseInt(finalAmount)); // 할인된 최종 금액
-    	    console.log("  ordrNo (주문 번호):", data.ordrNo);
-    	    console.log("  orderName (주문명):", orderName);
-    	    console.log("  customerName (고객명):", shippingName); // shippingName 사용
-    	    console.log("==========================================================");
-    	    // ★★★ 여기까지 추가 ★★★
-
-    	    tossPayments.requestPayment('카드', {
-    	        amount: parseInt(finalAmount), // 할인된 최종 금액 사용
-    	        orderId: data.ordrNo,
-    	        orderName: orderName,
-    	        successUrl: window.location.origin + "/payment/success",
-    	        failUrl: window.location.origin + "/payment/fail",
-    	        customerName: shippingName // shippingName 사용
-    	    })
-    	    .catch(function (error) {
-    	        if (error.code === 'USER_CANCEL') {
-	                alert('사용자가 결제를 취소했습니다.'); // 사용자에게 알림
-    	            console.log('사용자가 결제를 취소했습니다.');
-    	        } else {
-    	            console.error("결제 요청 에러:", error);
-    	            alert('결제 중 오류가 발생했습니다: ' + (error.message || '알 수 없는 오류')); // 상세 에러 메시지
-    	        }
-    	    });
-    	} else {
-    	    alert('서버로부터 올바른 주문 정보를 받지 못했습니다.');
-    	}
-    } catch (error) {
-        console.error('주문 생성 AJAX 오류', error);
-        alert('주문 생성 중 오류가 발생했습니다: ' + error.message);
-    }
-});
-	
-/*]]>*/
-</script>
+    </script>
 	</th:block>
-
 </body>
 </html>

@@ -205,7 +205,7 @@
                                         <span class="likes-count">216</span>
                                     </div>
                                     <div class="product-main-buttons">
-                                        <a href="#" class="btn-product btn-cart"><span>장바구니</span></a>
+                                        <a href="#" class="btn-product btn-cart" id="addToCartBtn"><span>장바구니</span></a>
                                         <a href="#" class="btn-product btn-buy-now"><span>구매하기</span></a>
                                         <button class="btn-product btn-share" data-toggle="modal"
                                             data-target="#shareModal" title="공유하기">
@@ -355,14 +355,15 @@
                         
                         <!-- 리뷰 조각 -->
                         <div class="tab-pane fade" id="product-review-tab" role="tabpanel"
-                            aria-labelledby="product-review-link">
-                            <div class="reviews">
-                                <div class="container">
-                                    <div th:replace="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">
-                                        </div>
-                                </div>
-                            </div>
-                        </div><!-- 리뷰 끝 -->
+						    aria-labelledby="product-review-link">
+						    <div class="reviews">
+						        <div class="container">
+						            <div th:replace="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">
+						            </div>
+						        </div>
+						    </div>
+						</div>
+						<!-- 리뷰 끝 -->
                     </div>
                 </div>
                 <div class="container">
@@ -652,30 +653,30 @@
         <!-- main.js도 layoutProductDetail.html에 이미 있습니다. -->
     </th:block>
 
-	<!-- 2025.07.14 gy 수정 -->
+	<!-- 2025.07.15 gy 수정 -->
     <th:block layout:fragment="jsScript">
-    <script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
-    <script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
-    <script>
-        // ⭐ 이 부분이 핵심 수정입니다. ⭐
-        // 컨트롤러에서 Model에 추가된 isLoggedIn 값을 받아와 JavaScript 변수에 할당합니다.
-        // /*[[${isLoggedIn}]]*/는 Thymeleaf의 인라인(inlining) 문법으로,
-        // 서버에서 렌더링될 때 실제 'true' 또는 'false' 값으로 대체됩니다.
-        let isLoggedIn = /*[[${isLoggedIn}]]*/ false;
-
-        // 디버깅을 위해 콘솔에 출력 (개발 완료 후 제거 가능)
-        console.log("isLoggedIn status (from Model via Session):", isLoggedIn);
-
-        function copyShareLink() {
-            const el = document.createElement('textarea');
-            el.value = window.location.href;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            alert('링크가 복사되었습니다!');
-        }
-    </script>
-</th:block>
+	    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	    
+	    <script th:inline="javascript">
+		    let isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+	        let currentProductGdsNo = /*[[${product?.gdsNo}]]*/ null;
+	        let currentProductStoreId = /*[[${product.store?.storeId}]]*/ null;
+	        let productDataOptions = /*[[${product?.productOptions}]]*/ []; 
+	
+	        // [디버깅 코드 추가] 페이지 로드 시 받은 원본 데이터를 콘솔에 출력합니다.
+	        console.log("=============== 원본 데이터 확인 ===============");
+	        console.log("서버로부터 받은 productDataOptions:", JSON.stringify(productDataOptions, null, 2));
+	        console.log("============================================");
+	        
+	   
+	        console.log("현재 상품 번호 (gdsNo):", currentProductGdsNo);
+	        console.log("현재 상점 ID (storeId):", currentProductStoreId); // 수정 후 이 값이 제대로 출력되는지 확인
+	        console.log("상품 옵션 데이터:", productDataOptions);
+	
+	    </script>
+	    
+	    <script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
+	    <script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
+	</th:block>
 </body>
 </html>
