@@ -8,8 +8,7 @@ import ks55team02.admin.common.domain.SearchCriteria;
 public interface AdminCouponsService {
 
     // 쿠폰 목록 조회
-    List<AdminCoupons> getCouponsList();
-    
+	Map<String, Object> getCouponsList(SearchCriteria searchCriteria);    
  // [추가] 신규 쿠폰 등록
     void addCoupon(AdminCoupons adminCoupons);
     

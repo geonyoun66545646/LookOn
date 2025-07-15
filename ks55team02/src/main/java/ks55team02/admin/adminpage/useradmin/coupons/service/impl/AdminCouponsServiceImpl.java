@@ -19,12 +19,12 @@ import java.util.Map;
 public class AdminCouponsServiceImpl implements AdminCouponsService {
 
 	private final AdminCouponsMapper adminCouponsMapper;
-	
-	  // [추가] 쿠폰 정보 수정
-    @Override
-    public void updateCoupon(AdminCoupons adminCoupons) {
-        adminCouponsMapper.updateCoupon(adminCoupons);
-    }
+
+	// [추가] 쿠폰 정보 수정
+	@Override
+	public void updateCoupon(AdminCoupons adminCoupons) {
+		adminCouponsMapper.updateCoupon(adminCoupons);
+	}
 
 	@Override
 	public void addCoupon(AdminCoupons adminCoupons) {
@@ -53,20 +53,51 @@ public class AdminCouponsServiceImpl implements AdminCouponsService {
 	}
 
 	@Override
-	public List<AdminCoupons> getCouponsList() {
-		// Mapper를 통해 모든 쿠폰 데이터 조회
-		return adminCouponsMapper.getCouponsList();
+	public Map<String, Object> getCouponsList(SearchCriteria searchCriteria) {
+		// ⭐⭐ 추가할 디버깅 로그 ⭐⭐
+		System.out.println("DEBUG_SERVICE: getCouponsList 호출 - 현재 페이지 (searchCriteria.currentPage): "
+				+ searchCriteria.getCurrentPage());
+		System.out.println(
+				"DEBUG_SERVICE: getCouponsList 호출 - 페이지 크기 (searchCriteria.pageSize): " + searchCriteria.getPageSize());
+
+		int couponsCount = adminCouponsMapper.getCouponsCount(searchCriteria);
+		System.out.println("DEBUG_SERVICE: getCouponsCount 결과 (전체 쿠폰 수): " + couponsCount);
+
+		Pagination pagination = new Pagination(couponsCount, searchCriteria); // searchCriteria를 Pagination 생성자에 넘김
+		System.out.println("DEBUG_SERVICE: Pagination 객체 생성 후 (totalPageCount): " + pagination.getTotalPageCount());
+		System.out.println("DEBUG_SERVICE: Pagination 객체 생성 후 (startPage): " + pagination.getStartPage()); // 시작 페이지 확인
+		System.out.println("DEBUG_SERVICE: Pagination 객체 생성 후 (existPrevBlock): " + pagination.isExistPrevBlock()); // ⭐⭐
+																													// 이
+																													// 값이
+																													// 2페이지에서
+																													// true가
+																													// 되는지
+																													// 확인
+		System.out.println("DEBUG_SERVICE: Pagination 객체 생성 후 (existNextBlock): " + pagination.isExistNextBlock());
+
+		// 페이징 처리를 위한 offset 계산 및 설정
+		searchCriteria.setOffset(pagination.getLimitStart()); // Pagination 객체의 계산 결과를 활용
+
+		List<AdminCoupons> couponsList = adminCouponsMapper.getCouponsList(searchCriteria);
+		System.out.println("DEBUG_SERVICE: 조회된 쿠폰 리스트 크기: " + (couponsList != null ? couponsList.size() : 0));
+
+		Map<String, Object> resultMap = new HashMap<>();
+		resultMap.put("pagination", pagination);
+		resultMap.put("couponsList", couponsList);
+		resultMap.put("totalCount", couponsCount);
+
+		return resultMap;
 	}
-	
-	 // [추가/확인] ID로 특정 쿠폰 정보 조회
-    @Override
-    public AdminCoupons getCouponById(String pblcnCpnId) {
-        return adminCouponsMapper.getCouponById(pblcnCpnId);
-    }
-    
-    // [추가] 쿠폰 삭제
-    @Override
-    public void deleteCoupon(String pblcnCpnId) {
-        adminCouponsMapper.deleteCoupon(pblcnCpnId);
-    }
+
+	// [추가/확인] ID로 특정 쿠폰 정보 조회
+	@Override
+	public AdminCoupons getCouponById(String pblcnCpnId) {
+		return adminCouponsMapper.getCouponById(pblcnCpnId);
+	}
+
+	// [추가] 쿠폰 삭제
+	@Override
+	public void deleteCoupon(String pblcnCpnId) {
+		adminCouponsMapper.deleteCoupon(pblcnCpnId);
+	}
 }

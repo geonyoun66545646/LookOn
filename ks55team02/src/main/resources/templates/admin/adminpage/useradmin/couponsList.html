@@ -5,6 +5,8 @@
 
 <head>
 <title>쿠폰 목록/관리</title>
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/customadmincss/couponsList.css}">
 </head>
 
 <th:block layout:fragment="contents">
@@ -65,15 +67,20 @@
 		<div class="card">
 			<div class="card-body">
 				<div class="d-flex justify-content-between align-items-center mb-3">
-					<div>
-						<span class="font-weight-bold">[ 전체 쿠폰 <span
-							class="text-primary">0</span>건 ]
+
+					<div class="d-flex align-items-center">
+						<span class="font-weight-bold"> [ 전체 쿠폰 <span
+							class="text-primary" id="total-coupons-count"> 0 </span> 건 ]
 						</span>
 					</div>
-					<div>
+
+					<div class="coupons-ct-dt-btn">
 						<a th:href="@{/adminpage/useradmin/createCoupons}"
-							class="btn btn-primary">신규 쿠폰 생성</a>
+							class="btn btn-primary" id="create-coupon-btn">신규 쿠폰 생성</a> <a
+							href="javascript:void(0);" class="btn btn-danger"
+							id="delete-selected-btn">신규 쿠폰 생성</a>
 					</div>
+
 				</div>
 
 				<table class="table table-hover text-center">
@@ -98,57 +105,23 @@
 							<th>수정/삭제</th>
 						</tr>
 					</thead>
-					<tbody th:if="${couponsList != null and !couponsList.isEmpty()}">
-    <tr th:each="coupon : ${couponsList}">
-        <td>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" th:value="${coupon.pblcnCpnId}">
-            </div>
-        </td>
-        <td th:text="${coupon.pblcnCpnId}">CPN_CD_001</td>
-        <td th:text="${coupon.cpnNm}">신규 가입 환영 쿠폰</td>
-        <td>
-            [[${#numbers.formatDecimal(coupon.dscntVl, 1, 0)}]]%
-        </td>
-        <td>[[${#numbers.formatDecimal(coupon.minOrdrAmt, 0, 'COMMA', 0, 'POINT')}]]원</td>
-        <td>[[${#numbers.formatDecimal(coupon.maxDscntAmt, 0, 'COMMA', 0, 'POINT')}]]원</td>
-        <td>
-            [[${#temporals.format(coupon.vldBgngDt, 'yyyy-MM-dd')}]] ~ [[${#temporals.format(coupon.vldEndDt, 'yyyy-MM-dd')}]]
-        </td>
-        <td th:text="${coupon.totUseLmtNmtm == 0 ? '무제한' : coupon.totUseLmtNmtm + '회'}">1000회</td>
-        <td th:text="${coupon.userPerUseLmtNmtm} + '회'">1회</td>
-        <td th:text="${coupon.issueConditionType}">회원가입</td>
-        <td th:text="${coupon.reissueCycle}">없음</td>
-        <td>
-            <span th:if="${coupon.actvtnYn}" class="badge bg-success">활성</span>
-            <span th:unless="${coupon.actvtnYn}" class="badge bg-danger">비활성</span>
-        </td>
-        <td>[[${#temporals.format(coupon.crtDt, 'yyyy-MM-dd')}]]</td>
-        <td>
-            <a th:href="@{/adminpage/useradmin/editCoupons/{id}(id=${coupon.pblcnCpnId})}"
-            class="btn btn-sm btn-outline-dark">수정</a>
-           <a href="javascript:void(0);" th:onclick="confirmDelete([[${coupon.pblcnCpnId}]])" class="btn btn-sm btn-outline-danger">삭제</a>
-        </td>
-    </tr>
-</tbody>
 
-<tbody th:if="${couponsList == null or couponsList.isEmpty()}">
-    <tr>
-        <td colspan="14" class="text-center py-5">
-            조회된 쿠폰 정보가 없습니다.
-        </td>
-    </tr>
-</tbody>
+					<tbody id="coupons-table-body">
+					</tbody>
+
 				</table>
 
-				<nav class="d-flex justify-content-center mt-4"
+				<table class="table table-hover text-center">
+					<thead class="thead-light">
+					</thead>
+					<tbody id="coupons-table-body">
+					</tbody>
+				</table>
+
+				<nav id="pagination-container"
+					class="d-flex justify-content-center mt-4"
 					aria-label="Page navigation">
 					<ul class="pagination">
-						<li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-						<li class="page-item active"><a class="page-link" href="#">1</a></li>
-						<li class="page-item"><a class="page-link" href="#">2</a></li>
-						<li class="page-item"><a class="page-link" href="#">3</a></li>
-						<li class="page-item"><a class="page-link" href="#">다음</a></li>
 					</ul>
 				</nav>
 			</div>
@@ -157,28 +130,155 @@
 </th:block>
 
 <th:block layout:fragment="jsScript">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-     <script>
-        function confirmDelete(couponId) {
-            Swal.fire({
-                title: "정말로 삭제하시겠습니까?",
-                text: "이 쿠폰은 비활성화 상태로 변경됩니다.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#d33",
-                cancelButtonColor: "#3085d6",
-                confirmButtonText: "삭제",
-                cancelButtonText: "취소"
-            }).then((result) => {
-                // '삭제' 버튼을 눌렀을 경우
-                if (result.isConfirmed) {
-                    // 백엔드에 만들어 둔 삭제 URL로 페이지를 이동시켜 삭제를 실행합니다.
-                    window.location.href = `/adminpage/useradmin/deleteCoupons/${couponId}`;
-                }
-            });
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+	<script>
+    // 페이지가 처음 로드될 때 1페이지의 데이터를 자동으로 가져옵니다.
+    document.addEventListener('DOMContentLoaded', () => {
+        getCoupons(1); // 초기 로드 시 1페이지 데이터 가져오기
+
+        // 검색 버튼 이벤트 리스너
+        document.getElementById('searchBtn').addEventListener('click', (event) => {
+            event.preventDefault(); // 기본 폼 제출 방지
+            getCoupons(1); // 검색 시 항상 1페이지부터 시작
+        });
+    });
+
+    // [수정] getCoupons 함수는 변경 없습니다.
+    function getCoupons(page) {
+        const form = document.getElementById('couponSearchForm');
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+
+        // 폼 데이터를 URLSearchParams에 추가
+        for (const [key, value] of formData.entries()) {
+            params.append(key, value);
         }
-    </script>
+        // 페이지 번호 추가
+        params.append('page', page);
+
+        console.log("Fetching coupons for page:", page, "with params:", params.toString());
+
+        fetch(`/adminpage/useradmin/api/coupons?${params.toString()}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Received data:", data);
+
+                // total-coupons-count 업데이트
+                document.getElementById('total-coupons-count').textContent = data.pagination && data.pagination.totalRecordCount !== undefined ? data.pagination.totalRecordCount : '0';
+                
+                renderTable(data.couponsList);
+                renderPagination(data.pagination); // 페이지네이션 UI 동적 업데이트
+            })
+            .catch(error => console.error('Error fetching coupons:', error));
+    }
     
-    </th:block>
+    // 테이블을 그리는 함수 (변경 없음)
+    function renderTable(couponsList) {
+        const tableBody = document.getElementById('coupons-table-body');
+        tableBody.innerHTML = ''; // 기존 내용을 깨끗이 비웁니다.
+
+        if (!couponsList || couponsList.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="14" class="text-center py-5">조회된 쿠폰 정보가 없습니다.</td></tr>`;
+            return;
+        }
+
+        couponsList.forEach(coupon => {
+            const row = `
+                <tr id="coupon-row-${coupon.pblcnCpnId}">
+                    <td><div class="form-check"><input class="form-check-input" type="checkbox" class="coupon-checkbox" value="${coupon.pblcnCpnId}"></div></td>
+                    <td>${coupon.pblcnCpnId}</td>
+                    <td>${coupon.cpnNm || ''}</td>
+                    <td>${coupon.dscntVl || 0}%</td>
+                    <td>${(coupon.minOrdrAmt || 0).toLocaleString()}원</td>
+                    <td>${(coupon.maxDscntAmt || 0).toLocaleString()}원</td>
+                    <td>${formatDate(coupon.vldBgngDt)} ~ ${formatDate(coupon.vldEndDt)}</td>
+                    <td>${coupon.totUseLmtNmtm === 0 ? '무제한' : coupon.totUseLmtNmtm + '회'}</td>
+                    <td>${coupon.userPerUseLmtNmtm}회</td>
+                    <td>${coupon.issueConditionType || ''}</td>
+                    <td>${coupon.reissueCycle || ''}</td>
+                    <td>${coupon.actvtnYn ? '<span class="badge bg-success">활성</span>' : '<span class="badge bg-danger">비활성</span>'}</td>
+                    <td>${formatDate(coupon.crtDt)}</td>
+                    <td>
+                        <a href="/adminpage/useradmin/editCoupons/${coupon.pblcnCpnId}" class="btn btn-sm btn-outline-dark">수정</a>
+                        <a href="javascript:void(0);" onclick="confirmDelete('${coupon.pblcnCpnId}')" class="btn btn-sm btn-outline-danger">삭제</a>
+                    </td>
+                </tr>`;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+    
+    // 날짜 포맷팅 함수 (변경 없음)
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        return dateString.substring(0, 10);
+    }
+    
+    // 개별 삭제 함수 (변경 없음)
+    function confirmDelete(couponId) {
+        Swal.fire({
+            title: "정말로 삭제하시겠습니까?",
+            text: "이 쿠폰은 비활성화 상태로 변경됩니다.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "삭제",
+            cancelButtonText: "취소"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/adminpage/useradmin/deleteCoupons/${couponId}`;
+            }
+        });
+    }
+    
+    /**
+     * ======================================================
+     * [최종 수정] 페이지네이션 버튼들을 그리는 함수
+     * - Pagination.java 로직은 그대로 유지하고,
+     * - '이전'과 '다음' 버튼의 활성화 여부를 currentPage 기준으로 판단합니다.
+     * ======================================================
+     */
+    function renderPagination(pagination) {
+        const pageContainer = document.querySelector('#pagination-container .pagination');
+        pageContainer.innerHTML = ''; // 기존 페이지 번호를 깨끗이 비웁니다.
+
+        if (!pagination || pagination.totalPageCount === 0) {
+            return;
+        }
+
+        let paginationHtml = '';
+
+        // '이전' 버튼
+        // ⭐ 이 부분을 수정합니다: existPrevBlock 대신 currentPage > 1을 사용 ⭐
+        if (pagination.currentPage > 1) { // 현재 페이지가 1보다 크면 '이전' 버튼 활성화
+            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="event.preventDefault(); getCoupons(${pagination.currentPage - 1});">이전</a></li>`;
+        } else {
+            paginationHtml += `<li class="page-item disabled"><a class="page-link" href="#">이전</a></li>`;
+        }
+
+        // 페이지 번호 버튼들
+        for (let i = pagination.startPage; i <= pagination.endPage; i++) {
+            paginationHtml += `<li class="page-item ${i === pagination.currentPage ? 'active' : ''}">
+                                     <a class="page-link" href="#" onclick="event.preventDefault(); getCoupons(${i});">${i}</a>
+                                   </li>`;
+        }
+
+        // '다음' 버튼
+        // 현재 페이지가 전체 페이지 수보다 작으면 '다음' 버튼 활성화 (이전과 동일)
+        if (pagination.currentPage < pagination.totalPageCount) {
+            paginationHtml += `<li class="page-item"><a class="page-link" href="#" onclick="event.preventDefault(); getCoupons(${pagination.currentPage + 1});">다음</a></li>`;
+        } else {
+            paginationHtml += `<li class="page-item disabled"><a class="page-link" href="#">다음</a></li>`;
+        }
+        
+        pageContainer.innerHTML = paginationHtml;
+    }
+</script>
+</th:block>
 </html>

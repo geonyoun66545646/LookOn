@@ -43,13 +43,13 @@ public class FeedServiceImpl implements FeedService {
         return feedMapper.selectFeedDetail(feedSn);
     }
     
-    // 피드 다음 페이지 조회
+    // 피드 다음 페이지 조회(신규)
     @Override
-    public Feed selectNextFeed(String currentFeedCrtDt, String wrtrUserNo) {
-    	Map<String, Object> params = new HashMap<>();
-    	params.put("currentFeedCrtDt", currentFeedCrtDt);
-    	params.put("wrtrUserNo", wrtrUserNo);
-        return feedMapper.selectNextFeed(params);
+    public List<Feed> selectNextFeedList(String currentFeedCrtDt, int limit) {
+        // 이 로직은 feedMapper에 새로운 쿼리를 호출하는 방식으로 구현되어야 합니다.
+        // Mapper는 currentFeedCrtDt보다 생성 시간이 빠른(이전인) 피드들을 limit 개수만큼 조회해야 합니다.
+        // 예: SELECT * FROM feed WHERE crt_dt < #{currentFeedCrtDt} ORDER BY crt_dt DESC LIMIT #{limit}
+        return feedMapper.selectNextFeedList(currentFeedCrtDt, limit);
     }
     
     // 마이 피드 목록 조회
