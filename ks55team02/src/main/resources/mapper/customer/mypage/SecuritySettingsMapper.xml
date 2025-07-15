@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.mypage.mapper.SecuritySettingsMapper">
+
+    <!-- 특정 사용자의 암호화된 비밀번호를 조회하는 SQL -->
+    <select id="selectUserEncryptedPasswordByNo" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT 
+        	user_pswd_encpt_val
+        FROM 
+        	users
+        WHERE 
+        	user_no = #{userNo}
+    </select>
+
+    <!-- 특정 사용자의 비밀번호를 새로운 암호화된 값으로 업데이트하는 SQL -->
+    <update id="updateUserPassword">
+        UPDATE users
+        SET
+            user_pswd_encpt_val = #{newUserPswdEncptVal}
+        WHERE 
+        	user_no = #{userNo}
+    </update>
+
+    <!-- 특정 사용자의 마지막 비밀번호 변경일시와 마지막 보안 설정 수정일시를 업데이트하는 SQL -->
+    <!-- user_security_settings 테이블에 해당 user_no가 없을 경우를 대비하여 INSERT ON DUPLICATE KEY UPDATE 사용 -->
+    <insert id="updatePasswordChangeDate">
+        INSERT INTO user_security_settings (user_no, last_pswd_chg_dt)
+        VALUES (#{userNo}, #{updateTime})
+        ON DUPLICATE KEY UPDATE
+            last_pswd_chg_dt = #{updateTime}
+    </insert>
+
+</mapper>
