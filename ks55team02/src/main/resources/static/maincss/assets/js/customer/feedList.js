@@ -13,9 +13,11 @@ $(() => {
         // 작성자 닉네임 (null일 경우 '알 수 없는 사용자' 등으로 표시)
         const writerNickname = feed.writerInfo?.userNcnm || '알 수 없는 사용자';
         
+		const detailLink = `/customer/feed/feedDetail/${feed.feedSn}?context=all`;
+		
         return `
             <article class="feed-item">
-                <a href="/customer/feed/feedDetail/${feed.feedSn}">
+                <a href="${detailLink}">
                     <img src="${imageUrl}" alt="${imageAlt}">
                     <div class="item-overlay">
                         <span class="likes">♥ ${feed.likeCount}</span>

@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import ks55team02.customer.feed.domain.Feed;
@@ -37,12 +38,19 @@ public class FeedController {
         return "customer/feed/feedList";
     }
 	     
-	 // 2. 피드 상세 조회 (selectFeedDetail)
+	 // 피드 상세 조회 
 	 // - 특별한 세션 처리가 없음. 로그인 여부와 관계없이 동작.
 	 @GetMapping("/feedDetail/{feedSn}")
-	 public String selectFeedDetail(@PathVariable String feedSn, Model model) {
+	 public String selectFeedDetail(@PathVariable String feedSn, 
+			 			@RequestParam(name = "context", defaultValue = "all") String context,
+			 			@RequestParam(name = "userNo", required = false) String userNo,
+			 			Model model) {
+		 
 	     Feed feed = feedService.selectFeedDetail(feedSn);
 	     model.addAttribute("feed", feed);
+	     model.addAttribute("context", context);
+	     model.addAttribute("userNo", userNo);
+	     
 	     return "customer/feed/feedDetail";
 	 }
 	    
@@ -62,8 +70,6 @@ public class FeedController {
     	UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
     	
     	model.addAttribute("userInfo", userInfo);
-    	
-        // feedList와 hasNext는 더 이상 모델에 추가하지 않습니다.
     	
     	return "customer/feed/feedListByUserNo";
     }

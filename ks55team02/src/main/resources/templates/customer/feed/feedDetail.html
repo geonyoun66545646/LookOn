@@ -18,14 +18,19 @@
 
 <th:block layout:fragment="contents">
     <!-- 페이지 중앙 정렬을 위한 컨테이너 -->
-    <div class="feed-detail-container" id="feed-container">
+    <div class="feed-detail-container" 
+    	id="feed-container"
+    	th:data-context="${context}"
+    	th:data-user-no="${userNo}">
         <!-- 하나의 피드 게시물을 감싸는 article 태그 -->
-        <article class="feed-post" th:object="${feed}" th:attr="data-crt-dt=*{crtDt}, data-wrtr-user-no=*{wrtrUserNo}">
+        <article class="feed-post" 
+        		th:object="${feed}" 
+        		th:attr="data-crt-dt=*{crtDt}, data-wrtr-user-no=*{wrtrUserNo}">
             <!-- 1. 작성자 정보 및 팔로우/더보기 버튼 -->
             <header class="feed-post-header">
                 <div class="user-profile">
                     <a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=*{writerInfo.userNo})}">
-                        <img th:src="*{writerInfo?.prflImg != null ? writerInfo.prflImg : '/uploads/profiles/profiles.jpg'}" alt="프로필 사진" class="profile-image">
+                        <img th:src="@{/uploads/profiles/profiles.jpg}" alt="프로필 사진" class="profile-image">
                     </a>
                     <div class="user-info">
                         <span class="username" th:text="*{writerInfo?.userNcnm}">유저닉네임</span>
