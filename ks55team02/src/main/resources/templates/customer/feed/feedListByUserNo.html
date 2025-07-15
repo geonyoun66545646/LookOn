@@ -4,11 +4,11 @@
       layout:decorate="~{customer/layout/layoutMain}">
 	<head>
 		<title>마이피드</title>
-		<link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/feedListByMe.css}">
+		<link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/feedListByUserNo.css}">
 	</head>
 	
 	<th:block layout:fragment="jsFile">
-		<script th:src="@{/maincss/assets/js/customer/feedListByMe.js}"></script>
+		<script th:src="@{/maincss/assets/js/customer/feedListByUserNo.js}"></script>
 	</th:block>
 	
 	<th:block layout:fragment="jsScript">
@@ -16,7 +16,10 @@
 	
 	<th:block layout:fragment="contents">
 	    <!-- th:object를 사용하여 userInfo 객체를 컨텍스트로 지정 -->
-	    <div class="my-feed-container" th:object="${userInfo}">
+	    <div class="my-feed-container" 
+	    	th:object="${userInfo}"
+	    	th:data-page-owner-user-no="*{userNo}"
+	    	th:data-login-user-no="${session.loginUser != null ? session.loginUser.userNo : ''}">
 	
 	        <!-- ======================================================= -->
 	        <!-- 1. 프로필 정보 영역 (Thymeleaf 적용) -->
