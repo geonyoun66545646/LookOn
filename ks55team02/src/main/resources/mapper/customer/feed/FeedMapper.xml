@@ -99,8 +99,10 @@
 	        fi.feed_img_sort_sn ASC
 	</select>
 	
-	<select id="selectNextFeed" parameterType="Map" resultMap="feedDetailResultMap">
-		/* 피드 다음 페이지 조회 */
+
+	
+	<select id="selectNextFeedList" parameterType="Map" resultMap="feedDetailResultMap">
+		/* 피드 상세 페이지에서 다음 피드 목록 조회 (여러 개) */
 	    SELECT
 	        f.feed_sn, f.wrtr_user_no, f.feed_cn, f.crt_dt,
 	        u.user_no, u.user_ncnm,
@@ -111,11 +113,10 @@
 	        (
 	            SELECT * FROM feeds
 	            WHERE
-	            	wrtr_user_no = #{wrtrUserNo}
-	                AND crt_dt &lt; STR_TO_DATE(#{currentFeedCrtDt}, '%Y-%m-%d %H:%i:%s')
+	                crt_dt &lt; STR_TO_DATE(#{currentFeedCrtDt}, '%Y-%m-%d %H:%i:%s')
 	                AND del_dt IS NULL
 	            ORDER BY crt_dt DESC
-	            LIMIT 1
+	            LIMIT #{limit}
 	        ) f
 	    LEFT JOIN
 	        users u ON f.wrtr_user_no = u.user_no
@@ -124,9 +125,9 @@
 	    LEFT JOIN
 	        feed_images fi ON f.feed_sn = fi.feed_sn
 	    ORDER BY
-	        fi.feed_img_sort_sn ASC
+	        f.crt_dt DESC, fi.feed_img_sort_sn ASC
 	</select>
-
+	
 	<select id="selectFeedList" parameterType="map" resultMap="feedListResultMap">
 		/* 피드 목록 조회 */
 		SELECT

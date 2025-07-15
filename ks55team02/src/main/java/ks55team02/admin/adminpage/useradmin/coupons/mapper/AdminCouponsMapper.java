@@ -8,8 +8,11 @@ import java.util.Map; // import 추가
 
 @Mapper
 public interface AdminCouponsMapper {
-    // 모든 쿠폰 데이터 조회
-    List<AdminCoupons> getCouponsList();
+	// [수정] 파라미터를 SearchCriteria로 변경
+    List<AdminCoupons> getCouponsList(SearchCriteria searchCriteria);
+
+    // [수정] 파라미터를 SearchCriteria로 변경
+    int getCouponsCount(SearchCriteria searchCriteria);
     
  // [추가] 신규 쿠폰 등록
     int addCoupon(AdminCoupons adminCoupons);
@@ -25,6 +28,8 @@ public interface AdminCouponsMapper {
     
     // [추가] 쿠폰 삭제 (비활성화 처리)
     int deleteCoupon(String pblcnCpnId);
+    
+    
     
     
     
