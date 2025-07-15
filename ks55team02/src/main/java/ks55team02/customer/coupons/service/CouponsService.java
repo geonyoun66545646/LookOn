@@ -43,7 +43,7 @@ public interface CouponsService {
      * - 2025.07.11 gy -
      * 특정 사용자가 보유한 사용 가능한 쿠폰 목록을 조회합니다.
      * @param userNo 사용자 번호
-     * @return 사용 가능한 UserCoupons 객체 리스트
+     * @return 사용 가능한 AdminUserCoupons 객체 리스트
      */
     List<UserCoupons> getUserAvailableCoupons(String userNo);
 

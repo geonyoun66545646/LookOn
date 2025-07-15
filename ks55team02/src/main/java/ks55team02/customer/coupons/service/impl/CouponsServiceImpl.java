@@ -223,7 +223,7 @@ public class CouponsServiceImpl implements CouponsService {
      * 이 메서드는 CouponMapper를 호출하여 DB에서 데이터를 가져옵니다.
      *
      * @param userNo 사용자 번호
-     * @return 사용 가능한 UserCoupons 객체 리스트
+     * @return 사용 가능한 AdminUserCoupons 객체 리스트
      */
 	@Override
 	public List<UserCoupons> getUserAvailableCoupons(String userNo) {

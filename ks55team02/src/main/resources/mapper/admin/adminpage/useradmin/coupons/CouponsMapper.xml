@@ -109,17 +109,16 @@
 	</update>
 
 	<select id="getCouponsList"
-		parameterType="ks55team02.admin.common.domain.SearchCriteria"
+		parameterType="ks55team02.admin.adminpage.useradmin.coupons.domain.AdminCouponsSearch"
 		resultMap="couponsResultMap">
 		SELECT * FROM coupons
 		<include refid="searchFragment" />
-		ORDER BY CAST(SUBSTRING_INDEX(pblcn_cpn_id, '_', -1) AS UNSIGNED)
-		ASC, pblcn_cpn_id ASC
+		ORDER BY pblcn_cpn_id ASC
 		LIMIT #{offset}, #{pageSize}
 	</select>
 
 	<select id="getCouponsCount"
-		parameterType="ks55team02.admin.common.domain.SearchCriteria"
+		parameterType="ks55team02.admin.adminpage.useradmin.coupons.domain.AdminCouponsSearch"
 		resultType="int">
 		SELECT COUNT(*) FROM coupons
 		<include refid="searchFragment" />
@@ -127,19 +126,53 @@
 
 	<sql id="searchFragment">
 		<where>
-			<if
-				test="searchKey != null and searchValue != null and searchValue != ''">
+			<if test="keyword != null and keyword != ''">
 				<choose>
-					<when test="'cpnNm'.equals(searchKey)">
-						AND cpn_nm LIKE CONCAT('%', #{searchValue}, '%')
+					<when test="'cpnNm'.equals(searchType)">
+						AND cpn_nm LIKE CONCAT('%', #{keyword}, '%')
 					</when>
-					<when test="'pblcnCpnId'.equals(searchKey)">
-						AND pblcn_cpn_id LIKE CONCAT('%', #{searchValue},
-						'%')
+					<when test="'pblcnCpnId'.equals(searchType)">
+						AND pblcn_cpn_id LIKE CONCAT('%', #{keyword}, '%')
 					</when>
+					<when test="'userNo'.equals(searchType)">
+						AND user_no LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<when test="'issueConditionType'.equals(searchType)">
+						AND issue_condition_type LIKE CONCAT('%',
+						#{keyword}, '%')
+					</when>
+					<otherwise>
+						AND (
+						cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+						OR
+						pblcn_cpn_id LIKE CONCAT('%', #{keyword}, '%')
+						OR user_no LIKE
+						CONCAT('%', #{keyword}, '%')
+						OR issue_condition_type LIKE
+						CONCAT('%', #{keyword}, '%')
+						)
+					</otherwise>
 				</choose>
+			</if>
+			<if test="actvtnYn != null and actvtnYn != ''">
+				AND actvtn_yn = #{actvtnYn}
+			</if>
+			<if test="vldBgngDt != null and vldEndDt != null">
+				AND (vld_bgng_dt &lt;= #{vldEndDt} AND vld_end_dt &gt;=
+				#{vldBgngDt})
 			</if>
 		</where>
 	</sql>
+
+	<update id="batchUpdateActivationStatus">
+		UPDATE coupons
+		SET actvtn_yn = #{status}
+		WHERE pblcn_cpn_id IN
+		<foreach collection="idList" item="id" open="(" separator=","
+			close=")">
+			#{id}
+		</foreach>
+	</update>
+
 
 </mapper>
