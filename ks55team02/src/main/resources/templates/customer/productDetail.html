@@ -10,17 +10,21 @@
 
 <th:block layout:fragment="cssFile">
 	<link rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+	<link rel="stylesheet"
 		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
 		integrity="sha512-..." crossorigin="anonymous"
 		referrerpolicy="no-referrer" />
 	<link rel="stylesheet"
 		th:href="@{/maincss/assets/css/plugins/nouislider/nouislider.css}">
 	<link rel="stylesheet"
-		th:href="@{/maincss/assets/productDetail/productDetail.css}">
-	<link rel="stylesheet"
 		th:href="@{/maincss/assets/mainHeader/mainHeader.css}">
 	<link rel="stylesheet"
 		th:href="@{/maincss/assets/categoryFilterModal/categoryFilterModal.css}">
+	<link rel="stylesheet"
+		th:href="@{/maincss/assets/productDetail/productDetail.css}">
+	<link rel="stylesheet"
+		th:href="@{/maincss/assets/mainSlide/mainSlide.css}" />
 </th:block>
 </head>
 
@@ -33,7 +37,7 @@
 		<!-- 단, <header th:replace...>와 <footer th:replace...> 등은 제거합니다. -->
 		<!-- 그리고 <div class="page-wrapper">, <main class="main"> 태그도 레이아웃에서 이미 제공하므로 제거합니다. -->
 
-		
+
 
 		<div class="page-content">
 			<div class="container">
@@ -284,13 +288,37 @@
 
 
 		<!-- 여기에 비슷한 상품목록을 넣고싶음 -->
-		<div class="container-bottom"
+		<div class="weekly-best-section"
 			th:if="${similarProducts != null and not #lists.isEmpty(similarProducts)}">
-			<h2 class="title text-center mb-4">비슷한 상품</h2>
-			<!-- owl-carousel 기반의 프래그먼트를 사용 -->
-			<div
-				th:replace="~{customer/fragments/mainProductList :: productListFragment(${similarProducts})}"></div>
+			<div class="weekly-best-container">
+				<div class="weekly-best-heading">
+					<h2 class="weekly-best-title">비슷한 상품</h2>
+					<div class="weekly-best-more-link">
+						<a
+							th:href="@{/products/category/{categoryId}(categoryId=${product.ctgryNo})}"
+							class="btn btn-outline-dark-2"><span>더보기</span> </a>
+					</div>
+				</div>
+
+				<div class="weekly-best-slider-container">
+					<!-- Swiper -->
+					<div class="swiper weekly-best-swiper">
+						<div class="swiper-wrapper">
+							<!-- 서버에서 전달받은 24개 상품을 슬라이드로 생성 -->
+							<div class="swiper-slide" th:each="product : ${similarProducts}">
+								<!-- 1단계에서 만든 단일 상품 카드 프래그먼트 재사용 -->
+								<div
+									th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
+							</div>
+						</div>
+					</div>
+					<!-- Navigation buttons -->
+					<div class="swiper-button-prev"></div>
+					<div class="swiper-button-next"></div>
+				</div>
+			</div>
 		</div>
+
 
 		<!-- 모달은 layout:fragment="contents" 바깥 (layoutProductDetail.html의 body 태그 닫히기 전)에 위치하는 것이 일반적입니다. -->
 		<!-- 하지만 현재 구조상, 만약 이 모달이 반드시 product detail 내부에 있어야 한다면 여기에 둡니다. -->
@@ -335,19 +363,24 @@
 
 	</th:block>
 
+
 	<!-- 이 페이지에만 필요한 추가 JS 파일을 layout:fragment="jsFile" 안에 넣습니다. -->
 	<th:block layout:fragment="jsFile">
-		<!-- jquery.min.js, bootstrap.bundle.min.js 등은 layoutProductDetail.html에 이미 있습니다. -->
+		<!-- ✅ jQuery 먼저 불러오기 -->
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+		<!-- 그다음 의존 스크립트들 -->
 		<script th:src="@{/maincss/assets/js/jquery.elevateZoom.min.js}"></script>
-		<!-- jquery.magnific-popup.min.js도 layoutProductDetail.html에 이미 있습니다. -->
-		<!-- main.js도 layoutProductDetail.html에 이미 있습니다. -->
+		<script
+			th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
+		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
+		<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
 	</th:block>
 
 	<!-- 이 페이지에만 필요한 인라인 스크립트를 layout:fragment="jsScript" 안에 넣습니다. -->
 	<th:block layout:fragment="jsScript">
-		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
-		<script
-			th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
 		<script>
 			function copyShareLink() {
 				const el = document.createElement('textarea');

@@ -2,177 +2,378 @@
 
 /* 페이지 스크롤바 제거 (요청사항) */
 html, body {
-    overflow-x: hidden;
+	overflow-x: hidden;
 }
 
 .main-page-slider-container .slide-content h3 {
-    margin: 0 0 5px 0;
-    font-size: 24px;
-    font-weight: 700;
-    color: #fdfdfd;
+	margin: 0 0 5px 0;
+	font-size: 24px;
+	font-weight: 700;
+	color: #fdfdfd;
 }
 
 .main-page-slider-container .slide-content p {
-    margin: 0;
-    font-size: 14px;
-    color: #fdfdfd;
+	margin: 0;
+	font-size: 14px;
+	color: #fdfdfd;
 }
 
 /* 메인 슬라이더 전체 컨테이너 */
 .main-page-slider-container {
-    width: 100%;
-    max-width: 1200px; 
-    padding: 40px 0;
-    margin: 0 auto; /* 중앙 정렬 */
+	width: 100%;
+	max-width: 1200px;
+	padding: 40px 0;
+	margin: 0 auto; /* 중앙 정렬 */
 }
 
 /* Swiper.js가 직접 제어하는 영역 */
 .main-page-slider-container .main-page-swiper {
-    width: 100%;
-    height: 450px;
-    overflow: visible; 
+	width: 100%;
+	height: 450px;
+	overflow: visible;
 }
 
 /* 개별 슬라이드 아이템 */
 .main-page-slider-container .swiper-slide {
-    border-radius: 16px;
-    overflow: hidden;
-    position: relative;
-    transition: transform 0.4s ease;
-    background-color: #f0f0f0;
+	border-radius: 16px;
+	overflow: hidden;
+	position: relative;
+	transition: transform 0.4s ease;
+	background-color: #f0f0f0;
 }
 
 .main-page-slider-container .swiper-slide::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    transition: background-color 0.4s ease;
-    z-index: 1;
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.4);
+	transition: background-color 0.4s ease;
+	z-index: 1;
 }
 
 .main-page-slider-container .swiper-slide-active::after {
-    background-color: rgba(0, 0, 0, 0);
+	background-color: rgba(0, 0, 0, 0);
 }
 
 .main-page-slider-container .swiper-slide-active {
-    transform: scale(1.02);
-    z-index: 2;
+	transform: scale(1.02);
+	z-index: 2;
 }
 
 .main-page-slider-container .swiper-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
 }
 
 /* 슬라이드 하단 텍스트 콘텐츠 */
 .main-page-slider-container .slide-content {
-    position: absolute;
-    bottom: 0; left: 0;
-    width: 100%;
-    padding: 25px;
-    box-sizing: border-box;
-    color: white;
-    background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0));
-    z-index: 3;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	padding: 25px;
+	box-sizing: border-box;
+	color: white;
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+	z-index: 3;
 }
 
 .main-page-slider-container .slide-content h3 {
-    margin: 0 0 5px 0;
-    font-size: 24px;
-    font-weight: 700;
+	margin: 0 0 5px 0;
+	font-size: 24px;
+	font-weight: 700;
 }
 
 .main-page-slider-container .slide-content p {
-    margin: 0;
-    font-size: 14px;
+	margin: 0;
+	font-size: 14px;
 }
 
 /* 컨트롤 버튼 영역 */
 .main-page-slider-container .main-swiper-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 25px;
-    gap: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 25px;
+	gap: 15px;
 }
 
 /* Swiper 기본 클래스에 대한 스타일 (부모로 범위 한정) */
 .main-page-slider-container .swiper-pagination-progressbar {
-    position: static;
-    width: 100%;
-    height: 3px;
-    background: #e0e0e0;
+	position: static;
+	width: 100%;
+	height: 3px;
+	background: #e0e0e0;
 }
-.main-page-slider-container .swiper-pagination-progressbar-fill {
-    background: #000;
-}
-.main-page-slider-container .swiper-button-prev,
-.main-page-slider-container .swiper-button-next {
-    position: static;
-    width: auto; height: auto;
-    margin: 0;
-    color: #000;
-}
-.main-page-slider-container .swiper-button-prev::after,
-.main-page-slider-container .swiper-button-next::after {
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-.main-page-slider-container .swiper-autoplay-button {
-    background: none; border: none; cursor: pointer;
-    width: 20px; height: 20px;
-    padding: 0; color: #000; font-size: 1.2rem;
-    display: flex; justify-content: center; align-items: center;
-}
-.main-page-slider-container .swiper-autoplay-button.paused .icon-pause { display: none; }
-.main-page-slider-container .swiper-autoplay-button:not(.paused) .icon-play { display: none; }
 
+.main-page-slider-container .swiper-pagination-progressbar-fill {
+	background: #000;
+}
+
+.main-page-slider-container .swiper-button-prev,
+	.main-page-slider-container .swiper-button-next {
+	position: static;
+	width: auto;
+	height: auto;
+	margin: 0;
+	color: #000;
+}
+
+.main-page-slider-container .swiper-button-prev::after,
+	.main-page-slider-container .swiper-button-next::after {
+	font-size: 1.2rem;
+	font-weight: bold;
+}
+
+/* 메인 슬라이더의 이전/다음 버튼 공통 스타일 */
+.main-swiper-controls .swiper-button-prev:after, .main-swiper-controls .swiper-button-next:after
+	{
+	font-family: swiper-icons;
+	font-size: 11px;
+	text-transform: none !important;
+	letter-spacing: 0;
+	font-variant: initial;
+	line-height: 1;
+	color: black; /* 메인 슬라이더 버튼은 흰색 */
+	margin-top: 1px;
+}
+
+/* 개별적으로 필요한 스타일은 따로 지정 (예: 마진) */
+.main-swiper-controls .swiper-button-prev:after {
+	margin-right: 2px;
+}
+
+.main-swiper-controls .swiper-button-next:after {
+	margin-left: 2px;
+}
+
+.main-page-slider-container .swiper-autoplay-button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	color: #000;
+	font-size: 1.2rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: 2px;
+}
+
+.main-page-slider-container .swiper-autoplay-button.paused .icon-pause {
+	display: none;
+}
+
+.main-page-slider-container .swiper-autoplay-button:not(.paused) .icon-play
+	{
+	display: none;
+}
+/* 슬라이더 끝  */
 
 /* 상품 영역 */
 /* 전체 섹션 배경 및 패딩 */
 .weekly-best-section {
-    background-color: #f8f8f8;
-    padding-top: 30px;
-    padding-bottom: 20px;
+	background-color: #fdfdfd;
+	padding-top: 30px;
+	padding-bottom: 20px;
 }
 
 /* 내부 컨텐츠 컨테이너 */
 .weekly-best-container {
-    /* 기존 부트스트랩 .container 스타일을 따른다고 가정 */
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 15px;
-    padding-right: 15px;
+	/* 기존 부트스트랩 .container 스타일을 따른다고 가정 */
+	max-width: 1200px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 15px;
+	padding-right: 15px;
 }
 
 /* 제목 영역 */
 .weekly-best-heading {
-    text-align: center;
-    margin-bottom: 15px;
+	text-align: center;
+	display: flex;
+	justify-content: space-between;
 }
 
 .weekly-best-title {
-    font-size: 2.4rem; /* title-lg에 해당하는 크기 */
-    font-weight: 600;
-    margin-bottom: 1.5rem;
+	font-size: 2.4rem; /* title-lg에 해당하는 크기 */
+	font-weight: 600;
+}
+
+.weekly-best-heading h2 {
+	margin-bottom: 0px;
+	line-height: 40px;
 }
 
 /* '더보러가기' 버튼 영역 */
 .weekly-best-more-link {
-    text-align: center;
-    margin-top: 3rem;
+	text-align: center;
+	display: flex;
+	align-items: center;
 }
 
-/* 예시: 상품 이미지에 적용될 CSS */
-.product-image { /* 상품 이미지를 감싸는 div 또는 img 태그 자체에 이 클래스를 부여한다고 가정 */
-    width: 250px; /* 원하는 너비 */
-    height: 275px; /* 원하는 높이 */
-    object-fit: cover; /* 이미지가 잘리더라도 비율을 유지하며 컨테이너를 채웁니다. */
-    /* object-fit: contain; 는 이미지 비율을 유지하며 컨테이너에 맞춰집니다. (빈 공간 생길 수 있음) */
-    /* object-fit: fill; 는 이미지를 늘리거나 줄여 컨테이너를 채웁니다. (이미지 왜곡될 수 있음) */
+.weekly-best-more-link a.btn-outline-dark-2 {
+	color: #777;
+	background-color: transparent;
+	background-image: none;
+	border-color: transparent;
+	box-shadow: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: flex-end;
+	text-align: center;
+	padding: 0px;
+	font-weight: 500;
+	font-size: 1.4rem;
+	line-height: 1.5;
+	letter-spacing: -.01em;
+	min-width: 0px;
+	border-radius: 0;
+	white-space: normal;
+	transition: all 0.3s;
+}
+
+/* =================================================================== */
+/* ⭐ [최종 버전 - Swiper 'auto' 모드] ⭐ */
+/* =================================================================== */
+.weekly-best-slider-container {
+	position: relative;
+}
+
+.weekly-best-slider-container .swiper {
+	padding: 10px 0;
+	box-sizing: border-box;
+}
+
+.weekly-best-slider-container .swiper-wrapper {
+	align-items: stretch;
+}
+
+/* 
+  [핵심 1] slidesPerView: 'auto' 모드에서는 우리가 직접 너비를 지정해야 합니다.
+  상품 목록 페이지의 그리드 시스템(2/4/5/6열)과 유사하게 반응형으로 너비를 설정합니다.
+*/
+.weekly-best-slider-container .swiper-slide {
+	height: auto;
+	/* 모바일 기본 (2열) */
+	width: 50%;
+}
+
+@media ( min-width : 576px) {
+	.weekly-best-slider-container .swiper-slide {
+		width: 33.3333%; /* 3열 */
+	}
+}
+
+@media ( min-width : 768px) {
+	.weekly-best-slider-container .swiper-slide {
+		width: 25%; /* 4열 */
+	}
+}
+
+@media ( min-width : 992px) {
+	.weekly-best-slider-container .swiper-slide {
+		width: 20%; /* 5열 */
+	}
+}
+
+@media ( min-width : 1200px) {
+	.weekly-best-slider-container .swiper-slide {
+		width: 16.6666%; /* 6열 */
+	}
+}
+
+/* 
+  [핵심 2] .product 카드가 높이를 100% 채우고, 내부 요소를 정렬하도록 합니다.
+*/
+.weekly-best-slider-container .product {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+}
+
+.weekly-best-slider-container .product-body {
+	flex-grow: 1;
+}
+
+/* --- 슬라이더 화살표 버튼 스타일 (위치 및 투명도 수정) --- */
+.weekly-best-slider-container .swiper-button-prev,
+	.weekly-best-slider-container .swiper-button-next {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 10;
+	height: 20px;
+	width: 28px;
+	height: 30px;
+	background-color: rgba(30, 30, 30, 0.9);
+	border: 1px solid #333;
+	border-radius: 5px;
+	color: #333;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	opacity: 0.25;
+	transition: opacity 0.3s ease-in-out;
+}
+
+/* 슬라이더 컨테이너에 호버했을 때만 버튼이 보이도록 함 */
+.weekly-best-slider-container:hover .swiper-button-prev,
+	.weekly-best-slider-container:hover .swiper-button-next {
+	opacity: 0.7;
+}
+
+/* 버튼 자체에 호버했을 때 투명도를 1로 만듦 */
+.weekly-best-slider-container .swiper-button-prev:hover,
+	.weekly-best-slider-container .swiper-button-next:hover {
+	opacity: 1;
+}
+
+.weekly-best-slider-container .swiper-button-prev:after,
+	.weekly-best-slider-container .swiper-button-next:after {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+/* Weekly Best 슬라이더의 이전/다음 버튼 공통 스타일 */
+.weekly-best-slider-container .swiper-button-prev:after,
+	.weekly-best-slider-container .swiper-button-next:after {
+	font-family: swiper-icons;
+	font-size: 10px;
+	text-transform: none !important;
+	letter-spacing: 0;
+	font-variant: initial;
+	line-height: 1;
+	color: white; /* Weekly Best 슬라이더 버튼 색상 */
+}
+
+/* Weekly Best 슬라이더 개별 버튼 스타일 */
+.weekly-best-slider-container .swiper-button-prev:after {
+	margin-right: 2px;
+}
+
+.weekly-best-slider-container .swiper-button-next:after {
+	margin-left: 2px;
+}
+
+/* 버튼 위치 조정 */
+.weekly-best-slider-container .swiper-button-prev {
+	left: 15px;
+}
+
+.weekly-best-slider-container .swiper-button-next {
+	right: 15px;
+}
+
+/* 비활성화된 버튼은 항상 숨김 */
+.weekly-best-slider-container .swiper-button-disabled {
+	opacity: 0 !important;
+	visibility: hidden;
+	pointer-events: none;
 }

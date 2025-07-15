@@ -19,11 +19,16 @@ public class ProductSearchServiceImpl implements ProductSearchService {
     private final ProductSearchMapper productSearchMapper;
     
     @Override
-    public List<Products> getSimilarProducts(String categoryId, String currentGdsNo, int limit) {
+    public List<Products> getWeeklyBestProducts() {
+        // 단순히 매퍼를 호출하여 DB 조회를 위임합니다.
+        return productSearchMapper.getWeeklyBestProducts();
+    }
+    
+    @Override
+    public List<Products> getSimilarProducts(String categoryId, String currentGdsNo) {
         Map<String, Object> params = new HashMap<>();
         params.put("categoryId", categoryId);
         params.put("currentGdsNo", currentGdsNo);
-        params.put("limit", limit);
         return productSearchMapper.getSimilarProducts(params);
     }
     

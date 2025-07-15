@@ -4,41 +4,82 @@
 	<div class="row justify-content-center">
 		<div class="col-6 col-md-4 col-lg-4 col-xl-3"
 			th:each="product : ${productList}">
+
 			<div class="product product-7 text-center">
 				<figure class="product-media">
-
 					<a th:href="@{/products/detail/{gdsNo}(gdsNo=${product.gdsNo})}">
 						<img th:src="@{${product.thumbnailImagePath}}" alt="Product image"
 						class="product-image">
 					</a>
-					<span class="product-label label-sale"
-						th:if="${product.dscntRt gt 0}"
-						th:text="${#numbers.formatDecimal(product.dscntRt, 0, 0) + '% off'}"></span>
-
 				</figure>
 
 				<div class="product-body">
 					<div class="product-cat">
-						<a th:href="@{/products(category=${product.ctgryNo})}"
-							th:text="${product.productCategory?.categoryName}">Category</a>
+						<a
+							th:href="@{/products/category/{categoryId}(categoryId=${product.ctgryNo})}"
+							th:text="${product.productCategory?.categoryName}">카테고리명</a>
+					</div>
+					<div class="product-brand">
+						<a th:href="@{/store/{id}(id=${product.storeId})}"
+							th:text="${product.storeName}">상점명</a>
 					</div>
 					<h3 class="product-title">
 						<a th:href="@{/products/detail/{gdsNo}(gdsNo=${product.gdsNo})}"
-							th:text="${product.gdsNm}">Product Name</a>
+							th:title="${product.gdsNm}" th:text="${product.gdsNm}">제품명</a>
 					</h3>
 					<div class="product-price">
-						<span th:if="${product.dscntRt gt 0}" class="new-price"
-							th:text="${#numbers.formatCurrency(product.lastSelPrc)}"></span>
-						<span th:if="${product.dscntRt gt 0}" class="old-price"
-							th:text="${#numbers.formatCurrency(product.basPrc)}"></span> <span
-							th:unless="${product.dscntRt gt 0}" class="price"
-							th:text="${#numbers.formatCurrency(product.basPrc)}"></span>
+						<span th:if="${product.dscntRt gt 0}" class="discount-rate"
+							th:text="${#numbers.formatDecimal(product.dscntRt, 0, 0) + '%'}">10%</span>
+						<span class="final-price"
+							th:classappend="${product.dscntRt != null and product.dscntRt > 0} ? 'discounted'"
+							th:text="${#strings.replace(#numbers.formatCurrency(product.lastSelPrc), '₩', '') + '원'}">최종가격
+						</span>
 					</div>
 				</div>
 			</div>
 		</div>
+
 		<div th:if="${productList.isEmpty()}" class="col-12 text-center mt-4">
 			<p>현재 판매 중인 상품이 없습니다.</p>
+		</div>
+	</div>
+</div>
+
+<!-- =================================================================== -->
+<!-- ⭐ [원래대로 복구] 단일 상품 카드를 위한 프래그먼트 ⭐ -->
+<!-- =================================================================== -->
+<div th:fragment="productCardFragment(product)">
+	<div class="product product-7 text-center">
+		<figure class="product-media">
+			<a th:href="@{/products/detail/{gdsNo}(gdsNo=${product.gdsNo})}">
+				<img th:src="@{${product.thumbnailImagePath}}" alt="Product image"
+				class="product-image">
+			</a>
+		</figure>
+
+		<div class="product-body">
+			<div class="product-cat">
+				<a
+					th:href="@{/products/category/{categoryId}(categoryId=${product.ctgryNo})}"
+					th:text="${product.productCategory?.categoryName}">카테고리명</a>
+			</div>
+			<div class="product-brand">
+				<a th:href="@{/store/{id}(id=${product.storeId})}"
+					th:text="${product.storeName}">상점명</a>
+			</div>
+			<h3 class="product-title">
+				<a th:href="@{/products/detail/{gdsNo}(gdsNo=${product.gdsNo})}"
+					th:title="${product.gdsNm}" th:text="${product.gdsNm}">제품명</a>
+			</h3>
+			<div class="product-price">
+				<span th:if="${product.dscntRt != null and product.dscntRt > 0}"
+					class="discount-rate"
+					th:text="${#numbers.formatDecimal(product.dscntRt, 0, 0) + '%'}">10%</span>
+				<span class="final-price"
+					th:classappend="${product.dscntRt != null and product.dscntRt > 0} ? 'discounted'"
+					th:text="${#strings.replace(#numbers.formatCurrency(product.lastSelPrc), '₩', '') + '원'}">최종가격
+				</span>
+			</div>
 		</div>
 	</div>
 </div>

@@ -1,0 +1,10 @@
+/* ⭐⭐ 여기에 style 태그 내용을 붙여넣습니다. ⭐⭐ */
+.footer .footer-middle .container .row {
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: row;
+}
+
+.footer .footer-middle .container .row .col-lg-3 {
+	flex: 1;
+}
