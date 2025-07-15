@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="ks55team02.admin.adminpage.useradmin.coupons.mapper.UserCouponsMapper">
+
+	<resultMap id="userCouponsResultMap"
+		type="ks55team02.admin.adminpage.useradmin.coupons.domain.AdminUserCoupons">
+		<id property="userCpnId" column="user_cpn_id" />
+		<result property="useYn" column="use_yn" />
+		<result property="cpnGiveDt" column="cpn_give_dt" />
+		<result property="useDt" column="use_dt" />
+		<result property="userNo" column="user_no" />
+		<result property="userLgnId" column="user_lgn_id" />
+		<result property="userNm" column="user_nm" />
+		<result property="pblcnCpnId" column="pblcn_cpn_id" />
+		<result property="cpnNm" column="cpn_nm" />
+	</resultMap>
+
+	<select id="findUserCoupons" resultMap="userCouponsResultMap">
+		SELECT
+			uc.user_cpn_id,
+			uc.use_yn,
+			uc.cpn_give_dt,
+			uc.use_dt,
+			u.user_no,
+			u.user_lgn_id,
+			u.user_nm,
+			c.pblcn_cpn_id,
+			c.cpn_nm
+		FROM
+			user_coupons uc
+		JOIN
+			users u ON uc.user_no = u.user_no
+		JOIN
+			coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+		<include refid="userCouponSearchFragment" />
+		ORDER BY
+			uc.user_cpn_id ASC
+		LIMIT #{offset}, #{pageSize}
+	</select>
+
+	<select id="countUserCoupons" resultType="int">
+		SELECT COUNT(*)
+		FROM
+			user_coupons uc
+		JOIN
+			users u ON uc.user_no = u.user_no
+		JOIN
+			coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+		<include refid="userCouponSearchFragment" />
+	</select>
+	
+	<update id="updateUserCouponStatus" parameterType="string">
+	    UPDATE 
+	        user_coupons
+	    SET 
+	        use_yn = 1,
+	        use_dt = NOW()
+	    WHERE 
+	        user_cpn_id = #{userCpnId}
+	</update>
+
+	<sql id="userCouponSearchFragment">
+		<where>
+			<if test="keyword != null and keyword != ''">
+				<choose>
+					<when test="'cpnNm'.equals(searchType)">
+						AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<when test="'userCpnId'.equals(searchType)">
+						AND uc.user_cpn_id LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<when test="'userNm'.equals(searchType)">
+						AND u.user_nm LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<otherwise>
+						AND (
+                               c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+                            OR u.user_lgn_id LIKE CONCAT('%', #{keyword}, '%')
+                            OR u.user_nm LIKE CONCAT('%', #{keyword}, '%')
+                        )
+					</otherwise>
+				</choose>
+			</if>
+			
+			<if test="actvtnYn != null and actvtnYn != ''">
+				AND uc.use_yn = #{actvtnYn}
+			</if>
+
+			<if test="vldBgngDt != null and vldEndDt != null">
+				AND (c.vld_bgng_dt &lt;= #{vldEndDt} AND c.vld_end_dt &gt;= #{vldBgngDt})
+			</if>
+		</where>
+	</sql>
+
+</mapper>

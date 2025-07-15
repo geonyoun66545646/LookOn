@@ -102,7 +102,7 @@
 
 	
 	<select id="selectNextFeedList" parameterType="Map" resultMap="feedDetailResultMap">
-		/* 피드 상세 페이지에서 다음 피드 목록 조회 (여러 개) */
+		/* 피드 상세 페이지에서 다음 피드 목록 조회 */
 	    SELECT
 	        f.feed_sn, f.wrtr_user_no, f.feed_cn, f.crt_dt,
 	        u.user_no, u.user_ncnm,
@@ -115,6 +115,9 @@
 	            WHERE
 	                crt_dt &lt; STR_TO_DATE(#{currentFeedCrtDt}, '%Y-%m-%d %H:%i:%s')
 	                AND del_dt IS NULL
+	                <if test="context == 'my' or context == 'user'">
+	                	AND wrtr_user_no = #{userNo}
+	                </if>
 	            ORDER BY crt_dt DESC
 	            LIMIT #{limit}
 	        ) f
@@ -129,7 +132,7 @@
 	</select>
 	
 	<select id="selectFeedList" parameterType="map" resultMap="feedListResultMap">
-		/* 피드 목록 조회 */
+		/* 피드 목록 조회 (통합) */
 		SELECT
 			f.feed_sn,
 			f.wrtr_user_no,
@@ -152,49 +155,26 @@
 			feed_images fi ON f.feed_sn = fi.feed_sn AND fi.feed_img_sort_sn = 0
 		WHERE
 			f.del_dt IS NULL
+			<if test="userNo != null and userNo != ''">
+				AND f.wrtr_user_no = #{userNo}
+			</if>
 		ORDER BY
 			f.crt_dt DESC
 		LIMIT #{limit} OFFSET #{offset}
 	</select>
 
 	<select id="selectFeedCount" resultType="int">
-		/* 피드 목록 조회를 위한 갯수 조회 */
-		SELECT COUNT(*) FROM feeds WHERE del_dt IS NULL;
+		/* 피드 목록 조회를 위한 갯수 조회 (통합) */
+		SELECT 
+			COUNT(*) 
+		FROM 
+			feeds f
+		WHERE 
+			f.del_dt IS NULL
+			<if test="params.userNo != null and params.userNo != ''">
+				AND f.wrtr_user_no = #{userNo}
+			</if>
 	</select>
-	
-	<select id="selectFeedListByMe" parameterType="map" resultMap="feedListResultMap">
-	    /* 특정 사용자의 피드 목록 조회 (페이지네이션) */
-	    SELECT
-	        f.feed_sn,
-	        f.wrtr_user_no,
-	        f.feed_cn,
-	        f.crt_dt,
-	        u.user_no,
-	        u.user_ncnm,
-	        p.prfl_img,
-	        fi.feed_img_sn,
-	        fi.img_file_path_nm,
-	        fi.feed_img_sort_sn,
-	        (
-	            SELECT COUNT(fi2.feed_intract_sn)
-	            FROM feed_interactions fi2
-	            WHERE fi2.feed_sn = f.feed_sn
-	              AND fi2.intract_type_cd = 'LIKE'
-	        ) AS like_count
-	    FROM
-	        feeds f
-	    LEFT JOIN
-	        users u ON f.wrtr_user_no = u.user_no
-	    LEFT JOIN
-	        user_profiles p ON u.user_no = p.user_no
-	    LEFT JOIN
-	        feed_images fi ON f.feed_sn = fi.feed_sn AND fi.feed_img_sort_sn = 0 /* 대표 이미지(정렬 순서 0번) */
-	    WHERE
-	        f.wrtr_user_no = #{userNo}
-	        AND f.del_dt IS NULL
-	    ORDER BY
-	        f.crt_dt DESC
-	    LIMIT #{limitPlusOne} OFFSET #{offset}
-	</select>
+
 	
 </mapper>

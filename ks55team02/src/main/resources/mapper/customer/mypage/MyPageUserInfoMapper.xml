@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.mypage.mapper.MyPageUserInfoMapper">
+
+    <!-- UserInfoResponse DTO와 DB 컬럼을 매핑합니다. -->
+	<resultMap id="userInfoResultMap" type="ks55team02.customer.login.domain.UserInfoResponse">
+        <id 	column="user_no" 		property="userNo"/>
+        <result column="user_lgn_id" 	property="userLgnId"/>
+        <result column="user_nm" 		property="userNm"/>
+        <result column="eml_addr" 		property="emlAddr"/>
+        <result column="telno" 			property="telno"/>
+        <result column="user_brdt" 		property="userBrdt"/>
+        <result column="zip_cd" 		property="zipCd"/>
+        <result column="addr" 			property="addr"/>
+        <result column="daddr" 			property="daddr"/>
+        <!-- 회원정보 수정에 필요한 최소한의 필드들 -->
+    </resultMap>
+    
+    <!-- 1. 특정 사용자의 현재 정보 조회 쿼리 -->
+    <select id="findUserInfo" parameterType="String" resultMap="userInfoResultMap">
+        SELECT
+            user_no, 
+            user_lgn_id, 
+            user_nm, 
+            eml_addr, 
+            telno, 
+            user_brdt, 
+            zip_cd, 
+            addr, 
+            daddr
+        FROM
+            users
+        WHERE
+            user_no = #{userNo}
+    </select>
+
+    <!-- 2. 이메일/연락처 중복 검사 쿼리 -->
+	<select id="countByEmailForOthers" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE user_no != #{userNo} AND eml_addr = #{emlAddr}
+    </select>
+    
+    <!-- 연락처 중복 검사 쿼리 -->
+    <select id="countByTelNoForOthers" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE user_no != #{userNo} AND telno = #{telno}
+    </select>
+	
+	
+
+    <!-- 3. 회원정보 수정 쿼리 -->
+    <update id="updateUserInfo" parameterType="ks55team02.customer.mypage.domain.UserUpdateRequest">
+	    UPDATE users
+	    <set>
+	        <!-- 각 필드가 null이나 빈 값이 아닐 경우에만 업데이트 목록에 포함시킵니다. -->
+	        <if test="userNm != null and userNm != ''">
+	            user_nm = #{userNm},
+	        </if>
+	        <if test="emlAddr != null and emlAddr != ''">
+	            eml_addr = #{emlAddr},
+	        </if>
+	        <if test="telno != null and telno != ''">
+	            telno = #{telno},
+	        </if>
+	        <if test="zipCd != null and zipCd != ''">
+	            zip_cd = #{zipCd},
+	        </if>
+	        <if test="addr != null and addr != ''">
+	            addr = #{addr},
+	        </if>
+	        <!-- 상세주소는 비어있을 수도 있으므로 null 체크만 합니다. -->
+	        <if test="daddr != null">
+	            daddr = #{daddr},
+	        </if>
+	        
+	        <!-- 어떤 필드든 하나라도 변경되었다면, 최종 수정일은 항상 업데이트합니다. -->
+	        last_info_mdfcn_dt = NOW()
+	    </set>
+	    WHERE user_no = #{userNo}
+	</update>
+
+</mapper>

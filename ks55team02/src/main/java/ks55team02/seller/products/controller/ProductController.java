@@ -13,11 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 
 @Controller
 @RequestMapping("/seller/products")
 @RequiredArgsConstructor
+@Slf4j
 public class ProductController {
 	
     private final ProductsService productsService;
@@ -106,11 +109,27 @@ public class ProductController {
     @PostMapping("/update")
     public String updateProduct(
             @ModelAttribute ProductRegistrationRequest productUpdateRequest,
+            @RequestParam(value = "deletedImageIds", required = false) List<String> deletedImageIds,
             @RequestParam(value = "thumbnailImage", required = false) List<MultipartFile> thumbnailImage,
             @RequestParam(value = "mainImage", required = false) List<MultipartFile> mainImage,
             @RequestParam(value = "detailImage", required = false) List<MultipartFile> detailImage,
             RedirectAttributes redirectAttributes) {
+    	
+    	
+    	// ========================> 디버깅 로그 추가 <========================
+        log.info("============== [Controller] Paramerter Check ==============");
+        if (deletedImageIds != null) {
+            log.info("deletedImageIds의 타입: {}", deletedImageIds.getClass().getName());
+            log.info("deletedImageIds의 내용: {}", deletedImageIds);
+            log.info("deletedImageIds의 첫번째 요소: {}", deletedImageIds.isEmpty() ? "비어있음" : deletedImageIds.get(0));
+        } else {
+            log.info("deletedImageIds가 null입니다.");
+        }
+        log.info("==========================================================");
+        // ====================================================================
+    	
         try {
+        	productUpdateRequest.setDeletedImageIds(deletedImageIds);
             productUpdateRequest.setThumbnailImage(thumbnailImage);
             productUpdateRequest.setMainImage(mainImage);
             productUpdateRequest.setDetailImage(detailImage);
