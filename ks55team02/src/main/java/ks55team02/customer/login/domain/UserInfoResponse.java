@@ -12,7 +12,6 @@ public class UserInfoResponse {
     private String mbrGrdCd; 				// 사용자의 등급
     private String userLgnId; 				// 유저 아이디
     private String userNm; 					// 유저 아이디
-    private String userPswdEncptVal;		// 입력받는 용도 + DB 값 확인 용도
     private String genderSeCd; 				// 입력받는 용도 + DB 값 확인 용도
     private String emlAddr; 				// 입력받는 용도 + DB 값 확인 용도
     private String telno; 					// 입력받는 용도 + DB 값 확인 용도
