@@ -54,7 +54,7 @@ public class FeedServiceImpl implements FeedService {
     
     // 마이 피드 목록 조회
     @Override
-    public Map<String, Object> selectFeedListByMe(String userNo, int page, int size) {
+    public Map<String, Object> selectFeedListByUserNo(String userNo, int page, int size) {
         // 1. DB에 요청할 개수 설정 (페이지 사이즈 + 1)
         int limit = size;
         int limitPlusOne = size + 1;
@@ -67,7 +67,7 @@ public class FeedServiceImpl implements FeedService {
         params.put("offset", offset); // XML의 #{offset}와 매칭
         
         // 3. DB에서 'size + 1' 만큼의 피드 목록 조회
-        List<Feed> feedListWithExtra = feedMapper.selectFeedListByMe(params);
+        List<Feed> feedListWithExtra = feedMapper.selectFeedListByUserNo(params);
 
         // 4. 다음 페이지 존재 여부(hasNext) 판별
         boolean hasNext = feedListWithExtra.size() > limit;

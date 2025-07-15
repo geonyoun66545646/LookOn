@@ -19,6 +19,6 @@ public interface FeedService {
 	List<Feed> selectNextFeedList(String currentFeedCrtDt, int limit);
 	
 	// 마이 피드 목록 조회
-	Map<String, Object> selectFeedListByMe(String userNo, int page, int size);
+	Map<String, Object> selectFeedListByUserNo(String userNo, int page, int size);
 	
 }

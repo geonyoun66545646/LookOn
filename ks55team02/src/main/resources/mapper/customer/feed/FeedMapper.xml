@@ -162,8 +162,8 @@
 		SELECT COUNT(*) FROM feeds WHERE del_dt IS NULL;
 	</select>
 	
-	<select id="selectFeedListByMe" parameterType="map" resultMap="feedListResultMap">
-	    /* 특정 사용자의 피드 목록 조회 (페이지네이션) */
+	<select id="selectFeedListByUserNo" parameterType="map" resultMap="feedListResultMap">
+	    /* 특정 사용자의 피드 목록 조회 */
 	    SELECT
 	        f.feed_sn,
 	        f.wrtr_user_no,
@@ -188,7 +188,7 @@
 	    LEFT JOIN
 	        user_profiles p ON u.user_no = p.user_no
 	    LEFT JOIN
-	        feed_images fi ON f.feed_sn = fi.feed_sn AND fi.feed_img_sort_sn = 0 /* 대표 이미지(정렬 순서 0번) */
+	        feed_images fi ON f.feed_sn = fi.feed_sn AND fi.feed_img_sort_sn = 0
 	    WHERE
 	        f.wrtr_user_no = #{userNo}
 	        AND f.del_dt IS NULL

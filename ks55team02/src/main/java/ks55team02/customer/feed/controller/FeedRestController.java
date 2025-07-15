@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,7 @@ public class FeedRestController {
     
     // 피드 다음 페이지 무한 스크롤
     @GetMapping("/next")
-    public ResponseEntity<List<Feed>> getNextFeeds(
+    public ResponseEntity<List<Feed>> selectNextFeeds(
             @RequestParam("currentFeedCrtDt") String currentFeedCrtDt,
             @RequestParam(value = "limit", defaultValue = "3") int limit) {
         
@@ -51,7 +52,7 @@ public class FeedRestController {
     
     // 마이피드 무한 스크롤
     @GetMapping("/my-feed") // RESTful한 네이밍 컨벤션을 따르는 것을 권장합니다.
-    public ResponseEntity<Map<String, Object>> getMyFeeds(
+    public ResponseEntity<Map<String, Object>> selectMyFeeds(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
 
@@ -64,8 +65,21 @@ public class FeedRestController {
         String userNo = loginUser.getUserNo();
         
         // 서비스의 반환값을 그대로 ResponseEntity.ok()에 담아 반환하는 기존 스타일을 따릅니다.
-        Map<String, Object> result = feedService.selectFeedListByMe(userNo, page, PAGE_SIZE);
+        Map<String, Object> result = feedService.selectFeedListByUserNo(userNo, page, PAGE_SIZE);
         
+        return ResponseEntity.ok(result);
+    }
+
+    // 남의 마이피드 조회
+    @GetMapping("/user-feed/{userNo}")
+    public ResponseEntity<Map<String, Object>> selectUserFeeds(
+            @PathVariable("userNo") String userNo,
+            @RequestParam(name = "page", defaultValue = "1") int page) {
+
+        // 4. "마이피드"와 "타인피드" 모두 동일한 서비스 메소드를 재사용합니다.
+        // 이것이 바로 이번 리팩토링의 핵심 목표였습니다.
+        Map<String, Object> result = feedService.selectFeedListByUserNo(userNo, page, PAGE_SIZE);
+
         return ResponseEntity.ok(result);
     }
     

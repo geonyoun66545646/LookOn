@@ -23,5 +23,5 @@ public interface FeedMapper {
 	List<Feed> selectNextFeedList(String currentFeedCrtDt, int limit);
 	
 	// 마이 피드 목록 조회
-	List<Feed> selectFeedListByMe(Map<String, Object> params);
+	List<Feed> selectFeedListByUserNo(Map<String, Object> params);
 }
