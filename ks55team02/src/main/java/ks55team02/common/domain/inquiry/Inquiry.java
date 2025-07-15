@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ks55team02.admin.common.domain.SearchCriteria;
+import ks55team02.common.domain.store.Store;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,11 +37,12 @@ public class Inquiry extends SearchCriteria{
 	private InquiryUser  	writerInfo ;
 	// Answer 타입의 객체를 answer 로 받음.
 	private Answer 			answer;
-	
 	// 정렬을 위한 키
 	private String 			sortKey; 			// 정렬 기준 컬럼 (예: "aplyId", "ctrtAplyYmd")
     private String 			sortOrder; 			// 정렬 방향 (예: "ASC", "DESC")
-
+    
+    private Store 			storeInfo;
+    
 	   // inq_ 제거
     public String getInqryIdNum() {
         if (this.inqryId == null) {

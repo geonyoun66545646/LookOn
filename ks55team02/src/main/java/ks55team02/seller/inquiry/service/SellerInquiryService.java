@@ -6,6 +6,9 @@ import ks55team02.common.domain.inquiry.Inquiry;
 
 public interface SellerInquiryService {
 	
-	List<Inquiry> getSellerInquiryList(String StoreId);
+	int getSellerInquiryCnt(Inquiry inquiry);
+	
+	List<Inquiry> getSellerInquiryList(Inquiry inquiry, int limitStart, int pageSize);
 
+	Inquiry getSellerInquiryByStoreId(String inqryId);
 }
