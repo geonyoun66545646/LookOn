@@ -321,29 +321,37 @@ public class ProductsServiceImpl implements ProductsService {
 	}
 
 	private int saveAndRegisterImage(List<MultipartFile> files, String gdsNo, String creatorNo, int startSn,
-			ProductImageType imageType) {
-		if (files == null || files.isEmpty())
-			return startSn;
+	        ProductImageType imageType) {
+	    // 1. files 리스트가 null이거나 비어있으면 즉시 반환
+	    if (files == null || files.isEmpty()) {
+	        return startSn;
+	    }
 
-		int currentSn = startSn;
-		/*ddddddddddddddddd여기부터*/
-		for (MultipartFile file : files) {
-			if (file != null && !file.isEmpty()) {
-				FileDetail fileDetail = filesUtils.saveFile(file, "products");
-				if (fileDetail != null) {
-					ProductImage productImage = new ProductImage();
-					productImage.setImgNo(productsMapper.getMaxImageNo());
-					productImage.setGdsNo(gdsNo);
-					productImage.setCreatrNo(creatorNo);
-					productImage.setImgFilePathNm(fileDetail.getSavedPath());
-					productImage.setImgIndctSn(currentSn++);
-					productImage.setImgType(imageType);
-					productImage.setActvtnYn(true);
-					productsMapper.insertProductImage(productImage);
-				}
-			}
-		}
-		return currentSn;
+	    int currentSn = startSn;
+
+	    for (MultipartFile file : files) {
+	        // 2. ⭐⭐⭐[핵심 수정]⭐⭐⭐
+	        //    List 안에 실제 파일 데이터가 있는지 한번 더 확인합니다.
+	        //    Spring이 빈 file input을 ""(빈 문자열)이 아닌,
+	        //    내용이 없는 MultipartFile 객체로 넘겨줄 수 있기 때문입니다.
+	        if (file == null || file.isEmpty()) {
+	            continue; // 파일이 비어있으면 다음 루프로 넘어갑니다.
+	        }
+
+	        FileDetail fileDetail = filesUtils.saveFile(file, "products");
+	        if (fileDetail != null) {
+	            ProductImage productImage = new ProductImage();
+	            productImage.setImgNo(productsMapper.getMaxImageNo());
+	            productImage.setGdsNo(gdsNo);
+	            productImage.setCreatrNo(creatorNo);
+	            productImage.setImgFilePathNm(fileDetail.getSavedPath());
+	            productImage.setImgIndctSn(currentSn++);
+	            productImage.setImgType(imageType);
+	            productImage.setActvtnYn(true);
+	            productsMapper.insertProductImage(productImage);
+	        }
+	    }
+	    return currentSn;
 	}
 
 	private void saveOptionsAndStock(ProductRegistrationRequest request, String gdsNo) {
