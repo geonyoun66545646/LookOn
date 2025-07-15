@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{admin/layout/layoutMain}">
+		
+	 <head>
+	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />	
+	 	<link rel="stylesheet" th:href="@{/admincss/assets/css/customadminpagecss/inquiryList.css}">
+	 </head>
+	 
+	 <th:block layout:fragment="contents">
+		<main class="main-content">
+		    <section class="content-header">
+		        <h2 class="content-title">셀러 문의 목록</h2>
+		    </section>	
+		    <div class="card mb-4">
+		        <div class="card-body">
+		                <div class="row gx-3">
+		                    <div class="col-lg-12">
+		                    	<label class="form-label">분류</label>
+		                        <div class="d-flex align-items-center">
+		                            <div class="form-check me-4">
+		                                <input class="form-check-input status-check" type="checkbox" 
+		                                	   name="inquiryStatusList" value="대기" checked>
+		                                <label class="form-check-label">답변 대기</label>
+		                            </div>
+		                            <div class="form-check me-4">
+		                                <input class="form-check-input status-check" type="checkbox" 
+		                                	   name="inquiryStatusList" value="완료" checked>
+		                                <label class="form-check-label">답변 완료</label>
+		                            </div>
+		                            <div class="form-check me-4">
+		                            <input class="form-check-input" type="checkbox"
+		                            	   id="filterCheckAll" checked>
+		                            <label class="form-check-label">전체선택</label>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		                <hr>
+		                <div class="row gx-3 align-items-end">
+		                    <div class="col-lg-4">
+		                        <label class="form-label">기간</label>
+		                        <div class="d-flex">
+		                            <input type="date" class="form-control" name="startDate" value="2024-01-01">
+		                            <span class="mx-2 d-flex align-items-center">-</span>
+		                            <input type="date" class="form-control" name="endDate" th:value="${#dates.format(#dates.createToday(), 'yyyy-MM-dd')}">
+		                        </div>
+		                    </div>
+		                    <div class="col-lg-4">
+		                        <label class="form-label">검색 키워드</label>
+		                        <div class="input-group">
+		                            <select class="form-select" name="searchKey" style="max-width: 120px; background-color: #fff;">
+		                                <option value="all" selected>전체</option>
+		                                <option value="inquiryTitle">제목</option>
+		                                <option value="inquiryContent">내용</option>
+		                                <option value="sellerName">셀러명</option>
+		                            </select>
+		                            <input type="text" class="form-control" name="searchValue" placeholder="검색어를 입력하세요">
+		                        </div>
+		                    </div>
+		                    <div class="col-lg-2">
+		                        <button class="btn btn-primary btn-block" type="button" id="searchBtn">검색</button>
+		                    </div>
+		                </div>
+		        </div>
+		    </div> <div class="card" id="inquiryListContainer" th:fragment="inquiryListFragment">
+		        <div class="card-body">
+		            <div class="row gx-3 align-items-center mb-4">
+		                <div class="col-md-6">
+		                	<div class="search-result-info">
+		                        총 <b class="text-brand" th:text="${totalCount}"></b> 건의 문의가 검색되었습니다.
+		                    </div>
+		                </div>
+		                <div class="col-md-6 text-md-end">
+		                	<div class="btn-group me-2">
+							    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+							        선택한 문의 상태 변경
+							    </button>
+							    <div class="dropdown-menu dropdown-menu-end">
+							        <a class="dropdown-item status-badge-item change-status-btn status-pending" href="#" data-status="대기">답변 대기</a>
+							        <a class="dropdown-item status-badge-item change-status-btn status-completed" href="#" data-status="완료">답변 완료</a>
+							    </div>
+							</div>
+		                    <div class="d-inline-block">
+		                        <select class="form-select d-inline-block" id="sortOrder" name="sortOrder" style="width: auto;">
+								    <option value="inquiryDtDesc" th:selected="${searchCriteria.sortOrder == 'inquiryDtDesc'}">최신 문의일순</option>
+								    <option value="inquiryDtAsc" th:selected="${searchCriteria.sortOrder == 'inquiryDtAsc'}">오래된 문의일순</option>
+								</select>
+		                        <select class="form-select d-inline-block" id="pageSize" name="pageSize" style="width: auto;">
+		                            <option value="10" th:selected="${searchCriteria.pageSize == 10}">10개씩 보기</option>
+		                            <option value="30" th:selected="${searchCriteria.pageSize == 30}">30개씩 보기</option>
+		                            <option value="50" th:selected="${searchCriteria.pageSize == 50}">50개씩 보기</option>
+		                        </select>
+		                    </div>
+		                </div>
+		            </div> <div class="table-responsive">
+				    <table class="table table-hover member-table">
+				        <thead>
+				            <tr class="text-center">
+				                <th scope="col" class="col-checkbox">
+				                	<input class="form-check-input" type="checkbox" id="checkAll">
+				                </th>
+				                <th scope="col">문의번호</th>
+				                <th scope="col">문의 제목</th>
+				                <th scope="col">문의 내용</th>
+				                <th scope="col">셀러명</th>
+				                <th scope="col">문의일자</th>
+				                <th scope="col">상태</th>
+				                <th scope="col">답변</th>
+				            </tr>
+				        </thead>
+				        <tbody class="text-center">
+				            <tr th:if="${#lists.isEmpty(inquiryList)}">
+				                <td colspan="8" class="text-center py-5">조회된 문의가 없습니다.</td>
+				            </tr>
+				            <tr th:unless="${#lists.isEmpty(inquiryList)}" th:each="inquiry : ${inquiryList}">
+				                <td>
+				                	<input class="form-check-input inquiry-check" type="checkbox" th:value="${inquiry.inquiryNo}">
+				                </td>
+				                <td th:text="${inquiry.inquiryNo}"></td>
+				                <td class="ellipsis text-left" th:text="${inquiry.inquiryTitle}" th:title="${inquiry.inquiryTitle}"></td>
+				                <td class="ellipsis text-left" th:text="${inquiry.inquiryContent}" th:title="${inquiry.inquiryContent}"></td>
+				                <td th:text="${inquiry.sellerName}"></td>
+				                <td th:text="${#temporals.format(inquiry.inquiryDt, 'yyyy-MM-dd HH:mm')}"></td>
+				                <td>
+				                    <span class="badge custom-badge"
+				                          th:text="${inquiry.inquiryStatus}"
+				                          th:classappend="${inquiry.inquiryStatus == '대기'} ? 'bg-warning text-dark' : 
+				                                         (${inquiry.inquiryStatus == '완료'} ? 'bg-success' : 'bg-secondary'))">
+				                    </span>
+				                </td>
+				                <td>
+				                	<a href="#" class="btn btn-sm btn-outline-primary" th:href="@{/admin/inquiryDetail(inquiryNo=${inquiry.inquiryNo})}">
+				                		<span th:if="${inquiry.inquiryStatus == '대기'}">답변 작성</span>
+				                		<span th:if="${inquiry.inquiryStatus == '완료'}">답변 보기</span>
+				                	</a>
+				                </td>
+				            </tr>
+				        </tbody>
+				    </table>
+				</div>
+		            <nav class="mt-4" aria-label="Page navigation" th:if="${totalCount > 0}">
+					    <ul class="pagination justify-content-center">
+					        <li class="page-item" th:if="${pagination.currentPage > 1}">
+					            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage - 1}">이전</a>
+					        </li>
+					        
+					        <li class="page-item" th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+					            th:classappend="${page == pagination.currentPage} ? 'active' : ''">
+					            <a class="page-link page-num" href="#" th:text="${page}" th:data-page="${page}"></a>
+					        </li>
+					        
+					        <li class="page-item" th:if="${pagination.currentPage < pagination.totalPageCount}">
+					            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage + 1}">다음</a>
+					        </li>
+					    </ul>
+					</nav>
+		        </div> </div> </main>
+	 </th:block>
+	 <th:block layout:fragment="jsFile">
+</th:block>
+
+<th:block layout:fragment="jsScript">
+    	<script th:src="@{/admincss/assets/js/adminpage/inquiryList.js}"></script>
+</th:block>    
+</html>

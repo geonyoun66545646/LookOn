@@ -1,9 +1,10 @@
 package ks55team02.customer.store.mapper;
 
-import org.apache.ibatis.annotations.Mapper;
-import ks55team02.customer.store.domain.StoreImage;
-
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import ks55team02.common.domain.store.StoreImage;
 
 @Mapper
 public interface StoreImageMapper {

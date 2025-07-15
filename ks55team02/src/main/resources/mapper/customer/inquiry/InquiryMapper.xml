@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ks55team02.customer.inquiry.mapper.InquiryMapper">
 
-    <resultMap id="inquiryResultMap" 			type="ks55team02.customer.inquiry.domain.Inquiry">
+    <resultMap id="inquiryResultMap" 			type="ks55team02.common.domain.inquiry.Inquiry">
         <id property="inqryId" 					column="inqry_id"/>
         <result property="inqryTypeCd" 			column="inqry_type_cd"/>
         <result property="inqryTrgtTypeCd" 		column="inqry_trgt_type_cd"/>
@@ -22,12 +22,12 @@
         <!-- Inquiry 도메인 객체에 InquiryUser 타입의 'writerInfo' 필드가 있다고 가정합니다. -->
         <association property="writerInfo" resultMap="inquiryUserResultMap"/>
         <!-- InquiryImage 리스트 매핑 (1:N 관계) -->
-        <collection property="inquiryImages" 	ofType="ks55team02.customer.inquiry.domain.InquiryImage"
+        <collection property="inquiryImages" 	ofType="ks55team02.common.domain.inquiry.InquiryImage"
 					select="ks55team02.customer.inquiry.mapper.InquiryImageMapper.getInquiryImagesByInquiryId"
                     column="inqry_id"/>
     	</resultMap>
     	<!-- 유저 테이블 -->
-    	<resultMap id="inquiryUserResultMap" type="ks55team02.customer.inquiry.domain.InquiryUser">
+    	<resultMap id="inquiryUserResultMap" type="ks55team02.common.domain.inquiry.InquiryUser">
         <id property="userNo"			 	column="user_no"/> <!-- 사용자 번호 (PK, 애플리케이션 생성 ID) -->
         <result property="mbrGrdCd" 		column="mbr_grd_cd"/> <!-- 회원 등급 코드 (FK) -->
         <result property="userLgnId" 		column="user_lgn_id"/> <!-- 사용자 로그인 아이디 -->
@@ -46,10 +46,25 @@
         <result property="whdwlDt" 			column="whdwl_dt"/> <!-- 탈퇴 일시 -->
         <result property="lastInfoMdfcnDt" 	column="last_info_mdfcn_dt"/> <!-- 마지막 정보 수정 일시 -->
     </resultMap>
+    
+    <!-- answer 테이블 -->
+    <resultMap id="answerResultMap" 			type="ks55team02.common.domain.inquiry.Answer">
+        <id property="ansId" 					column="ans_id"/> <!-- 답변 ID -->
+        <result property="inqryId" 				column="inqry_id"/> <!-- 문의 ID -->
+        <result property="answrUserNo" 			column="answr_user_no"/> <!-- 답변자 사용자 번호 -->
+        <result property="ansCn" 				column="ans_cn"/> <!-- 답변 내용 -->
+        <result property="ansTm" 				column="ans_tm"/> <!-- 답변 시간 -->
+        <result property="answrTypeCd" 			column="answr_type_cd"/> <!-- 답변자 유형 코드 -->
+        <result property="rlsYn" 				column="rls_yn"/> <!-- 공개 유무 -->
+        <result property="lastMdfcnDt" 			column="last_mdfcn_dt"/> <!-- 최종 수정일시 -->
+        <result property="actvtnYn" 			column="actvtn_yn"/> <!-- 활성 여부 -->
+        <result property="delDt" 				column="del_dt"/> <!-- 삭제(비활성) 일시 -->
+        <result property="delUserNo"			column="del_user_no"/> <!-- 삭제한 관리자 번호 -->
+    </resultMap>
     	
     	
 
-    <insert id="addInquiry" parameterType="ks55team02.customer.inquiry.domain.Inquiry">
+    <insert id="addInquiry" parameterType="ks55team02.common.domain.inquiry.Inquiry">
     <!--*/ 문의 정보 등록 /*-->
         INSERT INTO inquiries
         (inqry_id, inqry_type_cd, inqry_trgt_type_cd, wrtr_id, inqry_store_id, inqry_ttl, inqry_cn, prvt_yn, prcs_stts, prcs_user_no, mdfcn_ymd, del_dt, del_user_no, del_actvtn_yn)
@@ -249,6 +264,22 @@
         JOIN users u ON i.wrtr_id = u.user_no
         ORDER BY i.reg_ymd DESC, i.inqry_id DESC
         LIMIT #{pageSize} OFFSET #{startRow}
+    </select>
+    
+    <select id="getAnswerByInquiryId" resultMap="answerResultMap">
+    	SELECT 
+            ans_id, 
+            inqry_id, 
+            answr_user_no, 
+            ans_cn, ans_tm, 
+            answr_type_cd, rls_yn, 
+            last_mdfcn_dt, 
+            actvtn_yn, del_dt, 
+            del_user_no
+		FROM 
+         	answer
+         where
+         	inqry_id = #{inquiryId}
     </select>
 
 </mapper>

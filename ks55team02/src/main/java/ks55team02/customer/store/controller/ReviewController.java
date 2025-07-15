@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import ks55team02.customer.store.domain.ProductReview;
+import ks55team02.common.domain.store.ProductReview;
 import ks55team02.customer.store.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 

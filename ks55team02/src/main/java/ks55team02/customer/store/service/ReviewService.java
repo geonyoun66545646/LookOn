@@ -2,7 +2,7 @@ package ks55team02.customer.store.service;
 
 import java.util.List;
 
-import ks55team02.customer.store.domain.ProductReview;
+import ks55team02.common.domain.store.ProductReview;
 
 public interface ReviewService {
 

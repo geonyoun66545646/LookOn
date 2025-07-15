@@ -5,8 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import ks55team02.customer.inquiry.domain.Inquiry;
-// import ks55team02.customer.inquiry.domain.InquiryImage; // InquiryImage 관련 메서드 제거
+import ks55team02.common.domain.inquiry.Answer;
+import ks55team02.common.domain.inquiry.Inquiry;
 
 @Mapper
 public interface InquiryMapper {
@@ -40,4 +40,7 @@ public interface InquiryMapper {
     
     // 문의 상세조회시 이미지 정보 조회
     Inquiry getInquiryByIdWithImages(String inquiryId);
+    
+    Answer getAnswerByInquiryId(String answer);
+    
 }

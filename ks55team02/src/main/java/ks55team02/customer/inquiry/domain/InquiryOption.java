@@ -6,7 +6,7 @@ public enum InquiryOption {
 	    DELIVERY("배송"),
 	    SNS("SNS"),
 	    ETC("기타");
-
+		
 	    private final String inquiryOption;
 
 	    InquiryOption(String inquiryOption) {

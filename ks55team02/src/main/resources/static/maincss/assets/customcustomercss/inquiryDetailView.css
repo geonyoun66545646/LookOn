@@ -27,15 +27,37 @@
     border: 1px solid #ebebeb; /* 모든 셀에 테두리 적용 */
     box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 계산 */
     text-align: center; /* 기본 텍스트 정렬은 왼쪽으로 설정 */
-    width:25%;
     font-size: 1.2em;
     font-weight: 700;
 }
 
+.table.table-bordered .title-row td:nth-child(1) {
+    width: 12%; /* 첫 번째 <td> (비밀글 여부 셀) */
+}
+
+.table.table-bordered .title-row td:nth-child(2) {
+    width: 20%; /* 두 번째 <td> (문의 유형 셀) */
+}
+
+.table.table-bordered .title-row td:nth-child(3) {
+    width: 20%; /* 세 번째 <td> (대상 상점 셀) */
+}
+
+.table.table-bordered .title-row td:nth-child(4) {
+    width: 25%; /* 네 번째 <td> (작성자 셀) */
+}
+
+.table.table-bordered .title-row td:nth-child(5) {
+    width: 23%; /* 다섯 번째 <td> (작성일 셀) */
+}
+
+
+
+
 /* 제목 행 스타일 */
 .inquiry-row.title-row td {
     background-color: white;
-    font-weight: 500;
+    font-weight: 700;
     color: #495057;
     
     /* 이 셀들에 개별적으로 text-align: center; 가 필요한 경우 여기에 추가 */
@@ -89,8 +111,8 @@ body {
     font-family: 'Noto Sans KR', sans-serif;
 }
 
-/* 제목 td (colspan="4"인 첫 번째 행의 제목) 폰트 크기 및 스타일 조정 */
-.inquiry-row td[colspan="4"][scope="row"] {
+/* 제목 td (colspan="5"인 첫 번째 행의 제목) 폰트 크기 및 스타일 조정 */
+.inquiry-row td[colspan="5"][scope="row"] {
     padding: 20px 15px;
     color: #343a40;
     text-align: center; /* 제목만 가운데 정렬 */
@@ -108,4 +130,28 @@ body {
     gap: 5px; /* 이모티콘과 텍스트 사이 간격 */
     width: 100%; /* 부모 td의 너비를 꽉 채우도록 설정 */
     height: 100%; /* 부모 td의 높이를 꽉 채우도록 설정 (td에 min-height 등이 있다면 유용) */
+}
+
+/* 답변 테이블 */
+
+
+/* 답변 제목 행 스타일 */
+#answer-header{
+	color: #343a40;
+    text-align: center;
+    font-size: 1.8em;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+/* 답변 내용 텍스트 자체에 스타일 적용 */
+.answer-cn {
+    color: #555;
+    font-size: 0.95em;
+    text-align: left !Important; /* 답변 내용 텍스트도 왼쪽 정렬로 명시 */
+}
+.answer-sub{
+	width:50%;
+	font-weight: 500;
+    color: #495057;
 }

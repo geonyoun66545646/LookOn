@@ -18,11 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
-import ks55team02.customer.inquiry.domain.Inquiry;
+import ks55team02.common.domain.inquiry.Inquiry;
+import ks55team02.common.domain.store.Store;
 import ks55team02.customer.inquiry.domain.InquiryOption;
 import ks55team02.customer.inquiry.domain.InquiryTargetOption;
 import ks55team02.customer.inquiry.service.InquiryService;
-import ks55team02.customer.store.domain.Store;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -231,8 +231,9 @@ public class InquiryController {
         int pageBlockSize = 5;
         int startPage = ((currentPage - 1) / pageBlockSize) * pageBlockSize + 1;
         int endPage = Math.min(startPage + pageBlockSize - 1, totalPages);
+        
 
-        //4. Model에 데이터를 담아 뷰로 전달합니다.
+        //5. Model에 데이터를 담아 뷰로 전달합니다.
         model.addAttribute("title", "문의 목록");
         model.addAttribute("inquiryList", inquiryList);
         model.addAttribute("currentPage", currentPage);
@@ -245,4 +246,5 @@ public class InquiryController {
 
         return "customer/inquiry/inquiryListView";
     }
+    
 }

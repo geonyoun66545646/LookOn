@@ -35,7 +35,7 @@
                         <table class="table table-bordered">
                             <tbody>
                                 <tr class="inquiry-row">
-                                    <td th:text="${inquiry.inqryTtl}" colspan="4" scope="row"></td>
+                                    <td th:text="${inquiry.inqryTtl}" colspan="5" scope="row"></td>
                                 </tr>
 
                                 <tr class="inquiry-row title-row">
@@ -46,8 +46,16 @@
                                         </div>
                                     </td>
                                     <td>
-                                    <span>문의유형 &nbsp;&nbsp;:</span>&nbsp;
-                                    <span th:text="${inquiry.inqryTypeCd}" scope="row">문의 유형></span>
+                                    <span>문의 대상 &nbsp;&nbsp;:</span>&nbsp;
+                                   	<span th:if="${inquiry.inqryTrgtTypeCd == 'STORE'}">상점</span>
+   									<span th:if="${inquiry.inqryTrgtTypeCd == 'ADMIN'}">관리자</span>
+                                    </td>
+                                    <td>
+                                    <span>문의 유형 &nbsp;&nbsp;:</span>&nbsp;
+                                   <span th:if="${inquiry.inqryTypeCd == 'PRODUCT'}">상품</span>
+                                   <span th:if="${inquiry.inqryTypeCd == 'DELIVERY'}">배송</span>
+                                   <span th:if="${inquiry.inqryTypeCd == 'SNS'}">SNS</span>
+                                   <span th:if="${inquiry.inqryTypeCd == 'ETC'}">기타</span>
                                     </td>
                                     <td>
                                     <span>작성자 &nbsp;&nbsp;: </span>
@@ -59,7 +67,7 @@
                                     </td>
                                 </tr>
                                 <tr class="inquiry-row content-row">
-                                    <td colspan="4">
+                                    <td colspan="5">
                                         <div class="inquiry-content-box">
                                             <p class="inquiry-content-text" th:utext="${#strings.replace(inquiry.inqryCn, '\n', '<br>') ?: '내용 없음'}"></p>
                                         </div>
@@ -68,9 +76,6 @@
                             </tbody>
                         </table>
                         
-                    </form>
-                    </div>
-
                     <div class="inquiry-images-section mt-4">
 					    <h4>첨부 이미지</h4>
 					    <div class="row">
@@ -82,6 +87,44 @@
 					        </div>
 					    </div>
 					</div>
+                    </form>
+                    </div>
+
+					<div class="inquiryTable" >
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th colspan="2" id="answer-header" class="table-header" th:text="${inquiry.answer != null ? inquiry.inqryTtl + '에 대한 답변' :'문의가 접수되었습니다'}"></th> <!-- 답변 헤더를 2칸으로 통합 -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 답변이 있을 경우에만 이 행들을 표시 -->
+            <tr th:if="${inquiry.answer != null}" class="answer-info-row">
+                <td class="answer-sub"> <!-- 답변자 정보 -->
+                    <span>답변자 : </span>
+                    <span th:text="${inquiry.answer.answrUserNo}">답변자 이름</span>
+                    <!-- TODO: answrUserNo가 사용자 번호이므로, 실제 사용자 닉네임 등을 조회하여 표시하려면
+                                Answer DTO에 answererInfo 같은 association을 추가하고 매퍼에서 JOIN해야 합니다. -->
+                </td >
+                <td class="answer-sub"> <!-- 답변 시간 -->
+                    <span>답변 시간 : </span>
+                    <span th:text="${#temporals.format(inquiry.answer.ansTm, 'yyyy-MM-dd HH:mm')}" th:if="${inquiry.answer.ansTm != null}"></span>
+                </td>
+            </tr>
+            <tr th:if="${inquiry.answer != null}" class="answer-content-row">
+                <td colspan="2" class="answer-cn"> <!-- 답변 내용 -->
+                    <div class="answer-content-box">
+                        <p class="answer-content-text" th:utext="${#strings.replace(inquiry.answer.ansCn, '\n', '<br>') ?: '답변 내용 없음'}"></p>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${inquiry.answer == null}">
+                <td colspan="2" class="text-center">빠른 시일 내에 답변드리겠습니다.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+					
                     <div class="form-group d-flex justify-content-end mt-4 mb-3">
                      	    <a href="#" class="btn btn-primary btn-rounded">문의 수정</a> 
 	   				<!-- 	    <button type="submit" class="btn btn-primary btn-rounded">문의 수정</button> -->
