@@ -25,7 +25,7 @@ public class SellerInquiryController {
         return "store_22";
 	}
 	
-	//스토어 인쿼리
+	// 셀러 문의 목록
     @GetMapping("/sellerInquiryList")
     public String getSellerInquiryList(Model model, HttpSession session) {
     	// 로그인된 스토어 아이디를 가져옴
@@ -34,6 +34,7 @@ public class SellerInquiryController {
              // 예시: 로그인되지 않은 판매자 처리
              // return "redirect:/seller/login";
         }
+    	 // 로그인 된 판매자의 상점 ID를 검색 조건에 설
     	 
     	 List<Inquiry> inquiryList = sellerInquiryService.getSellerInquiryList(currentStoreId);
     	 
