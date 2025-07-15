@@ -18,6 +18,13 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
     private final ProductSearchMapper productSearchMapper;
     
+    @Override // ⭐ 이 부분 추가
+    public List<Products> getSpecialSaleProducts(double minDiscountRate) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("minDiscountRate", minDiscountRate);
+        return productSearchMapper.getSpecialSaleProducts(params);
+    }
+    
     @Override
     public List<Products> getWeeklyBestProducts() {
         // 단순히 매퍼를 호출하여 DB 조회를 위임합니다.

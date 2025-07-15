@@ -23,8 +23,9 @@ window.addEventListener('load', function() {
 			type: 'progressbar',
 		},
 		navigation: {
-			nextEl: '.main-page-slider-container .swiper-button-next', // 수정됨: '다음' 버튼은 '.swiper-button-next'
-			prevEl: '.main-page-slider-container .swiper-button-prev', // 수정됨: '이전' 버튼은 '.swiper-button-prev'
+			// ⭐ 메인 슬라이더 버튼 선택자도 더 명확하게 지정합니다.
+			nextEl: '.main-page-slider-container .swiper-button-next',
+			prevEl: '.main-page-slider-container .swiper-button-prev',
 		},
 		slidesPerView: 1.5,
 		spaceBetween: 15,
@@ -51,7 +52,7 @@ window.addEventListener('load', function() {
 
 
 	/* =================================================================== */
-	/* ⭐ [3-2단계: 추가] Weekly Best 슬라이더 초기화 ⭐ */
+	/* ⭐ Weekly Best 슬라이더 초기화 ⭐ */
 	/* =================================================================== */
 	const weeklySwiperContainer = document.querySelector('.weekly-best-slider-container .weekly-best-swiper');
 
@@ -60,15 +61,34 @@ window.addEventListener('load', function() {
 			// 옵션 설정
 			loop: false,
 			autoplay: false,
-			slidesPerView: 'auto', // CSS에 의해 슬라이드 너비 결정
-			spaceBetween: 1, // 상품 카드 사이의 간격
+			slidesPerView: 'auto',
+			spaceBetween: 1,
 
-			// 네비게이션 화살표 버튼 연결
+			// ⭐ Weekly Best 슬라이더 버튼 선택자 수정 ⭐
 			navigation: {
-				nextEl: '.weekly-best-slider-container .swiper-button-next',
-				prevEl: '.weekly-best-slider-container .swiper-button-prev',
+				nextEl: '.weekly-best-slider-container .swiper-button-next', // 이 부분이 원래도 이렇게 되어있었어야 합니다.
+				prevEl: '.weekly-best-slider-container .swiper-button-prev', // 이 부분이 원래도 이렇게 되어있었어야 합니다.
 			},
-			// breakpoints 옵션은 이제 필요 없으므로 제거합니다. (auto 슬라이드 뷰에는 일반적으로 사용 안 함)
+		});
+	}
+
+	/* =================================================================== */
+	/* ⭐ Sale 슬라이더 초기화 ⭐ */
+	/* =================================================================== */
+	const saleSwiperContainer = document.querySelector('.sale-products-slider-container .sale-products-swiper');
+
+	if (saleSwiperContainer) {
+		const saleSwiper = new Swiper(saleSwiperContainer, {
+			loop: false,
+			autoplay: false,
+			slidesPerView: 'auto',
+			spaceBetween: 1,
+
+			// ⭐ Sale 슬라이더 버튼 선택자 수정 (고유 클래스 사용) ⭐
+			navigation: {
+				nextEl: '.sale-products-slider-container .swiper-button-next',
+				prevEl: '.sale-products-slider-container .swiper-button-prev',
+			},
 		});
 	}
 });

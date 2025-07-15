@@ -53,6 +53,34 @@
         </association>
     </resultMap>
 	
+	<select id="getSpecialSaleProducts" resultMap="activeProductsResultMap">
+	    SELECT
+	        p.gds_no, p.store_id, p.gds_nm, p.bas_prc,
+	        p.dscnt_rt, (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
+	        pc.ctgry_no AS pc_ctgry_no,   <!-- ⭐ 이 라인을 추가하거나 수정하세요! ⭐ -->
+	        pc.ctgry_nm AS pc_ctgry_nm,   <!-- ⭐ 이 라인을 수정하세요! ⭐ -->
+	        s.store_conm AS store_name,
+	        (
+	            SELECT pi.img_file_path_nm
+	            FROM product_images pi
+	            WHERE pi.gds_no = p.gds_no AND pi.img_type = 1 AND pi.actvtn_yn = TRUE
+	            ORDER BY pi.img_indct_sn ASC
+	            LIMIT 1
+	        ) AS thumbnail_image_path
+	    FROM
+	        products p
+	    LEFT JOIN
+	        stores s ON p.store_id = s.store_id
+	    LEFT JOIN
+        	product_categories pc ON p.ctgry_no = pc.ctgry_no <!-- ⭐ 이 라인이 누락되었을 가능성이 높습니다! 반드시 추가해주세요. ⭐ -->
+	    WHERE
+	        p.expsr_yn = 1 AND p.actvtn_yn = 1 AND s.del_prcr_yn = FALSE
+	        AND p.dscnt_rt >= #{minDiscountRate}  <!-- 30% 이상 조건 -->
+	    ORDER BY
+	        p.dscnt_rt DESC, p.reg_dt DESC
+	    LIMIT 12 <!-- 조회 개수 제한 -->
+	</select>
+	
 	<!-- ⭐ Weekly Best 상품 24개 조회 -->
     <select id="getWeeklyBestProducts" resultMap="productsWithFilterResultMap"> <!-- productsWithFilterResultMap 사용 가정 -->
         SELECT

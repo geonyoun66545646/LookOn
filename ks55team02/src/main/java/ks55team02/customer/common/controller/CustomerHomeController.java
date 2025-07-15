@@ -29,10 +29,14 @@ public class CustomerHomeController {
         
         // 2. ⭐ Weekly Best 상품 목록 데이터 조회 (24개)
         List<Products> weeklyBestProducts = productSearchService.getWeeklyBestProducts();
+        
+        // 3. ⭐ 새로 추가: 30% 이상 할인된 특가 상품 조회 및 모델에 추가
+        List<Products> saleProductList = productSearchService.getSpecialSaleProducts(30.0);
 
-        // 3. 모델에 데이터 추가
+        // 4. 모델에 데이터 추가
         model.addAttribute("mainSlideProducts", mainSlideProducts);
         model.addAttribute("weeklyBestProducts", weeklyBestProducts); // <-- weeklyBestProducts로 변경
+        model.addAttribute("saleProductList", saleProductList);
         
         return "customer/main";
     }

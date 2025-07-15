@@ -377,3 +377,89 @@ html, body {
 	visibility: hidden;
 	pointer-events: none;
 }
+
+/* 여기에 sale 스타일 추가 */
+/* =================================================================== */
+/* ⭐ 놓치기 아까운 특가 상품 (Sale) 슬라이더 스타일 ⭐ */
+/* 기존 Weekly Best 슬라이더의 스타일을 대부분 재사용합니다. */
+/* =================================================================== */
+.sale-products-section {
+    /* weekly-best-section과 동일한 padding과 background-color를 가집니다. */
+    /* 만약 다른 스타일이 필요하다면 여기에 추가 */
+    padding-top: 30px; /* Weekly Best와 간격 조정을 위해 필요하다면 추가 */
+}
+
+/* Sale 상품 슬라이더 컨테이너: Weekly Best와 동일한 스타일 재사용 */
+.sale-products-slider-container {
+    /* weekly-best-slider-container와 동일하게 설정 */
+    /* position: relative; */
+}
+
+/* Sale 상품 Swiper 인스턴스: Weekly Best와 동일한 스타일 재사용 */
+.sale-products-swiper {
+    /* weekly-best-swiper와 동일하게 설정 */
+    /* padding: 10px 0; */
+    /* box-sizing: border-box; */
+}
+
+/* Sale 상품 슬라이드 아이템: Weekly Best와 동일한 반응형 너비 재사용 */
+.sale-products-slider-container .swiper-slide {
+    /* weekly-best-slider-container .swiper-slide 와 동일하게 설정 */
+    /* height: auto; */
+    /* width: 50%; (모바일 기본) */
+}
+
+/* Sale 상품 슬라이더 화살표 버튼 */
+/* 이전에 main.html에서 sale-swiper-button-prev, sale-swiper-button-next 클래스를 추가했습니다. */
+/* 이 클래스들을 사용하여 Weekly Best 버튼과 동일한 스타일을 적용합니다. */
+.sale-products-slider-container .sale-swiper-button-prev,
+.sale-products-slider-container .sale-swiper-button-next {
+    /* weekly-best-slider-container .swiper-button-prev, .swiper-button-next 와 동일하게 설정 */
+    background-color: rgba(30, 30, 30, 0.9);
+    border: 1px solid #333;
+    border-radius: 5px;
+    color: #333;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    opacity: 0.25;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Sale 슬라이더 컨테이너에 호버했을 때 버튼 투명도 */
+.sale-products-slider-container:hover .sale-swiper-button-prev,
+.sale-products-slider-container:hover .sale-swiper-button-next {
+    opacity: 0.7;
+}
+
+/* Sale 버튼 자체에 호버했을 때 투명도 */
+.sale-products-slider-container .sale-swiper-button-prev:hover,
+.sale-products-slider-container .sale-swiper-button-next:hover {
+    opacity: 1;
+}
+
+/* Sale 슬라이더 버튼 아이콘 스타일 */
+.sale-products-slider-container .sale-swiper-button-prev:after,
+.sale-products-slider-container .sale-swiper-button-next:after {
+    font-family: swiper-icons;
+    font-size: 10px;
+    text-transform: none !important;
+    letter-spacing: 0;
+    font-variant: initial;
+    line-height: 1;
+    color: white; /* Weekly Best와 동일하게 흰색 */
+}
+
+/* Sale 슬라이더 개별 버튼 위치 조정 */
+.sale-products-slider-container .sale-swiper-button-prev {
+    left: 15px; /* Weekly Best와 동일 */
+}
+
+.sale-products-slider-container .sale-swiper-button-next {
+    right: 15px; /* Weekly Best와 동일 */
+}
+
+/* Sale 슬라이더 비활성화된 버튼은 항상 숨김 */
+.sale-products-slider-container .swiper-button-disabled {
+    opacity: 0 !important;
+    visibility: hidden;
+    pointer-events: none;
+}

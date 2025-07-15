@@ -1,99 +1,104 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org/"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorate="~{customer/layout/layoutMain}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
 
-<!-- 1. 이 페이지 전용 CSS 파일들을 "cssFile" 프래그먼트에 정의합니다. -->
 <head>
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<link rel="stylesheet"
-	th:href="@{/maincss/assets/mainSlide/mainSlide.css}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" th:href="@{/maincss/assets/mainSlide/mainSlide.css}" />
 </head>
 
-<!-- 2. 페이지의 실제 메인 콘텐츠를 "contents" 프래그먼트에 정의합니다. -->
-
 <th:block layout:fragment="contents">
-	<main class="main">
+    <main class="main">
 
-		<!-- 고유한 클래스명을 가진 슬라이더 컨테이너 -->
-		<div class="main-page-slider-container">
-			<div class="main-page-swiper swiper">
-				<div class="swiper-wrapper">
-					<!-- DB에서 가져온 상품 목록으로 슬라이드 동적 생성 -->
-					<div class="swiper-slide" th:each="product : ${mainSlideProducts}">
-						<a th:href="@{/products/detail/{id}(id=${product.gdsNo})}"> <img
-							th:src="${product.thumbnailImagePath}" th:alt="${product.gdsNm}"
-							onerror="this.onerror=null; this.src='/maincss/assets/images/no_image.jpg';">
-							<div class="slide-content">
-								<h3 th:text="${product.gdsNm}">상품명</h3>
-								<p>
-									<span th:text="${product.productCategory?.categoryName}">카테고리</span>
-									<span
-										th:if="${product.dscntRt != null and product.dscntRt > 0}">|</span>
-									<span
-										th:if="${product.dscntRt != null and product.dscntRt > 0}"
-										th:text="'~' + ${#numbers.formatInteger(product.dscntRt, 0)} + '%'">할인율</span>
-								</p>
-							</div>
-						</a>
-					</div>
-				</div>
-			</div>
+        <!-- 메인 슬라이더 -->
+        <div class="main-page-slider-container">
+            <div class="main-page-swiper swiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" th:each="product : ${mainSlideProducts}">
+                        <a th:href="@{/products/detail/{id}(id=${product.gdsNo})}">
+                            <img th:src="${product.thumbnailImagePath}" th:alt="${product.gdsNm}"
+                                 onerror="this.onerror=null; this.src='/maincss/assets/images/no_image.jpg';">
+                            <div class="slide-content">
+                                <h3 th:text="${product.gdsNm}">상품명</h3>
+                                <p>
+                                    <span th:text="${product.productCategory?.categoryName}">카테고리</span>
+                                    <span th:if="${product.dscntRt != null and product.dscntRt > 0}">|</span>
+                                    <span th:if="${product.dscntRt != null and product.dscntRt > 0}"
+                                          th:text="'~' + ${#numbers.formatInteger(product.dscntRt, 0)} + '%'">할인율</span>
+                                </p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="main-swiper-controls">
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <button class="swiper-autoplay-button">
+                    <span class="icon-pause">||</span>
+                    <span class="icon-play">▶</span>
+                </button>
+            </div>
+        </div>
 
-			<!-- 슬라이더 컨트롤러 UI -->
-			<div class="main-swiper-controls">
-				<div class="swiper-button-prev"></div>
-				<div class="swiper-pagination"></div>
-				<div class="swiper-button-next"></div>
-				<button class="swiper-autoplay-button">
-					<span class="icon-pause">||</span> <span class="icon-play">▶</span>
-				</button>
-			</div>
-		</div>
+        <!-- Weekly Best -->
+        <div class="weekly-best-section">
+            <div class="weekly-best-container">
+                <div class="weekly-best-heading">
+                    <h2 class="weekly-best-title">Weekly Best</h2>
+                    <div class="weekly-best-more-link">
+                        <a th:href="@{/customer/products(type='sale')}" class="btn btn-outline-dark-2">
+                            <span>더보기</span>
+                        </a>
+                    </div>
+                </div>
 
-		<!-- =================================================================== -->
-		<!-- ⭐ [2단계: 교체] Weekly Best 상품 목록 (슬라이더로 변경) ⭐ -->
-		<!-- =================================================================== -->
-		<div class="weekly-best-section">
-			<div class="weekly-best-container">
-				<div class="weekly-best-heading">
-					<h2 class="weekly-best-title">Weekly Best</h2>
-					<div class="weekly-best-more-link">
-					<a th:href="@{/customer/products(type='sale')}" class="btn btn-outline-dark-2">
-						<span>더보기</span>
-					</a>
-				</div>
-				</div>
+                <div class="weekly-best-slider-container">
+                    <div class="swiper weekly-best-swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide" th:each="product : ${weeklyBestProducts}">
+                                <div th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 버튼에 고유 클래스 부여 -->
+                    <div class="swiper-button-prev weekly-best-button-prev"></div>
+                    <div class="swiper-button-next weekly-best-button-next"></div>
+                </div>
+            </div>
+        </div>
 
-				<!-- Weekly Best 상품 슬라이더 컨테이너 -->
-				<div class="weekly-best-slider-container">
-					<!-- Swiper -->
-					<div class="swiper weekly-best-swiper">
-						<div class="swiper-wrapper">
-							<!-- 서버에서 전달받은 24개 상품을 슬라이드로 생성 -->
-							<div class="swiper-slide"
-								th:each="product : ${weeklyBestProducts}">
-								<!-- 1단계에서 만든 단일 상품 카드 프래그먼트 재사용 -->
-								<div
-									th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
-							</div>
-						</div>
-					</div>
-					<!-- Navigation buttons -->
-					<div class="swiper-button-prev"></div>
-					<div class="swiper-button-next"></div>
-				</div>
-			</div>
-		</div>
-	</main>
+        <!-- 세일 상품 -->
+        <div class="sale-products-section weekly-best-section">
+            <div class="weekly-best-container container">
+                <div class="weekly-best-heading">
+                    <h2 class="weekly-best-title">놓치기 아까운 특가 상품</h2>
+                    <div class="weekly-best-more-link">
+                        <a th:href="@{/customer/products(type='sale')}" class="btn btn-outline-dark-2">
+                            <span>더보기</span><i class="icon-long-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="sale-products-slider-container weekly-best-slider-container">
+                    <div class="sale-products-swiper swiper">
+                        <div th:replace="~{customer/fragments/products :: saleProductsFragment(${saleProductList})}"></div>
+                    </div>
+                    <!-- 버튼에 고유 클래스 부여 -->
+                    <div class="swiper-button-prev sale-products-button-prev"></div>
+                    <div class="swiper-button-next sale-products-button-next"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
 </th:block>
 
-<!-- 3. 이 페이지 전용 JavaScript 파일들을 "jsScript" 프래그먼트에 정의합니다. -->
 <th:block layout:fragment="jsScript">
-	<script
-		src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-	<!-- ⭐ 수정: th:src="@{/maincss/...}" 로 변경 -->
-	<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
 </th:block>
+
 </html>

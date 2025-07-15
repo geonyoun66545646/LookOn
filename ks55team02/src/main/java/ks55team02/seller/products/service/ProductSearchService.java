@@ -18,4 +18,13 @@ public interface ProductSearchService {
      * @return Weekly Best 상품 목록 (24개)
      */
     List<Products> getWeeklyBestProducts();
+    
+    /**
+     * 메인 페이지의 '놓치기 아까운 특가 상품' 목록을 조회합니다.
+     * (30% 이상 할인된 상품을 할인율 높은 순으로 정렬)
+     * @param minDiscountRate 최소 할인율 (예: 30.0)
+     * @param limit 조회할 상품 개수 제한
+     * @return 특가 상품 목록
+     */
+    List<Products> getSpecialSaleProducts(double minDiscountRate); // ⭐ 이 부분 추가
 }

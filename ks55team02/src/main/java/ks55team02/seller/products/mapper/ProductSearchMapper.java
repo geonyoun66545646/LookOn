@@ -21,4 +21,11 @@ public interface ProductSearchMapper {
      * @return Weekly Best 상품 목록 (24개)
      */
     List<Products> getWeeklyBestProducts();
+    
+    /**
+     * 특정 할인율 이상인 특가 상품 목록을 조회합니다.
+     * @param params minDiscountRate (double)
+     * @return 특가 상품 목록
+     */
+    List<Products> getSpecialSaleProducts(Map<String, Object> params); // ⭐ 이 부분 추가
 }
