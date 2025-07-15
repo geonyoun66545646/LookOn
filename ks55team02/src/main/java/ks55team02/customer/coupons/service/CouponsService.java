@@ -46,6 +46,7 @@ public interface CouponsService {
 	
 
 	/**
+	 * - 2025.07.11 gy -
 	 * 결제 등 특정 상황에서, 사용자가 '현재 시점'에 사용 가능한 쿠폰 목록을 조회합니다. (기간 만료, 사용 완료 쿠폰 제외)
 	 * 
 	 * @param userNo 사용자 번호

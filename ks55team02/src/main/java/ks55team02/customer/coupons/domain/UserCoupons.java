@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class UserCoupons {
-	
+
 	private String userCpnId;
 	private String userNo;
 	private String pblcnCpnId;
@@ -22,9 +22,9 @@ public class UserCoupons {
 
 	private Coupons coupon;
 
-	// 이 필드도 다른 팀원의 코드이므로 그대로 둡니다.
+	// - 2025.07.11 gy / domain UserCoupons -
 	@Column(value = "use_yn")
-	private boolean used;
+	private boolean used; // true=1 (사용완료), false=0 (사용가능) → 필드명 변경으로 혼동 방지
 
 	// ===================================================================
 	// ★★★ 이 부분을 직접 추가하세요 ★★★
@@ -34,5 +34,5 @@ public class UserCoupons {
 		this.used = used;
 	}
 	// ===================================================================
-	
+
 }
