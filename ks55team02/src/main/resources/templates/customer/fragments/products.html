@@ -85,15 +85,13 @@
 </div>
 
 <!-- sale 상품 목록 들어갈 자리 -->
-<div th:fragment="saleProductsFragment(saleProductList)">
-    <div class="swiper-wrapper">
-        <div class="swiper-slide" th:each="product : ${saleProductList}">
-             <!-- ⭐ 이 경로를 수정해주세요! ⭐ -->
-             <div th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
-        </div>
+<div th:fragment="saleProductsFragment(saleProductList)" class="swiper-wrapper">
+    <div class="swiper-slide" th:each="product : ${saleProductList}">
+        <div th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
     </div>
-    <div th:if="${saleProductList.isEmpty()}" class="col-12 text-center mt-4">
-        <p>현재 특가 상품이 없습니다.</p>
     </div>
+
+<div th:fragment="noSaleProductsMessage" th:if="${saleProductList.isEmpty()}" class="col-12 text-center mt-4">
+    <p>현재 특가 상품이 없습니다.</p>
 </div>
 </html>
