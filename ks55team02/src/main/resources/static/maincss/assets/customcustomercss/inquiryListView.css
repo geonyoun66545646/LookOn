@@ -17,7 +17,7 @@
 /* 첫 번째 열: 번호 */
 .table-wishlist th:nth-child(1),
 .table-wishlist td:nth-child(1) {
-    width: 15%;
+    width: 10%;
     text-align: center !important;
     vertical-align: middle;
 }
@@ -39,8 +39,8 @@
 }
 
 /* 네 번째 열: 질문유형 */
-.table-wishlist th:nth-child(4),
-.table-wishlist td:nth-child(4) {
+.table-wishlist th:nth-child(6),
+.table-wishlist td:nth-child(6) {
     width: 10%;
     text-align: center;
     vertical-align: middle;
@@ -54,10 +54,10 @@
     vertical-align: middle;
 }
 
-/* 여섯 번째 열: 작성자 */
-.table-wishlist th:nth-child(6),
-.table-wishlist td:nth-child(6) {
-    width: 15%;
+/* 세 번째 열: 작성자 */
+.table-wishlist th:nth-child(4),
+.table-wishlist td:nth-child(4) {
+    width: 20%;
     text-align: center;
     vertical-align: middle;
 }

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.seller.inquiry.mapper.SellerInquiryMapper">
+
+    <resultMap id="storeResultMap" type="ks55team02.common.domain.store.Store">
+        <id property="storeId"          column="store_id"/>
+        <result property="aplyId"       column="aply_id"/>
+        <result property="sellerUserNo" column="seller_user_no"/>
+        <result property="storeConm"    column="store_conm"/>
+        <result property="storeIntroCn" column="store_intro_cn"/>
+        <result property="storeLogoImg" column="store_logo_img"/>
+        <result property="storeStts"    column="store_stts"/>
+        <result property="infoMdfcnDt"  column="info_mdfcn_dt"/>
+        <result property="inactvtnDt"   column="inactvtn_dt"/>
+        <result property="delPrcrYn"    column="del_prcr_yn"/>
+    </resultMap>
+
+    <resultMap id="sellerInquiryWithStoreResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
+        <id property="inqryId"           		column="inqry_id"/>
+        <result property="inqryTypeCd"   		column="inqry_type_cd"/>
+        <result property="inqryTrgtTypeCd" 		column="inqry_trgt_type_cd"/>
+        <result property="wrtrId"        		column="wrtr_id"/>
+        <result property="inqryStoreId"  		column="inqry_store_id"/>
+        <result property="inqryTtl"      		column="inqry_ttl"/>
+        <result property="inqryCn"       		column="inqry_cn"/>
+        <result property="prvtYn"        		column="prvt_yn"/>
+        <result property="prcsStts"     		column="prcs_stts"/>
+        <result property="prcsUserNo"    		column="prcs_user_no"/>
+        <result property="regYmd"        		column="reg_ymd"/>
+        <result property="mdfcnYmd"      		column="mdfcn_ymd"/>
+        <result property="delDt"         		column="del_dt"/>
+        <result property="delUserNo"     		column="del_user_no"/>
+        <result property="delActvtnYn"   		column="del_actvtn_yn"/>
+
+        <association property="storeInfo" resultMap="storeResultMap"/>
+
+        </resultMap>
+
+
+    <select id="getSellerInquiryCnt" parameterType="ks55team02.common.domain.inquiry.Inquiry" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            inquiries
+        WHERE
+            inqry_store_id = #{inqryStoreId};
+    </select>
+
+    <select id="getSellerInquiryList" parameterType="map"
+            resultMap="sellerInquiryWithStoreResultMap">
+        SELECT
+            i.inqry_id,
+            i.inqry_type_cd,
+            i.inqry_trgt_type_cd,
+            i.wrtr_id,
+            i.inqry_store_id,
+            i.inqry_ttl,
+            i.inqry_cn,
+            i.prvt_yn,
+            i.prcs_stts,
+            i.prcs_user_no,
+            i.reg_ymd,
+            i.mdfcn_ymd,
+            i.del_dt,
+            i.del_user_no,
+            i.del_actvtn_yn,
+            -- Store 테이블의 모든 컬럼 (resultMap에서 매핑될 수 있도록 명시적으로 선택)
+            s.store_id,
+            s.aply_id,
+            s.seller_user_no,
+            s.store_conm,
+            s.store_intro_cn,
+            s.store_logo_img,
+            s.store_stts,
+            s.info_mdfcn_dt,
+            s.inactvtn_dt,
+            s.del_prcr_yn
+        FROM
+            inquiries i
+        JOIN
+            stores s ON s.store_id = i.inqry_store_id
+        <where>
+            i.inqry_store_id = #{inquiry.inqryStoreId} <if test="inquiry.searchValue != null and inquiry.searchValue != ''">
+                <choose>
+                    <when test="inquiry.searchKey == 'inqryId'">
+                        AND i.inqry_id LIKE CONCAT('%', #{inquiry.searchValue}, '%')
+                    </when>
+                    <when test="inquiry.searchKey == 'inqryTtl'">
+                        AND i.inqry_ttl LIKE CONCAT('%', #{inquiry.searchValue}, '%')
+                    </when>
+                    <when test="inquiry.searchKey == 'wrtrId'">
+                        AND i.wrtr_id LIKE CONCAT('%', #{inquiry.searchValue}, '%')
+                    </when>
+                    <when test="inquiry.searchKey == 'prcsStts'">
+                        AND i.prcs_stts LIKE CONCAT('%', #{inquiry.searchValue}, '%')
+                    </when>
+                    <when test="inquiry.searchKey == null or inquiry.searchKey == ''">
+                        AND (
+                            i.inqry_id LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR
+                            i.inqry_ttl LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR
+                            i.wrtr_id LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR
+                            i.prcs_stts LIKE CONCAT('%', #{inquiry.searchValue}, '%')
+                        )
+                    </when>
+                </choose>
+            </if>
+            <if test="inquiry.startDate != null and inquiry.endDate != null">
+                AND i.reg_ymd BETWEEN #{inquiry.startDate} AND #{inquiry.endDate}
+            </if>
+            <if test="inquiry.filterConditions != null and inquiry.filterConditions.size > 0">
+                AND i.prcs_stts IN
+                <foreach item="condition" collection="inquiry.filterConditions" open="(" separator="," close=")">
+                    #{condition}
+                </foreach>
+            </if>
+            <if test="inquiry.levels != null and inquiry.levels.size > 0">
+                AND i.inqry_type_cd IN
+                <foreach item="level" collection="inquiry.levels" open="(" separator="," close=")">
+                    #{level}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY
+            <choose>
+                <when test="inquiry.sortKey == 'inqryId'">
+                    CAST(REGEXP_SUBSTR(i.inqry_id, '[0-9]+') AS UNSIGNED) <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
+                </when>
+                <when test="inquiry.sortKey == 'inqryTtl'"> i.inqry_ttl <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
+                </when>
+                <when test="inquiry.sortKey == 'wrtrId'"> i.wrtr_id <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
+                </when>
+                <when test="inquiry.sortKey == 'regYmd'"> i.reg_ymd <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
+                </when>
+                <otherwise>
+                    CAST(REGEXP_SUBSTR(i.inqry_id, '[0-9]+') AS UNSIGNED) DESC
+                </otherwise>
+            </choose>
+        LIMIT #{pageSize} OFFSET #{limitStart}; </select>
+
+    <select id="getSellerInquiryByStoreId" parameterType="String" resultMap="sellerInquiryWithStoreResultMap">
+        SELECT
+            i.inqry_id,
+            i.inqry_type_cd,
+            i.inqry_trgt_type_cd,
+            i.wrtr_id,
+            i.inqry_store_id,
+            i.inqry_ttl,
+            i.inqry_cn,
+            i.prvt_yn,
+            i.prcs_stts,
+            i.prcs_user_no,
+            i.reg_ymd,
+            i.mdfcn_ymd,
+            i.del_dt,
+            i.del_user_no,
+            i.del_actvtn_yn,
+            -- Store 테이블의 모든 컬럼
+            s.store_id,
+            s.aply_id,
+            s.seller_user_no,
+            s.store_conm,
+            s.store_intro_cn,
+            s.store_logo_img,
+            s.store_stts,
+            s.info_mdfcn_dt,
+            s.inactvtn_dt,
+            s.del_prcr_yn
+        FROM
+            inquiries i
+        JOIN
+            stores s ON s.store_id = i.inqry_store_id
+        WHERE
+            i.inqry_id = #{inqryId};
+    </select>
+            
+</mapper>

@@ -1,9 +1,10 @@
 package ks55team02.customer.inquiry.mapper;
 
-import org.apache.ibatis.annotations.Mapper;
-import ks55team02.customer.inquiry.domain.InquiryImage;
-
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import ks55team02.common.domain.inquiry.InquiryImage;
 
 @Mapper
 public interface InquiryImageMapper {

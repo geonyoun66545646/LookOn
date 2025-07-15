@@ -1,4 +1,4 @@
-package ks55team02.customer.store.domain;
+package ks55team02.common.domain.store;
 
 import java.time.LocalDateTime;
 
@@ -22,4 +22,6 @@ public class Store {
     private LocalDateTime infoMdfcnDt; // 정보 수정일시
     private LocalDateTime inactvtnDt; // 비활성화 일시
     private Boolean delPrcrYn; // 폐쇄 여부 (true: 폐쇄, false: 미폐쇄)
+    private String sellerUserNo; // 폐쇄 여부 (true: 폐쇄, false: 미폐쇄)
+    
 }
