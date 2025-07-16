@@ -3,11 +3,8 @@
     <aside class="navbar-aside" id="offcanvas_aside" th:fragment="asideFragments">
         <div class="aside-top">
             <a href="main.html" class="brand-wrap">
-                <img src="/admincss/assets/imgs/theme/logo.svg" class="logo" alt="Nest Dashboard" th:href="@{/main}" />
+                <!-- <img src="/admincss/assets/imgs/theme/logo.svg" class="logo" alt="Nest Dashboard" th:href="@{/main}" /> -->
             </a>
-            <div>
-                <button class="btn btn-icon btn-aside-minimize"><i class="text-muted material-icons md-menu_open"></i></button>
-            </div>
         </div>
         <nav>
             <ul class="menu-aside">
@@ -16,16 +13,6 @@
                         <i class="icon material-icons md-home"></i>
                         <span class="text">홈으로 이동</span>
                     </a>
-                </li>
-                <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#">
-                        <i class="icon material-icons md-shopping_bag"></i>
-                        <span class="text">총관리자</span>
-                    </a>
-                    <div class="submenu">
-                        <a th:href="@{/adminpage/superadmin/authrt}">권한 부여 및 회수</a>
-                        <!-- <a th:href="@{/adminpage/superadmin/adminCreate}">관리자 생성</a> -->
-                    </div>
                 </li>
                 <li class="menu-item has-submenu">
                     <a class="menu-link" href="#">
