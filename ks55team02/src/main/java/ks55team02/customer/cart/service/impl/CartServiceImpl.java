@@ -159,4 +159,20 @@ public class CartServiceImpl implements CartService{
         log.info("서비스: 사용자 '{}'의 장바구니 조회", userNo);
         return cartMapper.selectCartItemsByUserNo(userNo);
     }
+    
+    /**
+     * 특정 장바구니 항목 ID 목록에 해당하는 항목들을 삭제
+     * @param userNo 사용자 번호 (소유권 확인용)
+     * @param cartItemIds 삭제할 장바구니 항목 ID 목록
+     */
+    @Override
+    public void removeCartItemsByIds(String userNo, List<String> cartItemIds) {
+        if (cartItemIds == null || cartItemIds.isEmpty()) {
+            log.warn("서비스: 삭제할 장바구니 항목 ID 목록이 비어 있습니다. 사용자: {}", userNo);
+            return; // 삭제할 항목이 없으면 아무것도 하지 않음
+        }
+        log.info("서비스: 사용자 '{}'의 장바구니 항목들 삭제 시도: {}", userNo, cartItemIds);
+        cartMapper.deleteCartItemsByIds(cartItemIds, userNo);
+        log.info("서비스: 사용자 '{}'의 장바구니 항목들 삭제 성공", userNo);
+    }
 }
