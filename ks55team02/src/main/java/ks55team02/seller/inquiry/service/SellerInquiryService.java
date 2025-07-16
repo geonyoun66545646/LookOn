@@ -19,4 +19,7 @@ public interface SellerInquiryService {
 
 	// 상점 ID로 판매자 사용자 번호 조회 메서드 추가
 	String getSellerUserNoByStoreId(String storeId);
+	
+	// 문의 처리 상태를 업데이트하는 메서드 (새로 추가)
+	void updateInquiryProcessStatus(String inqryId, String prcsStts);
 }

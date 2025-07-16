@@ -32,8 +32,7 @@
         <result property="actvtnYn"     column="actvtn_yn"/>
         <result property="delDt"        column="del_dt"/>
         <result property="delUserNo"    column="del_user_no"/>
-        <!-- answrStoreName 매핑 제거 -->
-    </resultMap>
+        </resultMap>
 
     <resultMap id="inquiryListResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
         <id property="inqryId" column="inqry_id"/>
@@ -218,8 +217,7 @@
             a.actvtn_yn,
             a.del_dt,
             a.del_user_no
-            <!-- stores s_ans 조인과 answr_store_conm 컬럼 제거 -->
-        FROM
+            FROM
             inquiries i
         JOIN
             stores s ON s.store_id = i.inqry_store_id
@@ -239,5 +237,15 @@
         WHERE
             store_id = #{storeId}
     </select>
+    
+   
+    <update id="updateInquiryProcessStatus" parameterType="map">
+        UPDATE inquiries
+        SET
+            prcs_stts = #{prcsStts},
+            mdfcn_ymd = NOW()
+        WHERE
+            inqry_id = #{inqryId}
+    </update>
 
 </mapper>

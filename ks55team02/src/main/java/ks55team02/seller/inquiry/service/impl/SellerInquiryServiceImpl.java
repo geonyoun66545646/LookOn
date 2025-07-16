@@ -62,6 +62,9 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 		int affectedRows = answerMapper.insertAnswer(answer);
 		if (affectedRows > 0) {
 			log.info("서비스: 답변 등록 성공 - 삽입된 행 수: {}, 답변 ID: {}", affectedRows, ansId);
+			// 문의 처리 상태를 '완료'로 업데이트
+			sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "완료");
+			log.info("서비스: 문의 처리 상태 '완료'로 업데이트 성공 - 문의 ID: {}", inqryId);
 			return answerMapper.getAnswerById(ansId);
 		} else {
 			log.error("서비스: 답변 등록 실패 - 삽입된 행 수: 0, 답변 객체: {}", answer);
@@ -83,6 +86,9 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 		int affectedRows = answerMapper.updateAnswer(answer);
 		if (affectedRows > 0) {
 			log.info("서비스: 답변 수정 성공 - 업데이트된 행 수: {}, 답변 ID: {}", affectedRows, ansId);
+			// 문의 처리 상태를 '완료'로 업데이트 (수정 시에도 완료 상태 유지 또는 다시 완료로 변경)
+			sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "완료");
+			log.info("서비스: 문의 처리 상태 '완료'로 업데이트 성공 - 문의 ID: {}", inqryId);
 			return answerMapper.getAnswerById(ansId);
 		} else {
 			log.error("서비스: 답변 수정 실패 - 업데이트된 행 수: 0, 답변 객체: {}", answer);
@@ -94,5 +100,11 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 	public String getSellerUserNoByStoreId(String storeId) {
 		log.info("서비스: getSellerUserNoByStoreId 호출 - storeId: {}", storeId);
 		return sellerInquiryMapper.getSellerUserNoByStoreId(storeId);
+	}
+	
+	// 문의 처리 상태를 업데이트하는 메서드 구현 (SellerInquiryService 인터페이스에서 추가된 메서드)
+	@Override
+	public void updateInquiryProcessStatus(String inqryId, String prcsStts) {
+	    sellerInquiryMapper.updateInquiryProcessStatus(inqryId, prcsStts);
 	}
 }

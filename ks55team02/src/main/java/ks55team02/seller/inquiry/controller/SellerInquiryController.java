@@ -26,9 +26,9 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 @Log4j2
 public class SellerInquiryController {
-	
+
 	private final SellerInquiryService sellerInquiryService;
-	
+
 	@GetMapping("/sellerInquiryList")
 	public String sellerInquiryList(
 	        Model model,
@@ -37,12 +37,12 @@ public class SellerInquiryController {
 		log.info("컨트롤러: sellerInquiryList 호출 - 현재 페이지: {}, 페이지 크기: {}, 검색 키: {}, 검색 값: {}",
 	             inquiry.getCurrentPage(), inquiry.getPageSize(), inquiry.getSearchKey(), inquiry.getSearchValue());
 
-		String loggedInStoreId = "store_1"; 
+		String loggedInStoreId = "store_1";
 		
 		inquiry.setInqryStoreId(loggedInStoreId);
 		log.info("로그인된 상점 ID (하드코딩): {}", loggedInStoreId);
 
-		int totalRecordCount = sellerInquiryService.getSellerInquiryCnt(inquiry); 
+		int totalRecordCount = sellerInquiryService.getSellerInquiryCnt(inquiry);
 		log.info("컨트롤러: 문의 전체 개수: {}", totalRecordCount);
 
 		Pagination pagination = new Pagination(totalRecordCount, inquiry);
@@ -93,7 +93,7 @@ public class SellerInquiryController {
 
 		Map<String, Object> response = new HashMap<>();
 		
-		String loggedInStoreId = "store_1"; 
+		String loggedInStoreId = "store_1";
 		String answrUserNo = sellerInquiryService.getSellerUserNoByStoreId(loggedInStoreId);
 
 		if (answrUserNo == null || answrUserNo.isEmpty()) {
