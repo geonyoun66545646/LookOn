@@ -60,14 +60,16 @@
 								th:if="${searchResult.products != null AND !#lists.isEmpty(searchResult.products)}">
 								<div class="card product-card"
 									th:each="product : ${searchResult.products}">
-									<a th:href="@{/customer/products/{id}(id=${product.gdsNo})}">
+									<a
+										th:href="@{/products/detail/{gdsNo}(gdsNo=${product.gdsNo})}">
 										<img th:src="${product.imgFilePathNm}" class="card-img-top"
 										th:alt="${product.gdsNm}"
 										onerror="this.onerror=null; this.src='/maincss/assets/images/sellerUploads/default_product.png';">
 									</a>
 									<div class="card-body">
 										<h6 class="card-title text-truncate">
-											<a th:href="@{/customer/products/{id}(id=${product.gdsNo})}"
+											<a
+												th:href="@{/products/detail/{gdsNo}(gdsNo=${product.gdsNo})}"
 												th:text="${product.gdsNm}"></a>
 										</h6>
 										<p class="card-text text-muted"
@@ -98,7 +100,7 @@
 										th:each="post, iterStat : ${searchResult.posts}"
 										th:if="${iterStat.index < 5}">
 										<h6 class="mb-1 text-truncate">
-											<a th:href="@{/customer/posts/{id}(id=${post.pstSn})}"
+											<a th:href="@{/customer/post/postView(pstSn=${post.pstSn})}"
 												th:text="${post.pstTtl}"></a>
 										</h6>
 										<small class="text-muted"
@@ -128,7 +130,9 @@
 
 								<div class="card search-result-user-card"
 									th:each="user : ${searchResult.users}">
-									<a th:href="@{/customer/users/{id}(id=${user.userNcnm})}">
+									<a
+										th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=${user.userNo})}">
+
 										<img
 										th:src="${user.prflImg != null and !#strings.isEmpty(user.prflImg) ? user.prflImg : '/maincss/assets/images/default_user.png'}"
 										th:alt="${user.prflImg != null and !#strings.isEmpty(user.prflImg) ? user.prflImg : '없음'}"
@@ -140,10 +144,12 @@
 									</a>
 									<div class="card-body text-center">
 										<h6 class="card-title mb-0 text-truncate">
-											<a th:href="@{/customer/users/{id}(id=${user.userNcnm})}"
+											<a
+												th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=${user.userNo})}"
 												th:text="${user.userNcnm}"></a>
 										</h6>
-										<small class="text-muted" th:text="${user.userNm}"></small>
+										<small class="text-muted" th:text="${user.userLgnId}">
+										</small>
 									</div>
 								</div>
 							</th:block>
@@ -169,7 +175,7 @@
 	<th:block layout:fragment="jsFile"></th:block>
 
 	<th:block layout:fragment="jsScript">
-<script th:inline="javascript">
+		<script th:inline="javascript">
 /* <![CDATA[ */
 
     // ===================================================================
@@ -323,13 +329,13 @@
             pageData.list.forEach(product => {
                 itemsHtml += `
                     <div class="card h-100 product-card">
-                        <a href="/customer/products/${product.gdsNo}">
+                	 <a href="/products/detail/${product.gdsNo}">
                             <img src="${product.imgFilePathNm}" class="card-img-top" alt="${product.gdsNm}"
                                  onerror="this.onerror=null; this.src='/maincss/assets/images/sellerUploads/default_product.png';">
                         </a>
                         <div class="card-body">
                             <h6 class="card-title text-truncate">
-                                <a href="/customer/products/${product.gdsNo}">${product.gdsNm}</a>
+                            <a href="/products/detail/${product.gdsNo}">${product.gdsNm}</a>
                             </h6>
                             <p class="card-text text-muted">₩ ${product.lastSelPrc.toLocaleString()}</p>
                         </div>
@@ -363,7 +369,7 @@
                 const formattedDate = post.crtDt ? new Date(post.crtDt).toISOString().split('T')[0] : '';
                 itemsHtml += `
                     <div class="post-item">
-                        <h6 class="mb-1 text-truncate"><a href="/customer/posts/${post.pstSn}">${post.pstTtl}</a></h6>
+                        <h6 class="mb-1 text-truncate"><a href="/customer/post/postView?pstSn=${post.pstSn}">${post.pstTtl}</a></h6>
                         <small class="text-muted">${post.userNcnm} | ${formattedDate}</small>
                         <p class="text-truncate-2">${post.pstCn}</p>
                     </div>`;
@@ -395,15 +401,15 @@
                     ? user.prflImg : '/maincss/assets/images/default_user.png';
                 itemsHtml += `
                     <div class="card h-100 search-result-user-card">
-                        <a href="/customer/users/${user.userNcnm}">
+                	<a href="/customer/feed/feedListByUserNo/${user.userNo}">
                            <img src="${profileImagePath}" class="rounded-circle mx-auto mt-3 search-profile-img" alt="프로필" style="width: 80px; height: 80px; object-fit: cover;"
                                 onerror="this.onerror=null; this.src='/maincss/assets/images/default_user.png';">
                         </a>
                         <div class="card-body text-center">
                             <h6 class="card-title mb-0 text-truncate">
-                                <a href="/customer/users/${user.userNcnm}">${user.userNcnm}</a>
+                         	   <a href="/customer/feed/feedListByUserNo/${user.userNo}">${user.userNcnm}</a>
                             </h6>
-                            <small class="text-muted">${user.userNm}</small>
+                            <small class="text-muted">${user.userLgnId}</small>
                         </div>
                     </div>`;
             });
@@ -424,7 +430,7 @@
 
 /* ]]> */
 </script>
-</th:block>
+	</th:block>
 
 </body>
 </html>

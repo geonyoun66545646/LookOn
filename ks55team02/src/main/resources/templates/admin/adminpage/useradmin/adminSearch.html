@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout/layoutMain}">
+
+<head>
+<title>검색 기록 조회</title>
+</head>
+<th:block layout:fragment="contents">
+	<main class="main-content">
+		<section class="content-header">
+			<h2 class="content-title">검색 기록 조회</h2>
+		</section>
+
+		<div class="card mb-4">
+			<div class="card-body">
+				<div class="row gx-3 align-items-end">
+					<div class="col-lg-4 mb-3">
+						<label class="form-label">검색 기간</label>
+						<div class="d-flex">
+							<input type="date" class="form-control" name="searchStartDate"
+								value="2023-01-01"> <span
+								class="mx-2 d-flex align-items-center">-</span> <input
+								type="date" class="form-control" name="searchEndDate"
+								value="2023-12-31">
+						</div>
+					</div>
+					<div class="col-lg-4 mb-3">
+						<label class="form-label">검색 키워드</label>
+						<div class="input-group">
+							<select class="form-select" name="searchKey"
+								style="max-width: 150px; background-color: #fff;">
+								<option value="all" selected>전체</option>
+								<option value="srchLogId">검색 로그 ID</option>
+								<option value="userNo">사용자 번호</option>
+								<option value="srchKeywordNm">검색 키워드</option>
+								<option value="srchUserIpAddr">검색 IP 주소</option>
+							</select> <input type="text" class="form-control" name="searchValue"
+								value="" placeholder="검색어, 사용자 번호, IP 주소 등">
+						</div>
+					</div>
+					<div class="col-lg-2 mb-3">
+						<label for="srchDomainCd" class="form-label">검색 영역</label> <select
+							class="form-select" id="srchDomainCd" name="srchDomainCd">
+							<option value="" selected>-- 전체 --</option>
+							<option value="PRODUCT">상품</option>
+							<option value="COMMUNITY">게시글</option>
+							<option value="USER">사용자</option>
+						</select>
+					</div>
+					<div class="col-lg-2 mb-3 d-flex align-items-end">
+						<a href="#" class="btn btn-primary btn-block me-2" id="searchBtn">검색</a>
+						<button class="btn btn-light btn-block" type="reset">초기화</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<ul class="nav nav-tabs" id="viewTabs" role="tablist">
+			<li class="nav-item" role="presentation">
+				<button class="nav-link active" id="stats-tab" data-bs-toggle="tab"
+					data-bs-target="#stats-view-container" type="button" role="tab"
+					aria-controls="stats-view-container" aria-selected="true">
+					📈 통계 보기</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="log-tab" data-bs-toggle="tab"
+					data-bs-target="#log-view-container" type="button" role="tab"
+					aria-controls="log-view-container" aria-selected="false">
+					📄 로그 보기</button>
+			</li>
+		</ul>
+
+		<div class="card mb-4" id="stats-view-container">
+			<div class="card-body">
+				<div class="row gx-3 align-items-center mb-3">
+					<div class="col-md-6">
+						<div class="search-result-info">
+							<span id="stats-total-info"> 총 <b class="text-brand">0</b>개의
+								키워드에 대한 검색 통계입니다.
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr class="text-center">
+								<th style="width: 15%;">순위</th>
+								<th>검색 키워드</th>
+								<th style="width: 20%;">검색 횟수</th>
+							</tr>
+						</thead>
+						<tbody id="statsTableBody" class="text-center">
+						</tbody>
+					</table>
+				</div>
+
+				<nav class="mt-4" aria-label="Page navigation">
+					<ul class="pagination justify-content-center">
+					</ul>
+				</nav>
+			</div>
+		</div>
+
+		<div class="card mb-4" id="log-view-container" style="display: none;">
+			<div class="card-body">
+				<div class="row gx-3 align-items-center mb-3">
+					<div class="col-md-6">
+						<div class="search-result-info">
+							총 <b class="text-brand" id="logTotalCount">0</b> 건의 검색 기록이
+							검색되었습니다.
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr class="text-center">
+								<th>검색 로그 ID</th>
+								<th>사용자 번호</th>
+								<th>검색 키워드</th>
+								<th>검색 일시</th>
+								<th>검색 IP 주소</th>
+							</tr>
+						</thead>
+						<tbody id="logTableBody" class="text-center">
+						</tbody>
+					</table>
+				</div>
+				<nav class="mt-4" aria-label="Page navigation">
+					<ul class="pagination justify-content-center" id="pagination">
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</main>
+</th:block>
+
+<th:block layout:fragment="jsScript">
+	<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // ===== DOM 요소 선택 (변경 없음) =====
+    const statsTab = document.getElementById('stats-tab');
+    const logTab = document.getElementById('log-tab');
+    const statsContainer = document.getElementById('stats-view-container');
+    const logContainer = document.getElementById('log-view-container');
+    const statsTableBody = document.getElementById('statsTableBody');
+    const logTableBody = document.getElementById('logTableBody');
+    const statsPagination = document.querySelector('#stats-view-container .pagination');
+    const logPagination = document.querySelector('#log-view-container .pagination');
+    const searchBtn = document.getElementById('searchBtn');
+    let currentLogSearchParams = {};
+
+    // ===== 탭 전환 로직 (변경 없음) =====
+    statsTab.addEventListener('click', () => {
+        statsContainer.style.display = 'block';
+        logContainer.style.display = 'none';
+        fetchAndRenderStats(1);
+    });
+
+    logTab.addEventListener('click', () => {
+        statsContainer.style.display = 'none';
+        logContainer.style.display = 'block';
+        fetchAndRenderLogs(1);
+    });
+
+    // ✅✅✅ [수정] 이벤트 위임 방식으로 페이지네이션 클릭 처리 ✅✅✅
+    // 통계 보기 페이지네이션 컨테이너에 이벤트 리스너 1개만 등록
+    statsPagination.addEventListener('click', (e) => {
+        e.preventDefault();
+        // 클릭된 요소가 .page-link 클래스를 가지고 있는지 확인
+        if (e.target.classList.contains('page-link') && e.target.dataset.page) {
+            fetchAndRenderStats(parseInt(e.target.dataset.page));
+        }
+    });
+
+    // 로그 보기 페이지네이션 컨테이너에 이벤트 리스너 1개만 등록
+    logPagination.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (e.target.classList.contains('page-link') && e.target.dataset.page) {
+            fetchAndRenderLogs(parseInt(e.target.dataset.page), currentLogSearchParams);
+        }
+    });
+
+
+    // ===== 데이터 조회 및 렌더링 함수 (변경 없음) =====
+    const fetchAndRenderStats = async (page = 1) => {
+        const response = await fetch(`/api/admin/search/stats?page=${page}`);
+        const data = await response.json();
+        document.getElementById('stats-total-info').innerHTML = `총 <b class="text-brand">${data.totalStatsCount}</b>개의 키워드에 대한 검색 통계입니다.`;
+        renderStats(data.statsList, page);
+        renderPagination(statsPagination, data); // ✅ 수정: 마지막 인자 제거
+    };
+
+    const fetchAndRenderLogs = async (page = 1, params = currentLogSearchParams) => {
+        currentLogSearchParams = params;
+        const queryString = new URLSearchParams(params).toString();
+        const response = await fetch(`/api/admin/search/logs?page=${page}&${queryString}`);
+        const data = await response.json();
+        document.getElementById('logTotalCount').textContent = data.totalLogCount;
+        renderLogs(data.logList);
+        renderPagination(logPagination, data); // ✅ 수정: 마지막 인자 제거
+    };
+
+    const renderStats = (statsList, page) => {
+        statsTableBody.innerHTML = '';
+        if (!statsList || statsList.length === 0) {
+            statsTableBody.innerHTML = '<tr><td colspan="3">통계 데이터가 없습니다.</td></tr>';
+            return;
+        }
+        const pageSize = 10;
+        statsList.forEach((stat, index) => {
+            const rank = (page - 1) * pageSize + index + 1;
+            statsTableBody.innerHTML += `<tr><td>${rank}</td><td>${stat.srchKeywordNm}</td><td>${stat.searchCount}</td></tr>`;
+        });
+    };
+
+    const renderLogs = (logList) => {
+        logTableBody.innerHTML = '';
+        if (!logList || logList.length === 0) {
+            logTableBody.innerHTML = '<tr><td colspan="5">검색 결과가 없습니다.</td></tr>';
+            return;
+        }
+        logList.forEach(log => {
+            logTableBody.innerHTML += `<tr><td>${log.srchLogId}</td><td>${log.userNo}</td><td>${log.srchKeywordNm}</td><td>${new Date(log.srchDt).toLocaleString()}</td><td>${log.srchUserIpAddr}</td></tr>`;
+        });
+    };
+
+    // ✅✅✅ [수정] 페이지네이션 UI 렌더링 함수에서 이벤트 등록 로직 제거 ✅✅✅
+    const renderPagination = (container, pageData) => {
+        container.innerHTML = '';
+        if (!pageData || pageData.lastPage === 0) return;
+
+        const prevDisabled = pageData.currentPage <= 1 ? 'disabled' : '';
+        container.innerHTML += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" data-page="${pageData.currentPage - 1}">이전</a></li>`;
+
+        for (let i = pageData.startPage; i <= pageData.endPage; i++) {
+            const active = i === pageData.currentPage ? 'active' : '';
+            container.innerHTML += `<li class="page-item ${active}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+        }
+
+        const nextDisabled = pageData.currentPage >= pageData.lastPage ? 'disabled' : '';
+        container.innerHTML += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" data-page="${pageData.currentPage + 1}">다음</a></li>`;
+        
+        // 이 부분에 있던 이벤트 등록 forEach문이 삭제되었습니다.
+    };
+
+    // 검색 버튼 클릭 이벤트 (변경 없음)
+    searchBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const formData = new FormData(document.querySelector('.card-body form'));
+        const params = Object.fromEntries(formData.entries());
+        logTab.click();
+        fetchAndRenderLogs(1, params);
+    });
+
+    // ===== 페이지 최초 로딩 시 실행 (변경 없음) =====
+    fetchAndRenderStats(1);
+});
+</script>
+</th:block>
+</html>
