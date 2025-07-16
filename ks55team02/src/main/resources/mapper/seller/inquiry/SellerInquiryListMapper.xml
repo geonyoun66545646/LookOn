@@ -20,36 +20,10 @@
         <result property="userNcnm" column="user_ncnm"/>
     </resultMap>
 
-    <resultMap id="inquiryImageResultMap" type="ks55team02.common.domain.inquiry.InquiryImage">
-        <id property="inqryImgId"  column="inqry_img_id"/>   <result property="imgId"   column="img_id"/>         <result property="imgAddr" column="img_addr"/>       <result property="inqryId" column="inquiry_image_inqry_id"/> <result property="ord"     column="ord"/>            </resultMap>
-
-    <resultMap id="sellerInquiryWithStoreResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
-        <id property="inqryId"           		column="inqry_id"/>
-        <result property="inqryTypeCd"   		column="inqry_type_cd"/>
-        <result property="inqryTrgtTypeCd" 		column="inqry_trgt_type_cd"/>
-        <result property="wrtrId"        		column="wrtr_id"/>
-        <result property="inqryStoreId"  		column="inqry_store_id"/>
-        <result property="inqryTtl"      		column="inqry_ttl"/>
-        <result property="inqryCn"       		column="inqry_cn"/>
-        <result property="prvtYn"        		column="prvt_yn"/>
-        <result property="prcsStts"     		column="prcs_stts"/>
-        <result property="prcsUserNo"    		column="prcs_user_no"/>
-        <result property="regYmd"        		column="reg_ymd"/>
-        <result property="mdfcnYmd"      		column="mdfcn_ymd"/>
-        <result property="delDt"         		column="del_dt"/>
-        <result property="delUserNo"     		column="del_user_no"/>
-        <result property="delActvtnYn"   		column="del_actvtn_yn"/>
-
-        <association property="storeInfo" resultMap="storeResultMap"/>
-        <association property="writerInfo" resultMap="inquiryUserResultMap"/> 
-        <association property="answer" resultMap="answerResultMap" notNullColumn="ans_id"/> 
-        <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage" resultMap="inquiryImageResultMap"/>
-
-    </resultMap>
-    
+    <!-- answerResultMap은 Inquiry 상세 조회에서 사용되므로 여기에 유지 -->
     <resultMap id="answerResultMap" type="ks55team02.common.domain.inquiry.Answer">
-        <id property="ansId"        	column="ans_id"/> <!-- ans_id가 기본 키 -->
-        <result property="inqryId"      column="answer_inqry_id"/> <!-- answer 테이블의 inqry_id (FK) -->
+        <id property="ansId"        	column="ans_id"/>
+        <result property="inqryId"      column="answer_inqry_id"/>
         <result property="answrUserNo"  column="answr_user_no"/>
         <result property="ansCn"        column="ans_cn"/>
         <result property="ansTm"        column="ans_tm"/>
@@ -61,6 +35,72 @@
         <result property="delUserNo"    column="del_user_no"/>
     </resultMap>
 
+    <!-- Inquiry 목록 조회를 위한 resultMap (answer association 없음) -->
+    <resultMap id="inquiryListResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
+        <id property="inqryId" column="inqry_id"/>
+        <result property="inqryTypeCd" column="inqry_type_cd"/>
+        <result property="inqryTrgtTypeCd" column="inqry_trgt_type_cd"/>
+        <result property="wrtrId" column="wrtr_id"/>
+        <result property="inqryStoreId" column="inqry_store_id"/>
+        <result property="inqryTtl" column="inqry_ttl"/>
+        <result property="inqryCn" column="inqry_cn"/>
+        <result property="prvtYn" column="prvt_yn"/>
+        <result property="prcsStts" column="prcs_stts"/>
+        <result property="prcsUserNo" column="prcs_user_no"/>
+        <result property="regYmd" column="reg_ymd"/>
+        <result property="mdfcnYmd" column="mdfcn_ymd"/>
+        <result property="delDt" column="del_dt"/>
+        <result property="delUserNo" column="del_user_no"/>
+        <result property="delActvtnYn" column="del_actvtn_yn"/>
+        
+        <association property="writerInfo" resultMap="inquiryUserResultMap"/>
+        <association property="storeInfo" resultMap="storeResultMap"/>
+        <!-- 여기에는 answer association을 포함하지 않습니다. -->
+
+        <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage">
+            <id property="inqryImgId" column="inqry_img_id"/>
+            <result property="imgId" column="img_id"/>
+            <result property="inqryId" column="inquiry_image_inqry_id"/>
+            <result property="ord" column="ord"/>
+            <association property="storeImage" javaType="ks55team02.common.domain.store.StoreImage">
+                <result property="imgAddr" column="img_addr"/>
+            </association>
+        </collection>
+    </resultMap>
+
+    <!-- Inquiry 상세 조회를 위한 resultMap (answer association 포함) -->
+    <resultMap id="inquiryDetailResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
+        <id property="inqryId" column="inqry_id"/>
+        <result property="inqryTypeCd" column="inqry_type_cd"/>
+        <result property="inqryTrgtTypeCd" column="inqry_trgt_type_cd"/>
+        <result property="wrtrId" column="wrtr_id"/>
+        <result property="inqryStoreId" column="inqry_store_id"/>
+        <result property="inqryTtl" column="inqry_ttl"/>
+        <result property="inqryCn" column="inqry_cn"/>
+        <result property="prvtYn" column="prvt_yn"/>
+        <result property="prcsStts" column="prcs_stts"/>
+        <result property="prcsUserNo" column="prcs_user_no"/>
+        <result property="regYmd" column="reg_ymd"/>
+        <result property="mdfcnYmd" column="mdfcn_ymd"/>
+        <result property="delDt" column="del_dt"/>
+        <result property="delUserNo" column="del_user_no"/>
+        <result property="delActvtnYn" column="del_actvtn_yn"/>
+        
+        <association property="writerInfo" resultMap="inquiryUserResultMap"/>
+        <association property="storeInfo" resultMap="storeResultMap"/>
+        <association property="answer" resultMap="answerResultMap" notNullColumn="ans_id"/> <!-- 상세 조회에서는 답변 정보 포함 -->
+
+        <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage">
+            <id property="inqryImgId" column="inqry_img_id"/>
+            <result property="imgId" column="img_id"/>
+            <result property="inqryId" column="inquiry_image_inqry_id"/>
+            <result property="ord" column="ord"/>
+            <association property="storeImage" javaType="ks55team02.common.domain.store.StoreImage">
+                <result property="imgAddr" column="img_addr"/>
+            </association>
+        </collection>
+    </resultMap>
+
 
     <select id="getSellerInquiryCnt" parameterType="ks55team02.common.domain.inquiry.Inquiry" resultType="int">
         SELECT
@@ -68,111 +108,10 @@
         FROM
             inquiries
         WHERE
-            inqry_store_id = #{inqryStoreId};
+            inqry_store_id = #{inqryStoreId}
     </select>
 
-    <select id="getSellerInquiryList" parameterType="map"
-            resultMap="sellerInquiryWithStoreResultMap">
-        SELECT
-            i.inqry_id,
-            i.inqry_type_cd,
-            i.inqry_trgt_type_cd,
-            i.wrtr_id,
-            i.inqry_store_id,
-            i.inqry_ttl,
-            i.inqry_cn,
-            i.prvt_yn,
-            i.prcs_stts,
-            i.prcs_user_no,
-            i.reg_ymd,
-            i.mdfcn_ymd,
-            i.del_dt,
-            i.del_user_no,
-            i.del_actvtn_yn,
-            s.store_id,
-            s.aply_id,
-            s.seller_user_no,
-            s.store_conm,
-            s.store_intro_cn,
-            s.store_logo_img,
-            s.store_stts,
-            s.info_mdfcn_dt,
-            s.inactvtn_dt,
-            s.del_prcr_yn,
-            u.user_no,          u.user_ncnm,        -- 이미지 관련 컬럼 추가
-            iim.inqry_img_id,       
-            iim.img_id,             
-            iim.inqry_id AS inquiry_image_inqry_id, 
-            iim.ord,                
-            sim.img_addr            
-        FROM
-            inquiries i
-        JOIN
-            stores s ON s.store_id = i.inqry_store_id
-        LEFT JOIN
-            users u ON u.user_no = i.wrtr_id
-        LEFT JOIN inquiry_images iim ON iim.inqry_id = i.inqry_id
-        LEFT JOIN store_images sim ON sim.img_id = iim.img_id
-        <where>
-            i.inqry_store_id = #{inquiry.inqryStoreId} <if test="inquiry.searchValue != null and inquiry.searchValue != ''">
-                <choose>
-                    <when test="inquiry.searchKey == 'inqryId'">
-                        AND i.inqry_id LIKE CONCAT('%', #{inquiry.searchValue}, '%')
-                    </when>
-                    <when test="inquiry.searchKey == 'inqryTtl'">
-                        AND i.inqry_ttl LIKE CONCAT('%', #{inquiry.searchValue}, '%')
-                    </when>
-                    <when test="inquiry.searchKey == 'wrtrId'">
-                        AND i.wrtr_id LIKE CONCAT('%', #{inquiry.searchValue}, '%')
-                    </when>
-                    <when test="inquiry.searchKey == 'prcsStts'">
-                        AND i.prcs_stts LIKE CONCAT('%', #{inquiry.searchValue}, '%')
-                    </when>
-                    <when test="inquiry.searchKey == null or inquiry.searchKey == ''">
-                        AND (
-                            i.inqry_id LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR
-                            i.inqry_ttl LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR
-                            i.wrtr_id LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR
-                            i.prcs_stts LIKE CONCAT('%', #{inquiry.searchValue}, '%')
-                        )
-                    </when>
-                </choose>
-            </if>
-            <if test="inquiry.startDate != null and inquiry.endDate != null">
-                AND i.reg_ymd BETWEEN #{inquiry.startDate} AND #{inquiry.endDate}
-            </if>
-            <if test="inquiry.filterConditions != null and inquiry.filterConditions.size > 0">
-                AND i.prcs_stts IN
-                <foreach item="condition" collection="inquiry.filterConditions" open="(" separator="," close=")">
-                    #{condition}
-                </foreach>
-            </if>
-            <if test="inquiry.levels != null and inquiry.levels.size > 0">
-                AND i.inqry_type_cd IN
-                <foreach item="level" collection="inquiry.levels" open="(" separator="," close=")">
-                    #{level}
-                </foreach>
-            </if>
-        </where>
-        ORDER BY
-            <choose>
-                <when test="inquiry.sortKey == 'inqryId'">
-                    CAST(REGEXP_SUBSTR(i.inqry_id, '[0-9]+') AS UNSIGNED) <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
-                </when>
-                <when test="inquiry.sortKey == 'inqryTtl'"> i.inqry_ttl <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
-                </when>
-                <when test="inquiry.sortKey == 'wrtrId'"> i.wrtr_id <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
-                </when>
-                <when test="inquiry.sortKey == 'regYmd'"> i.reg_ymd <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
-                </when>
-                <otherwise>
-                    CAST(REGEXP_SUBSTR(i.inqry_id, '[0-9]+') AS UNSIGNED) DESC
-                </otherwise>
-            </choose>
-        LIMIT #{pageSize} OFFSET #{limitStart};
-    </select>
-
-    <select id="getSellerInquiryByStoreId" parameterType="String" resultMap="sellerInquiryWithStoreResultMap">
+    <select id="getSellerInquiryList" parameterType="map" resultMap="inquiryListResultMap"> <!-- inquiryListResultMap 사용 -->
         SELECT
             i.inqry_id,
             i.inqry_type_cd,
@@ -201,15 +140,78 @@
             s.del_prcr_yn,
             u.user_no,
             u.user_ncnm,
-            iim.inqry_img_id,       
-            iim.img_id,             
-            iim.inqry_id AS inquiry_image_inqry_id, 
-            iim.ord,                
+            iim.inqry_img_id,
+            iim.img_id,
+            iim.inqry_id AS inquiry_image_inqry_id,
+            iim.ord,
+            sim.img_addr
+        FROM
+            inquiries i
+        JOIN
+            stores s ON s.store_id = i.inqry_store_id
+        LEFT JOIN
+            users u ON u.user_no = i.wrtr_id
+        LEFT JOIN inquiry_images iim ON iim.inqry_id = i.inqry_id
+        LEFT JOIN store_images sim ON sim.img_id = iim.img_id
+        WHERE i.inqry_store_id = #{inquiry.inqryStoreId}
+        <if test="inquiry.searchKey != null and inquiry.searchKey == 'inqryTtl'">
+            AND i.inqry_ttl LIKE CONCAT('%', #{inquiry.searchValue}, '%')
+        </if>
+        <if test="inquiry.searchKey != null and inquiry.searchKey == 'inqryCn'">
+            AND i.inqry_cn LIKE CONCAT('%', #{inquiry.searchValue}, '%')
+        </if>
+        <if test="inquiry.searchKey != null and inquiry.searchKey == 'wrtrId'">
+            AND u.user_ncnm LIKE CONCAT('%', #{inquiry.searchValue}, '%')
+        </if>
+        ORDER BY
+        <choose>
+            <when test="inquiry.sortKey == 'regYmd'">
+                i.reg_ymd ${inquiry.sortOrder}
+            </when>
+            <otherwise>
+                CAST(REGEXP_SUBSTR(i.inqry_id, '[0-9]+') AS UNSIGNED) DESC
+            </otherwise>
+        </choose>
+        LIMIT #{limitStart}, #{pageSize}
+    </select>
+
+    <select id="getSellerInquiryByStoreId" parameterType="String" resultMap="inquiryDetailResultMap"> <!-- inquiryDetailResultMap 사용 -->
+        SELECT
+            i.inqry_id,
+            i.inqry_type_cd,
+            i.inqry_trgt_type_cd,
+            i.wrtr_id,
+            i.inqry_store_id,
+            i.inqry_ttl,
+            i.inqry_cn,
+            i.prvt_yn,
+            i.prcs_stts,
+            i.prcs_user_no,
+            i.reg_ymd,
+            i.mdfcn_ymd,
+            i.del_dt,
+            i.del_user_no,
+            i.del_actvtn_yn,
+            s.store_id,
+            s.aply_id,
+            s.seller_user_no,
+            s.store_conm,
+            s.store_intro_cn,
+            s.store_logo_img,
+            s.store_stts,
+            s.info_mdfcn_dt,
+            s.inactvtn_dt,
+            s.del_prcr_yn,
+            u.user_no,
+            u.user_ncnm,
+            iim.inqry_img_id,
+            iim.img_id,
+            iim.inqry_id AS inquiry_image_inqry_id,
+            iim.ord,
             sim.img_addr,
-            
-            -- Answer 관련 컬럼 추가 시작
-            a.ans_id,               -- answer 테이블의 기본 키
-            a.inqry_id AS answer_inqry_id, -- answer 테이블의 inqry_id (FK), 별칭 사용
+
+            a.ans_id,
+            a.inqry_id AS answer_inqry_id,
             a.answr_user_no,
             a.ans_cn,
             a.ans_tm,
@@ -219,7 +221,6 @@
             a.actvtn_yn,
             a.del_dt,
             a.del_user_no
-            -- Answer 관련 컬럼 추가 끝
         FROM
             inquiries i
         JOIN
@@ -228,9 +229,17 @@
             users u ON u.user_no = i.wrtr_id
         LEFT JOIN inquiry_images iim ON iim.inqry_id = i.inqry_id
         LEFT JOIN store_images sim ON sim.img_id = iim.img_id
-        LEFT JOIN answer a ON a.inqry_id = i.inqry_id -- DDL에 따라 inqry_id로 조인
-        WHERE
-            i.inqry_id = #{inqryId};
+        LEFT JOIN answer a ON a.inqry_id = i.inqry_id
+        WHERE i.inqry_id = #{inqryId}
     </select>
-            
+
+    <select id="getSellerUserNoByStoreId" parameterType="String" resultType="String">
+        SELECT
+            seller_user_no
+        FROM
+            stores
+        WHERE
+            store_id = #{storeId}
+    </select>
+
 </mapper>

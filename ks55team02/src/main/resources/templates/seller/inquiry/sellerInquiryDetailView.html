@@ -23,7 +23,10 @@
                 <div th:replace="~{/common/fragments/inquiryDetailFragment :: inquiryDetailFragment(inquiryData=${inquiryDetail})}"></div>
 
                 <th:block th:if="${inquiryDetail.answer == null}">
-                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail})}"></div>
+                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false)}"></div>
+                </th:block>
+                <th:block th:if="${inquiryDetail.answer != null}">
+                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true)}"></div>
                 </th:block>
             </div>
         </div>

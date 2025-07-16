@@ -1,25 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<th:block th:fragment="AnswerFragment (inquiryData)">
-    <div class="inquiryTable mt-4">
+<th:block th:fragment="AnswerFragment (inquiryData, isEditMode)">
+    <div class="inquiryTable mt-4" id="answerFormContainer">
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th colspan="2" class="table-header">답변 작성</th>
+                    <th colspan="2" class="table-header" th:text="${isEditMode ? '답변 수정' : '답변 작성'}"></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td colspan="2">
-                        <form id="answerForm" method="post" th:action="@{/seller/inquiry/answer}">
+                        <form id="answerHandlingForm">
                             <input type="hidden" name="inqryId" th:value="${inquiryData.inqryId}" />
+                            <input type="hidden" name="ansId" th:value="${isEditMode ? inquiryData.answer.ansId : ''}" />
                             <div class="form-group">
-                                <label for="answerContent">답변 내용</label>
-                                <textarea class="form-control" id="answerContent" name="ansCn" rows="5" required></textarea>
+                                <label for="answerContentInput">답변 내용</label>
+                                <textarea class="form-control" id="answerContentInput" name="ansCn" rows="5" required
+                                          th:text="${isEditMode ? inquiryData.answer.ansCn : ''}"></textarea>
                             </div>
                             <div class="form-group d-flex justify-content-end mt-3">
-                                <button type="submit" class="btn btn-primary btn-rounded">답변 제출</button>
+                                <button type="button" id="submitAnswerBtn" class="btn btn-primary btn-rounded"
+                                        th:text="${isEditMode ? '수정 완료' : '답변 제출'}"></button>
+                                <button type="button" id="cancelAnswerBtn" class="btn btn-outline-secondary btn-rounded ms-2"
+                                        th:if="${isEditMode}">취소</button>
                             </div>
                         </form>
                     </td>
@@ -27,6 +32,88 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        /* <![CDATA[ */
+        document.addEventListener('DOMContentLoaded', function() {
+            const answerFormContainer = document.getElementById('answerFormContainer');
+            const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+            const cancelAnswerBtn = document.getElementById('cancelAnswerBtn');
+            const answerContentInput = document.getElementById('answerContentInput');
+            const isEditMode = /*[[${isEditMode}]]*/ false; // Thymeleaf 변수를 JS로 가져옴
+
+            if (isEditMode && cancelAnswerBtn) {
+                cancelAnswerBtn.style.display = 'inline-block';
+            }
+
+            if (submitAnswerBtn) {
+                submitAnswerBtn.addEventListener('click', function() {
+                    const form = document.getElementById('answerHandlingForm');
+                    const inqryId = form.querySelector('input[name="inqryId"]').value;
+                    const ansId = form.querySelector('input[name="ansId"]').value;
+                    const ansCn = answerContentInput.value;
+
+                    if (!ansCn) {
+                        alert('답변 내용을 입력해주세요.');
+                        return;
+                    }
+
+                    console.log('AJAX 요청 시작:', { inqryId, ansId, ansCn, isEditMode });
+
+                    fetch('/seller/inquiry/answer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            inqryId: inqryId,
+                            ansId: ansId,
+                            ansCn: ansCn
+                        })
+                    })
+                    .then(response => {
+                        console.log('AJAX 응답 수신:', response);
+                        if (!response.ok) {
+                            return response.json().then(error => {
+                                console.error('서버 응답 오류 (JSON):', error);
+                                return Promise.reject(error);
+                            }).catch(() => {
+                                console.error('서버 응답 오류 (텍스트):', response.statusText);
+                                return Promise.reject(new Error('서버 오류: ' + response.status + ' ' + response.statusText));
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('AJAX 응답 데이터 (성공):', data);
+                        if (data.status === 'success') {
+                            alert(data.message);
+
+                            answerFormContainer.style.display = 'none';
+                            window.location.reload(); 
+
+                        } else {
+                            console.error('서버에서 반환된 오류 상태:', data);
+                            alert('답변 처리 실패: ' + (data.message || '알 수 없는 오류'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('AJAX 요청 중 치명적인 오류 발생:', error);
+                        alert('답변 처리 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
+                    });
+                });
+            }
+
+            if (cancelAnswerBtn) {
+                cancelAnswerBtn.addEventListener('click', function() {
+                    console.log('답변 수정 취소');
+                    answerFormContainer.style.display = 'none';
+                    window.location.reload();
+                });
+            }
+        });
+        /* ]]> */
+    </script>
 </th:block>
 </body>
 </html>
