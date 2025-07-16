@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+
+<head>
+    <title>새 피드 작성</title>
+    <!-- [신규] 피드 작성 페이지 전용 CSS 파일을 연결합니다. (향후 생성 필요) -->
+    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/feedWrite.css}">
+</head>
+
+
+<!-- 이 블록은 비워둡니다. -->
+<th:block layout:fragment="jsScript">
+	<script th:src="@{/maincss/assets/js/customer/feedWrite.js}"></script>
+</th:block>
+
+<!-- [핵심] 페이지의 실제 내용을 이 블록 안에 작성합니다. -->
+<th:block layout:fragment="contents">
+    <div class="feed-write-container">
+        
+        <h2 class="page-title">새 게시물 만들기</h2>
+
+        <!-- multipart/form-data 형식으로 데이터를 전송할 폼 -->
+        <form id="feed-form">
+            
+            <!-- 1. 이미지 업로드 영역 -->
+            <div class="form-section image-upload-section">
+                <div id="image-preview-container" class="image-preview-container">
+					<div class="upload-placeholder">
+					    <!-- [핵심 수정] label 태그가 모든 요소를 감싸도록 변경합니다. -->
+					    <label for="image-input" class="upload-label-wrapper">
+					        <svg>...</svg>
+					        <p>사진과 동영상을 여기에 끌어다 놓으세요</p>
+					        <span class="btn btn-primary">컴퓨터에서 선택</span>
+					    </label>
+					</div>
+                </div>
+                <input type="file" id="image-input" accept="image/*" multiple style="display: none;">
+            </div>
+
+            <!-- 2. 피드 내용 입력 영역 -->
+            <div class="form-section content-section">
+                <div class="writer-profile">
+                    <!-- 로그인한 사용자 정보를 표시 (세션이 있을 경우) -->
+                    <img th:if="${session.loginUser != null}" th:src="@{/uploads/profiles/profiles.jpg}" alt="프로필 사진" class="profile-image-small">
+                    <span th:if="${session.loginUser != null}" th:text="${session.loginUser.userNcnm}" class="writer-nickname">사용자 닉네임</span>
+                </div>
+                <textarea id="feed-content" class="form-control" rows="8" placeholder="문구 입력..."></textarea>
+            </div>
+            
+            <!-- 3. 작성/취소 버튼 영역 -->
+            <div class="form-section action-section">
+                <button type="button" class="btn btn-secondary" onclick="history.back();">취소</button>
+                <button type="submit" id="submit-btn" class="btn btn-primary">작성하기</button>
+            </div>
+
+        </form>
+    </div>
+</th:block>
+</html>

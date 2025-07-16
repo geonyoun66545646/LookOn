@@ -19,7 +19,7 @@
 	    <div class="my-feed-container" 
 	    	th:object="${userInfo}"
 	    	th:data-page-owner-user-no="*{userNo}"
-	    	th:data-login-user-no="${session.loginUser != null ? session.loginUser.userNo : ''}">
+	    	th:data-login-user-no="${loginUserNo}">
 	
 	        <!-- ======================================================= -->
 	        <!-- 1. 프로필 정보 영역 (Thymeleaf 적용) -->
@@ -29,14 +29,14 @@
 	            <div class="profile-image">
 	                <!-- prflImg가 null이거나 비어있으면 기본 이미지, 아니면 사용자 이미지 표시 -->
 <!-- 	                <img th:src="*{prflImg != null && !prflImg.isEmpty() ? prflImg : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREwQQpb3XOTXuvhRFPQVbHvcv5B9kRzIvTlg&s'}" alt="프로필 이미지"> -->
-	                <img th:src="@{/uploads/profiles/profiles.jpg}" alt="프로필 이미지">
+	                <img th:src="*{prflImg != null && !prflImg.isEmpty() ? prflImg : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREwQQpb3XOTXuvhRFPQVbHvcv5B9kRzIvTlg&s'}" alt="프로필 이미지">
 	            </div>
 	
 	            <!-- 프로필 정보 및 버튼 -->
 	            <div class="profile-info-wrapper">
 	                <div class="profile-details">
 	                    <!-- 닉네임과 자기소개 표시 -->
-	                    <h2 class="profile-nickname" th:text="*{userNcnm}">눈부신라임키홀더</h2>
+	                    <h2 class="profile-nickname" th:text="*{userNcnm}">닉네임</h2>
 	                    <p class="profile-bio" th:text="*{selfIntroCn != null ? selfIntroCn : '좋아하는 스타일이나 브랜드를 간단한 소개로 적어보세요.'}">좋아하는 스타일이나 브랜드를 간단한 소개로 적어보세요.</p>
 	                </div>
 	

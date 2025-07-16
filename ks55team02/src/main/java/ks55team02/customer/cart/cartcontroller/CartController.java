@@ -72,7 +72,7 @@ public class CartController {
     }
 
     /**
-     * [수정됨] 장바구니 항목 수량 변경
+     * 장바구니 항목 수량 변경
      * @param payload Map으로 cartItemId, quantity 수신
      */
     @PutMapping("/updateQuantity")
@@ -130,5 +130,32 @@ public class CartController {
         }
         cartService.clearCart(loginUser.getUserNo());
         return ResponseEntity.ok("장바구니가 성공적으로 비워졌습니다.");
+    }
+    
+    /**
+     * [추가] 결제된 장바구니 항목들 일괄 삭제
+     * @param cartItemIds 삭제할 장바구니 항목 ID 목록
+     */
+    @PostMapping("/removeSelected") // 배열 형태의 데이터를 받기 위해 POST 사용
+    public ResponseEntity<String> removeSelectedCartItems(@RequestBody List<String> cartItemIds, HttpSession session) {
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
+        }
+        String userNo = loginUser.getUserNo();
+        
+        if (cartItemIds == null || cartItemIds.isEmpty()) {
+            return new ResponseEntity<>("삭제할 장바구니 항목 ID가 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            cartService.removeCartItemsByIds(userNo, cartItemIds);
+            return ResponseEntity.ok("결제된 장바구니 항목들이 성공적으로 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN); // 권한 없음 오류
+        } catch (Exception e) {
+            log.error("선택된 장바구니 항목 삭제 중 서버 오류 발생 (사용자: {}, 항목: {}): {}", userNo, cartItemIds, e.getMessage(), e);
+            return new ResponseEntity<>("선택된 장바구니 항목 삭제 중 서버 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

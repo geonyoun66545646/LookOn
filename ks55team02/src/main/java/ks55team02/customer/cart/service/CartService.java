@@ -43,7 +43,14 @@ public interface CartService {
      * 사용자 장바구니의 모든 항목 비우기
      * @param userNo 사용자 번호
      */
-    void clearCart(String userNo);
+    void clearCart(String userNo); 
+    
+    /**
+     * 특정 장바구니 항목 ID 목록에 해당하는 항목들을 삭제
+     * @param userNo 사용자 번호 (소유권 확인용)
+     * @param cartItemIds 삭제할 장바구니 항목 ID 목록
+     */
+    void removeCartItemsByIds(String userNo, List<String> cartItemIds);
     
   
 }
