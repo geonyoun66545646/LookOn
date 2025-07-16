@@ -56,9 +56,6 @@
 											th:src="@{/maincss/assets/images/no_image.jpg}"
 											th:data-zoom-image="@{/maincss/assets/images/no_image.jpg}"
 											alt="No product image">
-										<a href="#" id="btn-product-gallery"
-											class="btn-product-gallery"> <i class="icon-arrows"></i>
-										</a>
 									</figure>
 
 									<div id="product-zoom-gallery"
@@ -86,8 +83,8 @@
 							<div class="product-details">
 								<!-- 1. 브랜드 정보 -->
 								<a th:if="${product.store != null}"
-									th:href="@{/stores/{id}(id=${product.store.storeId})}"
-									style="text-decoration: none; color: inherit;">
+									th:href="@{/customer/products/brand/{brandId}(brandId=${product.store.storeId})}" style="text-decoration: none; color:
+									inherit;">
 									<div class="product-brand-info">
 										<div class="product-brand-icon"
 											th:if="${product.store.storeLogoImg != null}">
@@ -111,8 +108,9 @@
 								<!-- 2. 카테고리 -->
 								<div class="product-details-top">
 									<div class="product-cat">
-										<a href="#"
-											th:text="${product?.productCategory?.categoryName ?: '카테고리 없음'}">카테고리</a>
+										<a	th:href="@{/products/category/{categoryId}(categoryId=${product.productCategory.categoryId})}"
+											th:text="${product?.productCategory?.categoryName ?: '카테고리	없음'}">카테고리
+										</a>
 									</div>
 								</div>
 
@@ -201,10 +199,6 @@
 
 								<!-- 9. 액션 버튼 (위시리스트, 장바구니, 구매) -->
 								<div class="product-details-action">
-									<div class="wishlist-section">
-										<button class="btn-product btn-wishlist" title="위시리스트"></button>
-										<span class="likes-count">216</span>
-									</div>
 									<div class="product-main-buttons">
 										<a href="#" class="btn-product btn-cart"><span>장바구니</span></a>
 										<a href="#" class="btn-product btn-buy-now"><span>구매하기</span></a>

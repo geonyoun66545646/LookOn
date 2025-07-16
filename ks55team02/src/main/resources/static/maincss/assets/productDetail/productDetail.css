@@ -52,13 +52,22 @@
 	margin-top: -.5rem;
 }
 
+/* 버튼 스타일 시작 */
 .product-details-action {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 10px; /* 버튼 사이의 간격 */
 	flex-direction: row;
 }
 
+/* ⭐ [추가] 버튼들을 감싸는 컨테이너, flex를 적용하여 자식 요소들이 공간을 나눠 갖도록 함 */
+.product-details-action .product-main-buttons {
+    display: flex;
+    flex-grow: 1; /* 남은 공간을 모두 차지하도록 */
+    gap: 10px;
+}
+
+/* ⭐ [수정] 모든 버튼의 기본 스타일 */
 .product-details-action .btn-product {
 	height: 40px;
 	padding: 0;
@@ -69,53 +78,39 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+    flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
 }
 
-/* 장바구니 버튼과 공유 버튼 스타일 */
-.product-details-action .btn-cart, .product-details-action .btn-share {
+/* ⭐ [수정] 장바구니 버튼과 구매하기 버튼 스타일 (비율 2) */
+.product-details-action .btn-cart,
+.product-details-action .btn-buy-now {
 	background-color: #fff;
 	color: #333;
 	border: 1px solid #ccc;
+    flex-grow: 2; /* 비율 2 */
 }
 
-/* 구매하기 버튼 스타일 */
+/* ⭐ [수정] 구매하기 버튼 스타일 */
 .product-details-action .btn-buy-now {
 	background-color: #000;
 	color: #fff;
 	border: 1px solid #000;
 }
 
-.wishlist-section {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	min-width: 50px;
+/* ⭐ [수정] 공유하기 버튼 스타일 (비율 1) */
+.product-details-action .btn-share {
+    background-color: #fff;
+	color: #333;
+	border: 1px solid #ccc;
+    flex-grow: 1; /* 비율 1 */
 }
 
-.btn-wishlist {
-	background: none;
-	border: none;
-	cursor: pointer;
-	padding: 0;
-	margin-bottom: 5px;
-	font-size: 24px;
-	color: #ccc;
-	transition: color 0.3s;
+/* 공유하기 버튼 아이콘 스타일 (기존 스타일과 충돌 방지를 위해 별도 지정) */
+.product-details-action .btn-share i {
+    margin-right: 5px; /* 아이콘과 텍스트 사이 간격 */
 }
 
-.btn-wishlist.liked {
-	color: #ff0000;
-}
-
-.likes-count {
-	font-size: 14px;
-	color: #666;
-}
-
-.social-icons.social-icons-sm {
-	display: none; /* 이 클래스가 HTML에 사용되지 않는다면 제거 가능 */
-}
-
+/* 공유하기 버튼 스타일 (이 부분은 이전 코드에 있었으나, 역할이 중복될 수 있으므로 주석 처리하거나 필요에 따라 수정) */
 .share-button {
 	font-weight: 500;
 	background-color: #fff;
@@ -129,6 +124,9 @@
 	font-size: 12px;
 	padding: 0 8px;
 }
+
+
+/* 버튼 스타일 끝 */
 
 .product-brand-info {
 	border-bottom: 1px solid #eee;
@@ -480,25 +478,6 @@
 	line-height: 1;
 }
 
-/* 주요 버튼 그룹 Flexbox 설정 */
-.product-details-action .product-main-buttons {
-	display: flex;
-	flex-grow: 1;
-	gap: 10px;
-}
-
-/* 장바구니 및 구매하기 버튼 너비 설정 */
-.product-details-action .product-main-buttons .btn-cart,
-	.product-details-action .product-main-buttons .btn-buy-now {
-	flex: 4;
-}
-
-/* 공유 버튼 너비 설정 */
-.product-details-action .product-main-buttons .btn-share {
-	flex: 1;
-	min-width: 50px;
-}
-
 /* 기본 모달 스타일 (Bootstrap 기반) */
 /* 공유 모달 관련 스타일 */
 .modal-backdrop.fade {
@@ -623,11 +602,6 @@
 	transition: all .3s;
 }
 
-@media screen and (min-width: 767px) and (max-width: 991px) {
-	.product-details-action .btn-cart {
-		min-width: initial !important;
-	}
-}
 /* 가격 전체를 감싸는 섹션 */
 .product-price-section {
 	margin-top: 1.5rem;
