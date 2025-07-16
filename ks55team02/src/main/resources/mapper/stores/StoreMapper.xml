@@ -14,6 +14,7 @@
 		<result property="delPrcrYn" column="del_prcr_yn" />
 	</resultMap>
 	
+
 	<!-- 키워드로 브랜드(상점) 검색 -->
     <select id="searchStoresByKeyword" parameterType="string" resultMap="storesResultMap">
         SELECT

@@ -36,8 +36,7 @@ public class CustomerProductController {
 	private final ProductCategoryService productCategoryService;
 	private final ProductsService productsService;
 	private final ProductSearchService productSearchService;
-	// 리뷰를 위해 삽입 (ljs)
-	private final ReviewService reviewService;
+	private final ReviewService reviewService;// 리뷰를 위해 삽입 (ljs)
 
 	public static class ColorOption {
 		private String name;
@@ -113,7 +112,20 @@ public class CustomerProductController {
 		return "redirect:/customer/products/list";
 	}
 
-	@GetMapping({ "/products/category/{categoryId}", "/customer/products/list" })
+	/**
+	 * 특정 브랜드의 상품 목록 페이지를 처리합니다.
+	 * 
+	 * @param storeId            URL 경로에서 추출된 브랜드(상점) ID
+	 * @param redirectAttributes 리다이렉트 시 파라미터 전달을 위함
+	 * @return /customer/products/list?brandId={storeId} 로 리다이렉트
+	 */
+	@GetMapping("/customer/products/brand/{storeId}") // ⭐ 이 메서드를 복구하고 사용합니다.
+	public String getProductsByBrand(@PathVariable String storeId, RedirectAttributes redirectAttributes) {
+		redirectAttributes.addAttribute("brand", storeId); // 'brandId' 파라미터로 storeId를 전달
+		return "redirect:/customer/products/list"; // 기존 상품 목록 조회 메서드로 리다이렉트
+	}
+
+	@GetMapping({ "/products/category/{categoryId}", "/customer/products/list" }) // ⭐ 브랜드 관련 경로 제거 ⭐
 	@SuppressWarnings("unchecked")
 	public String getFilteredAndSortedProductsView(Model model,
 			@RequestParam(name = "categoryId", required = false) String categoryId,
@@ -146,7 +158,7 @@ public class CustomerProductController {
 		filterParams.put("priceRange", priceRange);
 		filterParams.put("colors", colors);
 		filterParams.put("sizes", sizes);
-		filterParams.put("brands", brands);
+		filterParams.put("brands", brands); // ⭐ 이 부분은 이제 리다이렉트된 'brand' 파라미터를 자동으로 받습니다.
 		filterParams.put("styles", styles);
 		filterParams.put("discountRates", discountRates);
 		filterParams.put("isNewProductPage", isNewProductPage);
@@ -158,7 +170,22 @@ public class CustomerProductController {
 		String parentCategoryId = null;
 		List<ProductCategory> subCategories = new ArrayList<>();
 
-		if (categoryId != null && !categoryId.isEmpty()) {
+		// ⭐ 브랜드 페이지 제목 설정 로직 (brands 리스트를 기반으로) ⭐
+		Stores currentBrand = null;
+		String brandIdForTitle = null; // 제목 표시에 사용할 단일 brandId
+		if (brands != null && !brands.isEmpty()) {
+			brandIdForTitle = brands.get(0);
+			currentBrand = productsService.getStoreByStoreId(brandIdForTitle);
+			if (currentBrand != null) {
+				title = currentBrand.getStoreConm();
+				breadCrumbTitle = currentBrand.getStoreConm();
+			} else {
+				title = "알 수 없는 브랜드";
+				breadCrumbTitle = "알 수 없는 브랜드";
+			}
+			model.addAttribute("currentBrandId", brandIdForTitle);
+			model.addAttribute("currentBrandName", currentBrand != null ? currentBrand.getStoreConm() : null);
+		} else if (categoryId != null && !categoryId.isEmpty()) {
 			Map<String, Object> categoryHierarchyData = productCategoryService.getCategoryHierarchy(categoryId);
 			if (categoryHierarchyData != null) {
 				currentCategory = (ProductCategory) categoryHierarchyData.get("currentCategory");
@@ -171,28 +198,13 @@ public class CustomerProductController {
 				}
 			}
 		} else {
-			// ⭐ 수정: categoryId가 없을 때는 '전체' 상태로 두고, 하위 카테고리에 모든 1차 카테고리를 표시
 			parentCategoryName = "전체 상품";
-			// subCategories에 모든 최상위(1차) 카테고리 목록을 담습니다.
 			subCategories = productCategoryService.getAllTopLevelCategories();
 		}
 
 		Map<String, Object> productsResult = productSearchService.getFilteredAndSortedProducts(categoryId, sortBy,
 				filterParams, currentPage);
 		List<Products> productList = (List<Products>) productsResult.get("productsList");
-
-		// ⭐⭐ 이 부분에 디버깅 코드 추가 ⭐⭐
-		if (productList != null) {
-			for (Products product : productList) {
-				System.out.println("Product GdsNo: " + product.getGdsNo() + ", CategoryNo: " + product.getCtgryNo()
-						+ ", CategoryName: "
-						+ (product.getProductCategory() != null ? product.getProductCategory().getCategoryName()
-								: "N/A"));
-			}
-		} else {
-			System.out.println("productList is null or empty.");
-		}
-		// ⭐⭐ 디버깅 코드 끝 ⭐⭐
 
 		long totalProductCount = (long) productsResult.get("totalProductsCount");
 		int lastPage = (int) productsResult.get("lastPage");
@@ -220,6 +232,9 @@ public class CustomerProductController {
 		model.addAttribute("selectedMaxPrice", maxPrice);
 		model.addAttribute("selectedPriceRange", priceRange);
 		model.addAttribute("selectedIncludeSoldOut", includeSoldOut);
+
+        model.addAttribute("currentBrandId", brandIdForTitle);
+        model.addAttribute("currentBrandName", currentBrand != null ? currentBrand.getStoreConm() : null);
 
 		List<ProductOptionValue> rawColorOptionValues = productsService.getAllProductColors();
 		List<ColorOption> allColorOptions = new ArrayList<>();

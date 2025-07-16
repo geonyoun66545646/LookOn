@@ -216,6 +216,7 @@
 	        p.gds_nm,
 	        p.bas_prc,
 	        p.ctgry_no,
+	        p.store_id,
 	        IFNULL(p.dscnt_rt, 0.00) AS dscnt_rt,
 	        (p.bas_prc * (1 - IFNULL(p.dscnt_rt / 100.0, 0.00))) AS last_sel_prc,
 	        pc.ctgry_no AS pc_ctgry_no,
@@ -468,7 +469,7 @@
                     GROUP BY ps_inner.gds_no
                     HAVING SUM(ps_inner.sel_psblty_qntty) > 0
 	            )
-	        </if>
+	        </if>     
 	    </where>
 	</select>
 

@@ -20,7 +20,8 @@
 							th:text="${product.productCategory?.categoryName}">카테고리명</a>
 					</div>
 					<div class="product-brand">
-						<a th:href="@{/store/{id}(id=${product.storeId})}"
+						<a
+							th:href="@{/customer/products/brand/{brandId}(brandId=${product.storeId})}"
 							th:text="${product.storeName}">상점명</a>
 					</div>
 					<h3 class="product-title">
@@ -64,7 +65,8 @@
 					th:text="${product.productCategory?.categoryName}">카테고리명</a>
 			</div>
 			<div class="product-brand">
-				<a th:href="@{/store/{id}(id=${product.storeId})}"
+				<a
+					th:href="@{/customer/products/brand/{brandId}(brandId=${product.storeId})}"
 					th:text="${product.storeName}">상점명</a>
 			</div>
 			<h3 class="product-title">
