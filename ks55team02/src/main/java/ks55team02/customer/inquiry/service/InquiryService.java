@@ -5,10 +5,11 @@ import java.util.Map; // Map 사용을 위해 import
 
 import org.springframework.web.multipart.MultipartFile;
 
-import ks55team02.customer.inquiry.domain.Inquiry;
+import ks55team02.common.domain.inquiry.Answer;
+import ks55team02.common.domain.inquiry.Inquiry;
+import ks55team02.common.domain.store.Store;
 import ks55team02.customer.inquiry.domain.InquiryOption;
 import ks55team02.customer.inquiry.domain.InquiryTargetOption;
-import ks55team02.customer.store.domain.Store;
 
 
 
@@ -54,7 +55,6 @@ public interface InquiryService {
      */
     Inquiry getInquiryById(String inquiryId,  String currentUserId);
     
-
     /**
      * 페이징 처리된 문의 목록을 조회합니다.
      * @param currentPage 현재 페이지 번호
@@ -63,6 +63,7 @@ public interface InquiryService {
      */
     Map<String, Object> getInquiryList(int currentPage, int pageSize); // 페이징 메서드 시그니처 유지
     
+    Answer getAnswerByInquiryId(String answer);
     
     
 }

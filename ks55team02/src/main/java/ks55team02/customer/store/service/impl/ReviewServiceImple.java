@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import ks55team02.customer.store.domain.ProductReview;
-import ks55team02.customer.store.domain.ReviewImage;
+import ks55team02.common.domain.store.ProductReview;
+import ks55team02.common.domain.store.ReviewImage;
 import ks55team02.customer.store.mapper.ReviewMapper;
 import ks55team02.customer.store.service.ReviewService;
 import lombok.RequiredArgsConstructor;

@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
+import ks55team02.common.domain.store.ProductReview;
 import ks55team02.customer.login.domain.LoginUser;
-import ks55team02.customer.store.domain.ProductReview;
 import ks55team02.customer.store.service.ReviewService;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.domain.ProductImage;

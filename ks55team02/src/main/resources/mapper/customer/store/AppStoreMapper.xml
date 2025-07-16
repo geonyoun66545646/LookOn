@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ks55team02.customer.store.mapper.AppStoreMapper">
 
-    <resultMap id="appStoreResultMap" 			type="ks55team02.customer.store.domain.AppStore">
+    <resultMap id="appStoreResultMap" 			type="ks55team02.common.domain.store.AppStore">
 	  	<id property="aplyId"         				column="aply_id"/>
 		<result property ="aplyUserNo"     			column="aply_user_no"/>
 		<result property ="storeNm"        	 		column="store_nm"/>

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import ks55team02.customer.store.domain.Store;
+import ks55team02.common.domain.store.Store;
 
 
 

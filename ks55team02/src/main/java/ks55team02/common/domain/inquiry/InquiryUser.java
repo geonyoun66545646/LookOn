@@ -1,4 +1,4 @@
-package ks55team02.customer.inquiry.domain;
+package ks55team02.common.domain.inquiry;
 
 import java.time.LocalDateTime;
 

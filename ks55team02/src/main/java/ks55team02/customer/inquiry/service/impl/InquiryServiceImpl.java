@@ -14,15 +14,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import ks55team02.customer.inquiry.domain.Inquiry;
-import ks55team02.customer.inquiry.domain.InquiryImage;
+import ks55team02.common.domain.inquiry.Answer;
+import ks55team02.common.domain.inquiry.Inquiry;
+import ks55team02.common.domain.inquiry.InquiryImage;
+import ks55team02.common.domain.store.Store;
+import ks55team02.common.domain.store.StoreImage;
 import ks55team02.customer.inquiry.domain.InquiryOption;
 import ks55team02.customer.inquiry.domain.InquiryTargetOption;
 import ks55team02.customer.inquiry.mapper.InquiryImageMapper;
 import ks55team02.customer.inquiry.mapper.InquiryMapper;
 import ks55team02.customer.inquiry.service.InquiryService;
-import ks55team02.customer.store.domain.Store;
-import ks55team02.customer.store.domain.StoreImage;
 import ks55team02.customer.store.mapper.CustomerStoreMapper;
 import ks55team02.customer.store.mapper.StoreImageMapper;
 import ks55team02.util.FileDetail;
@@ -54,11 +55,21 @@ public class InquiryServiceImpl implements InquiryService {
     }
     
 
-    // 질문 세부
+    // 질문 Detail
     @Override
     public Inquiry getInquiryById(String inquiryId, String currentUserId) {
         // 1. 기본 문의 정보 조회 (이미지 정보 포함된 메서드 사용)
         Inquiry inquiry = inquiryMapper.getInquiryByIdWithImages(inquiryId);
+        
+        // 2. 답변 조회
+        Answer answer = inquiryMapper.getAnswerByInquiryId(inquiryId);
+        if (answer != null) {
+            // Inquiry 도메인에 Answer 객체를 담을 필드(예: private Answer answer;)와 setter가 있다고 가정
+            inquiry.setAnswer(answer); 
+            log.info("문의 ID {}에 대한 답변이 조회되었습니다.", inquiryId);
+        } else {
+            log.info("문의 ID {}에 대한 답변이 없습니다.", inquiryId);
+        }
 
         // 문의가 존재하지 않으면 null 반환
         if(inquiry == null) {
@@ -221,7 +232,9 @@ public class InquiryServiceImpl implements InquiryService {
         return customerStoreMapper.getAllStores();
     }
     
-    
-    
+    @Override
+    public Answer getAnswerByInquiryId(String inquiryId) { // 파라미터 이름을 inquiryId로 변경
+        return inquiryMapper.getAnswerByInquiryId(inquiryId);
+    }
     
 }

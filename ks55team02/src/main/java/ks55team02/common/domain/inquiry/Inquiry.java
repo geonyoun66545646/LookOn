@@ -1,19 +1,23 @@
-package ks55team02.customer.inquiry.domain;
+package ks55team02.common.domain.inquiry;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import ks55team02.admin.common.domain.SearchCriteria;
+import ks55team02.common.domain.store.Store;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Data
-public class Inquiry {
+@EqualsAndHashCode(callSuper = true)
+public class Inquiry extends SearchCriteria{
 	private String 			inqryId;
 	private String 			inqryTypeCd;
 	private String 			inqryTrgtTypeCd;
@@ -31,7 +35,14 @@ public class Inquiry {
 	private boolean 		delActvtnYn;
 	// InquiryUser 타입의 객체를 writerInfo 로 받음.
 	private InquiryUser  	writerInfo ;
-
+	// Answer 타입의 객체를 answer 로 받음.
+	private Answer 			answer;
+	// 정렬을 위한 키
+	private String 			sortKey; 			// 정렬 기준 컬럼 (예: "aplyId", "ctrtAplyYmd")
+    private String 			sortOrder; 			// 정렬 방향 (예: "ASC", "DESC")
+    
+    private Store 			storeInfo;
+    
 	   // inq_ 제거
     public String getInqryIdNum() {
         if (this.inqryId == null) {
