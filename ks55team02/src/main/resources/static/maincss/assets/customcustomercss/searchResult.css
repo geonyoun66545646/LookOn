@@ -315,3 +315,10 @@ button:focus, a:focus, input:focus, .btn:focus, .nav-link:focus,
 .search-post-section {
 	padding-bottom: 15px !important;
 }
+
+/* 사용자 검색 결과 카드의 아이디 스타일링 */
+.search-result-userid {
+  font-size: 0.875em; /* small 태그와 비슷한 글자 크기 */
+  margin-bottom: 0;   /* p 태그가 가질 수 있는 아래쪽 여백 제거 */
+  text-align: center;
+}
