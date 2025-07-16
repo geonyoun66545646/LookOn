@@ -36,7 +36,7 @@ public class SellerInquiryController {
 		// String loggedInStoreId = (String) session.getAttribute("SID"); // 세션에서 가져오는 코드 주석 처리
 		
 		// ⭐ 현재 로그인된 상점 ID를 하드코딩합니다.
-		String loggedInStoreId = "store_21"; // <-- 여기에 사용할 상점 ID를 입력하세요!
+		String loggedInStoreId = "store_1"; // <-- 여기에 사용할 상점 ID를 입력하세요!
 		
 		// if (loggedInStoreId == null) { // 세션에 로그인된 ID가 없을 경우의 처리 로직은 하드코딩 시 필요 없습니다.
 		// 	log.warn("세션에 로그인된 상점 ID(SID)가 없습니다. 로그인 페이지로 리다이렉트 또는 에러 처리 필요.");
@@ -87,6 +87,7 @@ public class SellerInquiryController {
 	    if (inquiryDetail != null) {
 	        model.addAttribute("title", "판매자 문의 상세");
 	        model.addAttribute("inquiryDetail", inquiryDetail);
+	     // model.addAttribute("hasReplyPermission", true); // 답장 권한 플래그 (선택 사항)
 	        log.info("컨트롤러: model에 inquiryDetail 추가 완료");
 	        return "seller/inquiry/sellerInquiryDetailView";
 	    } else {

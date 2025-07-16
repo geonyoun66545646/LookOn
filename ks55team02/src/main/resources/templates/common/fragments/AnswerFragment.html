@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<th:block th:fragment="AnswerFragment (inquiryData)">
+    <div class="inquiryTable mt-4">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th colspan="2" class="table-header">답변 작성</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2">
+                        <form id="answerForm" method="post" th:action="@{/seller/inquiry/answer}">
+                            <input type="hidden" name="inqryId" th:value="${inquiryData.inqryId}" />
+                            <div class="form-group">
+                                <label for="answerContent">답변 내용</label>
+                                <textarea class="form-control" id="answerContent" name="ansCn" rows="5" required></textarea>
+                            </div>
+                            <div class="form-group d-flex justify-content-end mt-3">
+                                <button type="submit" class="btn btn-primary btn-rounded">답변 제출</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</th:block>
+</body>
+</html>

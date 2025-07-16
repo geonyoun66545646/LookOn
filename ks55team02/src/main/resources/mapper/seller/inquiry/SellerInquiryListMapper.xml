@@ -15,6 +15,14 @@
         <result property="delPrcrYn"    column="del_prcr_yn"/>
     </resultMap>
 
+    <resultMap id="inquiryUserResultMap" type="ks55team02.common.domain.inquiry.InquiryUser">
+        <id property="userNo"       column="user_no"/>
+        <result property="userNcnm" column="user_ncnm"/>
+    </resultMap>
+
+    <resultMap id="inquiryImageResultMap" type="ks55team02.common.domain.inquiry.InquiryImage">
+        <id property="inqryImgId"  column="inqry_img_id"/>   <result property="imgId"   column="img_id"/>         <result property="imgAddr" column="img_addr"/>       <result property="inqryId" column="inquiry_image_inqry_id"/> <result property="ord"     column="ord"/>            </resultMap>
+
     <resultMap id="sellerInquiryWithStoreResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
         <id property="inqryId"           		column="inqry_id"/>
         <result property="inqryTypeCd"   		column="inqry_type_cd"/>
@@ -33,8 +41,25 @@
         <result property="delActvtnYn"   		column="del_actvtn_yn"/>
 
         <association property="storeInfo" resultMap="storeResultMap"/>
+        <association property="writerInfo" resultMap="inquiryUserResultMap"/> 
+        <association property="answer" resultMap="answerResultMap" notNullColumn="ans_id"/> 
+        <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage" resultMap="inquiryImageResultMap"/>
 
-        </resultMap>
+    </resultMap>
+    
+    <resultMap id="answerResultMap" type="ks55team02.common.domain.inquiry.Answer">
+        <id property="ansId"        	column="ans_id"/> <!-- ans_id가 기본 키 -->
+        <result property="inqryId"      column="answer_inqry_id"/> <!-- answer 테이블의 inqry_id (FK) -->
+        <result property="answrUserNo"  column="answr_user_no"/>
+        <result property="ansCn"        column="ans_cn"/>
+        <result property="ansTm"        column="ans_tm"/>
+        <result property="answrTypeCd"  column="answr_type_cd"/>
+        <result property="rlsYn"        column="rls_yn"/>
+        <result property="lastMdfcnDt"  column="last_mdfcn_dt"/>
+        <result property="actvtnYn"     column="actvtn_yn"/>
+        <result property="delDt"        column="del_dt"/>
+        <result property="delUserNo"    column="del_user_no"/>
+    </resultMap>
 
 
     <select id="getSellerInquiryCnt" parameterType="ks55team02.common.domain.inquiry.Inquiry" resultType="int">
@@ -64,7 +89,6 @@
             i.del_dt,
             i.del_user_no,
             i.del_actvtn_yn,
-            -- Store 테이블의 모든 컬럼 (resultMap에서 매핑될 수 있도록 명시적으로 선택)
             s.store_id,
             s.aply_id,
             s.seller_user_no,
@@ -74,11 +98,21 @@
             s.store_stts,
             s.info_mdfcn_dt,
             s.inactvtn_dt,
-            s.del_prcr_yn
+            s.del_prcr_yn,
+            u.user_no,          u.user_ncnm,        -- 이미지 관련 컬럼 추가
+            iim.inqry_img_id,       
+            iim.img_id,             
+            iim.inqry_id AS inquiry_image_inqry_id, 
+            iim.ord,                
+            sim.img_addr            
         FROM
             inquiries i
         JOIN
             stores s ON s.store_id = i.inqry_store_id
+        LEFT JOIN
+            users u ON u.user_no = i.wrtr_id
+        LEFT JOIN inquiry_images iim ON iim.inqry_id = i.inqry_id
+        LEFT JOIN store_images sim ON sim.img_id = iim.img_id
         <where>
             i.inqry_store_id = #{inquiry.inqryStoreId} <if test="inquiry.searchValue != null and inquiry.searchValue != ''">
                 <choose>
@@ -135,7 +169,8 @@
                     CAST(REGEXP_SUBSTR(i.inqry_id, '[0-9]+') AS UNSIGNED) DESC
                 </otherwise>
             </choose>
-        LIMIT #{pageSize} OFFSET #{limitStart}; </select>
+        LIMIT #{pageSize} OFFSET #{limitStart};
+    </select>
 
     <select id="getSellerInquiryByStoreId" parameterType="String" resultMap="sellerInquiryWithStoreResultMap">
         SELECT
@@ -154,7 +189,6 @@
             i.del_dt,
             i.del_user_no,
             i.del_actvtn_yn,
-            -- Store 테이블의 모든 컬럼
             s.store_id,
             s.aply_id,
             s.seller_user_no,
@@ -164,11 +198,37 @@
             s.store_stts,
             s.info_mdfcn_dt,
             s.inactvtn_dt,
-            s.del_prcr_yn
+            s.del_prcr_yn,
+            u.user_no,
+            u.user_ncnm,
+            iim.inqry_img_id,       
+            iim.img_id,             
+            iim.inqry_id AS inquiry_image_inqry_id, 
+            iim.ord,                
+            sim.img_addr,
+            
+            -- Answer 관련 컬럼 추가 시작
+            a.ans_id,               -- answer 테이블의 기본 키
+            a.inqry_id AS answer_inqry_id, -- answer 테이블의 inqry_id (FK), 별칭 사용
+            a.answr_user_no,
+            a.ans_cn,
+            a.ans_tm,
+            a.answr_type_cd,
+            a.rls_yn,
+            a.last_mdfcn_dt,
+            a.actvtn_yn,
+            a.del_dt,
+            a.del_user_no
+            -- Answer 관련 컬럼 추가 끝
         FROM
             inquiries i
         JOIN
             stores s ON s.store_id = i.inqry_store_id
+        LEFT JOIN
+            users u ON u.user_no = i.wrtr_id
+        LEFT JOIN inquiry_images iim ON iim.inqry_id = i.inqry_id
+        LEFT JOIN store_images sim ON sim.img_id = iim.img_id
+        LEFT JOIN answer a ON a.inqry_id = i.inqry_id -- DDL에 따라 inqry_id로 조인
         WHERE
             i.inqry_id = #{inqryId};
     </select>

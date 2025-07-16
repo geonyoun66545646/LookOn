@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class InquiryUser {
-	 private String userNo; // 사용자 번호 (PK, 애플리케이션 생성 ID)
+		private String userNo; // 사용자 번호 (PK, 애플리케이션 생성 ID)
 	    private String mbrGrdCd; // 회원 등급 코드 (FK)
 	    private String userLgnId; // 사용자 로그인 아이디
 	    private String userNm; // 사용자이름
