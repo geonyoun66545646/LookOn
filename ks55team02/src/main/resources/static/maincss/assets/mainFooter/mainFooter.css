@@ -1,0 +1,30 @@
+/* ⭐⭐ 여기에 style 태그 내용을 붙여넣습니다. ⭐⭐ */
+.footer .footer-middle .container .row {
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: row;
+	padding : 0 15px;
+	text-align: center;
+}
+
+.footer .footer-middle .container .row .col-lg-3 {
+	flex: 1;
+	padding-right: 0px;
+	padding-left: 0px;
+}
+
+@media ( max-width : 766px) {
+	.footer .footer-middle .container .row {
+		flex-wrap: wrap; /* 컬럼이 다음 줄로 래핑되도록 허용 */
+		/* 필요하다면 gap 등 조절 */
+	}
+	.footer .footer-middle .container .row .col-sm-6,
+		/* HTML에 있는 col-sm-6 클래스도 함께 타겟팅 */ .footer .footer-middle .container .row .col-lg-3
+		{
+		flex: none; /* flex: 1 속성을 재정의하여 컬럼이 늘어나지 않게 합니다 */
+		width: calc(100%/ 3); /* 각 컬럼이 한 줄 너비의 1/3을 차지하도록 설정 */
+		max-width: calc(100%/ 3); /* 너비가 1/3을 초과하지 않도록 제한 */
+		/* 필요하다면 부트스트랩의 gutter(간격)을 모방하기 위해 패딩을 추가할 수 있습니다.
+           예: padding: 0 15px; box-sizing: border-box; */
+	}
+}
