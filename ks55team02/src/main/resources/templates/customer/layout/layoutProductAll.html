@@ -56,8 +56,25 @@
 								th:if="${currentBrandId != null}">
 								<!-- 브랜드 헤더 -->
 								<div class="brand-page-header">
-									<h2 class="brand-name" th:text="${currentBrandName}">브랜드
-										이름</h2>
+									<!-- ⭐ 이 부분을 수정합니다. ⭐ -->
+									<div class="brand-name-wrapper">
+										<!-- 1. 브랜드 로고가 있을 경우 -->
+										<div class="brand-page-logo"
+											th:if="${currentBrand?.storeLogoImg != null and !#strings.isEmpty(currentBrand.storeLogoImg)}">
+											<img th:src="@{${currentBrand.storeLogoImg}}" alt="브랜드 로고"
+												onerror="this.parentElement.style.display='none';">
+										</div>
+										<!-- 2. 브랜드 로고가 없을 경우, 브랜드명 첫 글자 표시 -->
+										<div class="brand-page-logo-initial"
+											th:if="${currentBrand?.storeLogoImg == null or #strings.isEmpty(currentBrand.storeLogoImg)}">
+											<span
+												th:text="${#strings.substring(currentBrand.storeConm, 0, 1)}">L</span>
+										</div>
+
+										<h2 class="brand-name" th:text="${currentBrandName}">브랜드
+											이름</h2>
+									</div>
+
 									<div class="brand-actions">
 										<button class="btn btn-outline-dark btn-brand-info"
 											data-toggle="modal" data-target="#brandInfoModal">
@@ -155,8 +172,7 @@
 	<script th:src="@{/maincss/assets/js/customer/customer-pagination.js}"></script>
 	<script
 		th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
-	<script
-		th:src="@{/maincss/assets/productToolbar/productToolbar.js}"></script>
+	<script th:src="@{/maincss/assets/productToolbar/productToolbar.js}"></script>
 
 
 	<!-- <script th:src="@{/maincss/assets/js/customer/feedWriteBtn.js}"></script> 지성 수정 경로에 없다는데 이거 왜있는거야? -->
