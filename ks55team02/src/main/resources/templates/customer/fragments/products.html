@@ -88,14 +88,17 @@
 <!-- ⭐놓치기 아까운 특가 상품 (Sale) 슬라이더의 스와이프 컨텐츠를 위한 프래그먼트 ⭐ -->
 <!-- 이 프래그먼트는 swiper-slide만 포함합니다. (swiper-wrapper는 main.html에 배치) -->
 <!-- =================================================================== -->
-<div th:fragment="saleProductsFragment(saleProductList)" class="swiper-wrapper">
-    <div class="swiper-slide" th:each="product : ${saleProductList}">
-        <div th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
-    </div>
-    </div>
+<div th:fragment="saleProductsFragment(saleProductList)"
+	class="swiper-wrapper">
+	<div class="swiper-slide" th:each="product : ${saleProductList}">
+		<div
+			th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
+	</div>
+</div>
 
-<div th:fragment="noSaleProductsMessage" th:if="${saleProductList.isEmpty()}" class="col-12 text-center mt-4">
-    <p>현재 특가 상품이 없습니다.</p>
+<div th:fragment="noSaleProductsMessage"
+	th:if="${saleProductList.isEmpty()}" class="col-12 text-center mt-4">
+	<p>현재 특가 상품이 없습니다.</p>
 </div>
 
 <!-- th:fragment="noSaleProductsMessage" 이 부분은 main.html로 이동합니다. -->

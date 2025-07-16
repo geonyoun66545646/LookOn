@@ -48,8 +48,8 @@
         <result column="total_stock_quantity" property="totalStockQuantity" />
         <result column="is_sold_out" property="isSoldOut" />
         <association property="productCategory" javaType="ks55team02.seller.products.domain.ProductCategory">
-            <id property="categoryId" column="ctgry_no" />
-            <result property="categoryName" column="ctgry_nm" />
+            <id property="categoryId" column="pc_ctgry_no" />
+            <result property="categoryName" column="pc_ctgry_nm" />
         </association>
     </resultMap>
     
