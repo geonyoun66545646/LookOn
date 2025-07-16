@@ -33,14 +33,17 @@
         </table>
     </div>
 
-    <script>
+    <script th:inline="javascript">
         /* <![CDATA[ */
         document.addEventListener('DOMContentLoaded', function() {
             const answerFormContainer = document.getElementById('answerFormContainer');
             const submitAnswerBtn = document.getElementById('submitAnswerBtn');
             const cancelAnswerBtn = document.getElementById('cancelAnswerBtn');
             const answerContentInput = document.getElementById('answerContentInput');
-            const isEditMode = /*[[${isEditMode}]]*/ false; // Thymeleaf 변수를 JS로 가져옴
+            const isEditMode = /*[[${isEditMode}]]*/ false;
+            // inquiryData에서 스토어 이름 가져오기
+            const currentStoreName = /*[[${inquiryData.storeInfo.storeConm}]]*/ '알 수 없음';
+
 
             if (isEditMode && cancelAnswerBtn) {
                 cancelAnswerBtn.style.display = 'inline-block';
@@ -89,7 +92,59 @@
                         if (data.status === 'success') {
                             alert(data.message);
 
-                            answerFormContainer.style.display = 'none';
+                            // inquiryDetailFragment의 답변 표시 영역 업데이트 (새로고침 전에 임시로 업데이트)
+                            const answerContentBody = document.getElementById('answerContentBody');
+                            const noAnswerMessageRow = document.getElementById('noAnswerMessageRow');
+
+                            if (noAnswerMessageRow) {
+                                noAnswerMessageRow.remove();
+                            }
+
+                            const newAnsCnHtml = ansCn.replace(/\n/g, '<br>');
+                            // 스토어 이름을 현재 페이지의 inquiryData에서 가져와 사용
+                            const answrStoreName = currentStoreName; 
+                            const ansTm = data.ansTm || new Date().toLocaleString();
+                            const lastMdfcnDt = data.lastMdfcnDt;
+
+                            let modifiedTimeHtml = '';
+                            if (lastMdfcnDt) {
+                                modifiedTimeHtml = `<br/><span>(수정 시간 : </span><span id="displayModifiedTime">${lastMdfcnDt}</span>)`;
+                            }
+
+                            const updatedAnswerHtml = `
+                                <tr class="answer-info-row">
+                                    <td class="answer-sub">
+                                        <span>답변자 : </span>
+                                        <span id="displayAnswerWriter">${answrStoreName}</span>
+                                    </td>
+                                    <td class="answer-sub">
+                                        <span>작성 시간 : </span>
+                                        <span id="displayAnswerTime">${ansTm}</span>
+                                        ${modifiedTimeHtml}
+                                    </td>
+                                </tr>
+                                <tr class="answer-content-row">
+                                    <td colspan="2" class="answer-cn">
+                                        <div id="displayAnswerContent" class="answer-content-box">
+                                            <p class="answer-content-text">${newAnsCnHtml}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+
+                            while (answerContentBody.firstChild) {
+                                answerContentBody.removeChild(answerContentBody.firstChild);
+                            }
+                            answerContentBody.insertAdjacentHTML('beforeend', updatedAnswerHtml);
+
+                            const answerHeader = document.getElementById('answer-header');
+                            if (answerHeader) {
+                                // inqryId는 inquiryData에서 가져와야 함
+                                const inqryTtl = /*[[${inquiryData.inqryTtl}]]*/ '문의'; 
+                                answerHeader.textContent = `${inqryTtl}에 대한 답변`;
+                            }
+                            
+                            // 페이지 새로고침하여 최종 상태 반영
                             window.location.reload(); 
 
                         } else {

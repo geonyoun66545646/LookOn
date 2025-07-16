@@ -14,6 +14,7 @@
         <result property="actvtnYn"     column="actvtn_yn"/>
         <result property="delDt"        column="del_dt"/>
         <result property="delUserNo"    column="del_user_no"/>
+        <!-- answrStoreName 매핑 제거 -->
     </resultMap>
 
     <!-- 답변 등록 -->
@@ -53,24 +54,24 @@
             ans_id = #{ansId}
     </update>
 
-    <!-- 특정 답변 ID로 답변 조회 -->
+    <!-- 특정 답변 ID로 답변 조회 (이제 answrStoreName은 여기서 가져오지 않습니다) -->
     <select id="getAnswerById" parameterType="String" resultMap="answerResultMap">
         SELECT
-            ans_id,
-            inqry_id,
-            answr_user_no,
-            ans_cn,
-            ans_tm,
-            answr_type_cd,
-            rls_yn,
-            last_mdfcn_dt,
-            actvtn_yn,
-            del_dt,
-            del_user_no
+            a.ans_id,
+            a.inqry_id,
+            a.answr_user_no,
+            a.ans_cn,
+            a.ans_tm,
+            a.answr_type_cd,
+            a.rls_yn,
+            a.last_mdfcn_dt,
+            a.actvtn_yn,
+            a.del_dt,
+            a.del_user_no
         FROM
-            answer
+            answer a
         WHERE
-            ans_id = #{ansId}
+            a.ans_id = #{ansId}
     </select>
 
     <!-- ans_ 접두사를 가진 ans_id 중 가장 큰 숫자 부분을 조회 -->

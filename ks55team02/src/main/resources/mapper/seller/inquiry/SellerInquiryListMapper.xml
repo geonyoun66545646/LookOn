@@ -20,7 +20,6 @@
         <result property="userNcnm" column="user_ncnm"/>
     </resultMap>
 
-    <!-- answerResultMap은 Inquiry 상세 조회에서 사용되므로 여기에 유지 -->
     <resultMap id="answerResultMap" type="ks55team02.common.domain.inquiry.Answer">
         <id property="ansId"        	column="ans_id"/>
         <result property="inqryId"      column="answer_inqry_id"/>
@@ -33,9 +32,9 @@
         <result property="actvtnYn"     column="actvtn_yn"/>
         <result property="delDt"        column="del_dt"/>
         <result property="delUserNo"    column="del_user_no"/>
+        <!-- answrStoreName 매핑 제거 -->
     </resultMap>
 
-    <!-- Inquiry 목록 조회를 위한 resultMap (answer association 없음) -->
     <resultMap id="inquiryListResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
         <id property="inqryId" column="inqry_id"/>
         <result property="inqryTypeCd" column="inqry_type_cd"/>
@@ -55,7 +54,6 @@
         
         <association property="writerInfo" resultMap="inquiryUserResultMap"/>
         <association property="storeInfo" resultMap="storeResultMap"/>
-        <!-- 여기에는 answer association을 포함하지 않습니다. -->
 
         <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage">
             <id property="inqryImgId" column="inqry_img_id"/>
@@ -68,7 +66,6 @@
         </collection>
     </resultMap>
 
-    <!-- Inquiry 상세 조회를 위한 resultMap (answer association 포함) -->
     <resultMap id="inquiryDetailResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
         <id property="inqryId" column="inqry_id"/>
         <result property="inqryTypeCd" column="inqry_type_cd"/>
@@ -88,7 +85,7 @@
         
         <association property="writerInfo" resultMap="inquiryUserResultMap"/>
         <association property="storeInfo" resultMap="storeResultMap"/>
-        <association property="answer" resultMap="answerResultMap" notNullColumn="ans_id"/> <!-- 상세 조회에서는 답변 정보 포함 -->
+        <association property="answer" resultMap="answerResultMap" notNullColumn="ans_id"/>
 
         <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage">
             <id property="inqryImgId" column="inqry_img_id"/>
@@ -111,7 +108,7 @@
             inqry_store_id = #{inqryStoreId}
     </select>
 
-    <select id="getSellerInquiryList" parameterType="map" resultMap="inquiryListResultMap"> <!-- inquiryListResultMap 사용 -->
+    <select id="getSellerInquiryList" parameterType="map" resultMap="inquiryListResultMap">
         SELECT
             i.inqry_id,
             i.inqry_type_cd,
@@ -175,7 +172,7 @@
         LIMIT #{limitStart}, #{pageSize}
     </select>
 
-    <select id="getSellerInquiryByStoreId" parameterType="String" resultMap="inquiryDetailResultMap"> <!-- inquiryDetailResultMap 사용 -->
+    <select id="getSellerInquiryByStoreId" parameterType="String" resultMap="inquiryDetailResultMap">
         SELECT
             i.inqry_id,
             i.inqry_type_cd,
@@ -221,6 +218,7 @@
             a.actvtn_yn,
             a.del_dt,
             a.del_user_no
+            <!-- stores s_ans 조인과 answr_store_conm 컬럼 제거 -->
         FROM
             inquiries i
         JOIN

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}"> <!-- 요청하신 레이아웃 경로 -->
+
+<head>
+    <meta name="appDetail" content="adminInquiryDetail" />
+    <th:block layout:fragment="customCss">
+     <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/adminInquiryDetailView.css}">
+        
+        <style>
+  
+        </style>
+    </th:block>
+</head>
+<th:block layout:fragment="jsFile"></th:block>
+
+<th:block layout:fragment="contents">
+    <main class="main-content">
+        <section class="content-header">
+            <h2 class="content-title">관리자 문의 상세</h2>
+        </section>
+
+        <div class="card">
+            <div class="card-body"> <!-- userList.html의 card-body 구조를 따릅니다 -->
+                <div class="page-content">
+                    <div class="container">
+                        <!-- 문의 상세 정보 프래그먼트 재사용 -->
+                        <div th:replace="~{/common/fragments/inquiryDetailFragment :: inquiryDetailFragment(inquiryData=${inquiryDetail})}"></div>
+
+                        <th:block th:if="${inquiryDetail.answer == null}">
+                            <!-- 답변 작성 프래그먼트 호출 (contextPath 전달) -->
+                            <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false, contextPath='/adminpage/inquiryadmin')}"></div>
+                        </th:block>
+                        <th:block th:unless="${inquiryDetail.answer == null}">
+                            <!-- 답변 수정 프래그먼트 호출 (contextPath 전달) -->
+                            <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true, contextPath='/adminpage/inquiryadmin')}"></div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</th:block>
+
+<th:block layout:fragment="jsScript"></th:block>
+</html>

@@ -1,6 +1,5 @@
 package ks55team02.seller.inquiry.controller;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -94,9 +93,7 @@ public class SellerInquiryController {
 
 		Map<String, Object> response = new HashMap<>();
 		
-		// 현재 로그인된 상점 ID (하드코딩된 값)
 		String loggedInStoreId = "store_1"; 
-		// 상점 ID를 통해 해당 상점의 판매자 사용자 번호 조회
 		String answrUserNo = sellerInquiryService.getSellerUserNoByStoreId(loggedInStoreId);
 
 		if (answrUserNo == null || answrUserNo.isEmpty()) {
@@ -105,7 +102,7 @@ public class SellerInquiryController {
 		    response.put("message", "답변자 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
 		    return ResponseEntity.status(500).body(response);
 		}
-		log.info("컨트롤러: 답변자 사용자 번호: {}", answrUserNo); // 조회된 답변자 번호 로그
+		log.info("컨트롤러: 답변자 사용자 번호: {}", answrUserNo);
 
 		try {
 			Answer processedAnswer;
@@ -125,6 +122,8 @@ public class SellerInquiryController {
 				response.put("ansCn", processedAnswer.getAnsCn());
 				response.put("answrUserNo", processedAnswer.getAnswrUserNo());
 				response.put("ansTm", processedAnswer.getAnsTm() != null ? processedAnswer.getAnsTm().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null);
+				response.put("lastMdfcnDt", processedAnswer.getLastMdfcnDt() != null ? processedAnswer.getLastMdfcnDt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null);
+				// answrStoreName은 클라이언트에서 inquiryData.storeInfo.storeConm을 직접 사용하므로, 여기서 JSON 응답에 포함하지 않습니다.
 				log.info("컨트롤러: 답변 처리 성공 - 응답 데이터: {}", response);
 			} else {
 			    log.warn("컨트롤러: 답변 처리 성공했으나, 반환된 Answer 객체가 null입니다.");
