@@ -1,5 +1,7 @@
 // File: /js/customerjs/addInquiryView.js
 
+
+	// --- 상점 선택 및 문의 유형 동적 처리 ---
 $(document).ready(function () {
     const $inquiryTargetSelect = $('#inqryTrgtTypeCd');
     const $storeSelectRow = $('#storeSelectRow');
@@ -7,9 +9,6 @@ $(document).ready(function () {
     const $inquiryTypeSelect = $('#inqryTypeCd');
     const $form = $('#inquiryForm');
 
-    // options passed from Thymeleaf
-    //const allInquiryOptions = window.allInquiryOptions || [];
-    //const adminInquiryOptions = window.adminInquiryOptions || [];
 	const $inquiryOptions = $('#inqryTypeCd').find("option");
 	const inquiryOptions = [];
 	$inquiryOptions.each((idx, element)=> {
@@ -33,7 +32,6 @@ $(document).ready(function () {
             $storeSelectRow.show();
         } else { // 'ADMIN'이거나 다른 값일 경우
             $inquiryStoreSelect.prop('disabled', true).val('').removeAttr('required');
-            $storeSelectRow.hide(); // 'STORE'가 아니면 숨김
         }
 
         // 문의 유형 드롭다운 처리

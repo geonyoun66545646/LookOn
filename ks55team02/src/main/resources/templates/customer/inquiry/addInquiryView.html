@@ -9,6 +9,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/addInquiryView.css}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     </th:block>
 </head>
 <body>
@@ -46,10 +47,7 @@
 										            th:text="${option.getTargetOption()}"></option>
 										</select>
                                     </td>
-                                </tr>
-                                <tr class="inquiry-row" id="storeSelectRow" >
-                                    <th scope="row">상점 선택</th>
-                                    <td colspan="3" class="type-column">
+                                    <td colspan="" class="type-column">
                                         <select id ="inqryStoreId" name ="inqryStoreId" class="form-control" required>
                                     		<option value ="">상점을 선택하세요</option>
                                     		<option th:each="option : ${storeList}"
@@ -57,6 +55,9 @@
                                         </select>
                                     </td>
                                 </tr>
+                            
+                                    
+                                
                                    <tr class="inquiry-row">
                                    	<th scope="row">문의 유형</th>
                                    	<td colspan="2" class ="type-column" >

@@ -1,7 +1,5 @@
 package ks55team02.customer.inquiry.controller;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,11 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
-import ks55team02.customer.inquiry.domain.Inquiry;
+import ks55team02.common.domain.inquiry.Inquiry;
+import ks55team02.common.domain.store.Store;
 import ks55team02.customer.inquiry.domain.InquiryOption;
 import ks55team02.customer.inquiry.domain.InquiryTargetOption;
 import ks55team02.customer.inquiry.service.InquiryService;
-import ks55team02.customer.store.domain.Store;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +43,7 @@ public class InquiryController {
      * @return 로그인된 사용자 ID (현재는 'user_no_1000'으로 고정)
      */
     private String getCurrentUserId(HttpSession session) {
-        // 현재는 user_no_1000이 로그인 되어있다고 가정.
+        // 현재는 user_no_100이 로그인 되어있다고 가정.
         log.info("[임시] 현재 로그인된 사용자 ID: user_no_100"); // 로그 추가
         return "user_no_100";
 
@@ -233,8 +231,9 @@ public class InquiryController {
         int pageBlockSize = 5;
         int startPage = ((currentPage - 1) / pageBlockSize) * pageBlockSize + 1;
         int endPage = Math.min(startPage + pageBlockSize - 1, totalPages);
+        
 
-        //4. Model에 데이터를 담아 뷰로 전달합니다.
+        //5. Model에 데이터를 담아 뷰로 전달합니다.
         model.addAttribute("title", "문의 목록");
         model.addAttribute("inquiryList", inquiryList);
         model.addAttribute("currentPage", currentPage);
@@ -247,4 +246,5 @@ public class InquiryController {
 
         return "customer/inquiry/inquiryListView";
     }
+    
 }

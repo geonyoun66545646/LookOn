@@ -9,7 +9,7 @@
         이미 프로젝트에 Font Awesome이 설정되어 있다면 이 줄은 생략해도 됩니다.
     -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/FeedListByMe.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/FeedListByUserNo.css}">
 	<link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/customerMyPage.css}" />
 	
 </head>
@@ -73,7 +73,7 @@
 		        </div>
 		        <div class="my-feed-link-section">
 				        <div class="my-feed-link-item first">
-				            <a th:href="@{/customer/feed/feedListByMe}">
+				            <a th:href="@{/customer/feed/feedListByUserNo}">
 				                <span class="link-label">내 피드 가기</span>
 				                <strong class="link-text">GO<small class="link-small-text"></small></strong>
 				            </a>
@@ -117,7 +117,7 @@
                 </div>
                 <div class="nav-column">
                     <ul>
-                        <li><a th:href="@{/customer/feed/feedListByMe}">마이피드</a></li>
+                        <li><a th:href="@{/customer/feed/feedListByUserNo}">마이피드</a></li>
                         <li><a th:href="@{/customer/chat}">채팅</a></li>
                     </ul>
                 </div>

@@ -25,16 +25,7 @@
 </head>
 
 <body>
-	<!-- 레이아웃이 제공하는 <header>, <main>, <footer> 등은 제거하고, -->
-	<!-- 실제 상품 상세 내용을 layout:fragment="contents" 안에 넣어주세요. -->
-
 	<th:block layout:fragment="contents">
-		<!-- 기존 productDetail.html의 <body> 내부 전체 내용을 여기에 붙여넣으세요. -->
-		<!-- 단, <header th:replace...>와 <footer th:replace...> 등은 제거합니다. -->
-		<!-- 그리고 <div class="page-wrapper">, <main class="main"> 태그도 레이아웃에서 이미 제공하므로 제거합니다. -->
-
-		
-
 		<div class="page-content">
 			<div class="container">
 				<div class="product-details-top">
@@ -202,7 +193,7 @@
 										<span class="likes-count">216</span>
 									</div>
 									<div class="product-main-buttons">
-										<a href="#" class="btn-product btn-cart"><span>장바구니</span></a>
+										<a href="#" class="btn-product btn-cart" id="addToCartBtn"><span>장바구니</span></a>
 										<a href="#" class="btn-product btn-buy-now"><span>구매하기</span></a>
 										<button class="btn-product btn-share" data-toggle="modal"
 											data-target="#shareModal" title="공유하기">
@@ -214,7 +205,7 @@
 						</div>
 					</div>
 				</div>
-				<!-- 수정 x -->
+
 				<div class="product-details-tab product-details-extended">
 					<div class="container">
 						<ul class="nav nav-pills justify-content-center" role="tablist">
@@ -258,8 +249,6 @@
 									<h3>상품 정보</h3>
 									<!-- 판매자가 작성한 상품 설명을 여기에 표시 -->
 									<p th:text="${product.gdsExpln}">상품 설명</p>
-
-									<!-- TODO: 상품 정보 고시 등 추가 정보가 있다면 여기에 표시 -->
 								</div>
 							</div>
 						</div>
@@ -277,13 +266,11 @@
 						</div>
 						<!-- 리뷰 끝 -->
 					</div>
-
 				</div>
 			</div>
 		</div>
 
-
-		<!-- 여기에 비슷한 상품목록을 넣고싶음 -->
+		<!-- 비슷한 상품목록 -->
 		<div class="container-bottom"
 			th:if="${similarProducts != null and not #lists.isEmpty(similarProducts)}">
 			<h2 class="title text-center mb-4">비슷한 상품</h2>
@@ -292,8 +279,7 @@
 				th:replace="~{customer/fragments/mainProductList :: productListFragment(${similarProducts})}"></div>
 		</div>
 
-		<!-- 모달은 layout:fragment="contents" 바깥 (layoutProductDetail.html의 body 태그 닫히기 전)에 위치하는 것이 일반적입니다. -->
-		<!-- 하지만 현재 구조상, 만약 이 모달이 반드시 product detail 내부에 있어야 한다면 여기에 둡니다. -->
+		<!-- 공유 모달 -->
 		<div class="modal fade" id="shareModal" tabindex="-1" role="dialog"
 			aria-labelledby="shareModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
@@ -332,22 +318,34 @@
 				</div>
 			</div>
 		</div>
-
 	</th:block>
 
-	<!-- 이 페이지에만 필요한 추가 JS 파일을 layout:fragment="jsFile" 안에 넣습니다. -->
 	<th:block layout:fragment="jsFile">
-		<!-- jquery.min.js, bootstrap.bundle.min.js 등은 layoutProductDetail.html에 이미 있습니다. -->
 		<script th:src="@{/maincss/assets/js/jquery.elevateZoom.min.js}"></script>
-		<!-- jquery.magnific-popup.min.js도 layoutProductDetail.html에 이미 있습니다. -->
-		<!-- main.js도 layoutProductDetail.html에 이미 있습니다. -->
 	</th:block>
 
-	<!-- 이 페이지에만 필요한 인라인 스크립트를 layout:fragment="jsScript" 안에 넣습니다. -->
 	<th:block layout:fragment="jsScript">
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+		
+		<script th:inline="javascript">
+			let isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+			let currentProductGdsNo = /*[[${product?.gdsNo}]]*/ null;
+			let currentProductStoreId = /*[[${product.store?.storeId}]]*/ null;
+			let productDataOptions = /*[[${product?.productOptions}]]*/ []; 
+	
+			// [디버깅 코드 추가] 페이지 로드 시 받은 원본 데이터를 콘솔에 출력합니다.
+			console.log("=============== 원본 데이터 확인 ===============");
+			console.log("서버로부터 받은 productDataOptions:", JSON.stringify(productDataOptions, null, 2));
+			console.log("============================================");
+			
+			console.log("현재 상품 번호 (gdsNo):", currentProductGdsNo);
+			console.log("현재 상점 ID (storeId):", currentProductStoreId);
+			console.log("상품 옵션 데이터:", productDataOptions);
+		</script>
+		
 		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
-		<script
-			th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
+		<script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
+		
 		<script>
 			function copyShareLink() {
 				const el = document.createElement('textarea');

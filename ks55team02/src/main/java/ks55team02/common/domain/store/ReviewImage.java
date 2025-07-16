@@ -1,4 +1,4 @@
-package ks55team02.customer.store.domain;
+package ks55team02.common.domain.store;
 
 import lombok.Data;
 
