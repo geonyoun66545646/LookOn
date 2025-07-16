@@ -1,6 +1,9 @@
+// ks55team02.seller.inquiry.controller.SellerInquiryController.java
+
 package ks55team02.seller.inquiry.controller;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays; // Arrays 임포트 추가
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +35,23 @@ public class SellerInquiryController {
 	@GetMapping("/sellerInquiryList")
 	public String sellerInquiryList(
 	        Model model,
-	        Inquiry inquiry
+	        Inquiry inquiry, // Inquiry 객체는 SearchCriteria를 상속하므로 검색 조건 포함
+	        @RequestParam(value = "filterConditions", required = false) String filterConditionsString // ⭐ 추가: filterConditions를 String으로 직접 받음
 	) {
 		log.info("컨트롤러: sellerInquiryList 호출 - 현재 페이지: {}, 페이지 크기: {}, 검색 키: {}, 검색 값: {}",
 	             inquiry.getCurrentPage(), inquiry.getPageSize(), inquiry.getSearchKey(), inquiry.getSearchValue());
+		log.info("컨트롤러: filterConditionsString (Raw): {}", filterConditionsString); // ⭐ 추가: 로그 확인
 
-		String loggedInStoreId = "store_1";
+		// ⭐ 추가: filterConditionsString을 파싱하여 Inquiry 객체에 설정
+		if (filterConditionsString != null && !filterConditionsString.trim().isEmpty()) {
+		    List<String> filterConditions = Arrays.asList(filterConditionsString.split(","));
+		    inquiry.setFilterConditions(filterConditions); // Inquiry 객체의 List<String> 필드에 설정
+		    log.info("컨트롤러: 파싱된 filterConditions: {}", filterConditions); // ⭐ 추가: 로그 확인
+		} else {
+		    inquiry.setFilterConditions(null); // 필터 조건이 없으면 null로 설정하여 MyBatis에서 조건 건너뛰도록 함
+		}
+
+		String loggedInStoreId = "store_1"; // 실제 로그인 로직으로 대체 필요
 		
 		inquiry.setInqryStoreId(loggedInStoreId);
 		log.info("로그인된 상점 ID (하드코딩): {}", loggedInStoreId);
@@ -57,7 +71,7 @@ public class SellerInquiryController {
 		model.addAttribute("title", "판매자 문의 목록");
 		model.addAttribute("sellerInquiryList", sellerInquiryList);
 		model.addAttribute("pagination", pagination);
-		model.addAttribute("searchCriteria", inquiry);
+		model.addAttribute("searchCriteria", inquiry); // inquiry 객체를 searchCriteria로 모델에 추가
 		
 		return "seller/inquiry/sellerInquiryListView";
 	}
@@ -93,7 +107,7 @@ public class SellerInquiryController {
 
 		Map<String, Object> response = new HashMap<>();
 		
-		String loggedInStoreId = "store_1";
+		String loggedInStoreId = "store_1"; // 실제 로그인 로직으로 대체 필요
 		String answrUserNo = sellerInquiryService.getSellerUserNoByStoreId(loggedInStoreId);
 
 		if (answrUserNo == null || answrUserNo.isEmpty()) {
@@ -123,7 +137,6 @@ public class SellerInquiryController {
 				response.put("answrUserNo", processedAnswer.getAnswrUserNo());
 				response.put("ansTm", processedAnswer.getAnsTm() != null ? processedAnswer.getAnsTm().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null);
 				response.put("lastMdfcnDt", processedAnswer.getLastMdfcnDt() != null ? processedAnswer.getLastMdfcnDt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null);
-				// answrStoreName은 클라이언트에서 inquiryData.storeInfo.storeConm을 직접 사용하므로, 여기서 JSON 응답에 포함하지 않습니다.
 				log.info("컨트롤러: 답변 처리 성공 - 응답 데이터: {}", response);
 			} else {
 			    log.warn("컨트롤러: 답변 처리 성공했으나, 반환된 Answer 객체가 null입니다.");

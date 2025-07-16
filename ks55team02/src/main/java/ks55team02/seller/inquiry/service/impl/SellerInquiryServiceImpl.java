@@ -2,13 +2,13 @@ package ks55team02.seller.inquiry.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-// import java.util.UUID; // UUID는 더 이상 사용하지 않으므로 제거 또는 주석 처리
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ks55team02.common.domain.inquiry.Answer;
 import ks55team02.common.domain.inquiry.Inquiry;
+import ks55team02.common.domain.inquiry.InquiryAnswerHistory; // 추가
 import ks55team02.seller.inquiry.mapper.AnswerMapper;
 import ks55team02.seller.inquiry.mapper.SellerInquiryMapper;
 import ks55team02.seller.inquiry.service.SellerInquiryService;
@@ -62,9 +62,32 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 		int affectedRows = answerMapper.insertAnswer(answer);
 		if (affectedRows > 0) {
 			log.info("서비스: 답변 등록 성공 - 삽입된 행 수: {}, 답변 ID: {}", affectedRows, ansId);
+			
+			// 문의 처리 상태를 '완료'로 업데이트하기 전, 현재 상태 조회
+			String chgBfrStts = sellerInquiryMapper.getInquiryProcessStatus(inqryId);
+			
 			// 문의 처리 상태를 '완료'로 업데이트
 			sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "완료");
 			log.info("서비스: 문의 처리 상태 '완료'로 업데이트 성공 - 문의 ID: {}", inqryId);
+
+			// 문의 답변 이력 기록
+			Integer maxAnsHstryNum = sellerInquiryMapper.getMaxAnsHstryIdNumber();
+			int nextAnsHstryNum = (maxAnsHstryNum != null) ? maxAnsHstryNum + 1 : 1;
+			String ansHstryId = "ans_hstry_" + nextAnsHstryNum;
+
+			InquiryAnswerHistory history = new InquiryAnswerHistory();
+			history.setAnsHstryId(ansHstryId);
+			history.setAnswerId(ansId);
+			history.setInqryId(inqryId);
+			history.setPrcsUserNo(answrUserNo); // 처리 사용자 번호는 답변자 번호와 동일
+			history.setChgBfrStts(chgBfrStts); // 변경 전 상태
+			history.setChgAftrStts("완료"); // 변경 후 상태
+			history.setChgCn("답변 등록으로 인한 상태 변경"); // 변경 내용
+			// chgDt는 DB에서 NOW()로 자동 설정됩니다.
+
+			sellerInquiryMapper.insertInquiryAnswerHistory(history);
+			log.info("서비스: 문의 답변 이력 기록 성공 - 이력 ID: {}", ansHstryId);
+
 			return answerMapper.getAnswerById(ansId);
 		} else {
 			log.error("서비스: 답변 등록 실패 - 삽입된 행 수: 0, 답변 객체: {}", answer);
@@ -86,9 +109,32 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 		int affectedRows = answerMapper.updateAnswer(answer);
 		if (affectedRows > 0) {
 			log.info("서비스: 답변 수정 성공 - 업데이트된 행 수: {}, 답변 ID: {}", affectedRows, ansId);
+			
+			// 문의 처리 상태를 '완료'로 업데이트하기 전, 현재 상태 조회
+			String chgBfrStts = sellerInquiryMapper.getInquiryProcessStatus(inqryId);
+
 			// 문의 처리 상태를 '완료'로 업데이트 (수정 시에도 완료 상태 유지 또는 다시 완료로 변경)
 			sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "완료");
 			log.info("서비스: 문의 처리 상태 '완료'로 업데이트 성공 - 문의 ID: {}", inqryId);
+
+			// 문의 답변 이력 기록
+			Integer maxAnsHstryNum = sellerInquiryMapper.getMaxAnsHstryIdNumber();
+			int nextAnsHstryNum = (maxAnsHstryNum != null) ? maxAnsHstryNum + 1 : 1;
+			String ansHstryId = "ans_hstry_" + nextAnsHstryNum;
+
+			InquiryAnswerHistory history = new InquiryAnswerHistory();
+			history.setAnsHstryId(ansHstryId);
+			history.setAnswerId(ansId);
+			history.setInqryId(inqryId);
+			history.setPrcsUserNo(answrUserNo); // 처리 사용자 번호는 답변자 번호와 동일
+			history.setChgBfrStts(chgBfrStts); // 변경 전 상태
+			history.setChgAftrStts("완료"); // 변경 후 상태
+			history.setChgCn("답변 수정으로 인한 상태 변경"); // 변경 내용
+			// chgDt는 DB에서 NOW()로 자동 설정됩니다.
+
+			sellerInquiryMapper.insertInquiryAnswerHistory(history);
+			log.info("서비스: 문의 답변 이력 기록 성공 - 이력 ID: {}", ansHstryId);
+
 			return answerMapper.getAnswerById(ansId);
 		} else {
 			log.error("서비스: 답변 수정 실패 - 업데이트된 행 수: 0, 답변 객체: {}", answer);
