@@ -22,8 +22,8 @@ public interface AdminSearchMapper {
 	 * 키워드 통계의 전체 개수 (전체 페이지 수를 계산하기 위함)
 	 * @return 그룹화된 키워드의 총 개수
 	 */
-	int getSearchStatsCount();
-	
+	 int getSearchStatsCount(Map<String, Object> params);
+	 
 	/**
 	 * 검색 조건에 맞는 검색 로그 목록을 조회 (페이지네이션 적용)
 	 * @param params 검색 조건과 페이지네이션 정보가 담긴 Map
@@ -37,5 +37,6 @@ public interface AdminSearchMapper {
 	 * @return 로그 총 개수
 	 */
 	int getSearchLogListCount(Map<String, Object> params);
+	
 
 }
