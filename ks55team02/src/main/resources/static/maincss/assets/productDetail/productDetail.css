@@ -29,7 +29,7 @@
 .product-details-top {
 	border-top: none;
 	margin-bottom: 15px;
-	margin-top: 5px;
+	margin-top: 10px;
 }
 
 .product-details .product-cat {
@@ -62,9 +62,9 @@
 
 /* ⭐ [추가] 버튼들을 감싸는 컨테이너, flex를 적용하여 자식 요소들이 공간을 나눠 갖도록 함 */
 .product-details-action .product-main-buttons {
-    display: flex;
-    flex-grow: 1; /* 남은 공간을 모두 차지하도록 */
-    gap: 10px;
+	display: flex;
+	flex-grow: 1; /* 남은 공간을 모두 차지하도록 */
+	gap: 10px;
 }
 
 /* ⭐ [수정] 모든 버튼의 기본 스타일 */
@@ -78,16 +78,16 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-    flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
+	flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
 }
 
 /* ⭐ [수정] 장바구니 버튼과 구매하기 버튼 스타일 (비율 2) */
-.product-details-action .btn-cart,
-.product-details-action .btn-buy-now {
+.product-details-action .btn-cart, .product-details-action .btn-buy-now
+	{
 	background-color: #fff;
 	color: #333;
 	border: 1px solid #ccc;
-    flex-grow: 2; /* 비율 2 */
+	flex-grow: 2; /* 비율 2 */
 }
 
 /* ⭐ [수정] 구매하기 버튼 스타일 */
@@ -99,15 +99,15 @@
 
 /* ⭐ [수정] 공유하기 버튼 스타일 (비율 1) */
 .product-details-action .btn-share {
-    background-color: #fff;
+	background-color: #fff;
 	color: #333;
 	border: 1px solid #ccc;
-    flex-grow: 1; /* 비율 1 */
+	flex-grow: 1; /* 비율 1 */
 }
 
 /* 공유하기 버튼 아이콘 스타일 (기존 스타일과 충돌 방지를 위해 별도 지정) */
 .product-details-action .btn-share i {
-    margin-right: 5px; /* 아이콘과 텍스트 사이 간격 */
+	margin-right: 5px; /* 아이콘과 텍스트 사이 간격 */
 }
 
 /* 공유하기 버튼 스타일 (이 부분은 이전 코드에 있었으나, 역할이 중복될 수 있으므로 주석 처리하거나 필요에 따라 수정) */
@@ -125,9 +125,7 @@
 	padding: 0 8px;
 }
 
-
 /* 버튼 스타일 끝 */
-
 .product-brand-info {
 	border-bottom: 1px solid #eee;
 	padding-bottom: 15px;
@@ -979,6 +977,23 @@
 	margin-bottom: 0rem;
 }
 
+/* 하단 */
+.product-desc-content .container, .reviews .container {
+	box-sizing: border-box;
+}
+
+.container-bottom {
+	width: 100%;
+	padding-right: 0px;
+	padding-left: 0px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.zoomContainer {
+	display: none;
+}
+
 /* --- 태블릿 반응형 스타일 (768px ~ 991px) --- */
 @media screen and (min-width: 768px) and (max-width: 992px) {
 	/* 1. 부모 컨테이너 (#product-zoom-gallery) 스타일 */
@@ -1002,7 +1017,8 @@
 
 	/* 2. 개별 아이템 (.product-gallery-item) 스타일 */
 	#product-zoom-gallery .product-gallery-item {
-		flex: 0 0 100px; width : 100px;
+		flex: 0 0 100px;
+		width: 100px;
 		margin-bottom: 0;
 		position: relative;
 		display: block;
@@ -1010,6 +1026,10 @@
 		padding-right: .5rem;
 		box-sizing: border-box;
 		width: 100px;
+	}
+	.product-desc-content .container, .reviews .container {
+		padding: 0 15px;
+		box-sizing: border-box;
 	}
 }
 
@@ -1030,6 +1050,10 @@
 	}
 	.product-gallery-vertical .product-image-gallery.active {
 		cursor: grabbing;
+	}
+	.product-desc-content .container, .reviews .container {
+		padding: 0 15px;
+		box-sizing: border-box;
 	}
 }
 
@@ -1076,18 +1100,7 @@
 		border: none;
 		padding: 15px;
 	}
-	.container-bottom{
+	.container-bottom {
 		padding: 15px;
 	}
-}
-
-/* 하단 */
-
-
-.container-bottom {
-    width: 100%;
-    padding-right: 0px;
-    padding-left: 0px;
-    margin-right: auto;
-    margin-left: auto;
 }

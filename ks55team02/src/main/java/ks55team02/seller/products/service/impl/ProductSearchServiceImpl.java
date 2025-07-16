@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.domain.Products;
 import ks55team02.seller.products.mapper.ProductSearchMapper;
 import ks55team02.seller.products.service.ProductSearchService;
@@ -17,6 +18,11 @@ import lombok.RequiredArgsConstructor;
 public class ProductSearchServiceImpl implements ProductSearchService {
 
     private final ProductSearchMapper productSearchMapper;
+    
+    @Override
+    public List<ProductCategory> getCategoriesByStoreId(String storeId) {
+        return productSearchMapper.getCategoriesByStoreId(storeId);
+    }
     
     @Override
     public List<Products> getRecentProductsByStoreId(String storeId, int limit) {

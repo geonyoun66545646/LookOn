@@ -8,10 +8,10 @@
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title th:text="${title} ?: 'LookOn'">룩온 전체 상품 페이지</title>
 
-<link rel="stylesheet" th:href="@{/maincss/assets/css/demos/demo-6.css}">
 <link rel="stylesheet"
 	th:href="@{/maincss/assets/css/bootstrap.min.css}">
 <link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
+
 <link rel="stylesheet"
 	th:href="@{/maincss/assets/css/plugins/owl-carousel/owl.carousel.css}">
 <link rel="stylesheet"
@@ -23,6 +23,7 @@
 	th:href="@{/maincss/assets/css/plugins/jquery.countdown.css}">
 <link rel="stylesheet"
 	th:href="@{/maincss/assets/css/skins/skin-demo-6.css}">
+<link rel="stylesheet" th:href="@{/maincss/assets/css/demos/demo-6.css}">
 
 <link rel="stylesheet"
 	th:href="@{/maincss/assets/mainHeader/mainHeader.css}">
@@ -46,6 +47,10 @@
 
 		<main class="main">
 			<div class="page-content">
+
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-12">
 							<!-- ⭐ 기존 brand-header 삭제 후, 이 블록으로 교체해주세요. ⭐ -->
 							<div class="brand-page-container"
 								th:if="${currentBrandId != null}">
@@ -73,14 +78,10 @@
 									</div>
 								</div>
 							</div>
-				<div class="container">
-					<div class="row">
-						<div class="col-lg-12">
+							<!-- 브랜드 끝 -->
 
 							<div
 								th:replace="~{customer/fragments/productToolbar :: productToolbarFragment}"></div>
-
-
 							<th:block layout:fragment="content"></th:block>
 						</div>
 					</div>
@@ -105,62 +106,76 @@
 						<span aria-hidden="true">×</span>
 					</button>
 				</div>
-				<div class="modal-body text-center">
-					<img th:if="${currentBrand?.storeLogoImg != null}"
+				<!-- ⭐ th:if 조건을 추가하여 currentBrand가 null이 아닐 때만 내용을 표시하도록 함 ⭐ -->
+				<div class="modal-body text-center" th:if="${currentBrand != null}">
+					<img
+						th:if="${currentBrand.storeLogoImg != null and !#strings.isEmpty(currentBrand.storeLogoImg)}"
 						th:src="@{${currentBrand.storeLogoImg}}" alt="Brand Logo"
-						class="brand-modal-logo mb-3">
-					<h4 class="brand-modal-title" th:text="${currentBrand?.storeConm}">브랜드	이름</h4>
+						class="brand-modal-logo mb-3" onerror="this.style.display='none'">
+					<!-- 이미지 로드 실패 시 숨김 처리 -->
+
+					<h4 class="brand-modal-title" th:text="${currentBrand.storeConm}">브랜드
+						이름</h4>
+
 					<p class="brand-modal-description"
-						th:text="${currentBrand?.storeIntroCn}">브랜드 소개글이 여기에 들어갑니다.</p>
+						th:text="${currentBrand.storeIntroCn}">브랜드 소개글이 여기에 들어갑니다.</p>
+				</div>
+				<!-- currentBrand가 null일 경우를 위한 대체 메시지 (선택 사항) -->
+				<div class="modal-body text-center" th:if="${currentBrand == null}">
+					<p>브랜드 정보를 불러올 수 없습니다.</p>
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/jquery.waypoints.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/superfish.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/owl.carousel.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/jquery.plugin.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/jquery.countdown.min.js}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-    <script th:src="@{/js/customerjs/register.js}"></script>
-    <script th:src="@{/js/customerjs/login.js}"></script>
-    <script th:src="@{/js/customerjs/loginCheckInterceptor.js}"></script>
-    
-    <th:block layout:fragment="jsFile"></th:block>
-    
-    <script th:src="@{/maincss/assets/js/main.js}"></script>
-    <script th:src="@{/maincss/assets/js/demos/demo-2.js}"></script>
-    
-    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    
-    <script th:src="@{/maincss/assets/js/demos/demo-2.js}"></script>
-	<script th:src="@{/maincss/assets/js/customer/customer-pagination.js}"></script>
-	
-	<!-- <script th:src="@{/maincss/assets/js/customer/feedWriteBtn.js}"></script> 지성 수정 경로에 없다는데 이거 왜있는거야? -->
-	
+	<script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.waypoints.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/superfish.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/owl.carousel.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.plugin.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
+	<script th:src="@{/maincss/assets/js/jquery.countdown.min.js}"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script th:src="@{/js/customerjs/register.js}"></script>
+	<script th:src="@{/js/customerjs/login.js}"></script>
+	<script th:src="@{/js/customerjs/loginCheckInterceptor.js}"></script>
 
-    <script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
-    <!-- 이건 따로 빼서 사용할수없어서 여기 있는 거에여 -->
-    <!-- 이스크립트 코드 사용처는 비로그인 사용자 접근 막는 용도 에여 -->
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        // authAlert 값이 실제로 존재하는 경우에만 세션 클리어 요청을 보냅니다.
-        const authAlert = /*[[${session.authAlert}]]*/ null;
-        if (authAlert) {
-            // 이 AJAX 요청은 페이지 로딩과 비동기적으로 실행되므로 다른 스크립트에 영향을 주지 않습니다.
-            $.ajax({
-                url: '/customer/clearLoginInterceptorSession',
-                type: 'GET'
-            });
-        }
-        /*]]>*/
-    </script>
-    <th:block layout:fragment="jsScript"></th:block>
+	<th:block layout:fragment="jsFile"></th:block>
+
+	<script th:src="@{/maincss/assets/js/main.js}"></script>
+	<script th:src="@{/maincss/assets/js/demos/demo-2.js}"></script>
+
+	<script
+		src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+	<script th:src="@{/maincss/assets/js/demos/demo-2.js}"></script>
+	<script th:src="@{/maincss/assets/js/customer/customer-pagination.js}"></script>
+	<script
+		th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
+	<script
+		th:src="@{/maincss/assets/productToolbar/productToolbar.js}"></script>
+
+
+	<!-- <script th:src="@{/maincss/assets/js/customer/feedWriteBtn.js}"></script> 지성 수정 경로에 없다는데 이거 왜있는거야? -->
+	<!-- 이건 따로 빼서 사용할수없어서 여기 있는 거에여 -->
+	<!-- 이스크립트 코드 사용처는 비로그인 사용자 접근 막는 용도 에여 -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		// authAlert 값이 실제로 존재하는 경우에만 세션 클리어 요청을 보냅니다.
+		const authAlert = /*[[${session.authAlert}]]*/null;
+		if (authAlert) {
+			// 이 AJAX 요청은 페이지 로딩과 비동기적으로 실행되므로 다른 스크립트에 영향을 주지 않습니다.
+			$.ajax({
+				url : '/customer/clearLoginInterceptorSession',
+				type : 'GET'
+			});
+		}
+		/*]]>*/
+	</script>
+	<th:block layout:fragment="jsScript"></th:block>
 
 </body>
 </html>

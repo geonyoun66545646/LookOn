@@ -180,11 +180,13 @@ public class CustomerProductController {
 				title = currentBrand.getStoreConm();
 				breadCrumbTitle = currentBrand.getStoreConm();
 				// ⭐ 이 블록을 추가합니다: 브랜드 스냅용 상품 조회 ⭐
-	            List<Products> brandSnapProducts = productSearchService.getRecentProductsByStoreId(brandIdForTitle, 3);
+	            List<Products> brandSnapProducts = productSearchService.getRecentProductsByStoreId(brandIdForTitle, 4);
 	            model.addAttribute("brandSnapProducts", brandSnapProducts);
-	            
-	            // ⭐ Store 객체 자체를 모델에 추가하여 소개글 등 다른 정보도 활용 가능하게 함 ⭐
 	            model.addAttribute("currentBrand", currentBrand);
+	            // 해당 브랜드가 판매하는 상품의 카테고리 목록을 조회
+	            List<ProductCategory> brandCategories = productSearchService.getCategoriesByStoreId(brandIdForTitle);
+				model.addAttribute("subCategories", brandCategories);
+				model.addAttribute("parentCategoryName", "전체");
 			} else {
 				title = "알 수 없는 브랜드";
 				breadCrumbTitle = "알 수 없는 브랜드";

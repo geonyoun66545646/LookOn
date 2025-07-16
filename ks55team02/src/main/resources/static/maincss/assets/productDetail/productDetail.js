@@ -290,6 +290,52 @@ $(document).ready(function() {
 			},
 		});
 	}
+	
+	const gallery = document.querySelector('.product-detail-image-gallery');
+
+	    if (gallery) {
+	        // --- 1. 휠 스크롤 문제 해결 (이전과 동일) ---
+	        // 썸네일 갤러리 위에서 마우스 휠을 돌릴 때 페이지 전체가 스크롤되도록 함
+	        gallery.addEventListener('wheel', function(event) {
+	            if (event.deltaY !== 0) {
+	                event.preventDefault();
+	                window.scrollBy(0, event.deltaY);
+	            }
+	        });
+
+	        // --- 2. 드래그-스크롤 기능 구현 ---
+	        let isDown = false;
+	        let startY;
+	        let scrollTop;
+
+	        // 마우스를 눌렀을 때
+	        gallery.addEventListener('mousedown', (e) => {
+	            isDown = true;
+	            gallery.classList.add('active'); // '잡는 중' 커서 스타일 적용
+	            startY = e.pageY - gallery.offsetTop;
+	            scrollTop = gallery.scrollTop;
+	        });
+
+	        // 마우스를 뗐을 때
+	        gallery.addEventListener('mouseleave', () => {
+	            isDown = false;
+	            gallery.classList.remove('active');
+	        });
+
+	        gallery.addEventListener('mouseup', () => {
+	            isDown = false;
+	            gallery.classList.remove('active');
+	        });
+
+	        // 마우스를 움직일 때
+	        gallery.addEventListener('mousemove', (e) => {
+	            if (!isDown) return;
+	            e.preventDefault(); // ⭐ 중요: 이미지/텍스트 드래그 선택 방지
+	            const y = e.pageY - gallery.offsetTop;
+	            const walk = (y - startY) * 2; // *2는 스크롤 속도 조절 (숫자를 키우면 더 빨리 스크롤됨)
+	            gallery.scrollTop = scrollTop - walk;
+	        });
+	    }
 
 	console.log("페이지 로드 시 모든 스크립트 초기화 완료.");
 });

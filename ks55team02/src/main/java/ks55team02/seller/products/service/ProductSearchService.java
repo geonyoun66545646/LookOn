@@ -1,8 +1,10 @@
 package ks55team02.seller.products.service;
 
-import ks55team02.seller.products.domain.Products;
 import java.util.List;
 import java.util.Map;
+
+import ks55team02.seller.products.domain.ProductCategory;
+import ks55team02.seller.products.domain.Products;
 
 public interface ProductSearchService {
 	
@@ -35,4 +37,10 @@ public interface ProductSearchService {
      * @return 해당 브랜드의 최신 상품 목록
      */
     List<Products> getRecentProductsByStoreId(String storeId, int limit);
+    /**
+     * 특정 브랜드(상점)가 판매하는 상품들의 카테고리 목록을 조회합니다.
+     * @param storeId 상점 고유 ID
+     * @return 해당 상점의 카테고리 목록
+     */
+    List<ProductCategory> getCategoriesByStoreId(String storeId);
 }
