@@ -83,7 +83,10 @@
             .address-form-wrapper { width: 100%; margin: 0 auto; border: 1px solid #e9e9e9; padding: 20px; border-radius: 5px; }
             .address-form-group { display: flex; align-items: center; margin-bottom: 12px; }
             .address-form-group label { width: 120px; flex-shrink: 0; }
-            .address-form-group .input-group { display: flex; flex-grow: 1; }
+            .address-form-group .input-group { display: flex; align-items: center; }
+            
+            #search-postcode-btn{margin-bottom : 15px;}
+            
         </style>
     </th:block>
 </head>
@@ -92,8 +95,7 @@
 	<th:block layout:fragment="contents">
 		<div class="page-wrapper">
 			<main class="main">
-				<div class="page-header text-center"
-					style="background-image: url('/maincss/assets/images/page-header-bg.jpg')">
+				<div class="page-header text-center">
 					<div class="container">
 						<h1 class="page-title">Checkout<span>Shop</span></h1>
 					</div>
@@ -167,178 +169,181 @@
 	</th:block>
 
 	<th:block layout:fragment="jsScript">
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+   <script>
+	    document.addEventListener('DOMContentLoaded', function() {
+	
+	        // 'cart_data' 대신 올바른 키 이름인 'buy_now_data'로 데이터를 가져옵니다.
+	        const buyNowDataString = sessionStorage.getItem('buy_now_data');
+	
+	        if (!buyNowDataString) {
+	            alert("결제할 상품 정보가 없습니다. 장바구니로 이동합니다.");
+	            window.location.href = '/cart'; // 장바구니 페이지로 강제 이동
+	            return;
+	        }
+	
+	        const productsToCheckout = JSON.parse(buyNowDataString);
+	        let subtotal = 0;
+	        productsToCheckout.forEach(p => {
+	            subtotal += (p.price || 0) * (p.quantity || 1);
+	        });
+	
+	        const productListContainer = document.getElementById('order-product-list-container');
+	        const checkoutSubtotalElem = document.getElementById('checkoutSubtotal');
+	        const checkoutTotalElem = document.getElementById('checkoutTotal');
+	        
+	        productListContainer.innerHTML = productsToCheckout.map(p => `
+	        <div class="order-product-item">
+	            <div class="order-product-details" style="margin-left: 0;">
+	                <h3 class="order-product-name">${p.name || '상품명 없음'}</h3>
+	                <div class="order-product-info">수량: ${p.quantity || 1}개</div>
+	            </div>
+	            <div class="order-product-price">₩${((p.price || 0) * (p.quantity || 1)).toLocaleString()}</div>
+	        </div>
+	    `).join('');
+	
+	    // 주문 요약 정보를 화면에 그립니다.
+	    checkoutSubtotalElem.textContent = `₩${subtotal.toLocaleString()}`;
+	    checkoutTotalElem.textContent = `₩${subtotal.toLocaleString()}`;
+	
+	
+	        // =================================================================
+	        // 2. 배송지 관련 로직 (수정 없음)
+	        // =================================================================
+	        const registerAddressBtn = document.getElementById('register-address-btn');
+	        const addressDisplay = document.getElementById('address-display');
+	        const originalAddressDisplayContent = addressDisplay.innerHTML;
+	
+	        registerAddressBtn.addEventListener('click', showAddressForm);
+	
+	        function showAddressForm() {
+	            addressDisplay.innerHTML = `
+	            <div class="address-form-wrapper">
+	                <form id="address-entry-form">
+	                    <div class="address-form-group"><label for="shipping-name">받는 사람 *</label><input type="text" id="shipping-name" class="form-control"></div>
+	                    <div class="address-form-group"><label>주소 *</label><div class="input-group"><input type="text" id="postcode" class="form-control" readonly><button type="button" id="search-postcode-btn" class="btn btn-light">우편번호</button></div></div>
+	                    <div class="address-form-group"><label></label><input type="text" id="main-address" class="form-control" readonly></div>
+	                    <div class="address-form-group"><label></label><input type="text" id="detail-address" class="form-control" placeholder="상세주소 입력"></div>
+	                    <div class="address-form-group"><label>연락처 *</label><input type="tel" id="phone" class="form-control" placeholder="'-' 없이 숫자만 입력"></div>
+	                    <div class="address-form-group"><label for="delivery-request">배송 요청사항</label><select id="delivery-request" class="form-control"><option value="요청사항 없음">요청사항 없음</option><option value="문 앞에 놓아주세요">문 앞에 놓아주세요</option><option value="경비실에 맡겨주세요">경비실에 맡겨주세요</option></select></div>
+	                    <div class="text-center mt-3"><button type="button" id="save-address-btn" class="btn btn-primary">저장</button><button type="button" id="cancel-address-btn" class="btn btn-secondary ml-2">취소</button></div>
+	                </form>
+	            </div>`;
+	            
+	            document.getElementById('search-postcode-btn').addEventListener('click', execDaumPostcode);
+	            document.getElementById('save-address-btn').addEventListener('click', saveAddress);
+	            document.getElementById('cancel-address-btn').addEventListener('click', () => {
+	                addressDisplay.innerHTML = originalAddressDisplayContent;
+	            });
+	        }
+	
+	        function execDaumPostcode() {
+	            new daum.Postcode({
+	                oncomplete: function(data) {
+	                    document.getElementById('postcode').value = data.zonecode;
+	                    document.getElementById('main-address').value = data.address;
+	                    document.getElementById('detail-address').focus();
+	                }
+	            }).open();
+	        }
+	
+	        function saveAddress() {
+	            const recipientName = document.getElementById('shipping-name').value.trim();
+	            const postcode = document.getElementById('postcode').value.trim();
+	            const mainAddress = document.getElementById('main-address').value.trim();
+	            const detailAddress = document.getElementById('detail-address').value.trim();
+	            const phone = document.getElementById('phone').value.trim();
+	            const deliveryRequest = document.getElementById('delivery-request').value;
+	
+	            if (!recipientName || !postcode || !detailAddress || !phone) {
+	                alert('필수 항목(*)을 모두 입력해주세요.');
+	                return;
+	            }
+	
+	            const fullAddress = `${mainAddress} ${detailAddress}`;
+	            addressDisplay.innerHTML = `
+	                <div style="width:100%; text-align:left; padding:1rem;">
+	                    <p><strong>받는 사람:</strong> <span id="display-recipient">${recipientName}</span></p>
+	                    <p><strong>연락처:</strong> <span id="display-phone">${phone}</span></p>
+	                    <p><strong>주소:</strong> (<span id="display-postcode">${postcode}</span>) <span id="display-address">${fullAddress}</span></p>
+	                    <p><strong>요청사항:</strong> <span id="display-request">${deliveryRequest}</span></p>
+	                </div>`;
+	            registerAddressBtn.textContent = '배송지 변경';
+	        }
+	
+	        // =================================================================
+	        // 3. 결제 버튼 로직 
+	        // =================================================================
+	        const paymentButton = document.getElementById("payment-button");
+	        paymentButton.addEventListener("click", async function() {
+	            const postcodeElem = document.querySelector('#display-postcode');
+	            if (!postcodeElem) {
+	                alert('배송지를 먼저 등록해주세요.');
+	                return;
+	            }
 
-            // 'cart_data' 대신 올바른 키 이름인 'buy_now_data'로 데이터를 가져옵니다.
-            const buyNowDataString = sessionStorage.getItem('buy_now_data');
+	            const orderName = productsToCheckout.length > 1 
+	                ? `${productsToCheckout[0].name} 외 ${productsToCheckout.length - 1}건`
+	                : productsToCheckout[0].name;
 
-            if (!buyNowDataString) {
-                alert("결제할 상품 정보가 없습니다. 장바구니로 이동합니다.");
-                window.location.href = '/cart'; // 장바구니 페이지로 강제 이동
-                return;
-            }
+	            const orderData = {
+	                products: productsToCheckout.map(p => ({ gdsNo: p.gdsNo, quantity: p.quantity, price: p.price, name: p.name })),
+	                totalAmount: subtotal,
+	                shippingAddress: {
+	                    recipientName: document.querySelector('#display-recipient').textContent,
+	                    phone: document.querySelector('#display-phone').textContent,
+	                    postcode: postcodeElem.textContent,
+	                    address: document.querySelector('#display-address').textContent,
+	                    deliveryRequest: document.querySelector('#display-request').textContent,
+	                },
+	                customerName: document.querySelector('#display-recipient').textContent
+	            };
 
-            const productsToCheckout = JSON.parse(buyNowDataString);
-            let subtotal = 0;
-            productsToCheckout.forEach(p => {
-                subtotal += (p.price || 0) * (p.quantity || 1);
-            });
+	            try {
+	                paymentButton.disabled = true;
+	                paymentButton.textContent = "주문 처리 중...";
 
-            const productListContainer = document.getElementById('order-product-list-container');
-            const checkoutSubtotalElem = document.getElementById('checkoutSubtotal');
-            const checkoutTotalElem = document.getElementById('checkoutTotal');
-            
-            productListContainer.innerHTML = productsToCheckout.map(p => `
-            <div class="order-product-item">
-                <div class="order-product-details" style="margin-left: 0;">
-                    <h3 class="order-product-name">${p.name || '상품명 없음'}</h3>
-                    <div class="order-product-info">수량: ${p.quantity || 1}개</div>
-                </div>
-                <div class="order-product-price">₩${((p.price || 0) * (p.quantity || 1)).toLocaleString()}</div>
-            </div>
-        `).join('');
+	                const response = await fetch('/api/orders', {
+	                    method: 'POST',
+	                    headers: { 'Content-Type': 'application/json' },
+	                    body: JSON.stringify(orderData)
+	                });
 
-        // 주문 요약 정보를 화면에 그립니다.
-        checkoutSubtotalElem.textContent = `₩${subtotal.toLocaleString()}`;
-        checkoutTotalElem.textContent = `₩${subtotal.toLocaleString()}`;
+	                if (!response.ok) {
+	                    const errorData = await response.json(); 
+	                    throw new Error(errorData.error || '주문 생성에 실패했습니다.'); 
+	                }
+	                const data = await response.json();
+	                
+	                // ▼▼▼▼▼ [수정됨] 결제 호출 로직 전체 수정 ▼▼▼▼▼
+	                const clientKey = '[[${tossClientKey}]]';
+	                const tossPayments = TossPayments(clientKey);
 
+	                // 불필요한 중복 호출과 promise 로직을 제거하고, 단일 호출로 간결하게 수정합니다.
+	                // method를 제거하여 사용자가 결제수단을 선택할 수 있도록 합니다.
+	                tossPayments.requestPayment('카드', {
+	                    orderId: data.orderId,
+	                    orderName: orderName,
+	                    customerName: data.customerName,
+	                    amount: data.amount,
+	                    successUrl: window.location.origin + '/toss/success',
+	                    failUrl: window.location.origin + '/payment/fail',
+	                }).catch(function (error) {
+	                    // 사용자가 결제창을 닫는 등 예외 처리
+	                    if (error.code !== 'USER_CANCEL') {
+	                        alert('결제 중 오류가 발생했습니다: ' + error.message);
+	                    }
+	                });
+	                // ▲▲▲▲▲ [수정됨] 결제 호출 로직 전체 수정 ▲▲▲▲▲
 
-            // =================================================================
-            // 2. 배송지 관련 로직 (수정 없음)
-            // =================================================================
-            const registerAddressBtn = document.getElementById('register-address-btn');
-            const addressDisplay = document.getElementById('address-display');
-            const originalAddressDisplayContent = addressDisplay.innerHTML;
-
-            registerAddressBtn.addEventListener('click', showAddressForm);
-
-            function showAddressForm() {
-                addressDisplay.innerHTML = `
-                <div class="address-form-wrapper">
-                    <form id="address-entry-form">
-                        <div class="address-form-group"><label for="shipping-name">받는 사람 *</label><input type="text" id="shipping-name" class="form-control"></div>
-                        <div class="address-form-group"><label>주소 *</label><div class="input-group"><input type="text" id="postcode" class="form-control" readonly><button type="button" id="search-postcode-btn" class="btn btn-light">우편번호</button></div></div>
-                        <div class="address-form-group"><label></label><input type="text" id="main-address" class="form-control" readonly></div>
-                        <div class="address-form-group"><label></label><input type="text" id="detail-address" class="form-control" placeholder="상세주소 입력"></div>
-                        <div class="address-form-group"><label>연락처 *</label><input type="tel" id="phone" class="form-control" placeholder="'-' 없이 숫자만 입력"></div>
-                        <div class="address-form-group"><label for="delivery-request">배송 요청사항</label><select id="delivery-request" class="form-control"><option value="요청사항 없음">요청사항 없음</option><option value="문 앞에 놓아주세요">문 앞에 놓아주세요</option><option value="경비실에 맡겨주세요">경비실에 맡겨주세요</option></select></div>
-                        <div class="text-center mt-3"><button type="button" id="save-address-btn" class="btn btn-primary">저장</button><button type="button" id="cancel-address-btn" class="btn btn-secondary ml-2">취소</button></div>
-                    </form>
-                </div>`;
-                
-                document.getElementById('search-postcode-btn').addEventListener('click', execDaumPostcode);
-                document.getElementById('save-address-btn').addEventListener('click', saveAddress);
-                document.getElementById('cancel-address-btn').addEventListener('click', () => {
-                    addressDisplay.innerHTML = originalAddressDisplayContent;
-                });
-            }
-
-            function execDaumPostcode() {
-                new daum.Postcode({
-                    oncomplete: function(data) {
-                        document.getElementById('postcode').value = data.zonecode;
-                        document.getElementById('main-address').value = data.address;
-                        document.getElementById('detail-address').focus();
-                    }
-                }).open();
-            }
-
-            function saveAddress() {
-                const recipientName = document.getElementById('shipping-name').value.trim();
-                const postcode = document.getElementById('postcode').value.trim();
-                const mainAddress = document.getElementById('main-address').value.trim();
-                const detailAddress = document.getElementById('detail-address').value.trim();
-                const phone = document.getElementById('phone').value.trim();
-                const deliveryRequest = document.getElementById('delivery-request').value;
-
-                if (!recipientName || !postcode || !detailAddress || !phone) {
-                    alert('필수 항목(*)을 모두 입력해주세요.');
-                    return;
-                }
-
-                const fullAddress = `${mainAddress} ${detailAddress}`;
-                addressDisplay.innerHTML = `
-                    <div style="width:100%; text-align:left; padding:1rem;">
-                        <p><strong>받는 사람:</strong> <span id="display-recipient">${recipientName}</span></p>
-                        <p><strong>연락처:</strong> <span id="display-phone">${phone}</span></p>
-                        <p><strong>주소:</strong> (<span id="display-postcode">${postcode}</span>) <span id="display-address">${fullAddress}</span></p>
-                        <p><strong>요청사항:</strong> <span id="display-request">${deliveryRequest}</span></p>
-                    </div>`;
-                registerAddressBtn.textContent = '배송지 변경';
-            }
-
-            // =================================================================
-            // 3. 결제 버튼 로직 (수정 없음)
-            // =================================================================
-            const paymentButton = document.getElementById("payment-button");
-            paymentButton.addEventListener("click", async function() {
-                const postcodeElem = document.querySelector('#display-postcode');
-                if (!postcodeElem) {
-                    alert('배송지를 먼저 등록해주세요.');
-                    return;
-                }
-
-                const orderName = productsToCheckout.length > 1 
-                    ? `${productsToCheckout[0].name} 외 ${productsToCheckout.length - 1}건`
-                    : productsToCheckout[0].name;
-
-                const orderData = {
-                    products: productsToCheckout.map(p => ({ gdsNo: p.gdsNo, quantity: p.quantity, price: p.price, name: p.name })),
-                    totalAmount: subtotal,
-                    shippingAddress: {
-                        recipientName: document.querySelector('#display-recipient').textContent,
-                        phone: document.querySelector('#display-phone').textContent,
-                        postcode: postcodeElem.textContent,
-                        address: document.querySelector('#display-address').textContent,
-                        deliveryRequest: document.querySelector('#display-request').textContent,
-                    },
-                    customerName: document.querySelector('#display-recipient').textContent
-                };
-
-                try {
-                    paymentButton.disabled = true;
-                    paymentButton.textContent = "주문 처리 중...";
-
-                    const response = await fetch('/api/orders', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(orderData)
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('주문 생성에 실패했습니다.');
-                    }
-                    const data = await response.json();
-
-                    if (data.success && data.ordrNo) {
-                        const clientKey = 'test_ck_BX7zk2yd8yPpN1PLNlXprx9POLqK';
-                        const tossPayments = TossPayments(clientKey);
-                        
-                        tossPayments.requestPayment('카드', {
-                            amount: data.amount,
-                            orderId: data.ordrNo,
-                            orderName: orderName,
-                            customerName: data.customerName,
-                            successUrl: `${window.location.origin}/payment/success`,
-                            failUrl: `${window.location.origin}/payment/fail`,
-                        }).catch(function (error) {
-                            if (error.code !== 'USER_CANCEL') {
-                                alert('결제 중 오류가 발생했습니다: ' + error.message);
-                            }
-                        });
-                    } else {
-                        alert('서버로부터 올바른 주문 정보를 받지 못했습니다.');
-                    }
-                } catch (error) {
-                    alert('주문 처리 중 오류가 발생했습니다: ' + error.message);
-                } finally {
-                    paymentButton.disabled = false;
-                    paymentButton.textContent = "결제하기";
-                }
-            });
-        });
-    </script>
+	            } catch (error) {
+	                alert('주문 처리 중 오류가 발생했습니다: ' + error.message);
+	                paymentButton.disabled = false;
+	                paymentButton.textContent = "결제하기";
+	            } 
+	            // finally 블록은 즉시 실행되므로 버튼 활성화 로직은 catch 블록으로 이동
+	        });
+	    });
+	</script>
 	</th:block>
 </body>
 </html>

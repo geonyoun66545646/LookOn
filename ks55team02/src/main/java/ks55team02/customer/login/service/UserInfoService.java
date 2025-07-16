@@ -10,4 +10,5 @@ public interface UserInfoService {
      * @return users, users_profiles 등 관련 테이블 정보가 모두 담긴 DTO
      */
     UserInfoResponse getUserInfo(String userNo);
+
 }

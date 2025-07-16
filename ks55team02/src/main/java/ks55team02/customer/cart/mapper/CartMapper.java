@@ -62,4 +62,11 @@ public interface CartMapper {
     
     // TODO: 추가할 메서드 - 가장 큰 cart_item_id의 숫자 부분 조회
     String getMaxCartItemId(); // 예: "cart_id_80" 또는 "80"을 반환하도록 처리
+    
+    /**
+     * 특정 cartItemId 목록에 해당하는 장바구니 항목들을 삭제
+     * @param cartItemIds 삭제할 장바구니 항목 ID 목록
+     * @param userNo 사용자 번호 (보안 강화를 위해 추가)
+     */
+    void deleteCartItemsByIds(@Param("cartItemIds") List<String> cartItemIds, @Param("userNo") String userNo);
 }
