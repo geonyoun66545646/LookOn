@@ -24,4 +24,5 @@ public class OrderDTO {
     private String zip;
     private String dlvyMemoCn;
     private String userName;
+    private String emlAddr;
 }

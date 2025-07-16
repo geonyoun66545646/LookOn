@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
-public class OrderItemsDTO {
+public class PayOrderItemsDTO {
 	
 	private String ordrDtlArtclNo; // 주문 상세 항목 번호 (ordr_dtl_artcl_no)
     private String ordrNo;         // 주문 번호 (ordr_no)
