@@ -245,18 +245,20 @@ html, body {
 /* =================================================================== */
 .weekly-best-slider-container {
 	position: relative;
+	padding: 10px 0; /* 이 부분의 패딩 값을 확인하고 sale에도 적용해야 합니다. */
+	box-sizing: border-box;
 }
 
 .weekly-best-slider-container .swiper {
-	padding: 10px 0;
-	box-sizing: border-box;
+	width: 100%; /* 너비 100% 명시 */
+	height: auto; /* 높이 auto 명시 */
 }
 
 .weekly-best-slider-container .swiper-wrapper {
 	align-items: stretch;
 }
 
-/* 
+/*
   [핵심 1] slidesPerView: 'auto' 모드에서는 우리가 직접 너비를 지정해야 합니다.
   상품 목록 페이지의 그리드 시스템(2/4/5/6열)과 유사하게 반응형으로 너비를 설정합니다.
 */
@@ -290,7 +292,7 @@ html, body {
 	}
 }
 
-/* 
+/*
   [핵심 2] .product 카드가 높이를 100% 채우고, 내부 요소를 정렬하도록 합니다.
 */
 .weekly-best-slider-container .product {
@@ -383,38 +385,82 @@ html, body {
 /* ⭐ 놓치기 아까운 특가 상품 (Sale) 슬라이더 스타일 ⭐ */
 /* 기존 Weekly Best 슬라이더의 스타일을 대부분 재사용합니다. */
 /* =================================================================== */
+
 .sale-products-section {
     /* weekly-best-section과 동일한 padding과 background-color를 가집니다. */
-    /* 만약 다른 스타일이 필요하다면 여기에 추가 */
-    padding-top: 30px; /* Weekly Best와 간격 조정을 위해 필요하다면 추가 */
+    background-color: #fdfdfd; /* weekly-best-section에서 복사 */
+	padding-top: 30px; /* weekly-best-section에서 복사 */
+	padding-bottom: 20px; /* weekly-best-section에서 복사 */
 }
 
 /* Sale 상품 슬라이더 컨테이너: Weekly Best와 동일한 스타일 재사용 */
 .sale-products-slider-container {
-    /* weekly-best-slider-container와 동일하게 설정 */
-    /* position: relative; */
+    position: relative; /* weekly-best-slider-container에서 복사 */
+    padding: 10px 0;    /* weekly-best-slider-container에서 복사 */
+    box-sizing: border-box; /* weekly-best-slider-container에서 복사 */
 }
 
 /* Sale 상품 Swiper 인스턴스: Weekly Best와 동일한 스타일 재사용 */
 .sale-products-swiper {
-    /* weekly-best-swiper와 동일하게 설정 */
-    /* padding: 10px 0; */
-    /* box-sizing: border-box; */
+    width: 100%; /* weekly-best-slider-container .swiper에서 복사 */
+    height: auto; /* weekly-best-slider-container .swiper에서 복사 */
 }
 
 /* Sale 상품 슬라이드 아이템: Weekly Best와 동일한 반응형 너비 재사용 */
 .sale-products-slider-container .swiper-slide {
-    /* weekly-best-slider-container .swiper-slide 와 동일하게 설정 */
-    /* height: auto; */
-    /* width: 50%; (모바일 기본) */
+    height: auto; /* weekly-best-slider-container .swiper-slide에서 복사 */
+    width: 50%; /* 모바일 기본 (2열) */
 }
 
+@media ( min-width : 576px) {
+	.sale-products-slider-container .swiper-slide {
+		width: 33.3333%; /* 3열 */
+	}
+}
+
+@media ( min-width : 768px) {
+	.sale-products-slider-container .swiper-slide {
+		width: 25%; /* 4열 */
+	}
+}
+
+@media ( min-width : 992px) {
+	.sale-products-slider-container .swiper-slide {
+		width: 20%; /* 5열 */
+	}
+}
+
+@media ( min-width : 1200px) {
+	.sale-products-slider-container .swiper-slide {
+		width: 16.6666%; /* 6열 */
+	}
+}
+
+/* Sale 상품 .product 카드 스타일: Weekly Best와 동일하게 높이 채우고 정렬 */
+.sale-products-slider-container .product {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+}
+
+.sale-products-slider-container .product-body {
+	flex-grow: 1;
+}
+
+
 /* Sale 상품 슬라이더 화살표 버튼 */
-/* 이전에 main.html에서 sale-swiper-button-prev, sale-swiper-button-next 클래스를 추가했습니다. */
-/* 이 클래스들을 사용하여 Weekly Best 버튼과 동일한 스타일을 적용합니다. */
-.sale-products-slider-container .sale-swiper-button-prev,
-.sale-products-slider-container .sale-swiper-button-next {
-    /* weekly-best-slider-container .swiper-button-prev, .swiper-button-next 와 동일하게 설정 */
+/* HTML에서 .sale-products-button-prev, .sale-products-button-next 클래스로 변경되었으므로,
+   CSS 선택자도 이 클래스들로 변경해야 합니다. */
+.sale-products-slider-container .sale-products-button-prev,
+.sale-products-slider-container .sale-products-button-next {
+    position: absolute; /* weekly-best-slider-container에서 복사 */
+    top: 50%; /* weekly-best-slider-container에서 복사 */
+    transform: translateY(-50%); /* weekly-best-slider-container에서 복사 */
+    z-index: 10; /* weekly-best-slider-container에서 복사 */
+    height: 20px; /* weekly-best-slider-container에서 복사 */
+    width: 28px; /* weekly-best-slider-container에서 복사 */
+    height: 30px; /* weekly-best-slider-container에서 복사 */
     background-color: rgba(30, 30, 30, 0.9);
     border: 1px solid #333;
     border-radius: 5px;
@@ -425,20 +471,20 @@ html, body {
 }
 
 /* Sale 슬라이더 컨테이너에 호버했을 때 버튼 투명도 */
-.sale-products-slider-container:hover .sale-swiper-button-prev,
-.sale-products-slider-container:hover .sale-swiper-button-next {
+.sale-products-slider-container:hover .sale-products-button-prev,
+.sale-products-slider-container:hover .sale-products-button-next {
     opacity: 0.7;
 }
 
 /* Sale 버튼 자체에 호버했을 때 투명도 */
-.sale-products-slider-container .sale-swiper-button-prev:hover,
-.sale-products-slider-container .sale-swiper-button-next:hover {
+.sale-products-slider-container .sale-products-button-prev:hover,
+.sale-products-slider-container .sale-products-button-next:hover {
     opacity: 1;
 }
 
 /* Sale 슬라이더 버튼 아이콘 스타일 */
-.sale-products-slider-container .sale-swiper-button-prev:after,
-.sale-products-slider-container .sale-swiper-button-next:after {
+.sale-products-slider-container .sale-products-button-prev:after,
+.sale-products-slider-container .sale-products-button-next:after {
     font-family: swiper-icons;
     font-size: 10px;
     text-transform: none !important;
@@ -449,15 +495,16 @@ html, body {
 }
 
 /* Sale 슬라이더 개별 버튼 위치 조정 */
-.sale-products-slider-container .sale-swiper-button-prev {
+.sale-products-slider-container .sale-products-button-prev {
     left: 15px; /* Weekly Best와 동일 */
 }
 
-.sale-products-slider-container .sale-swiper-button-next {
+.sale-products-slider-container .sale-products-button-next {
     right: 15px; /* Weekly Best와 동일 */
 }
 
 /* Sale 슬라이더 비활성화된 버튼은 항상 숨김 */
+/* 참고: 이 선택자는 Sale Products 버튼 클래스를 직접 참조하지 않으므로, Swiper의 기본 클래스인 .swiper-button-disabled를 사용합니다. */
 .sale-products-slider-container .swiper-button-disabled {
     opacity: 0 !important;
     visibility: hidden;

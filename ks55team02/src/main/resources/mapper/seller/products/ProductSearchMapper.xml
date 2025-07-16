@@ -52,7 +52,8 @@
             <result property="categoryName" column="ctgry_nm" />
         </association>
     </resultMap>
-	
+    
+	<!-- ⭐ 특가상품 -->
 	<select id="getSpecialSaleProducts" resultMap="activeProductsResultMap">
 	    SELECT
 	        p.gds_no, p.store_id, p.gds_nm, p.bas_prc,
