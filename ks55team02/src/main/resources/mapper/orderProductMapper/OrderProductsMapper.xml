@@ -23,6 +23,7 @@
 	        <result column="dlvy_memo_cn"   	property="dlvyMemoCn"/>
 	        <result column="user_name"   		property="userName"/>
 	        <result column="eml_addr"			property="emlAddr"/>
+	        <result column="gds_nm"				property="gdsNm" />
 	    </resultMap>
 	    
 	    <!-- ================================== 배송 관련 ================================== -->
@@ -64,7 +65,7 @@
   		
   	<select id="getCombinedOrderDetailsByOrderId" parameterType="String" resultMap="orderResultMap">
         SELECT
-            o.ordr_no            	-- 주문번호
+            o.ordr_no,            	-- 주문번호
             o.last_stlm_amt,        -- 최종 결제 금액
             o.ordr_dt,              -- 주문일시를 결제 승인일시로 사용
           	o.rcvr_nm,              -- 수령인 이름
@@ -86,7 +87,7 @@
             o.ordr_no = #{ordrNo}
     </select>
     
-    <select id="getOrderedProductsByOrderId" parameterType="String" resultMap="Map">
+    <select id="getOrderedProductsByOrderId" parameterType="String" resultMap="orderResultMap">
         SELECT
             p.gds_nm                            AS name,      -- 상품명
             oi.ordr_qntty                       AS quantity,  -- 주문 수량

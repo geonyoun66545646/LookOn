@@ -108,7 +108,7 @@
                                     </thead>
                                     <tbody>
                                         <tr th:each="product : ${orderedProducts}">
-                                            <td th:text="${product.gdsNm}">상품 A</td>
+                                            <td th:text="${product.name}">상품 A</td>
                                             <td th:text="${product.ordrQnty}">2</td>
                                             <td th:text="${#numbers.formatInteger(product.gdsPrice, 0, 'COMMA') + '원'}">25,000원</td>
                                             <td th:text="${#numbers.formatInteger(product.totalPrice, 0, 'COMMA') + '원'}">50,000원</td>

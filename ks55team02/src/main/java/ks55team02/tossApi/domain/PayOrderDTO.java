@@ -25,5 +25,6 @@ public class PayOrderDTO {
     private String zip;
     private String dlvyMemoCn;
     private String userName;
+    private String gdsNm;
        
 }
