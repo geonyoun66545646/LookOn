@@ -29,10 +29,17 @@
 		            <div class="my-feed-container" th:object="${userInfo}">
 		                <section class="profile-section">
 			            <!-- 프로필 이미지 -->
-			            <div class="profile-image">
-			                <!-- prflImg가 null이거나 비어있으면 기본 이미지, 아니면 사용자 이미지 표시 -->
-			                <img th:src="@{/uploads/profiles/profiles.jpg}" alt="프로필 이미지">
-			                <!-- th:src="*{prflImg != null && !prflImg.isEmpty() ? prflImg : 'C:\home\teamproject\attachment\profiles\profiles.jpg'} -->
+			            <div>
+			                <img th:if="${userInfo.prflImg != null}" 
+					             th:src="${userInfo.prflImg}" 
+					             alt="프로필 이미지"
+					             style="width: 100px; height: 100px; border-radius: 50%;"> <!-- 예시 스타일 -->
+					             
+					        <!-- prflImg 값이 null이거나 비어있을 경우, static 폴더의 기본 이미지를 표시합니다. -->
+					        <img th:if="${userInfo.prflImg == null or #strings.isEmpty(userInfo.prflImg)}" 
+					             th:src="@{/uploads/profiles/defaultprofile.jpg}" 
+					             alt="기본 프로필"
+					             style="width: 100px; height: 100px; border-radius: 50%;"> <!-- 예시 스타일 -->
 			            </div>
 			
 			            <!-- 프로필 정보 및 버튼 -->
@@ -84,7 +91,7 @@
         <!-- 2. 마이페이지 네비게이션 메뉴 -->
         <div class="mypage-nav-container">
             <ul class="main-nav">
-                <li><a href="#">마이하트</a></li>
+                <li><a href="#">상점</a></li>
                 <li><a href="#">주문관리</a></li>
                 <li><a href="#">나의활동</a></li>
                 <li><a href="#">쇼핑혜택</a></li>
@@ -94,13 +101,17 @@
             <div class="mypage-nav-details">
                 <div class="nav-column">
                     <ul>
-                        <li><a th:href="@{/store/appStore}">상점신청</a></li>
-                        <li><a th:href="@{/seller}">판매자 페이지</a></li>
+                        <li th:if="${userInfo.mbrGrdCd == 'grd_cd_3'}">
+                        	<a th:href="@{/store/appStore}">상점신청</a>
+                        </li>
+                        <li th:if="${userInfo.mbrGrdCd == 'grd_cd_2'}">
+                        	<a th:href="@{/seller}">판매자 페이지</a>
+                        </li>
                     </ul>
                 </div>
                 <div class="nav-column">
                     <ul>
-                        <li><a href="#">주문조회</a></li>
+                        <li><a href="@{/paymentHistory}">주문조회</a></li>
                         <li><a href="#">환불</a></li>
                     </ul>
                 </div>
@@ -117,9 +128,9 @@
                 </div>
                 <div class="nav-column">
                     <ul>
-                        <li><a th:href="@{/aditinfo}">회원정보 수정</a></li>
-                        <li><a th:href="@{/aditinfo(tab='profile')}">프로필 관리</a></li>
-                        <li><a th:href="@{/aditinfo(tab='security')}">보안설정</a></li>
+                        <li><a th:href="@{/aditinfo(tab='edit-info')}">회원정보 수정</a></li>
+                        <li><a th:href="@{/aditinfo(tab='manage-profile')}">프로필 관리</a></li>
+                        <li><a th:href="@{/aditinfo(tab='security-settings')}">보안설정</a></li>
                         <li><a th:href="@{/adminpage}">관리자페이지</a></li>
                         <li><a href="#">회원탈퇴</a></li>
                     </ul>

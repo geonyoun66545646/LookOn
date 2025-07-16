@@ -90,7 +90,7 @@ public class LoginController {
     	session.invalidate();
     	
     	log.info("========== 로그아웃 메소드 실행됨 ==========");
-    	return "redirect:/main"; 
+    	return "redirect:/"; 
     }
     
     @GetMapping("/clearLoginInterceptorSession")

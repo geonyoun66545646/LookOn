@@ -30,7 +30,7 @@
             <header class="feed-post-header">
                 <div class="user-profile">
                     <a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=*{writerInfo.userNo})}">
-                        <img th:src="@{/uploads/profiles/profiles.jpg}" alt="프로필 사진" class="profile-image">
+                        <img th:src="@{/uploads/profiles/defaultprofile.jpg}" alt="프로필 사진" class="profile-image">
                     </a>
                     <div class="user-info">
                         <span class="username" th:text="*{writerInfo?.userNcnm}">유저닉네임</span>

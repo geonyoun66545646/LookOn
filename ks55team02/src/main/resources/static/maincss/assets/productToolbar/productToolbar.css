@@ -1,4 +1,4 @@
-/* ================== 상품 관련 ===================== */
+/* ================== 상품 관련 시작 ===================== */
 .container {
 	width: 100%;
 	padding-right: 0px;
@@ -34,6 +34,8 @@
 .product-label.label-sale {
 	color: #fff;
 	background-color: #c96;
+	/* [수정] 이제 사용하지 않으므로 주석 처리 또는 삭제 */
+    display: none;
 }
 
 .product-label {
@@ -57,28 +59,96 @@
 	margin-bottom: 0rem;
 	transition: box-shadow .35s ease;
 	background-color: #fff;
+	/* ⭐⭐⭐ [추가] 시작 ⭐⭐⭐ */
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* 부모 요소의 높이를 꽉 채우도록 설정 */
+    /* ⭐⭐⭐ [추가] 끝 ⭐⭐⭐ */
 }
 
 .product-body {
 	position: relative;
-	padding: 20px 10px;
+	padding: 15px; /* 패딩을 약간 조정 */
 	transition: all .35s ease;
-	background-color: #f9f9f9;
-	/* 각 상품 body 자체에는 보더를 두지 않습니다. */
-	/* gap이 선 역할을 할 것입니다. */
-	/* 추가: 내용이 적을 때 최소한 이 높이를 유지합니다. */
-	min-height: 120px; /* 원하는 최소 높이로 조정하세요. */
-	/* 내부 폰트 사이즈, 패딩 등을 고려하여 적절히 설정 */
+	background-color: #fff; /* 배경색을 흰색으로 변경 */
+	min-height: 120px;
+    flex-grow: 1;
 }
 
+/* 1. 카테고리 스타일 */
 .product-cat {
 	color: #777;
 	font-weight: 400;
-	font-size: 1.2rem;
+	font-size: 1.1rem; /* 폰트 크기 약간 줄임 */
 	line-height: 1.2;
 	letter-spacing: -.01em;
-	margin-bottom: 1rem;
+	margin-bottom: 0.1rem; /* 아래 간격 줄임 */
 }
+
+/* 2. 상점명 (브랜드명) 스타일 */
+.product-brand {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 0.4rem;
+    /* 너비 초과 시 ... 처리 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.product-brand a {
+    color: inherit;
+    text-decoration: none;
+}
+.product-brand a:hover {
+    color: #c96;
+}
+
+/* 3. 제품명 (.product-title) 스타일 수정 */
+.product.product-7 .product-title {
+    font-size: 1.6rem;
+    font-weight: 400; /* 일반 두께로 */
+    color: #666;
+    letter-spacing: 0;
+    margin-bottom: 0.8rem;
+    /* 너비 초과 시 ... 처리 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.product.product-7 .product-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* 4. 가격 영역 (.product-price) 전체 스타일 수정 */
+.product.product-7 .product-price {
+    display: flex;
+    align-items: baseline; /* 할인율과 가격의 세로 정렬 기준선 */
+    font-size: 19px;
+    font-weight: 600; /* 굵게 */
+    margin-top: auto; /* 항상 카드 하단에 위치하도록 함 */
+    margin-bottom: 0px;
+}
+
+/* 할인율 스타일 */
+.product-price .discount-rate {
+    color: #c96; /* 할인율 텍스트 색상 */
+    font-size: 1.5rem;
+    margin-right: 8px; /* 가격과의 간격 */
+}
+
+/* 최종 가격 스타일 (할인 여부와 무관하게 공통 적용) */
+.product-price .final-price {
+    color: #333;
+}
+
+/* 할인된 가격에만 특별히 적용할 스타일 (필요하다면) */
+.product-price .final-price.discounted {
+    color: #333;
+}
+
+/* ⭐⭐⭐ [추가] 끝 ⭐⭐⭐ */
 
 .text-center {
 	text-align: left !important;
@@ -148,7 +218,7 @@
 	width: 100%; /* 너비를 기준으로 높이가 결정되므로 너비는 100%로 설정 */
 	height: 0; /* 높이를 padding으로 제어하기 위해 0으로 설정 */
 	/* 계산된 비율(119.6%)을 padding-top에 적용하여 높이 공간을 만듦 */
-	padding-top: 100.6%;
+	padding-top: 125%;
 }
 
 /* 내부 이미지 (컨테이너를 채움) */
@@ -161,6 +231,10 @@
 	object-fit: cover;
 	object-position: center;
 }
+
+/* ================== 상품 관련 끝 ================== */
+
+/* ================== 옵션툴바, 모달 스타일 시작 ================== */
 /* ================== 기본 & 툴바 스타일 ================== */
 .product-toolbar-container {
 	width: 100%;

@@ -13,45 +13,37 @@ import ks55team02.seller.products.domain.Products;
 import ks55team02.seller.products.service.ProductSearchService;
 import lombok.RequiredArgsConstructor;
 
-// ⭐ 1. @RequiredArgsConstructor 추가: final 필드를 위한 생성자 자동 주입
 @Controller
 @RequiredArgsConstructor
 public class CustomerHomeController {
 	
-	// ⭐ 2. final 키워드 추가: 생성자 주입의 대상임을 명시
     private final ProductSearchService productSearchService;
 	
-    // ⭐ 3. customerHomeView 메소드에 데이터 조회 로직 추가
-	@GetMapping(value= {"/main","/main/"})
-    public String customerHomeView(Model model, HttpServletRequest request) {
-		
+
+	@GetMapping("/")
+    public String customerHomeView(Model model, HttpServletRequest request) {	
 		model.addAttribute("currentUrl", request.getRequestURI());
 		
         // --- 메인 페이지 데이터 조회 로직 ---
-        
         // 1. 메인 슬라이더용 데이터 조회 (최신 상품 10개)
         List<Products> mainSlideProducts = productSearchService.getRecentProductsForMain(10);
         
-        // 2. 탭별 상품 목록 데이터 조회 (각 10개씩)
-        List<Products> allTabProducts = productSearchService.getAllActiveProductsForCustomer().stream().limit(10).collect(Collectors.toList());
-        List<Products> newTabProducts = productSearchService.getNewProducts().stream().limit(10).collect(Collectors.toList());
-        List<Products> saleTabProducts = productSearchService.getSaleProducts().stream().limit(10).collect(Collectors.toList());
-
-        // 3. 모델에 데이터 추가
-        model.addAttribute("mainSlideProducts", mainSlideProducts);
-        model.addAttribute("allTabProducts", allTabProducts);
-        model.addAttribute("newTabProducts", newTabProducts);
-        model.addAttribute("saleTabProducts", saleTabProducts);
+        // 2. ⭐ Weekly Best 상품 목록 데이터 조회 (24개)
+        List<Products> weeklyBestProducts = productSearchService.getWeeklyBestProducts();
         
-        // --- 여기까지 추가 ---
-		
+        // 3. ⭐ 새로 추가: 30% 이상 할인된 특가 상품 조회 및 모델에 추가
+        List<Products> saleProductList = productSearchService.getSpecialSaleProducts(30.0);
+
+        // 4. 모델에 데이터 추가
+        model.addAttribute("mainSlideProducts", mainSlideProducts);
+        model.addAttribute("weeklyBestProducts", weeklyBestProducts); // <-- weeklyBestProducts로 변경
+        model.addAttribute("saleProductList", saleProductList);
+        
         return "customer/main";
     }
-	
 	// 배송 조회 화면
 	@GetMapping(value = {"/shippmentStts"})
 	public String shippmentSttsView() {
 		return "customer/fragments/shippmentStts";
 	}
-	
 }

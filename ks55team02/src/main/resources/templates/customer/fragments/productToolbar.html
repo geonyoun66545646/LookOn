@@ -3,38 +3,63 @@
 
 <div th:fragment="productToolbarFragment">
 	<div class="product-toolbar-container">
-		<nav class="main-category-nav">
-			<ul class="main-category-list">
-				<li class="main-category-item"><a
-					th:href="@{/customer/products/list(categoryId=${parentCategoryId})}"
-					class="main-category-link"
-					th:classappend="${#strings.isEmpty(currentCategoryId) || currentCategoryId == parentCategoryId ? 'active' : ''}">전체</a>
-				</li>
-				<li class="main-category-item"
-					th:each="subCategory : ${subCategories}"><a
-					th:href="@{/customer/products/list(categoryId=${subCategory.categoryId})}"
-					class="main-category-link"
-					th:classappend="${currentCategoryId == subCategory.categoryId ? 'active' : ''}"
-					th:text="${subCategory.categoryName}">하위 카테고리명</a></li>
-			</ul>
-		</nav>
+		<!-- customer/fragments/productToolbar.html -->
+
+		<!-- customer/fragments/productToolbar.html -->
+
+		
+<nav class="main-category-nav">
+    <ul class="main-category-list">
+        <!-- '전체' 링크 -->
+        <li class="main-category-item">
+            <a class="main-category-link"
+               th:classappend="${#strings.isEmpty(currentCategoryId)} ? 'active' : ''"
+               th:href="${currentBrandId != null} ? @{/customer/products/brand/{brandId}(brandId=${currentBrandId})} : @{/customer/products/list}">
+               전체
+            </a>
+        </li>
+        
+        <!-- 카테고리 목록 (브랜드/일반 페이지 공통) -->
+        <li class="main-category-item" th:each="subCategory : ${subCategories}">
+            <a class="main-category-link"
+               th:classappend="${currentCategoryId == subCategory.categoryId} ? 'active' : ''"
+               th:href="${currentBrandId != null} 
+                         ? @{/customer/products/list(brands=${currentBrandId}, categoryId=${subCategory.categoryId})} 
+                         : @{/products/category/{categoryId}(categoryId=${subCategory.categoryId})}"
+               th:text="${subCategory.categoryName}">카테고리명</a>
+        </li>
+    </ul>
+</nav>
+
+		<!-- ... (다른 툴바 요소들은 그대로 유지) ... -->
 
 		<div class="product-filter-bar">
 			<div class="filter-controls">
 				<!-- 메인 필터 버튼: 클릭 시 모달이 열리고 기본 탭(컬러)이 표시됨 -->
-    <button class="filter-main-button app-modal-trigger" data-modal-tab="color">상품 필터</button>
-    
-    <!-- 성별 필터 버튼: 모달을 열지 않고 즉시 필터링 적용 -->
-    <button class="filter-button" data-filter-group="gender" data-gender="M" th:classappend="${currentGender == 'M' ? 'active' : ''}">남</button>
-    <button class="filter-button" data-filter-group="gender" data-gender="F" th:classappend="${currentGender == 'F' ? 'active' : ''}">여</button>
-    
-    <!-- 각 항목별 필터 버튼: 클릭 시 모달이 열리고 해당 탭이 표시됨 -->
-    <button class="filter-dropdown app-modal-trigger" data-modal-tab="color">컬러</button>
-    <button class="filter-dropdown app-modal-trigger" data-modal-tab="price">가격</button>
-    <button class="filter-dropdown app-modal-trigger" data-modal-tab="size">사이즈</button>
-    <button class="filter-dropdown app-modal-trigger" data-modal-tab="brand">브랜드</button>
-    <button class="filter-dropdown app-modal-trigger" data-modal-tab="discount">할인율</button>
-    <button class="filter-dropdown app-modal-trigger" data-modal-tab="type">상품유형</button>
+				<button class="filter-main-button app-modal-trigger"
+					data-modal-tab="color">상품 필터</button>
+
+				<!-- 성별 필터 버튼: 모달을 열지 않고 즉시 필터링 적용 -->
+				<button class="filter-button" data-filter-group="gender"
+					data-gender="M"
+					th:classappend="${currentGender == 'M' ? 'active' : ''}">남</button>
+				<button class="filter-button" data-filter-group="gender"
+					data-gender="F"
+					th:classappend="${currentGender == 'F' ? 'active' : ''}">여</button>
+
+				<!-- 각 항목별 필터 버튼: 클릭 시 모달이 열리고 해당 탭이 표시됨 -->
+				<button class="filter-dropdown app-modal-trigger"
+					data-modal-tab="color">컬러</button>
+				<button class="filter-dropdown app-modal-trigger"
+					data-modal-tab="price">가격</button>
+				<button class="filter-dropdown app-modal-trigger"
+					data-modal-tab="size">사이즈</button>
+				<button class="filter-dropdown app-modal-trigger"
+					data-modal-tab="brand">브랜드</button>
+				<button class="filter-dropdown app-modal-trigger"
+					data-modal-tab="discount">할인율</button>
+				<button class="filter-dropdown app-modal-trigger"
+					data-modal-tab="type">상품유형</button>
 			</div>
 
 			<div class="sort-control filter-button">
@@ -270,7 +295,7 @@
 				</div>
 
 				<div class="app-modal-tab-pane" id="brand-pane">
-				
+
 					<h3 class="app-tab-pane-title">브랜드</h3>
 					<div class="app-brand-search-wrapper">
 						<input type="text" class="app-brand-search-input"
@@ -284,15 +309,16 @@
 							</svg>
 						</button>
 					</div>
-					
-					<div class="app-filter-options-grid app-brand-options" id="brandListContainer">
-				        <label class="app-filter-option" th:each="brand : ${allBrands}">
-				            <input type="checkbox" name="brand" th:value="${brand.storeId}"
-				                   th:checked="${#lists.contains(selectedBrands, brand.storeId)}">
-				            <span class="brand-name">[[${brand.storeConm}]]</span>
-				        </label>
-				    </div>
-					
+
+					<div class="app-filter-options-grid app-brand-options"
+						id="brandListContainer">
+						<label class="app-filter-option" th:each="brand : ${allBrands}">
+							<input type="checkbox" name="brand" th:value="${brand.storeId}"
+							th:checked="${#lists.contains(selectedBrands, brand.storeId)}">
+							<span class="brand-name">[[${brand.storeConm}]]</span>
+						</label>
+					</div>
+
 				</div>
 
 				<div class="app-modal-tab-pane" id="type-pane">

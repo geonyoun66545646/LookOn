@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="utf-8" />
-	    <title th:text="${title}">Nest Dashboard</title>
+	    <title th:text="${title}"></title>
 	    <meta http-equiv="x-ua-compatible" content="ie=edge" />
 	    <meta name="viewport" content="width=device-width, initial-scale=1" />
 	    <!-- Favicon -->
@@ -16,7 +16,7 @@
             <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
                 <div class="container">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a th:href="@{/main}">Home</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
                         <li class="breadcrumb-item"><a href="#">Pages</a></li>
                         <li class="breadcrumb-item active" aria-current="page">404</li>
                     </ol>

@@ -21,4 +21,7 @@ public interface SearchMapper {
     int getProductsCount(String keyword);
     int getPostsCount(String keyword);
     int getUsersCount(String keyword);
+    
+    String getNextSearchLogId();
+    void insertSearchHistory(Map<String, Object> params);
 }
