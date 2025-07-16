@@ -1,46 +1,73 @@
 package ks55team02.customer.search.controller;
 
-import ks55team02.customer.search.domain.Search;
-import ks55team02.customer.search.service.SearchService;
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.ArrayList; // ArrayList를 사용하기 위해 import
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import ks55team02.customer.login.domain.LoginUser;
+import ks55team02.customer.search.domain.Search;
+import ks55team02.customer.search.service.SearchService;
+import lombok.RequiredArgsConstructor;
+
 
 @Controller
 @RequestMapping("/customer")
+@RequiredArgsConstructor
 public class SearchResultController {
 
-    private final SearchService searchService;
+	private final SearchService searchService;
 
-    public SearchResultController(SearchService searchService) {
-        this.searchService = searchService;
-    }
+	@GetMapping("/searchResult")
+	public String showSearchResults(
+			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword, HttpSession session,
+			HttpServletRequest request, Model model) {
 
-    @GetMapping("/searchResult")
-    public String showSearchResults(
-            @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword, 
-            Model model) {
+		// (수정) searchData 변수 선언을 메소드 최상단으로 옮깁니다.
+		Search searchData;
 
-        Search searchData;
+		if (keyword == null || keyword.trim().isEmpty()) {
+			searchData = new Search(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+		} else {
+			LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+			String userNo = (loginUser != null) ? loginUser.getUserNo() : null;
+			String ipAddress = getClientIp(request);
 
-        // keyword가 비어있거나 공백만 있는지 확인
-        if (keyword == null || keyword.trim().isEmpty()) {
-            // 키워드가 비어있으면, 비어있는 리스트를 가진 빈 검색 결과 객체를 생성
-            searchData = new Search(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        } else {
-            // 키워드가 있으면 정상적으로 검색 실행
-            searchData = searchService.searchAll(keyword);
-        }
+			// 이제 이 호출은 SearchService 인터페이스 수정 후 정상 동작합니다.
+			searchData = searchService.searchAll(keyword, userNo, ipAddress);
+		}
 
-        model.addAttribute("searchResult", searchData);
-        model.addAttribute("keyword", keyword);
-        
+		model.addAttribute("searchResult", searchData);
+		model.addAttribute("keyword", keyword);
 
-        return "customer/search/searchResult";
-    }
+		return "customer/search/searchResult";
+	}
+
+	/**
+	 * (추가 3) 클라이언트의 IP 주소를 가져오는 private 헬퍼 메소드
+	 */
+	private String getClientIp(HttpServletRequest request) {
+		String ip = request.getHeader("X-Forwarded-For");
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("Proxy-Client-IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("WL-Proxy-Client-IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("HTTP_CLIENT_IP");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+		}
+		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getRemoteAddr();
+		}
+		return ip;
+	}
 }
