@@ -22,7 +22,7 @@ public class CustomerHomeController {
     private final ProductSearchService productSearchService;
 	
     // ⭐ 3. customerHomeView 메소드에 데이터 조회 로직 추가
-	@GetMapping(value= {"/main","/main/"})
+	@GetMapping()
     public String customerHomeView(Model model, HttpServletRequest request) {
 		
 		model.addAttribute("currentUrl", request.getRequestURI());

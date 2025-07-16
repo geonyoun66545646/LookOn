@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import ks55team02.common.domain.store.ProductReview;
+import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.customer.store.service.ReviewService;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.domain.ProductImage;
@@ -204,12 +206,13 @@ public class CustomerProductController {
     }
 
     @GetMapping("/products/detail/{productCode}")
-    public String getProductDetailForCustomer(@PathVariable String productCode, Model model) {
+    public String getProductDetailForCustomer(@PathVariable String productCode, Model model, HttpSession session) {
         Products product = productsService.getProductDetailWithImages(productCode);
 
         if (product == null || !Boolean.TRUE.equals(product.getExpsrYn()) || !Boolean.TRUE.equals(product.getActvtnYn())) {
             return "redirect:/error/404";
-        }
+        }  
+        
         model.addAttribute("product", product);
 
         List<ProductImage> allImages = product.getProductImages();
@@ -232,7 +235,18 @@ public class CustomerProductController {
         
         model.addAttribute("thumbnailImage", thumbnailImage);
         model.addAttribute("mainGalleryImages", mainGalleryImages);
-        model.addAttribute("detailImages", detailImages);
+        model.addAttribute("detailImages", detailImages);    
+        
+        // ⭐ 이 부분을 컨트롤러에 추가해야 합니다. ⭐
+        // 세션에서 LoginUser 객체를 가져와 로그인 여부를 확인합니다.
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        boolean isLoggedIn = (loginUser != null); // LoginUser 객체가 존재하면 로그인된 것으로 간주
+
+        // 이 isLoggedIn 값을 Thymeleaf 템플릿으로 전달합니다.
+        model.addAttribute("isLoggedIn", isLoggedIn);
+        // 디버깅을 위해 콘솔에 출력해볼 수 있습니다.
+        System.out.println("CustomerProductController: isLoggedIn for template = " + isLoggedIn);
+        // ⭐ 여기까지 추가 ⭐
 
         return "customer/productDetail";
     }

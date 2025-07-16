@@ -11,10 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -22,8 +25,10 @@ import jakarta.validation.Valid;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.customer.mypage.domain.PasswordChangeRequest;
 import ks55team02.customer.mypage.domain.UserUpdateRequest;
-import ks55team02.customer.mypage.service.SecuritySettingsService;
+import ks55team02.customer.mypage.mapper.ProfileMapper;
 import ks55team02.customer.mypage.service.MyPageUserInfoService;
+import ks55team02.customer.mypage.service.ProfileService;
+import ks55team02.customer.mypage.service.SecuritySettingsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,8 +41,11 @@ public class MyPageApiController {
 	@Qualifier("myPageUserInfoService")
 	private final MyPageUserInfoService myPageUserInfoMapper;
 	private final SecuritySettingsService securitySettingsService;
+	private final ProfileService profileService;
+	private final ProfileMapper profileMapper;
 
 
+	// 회원 정보 수정
 	@PutMapping("/info")
     public ResponseEntity<Map<String, Object>> updateUserInfo(
             HttpServletRequest request,
@@ -74,6 +82,80 @@ public class MyPageApiController {
             response.put("message", "서버 내부 오류로 정보 수정에 실패했습니다.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+	/**
+     * 프로필 정보(닉네임, 자기소개, 이미지) 수정을 처리하는 API 엔드포인트입니다.
+     * multipart/form-data 형태로 텍스트와 파일 데이터를 함께 받습니다.
+     *
+     * @param userNcnm    폼 데이터로 전송된 새로운 닉네임
+     * @param selfIntroCn 폼 데이터로 전송된 새로운 자기소개
+     * @param profileImage 폼 데이터로 전송된 프로필 이미지 파일
+     * @param session     현재 로그인된 사용자의 세션 정보
+     * @return            처리 결과에 따른 JSON 응답
+     */
+    @PutMapping("/profile")
+    public ResponseEntity<Map<String, Object>> updateProfile(
+            @RequestParam("userNcnm") String userNcnm,
+            @RequestParam("selfIntroCn") String selfIntroCn,
+            @RequestParam(value = "profileImageFile", required = false) MultipartFile profileImage,
+            HttpSession session) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        // 1. 세션에서 로그인된 사용자 정보 (userNo) 가져오기
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            response.put("success", false);
+            response.put("message", "로그인 세션이 만료되었거나 유효하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        try {
+            // 2. Service 계층 호출하여 프로필 업데이트 로직 수행
+            profileService.updateProfile(loginUser.getUserNo(), userNcnm, selfIntroCn, profileImage);
+
+            // 3. 성공 응답 반환
+            response.put("success", true);
+            response.put("message", "프로필이 성공적으로 저장되었습니다.");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            // 4. 모든 종류의 예외를 처리 (파일 저장 실패, DB 오류 등)
+            log.error("프로필 업데이트 중 에러 발생 - userNo: {}", loginUser.getUserNo(), e);
+            response.put("success", false);
+            response.put("message", "프로필 저장 중 오류가 발생했습니다. 다시 시도해주세요.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    /**
+     * 닉네임 중복 여부를 실시간으로 확인하는 API 엔드포인트
+     * @param userNcnm 검사할 닉네임
+     * @param session 현재 로그인한 사용자를 식별하기 위함
+     * @return 사용 가능 여부를 담은 JSON 응답 ({"isAvailable": true/false})
+     */
+    @GetMapping("/profile/check-nickname")
+    public ResponseEntity<Map<String, Object>> checkNickname(
+            @RequestParam("userNcnm") String userNcnm,
+            HttpSession session) {
+        
+        Map<String, Object> response = new HashMap<>();
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+
+        // 비로그인 상태에서는 검사 무의미
+        if (loginUser == null) {
+            response.put("isAvailable", false);
+            response.put("message", "로그인 상태가 아닙니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        // ProfileMapper에 추가했던 중복 검사 메소드를 그대로 사용합니다.
+        int duplicateCount = profileMapper.countByUserNcnmForOthers(loginUser.getUserNo(), userNcnm);
+        
+        // 중복된 닉네임이 없으면(0이면) 사용 가능
+        boolean isAvailable = (duplicateCount == 0);
+        response.put("isAvailable", isAvailable);
+        
+        return ResponseEntity.ok(response);
     }
 
     

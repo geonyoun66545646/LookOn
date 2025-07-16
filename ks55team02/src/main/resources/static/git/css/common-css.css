@@ -1,0 +1,22 @@
+@charset "UTF-8";
+
+:root {
+	--maincolor: #235fd9;
+	--borderColor: #dee1e8;
+	--errorColor: #ef3e3e;
+}
+a {
+	cursor: pointer;
+}
+
+.error-message {
+	color: var(--errorColor);
+}
+.payments-form input {
+	text-align: right;
+}
+.payments-form label {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
