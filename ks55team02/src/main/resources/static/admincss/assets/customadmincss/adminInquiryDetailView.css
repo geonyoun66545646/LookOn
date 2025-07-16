@@ -1,0 +1,195 @@
+/* inquiryDetailView.css - 최종 통합본 */
+
+/* 전체 문의 테이블을 감싸는 컨테이너 스타일 */
+.table-bordered {
+    /* 원래 padding은 유지하되, 내부 테이블이 100%를 채우도록 설정 */
+    padding: 20px; /* 내부 여백 유지 */
+    background-color: white; /* 테이블 배경색 */
+   	border : 1px solid #ebebeb;
+    margin-top: 30px;
+    margin-bottom: 50px;
+    /* text-align: center;는 여기서 제거합니다.
+       각 셀 내부의 텍스트 정렬은 개별 td/th에서 제어하는 것이 더 유연합니다. */
+}
+
+/* inquiryTable 안에 있는 실제 table 태그의 너비를 100%로 설정 */
+/* 이 부분이 테이블과 아래 내용 박스(inquiry-content-box)의 너비를 맞추는 핵심 */
+.inquiryTable table {
+    width: 100%; /* 부모 .inquiryTable의 내부 공간을 꽉 채웁니다. */
+    
+}
+
+/* 테이블 셀 (td, th)에 기본 스타일 적용 */
+.inquiryTable .table td,
+.inquiryTable .table th {
+    padding: 15px; /* 셀 내부 여백 */
+    vertical-align: middle; /* 세로 중앙 정렬 */
+    border: 1px solid #ebebeb; /* 모든 셀에 테두리 적용 */
+    box-sizing: border-box; /* 패딩과 보더가 너비에 포함되도록 계산 */
+    text-align: center; /* 기본 텍스트 정렬은 왼쪽으로 설정 */
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.table.table-bordered .title-row td:nth-child(1) {
+    width: 12%; /* 첫 번째 <td> (비밀글 여부 셀) */
+}
+
+.table.table-bordered .title-row td:nth-child(2) {
+    width: 20%; /* 두 번째 <td> (문의 유형 셀) */
+}
+
+.table.table-bordered .title-row td:nth-child(3) {
+    width: 20%; /* 세 번째 <td> (대상 상점 셀) */
+}
+
+.table.table-bordered .title-row td:nth-child(4) {
+    width: 25%; /* 네 번째 <td> (작성자 셀) */
+}
+
+.table.table-bordered .title-row td:nth-child(5) {
+    width: 23%; /* 다섯 번째 <td> (작성일 셀) */
+}
+
+
+
+
+/* 제목 행 스타일 */
+.inquiry-row.title-row td {
+    background-color: white;
+    font-weight: 700;
+    color: #495057;
+    
+    /* 이 셀들에 개별적으로 text-align: center; 가 필요한 경우 여기에 추가 */
+}
+
+.inquiry-row.content-row td {
+    /* 이 td는 inquiry-content-box를 감싸는 역할을 합니다. */
+    /* inquiry-content-box가 td 전체를 채우도록, td의 패딩과 테두리를 없앱니다. */
+    padding: 0; /* 내용 박스가 td 전체를 채우도록 패딩 제거 */
+    border: none; /* 내용 박스를 감싸는 td의 테두리 제거 */
+    background-color: transparent; /* 배경색도 투명으로 */
+}
+
+.inquiry-content-box {
+    /* min-height는 유지 */
+    min-height: 200px;
+    /* 배경색, 테두리, 모서리 둥글게, 그림자는 이 박스 자체에 적용 */
+    background-color: white;
+    padding: 20px; /* 내용 박스 내부 여백 */
+    line-height: 1.8;
+    color: #333;
+    text-align : left;
+    font-weight: bolder;
+    overflow-y: auto;
+    box-sizing: border-box;
+    width: 100%; /* 부모 td의 너비를 꽉 채움 */
+    height: 100%; /* 부모 td의 높이를 꽉 채움 */
+    /* inquiryTable의 20px 패딩을 고려하여 내용 박스의 좌우 여백을 조정합니다.
+       calc() 함수를 사용하여 정확한 너비를 계산합니다.
+       이전 대화에서 inquiryTable에 padding: 20px가 있었으므로, 이를 반영하여
+       문의 내용 박스의 좌우 여백을 테이블의 컨테이너(inquiryTable)와 맞춥니다. */
+    border-top-left-radius: 0; /* 상단 좌우 모서리는 둥글게 하지 않음 (테이블과 붙으니) */
+    border-top-right-radius: 0;
+}
+
+/* 내용 텍스트 스타일 */
+.inquiry-content-text {
+    margin: 0;
+    white-space: pre-wrap; /* 공백과 줄바꿈 유지 */
+}
+
+/* 폼 컨트롤 버튼 스타일 */
+.form-group.d-flex button,
+.form-group.d-flex a {
+    min-width: 120px;
+    padding: 10px 20px;
+}
+
+/* 기타 폰트 설정 */
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 제목 td (colspan="5"인 첫 번째 행의 제목) 폰트 크기 및 스타일 조정 */
+.inquiry-row td[colspan="5"][scope="row"] {
+    padding: 20px 15px;
+    color: #343a40;
+    text-align: center; /* 제목만 가운데 정렬 */
+    font-size: 1.8em;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+/* 자물쇠 아이콘과 텍스트 중앙 정렬을 위한 스타일 */
+/* .inquiry-row.title-row td:first-child는 제거하고, 아래 새로운 클래스를 사용합니다. */
+.lock-status-box {
+    display: flex; /* flex 컨테이너로 만듭니다. */
+    justify-content: center; /* 가로 방향(주 축)으로 중앙 정렬 */
+    align-items: center; /* 세로 방향(교차 축)으로 중앙 정렬 */
+    gap: 5px; /* 이모티콘과 텍스트 사이 간격 */
+    width: 100%; /* 부모 td의 너비를 꽉 채우도록 설정 */
+    height: 100%; /* 부모 td의 높이를 꽉 채우도록 설정 (td에 min-height 등이 있다면 유용) */
+}
+
+/* 답변 테이블 */
+
+
+/* 답변 제목 행 스타일 */
+#answer-header{
+	padding: 20px 15px;
+    color: #343a40;
+    text-align: center;
+    font-size: 1.8em;
+    font-weight: 700;
+    vertical-align: middle;
+    background: white;
+    border-bottom : none; 
+}
+
+/* 답변 내용 텍스트 자체에 스타일 적용 */
+.answer-cn {
+    color: #555;
+    font-size: 0.95em;
+    text-align: left !Important; /* 답변 내용 텍스트도 왼쪽 정렬로 명시 */
+}
+.answer-sub{
+	width:50%;
+	font-weight: 500;
+    color: #495057;
+}
+
+/* ----------------------- 프래그먼트 css------------------------ */
+/*sellerInquiryDetailView  */
+.card{
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1.3rem 1.3rem;
+}
+
+.form-group.d-flex button{
+font-size: 14px;
+    font-weight: 500;
+    padding: 10px 40px;
+    color: #ffffff;
+    border: none;
+    background-color: #3BB77E;
+    border-radius: 4px;
+    text-align : center;
+}
+
+/* sellerInquiryDetailView.css 또는 해당 페이지의 <style> 태그 내에 추가 */
+
+.answer-info-row td {
+    width: 33.33%; /* 각 셀이 전체 너비의 1/3을 차지하도록 설정 */
+    box-sizing: border-box; /* padding과 border가 width에 포함되도록 설정 */
+    vertical-align: top; /* 내용이 위쪽에 정렬되도록 (선택 사항) */
+}
+
+/* 필요에 따라 추가적인 스타일링 */
+.answer-info-row .answer-sub {
+    padding: 8px 15px; /* 내부 여백 */
+    /* border-right: 1px solid #dee2e6; /* 셀 구분선 (선택 사항) */
+}
+
+ 

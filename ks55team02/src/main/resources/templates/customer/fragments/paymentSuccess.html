@@ -76,9 +76,10 @@
                 </div>
                 
                 <div class="action-buttons">
-                    <a th:href="@{/paymentHistory}" class="btn btn-primary">주문 내역 확인</a>
-                    <a th:href="@{/customer/products/list}" class="btn btn-outline-primary-2">쇼핑 계속하기</a>
-                </div>
+				    <!-- <a th:href="@{/paymentHistory(userNo=${session.loginUser.userNo})}" class="btn btn-primary">주문 내역 확인</a> -->
+				    <a th:href="@{/paymentHistory(userNo=${session.loginUser.userNo})}" class="btn btn-primary" onclick="return false;">주문 내역 확인</a>
+				    <a th:href="@{/customer/products/list}" class="btn btn-outline-primary-2">쇼핑 계속하기</a>
+				</div>
             </div>
         </div>
     </div>

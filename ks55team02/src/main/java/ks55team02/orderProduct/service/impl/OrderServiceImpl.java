@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ks55team02.orderProduct.domain.OrderDTO;
 import ks55team02.orderProduct.mapper.OrderProductsMapper;
 import ks55team02.orderProduct.service.OrderService;
 
@@ -33,44 +34,22 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Map<String, Object> getLatestOrderDetailsForUser(String userNo) {
-        log.info("사용자 '{}'의 최근 주문 상세 내역 조회를 시작합니다.", userNo);
-
-        // 1. 가장 최근 주문 ID 조회
         String latestOrderId = orderMapper.findLatestOrderIdByUserNo(userNo);
-        log.info("Step 1: 조회된 latestOrderId: {}", latestOrderId); // **로그 추가**
-
-        // 주문 ID가 없거나 비어있으면 null 반환
-        if (latestOrderId == null || latestOrderId.isEmpty()) { // 빈 문자열도 체크
-            log.warn("사용자 '{}'의 주문 내역이 존재하지 않습니다. (latestOrderId is null or empty)", userNo);
+        if (latestOrderId == null || latestOrderId.isEmpty()) {
             return null;
         }
 
-        // 2. JOIN된 쿼리를 사용하여 주문/결제/배송지 정보를 한 번에 조회
-        Map<String, Object> combinedDetails = orderMapper.getCombinedOrderDetailsByOrderId(latestOrderId);
-        log.info("Step 2: 조회된 combinedDetails: {}", combinedDetails); // **로그 추가**
-
-        // 3. JOIN된 쿼리를 사용하여 상품 목록을 한 번에 조회
+        // OrderDTO로 직접 매핑
+        OrderDTO orderDTO = orderMapper.getCombinedOrderDetailsByOrderId(latestOrderId);
+        
+        // 상품 목록 조회
         List<Map<String, Object>> orderedProducts = orderMapper.getOrderedProductsByOrderId(latestOrderId);
-        log.info("Step 3: 조회된 orderedProducts: {}", orderedProducts); // **로그 추가**
 
-        // **NULL 체크 및 빈 Map/List로 초기화하여 NullPointerException 방지**
-        if (combinedDetails == null) {
-            log.warn("combinedDetails가 null입니다. 빈 Map으로 초기화합니다.");
-            combinedDetails = new HashMap<>();
-        }
-        if (orderedProducts == null) {
-            log.warn("orderedProducts가 null입니다. 빈 List로 초기화합니다.");
-            orderedProducts = new ArrayList<>(); // 빈 리스트로 초기화
-        }
-
-        // 4. 조회된 데이터를 최종 결과 Map에 담아 Controller로 반환
+        // 결과 맵 구성
         Map<String, Object> result = new HashMap<>();
-        result.put("paymentInfo", combinedDetails);
-        result.put("orderDetails", combinedDetails); // paymentInfo와 동일한 Map 객체 사용
+        result.put("orderInfo", orderDTO);
         result.put("orderedProducts", orderedProducts);
-
-        log.info("최근 주문 상세 내역 조회가 완료되었습니다. 최종 결과 Map: {}", result); // **로그 추가**
-
+        
         return result;
     }
 
