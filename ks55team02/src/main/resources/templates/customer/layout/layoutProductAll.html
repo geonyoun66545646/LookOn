@@ -1,79 +1,166 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title th:text="${title} ?: 'LookOn'">룩온 전체 상품 페이지</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title th:text="${title} ?: 'LookOn'">룩온 전체 상품 페이지</title>
 
-    <link rel="stylesheet" th:href="@{/maincss/assets/css/demos/demo-6.css}">
-    <link rel="stylesheet" th:href="@{/maincss/assets/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
-    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/owl-carousel/owl.carousel.css}">
-    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/magnific-popup/magnific-popup.css}">
-    
-    <link rel="stylesheet" th:href="@{/maincss/assets/vendor/line-awesome/line-awesome/line-awesome/css/line-awesome.min.css}">
-    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/jquery.countdown.css}">
-    <link rel="stylesheet" th:href="@{/maincss/assets/css/skins/skin-demo-6.css}">
-    
-    <link rel="stylesheet" th:href="@{/maincss/assets/mainHeader/mainHeader.css}"> 
-    <link rel="stylesheet" th:href="@{/maincss/assets/categoryFilterModal/categoryFilterModal.css}">
-    <link rel="stylesheet" th:href="@{/maincss/assets/mainFooter/mainFooter.css}" />
-    <link rel="stylesheet" th:href="@{/maincss/assets/productToolbar/productToolbar.css}">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" th:href="@{/maincss/assets/css/demos/demo-6.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/css/bootstrap.min.css}">
+<link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/css/plugins/owl-carousel/owl.carousel.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/css/plugins/magnific-popup/magnific-popup.css}">
+
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/vendor/line-awesome/line-awesome/line-awesome/css/line-awesome.min.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/css/plugins/jquery.countdown.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/css/skins/skin-demo-6.css}">
+
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/mainHeader/mainHeader.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/categoryFilterModal/categoryFilterModal.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/mainFooter/mainFooter.css}" />
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/productToolbar/productToolbar.css}">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/brandPage/brandPage.css}" />
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body>
-    <div class="page-wrapper">
-        <header th:replace="~{customer/fragments/mainHeader :: mainHeaderFragment}"></header>
+	<div class="page-wrapper">
+		<header
+			th:replace="~{customer/fragments/mainHeader :: mainHeaderFragment}"></header>
 
-        <main class="main">
-            <div class="page-content">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <!-- ⭐ 이 블록을 추가해주세요. ⭐ -->
-                            <div class="brand-header mb-3" th:if="${currentBrandId != null and currentBrandName != null}">
-                                <h2 class="brand-title" th:text="${currentBrandName}">브랜드 이름</h2>
-                                <!-- 필요하다면 여기에 브랜드 로고나 소개 문구를 추가할 수 있습니다. -->
-                            </div>	
-                            <div th:replace="~{customer/fragments/productToolbar :: productToolbarFragment}"></div>
-                            
-                            	
-                            <th:block layout:fragment="content"></th:block>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+		<main class="main">
+			<div class="page-content">
+							<!-- ⭐ 기존 brand-header 삭제 후, 이 블록으로 교체해주세요. ⭐ -->
+							<div class="brand-page-container"
+								th:if="${currentBrandId != null}">
+								<!-- 브랜드 헤더 -->
+								<div class="brand-page-header">
+									<h2 class="brand-name" th:text="${currentBrandName}">브랜드
+										이름</h2>
+									<div class="brand-actions">
+										<button class="btn btn-outline-dark btn-brand-info"
+											data-toggle="modal" data-target="#brandInfoModal">
+											<span>브랜드 정보</span>
+										</button>
+									</div>
+								</div>
 
-        <footer th:replace="~{customer/fragments/footer :: footerFragment}"></footer>
-    </div>
+								<!-- 브랜드 스냅 -->
+								<div class="brand-snap-container">
+									<div class="brand-snap-item"
+										th:each="snap : ${brandSnapProducts}">
+										<a th:href="@{/products/detail/{gdsNo}(gdsNo=${snap.gdsNo})}">
+											<img th:src="@{${snap.thumbnailImagePath}}"
+											alt="Brand Snap Image"
+											onerror="this.onerror=null; this.src='/maincss/assets/images/no_image.jpg';">
+										</a> <span class="snap-title" th:text="${snap.gdsNm}">상품명</span>
+									</div>
+								</div>
+							</div>
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-12">
 
-    <div th:replace="~{customer/fragments/categoryFilterModal :: categoryFilterModalFragment}"></div>
+							<div
+								th:replace="~{customer/fragments/productToolbar :: productToolbarFragment}"></div>
 
-    <script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
+
+							<th:block layout:fragment="content"></th:block>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<footer th:replace="~{customer/fragments/footer :: footerFragment}"></footer>
+	</div>
+
+	<div
+		th:replace="~{customer/fragments/categoryFilterModal :: categoryFilterModalFragment}"></div>
+
+	<!-- ⭐ 브랜드 정보 모달 추가 ⭐ -->
+	<div class="modal fade" id="brandInfoModal" tabindex="-1" role="dialog"
+		aria-labelledby="brandInfoModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body text-center">
+					<img th:if="${currentBrand?.storeLogoImg != null}"
+						th:src="@{${currentBrand.storeLogoImg}}" alt="Brand Logo"
+						class="brand-modal-logo mb-3">
+					<h4 class="brand-modal-title" th:text="${currentBrand?.storeConm}">브랜드	이름</h4>
+					<p class="brand-modal-description"
+						th:text="${currentBrand?.storeIntroCn}">브랜드 소개글이 여기에 들어갑니다.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
     <script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
     <script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>
     <script th:src="@{/maincss/assets/js/jquery.waypoints.min.js}"></script>
     <script th:src="@{/maincss/assets/js/superfish.min.js}"></script>
     <script th:src="@{/maincss/assets/js/owl.carousel.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/wNumb.js}"></script>
-    <script th:src="@{/maincss/assets/js/bootstrap-input-spinner.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.plugin.min.js}"></script>
     <script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/nouislider.min.js}"></script>
-    <script th:src="@{/maincss/assets/js/main.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.countdown.min.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script th:src="@{/js/customerjs/register.js}"></script>
+    <script th:src="@{/js/customerjs/login.js}"></script>
+    <script th:src="@{/js/customerjs/loginCheckInterceptor.js}"></script>
     
     <th:block layout:fragment="jsFile"></th:block>
-    <th:block layout:fragment="jsScript"></th:block>
-
+    
+    <script th:src="@{/maincss/assets/js/main.js}"></script>
+    <script th:src="@{/maincss/assets/js/demos/demo-2.js}"></script>
+    
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     
-    <script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
-    <script th:src="@{/maincss/assets/productToolbar/productToolbar.js}"></script>
-    
+    <script th:src="@{/maincss/assets/js/demos/demo-2.js}"></script>
+	<script th:src="@{/maincss/assets/js/customer/customer-pagination.js}"></script>
+	
+	<!-- <script th:src="@{/maincss/assets/js/customer/feedWriteBtn.js}"></script> 지성 수정 경로에 없다는데 이거 왜있는거야? -->
+	
 
-    </body>
+    <script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
+    <!-- 이건 따로 빼서 사용할수없어서 여기 있는 거에여 -->
+    <!-- 이스크립트 코드 사용처는 비로그인 사용자 접근 막는 용도 에여 -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // authAlert 값이 실제로 존재하는 경우에만 세션 클리어 요청을 보냅니다.
+        const authAlert = /*[[${session.authAlert}]]*/ null;
+        if (authAlert) {
+            // 이 AJAX 요청은 페이지 로딩과 비동기적으로 실행되므로 다른 스크립트에 영향을 주지 않습니다.
+            $.ajax({
+                url: '/customer/clearLoginInterceptorSession',
+                type: 'GET'
+            });
+        }
+        /*]]>*/
+    </script>
+    <th:block layout:fragment="jsScript"></th:block>
+
+</body>
 </html>

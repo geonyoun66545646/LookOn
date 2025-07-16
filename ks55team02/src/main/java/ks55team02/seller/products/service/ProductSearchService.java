@@ -27,4 +27,12 @@ public interface ProductSearchService {
      * @return 특가 상품 목록
      */
     List<Products> getSpecialSaleProducts(double minDiscountRate); // ⭐ 이 부분 추가
+    
+    /**
+     * 특정 브랜드의 최신 상품 목록을 조회합니다 (브랜드 스냅용).
+     * @param storeId 상점 고유 ID
+     * @param limit 조회할 상품 개수
+     * @return 해당 브랜드의 최신 상품 목록
+     */
+    List<Products> getRecentProductsByStoreId(String storeId, int limit);
 }

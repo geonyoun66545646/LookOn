@@ -18,6 +18,14 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
     private final ProductSearchMapper productSearchMapper;
     
+    @Override
+    public List<Products> getRecentProductsByStoreId(String storeId, int limit) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("storeId", storeId);
+        params.put("limit", limit);
+        return productSearchMapper.getRecentProductsByStoreId(params);
+    }
+    
     @Override // ⭐ 이 부분 추가
     public List<Products> getSpecialSaleProducts(double minDiscountRate) {
         Map<String, Object> params = new HashMap<>();

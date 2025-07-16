@@ -28,4 +28,11 @@ public interface ProductSearchMapper {
      * @return 특가 상품 목록
      */
     List<Products> getSpecialSaleProducts(Map<String, Object> params); // ⭐ 이 부분 추가
+    
+    /**
+     * 특정 브랜드의 최신 상품 목록을 조회합니다 (브랜드 스냅용).
+     * @param params storeId (String), limit (int)
+     * @return 해당 브랜드의 최신 상품 목록
+     */
+    List<Products> getRecentProductsByStoreId(Map<String, Object> params);
 }
