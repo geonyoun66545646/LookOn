@@ -389,7 +389,6 @@ html, body {
 .sale-products-section {
     /* weekly-best-section과 동일한 padding과 background-color를 가집니다. */
     background-color: #fdfdfd; /* weekly-best-section에서 복사 */
-	padding-top: 30px; /* weekly-best-section에서 복사 */
 	padding-bottom: 20px; /* weekly-best-section에서 복사 */
 }
 
@@ -409,30 +408,30 @@ html, body {
 /* Sale 상품 슬라이드 아이템: Weekly Best와 동일한 반응형 너비 재사용 */
 .sale-products-slider-container .swiper-slide {
     height: auto; /* weekly-best-slider-container .swiper-slide에서 복사 */
-    width: 50%; /* 모바일 기본 (2열) */
+    width: 100%; /* 모바일 기본 (2열) */
 }
 
 @media ( min-width : 576px) {
 	.sale-products-slider-container .swiper-slide {
-		width: 33.3333%; /* 3열 */
+		width: 50%; /* 3열 */
 	}
 }
 
 @media ( min-width : 768px) {
 	.sale-products-slider-container .swiper-slide {
-		width: 25%; /* 4열 */
+		width: 33.3333%; /* 4열 */
 	}
 }
 
 @media ( min-width : 992px) {
 	.sale-products-slider-container .swiper-slide {
-		width: 20%; /* 5열 */
+		width: 33.3333%; /* 5열 */
 	}
 }
 
 @media ( min-width : 1200px) {
 	.sale-products-slider-container .swiper-slide {
-		width: 16.6666%; /* 6열 */
+		width: 25%; /* 6열 */
 	}
 }
 

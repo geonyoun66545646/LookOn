@@ -57,7 +57,7 @@ window.addEventListener('load', function () {
 	        loop: false,
 	        autoplay: false,
 	        slidesPerView: 'auto',
-	        spaceBetween: 1,
+	        spaceBetween: 10,
 	        navigation: {
 	            // ⭐ Sale Products 슬라이더 버튼 선택자를 해당 컨테이너와 고유 버튼 클래스로 명확히 지정 ⭐
 	            nextEl: '.sale-products-slider-container .sale-products-button-next',
