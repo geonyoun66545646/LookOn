@@ -125,7 +125,7 @@ public class CustomerProductController {
 		return "redirect:/customer/products/list"; // 기존 상품 목록 조회 메서드로 리다이렉트
 	}
 
-	@GetMapping({ "/products/category/{categoryId}", "/customer/products/list" }) // ⭐ 브랜드 관련 경로 제거 ⭐
+	@GetMapping({ "/products/category/{categoryId}", "/customer/products/list" })
 	@SuppressWarnings("unchecked")
 	public String getFilteredAndSortedProductsView(Model model,
 			@RequestParam(name = "categoryId", required = false) String categoryId,
@@ -158,58 +158,64 @@ public class CustomerProductController {
 		filterParams.put("priceRange", priceRange);
 		filterParams.put("colors", colors);
 		filterParams.put("sizes", sizes);
-		filterParams.put("brands", brands); // ⭐ 이 부분은 이제 리다이렉트된 'brand' 파라미터를 자동으로 받습니다.
+		filterParams.put("brands", brands);
 		filterParams.put("styles", styles);
 		filterParams.put("discountRates", discountRates);
 		filterParams.put("isNewProductPage", isNewProductPage);
-		filterParams.put("includeSoldOut", includeSoldOut);
 		filterParams.put("categoryId", categoryId);
 
-		ProductCategory currentCategory = null;
 		String parentCategoryName = "전체";
 		String parentCategoryId = null;
-		List<ProductCategory> subCategories = new ArrayList<>();
 
-		// ⭐ 브랜드 페이지 제목 설정 로직 (brands 리스트를 기반으로) ⭐
-		Stores currentBrand = null;
-		String brandIdForTitle = null; // 제목 표시에 사용할 단일 brandId
 		if (brands != null && !brands.isEmpty()) {
-			brandIdForTitle = brands.get(0);
-			currentBrand = productsService.getStoreByStoreId(brandIdForTitle);
+			// --- 1. 브랜드 페이지 로직 ---
+			String brandId = brands.get(0);
+			Stores currentBrand = productsService.getStoreByStoreId(brandId);
+
 			if (currentBrand != null) {
 				title = currentBrand.getStoreConm();
 				breadCrumbTitle = currentBrand.getStoreConm();
-				// ⭐ 이 블록을 추가합니다: 브랜드 스냅용 상품 조회 ⭐
-	            List<Products> brandSnapProducts = productSearchService.getRecentProductsByStoreId(brandIdForTitle, 4);
-	            model.addAttribute("brandSnapProducts", brandSnapProducts);
-	            model.addAttribute("currentBrand", currentBrand);
-	            // 해당 브랜드가 판매하는 상품의 카테고리 목록을 조회
-	            List<ProductCategory> brandCategories = productSearchService.getCategoriesByStoreId(brandIdForTitle);
-				model.addAttribute("subCategories", brandCategories);
-				model.addAttribute("parentCategoryName", "전체");
+				
+				List<Products> brandSnapProducts = productSearchService.getRecentProductsByStoreId(brandId, 4);
+				model.addAttribute("brandSnapProducts", brandSnapProducts);
+				model.addAttribute("currentBrand", currentBrand);
 			} else {
 				title = "알 수 없는 브랜드";
 				breadCrumbTitle = "알 수 없는 브랜드";
 			}
-			model.addAttribute("currentBrandId", brandIdForTitle);
-			model.addAttribute("currentBrandName", currentBrand != null ? currentBrand.getStoreConm() : null);
-		} else if (categoryId != null && !categoryId.isEmpty()) {
-			Map<String, Object> categoryHierarchyData = productCategoryService.getCategoryHierarchy(categoryId);
-			if (categoryHierarchyData != null) {
-				currentCategory = (ProductCategory) categoryHierarchyData.get("currentCategory");
-				parentCategoryName = (String) categoryHierarchyData.get("parentCategoryName");
-				parentCategoryId = (String) categoryHierarchyData.get("parentCategoryId");
-				subCategories = (List<ProductCategory>) categoryHierarchyData.get("subCategories");
-				if (currentCategory != null) {
-					title = currentCategory.getCategoryName();
-					breadCrumbTitle = currentCategory.getCategoryName();
-				}
-			}
+			
+			model.addAttribute("currentBrandId", brandId);
+			model.addAttribute("currentBrandName", title);
+			
+			// ⭐ 브랜드 페이지의 카테고리 계층 처리 로직 (수정) ⭐
+	        // 해당 브랜드가 판매하는 상품의 상위 카테고리 목록을 조회하여 subCategories에 담음
+	        List<ProductCategory> topLevelBrandCategories = productSearchService.getTopLevelCategoriesByStoreId(brandId);
+	        model.addAttribute("subCategories", topLevelBrandCategories);
+			
 		} else {
-			parentCategoryName = "전체 상품";
-			subCategories = productCategoryService.getAllTopLevelCategories();
-		}
+	        // --- 2. 브랜드 페이지가 아닐 경우 (기존 로직 그대로 유지) ---
+			if (categoryId != null && !categoryId.isEmpty()) {
+				Map<String, Object> categoryHierarchyData = productCategoryService.getCategoryHierarchy(categoryId);
+				if (categoryHierarchyData != null) {
+	                parentCategoryName = (String) categoryHierarchyData.get("parentCategoryName");
+	                parentCategoryId = (String) categoryHierarchyData.get("parentCategoryId");
+	                List<ProductCategory> subCategories = (List<ProductCategory>) categoryHierarchyData.get("subCategories");
+	                model.addAttribute("subCategories", subCategories);
 
+	                ProductCategory currentCategory = (ProductCategory) categoryHierarchyData.get("currentCategory");
+	                if (currentCategory != null) {
+						title = currentCategory.getCategoryName();
+						breadCrumbTitle = currentCategory.getCategoryName();
+					}
+				}
+			} else {
+				parentCategoryName = "전체 상품";
+				title = "전체 상품";
+				breadCrumbTitle = "전체 상품";
+				model.addAttribute("subCategories", productCategoryService.getAllTopLevelCategories());
+			}
+		}
+	    
 		Map<String, Object> productsResult = productSearchService.getFilteredAndSortedProducts(categoryId, sortBy,
 				filterParams, currentPage);
 		List<Products> productList = (List<Products>) productsResult.get("productsList");
@@ -227,7 +233,6 @@ public class CustomerProductController {
 
 		model.addAttribute("parentCategoryName", parentCategoryName);
 		model.addAttribute("parentCategoryId", parentCategoryId);
-		model.addAttribute("subCategories", subCategories);
 		model.addAttribute("currentCategoryId", categoryId);
 		model.addAttribute("currentGender", gender);
 		model.addAttribute("currentSortBy", sortBy);
@@ -240,9 +245,6 @@ public class CustomerProductController {
 		model.addAttribute("selectedMaxPrice", maxPrice);
 		model.addAttribute("selectedPriceRange", priceRange);
 		model.addAttribute("selectedIncludeSoldOut", includeSoldOut);
-
-        model.addAttribute("currentBrandId", brandIdForTitle);
-        model.addAttribute("currentBrandName", currentBrand != null ? currentBrand.getStoreConm() : null);
 
 		List<ProductOptionValue> rawColorOptionValues = productsService.getAllProductColors();
 		List<ColorOption> allColorOptions = new ArrayList<>();

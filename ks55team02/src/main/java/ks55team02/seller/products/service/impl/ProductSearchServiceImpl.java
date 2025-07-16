@@ -19,6 +19,12 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
     private final ProductSearchMapper productSearchMapper;
     
+    
+    @Override
+    public List<ProductCategory> getTopLevelCategoriesByStoreId(String storeId) {
+        return productSearchMapper.getTopLevelCategoriesByStoreId(storeId);
+    }
+    
     @Override
     public List<ProductCategory> getCategoriesByStoreId(String storeId) {
         return productSearchMapper.getCategoriesByStoreId(storeId);

@@ -15,6 +15,9 @@ public interface ProductSearchService {
     List<Products> getAllActiveProductsForCustomer();
     Map<String, Object> getFilteredAndSortedProducts(String categoryId, String sortBy, Map<String, Object> filterParams, int currentPage);
     
+    
+    List<ProductCategory> getTopLevelCategoriesByStoreId(String storeId);
+
     /**
      * 메인 페이지의 Weekly Best 상품 목록을 조회합니다.
      * @return Weekly Best 상품 목록 (24개)

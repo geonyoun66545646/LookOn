@@ -16,7 +16,10 @@ public interface ProductSearchMapper {
     long countFilteredProducts(Map<String, Object> paramMap);
     List<Products> getAllActiveProductsForCustomer();
     List<Products> getActiveProductsForCustomerByCategory(String categoryId);
+    
+    List<ProductCategory> getTopLevelCategoriesByStoreId(String storeId);
 
+    
     /**
      * 메인 페이지의 Weekly Best 상품 목록을 조회합니다.
      * @return Weekly Best 상품 목록 (24개)
