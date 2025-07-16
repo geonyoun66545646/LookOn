@@ -15,162 +15,322 @@
         <result property="delPrcrYn"    column="del_prcr_yn"/>
     </resultMap>
 
-    <resultMap id="sellerInquiryWithStoreResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
-        <id property="inqryId"           		column="inqry_id"/>
-        <result property="inqryTypeCd"   		column="inqry_type_cd"/>
-        <result property="inqryTrgtTypeCd" 		column="inqry_trgt_type_cd"/>
-        <result property="wrtrId"        		column="wrtr_id"/>
-        <result property="inqryStoreId"  		column="inqry_store_id"/>
-        <result property="inqryTtl"      		column="inqry_ttl"/>
-        <result property="inqryCn"       		column="inqry_cn"/>
-        <result property="prvtYn"        		column="prvt_yn"/>
-        <result property="prcsStts"     		column="prcs_stts"/>
-        <result property="prcsUserNo"    		column="prcs_user_no"/>
-        <result property="regYmd"        		column="reg_ymd"/>
-        <result property="mdfcnYmd"      		column="mdfcn_ymd"/>
-        <result property="delDt"         		column="del_dt"/>
-        <result property="delUserNo"     		column="del_user_no"/>
-        <result property="delActvtnYn"   		column="del_actvtn_yn"/>
+    <resultMap id="inquiryUserResultMap" type="ks55team02.common.domain.inquiry.InquiryUser">
+        <id property="userNo"       column="user_no"/>
+        <result property="userNcnm" column="user_ncnm"/>
+    </resultMap>
 
+    <resultMap id="inquiryImageResultMap" type="ks55team02.common.domain.inquiry.InquiryImage">
+        <id property="inqryImgId"    column="inqry_img_id"/>
+        <result property="imgId"       column="img_id"/> <result property="inqryId"     column="inquiry_image_inqry_id"/>
+        <result property="ord"         column="ord"/>
+        <result property="imgAddr"     column="img_addr"/>
+    </resultMap>
+
+    <resultMap id="answerResultMap" type="ks55team02.common.domain.inquiry.Answer">
+        <id property="ansId"          column="ans_id"/>
+        <result property="inqryId"      column="answer_inqry_id"/>
+        <result property="answrUserNo"  column="answr_user_no"/>
+        <result property="ansCn"        column="ans_cn"/>
+        <result property="ansTm"        column="ans_tm"/>
+        <result property="answrTypeCd"  column="answr_type_cd"/>
+        <result property="rlsYn"        column="rls_yn"/>
+        <result property="lastMdfcnDt"  column="last_mdfcn_dt"/>
+        <result property="actvtnYn"     column="actvtn_yn"/>
+        <result property="delDt"        column="del_dt"/>
+        <result property="delUserNo"    column="del_user_no"/>
+    </resultMap>
+
+    <resultMap id="inquiryResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
+        <id property="inqryId"            column="inqry_id"/>
+        <result property="inqryTypeCd"    column="inqry_type_cd"/>
+        <result property="inqryTrgtTypeCd" column="inqry_trgt_type_cd"/>
+        <result property="wrtrId"         column="wrtr_id"/>
+        <result property="inqryStoreId"   column="inqry_store_id"/>
+        <result property="inqryTtl"       column="inqry_ttl"/>
+        <result property="inqryCn"        column="inqry_cn"/>
+        <result property="prvtYn"         column="prvt_yn"/>
+        <result property="prcsStts"       column="prcs_stts"/>
+        <result property="prcsUserNo"     column="prcs_user_no"/>
+        <result property="regYmd"         column="reg_ymd"/>
+        <result property="mdfcnYmd"       column="mdfcn_ymd"/>
+        <result property="delDt"          column="del_dt"/>
+        <result property="delUserNo"      column="del_user_no"/>
+        <result property="delActvtnYn"    column="del_actvtn_yn"/>
+
+        <association property="writerInfo" resultMap="inquiryUserResultMap"/>
         <association property="storeInfo" resultMap="storeResultMap"/>
-
-        </resultMap>
-
+        <association property="answer" resultMap="ks55team02.seller.inquiry.mapper.AnswerMapper.answerResultMap"/>
+        
+        <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage" resultMap="inquiryImageResultMap"/>
+    </resultMap>
 
     <select id="getSellerInquiryCnt" parameterType="ks55team02.common.domain.inquiry.Inquiry" resultType="int">
         SELECT
-            COUNT(*)
+            COUNT(i.inqry_id)
+        FROM
+            inquiries i
+        JOIN
+            stores s ON s.store_id = i.inqry_store_id
+        LEFT JOIN
+            users u ON u.user_no = i.wrtr_id
+        WHERE 1=1
+        <if test="inqryStoreId != null and inqryStoreId != ''">
+            AND i.inqry_store_id = #{inqryStoreId}
+        </if>
+        <if test="searchKey != null and searchKey != '' and searchValue != null and searchValue != ''">
+            <choose>
+                <when test="searchKey == 'inqryTtl'">
+                    AND i.inqry_ttl LIKE CONCAT('%', #{searchValue}, '%')
+                </when>
+                <when test="searchKey == 'inqryCn'">
+                    AND i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%')
+                </when>
+                <when test="searchKey == 'wrtrId'">
+                    AND u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')
+                </when>
+                <when test="searchKey == 'inqryId'">
+                    AND i.inqry_id LIKE CONCAT('%', #{searchValue}, '%')
+                </when>
+                <when test="searchKey == 'prcsStts'">
+                    AND i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%')
+                </when>
+                <otherwise>
+                    </otherwise>
+            </choose>
+        </if>
+        <if test="filterConditions != null and filterConditions.size() > 0">
+            AND i.prcs_stts IN
+            <foreach collection="filterConditions" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND i.reg_ymd BETWEEN #{startDate} AND #{endDate}
+        </if>
+    </select>
+
+    <select id="getSellerInquiryList" parameterType="map" resultMap="inquiryResultMap">
+        SELECT
+            i.inqry_id,
+            i.inqry_type_cd,
+            i.inqry_trgt_type_cd,
+            i.wrtr_id,
+            i.inqry_store_id,
+            i.inqry_ttl,
+            i.inqry_cn,
+            i.prvt_yn,
+            i.prcs_stts,
+            i.prcs_user_no,
+            i.reg_ymd,
+            i.mdfcn_ymd,
+            i.del_dt,
+            i.del_user_no,
+            i.del_actvtn_yn,
+            s.store_id,
+            s.aply_id,
+            s.seller_user_no,
+            s.store_conm,
+            s.store_intro_cn,
+            s.store_logo_img,
+            s.store_stts,
+            s.info_mdfcn_dt,
+            s.inactvtn_dt,
+            s.del_prcr_yn,
+            u.user_no,
+            u.user_ncnm,
+            iim.inqry_img_id,
+            iim.img_id,
+            iim.inqry_id AS inquiry_image_inqry_id,
+            iim.ord,
+            stim.img_addr, a.ans_id,
+            a.inqry_id AS answer_inqry_id,
+            a.answr_user_no,
+            a.ans_cn,
+            a.ans_tm,
+            a.answr_type_cd,
+            a.rls_yn,
+            a.last_mdfcn_dt,
+            a.actvtn_yn,
+            a.del_dt,
+            a.del_user_no
+        FROM
+            inquiries i
+        JOIN
+            stores s ON s.store_id = i.inqry_store_id
+        LEFT JOIN
+            users u ON u.user_no = i.wrtr_id
+        LEFT JOIN inquiry_images iim ON iim.inqry_id = i.inqry_id
+        LEFT JOIN store_images stim ON stim.img_id = iim.img_id LEFT JOIN
+            answer a ON a.inqry_id = i.inqry_id
+        WHERE 1=1
+        AND i.inqry_store_id = #{param1.inqryStoreId}
+        <if test="param1.searchKey != null and param1.searchKey != '' and param1.searchValue != null and param1.searchValue != ''">
+            <choose>
+                <when test="param1.searchKey == 'inqryTtl'">
+                    AND i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%')
+                </when>
+                <when test="param1.searchKey == 'inqryCn'">
+                    AND i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%')
+                </when>
+                <when test="param1.searchKey == 'wrtrId'">
+                    AND u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%')
+                </when>
+                <when test="param1.searchKey == 'inqryId'">
+                    AND i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%')
+                </when>
+                <when test="param1.searchKey == 'prcsStts'">
+                    AND i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
+                </when>
+                <otherwise>
+                    </otherwise>
+            </choose>
+        </if>
+        <if test="param1.filterConditions != null and param1.filterConditions.size() > 0">
+            AND i.prcs_stts IN
+            <foreach collection="param1.filterConditions" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
+        <if test="param1.startDate != null and param1.endDate != null">
+            AND i.reg_ymd BETWEEN #{param1.startDate} AND #{param1.endDate}
+        </if>        
+        ORDER BY
+            <choose>
+                <when test="param1.sortKey == 'inqryId'">
+                    i.inqry_id
+                </when>
+                <when test="param1.sortKey == 'regYmd'">
+                    i.reg_ymd
+                </when>
+                <otherwise>
+                    i.reg_ymd
+                </otherwise>
+            </choose>
+            <if test="param1.sortOrder != null and param1.sortOrder != ''">
+                ${param1.sortOrder}
+            </if>
+            <if test="param1.sortOrder == null or param1.sortOrder == ''">
+                DESC
+            </if>
+        LIMIT #{param2}, #{param3}
+    </select>
+
+    <select id="getSellerInquiryByStoreId" parameterType="String" resultMap="inquiryResultMap">
+        SELECT
+            i.inqry_id,
+            i.inqry_type_cd,
+            i.inqry_trgt_type_cd,
+            i.wrtr_id,
+            i.inqry_store_id,
+            i.inqry_ttl,
+            i.inqry_cn,
+            i.prvt_yn,
+            i.prcs_stts,
+            i.prcs_user_no,
+            i.reg_ymd,
+            i.mdfcn_ymd,
+            i.del_dt,
+            i.del_user_no,
+            i.del_actvtn_yn,
+            s.store_id,
+            s.aply_id,
+            s.seller_user_no,
+            s.store_conm,
+            s.store_intro_cn,
+            s.store_logo_img,
+            s.store_stts,
+            s.info_mdfcn_dt,
+            s.inactvtn_dt,
+            s.del_prcr_yn,
+            u.user_no,
+            u.user_ncnm,
+            iim.inqry_img_id,
+            iim.img_id,
+            iim.inqry_id AS inquiry_image_inqry_id,
+            iim.ord,
+            stim.img_addr, a.ans_id,
+            a.inqry_id AS answer_inqry_id,
+            a.answr_user_no,
+            a.ans_cn,
+            a.ans_tm,
+            a.answr_type_cd,
+            a.rls_yn,
+            a.last_mdfcn_dt,
+            a.actvtn_yn,
+            a.del_dt,
+            a.del_user_no
+        FROM
+            inquiries i
+        JOIN
+            stores s ON s.store_id = i.inqry_store_id
+        LEFT JOIN
+            users u ON u.user_no = i.wrtr_id
+        LEFT JOIN inquiry_images iim ON iim.inqry_id = i.inqry_id
+        LEFT JOIN store_images stim ON stim.img_id = iim.img_id LEFT JOIN
+            answer a ON a.inqry_id = i.inqry_id
+        WHERE i.inqry_id = #{inqryId}
+    </select>
+
+    <select id="getSellerUserNoByStoreId" parameterType="String" resultType="String">
+        SELECT
+            seller_user_no
+        FROM
+            stores
+        WHERE
+            store_id = #{storeId}
+    </select>
+    
+    <update id="updateInquiryProcessStatus" parameterType="map">
+        UPDATE inquiries
+        SET
+            prcs_stts = #{prcsStts},
+            mdfcn_ymd = NOW()
+        WHERE
+            inqry_id = #{inqryId}
+    </update>
+
+    <insert id="insertInquiryAnswerHistory" parameterType="ks55team02.common.domain.inquiry.InquiryAnswerHistory">
+        INSERT INTO inquiry_answer_history
+        (
+            ans_hstry_id,
+            answer_id,
+            inqry_id,
+            prcs_user_no,
+            chg_bfr_stts,
+            chg_aftr_stts,
+            chg_cn,
+            chg_dt
+        )
+        VALUES
+        (
+            #{ansHstryId},
+            #{answerId},
+            #{inqryId},
+            #{prcsUserNo},
+            #{chgBfrStts},
+            #{chgAftrStts},
+            #{chgCn},
+            NOW()
+        )
+    </insert>
+
+    <select id="getMaxAnsHstryIdNumber" resultType="java.lang.Integer">
+        SELECT
+            MAX(CAST(SUBSTRING_INDEX(ans_hstry_id, '_', -1) AS UNSIGNED))
+        FROM
+            inquiry_answer_history
+        WHERE
+            ans_hstry_id LIKE 'ans_hstry_%'
+    </select>
+
+    <select id="getInquiryProcessStatus" parameterType="String" resultType="String">
+        SELECT
+            prcs_stts
         FROM
             inquiries
         WHERE
-            inqry_store_id = #{inqryStoreId};
+            inqry_id = #{inqryId}
     </select>
 
-    <select id="getSellerInquiryList" parameterType="map"
-            resultMap="sellerInquiryWithStoreResultMap">
-        SELECT
-            i.inqry_id,
-            i.inqry_type_cd,
-            i.inqry_trgt_type_cd,
-            i.wrtr_id,
-            i.inqry_store_id,
-            i.inqry_ttl,
-            i.inqry_cn,
-            i.prvt_yn,
-            i.prcs_stts,
-            i.prcs_user_no,
-            i.reg_ymd,
-            i.mdfcn_ymd,
-            i.del_dt,
-            i.del_user_no,
-            i.del_actvtn_yn,
-            -- Store 테이블의 모든 컬럼 (resultMap에서 매핑될 수 있도록 명시적으로 선택)
-            s.store_id,
-            s.aply_id,
-            s.seller_user_no,
-            s.store_conm,
-            s.store_intro_cn,
-            s.store_logo_img,
-            s.store_stts,
-            s.info_mdfcn_dt,
-            s.inactvtn_dt,
-            s.del_prcr_yn
-        FROM
-            inquiries i
-        JOIN
-            stores s ON s.store_id = i.inqry_store_id
-        <where>
-            i.inqry_store_id = #{inquiry.inqryStoreId} <if test="inquiry.searchValue != null and inquiry.searchValue != ''">
-                <choose>
-                    <when test="inquiry.searchKey == 'inqryId'">
-                        AND i.inqry_id LIKE CONCAT('%', #{inquiry.searchValue}, '%')
-                    </when>
-                    <when test="inquiry.searchKey == 'inqryTtl'">
-                        AND i.inqry_ttl LIKE CONCAT('%', #{inquiry.searchValue}, '%')
-                    </when>
-                    <when test="inquiry.searchKey == 'wrtrId'">
-                        AND i.wrtr_id LIKE CONCAT('%', #{inquiry.searchValue}, '%')
-                    </when>
-                    <when test="inquiry.searchKey == 'prcsStts'">
-                        AND i.prcs_stts LIKE CONCAT('%', #{inquiry.searchValue}, '%')
-                    </when>
-                    <when test="inquiry.searchKey == null or inquiry.searchKey == ''">
-                        AND (
-                            i.inqry_id LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR
-                            i.inqry_ttl LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR
-                            i.wrtr_id LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR
-                            i.prcs_stts LIKE CONCAT('%', #{inquiry.searchValue}, '%')
-                        )
-                    </when>
-                </choose>
-            </if>
-            <if test="inquiry.startDate != null and inquiry.endDate != null">
-                AND i.reg_ymd BETWEEN #{inquiry.startDate} AND #{inquiry.endDate}
-            </if>
-            <if test="inquiry.filterConditions != null and inquiry.filterConditions.size > 0">
-                AND i.prcs_stts IN
-                <foreach item="condition" collection="inquiry.filterConditions" open="(" separator="," close=")">
-                    #{condition}
-                </foreach>
-            </if>
-            <if test="inquiry.levels != null and inquiry.levels.size > 0">
-                AND i.inqry_type_cd IN
-                <foreach item="level" collection="inquiry.levels" open="(" separator="," close=")">
-                    #{level}
-                </foreach>
-            </if>
-        </where>
-        ORDER BY
-            <choose>
-                <when test="inquiry.sortKey == 'inqryId'">
-                    CAST(REGEXP_SUBSTR(i.inqry_id, '[0-9]+') AS UNSIGNED) <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
-                </when>
-                <when test="inquiry.sortKey == 'inqryTtl'"> i.inqry_ttl <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
-                </when>
-                <when test="inquiry.sortKey == 'wrtrId'"> i.wrtr_id <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
-                </when>
-                <when test="inquiry.sortKey == 'regYmd'"> i.reg_ymd <if test="inquiry.sortOrder == 'ASC'">ASC</if><if test="inquiry.sortOrder == 'DESC'">DESC</if>
-                </when>
-                <otherwise>
-                    CAST(REGEXP_SUBSTR(i.inqry_id, '[0-9]+') AS UNSIGNED) DESC
-                </otherwise>
-            </choose>
-        LIMIT #{pageSize} OFFSET #{limitStart}; </select>
-
-    <select id="getSellerInquiryByStoreId" parameterType="String" resultMap="sellerInquiryWithStoreResultMap">
-        SELECT
-            i.inqry_id,
-            i.inqry_type_cd,
-            i.inqry_trgt_type_cd,
-            i.wrtr_id,
-            i.inqry_store_id,
-            i.inqry_ttl,
-            i.inqry_cn,
-            i.prvt_yn,
-            i.prcs_stts,
-            i.prcs_user_no,
-            i.reg_ymd,
-            i.mdfcn_ymd,
-            i.del_dt,
-            i.del_user_no,
-            i.del_actvtn_yn,
-            -- Store 테이블의 모든 컬럼
-            s.store_id,
-            s.aply_id,
-            s.seller_user_no,
-            s.store_conm,
-            s.store_intro_cn,
-            s.store_logo_img,
-            s.store_stts,
-            s.info_mdfcn_dt,
-            s.inactvtn_dt,
-            s.del_prcr_yn
-        FROM
-            inquiries i
-        JOIN
-            stores s ON s.store_id = i.inqry_store_id
-        WHERE
-            i.inqry_id = #{inqryId};
-    </select>
-            
 </mapper>
