@@ -142,7 +142,8 @@
 
 	<select id="getNextSearchLogId" resultType="string">
 		SELECT
-		CONCAT('SRCH_LOG_', LPAD(COALESCE(MAX(CAST(REPLACE(srch_log_id, 'SRCH_LOG_', '') AS
+		CONCAT('SRCH_LOG_', LPAD(COALESCE(MAX(CAST(REPLACE(srch_log_id,
+		'SRCH_LOG_', '') AS
 		UNSIGNED)), 0) + 1, 5, '0'))
 		FROM
 		search_logs
@@ -154,16 +155,13 @@
 		user_no,
 		srch_keyword_nm,
 		srch_dt,
-		srch_user_ip_addr, -- (추가) IP 주소
-		accmtl_srch_rslt_nocs -- (추가) 검색 결과 수
-		-- srch_domain_cd 컬럼은 지금 당장 쓰임새가 명확하지 않으므로, 필요 시 나중에 추가
+		srch_user_ip_addr -- 마지막 쉼표 제거
 		) VALUES (
 		#{searchLogId},
 		#{userNo},
 		#{keyword},
 		NOW(),
-		#{ipAddress}, -- (추가) IP 주소 값
-		#{totalResultCount} -- (추가) 검색 결과 수 값
+		#{ipAddress} -- 마지막 쉼표 제거
 		)
 	</insert>
 

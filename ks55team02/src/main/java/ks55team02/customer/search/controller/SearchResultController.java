@@ -38,6 +38,7 @@ public class SearchResultController {
 			String userNo = (loginUser != null) ? loginUser.getUserNo() : null;
 			String ipAddress = getClientIp(request);
 
+
 			// 이제 이 호출은 SearchService 인터페이스 수정 후 정상 동작합니다.
 			searchData = searchService.searchAll(keyword, userNo, ipAddress);
 		}

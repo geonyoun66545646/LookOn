@@ -51,8 +51,10 @@ public class SearchServiceImpl implements SearchService {
 			historyParams.put("userNo", userNo);
 			historyParams.put("keyword", keyword);
 			historyParams.put("ipAddress", ipAddress); // (추가) IP 주소
-			historyParams.put("totalResultCount", totalResultCount); // (추가) 검색 결과 수
 
+			
+
+			
 			searchMapper.insertSearchHistory(historyParams);
 		}
 
