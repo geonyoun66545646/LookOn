@@ -24,6 +24,8 @@
 			b.bbs_nm
 		FROM
 			boards b
+		WHERE
+			b.del_dt IS NULL
 		ORDER BY
 		CASE
 			WHEN bbs_clsf_cd = 'notice' THEN 1

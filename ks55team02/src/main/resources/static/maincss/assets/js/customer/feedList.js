@@ -13,9 +13,11 @@ $(() => {
         // 작성자 닉네임 (null일 경우 '알 수 없는 사용자' 등으로 표시)
         const writerNickname = feed.writerInfo?.userNcnm || '알 수 없는 사용자';
         
+		const detailLink = `/customer/feed/feedDetail/${feed.feedSn}?context=all`;
+		
         return `
             <article class="feed-item">
-                <a href="/customer/feed/feedDetail/${feed.feedSn}">
+                <a href="${detailLink}">
                     <img src="${imageUrl}" alt="${imageAlt}">
                     <div class="item-overlay">
                         <span class="likes">♥ ${feed.likeCount}</span>
@@ -55,6 +57,11 @@ $(() => {
             dataType: 'json'
         })
         .done(response => {
+			if (currentPage === 1) {
+			    const totalCount = response.totalCount || 0;
+			    // toLocaleString()을 사용하여 1000단위 콤마를 추가합니다. (예: 12345 -> 12,345)
+			    $('.content-count').text(`총 ${totalCount.toLocaleString()}개`);
+			}
             renderFeeds(response.feedList); 
             hasNext = response.hasNext;     
             currentPage++;                  

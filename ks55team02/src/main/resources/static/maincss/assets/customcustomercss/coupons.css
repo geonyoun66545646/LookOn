@@ -406,3 +406,27 @@ body {
 .coupon-download-btn.issued-success:hover {
 	background-color: #28a745; /* 호버 시에도 색상 유지 */
 }
+
+/* coupons.css 또는 <style> 태그 안에 추가 */
+.member-coupon__filter-group {
+    margin: 15px 0;
+    display: flex;
+    gap: 10px;
+}
+
+.filter-btn {
+    padding: 5px 15px;
+    border: 1px solid #ddd;
+    background-color: #f7f7f7;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.filter-btn.active {
+    border-color: #333;
+    background-color: #333;
+    color: #fff;
+    font-weight: bold;
+}
+/* coupons.css */

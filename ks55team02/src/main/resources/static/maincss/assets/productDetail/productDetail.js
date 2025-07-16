@@ -96,6 +96,7 @@ $(document).ready(function() {
 		const colorText = colorSelect.find('option:selected').text();
 		const sizeText = sizeSelect.find('option:selected').text();
 
+
 		const isExisting = selectedOptions.some(opt => opt.color === colorText && opt.size === sizeText);
 
 		if (isExisting) {
@@ -147,9 +148,11 @@ $(document).ready(function() {
 			});
 		});
 
+
 		// 초기 카운터 설정
 		updateImageCounter(0);
 	}
+
 
 	// 썸네일 스크롤 버튼 기능
 	if (thumbnailGallery && thumbUpButton && thumbDownButton) {
@@ -162,8 +165,12 @@ $(document).ready(function() {
 		});
 	}
 
+
+
 	// 옵션 선택 이벤트
 	$('.product-option-select').on('change', handleOptionSelection);
+
+
 
 	// 수량 변경 및 삭제 버튼 이벤트 (이벤트 위임)
 	selectedOptionsContainer.on('click', '.qty-control-button, .remove-option-button', function() {
@@ -171,8 +178,11 @@ $(document).ready(function() {
 		const $item = $target.closest('.selected-option-item-custom');
 		if ($item.length === 0) return;
 
+
+
 		const index = $item.data('index');
 		let option = selectedOptions[index];
+
 
 		if ($target.hasClass('plus') && option.quantity < 10) {
 			option.quantity++;

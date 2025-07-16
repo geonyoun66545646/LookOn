@@ -37,7 +37,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor{
             session.setAttribute("redirectUrlAfterLogin", requestURI);
             
             // 5. 우리 프로젝트의 메인 페이지로 리다이렉트 시킨다.
-            response.sendRedirect("/main");
+            response.sendRedirect("/");
 
             return false; // 컨트롤러 실행을 막고 여기서 요청 처리 종료
         }

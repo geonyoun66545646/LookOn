@@ -19,6 +19,7 @@ public class CustomerHomeController {
 	
     private final ProductSearchService productSearchService;
 	
+
 	@GetMapping(value= {"/main","/main/"})
     public String customerHomeView(Model model, HttpServletRequest request) {	
 		model.addAttribute("currentUrl", request.getRequestURI());

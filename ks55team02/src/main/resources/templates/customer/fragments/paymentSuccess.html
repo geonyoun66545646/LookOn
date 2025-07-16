@@ -6,144 +6,82 @@
 <head>
     <meta charset="UTF-8">
     <title>결제 완료</title>
-    
-    <!-- 이 페이지를 위한 전용 스타일 -->
     <style>
-        .order-success-container {
-            max-width: 700px;
-            margin: 4rem auto;
-            padding: 4rem;
-            text-align: center;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            background-color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .success-icon {
-            font-size: 6rem;
-            color: #28a745; /* 성공을 의미하는 초록색 */
-            margin-bottom: 2rem;
-            /* Font Awesome 아이콘을 사용하려면 해당 CSS가 로드되어야 합니다. */
-            /* Molla 템플릿은 자체 아이콘 폰트를 사용하므로, 아래는 예시입니다. */
-        }
-        .success-title {
-            font-size: 2.4rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #333;
-        }
-        .success-message {
-            font-size: 1.6rem;
-            color: #666;
-            margin-bottom: 3rem;
-        }
-        .order-summary-table {
-            width: 100%;
-            margin: 2.5rem 0;
-            text-align: left;
-            border-top: 2px solid #333;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .order-summary-table th, .order-summary-table td {
-            padding: 1.5rem 1rem;
-            border-bottom: 1px solid #e9ecef;
-            font-size: 1.5rem;
-        }
-        .order-summary-table th {
-            width: 30%;
-            background-color: #f8f9fa;
-            font-weight: 500;
-            color: #495057;
-        }
-        .order-summary-table td {
-            color: #212529;
-            font-weight: 500;
-        }
-        .action-buttons {
-            margin-top: 3rem;
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-        }
-        .action-buttons .btn {
-            min-width: 180px;
-            padding: 1.2rem 2rem;
-            font-size: 1.6rem;
-        }
+        .order-success-container { max-width: 700px; margin: 4rem auto; padding: 4rem; text-align: center; border: 1px solid #e9ecef; border-radius: 8px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .success-icon { font-size: 6rem; color: #28a745; margin-bottom: 2rem; }
+        .success-title { font-size: 2.4rem; font-weight: 600; margin-bottom: 1rem; }
+        .success-message { font-size: 1.6rem; color: #666; margin-bottom: 3rem; }
+        .order-summary-table { width: 100%; margin: 2.5rem 0; text-align: left; border-top: 2px solid #333; border-bottom: 1px solid #e9ecef; }
+        .order-summary-table th, .order-summary-table td { padding: 1.5rem 1rem; border-bottom: 1px solid #e9ecef; font-size: 1.5rem; }
+        .order-summary-table th { width: 30%; background-color: #f8f9fa; font-weight: 500; }
+        .order-summary-table td { font-weight: 500; }
+        .action-buttons { margin-top: 3rem; display: flex; justify-content: center; gap: 1.5rem; }
+
+        /* <<<<<<<<< [추가됨] 주문 상품 목록 스타일 >>>>>>>>> */
+        .ordered-products-section { margin-top: 3rem; border-top: 1px solid #e9ecef; padding-top: 2rem; }
+        .ordered-products-section h3 { font-size: 2rem; font-weight: 600; margin-bottom: 1.5rem; text-align: left; }
+        .ordered-product-item { display: flex; align-items: center; padding: 1rem 0; border-bottom: 1px dashed #e9ecef; }
+        .ordered-product-item:last-child { border-bottom: none; }
+        .ordered-product-details { flex-grow: 1; text-align: left; }
+        .ordered-product-name { font-weight: 500; font-size: 1.5rem; margin-bottom: 0.2rem; }
+        .ordered-product-info { font-size: 1.3rem; color: #666; }
+        .ordered-product-price { font-size: 1.5rem; font-weight: 600; white-space: nowrap; }
     </style>
 </head>
 
 <body>
 <th:block layout:fragment="contents">
     <div class="page-content">
-    <div class="container">
-        <div class="order-success-container">
-            <!-- 성공 아이콘, 제목, 메시지는 그대로 유지 -->
-            <i class="icon-check-circle success-icon"></i>
-            <h2 class="success-title">결제가 성공적으로 완료되었습니다.</h2>
-            <p class="success-message">저희 서비스를 이용해 주셔서 감사합니다. 주문 내역은 아래와 같습니다.</p>
-            
-            <!-- ================================================== -->
-            <!--   ↓↓↓ 이 부분을 통째로 수정 또는 교체하세요 ↓↓↓   -->
-            <!-- ================================================== -->
-            
-            <!-- 주문 상품 목록 테이블 (동적 생성) -->
-            <table class="order-summary-table" th:if="${orderedProducts != null and not #lists.isEmpty(orderedProducts)}">
-                <thead>
-                    <tr>
-                        <th style="text-align: left;">상품명</th>
-                        <th style="width: 20%; text-align: right;">수량</th>
-                        <th style="width: 30%; text-align: right;">가격</th>
-                    </tr>
-                </thead>
-				<!-- paymentSuccess.html 의 상품 목록 테이블 부분 -->
-				<tbody>
-				    <!-- th:each를 사용해 상품 목록 반복 -->
-				    <tr th:each="product : ${orderedProducts}">
-				        <td th:text="${product.name}">Beige knitted elastic runner shoes</td>
-				        <td style="text-align: right;" th:text="${product.quantity}">2</td>
-				        <!-- ↓↓↓ 이 부분을 수정하면 좋습니다 ↓↓↓ -->
-				        <td style="text-align: right;" th:text="${#numbers.formatInteger(product.total, 0, 'COMMA') + '원'}">168,000원</td>
-				    </tr>
-				</tbody>
-            </table>
-            
-            <!-- 결제 정보 요약 테이블 -->
-            <table class="order-summary-table">
-			    <tbody>
-			        <tr>
-			            <th>주문 번호</th>
-			            <!-- Controller에서 payment.orderId로 데이터를 보내므로 paymentInfo가 아닌 payment를 사용해야 합니다. -->
-			            <td th:text="${orders.orderId}"></td>
-			        </tr>
-			        <tr>
-			            <th>총 결제 금액</th>
-			            <!-- Controller에서 payment.totalAmount로 데이터를 보내므로 paymentInfo가 아닌 payment를 사용해야 합니다. -->
-			            <td th:text="${#numbers.formatInteger(orders.amount, 0, 'COMMA') + '원'}">50,000원</td>
-			        </tr>
-			        <tr>
-			            <th>결제 수단</th>
-			            <td th:text="${orders.method}">신용카드</td>
-			        </tr>
-			        <tr>
-			            <th>결제 승인일시</th>
-			            <td th:text="${#temporals.format(orders.approvedAt, 'yyyy-MM-dd HH:mm:ss')}">2023-10-27 12:35:00</td>
-			        </tr>
-			    </tbody>
-			</table>
-
-            <!-- ================================================== -->
-            <!--   ↑↑↑ 여기까지 수정 또는 교체 ↑↑↑   -->
-            <!-- ================================================== -->
-            
-            <!-- 다음 행동을 유도하는 버튼 -->
-            <div class="action-buttons">
-                <a th:href="@{/paymentHistory}" class="btn btn-primary">주문 내역 확인</a>
-                <a th:href="@{/productDetail}" class="btn btn-outline-primary-2">쇼핑 계속하기</a>
+        <div class="container">
+            <div class="order-success-container">
+                <i class="icon-check-circle success-icon"></i>
+                <h2 class="success-title">결제가 성공적으로 완료되었습니다.</h2>
+                <p class="success-message">주문해 주셔서 감사합니다. 주문 내역은 아래와 같습니다.</p>
+                
+                <table class="order-summary-table" th:if="${paymentResult != null}">
+                    <tbody>
+                        <tr>
+                            <th>주문 번호</th>
+                            <td th:text="${orderId}">ORD20250715-001</td>
+                        </tr>
+                        <tr>
+                            <th>총 결제 금액</th>
+                            <td th:text="${#numbers.formatInteger(amount, 0, 'COMMA') + '원'}">50,000원</td>
+                        </tr>
+                        <tr>
+                            <th>결제 수단</th>
+                            <td th:text="${paymentResult.method}">신용카드</td>
+                        </tr>
+                        <tr>
+                            <th>결제 승인일시</th>
+                            <td th:text="${#temporals.format(T(java.time.OffsetDateTime).parse(paymentResult.approvedAt).toLocalDateTime(), 'yyyy-MM-dd HH:mm:ss')}">2025-07-15 21:30:00</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="ordered-products-section" th:if="${orderedItems != null and !orderedItems.isEmpty()}">
+                    <h3>주문 상품 목록</h3>
+                    <!-- 
+                    <div th:each="item : ${orderedItems}" class="ordered-product-item">
+                        <div class="ordered-product-details">
+                            <div class="ordered-product-name" th:text="${item.product_name}">상품명</div>
+                            <div class="ordered-product-info">
+                                <span th:if="${item.option_name != null}" th:text="${'옵션: ' + item.option_name + ' / '}"></span>
+                                <span th:text="${'수량: ' + item.ordr_qntty + '개'}"></span>
+                            </div>
+                        </div>
+                        <div class="ordered-product-price" th:text="${#numbers.formatInteger(item.ordr_tm_untprc * item.ordr_qntty, 0, 'COMMA') + '원'}">가격</div>
+                    </div> 
+                    -->
+                </div>
+                
+                <div class="action-buttons">
+                    <a th:href="@{/paymentHistory}" class="btn btn-primary">주문 내역 확인</a>
+                    <a th:href="@{/customer/products/list}" class="btn btn-outline-primary-2">쇼핑 계속하기</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </th:block>
 </body>
 </html>

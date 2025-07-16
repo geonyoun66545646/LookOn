@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import ks55team02.customer.store.domain.ProductReview;
-import ks55team02.customer.store.domain.ReviewImage;
+import ks55team02.common.domain.store.ProductReview;
+import ks55team02.common.domain.store.ReviewImage;
 
 @Mapper
 public interface ReviewMapper {
