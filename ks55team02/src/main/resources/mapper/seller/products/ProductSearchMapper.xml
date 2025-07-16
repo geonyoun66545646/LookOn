@@ -53,6 +53,26 @@
         </association>
     </resultMap>
 	
+	<!-- 비슷한 상품 목록 조회 (현재 상품 제외) -->
+    <select id="getSimilarProducts" parameterType="map" resultMap="activeProductsResultMap">
+        SELECT
+		    p.gds_no, p.store_id, p.gds_nm, p.bas_prc,
+		    p.dscnt_rt, (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
+		    s.store_conm AS store_name,
+            (SELECT pi.img_file_path_nm FROM product_images pi WHERE pi.gds_no = p.gds_no AND pi.img_type = 1 AND pi.actvtn_yn = TRUE ORDER BY pi.img_indct_sn ASC LIMIT 1) AS thumbnail_image_path
+		FROM
+		    products p
+		LEFT JOIN
+		    stores s ON p.store_id = s.store_id
+		WHERE
+		    p.expsr_yn = 1 AND p.actvtn_yn = 1 AND s.del_prcr_yn = FALSE
+            AND p.ctgry_no = #{categoryId} <!-- 동일 카테고리 조건 -->
+            AND p.gds_no != #{currentGdsNo}  <!-- 현재 상품 제외 조건 -->
+		ORDER BY
+            RAND() -- 랜덤 정렬
+        LIMIT #{limit}
+    </select>
+	
 	<!-- 메인 슬라이더용: 최근 등록된 상품 조회 -->
     <select id="getRecentProductsForMain" parameterType="int" resultMap="productsWithFilterResultMap">
         SELECT

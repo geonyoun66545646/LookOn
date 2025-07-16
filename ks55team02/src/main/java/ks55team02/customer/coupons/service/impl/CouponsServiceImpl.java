@@ -1,5 +1,12 @@
 package ks55team02.customer.coupons.service.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import ks55team02.customer.coupons.domain.Coupons;
 import ks55team02.customer.coupons.domain.UserCoupons;
 import ks55team02.customer.coupons.mapper.CouponsMapper;
@@ -7,16 +14,6 @@ import ks55team02.customer.coupons.service.CouponsService;
 import ks55team02.util.CustomerPagination;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -28,10 +25,10 @@ public class CouponsServiceImpl implements CouponsService {
 	private static final int PAGE_SIZE = 10;
 	private static final int BLOCK_SIZE = 10;
 
+	// (수정) getAvailableCoupons 메소드가 userNo를 받도록 변경합니다.
 	@Override
 	public CustomerPagination<Coupons> getAvailableCoupons(String userNo, String keyword, String sortOrder, int page) {
 		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("userNo", userNo);
 		paramMap.put("keyword", keyword);
 		paramMap.put("sortOrder", sortOrder);
 
@@ -43,28 +40,34 @@ public class CouponsServiceImpl implements CouponsService {
 
 		List<Coupons> availableCoupons = couponsMapper.getAvailableCoupons(paramMap);
 
-		if (userNo != null && !userNo.isEmpty()) { // 로그인한 사용자에게만 발급 가능 여부를 체크
+		// (핵심 로직 추가) 사용자가 로그인한 경우, 각 쿠폰의 보유 여부를 체크합니다.
+		if (userNo != null && !userNo.trim().isEmpty()) {
+			// 1. 사용자가 보유한 모든 쿠폰의 ID 목록을 한 번에 조회합니다. (성능 최적화)
+			List<String> ownedCouponIds = couponsMapper.getOwnedCouponIds(userNo);
+
+			// 2. 조회된 쿠폰 목록을 순회하며, 보유 여부(isOwned)를 설정합니다.
+			// for (Coupons coupon : availableCoupons) 루프 내부
 			for (Coupons coupon : availableCoupons) {
-				Map<String, Object> status = checkCouponStatusForUser(userNo, coupon);
-				coupon.setIssuable((Boolean) status.get("isIssuable"));
-				coupon.setStatusMessage((String) status.get("statusMessage"));
-			}
-		} else { // 비로그인 사용자에게는 모든 쿠폰을 발급 불가능으로 표시
-			for (Coupons coupon : availableCoupons) {
-				coupon.setIssuable(false);
-				coupon.setStatusMessage("로그인 후 확인 가능"); // 비로그인 시 메시지
+				if (ownedCouponIds.contains(coupon.getPblcnCpnId())) {
+					// (수정) setOwned(true)로 호출합니다.
+					coupon.setOwned(true);
+				}
 			}
 		}
-
 		return new CustomerPagination<>(availableCoupons, totalCount, page, PAGE_SIZE, BLOCK_SIZE);
 	}
 
 	@Override
-	public CustomerPagination<UserCoupons> getMyCoupons(String userNo, String keyword, String sortOrder, int page) {
+	public CustomerPagination<UserCoupons> getMyCoupons(String userNo, String keyword, String sortOrder, int page,
+			Boolean isUsed) {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("userNo", userNo);
 		paramMap.put("keyword", keyword);
 		paramMap.put("sortOrder", sortOrder);
+		// (개선) isUsed 파라미터를 추가하여 사용 가능/완료 쿠폰 필터링
+		if (isUsed != null) {
+			paramMap.put("isUsed", isUsed);
+		}
 
 		int totalCount = couponsMapper.getMyCouponsCount(paramMap);
 
@@ -79,131 +82,86 @@ public class CouponsServiceImpl implements CouponsService {
 
 	@Override
 	@Transactional
-	public boolean issueCouponToUser(String userNo, String couponId) {
+	public Map<String, Object> issueCouponToUser(String userNo, String couponId) {
+		Map<String, Object> result = new HashMap<>();
+
 		Coupons couponInfo = couponsMapper.getCouponInfo(couponId);
 		if (couponInfo == null) {
-			throw new IllegalArgumentException("존재하지 않는 쿠폰입니다.");
+			result.put("success", false);
+			result.put("message", "존재하지 않는 쿠폰입니다.");
+			return result;
+		}
+		// (수정) isIssuable은 이제 실패 이유(String)를 반환합니다. 성공 시 null을 반환합니다.
+		String failureReason = isIssuable(userNo, couponInfo);
+
+		if (failureReason != null) {
+			// 발급 조건 검증 실패
+			log.warn("쿠폰 발급 거절: {}. (userNo: {}, couponId: {})", failureReason, userNo, couponId);
+			result.put("success", false);
+			result.put("message", failureReason);
+			return result;
 		}
 
-		// 1. 발급 자격 검사 (여기서 checkCouponStatusForUser 호출)
-		Map<String, Object> eligibilityResult = checkCouponStatusForUser(userNo, couponInfo);
-		boolean isEligible = (Boolean) eligibilityResult.get("isIssuable");
-		String statusMessage = (String) eligibilityResult.get("statusMessage");
-
-		if (!isEligible) {
-			// 발급 불가능한 경우, 해당 메시지를 컨트롤러로 전달하기 위해 예외 발생
-			throw new IllegalArgumentException(statusMessage != null ? statusMessage : "쿠폰 발급 조건을 충족하지 않습니다.");
-		}
-
-		// 2. 모든 검사를 통과했으면 실제 쿠폰 발급
+		// 모든 검증 통과 후 쿠폰 발급
 		issueNewCoupon(userNo, couponInfo);
-
-		return true; // 최종 성공
-	}
-
-	/**
-	 * 쿠폰 발급 자격 조건을 검사하고, 결과를 Map으로 반환합니다.
-	 * isIssuable (boolean)과 statusMessage (String)를 포함합니다.
-	 * * @param userNo 사용자 번호
-	 * @param couponInfo 검사할 쿠폰 정보
-	 * @return isIssuable (boolean)과 statusMessage (String)를 포함하는 Map
-	 */
-	private Map<String, Object> checkCouponStatusForUser(String userNo, Coupons couponInfo) {
-		Map<String, Object> result = new HashMap<>();
-		result.put("isIssuable", true); // 기본은 발급 가능
-		result.put("statusMessage", null); // 기본 메시지 없음
-
-		String condition = couponInfo.getIssueConditionType();
-		String reissueCycle = couponInfo.getReissueCycle();
-		String pblcnCpnId = couponInfo.getPblcnCpnId();
-
-		log.info("--- 쿠폰 발급 가능 여부 검사 시작 (userNo: {}, couponId: {}) ---", userNo, pblcnCpnId);
-		log.info("쿠폰 타입: {}, 재발급 주기: {}", condition, reissueCycle);
-
-		// ★★★ 1. UNIVERSAL: 이 사용자가 이 공개 쿠폰을 이미 '활성 상태'로 보유하고 있는가? ★★★
-		// 이 체크는 모든 쿠폰 타입에 대해 가장 먼저 수행되어야 합니다.
-		// 사용자가 이미 활성 상태의 쿠폰을 보유하고 있다면, 더 이상 발급 가능하지 않습니다.
-		int activeOwnedCount = couponsMapper.countActiveUserCouponByCouponId(userNo, pblcnCpnId);
-		log.info("UNIVERSAL 보유 검사 - 활성 보유 이력: {}개", activeOwnedCount);
-		if (activeOwnedCount > 0) {
-			result.put("isIssuable", false);
-			result.put("statusMessage", "이미 발급받았습니다."); // "보유 쿠폰"을 나타내는 메시지 (프론트엔드 판단 기준)
-			log.info("UNIVERSAL 보유 - 이미 발급받음: isIssuable = false");
-			return result; // 이미 보유했으면 더 이상 조건 검사할 필요 없이 반환
-		}
-
-		// ★★★ 2. 발급 조건(issue_condition_type)에 따른 상세 검사 ★★★
-		// (여기에 도달했다는 것은 현재 활성 쿠폰을 보유하고 있지 않다는 의미)
-
-		if ("SIGN_UP".equals(condition)) {
-			// SIGN_UP은 단 1회성이므로, 위 UNIVERSAL 체크로 이미 충분합니다.
-			// (활성 쿠폰을 보유하고 있지 않으므로, 이전에 발급받은 적이 없다는 의미)
-		} else if ("FIRST_PURCHASE".equals(condition)) {
-			int orderCount = couponsMapper.countUserOrders(userNo);
-			log.info("FIRST_PURCHASE 검사 - 주문 이력: {}개", orderCount);
-			if (orderCount > 0) {
-				result.put("isIssuable", false);
-				result.put("statusMessage", "이미 구매 이력이 있습니다.");
-				log.info("FIRST_PURCHASE - 구매 이력 있음: isIssuable = false");
-				return result;
-			}
-		} else if ("REVIEW".equals(condition)) {
-			// REVIEW는 월 3회 제한이 있으므로, 이 부분에서 추가 검사.
-			int reviewCount = couponsMapper.countUserReviews(userNo);
-			log.info("REVIEW 검사 - 총 리뷰 개수: {}개", reviewCount);
-			if (reviewCount == 0) {
-				result.put("isIssuable", false);
-				result.put("statusMessage", "리뷰 작성 내역이 없습니다.");
-				log.info("REVIEW - 리뷰 없음: isIssuable = false");
-				return result;
-			}
-            // 금월 발급 이력 확인 (월 3회 제한)
-			int monthlyReviewCouponCount = couponsMapper.countMonthlyIssuedReviewCoupons(userNo, pblcnCpnId);
-			log.info("REVIEW 검사 - 금월 발급 리뷰 쿠폰: {}개", monthlyReviewCouponCount);
-			if (monthlyReviewCouponCount >= 3) { // 월 3회 제한
-				result.put("isIssuable", false);
-				result.put("statusMessage", "금월 발급이 완료되었습니다. (월 3회 제한)");
-				log.info("REVIEW - 월 3회 초과: isIssuable = false");
-				return result;
-			}
-		} else if ("BIRTHDAY".equals(condition)) {
-			boolean isBirthdayWeek = couponsMapper.isBirthdayWeek(userNo);
-			log.info("BIRTHDAY 검사 - 생일 주간 여부: {}", isBirthdayWeek);
-			if (!isBirthdayWeek) {
-				result.put("isIssuable", false);
-				result.put("statusMessage", "생일 주간이 아닙니다.");
-				log.info("BIRTHDAY - 생일 주간 아님: isIssuable = false");
-				return result;
-			}
-            // 올해 발급 이력 확인 (연 1회 제한)
-			int yearlyBirthdayCouponCount = couponsMapper.countIssuedBirthdayCouponThisYear(userNo, pblcnCpnId);
-			log.info("BIRTHDAY 검사 - 올해 발급 생일 쿠폰: {}개", yearlyBirthdayCouponCount);
-			if (yearlyBirthdayCouponCount > 0) {
-				result.put("isIssuable", false);
-				result.put("statusMessage", "올해 생일 쿠폰은 이미 발급받았습니다.");
-				log.info("BIRTHDAY - 올해 이미 발급: isIssuable = false");
-				return result;
-			}
-		} else if ("REISSUE_MONTHLY".equals(condition)) {
-			// REISSUE_MONTHLY는 월별 재발급이므로, 금월 발급 이력을 확인합니다.
-			int monthlyIssuedCount = couponsMapper.countMonthlyIssuedCoupon(userNo, pblcnCpnId);
-			log.info("REISSUE_MONTHLY 검사 - 금월 발급 쿠폰: {}개", monthlyIssuedCount);
-			if (monthlyIssuedCount > 0) {
-				result.put("isIssuable", false);
-				result.put("statusMessage", "금월 발급이 완료되었습니다.");
-				log.info("REISSUE_MONTHLY - 금월 이미 발급: isIssuable = false");
-				return result;
-			}
-		}
-		// 'UNLIMITED' 재발급 주기는 별도의 발급 조건이 없다면,
-		// 위 UNIVERSAL 체크에서 이미 활성 보유 여부를 판단하므로 추가 로직이 필요 없습니다.
-
-		log.info("--- 쿠폰 발급 가능 여부 검사 완료 (isIssuable: {}, statusMessage: {}) ---", result.get("isIssuable"), result.get("statusMessage"));
+		log.info("쿠폰 발급 성공! (userNo: {}, couponId: {})", userNo, couponId);
+		result.put("success", true);
+		result.put("message", "쿠폰이 발급되었습니다.");
 		return result;
 	}
 
 	/**
-	 * 실제 쿠폰을 발급(INSERT)하는 로직만 담당합니다.
+	 * (완벽 복구) '두 단계 검증' 방식으로 모든 상세 발급 조건을 검사합니다.
+	 * 
+	 * @return 발급 실패 이유(String). 발급 가능 시 null을 반환합니다.
+	 */
+	private String isIssuable(String userNo, Coupons couponInfo) {
+		String couponId = couponInfo.getPblcnCpnId();
+
+		// --- 1단계: 공통 검증 (가장 먼저!) ---
+		int issueCount = couponsMapper.countUserCouponByCouponId(userNo, couponId);
+		if (issueCount > 0) {
+			return "이미 발급받은 쿠폰입니다.";
+		}
+
+		// --- 2단계: 특별 조건 검증 ---
+		String conditionType = couponInfo.getIssueConditionType();
+		if (conditionType == null || "ANYONE".equals(conditionType)) {
+			return null; // 조건 없으면 통과
+		}
+
+		switch (conditionType) {
+		case "SIGN_UP":
+			return null; // 1단계 통과했으면 OK
+
+		case "FIRST_PURCHASE":
+			if (couponsMapper.countUserOrders(userNo) > 0) {
+				return "발급 조건이 맞지 않습니다. (사유: 첫 구매 전용)";
+			}
+			break;
+
+		case "REVIEW":
+			if (couponsMapper.countUserReviews(userNo) == 0) {
+				return "발급 조건이 맞지 않습니다. (사유: 리뷰 작성 필요)";
+			}
+			break;
+
+		case "BIRTHDAY":
+			if (!couponsMapper.isBirthdayWeek(userNo)) {
+				return "발급 조건이 맞지 않습니다. (사유: 생일 주간이 아님)";
+			}
+			// 생일 쿠폰은 1년에 한 번만 받을 수 있다는 추가 규칙 적용
+			if (couponsMapper.countIssuedBirthdayCouponThisYear(userNo, couponId) > 0) {
+				return "올해의 생일 쿠폰은 이미 발급받았습니다.";
+			}
+			break;
+		}
+
+		return null; // 모든 특별 조건을 통과했으면 최종 성공
+	}
+
+	/**
+	 * 실제 쿠폰을 발급(INSERT)하는 로직만 담당합니다. (수정 없음)
 	 */
 	private void issueNewCoupon(String userNo, Coupons couponInfo) {
 		String nextUserCouponId = couponsMapper.getNextUserCouponId();
@@ -212,19 +170,32 @@ public class CouponsServiceImpl implements CouponsService {
 		newUserCoupon.setUserNo(userNo);
 		newUserCoupon.setPblcnCpnId(couponInfo.getPblcnCpnId());
 		newUserCoupon.setIndivExpryDt(couponInfo.getVldEndDt());
+		// 발급 사유는 쿠폰의 발급 조건 타입을 따라가는 것이 일관성 있어 보입니다.
 		newUserCoupon.setIssuRsnSrcCn(couponInfo.getIssueConditionType());
 
 		couponsMapper.issueUserCoupon(newUserCoupon);
 	}
+
 	
-	/**
+	// * - 2025.07.11 gy -
+	@Override
+	public List<UserCoupons> getUserAvailableCoupons(String userNo) {
+		if (userNo == null || userNo.trim().isEmpty()) {
+			throw new IllegalArgumentException("사용자 번호가 유효하지 않습니다.");
+		}
+		// (개선) Mapper에서 이미 완벽하게 필터링하므로, 서비스단의 추가 필터링 로직은 제거합니다.
+		return couponsMapper.getUserAvailableCoupons(userNo);
+	}
+	
+	/*
+		
+		**
      * - 2025.07.11 gy -
      * 특정 사용자가 보유한 사용 가능한 쿠폰 목록을 조회합니다.
      * 이 메서드는 CouponMapper를 호출하여 DB에서 데이터를 가져옵니다.
      *
      * @param userNo 사용자 번호
      * @return 사용 가능한 UserCoupons 객체 리스트
-     */
 	@Override
 	public List<UserCoupons> getUserAvailableCoupons(String userNo) {
 	    // 1. 파라미터 검증
@@ -245,5 +216,13 @@ public class CouponsServiceImpl implements CouponsService {
 	    log.debug("사용자 보유 쿠폰 조회 완료 - 유효 쿠폰 수: {}", validCoupons.size());
 	    return validCoupons;
 	}
-	
+	     */
+
+
+	/*
+	 * ─── 삭제된 메소드 ──────────────────────────────────────────────────────────
+	 * private Map<String, Object> checkCouponStatusForUser(...) ->
+	 * isIssuable(userNo, couponId) boolean 메소드로 완전 대체됨.
+	 * ────────────────────────────────────────────────────────────────────────
+	 */
 }

@@ -1,6 +1,4 @@
 $(document).ready(function() {
-    console.log("DOM이 로드되었습니다. 스크립트 실행 시작.");
-
     // --- 1. 전역 변수 및 요소 선택 ---
     const colorSelect = $('.details-row-color .product-option-select');
     const sizeSelect = $('.details-row-size .product-option-select');
@@ -10,34 +8,47 @@ $(document).ready(function() {
     const selectedOptionCurrentPriceSpan = $('#selectedOptionCurrentPrice'); 
     let selectedOptions = []; // 선택된 옵션 목록 (배열)
 
-    // --- 2. 헬퍼 함수 정의 ---
+    // 이미지 갤러리 관련 요소
+    const mainImage = document.getElementById('product-detail-zoom');
+    const galleryItems = document.querySelectorAll('.product-detail-gallery-item');
+    const imageCounter = document.querySelector('.product-detail-image-counter span'); 
+    const thumbnailGallery = document.querySelector('.product-detail-image-gallery'); // ID -> 클래스로 변경
+    const thumbUpButton = document.querySelector('.product-detail-thumbnail-nav-btn.up'); // 클래스 세분화
+    const thumbDownButton = document.querySelector('.product-detail-thumbnail-nav-btn.down'); // 클래스 세분화
 
-    // 가격을 '1,000원' 형태로 포맷팅하는 함수
+    // --- 2. 초기화 및 헬퍼 함수 ---
+
+    /**
+     * 숫자를 통화 형식(예: 10,000원)으로 변환합니다.
+     * @param {number} price - 가격
+     * @returns {string} 포맷팅된 가격 문자열
+     */
     function formatPrice(price) {
         return price.toLocaleString('ko-KR') + '원';
     }
 
-    // 상품의 실제 최종 가격을 화면에서 읽어오는 함수
+    /**
+     * 페이지에서 상품의 기본 가격을 가져옵니다.
+     * @returns {number} 기본 가격
+     */
     function getBaseProductPrice() {
-        const priceText = $('.final-price-wrapper .final-price').text() || $('.product-price .new-price').text();
-        return parseInt(priceText.replace(/[^0-9]/g, '')) || 0;
+        const priceText = $('.final-price-wrapper .final-price').text() || '0';
+        return parseInt(priceText.replace(/[^0-9]/g, ''), 10) || 0;
     }
 
-    // 화면에 표시된 옵션 목록을 기반으로 총액을 계산하고 업데이트하는 함수
+    /**
+     * 선택된 옵션들의 총 가격을 계산하고 화면에 업데이트합니다.
+     */
     function updateTotalPrice() {
-        let total = 0;
         const basePrice = getBaseProductPrice();
-        
-        $('.selected-option-item-custom').each(function() {
-            const quantity = parseInt($(this).find('.option-qty-input-custom').val(), 10);
-            total += basePrice * quantity;
-        });
+        let total = selectedOptions.reduce((sum, option) => sum + (basePrice * option.quantity), 0);
         
         totalPriceSpan.text(formatPrice(total));
-        console.log("총 상품금액 업데이트:", formatPrice(total));
     }
 
-    // 선택된 옵션을 화면에 표시하는 함수
+    /**
+     * 선택된 옵션 목록을 화면에 다시 그립니다.
+     */
     function updateOptionsDisplay() {
         selectedOptionsContainer.empty();
         const basePrice = getBaseProductPrice();
@@ -46,7 +57,6 @@ $(document).ready(function() {
             selectionSummary.show();
             
             selectedOptions.forEach((option, index) => {
-                const optionPrice = basePrice * option.quantity;
                 const optionElement = $(`
                     <div class="selected-option-item-custom" data-index="${index}">
                         <div class="option-name-display-custom">
@@ -69,7 +79,9 @@ $(document).ready(function() {
         updateTotalPrice();
     }
 
-    // 옵션이 모두 선택되었을 때, 선택 목록에 추가하는 함수
+    /**
+     * 옵션 선택 시 처리 로직입니다.
+     */
     function handleOptionSelection() {
         const selectedColorValue = colorSelect.val();
         const selectedSizeValue = sizeSelect.val();
@@ -122,35 +134,77 @@ $(document).ready(function() {
 		    });
 		    updateOptionsDisplay();
 		}
-
         
+        // 옵션 선택 후 드롭다운 초기화
         colorSelect.val('');
         sizeSelect.val('');
         selectedOptionCurrentPriceSpan.text('옵션을 모두 선택해주세요.');
     }
 
-
     // --- 3. 이벤트 리스너 등록 ---
+    
+    // 이미지 갤러리 기능 초기화
+    if (mainImage && galleryItems.length > 0) {
+        const totalImages = galleryItems.length;
 
-    // 컬러 또는 사이즈 select 박스 값이 변경될 때마다 실행
+        const updateImageCounter = (currentIndex) => {
+            if (imageCounter) {
+                const counterContainer = imageCounter.closest('.product-detail-image-counter');
+                if (counterContainer) {
+                    counterContainer.innerHTML = `${currentIndex + 1}/${totalImages} <i class="icon-arrows"></i>`;
+                }
+            }
+        };
+
+        galleryItems.forEach((item, index) => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // 활성 클래스 관리
+                galleryItems.forEach(thumb => thumb.classList.remove('active'));
+                this.classList.add('active');
+
+                // 메인 이미지 변경
+                const newImageSrc = this.getAttribute('data-image');
+                mainImage.src = newImageSrc;
+
+                // 카운터 업데이트
+                updateImageCounter(index);
+            });
+        });
+
+        // 초기 카운터 설정
+        updateImageCounter(0);
+    }
+
+    // 썸네일 스크롤 버튼 기능
+    if (thumbnailGallery && thumbUpButton && thumbDownButton) {
+        const scrollAmount = 100; // 한 번에 스크롤할 양
+        thumbUpButton.addEventListener('click', () => {
+            thumbnailGallery.scrollBy({ top: -scrollAmount, behavior: 'smooth' });
+        });
+        thumbDownButton.addEventListener('click', () => {
+            thumbnailGallery.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+        });
+    }
+    
+    // 옵션 선택 이벤트
     $('.product-option-select').on('change', handleOptionSelection);
 
     // 수량 변경 및 삭제 버튼 이벤트 (이벤트 위임)
-    selectedOptionsContainer.on('click', function(e) {
-        const $target = $(e.target);
+    selectedOptionsContainer.on('click', '.qty-control-button, .remove-option-button', function() {
+        const $target = $(this);
         const $item = $target.closest('.selected-option-item-custom');
         if ($item.length === 0) return;
 
         const index = $item.data('index');
         let option = selectedOptions[index];
 
-        if ($target.hasClass('plus')) {
-            if (option.quantity < 10) option.quantity++;
-        } 
-        else if ($target.hasClass('minus')) {
-            if (option.quantity > 1) option.quantity--;
-        } 
-        else if ($target.hasClass('remove-option-button')) {
+        if ($target.hasClass('plus') && option.quantity < 10) {
+            option.quantity++;
+        } else if ($target.hasClass('minus') && option.quantity > 1) {
+            option.quantity--;
+        } else if ($target.hasClass('remove-option-button')) {
             selectedOptions.splice(index, 1);
         }
         
@@ -301,5 +355,5 @@ $(document).ready(function() {
 	});
 
 
-    console.log("페이지 로드 시 초기화 완료.");
+    console.log("페이지 로드 시 모든 스크립트 초기화 완료.");
 });

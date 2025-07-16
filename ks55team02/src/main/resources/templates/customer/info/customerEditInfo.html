@@ -46,18 +46,18 @@
                                     <input type="text" id="userName">
                                 </div>
                                 <div class="form-group">
-                                    <label>이메일</label>
-                                    <input type="text" id="userEmail" class="form-control">
-    								<span class="error-message" id="emailError">유효한 이메일 형식이 아닙니다</span>
+                                    <label for="userEmail">이메일</label>
+								    <input type="email" class="form-control" id="userEmail" name="emlAddr">
+								    <p class="error-message" id="emailError" style="color: red; display: none;"></p>
                                 </div>
                                 <div class="form-group">
                                     <label>생년월일</label>
                                     <input type="email" id="userBrdt" readonly>
                                 </div>
                                 <div class="form-group">
-                                    <label>전화번호</label>
-                                    <input type="text" id="userTelNo" class="form-control">
-    								<span class="error-message" id="telError">10~11자리 숫자만 입력해주세요</span>
+                                    <label for="userTelNo">전화번호</label>
+                                    <input type="text" class="form-control" id="userTelNo" name="telno">
+    								<p class="error-message" id="telError" style="color: red; display: none;"></p>
                                 </div>
                                 <div class="form-group">
                                     <label>주소</label>
@@ -102,39 +102,30 @@
 
                         <!-- [탭 3] 보안 설정 -->
                         <div id="security-settings" class="tab-pane">
-                            <h3>보안 설정</h3>
-                            <form class="profile-form">
-                                <div class="form-group">
-                                    <label>현재 비밀번호</label>
-                                    <input type="password">
-                                </div>
-                                <div class="form-group">
-                                    <label>새 비밀번호</label>
-                                    <input type="password">
-                                </div>
-                                <div class="form-group">
-                                    <label>새 비밀번호 확인</label>
-                                    <input type="password">
-                                </div>
-                                <hr>
-                                <div class="form-group">
-                                    <label>2단계 인증</label>
-                                    <label class="switch">
-                                        <input type="checkbox">
-                                        <span class="slider round"></span>
-                                    </label>
-                                    <span class="switch-label">2단계 인증 사용</span>
-                                </div>
-                                <div class="form-actions">
-                                    <a href="#" type="submit" class="btn-primary">
-                                    <!-- <button type="submit" class="btn-primary"> -->
-                                    	변경사항 저장
-                                    <!-- </button> -->
-                                    </a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+						    <h3>보안 설정</h3>
+						    <form id="password-change-form" class="profile-form">
+						        <div class="form-group">
+						            <label for="currentPassword">현재 비밀번호 <span class="required-star">*</span></label>
+						            <input type="password" id="currentPassword" name="currentPassword">
+						            <span class="error-message" id="currentPasswordError"></span> <!-- 비워둡니다 -->
+						        </div>
+						        <div class="form-group">
+						            <label for="newPassword">새 비밀번호 <span class="required-star">*</span></label>
+						            <input type="password" id="newPassword" name="newPassword">
+						            <span class="error-message" id="newPasswordError"></span> <!-- 비워둡니다 -->
+						        </div>
+						        <div class="form-group">
+						            <label for="confirmNewPassword">새 비밀번호 확인 <span class="required-star">*</span></label>
+						            <input type="password" id="confirmNewPassword" name="confirmNewPassword">
+						            <span class="error-message" id="confirmNewPasswordError"></span> <!-- 비워둡니다 -->
+						        </div>
+						        <hr>
+						        <div class="form-actions">
+						            <button type="submit" class="btn-primary" id="changePasswordBtn">변경사항 저장</button>
+						        </div>
+						    </form>
+						</div>                   
+                	</div>
                 </div>
             </div>
         </main>
@@ -165,7 +156,7 @@
                 $('#userId').val(userInfo.userLgnId);
                 $('#userName').val(userInfo.userNm);
                 $('#userEmail').val(userInfo.emlAddr);
-                $('#userTelNo').val(userInfo.telno);
+                $('#userTelNo').val( formatTelno(userInfo.telno) );
                 $('#userZipCode').val(userInfo.zipCd);
                 $('#userAddress').val(userInfo.addr);
                 $('#userDetailAddress').val(userInfo.daddr);
@@ -196,6 +187,22 @@
                 }
             });
         };
+        
+        function formatTelno(telno) {
+            if (!telno) return ''; // 값이 없으면 빈 문자열 반환
+
+            // 1. 입력값에서 모든 하이픈을 먼저 제거합니다.
+            // (예: '010-1111-2222' -> '01011112222', '01011112222' -> '01011112222')
+            const digitsOnly = telno.replace(/-/g, '');
+
+            // 2. 숫자가 11자리일 경우에만 하이픈을 다시 추가합니다.
+            if (digitsOnly.length === 11) {
+                return digitsOnly.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+            }
+
+            // 3. 11자리가 아니거나 다른 예외적인 경우, 원래 받은 값을 그대로 반환합니다.
+            return telno;
+        }
 
         function searchZipCode() {
             new daum.Postcode({
@@ -210,28 +217,57 @@
         function validateEmail(email) {
             const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const $error = $('#emailError');
-            if (email && !regex.test(email)) { $error.show(); return false; } 
-            else { $error.hide(); return true; }
+            if (!email) { // 1. 값이 비어있는지 먼저 확인
+                $error.text("이메일을 입력해주세요.").show();
+                return false;
+            } else if (!regex.test(email)) { // 2. 형식이 맞는지 확인
+                $error.text("올바른 이메일 형식이 아닙니다.").show();
+                return false;
+            } else {
+                $error.hide();
+                return true;
+            }
         }
 
+        // 제안: 연락처 유효성 검사 함수
         function validateTelno(telno) {
             const regex = /^010-?\d{3,4}-?\d{4}$/;
             const $error = $('#telError');
-            if (telno && !regex.test(telno)) { $error.text("휴대폰 번호 형식(010-1234-5678)을 확인해주세요.").show(); return false; } 
-            else { $error.hide(); return true; }
+            if (!telno) { // 1. 값이 비어있는지 먼저 확인
+                $error.text("휴대폰 번호를 입력해주세요.").show();
+                return false;
+            } else if (!regex.test(telno)) { // 2. 형식이 맞는지 확인
+                $error.text("휴대폰 번호 형식(010-1234-5678)을 확인해주세요.").show();
+                return false;
+            } else {
+                $error.hide();
+                return true;
+            }
         }
 
         function updateUserInfo(e) {
             e.preventDefault();
             
+            const userName = $('#userName').val();
+            let isNameValid = true;
+            if (!userName) {
+                alert('이름은 필수 항목입니다.'); // 간단한 alert 또는 전용 에러 메시지 공간 활용
+                $('#userName').focus();
+                isNameValid = false;
+            }
+            
             const isEmailValid = validateEmail($('#userEmail').val());
             const isTelValid = validateTelno($('#userTelNo').val());
-            if (!isEmailValid || !isTelValid) return;
+
+            // 모든 유효성 검사를 통과했는지 최종 확인
+            if (!isNameValid || !isEmailValid || !isTelValid) {
+                return;
+            }
             
             const requestData = {
                 userNm: $('#userName').val(),
                 emlAddr: $('#userEmail').val(),
-                telno: $('#userTelNo').val().replace(/-/g, ''),
+                telno: $('#userTelNo').val(),
                 zipCd: $('#userZipCode').val(),
                 addr: $('#userAddress').val(),
                 daddr: $('#userDetailAddress').val()
@@ -248,23 +284,49 @@
                 loadMyInfo();
             })
             .fail(xhr => {
-                const response = xhr.responseJSON;
-                alert('오류: ' + (response?.message || '정보 수정에 실패했습니다.'));
-            });
+			    // 1. 에러 메시지 영역을 일단 모두 숨깁니다.
+			    $('#emailError').hide();
+			    $('#telError').hide();
+			
+			    // 2. 서버로부터 받은 에러 응답 본문(JSON)을 가져옵니다.
+			    const response = xhr.responseJSON;
+			    
+			    // 3. 409 Conflict 에러(중복 에러)일 경우에만 특별 처리합니다.
+			    if (xhr.status === 409 && response && response.message) {
+			        const message = response.message;
+			        
+			        // 에러 메시지에 '이메일' 키워드가 포함되어 있으면
+			        if (message.includes('이메일')) {
+			            // 이메일 입력창 아래의 p 태그에 에러 메시지를 넣고 보여줍니다.
+			            $('#emailError').text(message).show();
+			        } 
+			        // 에러 메시지에 '연락처' 키워드가 포함되어 있으면
+			        else if (message.includes('연락처')) {
+			            // 연락처 입력창 아래의 p 태그에 에러 메시지를 넣고 보여줍니다.
+			            $('#telError').text(message).show();
+			        } 
+			        // 그 외의 경우 (만약을 대비)
+			        else {
+			            alert('오류: ' + message);
+			        }
+			    } 
+			    // 4. 409가 아닌 다른 모든 서버 에러(예: 500)는 기존처럼 alert으로 처리합니다.
+			    else {
+			        alert('오류: ' + (response?.message || '정보 수정에 실패했습니다. 잠시 후 다시 시도해주세요.'));
+			    }
+			})
         }
 
-        // [수정] 프로필 관리 폼 제출 처리 (AJAX 로직 완성)
         function updateProfileInfo(e) {
             e.preventDefault();
             const formData = new FormData(document.getElementById('profile-update-form'));
 
-            // ▼▼▼ 빠져있던 AJAX 호출 로직을 완성합니다. ▼▼▼
             $.ajax({
                 type: 'PUT',
                 url: '/api/v1/mypage/profile',
                 data: formData,
-                processData: false,  // FormData 사용 시 필수
-                contentType: false   // FormData 사용 시 필수
+                processData: false,
+                contentType: false 
             })
             .done(response => {
                 alert('프로필이 성공적으로 저장되었습니다.');
@@ -274,13 +336,146 @@
                 const response = xhr.responseJSON;
                 alert('오류: ' + (response?.message || '프로필 저장에 실패했습니다.'));
             });
-        } // ▼▼▼ 여기에 닫는 괄호 '}'를 추가하여 함수를 올바르게 종료합니다. ▼▼▼
+        }
+        const showFeedback = (element, message, isValid) => {
+            element.text(message).css('color', isValid ? 'green' : 'red');
+            // 에러 메시지는 항상 보여야 하므로 .show()를 추가합니다.
+            if (message) element.show(); else element.hide(); 
+        };
 
-        // 페이지 초기화
+        // 비밀번호 정책 정규식 (8~20자, 영문/숫자/특수문자(!@#$%^&*()) 각각 1개 이상 포함)
+        const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()])[a-zA-Z\d!@#$%^&*()]{8,20}$/;
+
+        // 새 비밀번호 입력 필드의 실시간 유효성 검사
+        $('#newPassword').on('keyup blur', function() { // keyup과 blur 이벤트에 모두 반응
+            const newPassword = $(this).val();
+            const $errorElement = $('#newPasswordError');
+            
+            if (newPassword === '') {
+                showFeedback($errorElement, '', true); // 비어있으면 메시지 숨김
+                return;
+            }
+
+            if (!passwordRegex.test(newPassword)) {
+                showFeedback($errorElement, '8~20자, 영문/숫자/특수문자(!@#$%^&*()) 조합', false);
+            } else {
+                showFeedback($errorElement, '안전', true);
+            }
+
+            // 새 비밀번호가 변경될 때마다 확인 비밀번호도 다시 검사
+            $('#confirmNewPassword').trigger('keyup');
+        });
+
+        // 새 비밀번호 확인 입력 필드의 실시간 유효성 검사
+        $('#confirmNewPassword').on('keyup blur', function() {
+            const newPassword = $('#newPassword').val();
+            const confirmNewPassword = $(this).val();
+            const $errorElement = $('#confirmNewPasswordError');
+
+            if (confirmNewPassword === '') {
+                showFeedback($errorElement, '', true); // 비어있으면 메시지 숨김
+                return;
+            }
+
+            if (newPassword !== confirmNewPassword) {
+                showFeedback($errorElement, '새 비밀번호와 일치하지 않습니다.', false);
+            } else {
+                showFeedback($errorElement, '일치', true);
+            }
+        });
+
+        // 비밀번호 변경 기능 (기존 폼 제출 시 최종 검사 및 AJAX 요청)
+        function changePassword(e) {
+            e.preventDefault(); // 기본 폼 제출 동작 방지
+
+            // 모든 에러 메시지 초기화 (실시간 검사 메시지도 초기화)
+            $('.error-message').hide().text('');
+
+            const currentPassword = $('#currentPassword').val();
+            const newPassword = $('#newPassword').val();
+            const confirmNewPassword = $('#confirmNewPassword').val();
+
+            let isValid = true; // 최종 유효성 검사 성공 여부
+
+            // 1. 현재 비밀번호 입력 여부 검사
+            if (!currentPassword) {
+                $('#currentPasswordError').text('현재 비밀번호를 입력해주세요.').show();
+                isValid = false;
+            }
+            // 2. 새 비밀번호 입력 여부 및 길이/정책 검사 (실시간 검사와 중복되지만 최종 확인)
+            if (!newPassword) {
+                $('#newPasswordError').text('새 비밀번호를 입력해주세요.').show();
+                isValid = false;
+            } else if (!passwordRegex.test(newPassword)) {
+                $('#newPasswordError').text('비밀번호는 8~20자이며, 영문, 숫자, 특수문자(!@#$%^&*())를 각각 1개 이상 포함해야 합니다.').show();
+                isValid = false;
+            }
+
+            // 3. 새 비밀번호 확인 입력 여부 및 일치 검사 (실시간 검사와 중복되지만 최종 확인)
+            if (!confirmNewPassword) {
+                $('#confirmNewPasswordError').text('새 비밀번호 확인을 입력해주세요.').show();
+                isValid = false;
+            } else if (newPassword !== confirmNewPassword) {
+                $('#confirmNewPasswordError').text('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.').show();
+                isValid = false;
+            }
+
+            // <<< 새롭게 추가된 유효성 검사: 현재 비밀번호와 새 비밀번호가 동일한지 확인
+            if (currentPassword && newPassword && currentPassword === newPassword) {
+                $('#newPasswordError').text('현재 비밀번호와 다른 비밀번호를 입력해주세요.').show();
+                isValid = false;
+            }
+            // >>>
+
+            // 클라이언트 측 최종 유효성 검사 실패 시 함수 종료
+            if (!isValid) {
+                return;
+            }
+
+            // 요청 데이터 객체 생성
+            const requestData = {
+                currentPassword: currentPassword,
+                newPassword: newPassword,
+                confirmNewPassword: confirmNewPassword
+            };
+
+            // AJAX PUT 요청으로 백엔드 API 호출
+            $.ajax({
+                type: 'PUT',
+                url: '/api/v1/mypage/security/password',
+                contentType: 'application/json',
+                data: JSON.stringify(requestData)
+            })
+            .done(response => {
+                alert(response.message);
+                $('#currentPassword, #newPassword, #confirmNewPassword').val('');
+                // 성공 후 실시간 유효성 검사 메시지도 초기화
+                $('#newPasswordError, #confirmNewPasswordError').hide().text(''); 
+            })
+            .fail(xhr => {
+                const response = xhr.responseJSON;
+                let errorMessage = '비밀번호 변경에 실패했습니다. 알 수 없는 오류.';
+
+                if (response && response.message) {
+                    errorMessage = response.message;
+                } else if (xhr.status === 401) {
+                    errorMessage = '세션이 만료되었거나 로그인 정보가 유효하지 않습니다. 다시 로그인해주세요.';
+                    setTimeout(() => window.location.href = '/customer/login', 1500); 
+                } else if (xhr.status === 400) {
+                    errorMessage = response?.message || '입력값이 올바르지 않습니다.';
+                } else if (xhr.status === 500) {
+                    errorMessage = '서버에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+                }
+                alert('오류: ' + errorMessage);
+                console.error("비밀번호 변경 실패:", xhr.status, xhr.statusText, response);
+            });
+        }
+
+        // 페이지 초기화 및 이벤트 바인딩
         $(document).ready(function() {
             // [회원정보 수정 탭] 이벤트 바인딩
-            $('#userEmail').on('blur', function() { validateEmail($(this).val()); });
-            $('#userTelNo').on('blur', function() { validateTelno($(this).val()); });
+            $('#userEmail').on('keyup blur', function() { validateEmail($(this).val()); });
+			$('#userTelNo').on('keyup blur', function() { validateTelno($(this).val()); });
             $('.address-group button').on('click', searchZipCode);
             $('#edit-info form').on('submit', updateUserInfo);
 
@@ -298,6 +493,9 @@
                     reader.readAsDataURL(file);
                 }
             });
+
+            // [보안 설정 탭] 이벤트 바인딩 (새로 추가) <<< 이 한 줄이 핵심입니다!
+            $('#password-change-form').on('submit', changePassword);
 
             // 사이드바 탭 전환 이벤트
             $('.profile-sidebar a').on('click', function(e) {
