@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="ks55team02.admin.adminpage.useradmin.search.mapper.AdminSearchMapper">
+
+	<select id="getSearchStats" parameterType="map"
+		resultType="ks55team02.admin.adminpage.useradmin.search.domain.AdminSearchStats">
+		SELECT
+		srch_keyword_nm AS srchKeywordNm, COUNT(*) AS
+		searchCount
+		FROM
+		search_logs
+		GROUP BY
+		srch_keyword_nm
+		ORDER BY
+		searchCount DESC, srch_keyword_nm ASC
+		LIMIT #{start}, #{size};
+	</select>
+
+	<select id="getSearchStatsCount" resultType="int">
+		SELECT COUNT(*)
+		FROM
+		(
+		SELECT 1
+		FROM search_logs
+		GROUP BY srch_keyword_nm
+		) AS stats_count;
+	</select>
+
+	<select id="getSearchLogList" parameterType="map"
+		resultType="ks55team02.admin.adminpage.useradmin.search.domain.AdminSearchLog">
+		SELECT
+		srch_log_id AS srchLogId, user_no AS userNo, srch_keyword_nm AS
+		srchKeywordNm,
+		srch_dt AS srchDt, srch_user_ip_addr AS srchUserIpAddr
+		FROM
+		search_logs
+		<where>
+			<if
+				test="searchKey != null and searchValue != null and searchValue != ''">
+				<choose>
+					<when test="searchKey == 'srchLogId'">
+						AND srch_log_id LIKE CONCAT('%', #{searchValue},
+						'%')
+					</when>
+					<when test="searchKey == 'userNo'">
+						AND user_no LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'srchKeywordNm'">
+						AND srch_keyword_nm LIKE CONCAT('%',
+						#{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'srchUserIpAddr'">
+						AND srch_user_ip_addr LIKE CONCAT('%',
+						#{searchValue}, '%')
+					</when>
+				</choose>
+			</if>
+			<if test="searchStartDate != null and searchStartDate != ''">
+				AND srch_dt >= #{searchStartDate}
+			</if>
+			<if test="searchEndDate != null and searchEndDate != ''">
+				AND DATE(srch_dt) &lt;= #{searchEndDate}
+			</if>
+		</where>
+		ORDER BY
+		srch_log_id ASC
+		LIMIT #{start}, #{size};
+	</select>
+
+	<select id="getSearchLogListCount" parameterType="map"
+		resultType="int">
+		SELECT
+		COUNT(*)
+		FROM
+		search_logs
+		<where>
+			<if
+				test="searchKey != null and searchValue != null and searchValue != ''">
+				<choose>
+					<when test="searchKey == 'srchLogId'">
+						AND srch_log_id LIKE CONCAT('%', #{searchValue},
+						'%')
+					</when>
+					<when test="searchKey == 'userNo'">
+						AND user_no LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'srchKeywordNm'">
+						AND srch_keyword_nm LIKE CONCAT('%',
+						#{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'srchUserIpAddr'">
+						AND srch_user_ip_addr LIKE CONCAT('%',
+						#{searchValue}, '%')
+					</when>
+				</choose>
+			</if>
+			<if test="searchStartDate != null and searchStartDate != ''">
+				AND srch_dt >= #{searchStartDate}
+			</if>
+			<if test="searchEndDate != null and searchEndDate != ''">
+				AND DATE(srch_dt) &lt;= #{searchEndDate}
+			</if>
+		</where>
+	</select>
+</mapper>

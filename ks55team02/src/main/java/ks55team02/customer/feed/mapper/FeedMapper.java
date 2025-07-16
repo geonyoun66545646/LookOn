@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import ks55team02.customer.feed.domain.Feed;
+import ks55team02.customer.feed.domain.FeedImage;
 
 @Mapper
 public interface FeedMapper {
@@ -28,5 +29,15 @@ public interface FeedMapper {
 						@Param("context") String context,
 						@Param("userNo") String userNo);
 	
-
+	// 피드 일련번호 생성 로직
+	String selectLastFeedSn();
+	
+	// 피드 삽입
+	int insertFeed(Feed feed);
+	
+	// 피드 이미지 일련번호 생성 로직
+	String selectLastFeedImageSn();
+	
+	// 피드 이미지 삽입
+	int insertFeedImages(List<FeedImage> imageList);
 }

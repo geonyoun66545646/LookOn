@@ -10,7 +10,7 @@ $(() => {
     let hasNext = true;
     
     // 3. 현재 페이지가 '마이피드'인지 '타인피드'인지 판단하고, 그에 맞는 API URL을 설정합니다.
-    const isMyFeed = pageOwnerUserNo.toString() === loginUserNo.toString();
+    const isMyFeed = pageOwnerUserNo === loginUserNo;
     const apiUrl = isMyFeed 
                    ? '/customer/feed/my-feed' 
                    : `/customer/feed/user-feed/${pageOwnerUserNo}`;
