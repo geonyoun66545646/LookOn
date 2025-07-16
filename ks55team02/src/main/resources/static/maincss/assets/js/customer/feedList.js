@@ -57,6 +57,11 @@ $(() => {
             dataType: 'json'
         })
         .done(response => {
+			if (currentPage === 1) {
+			    const totalCount = response.totalCount || 0;
+			    // toLocaleString()을 사용하여 1000단위 콤마를 추가합니다. (예: 12345 -> 12,345)
+			    $('.content-count').text(`총 ${totalCount.toLocaleString()}개`);
+			}
             renderFeeds(response.feedList); 
             hasNext = response.hasNext;     
             currentPage++;                  
