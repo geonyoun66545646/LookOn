@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.admin.login.mapper.AdminMapper">
+
+    <select id="getAdminInfoById" parameterType="String" resultType="ks55team02.admin.login.domain.AdminInfo">
+        SELECT
+            user_no             AS userNo,
+            user_lgn_id         AS userLgnId,
+            user_pswd_encpt_val AS userPswd, /* 비밀번호 컬럼 */
+            user_nm             AS userNm,
+            mbr_grd_cd          AS mbrGrdCd
+        FROM
+            users
+        WHERE
+            user_lgn_id = #{adminId}
+    </select>
+
+</mapper>

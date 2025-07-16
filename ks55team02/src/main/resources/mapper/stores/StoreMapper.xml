@@ -11,9 +11,11 @@
 		<id property="storeId" column="store_id" />
 		<result property="storeConm" column="store_conm" />
 		<result property="storeLogoImg" column="store_logo_img" />
+		<result property="storeIntroCn" column="store_intro_cn" />
 		<result property="delPrcrYn" column="del_prcr_yn" />
 	</resultMap>
 	
+
 	<!-- 키워드로 브랜드(상점) 검색 -->
     <select id="searchStoresByKeyword" parameterType="string" resultMap="storesResultMap">
         SELECT
@@ -36,7 +38,8 @@
 	    SELECT
 	        store_id,
 	        store_conm,
-	        store_logo_img
+	        store_logo_img,
+	        store_intro_cn
 	    FROM
 	        stores
 	    WHERE

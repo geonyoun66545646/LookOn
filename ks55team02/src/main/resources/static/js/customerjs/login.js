@@ -1,7 +1,37 @@
 /**
  * 
  */
+$(document).ready(function() {
+    
+    // 1. 현재 페이지의 URL에서 파라미터 정보를 읽어옵니다.
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // 2. URL에 'showLogin=true' 라는 신호가 있는지 확인합니다.
+    if (urlParams.get('showLogin') === 'true') {
+        
+        // 3. 신호가 있다면, URL에서 아이디와 비밀번호 값을 가져옵니다.
+        const userId = urlParams.get('id');
+        const userPw = urlParams.get('pw');
 
+        // 4. 로그인 모달의 ID는 "signin-modal" 입니다.
+        const $loginModal = $('#signin-modal');
+        
+        // 5. 가져온 아이디와 비밀번호 값을 로그인 모달의 각 input 창에 채워넣습니다.
+        //    (보내주신 모달 HTML을 보니, 아이디 input의 id는 'login-id', 비밀번호는 'login-pw'가 맞습니다.)
+        if (userId) {
+            $loginModal.find('#login-id').val(userId);
+        }
+        if (userPw) {
+            $loginModal.find('#login-pw').val(userPw);
+        }
+        
+        // 6. Bootstrap 모달을 여는 정확한 코드를 사용합니다.
+        $loginModal.modal('show');
+        
+        // 7. 사용자가 새로고침해도 모달이 다시 뜨지 않도록, URL에서 파라미터를 깔끔하게 제거합니다.
+        history.replaceState(null, null, window.location.pathname);
+    }
+});
 const savedUserId = $.cookie('saved_user_id');
 
 // 2. 쿠키에 아이디가 저장되어 있다면,

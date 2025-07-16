@@ -10,17 +10,21 @@
 
 <th:block layout:fragment="cssFile">
 	<link rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+	<link rel="stylesheet"
 		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
 		integrity="sha512-..." crossorigin="anonymous"
 		referrerpolicy="no-referrer" />
 	<link rel="stylesheet"
 		th:href="@{/maincss/assets/css/plugins/nouislider/nouislider.css}">
 	<link rel="stylesheet"
-		th:href="@{/maincss/assets/productDetail/productDetail.css}">
-	<link rel="stylesheet"
 		th:href="@{/maincss/assets/mainHeader/mainHeader.css}">
 	<link rel="stylesheet"
 		th:href="@{/maincss/assets/categoryFilterModal/categoryFilterModal.css}">
+	<link rel="stylesheet"
+		th:href="@{/maincss/assets/productDetail/productDetail.css}">
+	<link rel="stylesheet"
+		th:href="@{/maincss/assets/mainSlide/mainSlide.css}" />
 </th:block>
 </head>
 
@@ -43,9 +47,6 @@
 											th:src="@{/maincss/assets/images/no_image.jpg}"
 											th:data-zoom-image="@{/maincss/assets/images/no_image.jpg}"
 											alt="No product image">
-										<a href="#" id="btn-product-gallery"
-											class="btn-product-gallery"> <i class="icon-arrows"></i>
-										</a>
 									</figure>
 
 									<div id="product-zoom-gallery"
@@ -73,8 +74,8 @@
 							<div class="product-details">
 								<!-- 1. 브랜드 정보 -->
 								<a th:if="${product.store != null}"
-									th:href="@{/stores/{id}(id=${product.store.storeId})}"
-									style="text-decoration: none; color: inherit;">
+									th:href="@{/customer/products/brand/{brandId}(brandId=${product.store.storeId})}" style="text-decoration: none; color:
+									inherit;">
 									<div class="product-brand-info">
 										<div class="product-brand-icon"
 											th:if="${product.store.storeLogoImg != null}">
@@ -98,8 +99,9 @@
 								<!-- 2. 카테고리 -->
 								<div class="product-details-top">
 									<div class="product-cat">
-										<a href="#"
-											th:text="${product?.productCategory?.categoryName ?: '카테고리 없음'}">카테고리</a>
+										<a	th:href="@{/products/category/{categoryId}(categoryId=${product.productCategory.categoryId})}"
+											th:text="${product?.productCategory?.categoryName ?: '카테고리	없음'}">카테고리
+										</a>
 									</div>
 								</div>
 
@@ -188,10 +190,6 @@
 
 								<!-- 9. 액션 버튼 (위시리스트, 장바구니, 구매) -->
 								<div class="product-details-action">
-									<div class="wishlist-section">
-										<button class="btn-product btn-wishlist" title="위시리스트"></button>
-										<span class="likes-count">216</span>
-									</div>
 									<div class="product-main-buttons">
 										<a href="#" class="btn-product btn-cart" id="addToCartBtn"><span>장바구니</span></a>
 										<a href="#" class="btn-product btn-buy-now"><span>구매하기</span></a>
@@ -256,13 +254,12 @@
 						<!-- 리뷰 조각 -->
 						<div class="tab-pane fade" id="product-review-tab" role="tabpanel"
 							aria-labelledby="product-review-link">
-							<div class="reviews">
-								<div class="container">
+							
+
 									<div
 										th:replace="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">
 									</div>
-								</div>
-							</div>
+								
 						</div>
 						<!-- 리뷰 끝 -->
 					</div>
@@ -270,16 +267,45 @@
 			</div>
 		</div>
 
-		<!-- 비슷한 상품목록 -->
-		<div class="container-bottom"
+		<!-- 여기에 비슷한 상품목록을 넣고싶음 -->
+		<div class="weekly-best-section"
 			th:if="${similarProducts != null and not #lists.isEmpty(similarProducts)}">
-			<h2 class="title text-center mb-4">비슷한 상품</h2>
-			<!-- owl-carousel 기반의 프래그먼트를 사용 -->
-			<div
-				th:replace="~{customer/fragments/mainProductList :: productListFragment(${similarProducts})}"></div>
+			<div class="weekly-best-container">
+				<div class="weekly-best-heading">
+					<h2 class="weekly-best-title">비슷한 상품</h2>
+					<div class="weekly-best-more-link">
+						<a
+							th:href="@{/products/category/{categoryId}(categoryId=${product.ctgryNo})}"
+							class="btn btn-outline-dark-2"><span>더보기</span> </a>
+					</div>
+				</div>
+
+				<div class="weekly-best-slider-container">
+					<!-- Swiper -->
+					<div class="swiper weekly-best-swiper">
+						<div class="swiper-wrapper">
+							<!-- 서버에서 전달받은 24개 상품을 슬라이드로 생성 -->
+							<div class="swiper-slide" th:each="product : ${similarProducts}">
+								<!-- 1단계에서 만든 단일 상품 카드 프래그먼트 재사용 -->
+								<div
+									th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
+							</div>
+						</div>
+					</div>
+					<!-- Navigation buttons -->
+					<div class="swiper-button-prev"></div>
+					<div class="swiper-button-next"></div>
+				</div>
+			</div>
 		</div>
 
+<<<<<<< HEAD
+
+		<!-- 모달은 layout:fragment="contents" 바깥 (layoutProductDetail.html의 body 태그 닫히기 전)에 위치하는 것이 일반적입니다. -->
+		<!-- 하지만 현재 구조상, 만약 이 모달이 반드시 product detail 내부에 있어야 한다면 여기에 둡니다. -->
+=======
 		<!-- 공유 모달 -->
+>>>>>>> refs/heads/develop
 		<div class="modal fade" id="shareModal" tabindex="-1" role="dialog"
 			aria-labelledby="shareModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
@@ -320,11 +346,34 @@
 		</div>
 	</th:block>
 
+<<<<<<< HEAD
+
+	<!-- 이 페이지에만 필요한 추가 JS 파일을 layout:fragment="jsFile" 안에 넣습니다. -->
+=======
+>>>>>>> refs/heads/develop
 	<th:block layout:fragment="jsFile">
+<<<<<<< HEAD
+		<!-- ✅ jQuery 먼저 불러오기 -->
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+		<!-- 그다음 의존 스크립트들 -->
+=======
+>>>>>>> refs/heads/develop
 		<script th:src="@{/maincss/assets/js/jquery.elevateZoom.min.js}"></script>
+<<<<<<< HEAD
+		<script
+			th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
+		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
+		<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
+=======
+>>>>>>> refs/heads/develop
 	</th:block>
 
 	<th:block layout:fragment="jsScript">
+<<<<<<< HEAD
+=======
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		
 		<script th:inline="javascript">
@@ -346,6 +395,7 @@
 		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
 		<script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
 		
+>>>>>>> refs/heads/develop
 		<script>
 			function copyShareLink() {
 				const el = document.createElement('textarea');
