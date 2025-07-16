@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.servlet.http.HttpSession;
 import ks55team02.admin.adminpage.useradmin.userlist.domain.UserList;
-import ks55team02.customer.store.domain.AppStore;
+import ks55team02.common.domain.store.AppStore;
 import ks55team02.customer.store.service.AppStoreService;
 import lombok.RequiredArgsConstructor;
 

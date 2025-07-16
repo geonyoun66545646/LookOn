@@ -3,16 +3,18 @@
 <mapper namespace="ks55team02.customer.store.mapper.CustomerStoreMapper"> 
 
 
-     <resultMap id="storeResultMap" type="ks55team02.customer.store.domain.Store">
-        <id property="storeId" column="store_id"/>   
-        <result property="aplyId" column="aply_id"/> 
-        <result property="storeConm" column="store_conm"/>
-        <result property="storeIntroCn" column="store_intro_cn"/>
-        <result property="storeLogoImg" column="store_logo_img"/>
-        <result property="storeStts" column="store_stts"/>
-        <result property="infoMdfcnDt" column="info_mdfcn_dt"/>
-        <result property="inactvtnDt" column="inactvtn_dt"/>
-        <result property="delPrcrYn" column="del_prcr_yn"/>
+     <resultMap id="storeResultMap" 			type="ks55team02.common.domain.store.Store">
+        <id property="storeId" 					column="store_id"/>   
+        <result property="aplyId" 				column="aply_id"/> 
+        <result property="sellerUserNo" 		column="seller_user_no"/>
+        <result property="storeConm" 			column="store_conm"/>
+        <result property="storeIntroCn" 		column="store_intro_cn"/>
+        <result property="storeLogoImg" 		column="store_logo_img"/>
+        <result property="storeStts" 			column="store_stts"/>
+        <result property="infoMdfcnDt" 			column="info_mdfcn_dt"/>
+        <result property="inactvtnDt" 			column="inactvtn_dt"/>
+        <result property="delPrcrYn" 			column="del_prcr_yn"/>
+        
     </resultMap>
 
 <select id="getAllStores" resultMap="storeResultMap">

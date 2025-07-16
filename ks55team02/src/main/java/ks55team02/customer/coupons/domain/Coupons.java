@@ -19,6 +19,9 @@ public class Coupons {
     private LocalDateTime crtDt;
     private LocalDateTime mdfcnDt;
     
+    private boolean owned;
+
+    
     private String issueConditionType; // issue_condition_type 컬럼과 연결될 필드
     private String reissueCycle;       // reissue_cycle 컬럼과 연결될 필드
     

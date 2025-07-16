@@ -4,57 +4,57 @@
 	layout:decorate="~{admin/layout/layoutMain}">
 
 <head>
-<title>회원 쿠폰 조회</title>
+<title>쿠폰 목록/관리</title>
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/customadmincss/couponsList.css}">
 </head>
 
 <th:block layout:fragment="contents">
 	<main class="main-content">
 		<section class="content-header">
 			<h2 class="content-title">회원 쿠폰 조회</h2>
-			<div></div>
 		</section>
 
 		<div class="card mb-4">
 			<div class="card-body">
-				<form id="memberCouponSearchForm" action="#" method="get">
+				<form id="couponSearchForm" action="#" method="get">
 					<div class="row gx-3 align-items-end">
 
 						<div class="col-lg-4 mb-3">
-							<label class="form-label">지급/만료 일시</label>
+							<label class="form-label">유효 기간</label>
 							<div class="d-flex">
-								<input type="date" class="form-control" name="giveStartDt"
-									value="2023-01-01"> <span
-									class="mx-2 d-flex align-items-center">~</span> <input
-									type="date" class="form-control" name="giveEndDt"
-									value="2023-12-31">
+								<input type="date" class="form-control" name="vldBgngDt">
+								<span class="mx-2 d-flex align-items-center">~</span> <input
+									type="date" class="form-control" name="vldEndDt">
 							</div>
 						</div>
 
 						<div class="col-lg-4 mb-3">
 							<label class="form-label">검색 키워드</label>
 							<div class="input-group">
-								<select class="form-select" name="searchKey"
+								<select class="form-select" name="searchType"
 									style="max-width: 150px;">
 									<option value="all" selected>전체</option>
-									<option value="userNo">사용자 번호</option>
-									<option value="pblcnCpnId">쿠폰 ID</option>
 									<option value="cpnNm">쿠폰명</option>
-								</select> <input type="text" class="form-control" name="searchValue"
-									value="" placeholder="사용자 번호, 쿠폰명, ID">
+									<option value="userCpnId">쿠폰 ID</option>
+									<option value="userNm">사용자명</option>
+								</select> <input type="text" class="form-control" name="keyword" value=""
+									placeholder="쿠폰명, 쿠폰 ID, 이름">
 							</div>
 						</div>
 
 						<div class="col-lg-2 mb-3">
-							<label for="useYn" class="form-label">사용 여부</label> <select
-								class="form-select" id="useYn" name="useYn">
+							<label for="actvtnYn" class="form-label">사용 여부</label> <select
+								class="form-select" id="actvtnYn" name="actvtnYn">
 								<option value="">-- 전체 --</option>
-								<option value="0" selected>미사용</option>
-								<option value="1">사용됨</option>
+								<option value="0">미사용</option>
+								<option value="1">사용</option>
 							</select>
 						</div>
 
 						<div class="col-lg-2 mb-3 d-flex align-items-end">
-							<a href="#" class="btn btn-primary btn-block me-2" id="searchBtn">검색</a>
+							<button type="button" class="btn btn-primary btn-block me-2"
+								id="searchBtn">검색</button>
 							<button class="btn btn-light btn-block" type="reset">초기화</button>
 						</div>
 					</div>
@@ -65,99 +65,183 @@
 		<div class="card">
 			<div class="card-body">
 				<div class="d-flex justify-content-between align-items-center mb-3">
-					<div>
-						<span class="font-weight-bold">[ 전체 회원 쿠폰 <span
-							class="text-primary">0</span>건 ]
+					<div class="d-flex align-items-center">
+						<span class="font-weight-bold"> [ 전체 <span
+							class="text-primary" id="total-coupons-count">0</span> 건 ]
 						</span>
 					</div>
-					<div></div>
 				</div>
 
 				<table class="table table-hover text-center">
 					<thead class="thead-light">
 						<tr>
-							<th><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										id="checkAllRows">
-								</div></th>
+							<th>쿠폰 ID</th>
 							<th>사용자 번호</th>
-							<th>공개 쿠폰 ID</th>
+							<th>사용자명</th>
 							<th>쿠폰명</th>
-							<th>발급 일시</th>
-							<th>개별 만료 일시</th>
+							<th>발급일</th>
 							<th>사용 여부</th>
-							<th>사용 일시</th>
-							<th>발급 사유</th>
-							<th>삭제</th>
+							<th>사용일</th>
+							<th>관리</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										value="USER_CPN_001">
-								</div></td>
-							<td>USER_001</td>
-							<td>CPN_001</td>
-							<td>신규 가입 환영 쿠폰</td>
-							<td>2023-01-01 10:00:00</td>
-							<td>2023-12-31 23:59:59</td>
-							<td><span class="badge bg-primary">미사용</span></td>
-							<td>-</td>
-							<td>회원가입</td>
-							<td><a
-								href="#" class="btn btn-sm btn-outline-danger">삭제</a></td>
-						</tr>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										value="USER_CPN_002">
-								</div></td>
-							<td>USER_002</td>
-							<td>CPN_002</td>
-							<td>첫 구매 5% 할인</td>
-							<td>2023-07-01 14:30:00</td>
-							<td>2023-07-31 23:59:59</td>
-							<td><span class="badge bg-secondary">사용됨</span></td>
-							<td>2023-07-05 10:15:00</td>
-							<td>첫 구매 이벤트</td>
-							<td><a
-								href="#" class="btn btn-sm btn-outline-danger">삭제</a></td>
-						</tr>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										value="USER_CPN_003">
-								</div></td>
-							<td>USER_001</td>
-							<td>CPN_002</td>
-							<td>첫 구매 5% 할인</td>
-							<td>2023-08-01 09:00:00</td>
-							<td>2023-08-31 23:59:59</td>
-							<td><span class="badge bg-primary">미사용</span></td>
-							<td>-</td>
-							<td>재발급 (매월)</td>
-							<td><a
-								href="#" class="btn btn-sm btn-outline-danger">삭제</a></td>
-						</tr>
+					<tbody id="coupons-table-body">
 					</tbody>
 				</table>
 
-				<nav class="d-flex justify-content-center mt-4"
+				<nav id="pagination-container"
+					class="d-flex justify-content-center mt-4"
 					aria-label="Page navigation">
-					<ul class="pagination">
-						<li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-						<li class="page-item active"><a class="page-link" href="#">1</a></li>
-						<li class="page-item"><a class="page-link" href="#">2</a></li>
-						<li class="page-item"><a class="page-link" href="#">3</a></li>
-						<li class="page-item"><a class="page-link" href="#">다음</a></li>
-					</ul>
+					<ul class="pagination"></ul>
 				</nav>
 			</div>
 		</div>
 	</main>
 </th:block>
 
+
 <th:block layout:fragment="jsScript">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+    let currentPage = 1;
+
+    // 검색과 페이징을 처리하는 메인 함수
+    function getCoupons(page = 1) {
+        currentPage = page;
+        const form = document.getElementById('couponSearchForm');
+        const params = new URLSearchParams(new FormData(form));
+
+        // [수정] 빈 값 필터링 로직 제거 (new URLSearchParams가 이미 처리)
+        params.append('currentPage', page);
+
+        fetch(`/adminpage/useradmin/api/user-coupons?${params.toString()}`)
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('total-coupons-count').textContent = data.pagination?.totalRecordCount ?? '0';
+                renderTable(data.couponsList);
+                renderPagination(data.pagination);
+            })
+            .catch(error => {
+                console.error('Error fetching coupons:', error);
+                // 테이블을 비우고 에러 메시지 표시
+                const tableBody = document.getElementById('coupons-table-body');
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-danger">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
+            });
+    }
+    
+    function renderTable(userCouponsList) {
+        const tableBody = document.getElementById('coupons-table-body');
+        tableBody.innerHTML = ''; 
+
+        if (!userCouponsList || userCouponsList.length === 0) {
+            // [수정] colspan을 8로 변경
+            tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-5">조회된 회원 쿠폰 정보가 없습니다.</td></tr>`;
+            return;
+        }
+
+        userCouponsList.forEach(uc => {
+            const usedBadge = uc.useYn 
+                ? '<span class="badge bg-secondary">사용</span>'
+                : '<span class="badge bg-success">미사용</span>';
+
+            const row = `
+                <tr>
+                    <td>${uc.userCpnId || ''}</td>
+                    <td>${uc.userNo || ''}</td>               
+                    <td>${uc.userNm || ''}</td>
+                    <td>${uc.cpnNm || ''}</td>
+                    <td>${formatDate(uc.cpnGiveDt)}</td>
+                    <td>${usedBadge}</td>
+                    <td>${uc.useYn ? formatDate(uc.useDt) : '-'}</td>
+                    <td>
+                        <a href="javascript:void(0);" onclick="confirmRevoke('${uc.userCpnId}')" class="btn btn-sm btn-outline-danger">회수</a>
+                    </td>
+                </tr>`;
+            tableBody.insertAdjacentHTML('beforeend', row);
+        });
+    }
+    
+    function confirmRevoke(userCpnId) {
+        Swal.fire({
+            title: "쿠폰을 회수하시겠습니까?",
+            text: "해당 쿠폰이 '사용' 상태로 변경됩니다.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "네, 회수합니다.",
+            cancelButtonText: "취소"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // [수정] 위에서 만든 API 주소와 메소드(PUT)로 정확히 맞춰줍니다.
+                fetch(`/adminpage/useradmin/api/user-coupons/revoke/${userCpnId}`, {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire('성공!', '쿠폰이 회수되었습니다.', 'success');
+                        getCoupons(currentPage); // 목록 새로고침
+                    } else {
+                        Swal.fire('실패', '쿠폰 회수 중 오류가 발생했습니다.', 'error');
+                    }
+                });
+            }
+        });
+    }
+
+    // 페이지네이션 렌더링 함수 (변경 없음)
+    function renderPagination(pagination) {
+        const pageContainer = document.querySelector('#pagination-container .pagination');
+        pageContainer.innerHTML = '';
+        if (!pagination || pagination.totalPageCount === 0) return;
+        const { startPage, endPage, totalPageCount } = pagination;
+        let paginationHtml = '';
+        paginationHtml += `<li class="page-item ${currentPage <= 1 ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage - 1}">이전</a></li>`;
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+        }
+        paginationHtml += `<li class="page-item ${currentPage >= totalPageCount ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage + 1}">다음</a></li>`;
+        pageContainer.innerHTML = paginationHtml;
+    }
+
+    // 날짜 포맷팅 함수 (변경 없음)
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        return dateString.substring(0, 10);
+    }
+    
+    // 이벤트 리스너 설정
+	document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('couponSearchForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            getCoupons(1);
+        });
+        document.getElementById('searchBtn').addEventListener('click', (e) => {
+             e.preventDefault();
+             getCoupons(1);
+        });
+        const resetBtn = document.querySelector('button[type="reset"]');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                setTimeout(() => getCoupons(1), 50); 
+            });
+        }
+        document.getElementById('pagination-container').addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageLink = e.target.closest('.page-link');
+            if (pageLink && pageLink.dataset.page) {
+                const page = parseInt(pageLink.dataset.page, 10);
+                if (page !== currentPage) { 
+                    getCoupons(page);
+                }
+            }
+        });
+        
+        getCoupons(1);
+	});
+</script>
 </th:block>
 </html>

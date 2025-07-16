@@ -30,7 +30,8 @@
 		<result column="user_cpn_id" property="userCpnId" />
 		<result column="user_no" property="userNo" />
 		<result column="pblcn_cpn_id" property="pblcnCpnId" />
-		<result column="use_yn" property="useYn" />
+		<!-- UserCoupons DTO의 isUsed 필드와 매핑됩니다 (또는 useYn). -->
+		<result column="use_yn" property="isUsed" />
 		<result column="cpn_give_dt" property="cpnGiveDt" />
 		<result column="indiv_expry_dt" property="indivExpryDt" />
 		<result column="use_dt" property="useDt" />
@@ -47,7 +48,155 @@
 		</association>
 	</resultMap>
 
+	<!-- ================================================================= -->
+	<!-- ================ 쿠폰 발급/조회 관련 핵심 쿼리 ==================== -->
+	<!-- ================================================================= -->
 
+	<select id="getMyCoupons" parameterType="map"
+		resultMap="userCouponsResultMap">
+		/* 사용자가 보유한 쿠폰 목록 조회 */
+		SELECT
+		uc.user_cpn_id, uc.user_no,
+		uc.pblcn_cpn_id, uc.use_yn,
+		uc.cpn_give_dt, uc.indiv_expry_dt,
+		c.cpn_nm, c.dscnt_vl, c.min_ordr_amt, c.max_dscnt_amt,
+		c.vld_bgng_dt,
+		c.vld_end_dt
+		FROM
+		user_coupons uc
+		JOIN
+		coupons c ON uc.pblcn_cpn_id =
+		c.pblcn_cpn_id
+		WHERE
+		uc.user_no = #{userNo}
+		<if test="keyword != null and keyword != ''">
+			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<!-- (개선) '사용가능' / '사용완료' 쿠폰 필터링 기능 추가 -->
+		<if test="isUsed != null">
+			AND uc.use_yn = #{isUsed}
+		</if>
+		ORDER BY
+		<choose>
+			<when test="'expiry'.equals(sortOrder)">uc.indiv_expry_dt ASC</when>
+			<when test="'recent'.equals(sortOrder)">uc.cpn_give_dt DESC</when>
+			<otherwise>uc.indiv_expry_dt ASC</otherwise>
+		</choose>
+		LIMIT #{limit} OFFSET #{offset}
+	</select>
+
+	<select id="getMyCouponsCount" parameterType="map"
+		resultType="int">
+		/* 사용자가 보유한 쿠폰의 전체 또는 조건별 개수 조회 */
+		SELECT COUNT(*)
+		FROM user_coupons uc
+		JOIN coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+		WHERE uc.user_no =
+		#{userNo}
+		<if test="keyword != null and keyword != ''">
+			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		<if test="isUsed != null">
+			AND uc.use_yn = #{isUsed}
+		</if>
+	</select>
+
+	<!-- (추가) 쿠폰 발급 시 쿠폰의 상세 정보를 조회하기 위해 반드시 필요한 쿼리입니다. -->
+	<select id="getCouponInfo" parameterType="string"
+		resultMap="couponsResultMap">
+		/* 단일 쿠폰의 상세 정보 조회 */
+		SELECT
+		pblcn_cpn_id,
+		user_no,
+		cpn_nm,
+		dscnt_vl,
+		min_ordr_amt,
+		max_dscnt_amt,
+		vld_bgng_dt,
+		vld_end_dt,
+		tot_use_lmt_nmtm,
+		user_per_use_lmt_nmtm,
+		actvtn_yn,
+		crt_dt,
+		mdfcn_dt,
+		issue_condition_type,
+		reissue_cycle
+		FROM
+		coupons
+		WHERE
+		pblcn_cpn_id =
+		#{couponId}
+	</select>
+
+
+	<select id="countUserCouponByCouponId" resultType="int">
+		/* (핵심 정책 쿼리)
+		사용자의 특정 쿠폰 보유 여부 확인 (재발급 방지용) */
+		/* 이 쿼리 결과가 0보다 크면, 절대 재발급하면 안됨. */
+		SELECT COUNT(*)
+		FROM user_coupons
+		WHERE user_no = #{userNo} AND
+		pblcn_cpn_id = #{couponId}
+	</select>
+
+	<insert id="issueUserCoupon"
+		parameterType="ks55team02.customer.coupons.domain.UserCoupons">
+		/* 사용자에게 쿠폰 발급 처리 (use_yn은 0으로 고정) */
+		INSERT INTO
+		user_coupons
+		(user_cpn_id, user_no, pblcn_cpn_id, use_yn, cpn_give_dt,
+		indiv_expry_dt,
+		issu_rsn_src_cn)
+		VALUES
+		(#{userCpnId}, #{userNo},
+		#{pblcnCpnId}, 0, NOW(), #{indivExpryDt}, #{issuRsnSrcCn})
+	</insert>
+
+	<select id="getUserAvailableCoupons" parameterType="String"
+		resultMap="userCouponsResultMap">
+		/* (우수 쿼리) 결제 시 사용 가능한 쿠폰 목록 조회 */
+		SELECT
+		uc.user_cpn_id,
+		uc.user_no, uc.pblcn_cpn_id, uc.use_yn,
+		uc.cpn_give_dt,
+		uc.indiv_expry_dt, uc.use_dt, uc.cpn_mdfcn_dt,
+		uc.issu_rsn_src_cn,
+		c.cpn_nm, c.dscnt_vl,
+		c.min_ordr_amt, c.max_dscnt_amt, c.vld_bgng_dt,
+		c.vld_end_dt
+		FROM
+		user_coupons uc
+		JOIN
+		coupons c ON uc.pblcn_cpn_id =
+		c.pblcn_cpn_id
+		WHERE
+		uc.user_no = #{userNo}
+		AND uc.use_yn = 0
+		AND
+		(uc.indiv_expry_dt IS NULL OR uc.indiv_expry_dt > NOW())
+		ORDER BY
+		uc.cpn_give_dt DESC
+	</select>
+
+	<select id="getNextUserCouponId" resultType="String">
+		/* user_coupons 테이블의
+		새로운 PK 생성 */
+		SELECT CONCAT('USRCPN_',
+		LPAD(IFNULL(MAX(SUBSTRING(user_cpn_id, 8)), 0) + 1, 3, '0'))
+		FROM
+		user_coupons
+	</select>
+
+	<select id="getAvailableCouponsCount" parameterType="map"
+		resultType="int">
+		SELECT COUNT(*) FROM coupons
+		WHERE actvtn_yn = 1
+		<if test="keyword != null and keyword != ''">
+			AND cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+	</select>
+
+	<!-- (추가) '쿠폰 받기' 탭의 실제 목록을 가져오는 이 쿼리가 누락되었습니다. -->
 	<select id="getAvailableCoupons" parameterType="map"
 		resultMap="couponsResultMap">
 		SELECT
@@ -74,144 +223,46 @@
 		LIMIT #{limit} OFFSET #{offset}
 	</select>
 
-	<select id="getAvailableCouponsCount" parameterType="map"
-		resultType="int">
-		SELECT COUNT(*) FROM coupons
-		WHERE actvtn_yn = 1
-		<if test="keyword != null and keyword != ''">
-			AND cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-		</if>
-	</select>
-
-	<select id="getMyCoupons" parameterType="map"
-		resultMap="userCouponsResultMap">
-		/* 사용자가 보유한 쿠폰 목록 조회 */
-		SELECT
-		uc.user_cpn_id, uc.user_no,
-		uc.pblcn_cpn_id, uc.use_yn,
-		uc.cpn_give_dt, c.vld_end_dt, c.cpn_nm,
-		c.dscnt_vl, c.min_ordr_amt, c.max_dscnt_amt,
-		c.vld_bgng_dt,
-		uc.indiv_expry_dt
-		FROM
-		user_coupons uc
-		JOIN
-		coupons c ON uc.pblcn_cpn_id
-		=
-		c.pblcn_cpn_id
-		WHERE
-		uc.user_no =
+	<select id="getOwnedCouponIds" parameterType="string"
+		resultType="string">
+		SELECT pblcn_cpn_id FROM user_coupons WHERE user_no =
 		#{userNo}
-		<if test="keyword != null and keyword != ''">
-			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-		</if>
-		ORDER BY
-		<choose>
-			<when test="'recommended'.equals(sortOrder)">uc.indiv_expry_dt ASC</when>
-			<when test="'expiry'.equals(sortOrder)">uc.indiv_expry_dt ASC</when>
-			<when test="'recent'.equals(sortOrder)">uc.cpn_give_dt DESC</when>
-			<when test="'rate'.equals(sortOrder)">c.dscnt_vl DESC</when>
-			<otherwise>uc.indiv_expry_dt ASC</otherwise>
-		</choose>
-		LIMIT #{limit} OFFSET #{offset}
 	</select>
 
-	<select id="getMyCouponsCount" parameterType="map"
+	<!-- (추가) '첫 구매' 조건 검사를 위해 반드시 필요한 쿼리 -->
+	<select id="countUserOrders" parameterType="string"
 		resultType="int">
-		/* 사용자가 보유한 쿠폰의 전체 개수 조회 */
 		SELECT COUNT(*)
-		FROM user_coupons uc
-		JOIN
-		coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
-		WHERE uc.user_no =
-		#{userNo}
-		<if test="keyword != null and keyword != ''">
-			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-		</if>
-	</select>
-
-	<select id="getCouponInfo" parameterType="string"
-		resultMap="couponsResultMap">
-		/* 단일 쿠폰의 상세 정보 조회 */
-		SELECT * FROM coupons WHERE
-		pblcn_cpn_id = #{couponId}
-	</select>
-
-	<select id="countUserCouponByCouponId" resultType="int">
-		/* 사용자의 특정 쿠폰
-		보유 여부 확인 */
-		SELECT COUNT(*) FROM user_coupons WHERE user_no = #{userNo}
-		AND pblcn_cpn_id
-		= #{couponId}
-	</select>
-
-	<insert id="issueUserCoupon"
-		parameterType="ks55team02.customer.coupons.domain.UserCoupons">
-		/* 사용자에게 쿠폰 발급 처리 */
-		INSERT INTO user_coupons
-		(user_cpn_id, user_no, pblcn_cpn_id, use_yn, cpn_give_dt,
-		indiv_expry_dt,
-		issu_rsn_src_cn)
-		VALUES
-		(#{userCpnId}, #{userNo},
-		#{pblcnCpnId}, 0, NOW(), #{indivExpryDt}, #{issuRsnSrcCn})
-	</insert>
-
-	<select id="getNextUserCouponId" resultType="String">
-		SELECT
-		CONCAT('USRCPN_', LPAD(IFNULL(MAX(SUBSTRING(user_cpn_id, 8)), 0) + 1,
-		3, '0'))
-		FROM user_coupons
-	</select>
-
-	<select id="countUserOrders" resultType="int">
-		SELECT COUNT(*)
-		FROM
-		orders
+		FROM orders
 		WHERE user_no = #{userNo}
 	</select>
 
-	<select id="countUserReviews" resultType="int">
+	<!-- (추가) '리뷰 작성' 조건 검사를 위해 필요한 쿼리 (미리 추가) -->
+	<select id="countUserReviews" parameterType="string"
+		resultType="int">
 		SELECT COUNT(*)
-		FROM
-		product_reviews
-		WHERE prchsr_user_no = #{userNo}
+		FROM product_reviews
+		WHERE prchsr_user_no =
+		#{userNo}
 	</select>
 
-	<select id="countMonthlyIssuedReviewCoupons" resultType="int">
-		SELECT
-		COUNT(*)
-		FROM user_coupons
-		WHERE user_no = #{userNo}
-		AND pblcn_cpn_id =
-		#{couponId}
-		AND issu_rsn_src_cn = 'REVIEW'
-		AND DATE_FORMAT(cpn_give_dt,
-		'%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')
+	<!-- resources/mapper/customer/coupons/CouponsMapper.xml -->
+
+	<!-- (수정) <, > 같은 특수문자가 포함된 쿼리는 CDATA 섹션으로 감싸야 합니다. -->
+	<select id="isBirthdayWeek" parameterType="string"
+		resultType="boolean">
+    <![CDATA[
+        SELECT CASE
+            WHEN ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-', DATE_FORMAT(u.user_brdt, '%m-%d')), '%Y-%m-%d'))) <= 3
+            THEN TRUE
+            ELSE FALSE
+            END
+        FROM users u
+        WHERE u.user_no = #{userNo}
+    ]]>
 	</select>
 
-	<select id="isBirthdayWeek" resultType="boolean">
-		SELECT CASE
-		WHEN
-		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-',
-		DATE_FORMAT(u.user_brdt,
-		'%m-%d')), '%Y-%m-%d'))) &lt;= 3
-		OR
-		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()) - 1, '-',
-		DATE_FORMAT(u.user_brdt,
-		'%m-%d')), '%Y-%m-%d'))) &lt;= 3
-		OR
-		ABS(DATEDIFF(CURDATE(), STR_TO_DATE(CONCAT(YEAR(CURDATE()) + 1, '-',
-		DATE_FORMAT(u.user_brdt,
-		'%m-%d')), '%Y-%m-%d'))) &lt;= 3
-		THEN TRUE
-		ELSE
-		FALSE
-		END AS is_in_birthday_week
-		FROM users u
-		WHERE u.user_no = #{userNo}
-	</select>
-
+	<!-- (추가) '생일 쿠폰 연 1회' 조건 검사를 위해 필요한 쿼리 (미리 추가) -->
 	<select id="countIssuedBirthdayCouponThisYear" resultType="int">
 		SELECT COUNT(*)
 		FROM user_coupons
@@ -223,77 +274,15 @@
 		YEAR(cpn_give_dt) = YEAR(NOW())
 	</select>
 
-	<select id="countMonthlyIssuedCoupon" resultType="int">
-		SELECT COUNT(*)
-		FROM user_coupons
-		WHERE user_no = #{userNo}
-		AND pblcn_cpn_id =
-		#{couponId}
-		AND DATE_FORMAT(cpn_give_dt, '%Y-%m') = DATE_FORMAT(NOW(),
-		'%Y-%m')
-	</select>
 
-	<select id="countWeeklyIssuedCoupon" resultType="int">
-		SELECT COUNT(*)
-		FROM user_coupons
-		WHERE user_no = #{userNo}
-		AND pblcn_cpn_id =
-		#{couponId}
-		AND YEARWEEK(cpn_give_dt, 1) = YEARWEEK(NOW(), 1)
-	</select>
-
-	<select id="countYearlyIssuedCoupon" resultType="int">
-		SELECT COUNT(*)
-		FROM user_coupons
-		WHERE user_no = #{userNo}
-		AND pblcn_cpn_id =
-		#{couponId}
-		AND YEAR(cpn_give_dt) = YEAR(NOW())
-	</select>
-
-
-	<select id="countActiveUserCouponByCouponId" parameterType="map"
-		resultType="int">
-		SELECT COUNT(*)
-		FROM user_coupons uc
-		WHERE uc.user_no = #{userNo}
-		AND uc.pblcn_cpn_id = #{pblcnCpnId}
-		AND uc.use_yn = 0 AND uc.indiv_expry_dt >= CURDATE();
-	</select>
-
-
-	<!-- 2025.07.11 gy 결제할 때 보유하고 있는 쿠폰 조회 -->
-	<select id="getUserAvailableCoupons" parameterType="String" resultMap="userCouponsResultMap">
-		/* 사용자가 보유한 쿠폰 목록 조회 */
-		SELECT
-			uc.user_cpn_id,
-			uc.user_no,
-			uc.pblcn_cpn_id,
-			uc.use_yn,
-			uc.cpn_give_dt,
-			uc.indiv_expry_dt,
-			uc.use_dt,
-			uc.cpn_mdfcn_dt,
-			uc.issu_rsn_src_cn,
-			c.cpn_nm,
-			c.dscnt_vl,
-			c.min_ordr_amt,
-			c.max_dscnt_amt,
-			c.vld_bgng_dt,
-			c.vld_end_dt,
-			c.issue_condition_type,
-			c.reissue_cycle
-		FROM
-			user_coupons uc
-		JOIN
-			coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
-		WHERE
-			uc.user_no = #{userNo}
-			AND uc.use_yn = 0
-			AND (uc.indiv_expry_dt IS NULL OR uc.indiv_expry_dt > NOW())
-		ORDER BY
-			uc.cpn_give_dt DESC
-    </select>
-
+	<!-- ================================================================= -->
+	<!-- ====== 아래의 쿼리들은 '재발급/재사용' 정책 폐기로 삭제됨 ======== -->
+	<!-- ================================================================= -->
+	<!-- <select id="countMonthlyIssuedReviewCoupons" ... /> <select id="isBirthdayWeek" 
+		... /> <select id="countIssuedBirthdayCouponThisYear" ... /> <select id="countMonthlyIssuedCoupon" 
+		... /> <select id="countWeeklyIssuedCoupon" ... /> <select id="countYearlyIssuedCoupon" 
+		... /> <select id="countActiveUserCouponByCouponId" ... /> -->
+	<!-- 등등 재발급 관련 쿼리 일괄 삭제 -->
 
 </mapper>
+

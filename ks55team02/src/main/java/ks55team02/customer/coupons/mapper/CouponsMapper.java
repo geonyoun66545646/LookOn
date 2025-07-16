@@ -113,5 +113,7 @@ public interface CouponsMapper {
      */
     List<UserCoupons> getUserAvailableCoupons(String userNo);
     
+    List<String> getOwnedCouponIds(String userNo);
+    
 
 }
