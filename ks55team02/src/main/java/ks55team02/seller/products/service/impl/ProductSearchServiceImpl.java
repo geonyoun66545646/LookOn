@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.domain.Products;
 import ks55team02.seller.products.mapper.ProductSearchMapper;
 import ks55team02.seller.products.service.ProductSearchService;
@@ -18,12 +19,43 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
     private final ProductSearchMapper productSearchMapper;
     
+    
     @Override
-    public List<Products> getSimilarProducts(String categoryId, String currentGdsNo, int limit) {
+    public List<ProductCategory> getTopLevelCategoriesByStoreId(String storeId) {
+        return productSearchMapper.getTopLevelCategoriesByStoreId(storeId);
+    }
+    
+    @Override
+    public List<ProductCategory> getCategoriesByStoreId(String storeId) {
+        return productSearchMapper.getCategoriesByStoreId(storeId);
+    }
+    
+    @Override
+    public List<Products> getRecentProductsByStoreId(String storeId, int limit) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("storeId", storeId);
+        params.put("limit", limit);
+        return productSearchMapper.getRecentProductsByStoreId(params);
+    }
+    
+    @Override // ⭐ 이 부분 추가
+    public List<Products> getSpecialSaleProducts(double minDiscountRate) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("minDiscountRate", minDiscountRate);
+        return productSearchMapper.getSpecialSaleProducts(params);
+    }
+    
+    @Override
+    public List<Products> getWeeklyBestProducts() {
+        // 단순히 매퍼를 호출하여 DB 조회를 위임합니다.
+        return productSearchMapper.getWeeklyBestProducts();
+    }
+    
+    @Override
+    public List<Products> getSimilarProducts(String categoryId, String currentGdsNo) {
         Map<String, Object> params = new HashMap<>();
         params.put("categoryId", categoryId);
         params.put("currentGdsNo", currentGdsNo);
-        params.put("limit", limit);
         return productSearchMapper.getSimilarProducts(params);
     }
     
