@@ -45,7 +45,7 @@ public class FeedServiceImpl implements FeedService {
         Map<String, Object> result = new HashMap<>();
         result.put("feedList", feedList);
         result.put("hasNext", hasNext);
-
+        
         return result;
     }
 	

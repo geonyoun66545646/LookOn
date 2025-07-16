@@ -14,10 +14,12 @@ import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.customer.login.domain.UserInfoResponse;
 import ks55team02.customer.login.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequestMapping("/customer/feed")
 @RequiredArgsConstructor
+@Slf4j
 public class FeedController {
 
     private final FeedService feedService;
@@ -76,12 +78,21 @@ public class FeedController {
     
     // 타인의 마이 피드 조회
     @GetMapping("/feedListByUserNo/{userNo}")
-    public String userFeedPage(@PathVariable("userNo") String userNo, Model model) {
+    public String userFeedPage(@PathVariable("userNo") String userNo,
+    					@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, 
+    					Model model) {
         // 경로 변수(userNo)를 이용해 타인의 프로필 정보를 조회합니다.
         UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
         model.addAttribute("userInfo", userInfo);
         model.addAttribute("showFab", true);
+
         // "마이피드"와 "타인피드"는 동일한 뷰 파일을 재사용합니다.
+        if (loginUser != null) {
+            model.addAttribute("loginUserNo", loginUser.getUserNo());
+        } else {
+            model.addAttribute("loginUserNo", ""); // 비로그인 시 빈 문자열
+        }
+        
         return "customer/feed/feedListByUserNo";
     }
     

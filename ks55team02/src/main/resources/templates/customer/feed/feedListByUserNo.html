@@ -19,7 +19,7 @@
 	    <div class="my-feed-container" 
 	    	th:object="${userInfo}"
 	    	th:data-page-owner-user-no="*{userNo}"
-	    	th:data-login-user-no="${session.loginUser != null ? session.loginUser.userNo : ''}">
+	    	th:data-login-user-no="${loginUserNo}">
 	
 	        <!-- ======================================================= -->
 	        <!-- 1. 프로필 정보 영역 (Thymeleaf 적용) -->
