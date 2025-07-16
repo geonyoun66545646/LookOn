@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class OrderDTO {
+public class PayOrderDTO {
 	
 	private String ordrNo;
     private String userNo;

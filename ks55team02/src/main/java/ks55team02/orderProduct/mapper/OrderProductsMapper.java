@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import ks55team02.orderProduct.domain.OrderDTO;
+
 
 @Mapper
 public interface OrderProductsMapper {
@@ -15,7 +17,7 @@ public interface OrderProductsMapper {
      * @param orderId 조회할 주문의 ID
      * @return 주문 상세 정보를 담은 Map 객체
      */
-    Map<String, Object> getCombinedOrderDetailsByOrderId(String orderId);
+	OrderDTO getCombinedOrderDetailsByOrderId(String ordrNo);
     
     /**
      * XML ID: getOrderedProductsByOrderId
@@ -23,7 +25,7 @@ public interface OrderProductsMapper {
      * @param orderId 조회할 주문의 ID
      * @return 상품 목록을 담은 List<Map>
      */
-    List<Map<String, Object>> getOrderedProductsByOrderId(String orderId);
+    List<Map<String, Object>> getOrderedProductsByOrderId(String ordrNo);
     
     String selectNextOrderId();
     
