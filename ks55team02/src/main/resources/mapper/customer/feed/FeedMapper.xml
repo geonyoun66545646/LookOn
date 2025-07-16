@@ -176,5 +176,48 @@
 			</if>
 	</select>
 
+	<select id="selectLastFeedSn" resultType="string">
+		/* 피드일련번호 생성을 위한 조회 */
+	    SELECT
+	        feed_sn
+	    FROM
+	        feeds
+	    ORDER BY
+	        CAST(REPLACE(feed_sn, 'feed_', '') AS UNSIGNED) DESC
+	    LIMIT 1
+	</select>
+	
+	<insert id="insertFeed" parameterType="Feed">
+		/* 피드 삽입 */
+	    INSERT INTO feeds
+	        (feed_sn, wrtr_user_no, feed_cn, crt_dt)
+	    VALUES
+	        (#{feedSn}, #{wrtrUserNo}, #{feedCn}, NOW())
+	</insert>
+	
+	<select id="selectLastFeedImageSn" resultType="string">
+		/* 피드 이미지일련번호 생성을 위한 조회 */
+	    SELECT
+	        feed_img_sn
+	    FROM
+	        feed_images
+	    ORDER BY
+	        CAST(REPLACE(feed_img_sn, 'feed_img_', '') AS UNSIGNED) DESC
+	    LIMIT 1
+	</select>
+	
+	<insert id="insertFeedImages" parameterType="FeedImage">
+		/* 피드 이미지 삽입 */
+	    INSERT INTO feed_images
+	        (feed_img_sn, feed_sn, img_file_path_nm, feed_img_sort_sn, crt_dt)
+	    VALUES
+	    <foreach collection="list" item="image" separator=",">
+	        (#{image.feedImgSn}, 
+	        #{image.feedSn}, 
+	        #{image.imgFilePathNm},
+	        #{image.feedImgSortSn}, 
+	        NOW())
+	    </foreach>
+	</insert>
 	
 </mapper>
