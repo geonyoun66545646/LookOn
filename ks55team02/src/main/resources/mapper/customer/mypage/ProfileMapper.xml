@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.mypage.mapper.ProfileMapper">
+
+    <!-- 프로필 정보 업데이트 쿼리 -->
+    <update id="updateProfile" parameterType="ks55team02.customer.mypage.domain.ProfileUpdateRequest">
+        UPDATE user_profiles
+        <set>
+            <!-- 닉네임이 요청에 포함된 경우에만 업데이트 -->
+            <if test="userNcnm != null">
+                user_ncnm = #{userNcnm},
+            </if>
+            <!-- 자기소개가 요청에 포함된 경우에만 업데이트 -->
+            <if test="selfIntroCn != null">
+                self_intro_cn = #{selfIntroCn},
+            </if>
+            <!-- 프로필 이미지 경로가 요청에 포함된 경우에만 업데이트 -->
+            <if test="prflImgPath != null">
+                prfl_img = #{prflImgPath},
+            </if>
+            
+            <!-- 어떤 필드든 하나라도 변경되었다면, 최종 수정일은 항상 현재 시간으로 업데이트 -->
+            last_prfl_mdfcn_dt = NOW()
+        </set>
+        WHERE
+            user_no = #{userNo}
+    </update>
+
+	<update id="updateUserNickname">
+        UPDATE users
+        SET
+            user_ncnm = #{userNcnm}
+        WHERE
+            user_no = #{userNo}
+    </update>
+    
+    <select id="countByUserNcnmForOthers" resultType="int">
+	    SELECT COUNT(*)
+	    FROM users
+	    WHERE user_no != #{userNo} AND user_ncnm = #{userNcnm}
+	</select>
+</mapper>

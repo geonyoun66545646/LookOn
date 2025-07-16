@@ -79,22 +79,28 @@
                             <h3>프로필 관리</h3>
                             <form id="profile-update-form" class="profile-form" enctype="multipart/form-data">
                                 <div class="form-group">
-                                    <label>프로필 사진</label>
-							            <img id="profileImagePreview" src="" style="display: none; width: 100px;">
-							            <input type="file" id="profileImageInput" accept="image/*">
-							        </div>
+						            <label>프로필 사진</label>
+						            <!-- 이미지 미리보기 영역 -->
+						            <div>
+						                <img id="profileImagePreview" src="" alt="프로필 이미지 미리보기" style="width: 150px; height: 150px; object-fit: cover; display: none; margin-bottom: 15px; border-radius: 50%;">
+						            	<div class="custom-file">
+							                <input type="file" class="custom-file-input" id="profileImageInput" name="profileImageFile" accept="image/*">
+							                <label class="custom-file-label" for="profileImageInput">파일 선택...</label>
+							            </div>
+						            </div>
+						        </div>
 							
 							        <!-- 닉네임 -->
 							        <div class="form-group">
 							            <label>닉네임 *</label>
-							            <input type="text" id="userNickname" required>
-							            <span class="error-text" id="nicknameError"></span>
+							            <input type="text" id="userNickname" name="userNcnm">
+							            <p class="error-message" id="nicknameError" style="color: red; display: none;"></p>
 							        </div>
 							
 							        <!-- 자기소개 -->
 							        <div class="form-group">
 							            <label>자기소개</label>
-							            <textarea id="userSelfIntro" rows="3"></textarea>
+							            <textarea id="userSelfIntro" name="selfIntroCn"></textarea>
 							        </div>
 							        <button type="submit" class="btn-primary">저장하기</button>
                             </form>
@@ -165,12 +171,24 @@
                 // [탭 2] 프로필 관리 폼 채우기
                 $('#userNickname').val(userInfo.userNcnm);
                 $('#userSelfIntro').val(userInfo.selfIntroCn);
+                
 
-                // 프로필 이미지 설정
+             	// ▼▼▼▼▼ 프로필 이미지 설정 부분을 이 코드로 교체해주세요 ▼▼▼▼▼
+                const profileImageElement = $('#profileImagePreview');
+                
+                // DB에 저장된 이미지 경로(prflImg)가 있는지 확인
                 if (userInfo.prflImg) {
-                    $('#profileImagePreview').attr('src', userInfo.prflImg);
+                    
+                    // WebConfig가 /attachment/ 경로를 직접 처리하므로,
+                    // DB에 저장된 경로를 아무런 조작 없이 그대로 사용합니다.
+                    const imageUrl = userInfo.prflImg;
+                    profileImageElement.attr('src', imageUrl).show();
+                    
                 } else {
-                    $('#profileImagePreview').attr('src', '/images/default-profile.png');
+                    // 혹시라도 DB에 null 값이 있는 경우를 대비한 방어 코드
+                    // static 폴더에 있는 기본 이미지를 보여줍니다.
+                    // 기본 이미지의 웹 경로는 /static/을 제외한 경로입니다.
+                    profileImageElement.attr('src', '/uploads/profiles/defaultprofile.jpg').show();
                 }
                 
                 // 초기 데이터 유효성 검사
@@ -318,22 +336,37 @@
         }
 
         function updateProfileInfo(e) {
-            e.preventDefault();
-            const formData = new FormData(document.getElementById('profile-update-form'));
+            e.preventDefault(); // 기본 폼 제출 방지
 
+            // 1. FormData 객체 생성
+            const formData = new FormData();
+            
+            // 2. 각 필드의 값을 FormData에 추가
+            formData.append('userNcnm', $('#userNickname').val());
+            formData.append('selfIntroCn', $('#userSelfIntro').val());
+
+            // 3. 이미지 파일이 선택되었는지 확인하고, 선택된 경우에만 추가
+            const imageFile = $('#profileImageInput')[0].files[0];
+            if (imageFile) {
+                formData.append('profileImageFile', imageFile);
+            }
+
+            // 4. AJAX 요청
             $.ajax({
                 type: 'PUT',
-                url: '/api/v1/mypage/profile',
+                url: '/api/v1/mypage/profile', // 우리가 Controller에 만든 URL
                 data: formData,
-                processData: false,
-                contentType: false 
+                processData: false,  // FormData를 사용할 때 필수 설정 (1)
+                contentType: false   // FormData를 사용할 때 필수 설정 (2)
             })
             .done(response => {
-                alert('프로필이 성공적으로 저장되었습니다.');
-                loadMyInfo(); // 수정 후 최신 정보 다시 로드
+                // 성공 시, 서버가 보낸 메시지를 그대로 보여줍니다.
+                alert(response.message);
+                loadMyInfo(); // 수정 후 최신 정보(이미지, 닉네임)를 다시 로드
             })
             .fail(xhr => {
                 const response = xhr.responseJSON;
+                // 실패 시, 서버가 보낸 에러 메시지를 보여줍니다.
                 alert('오류: ' + (response?.message || '프로필 저장에 실패했습니다.'));
             });
         }
@@ -481,14 +514,64 @@
 
             // [프로필 관리 탭] 이벤트 바인딩
             $('#profile-update-form').on('submit', updateProfileInfo);
+            $('#userNickname').on('blur', function() {
+                const nickname = $(this).val();
+                const $errorElement = $('#nicknameError');
+                
+                // 닉네임 정규식 (특수문자 및 공백 비허용, 2~15자)
+                const nicknameRegex = /^[a-zA-Z0-9가-힣]{2,15}$/;
+
+                // 1. 비어있으면 메시지 숨기고 검사 종료
+                if (nickname === '') {
+                    $errorElement.hide();
+                    return;
+                }
+
+                // 2. 글자 수 및 특수문자 검사
+                if (!nicknameRegex.test(nickname)) {
+                    $errorElement.text('닉네임은 2~15자리의 한글, 영문, 숫자만 사용 가능합니다.').show();
+                    return;
+                }
+
+                // 3. 중복 검사 (서버에 실시간으로 물어보기)
+                // 모든 클라이언트 측 검사를 통과했을 때만 서버에 요청을 보냅니다.
+                $.ajax({
+                    type: 'GET',
+                    url: '/api/v1/mypage/profile/check-nickname', // 닉네임 중복 확인 전용 API
+                    data: {
+                        'userNcnm': nickname
+                    }
+                })
+                .done(response => {
+                    // 서버가 "사용 가능하지 않다"고 응답하면
+                    if (!response.isAvailable) {
+                    	 $errorElement.text('사용 가능한 닉네임입니다.').css('color', 'green').show();	
+                    } else {
+                        // 사용 가능하면 에러 메시지 숨김
+                    	$errorElement.text('이미 사용 중인 닉네임입니다.').show();	
+                    }
+                })
+                .fail(error => {
+                    // 서버 통신 자체에 실패한 경우
+                    console.error("닉네임 중복 확인 중 에러 발생:", error);
+                    $errorElement.text('닉네임 확인 중 오류가 발생했습니다.').show();
+                });
+            });
             
-            // 파일 선택 시 이미지 미리보기 기능
+         	// 파일 선택 시 이미지 미리보기 기능
             $('#profileImageInput').on('change', function(e) {
+            	// 선택된 파일의 이름을 가져옵니다.
+                var fileName = e.target.files[0].name;
+                // 파일 이름이 표시될 label의 내용을 변경합니다.
+                $(this).next('.custom-file-label').html(fileName);
+                
                 const file = e.target.files[0];
+                
                 if (file) {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
-                        $('#profileImagePreview').attr('src', e.target.result);
+                    reader.onload = function(event) {
+                        // 미리보기 <img> 태그의 src를 선택한 이미지 파일로 변경하고, 화면에 보여줍니다.
+                        $('#profileImagePreview').attr('src', event.target.result).show();
                     }
                     reader.readAsDataURL(file);
                 }

@@ -37,4 +37,15 @@ public class CustomerController {
 		return "customer/mypage/customerMyPage";
 	}
 	
+	@GetMapping("/editInfo")
+    public String editInfoPage(HttpSession session, Model model) {
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/customer/login";
+        }
+        // 이 페이지는 JavaScript가 API를 호출하여 데이터를 채우므로,
+        // 여기서는 페이지를 보여주는 역할만 합니다.
+        return "customer/info/customerEditInfo"; // customerEditInfo.html 파일을 보여줌
+    }
+	
 }
