@@ -171,7 +171,7 @@
 			feeds f
 		WHERE 
 			f.del_dt IS NULL
-			<if test="params.userNo != null and params.userNo != ''">
+			<if test="userNo != null and userNo != ''">
 				AND f.wrtr_user_no = #{userNo}
 			</if>
 	</select>

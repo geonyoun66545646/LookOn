@@ -41,10 +41,12 @@ public class FeedServiceImpl implements FeedService {
         boolean hasNext = feedListWithExtra.size() > limit;
         
         List<Feed> feedList = hasNext ? feedListWithExtra.subList(0, limit) : feedListWithExtra;
+        int totalCount = feedMapper.selectFeedCount(userNo);
 
         Map<String, Object> result = new HashMap<>();
         result.put("feedList", feedList);
         result.put("hasNext", hasNext);
+        result.put("totalCount", totalCount);
         
         return result;
     }
