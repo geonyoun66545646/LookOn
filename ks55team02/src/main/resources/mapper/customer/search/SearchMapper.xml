@@ -1,44 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="ks55team02.customer.search.mapper.SearchMapper">
+<mapper
+	namespace="ks55team02.customer.search.mapper.SearchMapper">
 
-	<resultMap type="ks55team02.customer.search.domain.ProductsSearch" id="productsSearchMap">
+	<resultMap
+		type="ks55team02.customer.search.domain.ProductsSearch"
+		id="productsSearchMap">
 		<result column="gds_no" property="gdsNo" />
 		<result column="gds_nm" property="gdsNm" />
 		<result column="last_sel_prc" property="lastSelPrc" />
 		<result column="img_file_path_nm" property="imgFilePathNm" />
 	</resultMap>
 
-	<select id="searchProducts" parameterType="map" resultMap="productsSearchMap">
-		<bind name="pattern" value="'%' + _parameter.get('keyword') + '%'" />
+	<select id="searchProducts" parameterType="map"
+		resultMap="productsSearchMap">
+		<bind name="pattern"
+			value="'%' + _parameter.get('keyword') + '%'" />
 		SELECT
-			p.gds_no,
-			p.gds_nm,
-			p.last_sel_prc,
-			img.img_file_path_nm
+		p.gds_no,
+		p.gds_nm,
+		p.last_sel_prc,
+		img.img_file_path_nm
 		FROM
-			products p
+		products p
 		LEFT JOIN
-			product_images img ON p.gds_no = img.gds_no AND img.rprs_img_yn = 'Y'
+		product_images img ON p.gds_no = img.gds_no AND
+		img.rprs_img_yn = 'Y'
 		WHERE
-			p.gds_nm LIKE #{pattern}
+		p.gds_nm LIKE #{pattern}
+		<!-- (핵심 수정) 판매중(expsr_yn = 1)인 상품만 조회하도록 조건을 추가합니다. -->
+		AND p.expsr_yn = 1
 		ORDER BY
-			p.reg_dt DESC
+		p.reg_dt DESC
 		LIMIT #{limit} OFFSET #{offset}
 	</select>
-	
-	<select id="getProductsCount" parameterType="string" resultType="int">
+
+	<select id="getProductsCount" parameterType="string"
+		resultType="int">
 		<bind name="pattern" value="'%' + _parameter + '%'" />
 		SELECT
-			COUNT(*)
+		COUNT(*)
 		FROM
-			products p
+		products p
 		WHERE
-			p.gds_nm LIKE #{pattern}
+		p.gds_nm LIKE #{pattern}
+		<!-- (핵심 수정) 카운트 쿼리에도 동일한 조건을 반드시 추가해야 합니다. -->
+		AND p.expsr_yn = 1
 	</select>
 
-	<resultMap type="ks55team02.customer.search.domain.PostsSearch" id="postsSearchMap">
+	<resultMap
+		type="ks55team02.customer.search.domain.PostsSearch"
+		id="postsSearchMap">
 		<result column="pst_sn" property="pstSn" />
 		<result column="pst_ttl" property="pstTtl" />
 		<result column="pst_cn" property="pstCn" />
@@ -46,70 +59,110 @@
 		<result column="crt_dt" property="crtDt" />
 	</resultMap>
 
-	<select id="searchPosts" parameterType="map" resultMap="postsSearchMap">
-		<bind name="pattern" value="'%' + _parameter.get('keyword') + '%'" />
+	<select id="searchPosts" parameterType="map"
+		resultMap="postsSearchMap">
+		<bind name="pattern"
+			value="'%' + _parameter.get('keyword') + '%'" />
 		SELECT
-			p.pst_sn,
-			p.pst_ttl,
-			LEFT(p.pst_cn, 100) AS pst_cn,
-			p.crt_dt,
-			u.user_ncnm
+		p.pst_sn,
+		p.pst_ttl,
+		LEFT(p.pst_cn, 100) AS pst_cn,
+		p.crt_dt,
+		u.user_ncnm
 		FROM
-			posts p
+		posts p
 		JOIN
-			users u ON p.wrtr_user_no = u.user_no
+		users u ON p.wrtr_user_no = u.user_no
 		WHERE
-			p.pst_ttl LIKE #{pattern}
+		p.pst_ttl LIKE #{pattern}
+		AND u.user_status = '활동'
 		ORDER BY
-			p.crt_dt DESC
+		p.crt_dt DESC
 		LIMIT #{limit} OFFSET #{offset}
 	</select>
-	
-	<select id="getPostsCount" parameterType="string" resultType="int">
+
+	<select id="getPostsCount" parameterType="string"
+		resultType="int">
 		<bind name="pattern" value="'%' + _parameter + '%'" />
 		SELECT
-			COUNT(*)
+		COUNT(*)
 		FROM
-			posts p
+		posts p
+		JOIN
+		users u ON p.wrtr_user_no = u.user_no
 		WHERE
-			p.pst_ttl LIKE #{pattern}
+		p.pst_ttl LIKE #{pattern}
+		AND u.user_status = '활동'
 	</select>
 
-	<resultMap type="ks55team02.customer.search.domain.UsersSearch" id="usersSearchMap">
+	<resultMap
+		type="ks55team02.customer.search.domain.UsersSearch"
+		id="usersSearchMap">
 		<result column="user_ncnm" property="userNcnm" />
-		<result column="user_nm" property="userNm" />
+		<result column="user_lgn_id" property="userLgnId" />
 		<result column="prfl_img" property="prflImg" />
+		<result column="user_no" property="userNo" />
 	</resultMap>
 
-	<select id="searchUsers" parameterType="map" resultMap="usersSearchMap">
-		<bind name="pattern" value="'%' + _parameter.get('keyword') + '%'" />
+	<select id="searchUsers" parameterType="map"
+		resultMap="usersSearchMap">
+		<bind name="pattern"
+			value="'%' + _parameter.get('keyword') + '%'" />
 		SELECT
-			u.user_ncnm,
-			u.user_nm,
-			pro.prfl_img
+		u.user_ncnm,
+		u.user_lgn_id,
+		pro.prfl_img,
+		u.user_no
 		FROM
-			users u
-		LEFT JOIN
-			user_profiles pro ON u.user_no = pro.user_no
+		users u
+		LEFT
+		JOIN
+		user_profiles pro ON u.user_no = pro.user_no
 		WHERE
-			u.user_nm LIKE #{pattern}
-			AND u.user_ncnm IS NOT NULL
-			AND u.user_nm IS NOT NULL
+		(u.user_nm LIKE
+		#{pattern} OR u.user_ncnm LIKE #{pattern})
+		AND u.user_status = '활동'
 		ORDER BY
-			u.join_dt DESC
+		u.join_dt DESC
 		LIMIT #{limit} OFFSET #{offset}
 	</select>
-	
-	<select id="getUsersCount" parameterType="string" resultType="int">
+
+	<select id="getUsersCount" parameterType="string"
+		resultType="int">
 		<bind name="pattern" value="'%' + _parameter + '%'" />
 		SELECT
-			COUNT(*)
+		COUNT(*)
 		FROM
-			users u
+		users u
 		WHERE
-			u.user_nm LIKE #{pattern}
-			AND u.user_ncnm IS NOT NULL
-			AND u.user_nm IS NOT NULL
+		(u.user_nm LIKE #{pattern} OR
+		u.user_ncnm LIKE #{pattern})
+		AND u.user_status = '활동'
 	</select>
+
+	<select id="getNextSearchLogId" resultType="string">
+		SELECT
+		CONCAT('SRCH_LOG_', LPAD(COALESCE(MAX(CAST(REPLACE(srch_log_id,
+		'SRCH_LOG_', '') AS
+		UNSIGNED)), 0) + 1, 5, '0'))
+		FROM
+		search_logs
+	</select>
+
+	<insert id="insertSearchHistory" parameterType="map">
+		INSERT INTO search_logs (
+		srch_log_id,
+		user_no,
+		srch_keyword_nm,
+		srch_dt,
+		srch_user_ip_addr -- 마지막 쉼표 제거
+		) VALUES (
+		#{searchLogId},
+		#{userNo},
+		#{keyword},
+		NOW(),
+		#{ipAddress} -- 마지막 쉼표 제거
+		)
+	</insert>
 
 </mapper>

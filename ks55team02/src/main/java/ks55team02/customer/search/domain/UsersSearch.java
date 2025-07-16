@@ -5,6 +5,8 @@ import lombok.Data;
 @Data
 public class UsersSearch {
 	private String userNcnm;
-	private String userNm;
+	private String userLgnId;
 	private String prflImg;
+    private String userNo; 
+
 }

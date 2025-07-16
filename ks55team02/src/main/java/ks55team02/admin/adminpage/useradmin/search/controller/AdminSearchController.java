@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/adminpage/useradmin")
-public class SearchController {
+public class AdminSearchController {
 
 	// 검색기록
 	@GetMapping("/search")
 	public String useradminSearchController() {
 		
-		return "admin/adminpage/useradmin/search";
+		return "admin/adminpage/useradmin/adminSearch";
 	}
 }
