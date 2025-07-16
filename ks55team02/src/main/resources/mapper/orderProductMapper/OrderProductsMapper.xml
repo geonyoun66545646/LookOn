@@ -3,8 +3,8 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-  <mapper namespace="ks55team02.tossApi.mapper.OrderProductsMapper">
-      <resultMap type="ks55team02.tossApi.domain.OrderDTO" id="orderResultMap">
+  <mapper namespace="ks55team02.orderProduct.mapper.OrderProductsMapper">
+      <resultMap type="ks55team02.orderProduct.domain.OrderDTO" id="orderResultMap">
         <id     column="ordr_no"        	property="ordrNo"/>
         <result column="user_no"        	property="userNo"/>
         <result column="ordr_dt"        	property="ordrDt"/>
@@ -62,7 +62,7 @@
             o.gds_tot_amt           AS gdsTotAmt,        -- 상품 총액 (할인 전)
             o.dlvy_fee_amt          AS dlvyFeeAmt,       -- 배송비
             o.apld_cpn_dscnt_amt    AS apldCpnDscntAmt,  -- 쿠폰 할인 금액
-            u.eml_addr              AS userEmail,        -- 주문자 이메일 (users 테이블에서 JOIN)
+            u.eml_addr              AS userEmail        -- 주문자 이메일 (users 테이블에서 JOIN)
         FROM
             orders o
         INNER JOIN

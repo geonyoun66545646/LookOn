@@ -27,4 +27,9 @@ public interface OrderProductsMapper {
     
     String selectNextOrderId();
     
+    // ** 특정 userNo의 가장 최근 주문 ID를 조회하는 메서드**
+    String selectLatestOrderIdByUserNo(String userNo);
+    
+    String findLatestOrderIdByUserNo(String userNo); 
+    
 }
