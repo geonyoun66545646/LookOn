@@ -118,30 +118,54 @@ public class FeedServiceImpl implements FeedService {
 		return result;
 	}
 
-	// [신규] 댓글 추가 로직
 	@Override
 	@Transactional
 	public FeedComment addComment(String feedSn, String commentText, String userNo) {
-		// 1. 새로운 댓글 PK 생성
 		String lastSn = feedMapper.selectLastFeedCommentSn();
 		int newNum = 1;
 		if (lastSn != null) {
 			newNum = Integer.parseInt(lastSn.replace("feed_cmnt_", "")) + 1;
 		}
 		String newCommentSn = "feed_cmnt_" + String.format("%03d", newNum);
-
-		// 2. DB에 삽입할 댓글 객체 생성
 		FeedComment newComment = new FeedComment();
 		newComment.setFeedCmntSn(newCommentSn);
 		newComment.setFeedSn(feedSn);
 		newComment.setWrtrUserNo(userNo);
 		newComment.setCmntCn(commentText);
-
-		// 3. DB에 INSERT
 		feedMapper.insertComment(newComment);
-
-		// 4. [핵심] 방금 삽입한 댓글의 완전한 정보를 다시 조회하여 반환
-		//    (이렇게 해야 프론트에서 작성자 닉네임, 프로필 등을 바로 표시할 수 있음)
 		return feedMapper.selectCommentBySn(newCommentSn);
+	}
+
+	// [신규] 댓글 삭제 로직
+	@Override
+	@Transactional
+	public boolean deleteComment(String feedCmntSn, String userNo) {
+		// [핵심] DB에서 실제 댓글 정보를 가져와 작성자 본인인지 서버에서 한번 더 확인합니다.
+		FeedComment comment = feedMapper.selectCommentBySn(feedCmntSn);
+
+		// 댓글이 존재하고, 요청한 사용자가 댓글 작성자와 일치하는 경우에만 삭제를 진행합니다.
+		if (comment != null && comment.getWrtrUserNo().equals(userNo)) {
+			feedMapper.deleteComment(feedCmntSn, userNo);
+			return true; // 삭제 성공
+		}
+
+		return false; // 삭제 실패 (댓글이 없거나, 권한이 없음)
+	}
+	// [신규] 댓글 수정 로직
+	@Override
+	@Transactional
+	public FeedComment updateComment(String feedCmntSn, String commentText, String userNo) {
+		// [핵심] DB에서 실제 댓글 정보를 가져와 작성자 본인인지 서버에서 한번 더 확인합니다.
+		FeedComment comment = feedMapper.selectCommentBySn(feedCmntSn);
+
+		// 댓글이 존재하고, 요청한 사용자가 댓글 작성자와 일치하는 경우에만 수정을 진행합니다.
+		if (comment != null && comment.getWrtrUserNo().equals(userNo)) {
+			feedMapper.updateComment(feedCmntSn, commentText);
+			// 수정된 최신 정보를 다시 조회하여 반환
+			return feedMapper.selectCommentBySn(feedCmntSn);
+		}
+		
+		// 권한이 없거나 댓글이 없는 경우 null 반환
+		return null;
 	}
 }
