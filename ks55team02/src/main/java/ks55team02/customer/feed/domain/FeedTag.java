@@ -10,4 +10,6 @@ public class FeedTag {
 	private String feedSn;
 	private String tagSn;
 	private String crtDt;
+	
+	private String tagNm; 
 }
