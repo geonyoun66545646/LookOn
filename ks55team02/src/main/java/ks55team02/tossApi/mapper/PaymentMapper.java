@@ -6,10 +6,9 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
-import ks55team02.tossApi.domain.OrderDTO;
+import ks55team02.tossApi.domain.PayOrderDTO;
 import ks55team02.tossApi.domain.PaymentDTO;
 import ks55team02.tossApi.domain.PaymentHistoryDTO;
-import ks55team02.tossApi.domain.OrderItemsDTO; // <<<<<<<<< [추가됨] OrderItemsDTO 임포트 >>>>>>>>>
 
 @Mapper
 public interface PaymentMapper {
@@ -25,7 +24,7 @@ public interface PaymentMapper {
      * '결제 대기' 상태의 주문 정보를 orders 테이블에 저장합니다.
      * @param orderDTO 저장할 주문 정보
      */
-    void insertOrder(OrderDTO orderDTO);
+    void insertOrder(PayOrderDTO payorderDTO);
 
     /**
      * 주문 상태를 업데이트합니다. (예: '결제 완료'로 변경)
@@ -49,9 +48,9 @@ public interface PaymentMapper {
     List<Map<String, Object>> getUserOrderPaymentHistory(String userNo);
     
     String findLatestOrderIdByUserNo(String userNo);
-    Map<String, Object> getPaymentDetailsByOrderId(String orderId);
+    Map<String, Object> getPaymentDetailsByOrderId(String ordrNo);
     // <<<<<<<<< [수정됨] 반환 타입을 Map<String, Object>에서 OrderDTO로 변경 >>>>>>>>>
-    OrderDTO getOrderDetailsByOrderId(String orderId); 
+    PayOrderDTO getOrderDetailsByOrderId(String ordrNo); 
 
     /**
      * 특정 주문 ID에 해당하는 모든 주문 항목(상품 및 옵션) 정보를 조회합니다.
@@ -60,7 +59,7 @@ public interface PaymentMapper {
      * @return 주문 항목 정보 목록 (Map 형태로 반환)
      */
     // <<<<<<<<< [기존/확인] 주문 항목 상세 정보 조회 메서드 >>>>>>>>>
-    List<Map<String, Object>> getOrderedProductsByOrderId(String orderId); 
+    List<Map<String, Object>> getOrderedProductsByOrderId(String ordrNo); 
 
     /**
      * 특정 사용자가 보유한 특정 발행 쿠폰 코드(pblcn_cpn_cd)에 해당하는 쿠폰의 상세 정보와

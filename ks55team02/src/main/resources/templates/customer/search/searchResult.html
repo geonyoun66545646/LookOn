@@ -84,7 +84,8 @@
 							</div>
 
 						</div>
-						<div class="card-footer search-etc py-4 px-4 bg-white text-center">
+						<div
+							class="card-footer search-etc py-4 px-4 bg-white d-flex justify-content-center">
 							<a href="#" class="btn view-more-btn-lg"
 								data-target-tab="shopping">상품 더보기</a>
 						</div>
@@ -115,7 +116,8 @@
 								</div>
 							</div>
 						</div>
-						<div class="card-footer search-etc py-4 px-4 bg-white text-center">
+						<div
+							class="card-footer search-etc py-4 px-4 bg-white d-flex justify-content-center">
 							<a href="#" class="btn view-more-btn-lg" data-target-tab="post">게시글
 								더보기</a>
 						</div>
@@ -148,8 +150,8 @@
 												th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=${user.userNo})}"
 												th:text="${user.userNcnm}"></a>
 										</h6>
-										<small class="text-muted" th:text="${user.userLgnId}">
-										</small>
+										<p class="text-muted search-result-userid" th:text="${user.userLgnId}">
+										</p>
 									</div>
 								</div>
 							</th:block>
@@ -159,7 +161,8 @@
 								<p class="text-center w-100">검색된 사용자가 없습니다.</p>
 							</div>
 						</div>
-						<div class="card-footer search-etc py-4 px-4 bg-white text-center">
+						<div
+							class="card-footer search-etc py-4 px-4 bg-white d-flex justify-content-center">
 							<a href="#" class="btn view-more-btn-lg" data-target-tab="user">사용자
 								더보기</a>
 						</div>
@@ -359,74 +362,77 @@
     /**
      * 2. 게시글 목록을 그리는 함수
      */
-    function renderPosts(container, pageData) {
-        let contentHtml;
-        if (!pageData.list || pageData.list.length === 0) {
-            contentHtml = '<div class="post-item"><p class="text-center w-100">검색된 게시글이 없습니다.</p></div>';
-        } else {
-            let itemsHtml = '';
-            pageData.list.forEach(post => {
-                const formattedDate = post.crtDt ? new Date(post.crtDt).toISOString().split('T')[0] : '';
-                itemsHtml += `
-                    <div class="post-item">
-                        <h6 class="mb-1 text-truncate"><a href="/customer/post/postView?pstSn=${post.pstSn}">${post.pstTtl}</a></h6>
-                        <small class="text-muted">${post.userNcnm} | ${formattedDate}</small>
-                        <p class="text-truncate-2">${post.pstCn}</p>
-                    </div>`;
-            });
-            contentHtml = `<div id="postPreviewContainer">${itemsHtml}</div>`;
-        }
+     function renderPosts(container, pageData) {
+    	    let contentHtml;
+    	    if (!pageData.list || pageData.list.length === 0) {
+    	        contentHtml = '<div class="post-item"><p class="text-center w-100">검색된 게시글이 없습니다.</p></div>';
+    	    } else {
+    	        let itemsHtml = '';
+    	        pageData.list.forEach(post => {
+    	            const formattedDate = post.crtDt ? new Date(post.crtDt).toISOString().split('T')[0] : '';
+    	            itemsHtml += `
+    	                <div class="post-item">
+    	                    <h6 class="mb-1 text-truncate"><a href="/customer/post/postView?pstSn=${post.pstSn}">${post.pstTtl}</a></h6>
+    	                    <small class="text-muted">${post.userNcnm} | ${formattedDate}</small>
+    	                    <p class="text-truncate-2">${post.pstCn}</p>
+    	                </div>`;
+    	        });
+    	        contentHtml = `<div id="postPreviewContainer">${itemsHtml}</div>`;
+    	    }
 
-        container.innerHTML = `
-            <div class="card-body search-results-card py-4 px-4">
-                ${contentHtml}
-                <div class="card-footer search-etc py-4 px-4 bg-white text-center">
-                    ${renderPagination(pageData)}
-                </div>
-            </div>
-        `;
-    }
+    	    // ✅ [구조 수정] card-footer를 card-body 밖으로 빼내어 다른 탭과 구조를 통일합니다.
+    	    container.innerHTML = `
+    	        <div class="card-body search-results-card py-4 px-4">
+    	            ${contentHtml}
+    	        </div>
+    	        <div class="card-footer search-etc py-4 px-4 bg-white d-flex justify-content-center">
+    	            ${renderPagination(pageData)}
+    	        </div>
+    	    `;
+    	}
     
     /**
      * 3. 사용자 목록을 그리는 함수
      */
-    function renderUsers(container, pageData) {
-        let contentHtml;
-        if (!pageData.list || pageData.list.length === 0) {
-            contentHtml = '<div class="no-results"><p class="text-center w-100">검색된 사용자가 없습니다.</p></div>';
-        } else {
-            let itemsHtml = '';
-            pageData.list.forEach(user => {
-                const profileImagePath = user.prflImg && user.prflImg.trim() !== "" 
-                    ? user.prflImg : '/maincss/assets/images/default_user.png';
-                itemsHtml += `
-                    <div class="card h-100 search-result-user-card">
-                	<a href="/customer/feed/feedListByUserNo/${user.userNo}">
-                           <img src="${profileImagePath}" class="rounded-circle mx-auto mt-3 search-profile-img" alt="프로필" style="width: 80px; height: 80px; object-fit: cover;"
-                                onerror="this.onerror=null; this.src='/maincss/assets/images/default_user.png';">
-                        </a>
-                        <div class="card-body text-center">
-                            <h6 class="card-title mb-0 text-truncate">
-                         	   <a href="/customer/feed/feedListByUserNo/${user.userNo}">${user.userNcnm}</a>
-                            </h6>
-                            <small class="text-muted">${user.userLgnId}</small>
-                        </div>
-                    </div>`;
-            });
-            contentHtml = `<div class="product-grid-container">${itemsHtml}</div>`;
-        }
+     function renderUsers(container, pageData) {
+    	    let contentHtml;
+    	    if (!pageData.list || pageData.list.length === 0) {
+    	        contentHtml = '<div class="no-results"><p class="text-center w-100">검색된 사용자가 없습니다.</p></div>';
+    	    } else {
+    	        let itemsHtml = '';
+    	        pageData.list.forEach(user => {
+    	            const profileImagePath = user.prflImg && user.prflImg.trim() !== "" 
+    	                ? user.prflImg : '/maincss/assets/images/default_user.png';
+    	            itemsHtml += `
+    	                <div class="card h-100 search-result-user-card">
+    	                    <a href="/customer/feed/feedListByUserNo/${user.userNo}">
+    	                       <img src="${profileImagePath}" class="rounded-circle mx-auto mt-3 search-profile-img" alt="프로필" style="width: 80px; height: 80px; object-fit: cover;"
+    	                            onerror="this.onerror=null; this.src='/maincss/assets/images/default_user.png';">
+    	                    </a>
+    	                    <div class="card-body text-center">
+    	                        <h6 class="card-title mb-0 text-truncate">
+    	                           <a href="/customer/feed/feedListByUserNo/${user.userNo}">${user.userNcnm}</a>
+    	                        </h6>
+    	                        <!-- ✅ [핵심 수정] d-block 클래스를 추가하여 small 태그를 블록 요소로 만듭니다. -->
+    	                        <p class="text-muted search-result-userid">${user.userLgnId}</p>
+    	                    </div>
+    	                </div>`;
+    	        });
+    	        contentHtml = `<div class="product-grid-container">${itemsHtml}</div>`;
+    	    }
 
-        container.innerHTML = `
-            <div class="card shadow-sm search-results-card">
-                <div class="card-body py-4 px-4">
-                    ${contentHtml}
-                </div>
-                <div class="card-footer search-etc py-4 px-4 bg-white text-center">
-                    ${renderPagination(pageData)}
-                </div>
-            </div>
-        `;
-    }
+    	    container.innerHTML = `
+    	        <div class="card shadow-sm search-results-card">
+    	            <div class="card-body py-4 px-4">
+    	                ${contentHtml}
+    	            </div>
+    	            <!-- ✅ [핵심 수정] text-center 대신 d-flex와 justify-content-center 클래스를 추가합니다. -->
+    	            <div class="card-footer search-etc py-4 px-4 bg-white d-flex justify-content-center">
+    	                ${renderPagination(pageData)}
+    	            </div>
+    	        </div>
+    	    `;
+    	}
 
 /* ]]> */
 </script>

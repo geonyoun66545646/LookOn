@@ -8,9 +8,10 @@ public interface OrderService {
      * @param userNo 사용자 식별자
      * @return 결제정보, 주문정보, 상품목록을 포함하는 Map
      */
-    Map<String, Object> getLatestOrderDetailsForUser(String userNo);
+	Map<String, Object> getLatestOrderDetailsForUser(String userNo);
     
     String createOrder(Map<String, Object> orderData);
     
     void saveOrder(Map<String, Object> orderData);
+    
 }

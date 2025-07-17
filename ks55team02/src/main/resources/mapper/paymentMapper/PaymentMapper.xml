@@ -18,7 +18,7 @@
         <result column="stlm_dmnd_dt"   property="stlmDmndDt"/>
     </resultMap>
     
-    <resultMap type="ks55team02.tossApi.domain.OrderDTO" id="orderResultMap">
+    <resultMap type="ks55team02.tossApi.domain.PayOrderDTO" id="payorderResultMap">
         <id     column="ordr_no"        	property="ordrNo"/>
         <result column="user_no"        	property="userNo"/>
         <result column="ordr_dt"        	property="ordrDt"/>
@@ -39,7 +39,7 @@
     </resultMap>
     
     <!-- <<<<<<<<< [추가됨] OrderItemsDTO에 대한 resultMap >>>>>>>>> -->
-    <resultMap type="ks55team02.tossApi.domain.OrderItemsDTO" id="orderItemsResultMap">
+    <resultMap type="ks55team02.tossApi.domain.PayOrderItemsDTO" id="payorderItemsResultMap">
         <id     column="ordr_dtl_artcl_no"  property="ordrDtlArtclNo"/>
         <result column="ordr_no"            property="ordrNo"/>
         <result column="opt_no"             property="optNo"/>
@@ -112,7 +112,7 @@
     <!-- <<<<<<<<< [위치변경 및 추가] ID 생성 쿼리 섹션 끝 >>>>>>>>> -->
 
     <!-- <<<<<<<<< [위치변경 및 추가] 주문 (Orders) 관련 쿼리 섹션 >>>>>>>>> -->
-    <insert id="insertOrder" parameterType="ks55team02.tossApi.domain.OrderDTO">
+    <insert id="insertOrder" parameterType="ks55team02.tossApi.domain.PayOrderDTO">
 	    INSERT INTO orders (
 	        ordr_no, user_no, ordr_dt, gds_tot_amt, dlvy_fee_amt, pblcn_cpn_id,
 	        user_cpn_id, apld_cpn_dscnt_amt, last_stlm_amt, ordr_stts_cd,
@@ -135,11 +135,11 @@
     <update id="updateOrderStatus" parameterType="map">
         UPDATE orders
            SET ordr_stts_cd = #{status}
-         WHERE ordr_no = #{orderId}
+         WHERE ordr_no = #{ordrNo}
     </update>
     
     <!-- <<<<<<<<< [추가됨] 주문 ID로 주문 상세 정보를 조회 (orders 테이블) >>>>>>>>> -->
-    <select id="getOrderDetailsByOrderId" parameterType="String" resultMap="orderResultMap">
+    <select id="getOrderDetailsByOrderId" parameterType="String" resultMap="payorderResultMap">
         SELECT
             ordr_no, user_no, ordr_dt, gds_tot_amt, dlvy_fee_amt, pblcn_cpn_id,
             user_cpn_id, apld_cpn_dscnt_amt, last_stlm_amt, ordr_stts_cd,
@@ -148,7 +148,7 @@
         FROM
             orders o
         WHERE
-            ordr_no = #{orderId}
+            ordr_no = #{ordrNo}
     </select>
 
     <!-- <<<<<<<<< [추가됨] 주문 ID로 주문 항목(상품 및 옵션) 상세 정보를 조회 (order_items 테이블) >>>>>>>>> -->
@@ -171,7 +171,7 @@
         LEFT JOIN
             product_options po ON oi.opt_no = po.opt_no
         WHERE
-            oi.ordr_no = #{orderId}
+            oi.ordr_no = #{ordrNo}
         ORDER BY
             oi.ordr_dtl_artcl_no ASC
     </select>

@@ -50,7 +50,9 @@ public class WebConfig implements WebMvcConfigurer{
         String os = System.getProperty("os.name").toLowerCase();
         
         if(os.contains("win")) {
+
             rootPath = "file:///C"; // Windows 접두사
+
         }
         
         return rootPath;
