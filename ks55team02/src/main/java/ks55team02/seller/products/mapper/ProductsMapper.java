@@ -23,7 +23,12 @@ public interface ProductsMapper {
 	void insertProductStatus(ProductStatus productStatus);
 	void insertStatusOptionMapping(StatusOptionMapping mapping);
 	
-	// ⭐⭐⭐⭐⭐ [추가 시작] ⭐⭐⭐⭐⭐
+	/**
+     * 특정 상품의 모든 옵션 조합(gds_stts_no)과 그에 속한 옵션 값(opt_vl_no)들을 조회
+     * @param gdsNo 상품 코드
+     * @return 옵션 조합과 값 매핑 정보 리스트
+     */
+    public List<Map<String, Object>> selectProductStatusOptions(String gdsNo);
 
     /**
      * 특정 이미지의 순서(img_indct_sn)를 업데이트합니다.

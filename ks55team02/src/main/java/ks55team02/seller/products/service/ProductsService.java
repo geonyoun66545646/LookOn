@@ -6,6 +6,7 @@ import ks55team02.seller.products.domain.ProductOptionValue;
 import ks55team02.seller.stores.domain.Stores; // Stores 도메인 import 확인
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 상품 관련 비즈니스 로직을 정의하는 서비스 인터페이스입니다.
@@ -13,6 +14,13 @@ import java.util.List;
  */
 public interface ProductsService {
 	
+	/**
+     * 특정 상품의 모든 옵션 조합(gds_stts_no)과 그에 속한 옵션 값(opt_vl_no)들을 조회
+     * @param gdsNo 상품 코드
+     * @return 옵션 조합과 값 매핑 정보 리스트
+     */
+    public List<Map<String, Object>> getProductStatusOptions(String gdsNo);
+    
 	/**
      * 키워드로 브랜드를 검색합니다.
      * @param keyword 검색어

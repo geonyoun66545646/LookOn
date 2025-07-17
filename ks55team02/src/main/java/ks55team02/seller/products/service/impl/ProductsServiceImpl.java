@@ -36,6 +36,14 @@ public class ProductsServiceImpl implements ProductsService {
 	private final FilesUtils filesUtils;
 	private final AdminProductManagementMapper adminProductManagementMapper;
 	
+	/**
+     * 특정 상품의 모든 옵션 조합(gds_stts_no)과 그에 속한 옵션 값(opt_vl_no)들을 조회
+     */
+    @Override
+    public List<Map<String, Object>> getProductStatusOptions(String gdsNo) {
+        return productsMapper.selectProductStatusOptions(gdsNo);
+    }
+	
 	@Override
 	public Stores getStoreByStoreId(String storeId) {
 	    return storeMapper.getStoreById(storeId); // ⭐ 이 메서드를 추가합니다.
