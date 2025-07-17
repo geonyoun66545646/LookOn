@@ -92,18 +92,7 @@
                                 <button type="submit" class="btn btn-primary btn-block" id="searchBtn">검색</button>
                             </div>
                         </div>
-                        <div class="row gx-2 mt-2">
-                            <div class="col-sm-auto mb-2">
-                                <label for="dateRange" class="form-label visually-hidden">날짜 범위</label>
-                                <select id="dateRange" class="form-select">
-                                    <option value="">날짜 범위 선택</option>
-                                    <option value="today">오늘</option>
-                                    <option value="1week">1주</option>
-                                    <option value="1month">1개월</option>
-                                </select>
-                            </div>
-                            </div>
-                    </form>
+                        </form>
                 </div>
             </div>
 
@@ -226,10 +215,10 @@
         const filterConditionsInput = $('#filterConditionsInput');
         const startDateInput = $('#startDate');
         const endDateInput = $('#endDate');
-        const dateRangeSelect = $('#dateRange');
+        // const dateRangeSelect = $('#dateRange'); // 제거됨
         const sortOrderSelect = $('#sortOrderSelect');
-        const inquiryTargetRadio = $('.inquiry-target-radio'); // 문의 대상 라디오 버튼 그룹
-        const inquiryTargetTypeInput = $('#inquiryTargetTypeInput'); // 문의 대상 hidden input
+        const inquiryTargetRadio = $('.inquiry-target-radio'); 
+        const inquiryTargetTypeInput = $('#inquiryTargetTypeInput'); 
 
         // 검색 폼 제출 함수
         function submitSearchForm() {
@@ -246,7 +235,6 @@
             filterConditionsInput.val(selectedStatuses.join(','));
             console.log("1. 필터 조건 (filterConditionsInput):", filterConditionsInput.val());
 
-            // 선택된 '문의 대상' 라디오 버튼의 값을 hidden input에 설정
             const selectedInquiryTargetValue = $('input[name="inquiryTargetRadio"]:checked').val();
             inquiryTargetTypeInput.val(selectedInquiryTargetValue);
             console.log("2. 선택된 문의 대상 라디오 값 (selectedInquiryTargetValue):", selectedInquiryTargetValue);
@@ -317,43 +305,15 @@
             submitSearchForm();
         });
 
-        // 날짜 범위 선택 시
-        dateRangeSelect.on('change', function() {
-            const range = $(this).val();
-            const today = new Date();
-            let newStartDate = '';
-            let newEndDate = '';
+        // 날짜 범위 선택 드롭박스 (dateRangeSelect)와 관련된 모든 로직이 제거됨
 
-            if (range === 'today') {
-                newStartDate = formatDate(today);
-                newEndDate = formatDate(today);
-            } else if (range === '1week') {
-                const oneWeekAgo = new Date(today);
-                oneWeekAgo.setDate(today.getDate() - 7);
-                newStartDate = formatDate(oneWeekAgo);
-                newEndDate = formatDate(today);
-            } else if (range === '1month') {
-                const oneMonthAgo = new Date(today);
-                oneMonthAgo.setMonth(today.getMonth() - 1);
-                newStartDate = formatDate(oneMonthAgo);
-                newEndDate = formatDate(today);
-            }
-            if (range === '') {
-                newStartDate = '';
-                newEndDate = '';
-            }
-
-            startDateInput.val(newStartDate);
-            endDateInput.val(newEndDate);
-            submitSearchForm(); // 날짜 범위 선택 시 바로 검색
-        });
-
-        function formatDate(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
+        // formatDate 함수는 더 이상 사용되지 않지만, 다른 곳에서 필요할 경우를 대비해 남겨둘 수 있습니다.
+        // function formatDate(date) {
+        //     const year = date.getFullYear();
+        //     const month = String(date.getMonth() + 1).padStart(2, '0');
+        //     const day = String(date.getDate()).padStart(2, '0');
+        //     return `${year}-${month}-${day}`;
+        // }
 
         // 문의 대상 라디오 버튼 선택 시 폼 제출
         inquiryTargetRadio.on('change', function() {
