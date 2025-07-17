@@ -4,25 +4,41 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
   <mapper namespace="ks55team02.orderProduct.mapper.OrderProductsMapper">
-      <resultMap type="ks55team02.orderProduct.domain.OrderDTO" id="orderResultMap">
-        <id     column="ordr_no"        	property="ordrNo"/>
-        <result column="user_no"        	property="userNo"/>
-        <result column="ordr_dt"        	property="ordrDt"/>
-        <result column="gds_tot_amt"    	property="gdsTotAmt"/>
-        <result column="dlvy_fee_amt"       property="dlvyFeeAmt"/>
-        <result column="pblcn_cpn_id"       property="pblcnCpnId"/>
-        <result column="user_cpn_id"       	property="userCpnId"/>
-        <result column="apld_cpn_dscnt_amt" property="apldCpnDscntAmt"/>
-        <result column="last_stlm_amt"      property="lastStlmAmt"/>
-       	<result column="ordr_stts_cd"   	property="ordrSttsCd"/>
-        <result column="rcvr_nm"     		property="rcvrNm"/>
-        <result column="rcvr_telno"     	property="rcvrTelno"/>
-        <result column="dlvy_addr"    		property="dlvyAddr"/>
-        <result column="dlvy_daddr"  		property="dlvyDaddr"/>
-        <result column="zip"   				property="zip"/>
-        <result column="dlvy_memo_cn"   	property="dlvyMemoCn"/>
-        <result column="user_name"   		property="userName"/>
-    </resultMap>
+       <resultMap type="ks55team02.orderProduct.domain.OrderDTO" id="orderResultMap">
+	        <id     column="ordr_no"        	property="ordrNo"/>
+	        <result column="user_no"        	property="userNo"/>
+	        <result column="ordr_dt"        	property="ordrDt"/>
+	        <result column="gds_tot_amt"    	property="gdsTotAmt"/>
+	        <result column="dlvy_fee_amt"       property="dlvyFeeAmt"/>
+	        <result column="pblcn_cpn_id"       property="pblcnCpnId"/>
+	        <result column="user_cpn_id"       	property="userCpnId"/>
+	        <result column="apld_cpn_dscnt_amt" property="apldCpnDscntAmt"/>
+	        <result column="last_stlm_amt"      property="lastStlmAmt"/>
+	       	<result column="ordr_stts_cd"   	property="ordrSttsCd"/>
+	        <result column="rcvr_nm"     		property="rcvrNm"/>
+	        <result column="rcvr_telno"     	property="rcvrTelno"/>
+	        <result column="dlvy_addr"    		property="dlvyAddr"/>
+	        <result column="dlvy_daddr"  		property="dlvyDaddr"/>
+	        <result column="zip"   				property="zip"/>
+	        <result column="dlvy_memo_cn"   	property="dlvyMemoCn"/>
+	        <result column="user_name"   		property="userName"/>
+	        <result column="eml_addr"			property="emlAddr"/>
+	        <result column="gds_nm"				property="gdsNm" />
+	    </resultMap>
+	    
+	    <!-- ================================== 배송 관련 ================================== -->
+	    <resultMap type="ks55team02.orderProduct.domain.ShipmentDTO" id="shipmentResultMap" >
+	        <id 	column="dlvy_no"			property="dlvyNo"/>
+	        <result column="ordr_no"			property="ordrNo"/>
+	        <result column="stlm_id"			property="stlmId"/>
+	        <result column="dlvy_co_nm"  		property="dlvyCoNm"/>
+	        <result column="waybil_no"			property="waybilNo"/>
+	        <result column="dlvy_stts_cd"		property="dlvySttsCd"/>
+	        <result column="sndng_dt"			property="sndngDt"/>
+	        <result column="dlvy_cmptn_dt"		property="dlvyCmptnDt"/>
+	        <result column="dlvy_info_crt_dt"	property="dlvyInfoCrtDt"/>
+	        <result column="dlvy_info_mdfcn_dt"	property="dlvyInfoMdfcnDt"/>
+	    </resultMap>
     
     <!-- [추가] 'ORD' + '날짜' + '일련번호' 형식의 다음 주문 번호를 조회 / 새로운 주문 번호를 생성 -->
 	<select id="selectNextOrderId" resultType="String">
@@ -47,31 +63,31 @@
         LIMIT 1
     </select>
   		
-  	<select id="getCombinedOrderDetailsByOrderId" parameterType="String" resultType="Map">
+  	<select id="getCombinedOrderDetailsByOrderId" parameterType="String" resultMap="orderResultMap">
         SELECT
-            o.ordr_no               AS orderId,      	 -- 주문번호
-            o.last_stlm_amt         AS totalAmount,  	 -- 최종 결제 금액
-            o.ordr_dt               AS approvedAt,   	 -- 주문일시를 결제 승인일시로 사용
-          	o.rcvr_nm               AS rcvrNm,           -- 수령인 이름
-            o.dlvy_addr             AS dlvyAddr,         -- 배송 주소
-            o.dlvy_daddr            AS dlvyDaddr,        -- 배송 상세 주소
-            o.zip                   AS zip,              -- 우편번호
-            o.rcvr_telno            AS rcvrTelno,        -- 수령인 연락처
-            o.user_name             AS userName,         -- 주문자 이름 (수령인과 다를 수 있음)
-            o.dlvy_memo_cn          AS dlvyMemoCn,       -- 배송 메모
-            o.gds_tot_amt           AS gdsTotAmt,        -- 상품 총액 (할인 전)
-            o.dlvy_fee_amt          AS dlvyFeeAmt,       -- 배송비
-            o.apld_cpn_dscnt_amt    AS apldCpnDscntAmt,  -- 쿠폰 할인 금액
-            u.eml_addr              AS userEmail        -- 주문자 이메일 (users 테이블에서 JOIN)
+            o.ordr_no,            	-- 주문번호
+            o.last_stlm_amt,        -- 최종 결제 금액
+            o.ordr_dt,              -- 주문일시를 결제 승인일시로 사용
+          	o.rcvr_nm,              -- 수령인 이름
+            o.dlvy_addr,            -- 배송 주소
+            o.dlvy_daddr,           -- 배송 상세 주소
+            o.zip,                  -- 우편번호
+            o.rcvr_telno,           -- 수령인 연락처
+            o.user_name,            -- 주문자 이름 (수령인과 다를 수 있음)
+            o.dlvy_memo_cn,         -- 배송 메모
+            o.gds_tot_amt,          -- 상품 총액 (할인 전)
+            o.dlvy_fee_amt,         -- 배송비
+            o.apld_cpn_dscnt_amt,   -- 쿠폰 할인 금액
+            u.eml_addr             -- 주문자 이메일 (users 테이블에서 JOIN)
         FROM
             orders o
         INNER JOIN
             users u ON o.user_no = u.user_no
         WHERE
-            o.ordr_no = #{orderId}
+            o.ordr_no = #{ordrNo}
     </select>
     
-    <select id="getOrderedProductsByOrderId" parameterType="String" resultType="Map">
+    <select id="getOrderedProductsByOrderId" parameterType="String" resultMap="orderResultMap">
         SELECT
             p.gds_nm                            AS name,      -- 상품명
             oi.ordr_qntty                       AS quantity,  -- 주문 수량
@@ -84,22 +100,9 @@
         WHERE
             oi.ordr_no = #{orderId}
     </select>
-    
-<!-- ================================== 배송 관련 ================================== -->
-
-    <!-- Result Map: ShipmentDTO와 shipments 테이블 컬럼 매핑 -->
-    <resultMap id="shipmentResultMap" type="ks55team02.orderProduct.domain.ShipmentDTO"> <!-- 당신의 DTO 패키지 경로에 맞게 수정하세요. -->
-        <id 	property="dlvyNo" 			column="dlvy_no"/>
-        <result property="ordrNo" 			column="ordr_no"/>
-        <result property="stlmId" 			column="stlm_id"/>
-        <result property="dlvyCoNm" 		column="dlvy_co_nm"/>
-        <result property="waybilNo" 		column="waybil_no"/>
-        <result property="dlvySttsCd" 		column="dlvy_stts_cd"/>
-        <result property="sndngDt" 			column="sndng_dt"/>
-        <result property="dlvyCmptnDt" 		column="dlvy_cmptn_dt"/>
-        <result property="dlvyInfoCrtDt" 	column="dlvy_info_crt_dt"/>
-        <result property="dlvyInfoMdfcnDt" 	column="dlvy_info_mdfcn_dt"/>
-    </resultMap>
+ 
+ 
+ 
 
     <!-- 새로운 배송 정보 등록 -->
     <insert id="insertShipment" parameterType="ks55team02.orderProduct.domain.ShipmentDTO">

@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import ks55team02.tossApi.mapper.PaymentMapper;
 import ks55team02.tossApi.service.PaymentService;
-import ks55team02.tossApi.domain.OrderDTO;
+import ks55team02.tossApi.domain.PayOrderDTO;
 import ks55team02.tossApi.domain.PaymentDTO;
 import ks55team02.tossApi.domain.PaymentHistoryDTO;
 
@@ -67,9 +67,9 @@ public class PaymentServiceImpl implements PaymentService {
             // ===========================================
             // 1. orders 테이블에 주문 정보 저장 (OrderDTO 사용)
             // ===========================================
-            OrderDTO orderDTO = new OrderDTO();
-            String orderNo = paymentMapper.selectNextOrderId(); 
-            orderDTO.setOrdrNo(orderNo);
+            PayOrderDTO payorderDTO = new PayOrderDTO();
+            String ordrNo = paymentMapper.selectNextOrderId(); 
+            payorderDTO.setOrdrNo(ordrNo);
             
             // userNo는 세션 등에서 받아오거나 orderData에 추가되어야 합니다.
             // 현재 로그에는 userNo가 보이지 않으므로, 임시로 null 처리되거나,
@@ -77,46 +77,46 @@ public class PaymentServiceImpl implements PaymentService {
             // 예: orderDTO.setUserNo((String) orderData.get("userNo"));
             // 현재 로그 상의 orderData에는 userNo 키가 없습니다. 로그인 구현에 따라 추가 필요.
             // 만약 프론트엔드에서 userNo를 보내준다면 아래와 같이 사용 가능.
-            orderDTO.setUserNo((String) orderData.get("userNo")); // <-- userNo 키가 없으면 null 됨.
+            payorderDTO.setUserNo((String) orderData.get("userNo")); // <-- userNo 키가 없으면 null 됨.
                                                                   // 실제 UserNo를 가져오는 로직 (예: 세션에서)이 필요합니다.
 
-            orderDTO.setOrdrDt(LocalDateTime.now());
+            payorderDTO.setOrdrDt(LocalDateTime.now());
             
             // 금액 정보 매핑 (프론트엔드에서 totalAmount로 오므로 매핑 조정)
             // totalAmount를 lastStlmAmt (최종 결제 금액) 및 gdsTotAmt (상품 총액)으로 매핑
             Object totalAmountObj = orderData.get("totalAmount"); // 프론트에서 totalAmount로 넘어옴
             BigDecimal totalAmount = totalAmountObj != null ? new BigDecimal(totalAmountObj.toString()) : BigDecimal.ZERO;
             
-            orderDTO.setGdsTotAmt(totalAmount); // 상품 총액 (임시로 totalAmount와 동일하게 설정)
-            orderDTO.setDlvyFeeAmt(new BigDecimal(orderData.getOrDefault("deliveryFee", 0).toString())); // 배송비 (프론트에서 deliveryFee로 올 경우)
+            payorderDTO.setGdsTotAmt(totalAmount); // 상품 총액 (임시로 totalAmount와 동일하게 설정)
+            payorderDTO.setDlvyFeeAmt(new BigDecimal(orderData.getOrDefault("deliveryFee", 0).toString())); // 배송비 (프론트에서 deliveryFee로 올 경우)
             
-            orderDTO.setPblcnCpnId((String) orderData.get("pblcnCpnId")); 
-            orderDTO.setUserCpnId((String) orderData.get("userCpnId"));
-            orderDTO.setApldCpnDscntAmt(new BigDecimal(orderData.getOrDefault("discountAmount", 0).toString())); // 할인 금액
+            payorderDTO.setPblcnCpnId((String) orderData.get("pblcnCpnId")); 
+            payorderDTO.setUserCpnId((String) orderData.get("userCpnId"));
+            payorderDTO.setApldCpnDscntAmt(new BigDecimal(orderData.getOrDefault("discountAmount", 0).toString())); // 할인 금액
             
-            orderDTO.setLastStlmAmt(totalAmount); // 최종 결제 금액 (totalAmount와 동일하게 설정)
+            payorderDTO.setLastStlmAmt(totalAmount); // 최종 결제 금액 (totalAmount와 동일하게 설정)
 
-            orderDTO.setOrdrSttsCd("CREATED");
+            payorderDTO.setOrdrSttsCd("CREATED");
 
             Map<String, Object> shippingAddress = (Map<String, Object>) orderData.get("shippingAddress");
             if (shippingAddress != null) {
-                orderDTO.setRcvrNm((String) shippingAddress.get("recipientName"));
+            	payorderDTO.setRcvrNm((String) shippingAddress.get("recipientName"));
                 // 프론트에서 'phone'으로 넘어옴, 백엔드는 'rcvrTelno' 기대
-                orderDTO.setRcvrTelno((String) shippingAddress.get("phone")); 
-                orderDTO.setDlvyAddr((String) shippingAddress.get("address"));
+            	payorderDTO.setRcvrTelno((String) shippingAddress.get("phone")); 
+            	payorderDTO.setDlvyAddr((String) shippingAddress.get("address"));
                 // 'detailAddress'는 프론트에서 넘어오지 않음. (null 유지 또는 프론트에서 추가 필요)
-                orderDTO.setDlvyDaddr((String) shippingAddress.get("detailAddress")); 
+            	payorderDTO.setDlvyDaddr((String) shippingAddress.get("detailAddress")); 
                 // 프론트에서 'postcode'로 넘어옴, 백엔드는 'zip' 기대
-                orderDTO.setZip((String) shippingAddress.get("postcode")); 
+            	payorderDTO.setZip((String) shippingAddress.get("postcode")); 
                 // 프론트에서 'deliveryRequest'로 넘어옴, 백엔드는 'dlvyMemoCn' 기대
-                orderDTO.setDlvyMemoCn((String) shippingAddress.get("deliveryRequest"));
+            	payorderDTO.setDlvyMemoCn((String) shippingAddress.get("deliveryRequest"));
             }
             // 프론트에서 'customerName'으로 넘어옴, 백엔드는 'userName' 기대
-            orderDTO.setUserName((String) orderData.get("customerName")); 
+            payorderDTO.setUserName((String) orderData.get("customerName")); 
 
-            log.info("orders 테이블에 주문 정보 INSERT 시도: {}", orderDTO);
-            paymentMapper.insertOrder(orderDTO); 
-            log.info("orders 테이블에 주문 정보 삽입 완료. 주문 번호: {}", orderNo);
+            log.info("orders 테이블에 주문 정보 INSERT 시도: {}", payorderDTO);
+            paymentMapper.insertOrder(payorderDTO); 
+            log.info("orders 테이블에 주문 정보 삽입 완료. 주문 번호: {}", ordrNo);
 
             // ===========================================
             // 2. order_items 테이블에 주문 상품 상세 정보 저장 (Map 사용)
@@ -124,7 +124,7 @@ public class PaymentServiceImpl implements PaymentService {
             List<Map<String, Object>> products = (List<Map<String, Object>>) orderData.get("products");
             if (products != null && !products.isEmpty()) {
                 for (Map<String, Object> product : products) {
-                    product.put("ordrNo", orderNo);
+                    product.put("ordrNo", ordrNo);
                     product.put("ordrDtlArtclNo", paymentMapper.selectNextOrderItemId());
 
                     // 각 필드에 대해 null 체크 및 적절한 형변환 (예: 숫자 필드)
@@ -159,17 +159,17 @@ public class PaymentServiceImpl implements PaymentService {
             PaymentDTO paymentDTO = new PaymentDTO();
             String stlmId = paymentMapper.selectNextPaymentId();
             paymentDTO.setStlmId(stlmId);
-            paymentDTO.setOrdrNo(orderNo);
-            paymentDTO.setUserNo(orderDTO.getUserNo()); // orderDTO에서 userNo 가져오기
+            paymentDTO.setOrdrNo(ordrNo);
+            paymentDTO.setUserNo(payorderDTO.getUserNo()); // orderDTO에서 userNo 가져오기
             
             // stlmMthdCd는 프론트엔드에서 어떤 방식으로 넘어오는지 확인 후 매핑 필요.
             // 현재 로그에는 'method' 키가 없으므로 null이 됩니다. (프론트에서 제공 필요)
             paymentDTO.setStlmMthdCd((String) orderData.get("method")); 
-            paymentDTO.setStlmAmt(orderDTO.getLastStlmAmt()); // 최종 결제 금액 사용
+            paymentDTO.setStlmAmt(payorderDTO.getLastStlmAmt()); // 최종 결제 금액 사용
             paymentDTO.setStlmSttsCd("READY");
             
             // pgDlngId는 백엔드에서 생성한 주문번호 (orderNo)로 설정
-            paymentDTO.setPgDlngId(orderNo); // orderId 대신 백엔드 생성 주문번호 사용
+            paymentDTO.setPgDlngId(ordrNo); // orderId 대신 백엔드 생성 주문번호 사용
             
             paymentDTO.setPgCoInfo("Toss Payments");
             paymentDTO.setStlmDmndDt(LocalDateTime.now());
@@ -191,7 +191,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentMapper.insertPaymentHistory(historyDTO); 
             log.info("payment_history 테이블에 결제 이력 삽입 완료. 이력 ID: {}", historyDTO.getStlmHstryId());
 
-            orderData.put("generatedOrdrNo", orderNo);
+            orderData.put("generatedOrdrNo", ordrNo);
             orderData.put("generatedStlmId", stlmId);
 
         } catch (Exception e) {
@@ -290,7 +290,7 @@ public class PaymentServiceImpl implements PaymentService {
             // ===========================================
             // 4. (선택 사항) 사용된 쿠폰 상태를 '사용됨'으로 업데이트
             // ===========================================
-            OrderDTO orderDetails = paymentMapper.getOrderDetailsByOrderId(orderId); 
+            PayOrderDTO orderDetails = paymentMapper.getOrderDetailsByOrderId(orderId); 
             if (orderDetails != null && orderDetails.getUserCpnId() != null && !orderDetails.getUserCpnId().isEmpty()) {
                 String userCpnId = orderDetails.getUserCpnId();
                 paymentMapper.updateUserCouponToUsed(userCpnId); 

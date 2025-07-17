@@ -19,5 +19,7 @@ public class Answer {
     private String 					delDt; // 삭제(비활성) 일시 (LocalDateTime으로 변경 고려, 현재는 String으로 유지)
     private String 					delUserNo; // 삭제한 관리자 번호
 
+    // 답변자의 스토어 이름을 저장할 필드 추가
+    private String 					answrStoreName;
 
 }

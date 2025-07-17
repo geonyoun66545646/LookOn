@@ -1,6 +1,5 @@
 package ks55team02.tossApi.controller;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +71,12 @@ public class PaymentController {
             errorBody.put("error", "로그인이 필요합니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorBody);
         }
+        
+     // 로그인한 사용자의 userNo를 orderData에 추가합니다.
+        String userNo = loginUser.getUserNo(); // LoginUser 객체에서 사용자 번호를 가져오는 실제 메서드를 사용하세요.
+                                                // 예: loginUser.getMemberId(), loginUser.getUserNo() 등
+        orderData.put("userNo", userNo);
+        log.info("orderData에 userNo 추가됨: {}", userNo);
         
         try {
             String orderId = paymentService.createOrder(orderData); // 주문 정보 저장 및 ID 생성
