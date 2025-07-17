@@ -19,6 +19,10 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
     private final ProductSearchMapper productSearchMapper;
     
+    @Override
+    public List<ProductCategory> getSubCategoriesWithProductsByBrand(String upCtgryNo, String storeId) {
+        return productSearchMapper.getSubCategoriesWithProductsByBrand(upCtgryNo, storeId);
+    }
     
     @Override
     public List<ProductCategory> getTopLevelCategoriesByStoreId(String storeId) {
@@ -81,7 +85,10 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
     @Override
     public Map<String, Object> getFilteredAndSortedProducts(String categoryId, String sortBy, Map<String, Object> filterParams, int currentPage) {
-    	Map<String, Object> paramMap = processFilterParams(filterParams);
+        // ⭐⭐ 핵심 수정: filterParams를 그대로 복사하여 모든 필터 조건을 유지합니다. ⭐⭐
+        Map<String, Object> paramMap = new HashMap<>(filterParams);
+        
+        // categoryId와 sortBy는 매개변수로 직접 받으므로, 맵에 다시 한번 설정해줍니다.
         paramMap.put("categoryId", categoryId);
         paramMap.put("sortBy", sortBy);
         
@@ -91,10 +98,10 @@ public class ProductSearchServiceImpl implements ProductSearchService {
         paramMap.put("pageSize", pageSize);
         paramMap.put("offset", offset);
         
+        // 이후 로직은 모두 동일합니다.
         long totalProductsCount = productSearchMapper.countFilteredProducts(paramMap);
         List<Products> productsList = productSearchMapper.getFilteredAndSortedProducts(paramMap);
         int lastPage = (int) Math.ceil((double) totalProductsCount / pageSize);
-
 
         Map<String, Object> result = new HashMap<>();
         result.put("productsList", productsList);
