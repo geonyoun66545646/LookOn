@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -132,6 +134,54 @@ public class FeedRestController {
             return ResponseEntity.status(HttpStatus.CREATED).body(newComment);
         } catch (Exception e) {
             log.error("댓글 작성 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    // [신규] 댓글 삭제 API
+    @DeleteMapping("/comments/{commentSn}")
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable String commentSn,
+            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
+        
+        // 1. 비로그인 사용자 차단
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        // 2. 서비스 호출하여 삭제 시도
+        boolean isDeleted = feedService.deleteComment(commentSn, loginUser.getUserNo());
+
+        if (isDeleted) {
+            // 3. 삭제 성공 시: 204 No Content (성공했지만 본문에 보낼 내용 없음)
+            return ResponseEntity.noContent().build();
+        } else {
+            // 4. 삭제 실패 시 (권한 없음 등): 403 Forbidden
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+    // [신규] 댓글 수정 API
+    @PatchMapping("/comments/{commentSn}")
+    public ResponseEntity<?> updateComment(
+            @PathVariable String commentSn,
+            @RequestParam("commentText") String commentText,
+            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
+        
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (commentText == null || commentText.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("댓글 내용이 없습니다.");
+        }
+
+        try {
+            FeedComment updatedComment = feedService.updateComment(commentSn, commentText, loginUser.getUserNo());
+            if (updatedComment != null) {
+                return ResponseEntity.ok(updatedComment); // 수정 성공
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 권한 없음
+            }
+        } catch (Exception e) {
+            log.error("댓글 수정 중 오류 발생: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
