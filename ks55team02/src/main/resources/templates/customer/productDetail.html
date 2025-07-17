@@ -34,7 +34,6 @@
 			<div class="container">
 				<div class="product-details-top">
 					<div class="row">
-						<!-- 대표이미지 왼쪽 -->
 						<div class="col-md-6">
 							<div class="product-gallery product-gallery-vertical">
 								<div class="row">
@@ -69,10 +68,8 @@
 							</div>
 						</div>
 
-						<!-- 상품정보 오른쪽 -->
 						<div class="col-md-6">
 							<div class="product-details">
-								<!-- 1. 브랜드 정보 -->
 								<a th:if="${product.store != null}"
 									th:href="@{/customer/products/brand/{brandId}(brandId=${product.store.storeId})}" style="text-decoration: none; color:
 									inherit;">
@@ -96,7 +93,6 @@
 									<span>브랜드 정보 없음</span>
 								</div>
 
-								<!-- 2. 카테고리 -->
 								<div class="product-details-top">
 									<div class="product-cat">
 										<a	th:href="@{/products/category/{categoryId}(categoryId=${product.productCategory.categoryId})}"
@@ -105,11 +101,9 @@
 									</div>
 								</div>
 
-								<!-- 3. 상품명 -->
 								<h1 class="product-title"
 									th:text="${product?.gdsNm ?: '상품명 없음'}"></h1>
 
-								<!-- 4. 리뷰/평점 -->
 								<div class="ratings-container">
 									<div class="ratings">
 										<div class="ratings-val" style="width: 80%;"></div>
@@ -118,7 +112,6 @@
 										id="review-link">( 2 리뷰 )</a>
 								</div>
 
-								<!-- 5. 가격 -->
 								<div class="product-price-section">
 									<div class="original-price-wrapper"
 										th:if="${product.dscntRt != null and product.dscntRt > 0}">
@@ -136,12 +129,10 @@
 									</div>
 								</div>
 
-								<!-- 6. 상품 설명 -->
 								<div class="product-content">
 									<p th:text="${product?.gdsExpln ?: '상품 설명이 없습니다.'}"></p>
 								</div>
 
-								<!-- 7. 옵션 선택 (수정됨) -->
 								<div
 									th:if="${product.productOptions != null and !#lists.isEmpty(product.productOptions)}">
 									<div th:each="option : ${product.productOptions}">
@@ -167,7 +158,6 @@
 									</div>
 								</div>
 
-								<!-- 8. 선택된 옵션 요약 및 총 가격 (JavaScript로 제어) -->
 								<div class="product-selection-summary" id="selectionSummary"
 									style="display: none;">
 									<div class="product-option-price-preview">
@@ -188,7 +178,6 @@
 									</div>
 								</div>
 
-								<!-- 9. 액션 버튼 (위시리스트, 장바구니, 구매) -->
 								<div class="product-details-action">
 									<div class="product-main-buttons">
 										<a href="#" class="btn-product btn-cart" id="addToCartBtn"><span>장바구니</span></a>
@@ -226,11 +215,9 @@
 					</div>
 
 					<div class="tab-content">
-						<!-- 1. 상품상세 탭 -->
 						<div class="tab-pane fade show active" id="product-desc-tab"
 							role="tabpanel">
 							<div class="product-desc-content">
-								<!-- 판매자가 올린 상세 이미지들을 순서대로 표시 -->
 								<div th:each="img : ${detailImages}"
 									class="product-detail-image-wrapper">
 									<img th:src="@{${img.imgFilePathNm}}" alt="상세 이미지">
@@ -240,18 +227,15 @@
 							</div>
 						</div>
 
-						<!-- 2. 상품정보 탭 -->
 						<div class="tab-pane fade" id="product-info-tab" role="tabpanel">
 							<div class="product-desc-content">
 								<div class="container">
 									<h3>상품 정보</h3>
-									<!-- 판매자가 작성한 상품 설명을 여기에 표시 -->
 									<p th:text="${product.gdsExpln}">상품 설명</p>
 								</div>
 							</div>
 						</div>
 
-						<!-- 리뷰 조각 -->
 						<div class="tab-pane fade" id="product-review-tab" role="tabpanel"
 							aria-labelledby="product-review-link">
 							
@@ -261,13 +245,11 @@
 									</div>
 								
 						</div>
-						<!-- 리뷰 끝 -->
-					</div>
+						</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- 여기에 비슷한 상품목록을 넣고싶음 -->
 		<div class="weekly-best-section"
 			th:if="${similarProducts != null and not #lists.isEmpty(similarProducts)}">
 			<div class="weekly-best-container">
@@ -281,31 +263,20 @@
 				</div>
 
 				<div class="weekly-best-slider-container">
-					<!-- Swiper -->
 					<div class="swiper weekly-best-swiper">
 						<div class="swiper-wrapper">
-							<!-- 서버에서 전달받은 24개 상품을 슬라이드로 생성 -->
 							<div class="swiper-slide" th:each="product : ${similarProducts}">
-								<!-- 1단계에서 만든 단일 상품 카드 프래그먼트 재사용 -->
 								<div
 									th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
 							</div>
 						</div>
 					</div>
-					<!-- Navigation buttons -->
 					<div class="swiper-button-prev"></div>
 					<div class="swiper-button-next"></div>
 				</div>
 			</div>
 		</div>
 
-<<<<<<< HEAD
-
-		<!-- 모달은 layout:fragment="contents" 바깥 (layoutProductDetail.html의 body 태그 닫히기 전)에 위치하는 것이 일반적입니다. -->
-		<!-- 하지만 현재 구조상, 만약 이 모달이 반드시 product detail 내부에 있어야 한다면 여기에 둡니다. -->
-=======
-		<!-- 공유 모달 -->
->>>>>>> refs/heads/develop
 		<div class="modal fade" id="shareModal" tabindex="-1" role="dialog"
 			aria-labelledby="shareModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
@@ -346,34 +317,15 @@
 		</div>
 	</th:block>
 
-<<<<<<< HEAD
 
-	<!-- 이 페이지에만 필요한 추가 JS 파일을 layout:fragment="jsFile" 안에 넣습니다. -->
-=======
->>>>>>> refs/heads/develop
 	<th:block layout:fragment="jsFile">
-<<<<<<< HEAD
-		<!-- ✅ jQuery 먼저 불러오기 -->
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-		<script
-			src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
-		<!-- 그다음 의존 스크립트들 -->
-=======
->>>>>>> refs/heads/develop
+		<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 		<script th:src="@{/maincss/assets/js/jquery.elevateZoom.min.js}"></script>
-<<<<<<< HEAD
-		<script
-			th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
 		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
 		<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
-=======
->>>>>>> refs/heads/develop
 	</th:block>
 
 	<th:block layout:fragment="jsScript">
-<<<<<<< HEAD
-=======
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		
 		<script th:inline="javascript">
@@ -392,10 +344,7 @@
 			console.log("상품 옵션 데이터:", productDataOptions);
 		</script>
 		
-		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
-		<script th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
 		
->>>>>>> refs/heads/develop
 		<script>
 			function copyShareLink() {
 				const el = document.createElement('textarea');
