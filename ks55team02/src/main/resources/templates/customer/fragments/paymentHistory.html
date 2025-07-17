@@ -11,16 +11,16 @@
     <meta name="keywords" content="HTML5 템플릿">
     <meta name="description" content="Molla - 주문 확인 페이지">
     <meta name="author" content="p-themes">
-    <link rel="stylesheet" href="maincss/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="maincss/assets/css/style.css">
-    <link rel="stylesheet" href="maincss/assets/css/plugins/owl-carousel/owl.carousel.css">
-    <link rel="stylesheet" href="maincss/assets/css/plugins/magnific-popup/magnific-popup.css">
-    <link rel="stylesheet" href="maincss/assets/css/plugins/jquery.countdown.css">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/magnific-popup/magnific-popup.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/jquery.countdown.css}">
 
     <style>
         .order-success-container {
-            max-width: 700px; /* 원래 템플릿의 .checkout .container 너비에 맞춤 */
-            margin: 2rem auto;
+            max-width: 700px;
+            margin: 4rem auto;
             padding: 4rem;
             text-align: center;
             border: 1px solid #e9ecef;
@@ -28,205 +28,116 @@
             background-color: #ffffff;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-        .success-icon {
-            font-size: 6rem;
-            color: #28a745;
-            margin-bottom: 2rem;
+        .success-icon { font-size: 6rem; color: #28a745; margin-bottom: 2rem; }
+        .success-title { font-size: 2.4rem; font-weight: 600; margin-bottom: 1rem; }
+        .success-message { font-size: 1.6rem; color: #666; margin-bottom: 3rem; }
+        .order-summary-table { width: 100%; margin: 2.5rem 0; text-align: left; border-top: 2px solid #333; border-bottom: 1px solid #e9ecef; }
+        .order-summary-table th, .order-summary-table td { padding: 12px 15px; border-bottom: 1px solid #e9ecef; }
+        .order-summary-table th { background-color: #f8f9fa; font-weight: 600; width: 30%; }
+        .order-summary-table td { color: #555; }
+        .action-buttons { margin-top: 3rem; }
+        .action-buttons .btn { margin: 0 10px; padding: 12px 25px; font-size: 1.6rem; }
+        .order-products-table { width: 100%; margin-top: 2rem; border-collapse: collapse; }
+        .order-products-table th, .order-products-table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: center;
         }
-        .success-title {
-            font-size: 2.4rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #333;
-        }
-        .success-message {
-            font-size: 1.6rem;
-            color: #666;
-            margin-bottom: 3rem;
-        }
-        .order-summary-table {
-            width: 100%;
-            margin: 2.5rem 0;
-            text-align: left;
-            border-top: 2px solid #333;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .order-summary-table th, .order-summary-table td {
-            padding: 1.5rem 1rem;
-            border-bottom: 1px solid #e9ecef;
-            font-size: 1.5rem;
-        }
-        .order-summary-table th {
-            width: 30%;
-            background-color: #f8f9fa;
-            font-weight: 500;
-            color: #495057;
-        }
-        .order-summary-table td {
-            color: #212529;
-            font-weight: 500;
-        }
-        .action-buttons {
-            margin-top: 3rem;
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-        }
-        .action-buttons .btn {
-            min-width: 180px;
-            padding: 1.2rem 2rem;
-            font-size: 1.6rem;
-        }
-        /* 추가: Molla 템플릿 스타일 오버라이드 및 일관성 유지 */
-        .summary-total td {
-             font-size: 1.8rem;
-             font-weight: 700;
-             color: #333;
-        }
-        address strong {
-            font-weight: 600;
-        }
+        .order-products-table th { background-color: #e9ecef; }
     </style>
 </head>
 
 <body>
 <th:block layout:fragment="contents">
-    <div class="page-wrapper">
-        <main class="main">
-            <div class="page-header text-center" style="background-image: url('maincss/assets/images/page-header-bg.jpg')">
-                <div class="container">
-                    <h1 class="page-title">주문 확인<span>쇼핑</span></h1>
-                </div>
-            </div>
-            <nav aria-label="경로" class="breadcrumb-nav">
-                <div class="container">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a th:href="@{/}">홈</a></li>
-                        <li class="breadcrumb-item"><a th:href="@{/checkout.html}">결제</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">주문 확인</li>
-                    </ol>
-                </div>
-            </nav>
-            <div class="page-content">
-                <div class="checkout">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-10">
-                                <div class="order-confirmation-message text-center mb-4">
-                                    <i class="icon-check-circle text-success" style="font-size: 3rem;"></i>
-                                    <h2 class="mt-2">주문해 주셔서 감사합니다!</h2>
-                                    <p class="lead" th:if="${paymentInfo}">주문 번호 **#<span th:text="${paymentInfo.orderId}">12345</span>**가 성공적으로 완료되었습니다.</p>
-                                    <p>주문 상세 정보가 **<span th:text="${orderDetails?.userEmail ?: '이메일 없음'}">your_email@example.com</span>** (으)로 전송되었습니다.</p>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-8">
-                                        <h3 class="checkout-title">주문 상세 정보</h3>
-                                        <div class="row">
-                                            <div class="col-sm-6" th:if="${orderDetails}">
-                                                <h4 class="mb-2">배송 정보</h4>
-                                                <address>
-                                                    <strong th:text="${orderDetails.rcvrNm}">홍길동</strong><br>
-                                                    <span th:text="${orderDetails.dlvyAddr}">서울특별시 강남구 테헤란로 123</span><br>
-                                                    <span th:text="${orderDetails.dlvyDaddr}">어떤동, 어떤시 12345</span><br>
-                                                    <span th:text="${orderDetails.zip}">12345</span><br>
-                                                    대한민국<br>
-                                                    전화: <span th:text="${orderDetails.rcvrTelno}">(010) 1234-5678</span><br>
-                                                    이메일: <span th:text="${orderDetails?.userEmail ?: '이메일 없음'}">hong.gildong@example.com</span>
-                                                    <div th:if="${orderDetails.dlvyMemoCn != null and orderDetails.dlvyMemoCn != ''}">
-                                                        <br>배송 요청사항: <span th:text="${orderDetails.dlvyMemoCn}">문 앞에 놓아주세요.</span>
-                                                    </div>
-                                                </address>
-                                            </div>
-                                            <div class="col-sm-6" th:if="${orderDetails}">
-                                                <h4 class="mb-2">청구 정보</h4>
-                                                <address>
-                                                    <strong th:text="${orderDetails.userName}">홍길동</strong><br>
-                                                    <span th:text="${orderDetails.dlvyAddr}">서울특별시 강남구 테헤란로 123</span><br>
-                                                    <span th:text="${orderDetails.dlvyDaddr}">어떤동, 어떤시 12345</span><br>
-                                                    <span th:text="${orderDetails.zip}">12345</span><br>
-                                                    대한민국<br>
-                                                    전화: <span th:text="${orderDetails.rcvrTelno}">(010) 1234-5678</span><br>
-                                                    이메일: <span th:text="${orderDetails?.userEmail ?: '이메일 없음'}">hong.gildong@example.com</span>
-                                                </address>
-                                            </div>
-                                        </div>
-                                        <h4 class="mt-4 mb-2">주문 상품</h4>
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-hover table-summary">
-                                                <thead>
-                                                    <tr>
-                                                        <th>상품</th>
-                                                        <th class="text-center">수량</th>
-                                                        <th class="text-right">단가</th> <th class="text-right">총액</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr th:each="product : ${orderedProducts}">
-                                                        <td><a href="#" th:text="${product.name}">베이지 니트 엘라스틱 런닝화</a></td>
-                                                        <td class="text-center" th:text="${product.quantity}">1</td>
-                                                        <td class="text-right" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + '원'}">$84.00</td> <td class="text-right" th:text="${#numbers.formatDecimal(product.total, 0, 'COMMA', 0, 'POINT') + '원'}">$84.00</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <aside class="col-lg-4">
-                                        <div class="summary summary-checkout">
-                                            <h3 class="summary-title">주문 요약</h3>
-                                            <table class="table table-summary" th:if="${paymentInfo}">
-                                                <tbody>
-                                                    <tr class="summary-subtotal">
-                                                        <td>상품 소계:</td>
-                                                        <td th:text="${#numbers.formatInteger(orderDetails.gdsTotAmt, 0, 'COMMA') + '원'}">$160.00</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>배송비:</td>
-                                                        <td th:text="${#numbers.formatInteger(orderDetails.dlvyFeeAmt, 0, 'COMMA') + '원'}">무료 배송</td>
-                                                    </tr>
-                                                    <tr th:if="${orderDetails.apldCpnDscntAmt != null and orderDetails.apldCpnDscntAmt > 0}">
-                                                        <td>할인 금액:</td>
-                                                        <td th:text="${#numbers.formatInteger(orderDetails.apldCpnDscntAmt, 0, 'COMMA') + '원'}">-$0.00</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>결제 방법:</td>
-                                                        <td th:text="${paymentInfo.method}">신용카드</td>
-                                                    </tr>
-                                                    <tr class="summary-total">
-                                                        <td>총 결제 금액:</td>
-                                                        <td th:text="${#numbers.formatInteger(paymentInfo.totalAmount, 0, 'COMMA') + '원'}">$160.00</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>결제 승인일시:</td>
-                                                        <td th:text="${#temporals.format(paymentInfo.approvedAt, 'yyyy-MM-dd HH:mm:ss')}">2023-10-27 12:35:00</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <div class="order-actions text-center mt-4">
-                                                <a th:href="@{/paymentHistory}" class="btn btn-outline-primary-2 btn-block mb-2">
-                                                    <span>주문 내역 확인</span><i class="icon-long-arrow-right"></i>
-                                                </a>
-                                                <a th:href="@{/}" class="btn btn-outline-darker btn-block">
-                                                    <span>쇼핑 계속하기</span><i class="icon-download"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </aside>
-                                </div>
+    <div class="page-content">
+        <div class="container">
+            <div class="checkout">
+                <div class="row justify-content-center">
+                    <div class="col-md-10 col-lg-8">
+                        <div class="order-success-container">
+                            <i class="icon-check success-icon"></i>
+                            <h2 class="success-title">주문이 성공적으로 완료되었습니다!</h2>
+                            <p class="success-message">주문 내역을 확인해 주세요.</p>
+
+                            <div th:if="${message}" class="alert alert-info" role="alert">
+                                <p th:text="${message}"></p>
+                            </div>
+
+                            <div th:if="${paymentInfo != null and !paymentInfo.isEmpty()}">
+                                <h3 class="text-left mb-3">결제 및 배송 정보</h3>
+                                <table class="order-summary-table">
+								    <tbody>
+								        <tr>
+										    <th>주문 번호</th>
+										    <td th:text="${orderInfo.ordrNo}">ORD20250715-001</td>
+										</tr>
+										<tr>
+										    <th>총 결제 금액</th>
+										    <td th:text="${#numbers.formatDecimal(orderInfo.lastStlmAmt, 0, 'COMMA', 2, 'POINT') + '원'}">50,000원</td>
+										</tr>
+										<tr>
+										    <th>결제 수단</th>
+										    <td th:text="${paymentMethod ?: '신용카드'}">신용카드</td>
+										</tr>
+										
+										<!-- 상품 목록 표시 수정 -->
+										<tr th:each="product : ${orderedProducts}">
+										    <td th:text="${product['name']}">상품명</td>
+										    <td th:text="${product['quantity']}">수량</td>
+										    <td th:text="${#numbers.formatDecimal(product['price'], 0, 'COMMA', 2, 'POINT') + '원'}">가격</td>
+										    <td th:text="${#numbers.formatDecimal(product['total'], 0, 'COMMA', 2, 'POINT') + '원'}">총액</td>
+										</tr>
+								    </tbody>
+								</table>
+                            </div>
+                            
+                            <div th:unless="${paymentInfo != null and !paymentInfo.isEmpty()}">
+                                <p class="text-center text-danger">결제 및 배송 정보를 불러올 수 없습니다.</p>
+                            </div>
+
+                            <div th:if="${orderedProducts != null and !orderedProducts.isEmpty()}">
+                                <h3 class="text-left mt-5 mb-3">주문 상품 목록</h3>
+                                <table class="order-products-table">
+                                    <thead>
+                                        <tr>
+                                            <th>상품명</th>
+                                            <th>수량</th>
+                                            <th>단가</th>
+                                            <th>총액</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="product : ${orderedProducts}">
+                                            <td th:text="${product.name}">상품 A</td>
+                                            <td th:text="${product.ordrQnty}">2</td>
+                                            <td th:text="${#numbers.formatInteger(product.gdsPrice, 0, 'COMMA') + '원'}">25,000원</td>
+                                            <td th:text="${#numbers.formatInteger(product.totalPrice, 0, 'COMMA') + '원'}">50,000원</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div th:unless="${orderedProducts != null and !orderedProducts.isEmpty()}">
+                                <p class="text-center text-danger">주문 상품 목록을 불러올 수 없습니다.</p>
+                            </div>
+                            
+                            <div class="order-actions text-center mt-5">
+                                <a th:href="@{/}" class="btn btn-outline-darker btn-block">
+                                    <span>쇼핑 계속하기</span><i class="icon-long-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
-    <script src="maincss/assets/js/jquery.min.js"></script>
-    <script src="maincss/assets/js/bootstrap.bundle.min.js"></script>
-    <script src="maincss/assets/js/jquery.hoverIntent.min.js"></script>
-    <script src="maincss/assets/js/jquery.waypoints.min.js"></script>
-    <script src="maincss/assets/js/superfish.min.js"></script>
-    <script src="maincss/assets/js/owl.carousel.min.js"></script>
-    <script src="maincss/assets/js/main.js"></script>
 </th:block>
+<script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
+<script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>
+<script th:src="@{/maincss/assets/js/jquery.waypoints.min.js}"></script>
+<script th:src="@{/maincss/assets/js/superfish.min.js}"></script>
+<script th:src="@{/maincss/assets/js/owl.carousel.min.js}"></script>
+<script th:src="@{/maincss/assets/js/main.js}"></script>
 </body>
-
 </html>

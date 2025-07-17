@@ -31,6 +31,18 @@
         <result column="follower_count" 			property="followerCount" />
         <result column="following_count" 			property="followingCount" />
     </resultMap>
+    <select id="getUserInfoById" parameterType="String" resultMap="userInfoResultMap">
+	    SELECT
+	        user_no, 
+	        mbr_grd_cd, 
+	        user_lgn_id, 
+	        user_pswd_encpt_val, 
+	        user_nm
+	    FROM
+	        users
+	    WHERE
+	        user_lgn_id = #{userId}
+	</select>
 
     <select id="findUserInfoByUserNo" parameterType="String" resultMap="userInfoResultMap">
         SELECT

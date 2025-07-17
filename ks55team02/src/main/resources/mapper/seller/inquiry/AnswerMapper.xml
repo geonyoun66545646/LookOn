@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.seller.inquiry.mapper.AnswerMapper">
+
+    <resultMap id="answerResultMap" type="ks55team02.common.domain.inquiry.Answer">
+        <id property="ansId"        	column="ans_id"/>
+        <result property="inqryId"      column="inqry_id"/>
+        <result property="answrUserNo"  column="answr_user_no"/>
+        <result property="ansCn"        column="ans_cn"/>
+        <result property="ansTm"        column="ans_tm"/>
+        <result property="answrTypeCd"  column="answr_type_cd"/>
+        <result property="rlsYn"        column="rls_yn"/>
+        <result property="lastMdfcnDt"  column="last_mdfcn_dt"/>
+        <result property="actvtnYn"     column="actvtn_yn"/>
+        <result property="delDt"        column="del_dt"/>
+        <result property="delUserNo"    column="del_user_no"/>
+        <!-- answrStoreName 매핑 제거 -->
+    </resultMap>
+
+    <!-- 답변 등록 -->
+    <insert id="insertAnswer" parameterType="ks55team02.common.domain.inquiry.Answer">
+        INSERT INTO answer
+        (
+            ans_id,
+            inqry_id,
+            answr_user_no,
+            ans_cn,
+            ans_tm,
+            answr_type_cd,
+            rls_yn,
+            actvtn_yn
+        )
+        VALUES
+        (
+            #{ansId},
+            #{inqryId},
+            #{answrUserNo},
+            #{ansCn},
+            NOW(),
+            #{answrTypeCd},
+            #{rlsYn},
+            #{actvtnYn}
+        )
+    </insert>
+
+    <!-- 답변 수정 -->
+    <update id="updateAnswer" parameterType="ks55team02.common.domain.inquiry.Answer">
+        UPDATE answer
+        SET
+            ans_cn = #{ansCn},
+            answr_user_no = #{answrUserNo},
+            last_mdfcn_dt = NOW()
+        WHERE
+            ans_id = #{ansId}
+    </update>
+
+    <!-- 특정 답변 ID로 답변 조회 (이제 answrStoreName은 여기서 가져오지 않습니다) -->
+    <select id="getAnswerById" parameterType="String" resultMap="answerResultMap">
+        SELECT
+            a.ans_id,
+            a.inqry_id,
+            a.answr_user_no,
+            a.ans_cn,
+            a.ans_tm,
+            a.answr_type_cd,
+            a.rls_yn,
+            a.last_mdfcn_dt,
+            a.actvtn_yn,
+            a.del_dt,
+            a.del_user_no
+        FROM
+            answer a
+        WHERE
+            a.ans_id = #{ansId}
+    </select>
+
+    <!-- ans_ 접두사를 가진 ans_id 중 가장 큰 숫자 부분을 조회 -->
+    <select id="getMaxAnsIdNumber" resultType="java.lang.Integer">
+        SELECT
+            MAX(CAST(SUBSTRING_INDEX(ans_id, '_', -1) AS UNSIGNED))
+        FROM
+            answer
+        WHERE
+            ans_id LIKE 'ans_%'
+    </select>
+
+</mapper>

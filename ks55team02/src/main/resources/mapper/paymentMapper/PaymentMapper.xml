@@ -4,6 +4,7 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
 <mapper namespace="ks55team02.tossApi.mapper.PaymentMapper">
+
 	<resultMap type="ks55team02.tossApi.domain.PaymentDTO" id="paymentResultMap">
         <id     column="stlm_id"        property="stlmId"/>
         <result column="ordr_no"        property="ordrNo"/>
@@ -17,7 +18,7 @@
         <result column="stlm_dmnd_dt"   property="stlmDmndDt"/>
     </resultMap>
     
-    <resultMap type="ks55team02.tossApi.domain.OrderDTO" id="orderResultMap">
+    <resultMap type="ks55team02.tossApi.domain.PayOrderDTO" id="payorderResultMap">
         <id     column="ordr_no"        	property="ordrNo"/>
         <result column="user_no"        	property="userNo"/>
         <result column="ordr_dt"        	property="ordrDt"/>
@@ -37,8 +38,20 @@
         <result column="user_name"   		property="userName"/>
     </resultMap>
     
-    <!-- 쿠폰테이블 -->
-	<resultMap type="ks55team02.customer.coupons.domain.Coupons" id="CouponDetailsMap">
+    <!-- <<<<<<<<< [추가됨] OrderItemsDTO에 대한 resultMap >>>>>>>>> -->
+    <resultMap type="ks55team02.tossApi.domain.PayOrderItemsDTO" id="payorderItemsResultMap">
+        <id     column="ordr_dtl_artcl_no"  property="ordrDtlArtclNo"/>
+        <result column="ordr_no"            property="ordrNo"/>
+        <result column="opt_no"             property="optNo"/>
+        <result column="gds_no"             property="gdsNo"/>
+        <result column="store_id"           property="storeId"/>
+        <result column="ordr_qntty"         property="ordrQntty"/>
+        <result column="ordr_tm_untprc"     property="ordrTmUntprc"/>
+        <result column="ordr_dtl_artcl_dcsn_cd" property="ordrDtlArtclDcsnCd"/>
+    </resultMap>
+    
+    <!-- <<<<<<<<< [추가됨] 새로운 CouponDetailsMap resultMap >>>>>>>>> -->
+    <resultMap type="ks55team02.customer.coupons.domain.Coupons" id="CouponDetailsMap">
         <id     column="user_cpn_id"        property="userCpnId"/>
         <result column="user_no"            property="userNo"/>
         <result column="pblcn_cpn_id"       property="pblcnCpnId"/>
@@ -50,8 +63,8 @@
         <result column="issu_rsn_src_cn"    property="issuRsnSrcCn"/>
     </resultMap>
      
-     <!-- 유저보유 쿠폰 테이블 -->
-     <resultMap type="ks55team02.customer.coupons.domain.UserCoupons" id="UserCouponDetailsMap">   
+    <!-- <<<<<<<<< [추가됨] 새로운 UserCouponDetailsMap resultMap >>>>>>>>> -->
+    <resultMap type="ks55team02.customer.coupons.domain.UserCoupons" id="UserCouponDetailsMap">   
         <id 	column="pblcn_cpn_cd"       	property="pblcnCpnCd"/>
         <result column="cpn_nm"             	property="cpnNm"/>
         <result column="dscnt_vl"           	property="dscntVl"/>
@@ -66,8 +79,8 @@
         <result column="issue_condition_type" 	property="issueConditionType"/>
     </resultMap>
     
-    <!-- [추가] 'ORD' + '날짜' + '일련번호' 형식의 다음 주문 번호를 조회 / 새로운 주문 번호를 생성 -->
-	<select id="selectNextOrderId" resultType="String">
+    <!-- <<<<<<<<< [위치변경 및 추가] ID 생성 쿼리 섹션 >>>>>>>>> -->
+    <select id="selectNextOrderId" resultType="String">
 	    SELECT CONCAT(
 	        'ORD', 
 	        DATE_FORMAT(CURDATE(), '%Y%m%d'), 
@@ -76,61 +89,143 @@
 	    FROM orders
 	    WHERE ordr_no LIKE CONCAT('ORD', DATE_FORMAT(CURDATE(), '%Y%m%d'), '%')
 	</select>
+
+    <select id="selectNextOrderItemId" resultType="String">
+        SELECT CONCAT(
+            'ITEM',
+            DATE_FORMAT(CURDATE(), '%Y%m%d'),
+            LPAD(IFNULL(MAX(CAST(SUBSTRING(ordr_dtl_artcl_no, 13) AS UNSIGNED)), 0) + 1, 3, '0')
+        )
+        FROM order_items
+        WHERE ordr_dtl_artcl_no LIKE CONCAT('ITEM', DATE_FORMAT(CURDATE(), '%Y%m%d'), '%')
+    </select>
 	
-    <!-- [추가] 주문 정보 저장 쿼리 / 주문 정보를 미리 등록 / 고객이 최종 결제를 하기 전에, "누가, 어떤 상품을, 어디로 받을지"에 대한 정보를 주문서(orders 테이블)에 '결제 대기중' 상태로 임시 저장-->
-	<insert id="insertOrder" parameterType="ks55team02.tossApi.domain.OrderDTO">
+    <select id="selectNextPaymentId" resultType="String">
+        SELECT CONCAT('pay_', LPAD(IFNULL(MAX(CAST(SUBSTRING(stlm_id, 5) AS UNSIGNED)), 0) + 1, 5, '0'))
+        FROM payments
+    </select>
+    
+    <select id="selectNextPaymentHistoryId" resultType="String">
+        SELECT CONCAT('pay_his_', LPAD(IFNULL(MAX(CAST(SUBSTRING(stlm_hstry_id, 9) AS UNSIGNED)), 0) + 1, 5, '0'))
+        FROM payments_history
+    </select>
+    <!-- <<<<<<<<< [위치변경 및 추가] ID 생성 쿼리 섹션 끝 >>>>>>>>> -->
+
+    <!-- <<<<<<<<< [위치변경 및 추가] 주문 (Orders) 관련 쿼리 섹션 >>>>>>>>> -->
+    <insert id="insertOrder" parameterType="ks55team02.tossApi.domain.PayOrderDTO">
 	    INSERT INTO orders (
 	        ordr_no, user_no, ordr_dt, gds_tot_amt, dlvy_fee_amt, pblcn_cpn_id,
 	        user_cpn_id, apld_cpn_dscnt_amt, last_stlm_amt, ordr_stts_cd,
 	        rcvr_nm, rcvr_telno, dlvy_addr, dlvy_daddr, zip, dlvy_memo_cn, user_name
 	    ) VALUES (
-	        #{ordrNo}, #{userNo}, #{ordrDt}, #{gdsTotAmt}, 0, #{pblcnCpnId},
+	        #{ordrNo}, #{userNo}, #{ordrDt}, #{gdsTotAmt}, #{dlvyFeeAmt}, #{pblcnCpnId},
 	        #{userCpnId}, #{apldCpnDscntAmt}, #{lastStlmAmt}, #{ordrSttsCd},
 	        #{rcvrNm}, #{rcvrTelno}, #{dlvyAddr}, #{dlvyDaddr}, #{zip}, #{dlvyMemoCn}, #{userName}
 	    )
 	</insert>
-    
-    <!-- 새로운 결제 관리 ID 생성 / 결제가 성공했을 때, 해당 결제를 시스템 내부에서 식별하기 위한 고유 ID 생성  151 부터 올라가니깐 이거 나중에 지우기-->
-    <select id="selectNextPaymentId" resultType="String">
-        SELECT CONCAT('pay_', IFNULL(MAX(CAST(SUBSTRING(stlm_id, 5) AS UNSIGNED)), 150) + 1)
-        FROM payments
-    </select>
-    
-    <!-- 새로운 결제 이력 ID 생성 / 모든 결제 과정을 기록하는 이력 데이터에 대한 고유 ID 생성-->
-    <select id="selectNextPaymentHistoryId" resultType="String">
-        SELECT CONCAT('pay_his_', IFNULL(MAX(CAST(SUBSTRING(stlm_hstry_id, 9) AS UNSIGNED)), 150) + 1)
-        FROM payments_history
-    </select>
 
-
-    <!-- [추가] 주문 상태 업데이트 쿼리 / 주문 상태를 변경 -->
+    <insert id="insertOrderItem" parameterType="map">
+        INSERT INTO order_items (
+            ordr_dtl_artcl_no, ordr_no, opt_no, gds_no, store_id, ordr_qntty, ordr_tm_untprc, ordr_dtl_artcl_dcsn_cd
+        ) VALUES (
+            #{ordrDtlArtclNo}, #{ordrNo}, #{optNo}, #{gdsNo}, #{storeId}, #{ordrQntty}, #{ordrTmUntprc}, #{ordrDtlArtclDcsnCd}
+        )
+    </insert>
+    
     <update id="updateOrderStatus" parameterType="map">
         UPDATE orders
            SET ordr_stts_cd = #{status}
-         WHERE ordr_no = #{orderId}
+         WHERE ordr_no = #{ordrNo}
     </update>
+    
+    <!-- <<<<<<<<< [추가됨] 주문 ID로 주문 상세 정보를 조회 (orders 테이블) >>>>>>>>> -->
+    <select id="getOrderDetailsByOrderId" parameterType="String" resultMap="payorderResultMap">
+        SELECT
+            ordr_no, user_no, ordr_dt, gds_tot_amt, dlvy_fee_amt, pblcn_cpn_id,
+            user_cpn_id, apld_cpn_dscnt_amt, last_stlm_amt, ordr_stts_cd,
+            rcvr_nm, rcvr_telno, dlvy_addr, dlvy_daddr, zip, dlvy_memo_cn,
+            (SELECT user_nm FROM users WHERE user_no = o.user_no) AS user_name
+        FROM
+            orders o
+        WHERE
+            ordr_no = #{ordrNo}
+    </select>
 
-	<!-- 결제 정보 저장 쿼리 / 상세 결제 내역을 저장-->
-    <insert id="insertPayment" parameterType="ks55team02.tossApi.domain.PaymentDTO">
+    <!-- <<<<<<<<< [추가됨] 주문 ID로 주문 항목(상품 및 옵션) 상세 정보를 조회 (order_items 테이블) >>>>>>>>> -->
+    <select id="getOrderedProductsByOrderId" parameterType="String" resultType="java.util.Map">
+        SELECT
+            oi.ordr_dtl_artcl_no,
+            oi.ordr_no,
+            oi.opt_no,
+            oi.gds_no,
+            oi.store_id,
+            oi.ordr_qntty,
+            oi.ordr_tm_untprc,
+            oi.ordr_dtl_artcl_dcsn_cd,
+            p.gds_nm AS product_name,          -- 상품 이름
+            po.opt_nm AS option_name           -- 옵션 이름
+        FROM
+            order_items oi
+        JOIN
+            products p ON oi.gds_no = p.gds_no
+        LEFT JOIN
+            product_options po ON oi.opt_no = po.opt_no
+        WHERE
+            oi.ordr_no = #{ordrNo}
+        ORDER BY
+            oi.ordr_dtl_artcl_no ASC
+    </select>
+    
+    <select id="findLatestOrderIdByUserNo" parameterType="String" resultType="String">
+	    SELECT
+	        ordr_no
+	    FROM
+	        orders
+	    WHERE
+	        user_no = #{userNo}
+	    ORDER BY
+	        ordr_dt DESC
+	    LIMIT 1
+	</select>
+    <!-- <<<<<<<<< [위치변경 및 추가] 주문 (Orders) 관련 쿼리 섹션 끝 >>>>>>>>> -->
+
+    <!-- <<<<<<<<< [위치변경 및 추가] 결제 (Payments) 관련 쿼리 섹션 >>>>>>>>> -->
+	<insert id="insertPayment" parameterType="ks55team02.tossApi.domain.PaymentDTO">
         INSERT INTO payments (
             stlm_id, ordr_no, user_no, stlm_mthd_cd, stlm_amt, 
             stlm_stts_cd, pg_dlng_id, pg_co_info, stlm_cmptn_dt, stlm_dmnd_dt
         ) VALUES (
             #{stlmId}, #{ordrNo}, #{userNo}, #{stlmMthdCd}, #{stlmAmt},
-            #{stlmSttsCd}, #{pgDlngId}, #{pgCoInfo}, #{stlmCmptnDt}, #{stlmDmndDt}
+            #{stlmSttsCd}, #{pgDlngId}, #{pgCoInfo}, NOW(), #{stlmDmndDt} 
         )
     </insert>
 
-    <!-- 결제 이력 저장 쿼리 / 결제 처리 이력을 기록-->
     <insert id="insertPaymentHistory" parameterType="ks55team02.tossApi.domain.PaymentHistoryDTO">
         INSERT INTO payments_history (
             stlm_hstry_id, stlm_id, hstry_crt_dt, hstry_mdfcn_dt
         ) VALUES (
-            #{stlmHstryId}, #{stlmId}, #{hstryCrtDt}, #{hstryMdfcnDt}
+            #{stlmHstryId}, #{stlmId}, NOW(), NOW()
         )
     </insert>
-    
-    <!-- ========================== 쿠폰 ========================== -->
+
+    <select id="getPaymentIdByPgDlngId" parameterType="String" resultType="String">
+        SELECT stlm_id
+        FROM payments
+        WHERE pg_dlng_id = #{pgDlngId}
+    </select>
+
+    <update id="updatePaymentStatusAndCompletionDate" parameterType="map">
+        UPDATE payments
+        SET 
+            stlm_stts_cd = #{stlmSttsCd},
+            stlm_cmptn_dt = NOW()
+        WHERE 
+            pg_dlng_id = #{pgDlngId}
+            AND ordr_no = #{ordrNo}
+    </update>
+    <!-- <<<<<<<<< [위치변경 및 추가] 결제 (Payments) 관련 쿼리 섹션 끝 >>>>>>>>> -->
+
+    <!-- <<<<<<<<< [위치변경 및 추가] 쿠폰 관련 쿼리 섹션 >>>>>>>>> -->
     <select id="getUserCouponDetails" parameterType="map" resultType="map">
         SELECT
             uc.user_cpn_id AS userCpnId,
@@ -161,7 +256,7 @@
         WHERE
             uc.user_no = #{userNo}
             AND c.pblcn_cpn_cd = #{pblcnCpnCd}
-            AND uc.use_yn = 0  -- 아직 사용하지 않은 쿠폰 (MySQL Tinyint 0은 false)
+            AND uc.use_yn = 1  -- 사용 가능한 쿠폰 (MySQL Tinyint 1은 true)
             AND (uc.indiv_expry_dt IS NULL OR uc.indiv_expry_dt > NOW()) -- 개별 만료일이 없거나 만료일이 현재보다 큰 경우
             AND (c.vld_end_dt IS NULL OR c.vld_end_dt > NOW()) -- 전체 쿠폰 만료일이 없거나 만료일이 현재보다 큰 경우
             AND c.actvtn_yn = 1 -- 활성화된 쿠폰만
@@ -189,14 +284,12 @@
                 -- 개별 만료일이 설정되어 있으면 개별 만료일 기준으로 유효성 검사
                 (uc.indiv_expry_dt IS NOT NULL AND uc.indiv_expry_dt >= NOW())
                 OR
-                -- 개별 만료일이 없으면 발행 쿠폰의 유효 종료일 기준으로 유효성 검사
                 (uc.indiv_expry_dt IS NULL AND c.vld_end_dt >= NOW())
             )
         ORDER BY
             c.cpn_nm ASC -- 쿠폰명을 기준으로 정렬 (선택 사항)
     </select>
 
-    <!-- 특정 사용자 쿠폰(user_cpn_id)의 사용 여부(use_yn)와 사용 일시(use_dt)를 '사용 완료'로 업데이트 -->
     <update id="updateUserCouponToUsed" parameterType="String">
         UPDATE user_coupons
         SET
@@ -206,19 +299,26 @@
             user_cpn_id = #{userCpnId}
             AND use_yn = 1 -- 아직 사용하지 않은 상태일 때만 업데이트
     </update>
-    
-    <!--  특정 사용자의 가장 최근 주문 ID (ordr_no)를 조회합니다.
-    주문 테이블(orders)의 등록일시(reg_dt 또는 order_date)를 기준으로 내림차순 정렬 후 1개만 가져옵니다. -->
-    <select id="findLatestOrderIdByUserNo" parameterType="String" resultType="String">
-	    SELECT
-	        ordr_no
-	    FROM
-	        orders
-	    WHERE
-	        user_no = #{userNo}
-	    ORDER BY
-	        ordr_dt DESC
-	    LIMIT 1
-	</select>
+    <!-- <<<<<<<<< [위치변경 및 추가] 쿠폰 관련 쿼리 섹션 끝 >>>>>>>>> -->
+
+    <!-- <<<<<<<<< [기존] getUserOrderPaymentHistory는 기존 위치에 유지 >>>>>>>>> -->
+    <select id="getUserOrderPaymentHistory" parameterType="String" resultType="Map">
+        SELECT
+            o.ordr_no,
+            o.ordr_dt,
+            o.last_stlm_amt,
+            o.ordr_stts_cd,
+            p.stlm_mthd_cd,
+            (SELECT gds_nm FROM products WHERE gds_no = (SELECT gds_no FROM order_items WHERE ordr_no = o.ordr_no LIMIT 1)) AS first_product_name,
+            (SELECT COUNT(*) FROM order_items WHERE ordr_no = o.ordr_no) AS total_products_count
+        FROM
+            orders o
+        JOIN
+            payments p ON o.ordr_no = p.ordr_no
+        WHERE
+            o.user_no = #{userNo}
+        ORDER BY
+            o.ordr_dt DESC
+    </select>
 
 </mapper>

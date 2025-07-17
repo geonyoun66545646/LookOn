@@ -35,7 +35,12 @@ public class ProductsServiceImpl implements ProductsService {
 	private final StoreMapper storeMapper;
 	private final FilesUtils filesUtils;
 	private final AdminProductManagementMapper adminProductManagementMapper;
-
+	
+	@Override
+	public Stores getStoreByStoreId(String storeId) {
+	    return storeMapper.getStoreById(storeId); // ⭐ 이 메서드를 추가합니다.
+	}
+	
 	@Override
 	public List<Stores> searchBrands(String keyword) {
 		return storeMapper.searchStoresByKeyword(keyword);
