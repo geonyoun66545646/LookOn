@@ -36,12 +36,7 @@
 		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '접수')}">
 		                                <label class="form-check-label">접수</label>
 		                            </div>
-		                            <div class="form-check me-4">
-		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="prcsStts" value="처리중" 
-		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '처리중')}">
-		                                <label class="form-check-label">처리중</label>
-		                            </div>
+		                            
 		                            <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
 		                                	   name="prcsStts" value="완료" 

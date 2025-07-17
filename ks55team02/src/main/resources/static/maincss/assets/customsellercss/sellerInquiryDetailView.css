@@ -192,3 +192,7 @@ font-size: 14px;
     /* border-right: 1px solid #dee2e6; /* 셀 구분선 (선택 사항) */
 }
 
+.btn-fixed-width {
+    min-width: 100px; /* '수정 완료' 버튼의 너비에 맞춰 이 값을 조절하세요. */
+    text-align: center; /* 텍스트가 이 최소 너비 안에서 가운데 정렬되도록 다시 한번 명시 */
+}

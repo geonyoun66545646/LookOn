@@ -192,4 +192,7 @@ font-size: 14px;
     /* border-right: 1px solid #dee2e6; /* 셀 구분선 (선택 사항) */
 }
 
- 
+.form-group.d-flex button, .form-group.d-flex a {
+    min-width: 0;
+   	padding: 0;
+}

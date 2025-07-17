@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ks55team02.seller.inquiry.mapper.SellerInquiryMapper">
+<mapper namespace="ks55team02.admin.inquiry.mapper.AdminInquiryMapper">
 
     <resultMap id="storeResultMap" type="ks55team02.common.domain.store.Store">
         <id property="storeId"          column="store_id"/>
@@ -22,7 +22,8 @@
 
     <resultMap id="inquiryImageResultMap" type="ks55team02.common.domain.inquiry.InquiryImage">
         <id property="inqryImgId"    column="inqry_img_id"/>
-        <result property="imgId"       column="img_id"/> <result property="inqryId"     column="inquiry_image_inqry_id"/>
+        <result property="imgId"       column="img_id"/>
+        <result property="inqryId"     column="inquiry_image_inqry_id"/>
         <result property="ord"         column="ord"/>
         <result property="imgAddr"     column="img_addr"/>
     </resultMap>
@@ -60,36 +61,30 @@
 
         <association property="writerInfo" resultMap="inquiryUserResultMap"/>
         <association property="storeInfo" resultMap="storeResultMap"/>
-        <association property="answer" resultMap="ks55team02.seller.inquiry.mapper.AnswerMapper.answerResultMap"/>
-        
-        <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage" resultMap="inquiryImageResultMap"/>
+        <association property="answer" resultMap="answerResultMap"/> <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage" resultMap="inquiryImageResultMap"/>
     </resultMap>
 
-    <select id="getSellerInquiryCnt" parameterType="ks55team02.common.domain.inquiry.Inquiry" resultType="int">
+    <select id="getAdminInquiryCnt" parameterType="ks55team02.common.domain.inquiry.Inquiry" resultType="int">
         SELECT
             COUNT(i.inqry_id)
         FROM
             inquiries i
-        JOIN
+        LEFT JOIN
             stores s ON s.store_id = i.inqry_store_id
         LEFT JOIN
             users u ON u.user_no = i.wrtr_id
         WHERE 1=1
-        <if test="inqryStoreId != null and inqryStoreId != ''">
-            AND i.inqry_store_id = #{inqryStoreId}
-        </if>
-        
         <if test="searchValue != null and searchValue != ''">
             <choose>
                 <when test="searchKey != null and searchKey != ''">
                     <choose>
-                        <when test="searchKey == 'inqryTtl'">
+                        <when test="searchKey == 'inquiryTitle'">
                             AND i.inqry_ttl LIKE CONCAT('%', #{searchValue}, '%')
                         </when>
-                        <when test="searchKey == 'inqryCn'">
+                        <when test="searchKey == 'inquiryContent'">
                             AND i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%')
                         </when>
-                        <when test="searchKey == 'wrtrId'">
+                        <when test="searchKey == 'writerName'">
                             AND u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')
                         </when>
                         <when test="searchKey == 'inqryId'">
@@ -97,6 +92,9 @@
                         </when>
                         <when test="searchKey == 'prcsStts'">
                             AND i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%')
+                        </when>
+                        <when test="searchKey == 'inqryStoreConm'">
+                            AND s.store_conm LIKE CONCAT('%', #{searchValue}, '%')
                         </when>
                     </choose>
                 </when>
@@ -106,11 +104,12 @@
                         i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%') OR
                         u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%') OR
                         i.inqry_id LIKE CONCAT('%', #{searchValue}, '%') OR
-                        i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%')
-                        )
+                        i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%') OR
+                        s.store_conm LIKE CONCAT('%', #{searchValue}, '%') )
                 </otherwise>
             </choose>
         </if>
+
         <if test="filterConditions != null and filterConditions.size() > 0">
             AND i.prcs_stts IN
             <foreach collection="filterConditions" item="status" open="(" separator="," close=")">
@@ -120,9 +119,15 @@
         <if test="startDate != null and endDate != null">
             AND i.reg_ymd BETWEEN #{startDate} AND #{endDate}
         </if>
+        <if test="inqryTypeCd != null and inqryTypeCd != ''">
+            AND i.inqry_type_cd = #{inqryTypeCd}
+        </if>
+        <if test="inqryTrgtTypeCd != null and inqryTrgtTypeCd != ''">
+            AND i.inqry_trgt_type_cd = #{inqryTrgtTypeCd}
+        </if>
     </select>
 
-    <select id="getSellerInquiryList" parameterType="map" resultMap="inquiryResultMap">
+    <select id="getAdminInquiryList" parameterType="map" resultMap="inquiryResultMap">
         SELECT
             i.inqry_id,
             i.inqry_type_cd,
@@ -168,27 +173,26 @@
             a.del_user_no
         FROM
             inquiries i
-        JOIN
+        LEFT JOIN
             stores s ON s.store_id = i.inqry_store_id
         LEFT JOIN
             users u ON u.user_no = i.wrtr_id
         LEFT JOIN inquiry_images iim ON iim.inqry_id = i.inqry_id
-        LEFT JOIN store_images stim ON stim.img_id = iim.img_id LEFT JOIN
+        LEFT JOIN store_images stim ON stim.img_id = iim.img_id
+        LEFT JOIN
             answer a ON a.inqry_id = i.inqry_id
         WHERE 1=1
-        AND i.inqry_store_id = #{param1.inqryStoreId}
-        
         <if test="param1.searchValue != null and param1.searchValue != ''">
             <choose>
                 <when test="param1.searchKey != null and param1.searchKey != ''">
                     <choose>
-                        <when test="param1.searchKey == 'inqryTtl'">
+                        <when test="param1.searchKey == 'inquiryTitle'">
                             AND i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%')
                         </when>
-                        <when test="param1.searchKey == 'inqryCn'">
+                        <when test="param1.searchKey == 'inquiryContent'">
                             AND i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%')
                         </when>
-                        <when test="param1.searchKey == 'wrtrId'">
+                        <when test="param1.searchKey == 'writerName'">
                             AND u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%')
                         </when>
                         <when test="param1.searchKey == 'inqryId'">
@@ -196,6 +200,9 @@
                         </when>
                         <when test="param1.searchKey == 'prcsStts'">
                             AND i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
+                        </when>
+                         <when test="param1.searchKey == 'inqryStoreConm'">
+                            AND s.store_conm LIKE CONCAT('%', #{param1.searchValue}, '%')
                         </when>
                     </choose>
                 </when>
@@ -205,11 +212,12 @@
                         i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%') OR
                         u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%') OR
                         i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                        i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        )
+                        i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%') OR
+                        s.store_conm LIKE CONCAT('%', #{param1.searchValue}, '%') )
                 </otherwise>
             </choose>
         </if>
+
         <if test="param1.filterConditions != null and param1.filterConditions.size() > 0">
             AND i.prcs_stts IN
             <foreach collection="param1.filterConditions" item="status" open="(" separator="," close=")">
@@ -218,7 +226,13 @@
         </if>
         <if test="param1.startDate != null and param1.endDate != null">
             AND i.reg_ymd BETWEEN #{param1.startDate} AND #{param1.endDate}
-        </if>        
+        </if>
+        <if test="param1.inqryTypeCd != null and param1.inqryTypeCd != ''">
+            AND i.inqry_type_cd = #{param1.inqryTypeCd}
+        </if>
+        <if test="param1.inqryTrgtTypeCd != null and param1.inqryTrgtTypeCd != ''">
+            AND i.inqry_trgt_type_cd = #{param1.inqryTrgtTypeCd}
+        </if>
         ORDER BY
             <choose>
                 <when test="param1.sortKey == 'inqryId'">
@@ -240,7 +254,7 @@
         LIMIT #{param2}, #{param3}
     </select>
 
-    <select id="getSellerInquiryByStoreId" parameterType="String" resultMap="inquiryResultMap">
+    <select id="getInquiryById" parameterType="String" resultMap="inquiryResultMap">
         SELECT
             i.inqry_id,
             i.inqry_type_cd,
@@ -286,25 +300,17 @@
             a.del_user_no
         FROM
             inquiries i
-        JOIN
+        LEFT JOIN
             stores s ON s.store_id = i.inqry_store_id
         LEFT JOIN
             users u ON u.user_no = i.wrtr_id
         LEFT JOIN inquiry_images iim ON iim.inqry_id = i.inqry_id
-        LEFT JOIN store_images stim ON stim.img_id = iim.img_id LEFT JOIN
+        LEFT JOIN store_images stim ON stim.img_id = iim.img_id
+        LEFT JOIN
             answer a ON a.inqry_id = i.inqry_id
         WHERE i.inqry_id = #{inqryId}
     </select>
 
-    <select id="getSellerUserNoByStoreId" parameterType="String" resultType="String">
-        SELECT
-            seller_user_no
-        FROM
-            stores
-        WHERE
-            store_id = #{storeId}
-    </select>
-    
     <update id="updateInquiryProcessStatus" parameterType="map">
         UPDATE inquiries
         SET
@@ -355,6 +361,60 @@
             inquiries
         WHERE
             inqry_id = #{inqryId}
+    </select>
+    
+    <insert id="insertAnswer" parameterType="ks55team02.common.domain.inquiry.Answer">
+        INSERT INTO answer
+        (
+            ans_id,
+            inqry_id,
+            answr_user_no,
+            ans_cn,
+            ans_tm,
+            answr_type_cd,
+            rls_yn,
+            actvtn_yn
+        )
+        VALUES
+        (
+            #{ansId},
+            #{inqryId},
+            #{answrUserNo},
+            #{ansCn},
+            NOW(),
+            #{answrTypeCd},
+            #{rlsYn},
+            #{actvtnYn}
+        )
+    </insert>
+
+    <update id="updateAnswer" parameterType="ks55team02.common.domain.inquiry.Answer">
+        UPDATE answer
+        SET
+            ans_cn = #{ansCn},
+            answr_user_no = #{answrUserNo},
+            last_mdfcn_dt = NOW()
+        WHERE
+            ans_id = #{ansId}
+    </update>
+
+    <select id="getAnswerById" parameterType="String" resultMap="answerResultMap">
+        SELECT
+            a.ans_id,
+            a.inqry_id,
+            a.answr_user_no,
+            a.ans_cn,
+            a.ans_tm,
+            a.answr_type_cd,
+            a.rls_yn,
+            a.last_mdfcn_dt,
+            a.actvtn_yn,
+            a.del_dt,
+            a.del_user_no
+        FROM
+            answer a
+        WHERE
+            a.ans_id = #{ansId}
     </select>
 
 </mapper>
