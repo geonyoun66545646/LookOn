@@ -127,7 +127,7 @@
 					</td>
 					<td class="table-th">
 						<a class="menu-title text-center" 
-				           href="/adminpage/login?id=superadmin&pw=superadmin12#">
+				           href="/adminpage/login?id=superadmin&pw=superadmin12!">
 				           관리자 메인화면
 				        </a>
 					</td>
@@ -154,7 +154,7 @@
 					</td>
 					<td style="color: #858585;">
 						아이디 : superadmin<br>
-						비밀번호 : superadmin12#<br>
+						비밀번호 : superadmin12!<br>
 					</td>
 				</tr>
 				
@@ -340,52 +340,39 @@
 								<a class="menu-title" target="_blank">로그인</a>
 							</li>
 							<li class="title-li">
-								<a class="menu-title" target="_blank">회원</a>
-								<H5>1. 멘토링 신청 관리 (멘티)</H5>
-								<p>멘토링 신청 내역 조회 및 신청 취소하는 화면</p>
+								<a class="menu-title" target="_blank">사용자</a>
+								<H5>1. 일반 사용자 장바구니</H5>
+								<p>구매할 물품을 장바구니에 보관하는 화면</p>
 								<ul class="sub-list">
-									<li>멘토링 신청 내역 조회</li>
-									<li>멘토링 신청 취소</li>
+									<li><a th:href="@{/cart}">장바구니</a></li>
+								</ul>
+								
+								<BR>
+								
+								<H5>2. 일반 사용자 결제 및 결재 내역</H5>
+								<p>toss api 연동 화면 결제 완료 후 결제 내역 및 배송화면</p>
+								<ul class="sub-list">
+									<li><a th:href="@{/checkout}">결제</a></li>
+									<li><a th:href="@{/paymentHistory}">결제 내역</a></li>
+									<li><a th:href="@{/track-delivery}">배송</a></li>
 								</ul>
 								<BR>
-								<H5>2. 멘토링 결제 (멘티)</H5>
-								<p>포트원 API를 활용하여 KAKAOPAY PG사 연동하여 결제</p>
-								<BR>
-								<H5>3. 멘토링 관리 (멘티)</H5>
-								<p>회원(멘티)이 결제한 멘토링 목록을 조회하고 관리하는 화면</p>
-								<ul class="sub-list">
-									<li>결제 내역 조회</li>
-									<li>후기 등록</li>
-									<li>회원(멘티)가 작성한 후기 목록 조회</li>
-									<li>후기 수정</li>
-								</ul>
-								<BR>
-								<H5>4. 멘토링 관리 (멘토)</H5>
-								<p>회원(멘토)이 신청 받은 멘토링 목록을 조회하고 정산을 신청하는 화면</p>
-								<ul class="sub-list">
-									<li>신청 받은 내역 조회</li>
-									<li>정산 신청</li>
-									<li>정산 내역 조회</li>
-								</ul>
 							</li>
 							<li class="title-li">
 								<a class="menu-title" target="_blank">관리자</a>
-								<H5>1. 멘토링 후기 관리</H5>
-								<p>멘토링 후기 조회하고 부적절한 후기 내용은 삭제할 수 있는 화면</p>
-								<BR>
-								<H5>2. 정산 및 결제 관리</H5>
-								<p>정산 및 결제를 관리하는 화면</p>
+								<H5>3. 관리자 구독권</H5>
+								<p>관리자가 구독권을 등록 / 수정,삭제 할 수 있는 화면</p>
 								<ul class="sub-list">
-									<li>멘토링 결제 내역 조회</li>
-									<li>멘토링 정산 신청 내역 조회</li>
-									<li>멘토링 정산 내역 조회</li>
+									<li><a th:href="@{/adminpage/storeadmin/premiumAdd}">구독권 등록</a></li>
+									<li><a th:href="@{/adminpage/storeadmin/list}">등록된 구독권 리스트[수정/삭제]</a></li>
 								</ul>
+								
 								<BR>
-								<H5>3. 명예 멘토 관리</H5>
-								<p>명예 멘토를 관리하는 화면</p>
+								
+								<H5>4. 관리자 스토어 정산</H5>
+								<p>관리자가 스토어에게 수수료에 맞게 정산해주는 화면</p>
 								<ul class="sub-list">
-									<li>명예 멘토 기준 조회 및 승인, 취소</li>
-									<li>명예 멘토 조회</li>
+									<li><a th:href="@{/adminpage/storeadmin/settlementDetailByStore}">스토어 정산</a></li>
 								</ul>
 							</li>
 						</ul>
