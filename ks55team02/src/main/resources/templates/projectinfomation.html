@@ -1,201 +1,191 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-	<meta charset="UTF-8">
-	<title>project infomation</title>
-	<link rel="stylesheet" href="/git/css/common-css.css">
-	<link rel="stylesheet" href="/git/css/font/font.css">
-	<style>
-		#wrap {
-			margin: 50px 0;
+<meta charset="UTF-8">
+<title>project infomation</title>
+<link rel="stylesheet" href="/git/css/common-css.css">
+<link rel="stylesheet" href="/git/css/font/font.css">
+<style>
+#wrap {
+	margin: 50px 0;
+}
 
-		}
-		* {
-			text-align: center;
-			margin: 0;
-			padding: 0;
-		}
-		.info-title-area h3 {
-			color: var(--maincolor);
-		}
-		table, tr, td {
-			border: 1px solid var(--borderColor);
-			border-collapse : collapse;
-			font-size: 13px;
-		}
-		td {
-			padding: 20px;
-		}
-		li {
-			margin: 5px 0;
-		}
-		ul, li,
-		ul p, ul h5 {
-			text-align : left;
+* {
+	text-align: center;
+	margin: 0;
+	padding: 0;
+}
 
-		}
-		ul p {
-			color: #858585;
-		}
-		.sub-list {
-			padding-left: 30px;
-		}
-		.sub-list li {
-			color: #adadad;
-			font-weight: 300;
-		}
-		ul h5 {
-			font-size: 14px;
-			margin: 5px 0;
-		}
-		.info-table {
-			width: 600px;
-			margin: 0 auto;
-		}
-		.table-th {
-			background: #f5f6fa;
-			width: 20%;
-			font-weight: 700;
-		}
-		#title {
-			font-size: 42px;
-			line-height: 1.2;
-			margin: 15px 0 35px;
-			color: #191919;
-			font-weight: 800;
-		}
-		.menu-title {
-			font-size: 16px;
-			margin: 10px 0 10px;
-			display: block;
-			text-align: left;
-			font-weight: 700;
-		}
-		.title-li {
-			margin-bottom: 20px;
-		}
-		.icon-link-container {
-		    text-align: center; 
-		    margin: 5px 0; 
-		}
-		.icon-link {
-		    display: inline-block;
-    		margin: 0 5px;
-		}
-	    .icon-link:hover img {
-	        transform: scale(1.1); 
-	    }
-	    .icon-link img {
-	        transition: transform 0.3s ease, opacity 0.3s ease;
-	        display: inline-block; 
-    		vertical-align: middle;
-	    }
-		.text-center{
-			text-align: center;
-		}
-	    
-	</style>
+.info-title-area h3 {
+	color: var(--maincolor);
+}
+
+table, tr, td {
+	border: 1px solid var(--borderColor);
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+td {
+	padding: 20px;
+}
+
+li {
+	margin: 5px 0;
+}
+
+ul, li, ul p, ul h5 {
+	text-align: left;
+}
+
+ul p {
+	color: #858585;
+}
+
+.sub-list {
+	padding-left: 30px;
+}
+
+.sub-list li {
+	color: #adadad;
+	font-weight: 300;
+}
+
+ul h5 {
+	font-size: 14px;
+	margin: 5px 0;
+}
+
+.info-table {
+	width: 600px;
+	margin: 0 auto;
+}
+
+.table-th {
+	background: #f5f6fa;
+	width: 20%;
+	font-weight: 700;
+}
+
+#title {
+	font-size: 42px;
+	line-height: 1.2;
+	margin: 15px 0 35px;
+	color: #191919;
+	font-weight: 800;
+}
+
+.menu-title {
+	font-size: 16px;
+	margin: 10px 0 10px;
+	display: block;
+	text-align: left;
+	font-weight: 700;
+}
+
+.title-li {
+	margin-bottom: 20px;
+}
+
+.icon-link-container {
+	text-align: center;
+	margin: 5px 0;
+}
+
+.icon-link {
+	display: inline-block;
+	margin: 0 5px;
+}
+
+.icon-link:hover img {
+	transform: scale(1.1);
+}
+
+.icon-link img {
+	transition: transform 0.3s ease, opacity 0.3s ease;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.text-center {
+	text-align: center;
+}
+</style>
 </head>
 <body>
 	<div id="wrap">
 		<div class="info-title-area">
-			<h3 >한국스마트정보교육원 55기 0팀</h3>
-			<h1 id="title">
-				팀프로젝트 프로젝트명	
-			</h1>
+			<h3>한국스마트정보교육원 55기 0팀</h3>
+			<h1 id="title">팀프로젝트 프로젝트명</h1>
 			<div class="icon-link-container">
-				<a href="https://github.com/jmh118/ks52team02" target="_blank" class="icon-link">
-			        <img alt="github" src="/git/img/github-logo.png" style="width: 50px">
-			    </a>
+				<a href="https://github.com/jmh118/ks52team02" target="_blank"
+					class="icon-link"> <img alt="github"
+					src="/git/img/github-logo.png" style="width: 50px">
+				</a>
 			</div>
-		</div>		
+		</div>
 		<BR>
-		<table class="info-table"  style="margin-top: 15px;">
-			<tbody>	
+		<table class="info-table" style="margin-top: 15px;">
+			<tbody>
 				<tr class="table-th">
-					<td class="table-th">
-						<a class="menu-title text-center" 
-				           href="/?showLogin=true&id=ordertest&pw=a12345678!">
-				           일반사용자 메인화면
-				        </a>
+					<td class="table-th"><a class="menu-title text-center"
+						href="/?showLogin=true&id=ordertest&pw=a12345678!"> 일반사용자 메인화면
+					</a></td>
+					<td class="table-th"><a class="menu-title text-center"
+						href="/seller/login?id=fashionking150&pw=seller1#"> 판매자 메인화면 </a>
 					</td>
-					<td class="table-th">
-						<a class="menu-title text-center" 
-				           href="/seller/login?id=fashionking150&pw=seller1#">
-				           판매자 메인화면
-				        </a>
-					</td>
-					<td class="table-th">
-						<a class="menu-title text-center" 
-				           href="/adminpage/login?id=superadmin&pw=superadmin12#">
-				           관리자 메인화면
-				        </a>
-					</td>
-				</tr>	
-				<tr>
-					<td class="table-th">
-						사용자 계정
-					</td>
-					<td class="table-th">
-						판매자 계정
-					</td>
-					<td class="table-th">
-						관리자 계정
-					</td>
+					<td class="table-th"><a class="menu-title text-center"
+						href="/adminpage/login?id=superadmin&pw=superadmin12#"> 관리자
+							메인화면 </a></td>
 				</tr>
 				<tr>
-					<td style="color: #858585;">
-						아이디 : ordertest<br>
-						비밀번호 : a12345678!<br>
+					<td class="table-th">사용자 계정</td>
+					<td class="table-th">판매자 계정</td>
+					<td class="table-th">관리자 계정</td>
+				</tr>
+				<tr>
+					<td style="color: #858585;">아이디 : ordertest<br> 비밀번호 :
+						a12345678!<br>
 					</td>
-					<td style="color: #858585;">
-						아이디 : fashionking150<br>
-						비밀번호 : seller1#<br>
+					<td style="color: #858585;">아이디 : fashionking150<br> 비밀번호
+						: seller1#<br>
 					</td>
-					<td style="color: #858585;">
-						아이디 : superadmin<br>
-						비밀번호 : superadmin12#<br>
+					<td style="color: #858585;">아이디 : superadmin<br> 비밀번호 :
+						superadmin12#<br>
 					</td>
 				</tr>
-				
+
 			</tbody>
 		</table>
 		<table class="info-table" style="margin-top: 30px;">
 			<tbody>
 				<tr>
 					<td class="table-th">
-					 	<p>김성주</p>
-					 	<BR>
-					 	<a href="#" target="_blank" class="icon-link">
-					        <img alt="github" src="/git/img/github-logo.png" style="width: 25px">
-					    </a>
+						<p>김성주</p> <BR> <a href="#" target="_blank" class="icon-link">
+							<img alt="github" src="/git/img/github-logo.png"
+							style="width: 25px">
+					</a>
 					</td>
 					<td colspan="2">
-						<ul style="padding-left:15px;">
-							<li class="title-li">
-								<a class="menu-title" target="_blank">회원</a>
+						<ul style="padding-left: 15px;">
+							<li class="title-li"><a class="menu-title" target="_blank">회원</a>
 								<H5>1. 회원가입</H5>
 								<p>멘티와 멘토의 회원가입하는 화면</p>
 								<ul class="sub-list">
 									<li>멘티 회원가입</li>
 									<li>멘토 회원가입(플랫폼 내부 기준 만족 후 관리자가 승인)</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>2. 비밀번호 찾기</H5>
-								<p>아이디가 일치할 시 비밀번호를 찾는 화면</p>
-								<BR>
+								<p>아이디가 일치할 시 비밀번호를 찾는 화면</p> <BR>
 								<H5>3. 회원 탈퇴</H5>
-								<p>회원 탈퇴를 신청하는 화면</p>
-								<BR>
-								<H5>4. 멘토 찾기 </H5>
+								<p>회원 탈퇴를 신청하는 화면</p> <BR>
+								<H5>4. 멘토 찾기</H5>
 								<p>멘토와 명예멘토를 조회할 수 있는 화면</p>
 								<ul class="sub-list">
 									<li>멘토 조회</li>
 									<li>명예멘토 조회</li>
-								</ul>
-							</li>
-							<li class="title-li">
-								<a class="menu-title" target="_blank">관리자</a>
+								</ul></li>
+							<li class="title-li"><a class="menu-title" target="_blank">관리자</a>
 								<H5>1. 회원관리</H5>
 								<p>회원의 정보를 조회하는 있는 화면</p>
 								<ul class="sub-list">
@@ -203,99 +193,88 @@
 									<li>탈퇴 회원정보 조회</li>
 									<li>휴먼 회원정보 조회</li>
 									<li>회원 로그인 기록 조회</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>2. 회원정보 수정</H5>
-								<p>회원의 정보를 수정하는 화면</p>
-								<BR>
+								<p>회원의 정보를 수정하는 화면</p> <BR>
 								<H5>3. 가입/탈퇴 관리</H5>
 								<p>가입/탈퇴 회원 관리하는 화면</p>
 								<ul class="sub-list">
 									<li>신규 회원 조회</li>
 									<li>신규 멘토 승인</li>
 									<li>회원 탈퇴 승인</li>
+								</ul></li>
+						</ul>
+					</td>
+				</tr>
+				
+				<tr>
+					<td class="table-th">
+						<p>정성훈</p> <BR>
+						<a href="#" target="_blank" class="icon-link">
+							<img alt="github" src="/git/img/github-logo.png"
+							style="width: 25px">
+						</a>
+					</td>
+					<td colspan="2">
+						<ul style="padding-left: 15px;">
+							<li class="title-li"><a class="menu-title" target="_blank">사용자</a>
+								<H5>1. 메인페이지</H5>
+								<p>사용자가 처음 진입하는 메인페이지 화면</p>
+								<ul class="sub-list">
+									<li><a th:href="@{/}">메인페이지</a></li>
+									<li>카테고리별 조회 모달 기능</li>
+									<li>상품 유형별 슬라이드 기능</li>
+								</ul> <BR>
+								<H5>2. 상품페이지</H5>
+								<p>사용자가 진입하는 상품화면</p>
+								<ul class="sub-list">
+									<li><a th:href="@{/customer/products/list}">유형별 상품목록화면</a></li>
+									<li><a th:href="@{/customer/products/list?brand=store_1}">브랜드 상품목록화면</a></li>
+									<li><a th:href="@{/products/detail/gds_no_2049}">상품상세화면</a></li>
+									<li>상품 옵션별 조회 기능</li>
+								</ul> <BR>
+							</li>
+							<li class="title-li"><a class="menu-title" target="_blank">판매자</a>
+								<H5>1. 상품관리</H5>
+								<p>판매자가 상품을 관리하는 화면</p>
+								<ul class="sub-list">
+									<li><a th:href="@{/seller/products/list}">상품목록 - 조회, 등록, 수정, 삭제</a></li>
+									<li><a th:href="@{/seller/products/registration}">상품등록화면</a></li>
+								</ul>
+							</li>
+							<li class="title-li"><a class="menu-title" target="_blank">관리자</a>
+								<H5>1. 상품 승인/반려 관리</H5>
+								<p>판매자가 제출한 상품을 승인/반려하는 화면</p>
+								<ul class="sub-list">
+									<li><a th:href="@{/adminpage/productadmin/adminProductManagement}">상품 승인/반려 화면</a></li>
+								</ul>
+								<H5>2. 카테고리관리</H5>
+								<p>등록된 카테고리를 관리하는 화면</p>
+								<ul class="sub-list">
+									<li><a th:href="@{/adminpage/productadmin/adminCategoryManagement}">카테고리관리 - 조회, 등록, 수정, 삭제</a></li>
 								</ul>
 							</li>
 						</ul>
 					</td>
 				</tr>
+				
 				<tr>
 					<td class="table-th">
-						<p>정성훈</p>
-					 	<BR>
-					 	<a href="#" target="_blank" class="icon-link">
-					        <img alt="github" src="/git/img/github-logo.png" style="width: 25px">
-					    </a>
+						<p>서요셉</p> <BR> <a href="#" target="_blank" class="icon-link">
+							<img alt="github" src="/git/img/github-logo.png"
+							style="width: 25px">
+					</a>
 					</td>
 					<td colspan="2">
-						<ul style="padding-left:15px;">
-							<li class="title-li">
-								<a class="menu-title" target="_blank">회원</a>
-								<H5>1. 포트폴리오</H5>
-								<p>멘티들의 포트폴리오 조회 및 파일을 다운로드하는 화면</p>
-								<ul class="sub-list">
-									<li>전체 포트폴리오 조회</li>
-									<li>포트폴리오 상세 조회</li>
-									<li>파일 다운로드</li>
-								</ul>
-								<BR>
-								<H5>2. 마이페이지(멘티)</H5>
-								<p>멘티의 마이페이지 화면</p>
-								<ul class="sub-list">
-									<li>계정 정보 조회, 수정</li>
-									<li>소개글 조회, 등록, 수정</li>
-									<li>경력관리(1) - 학력 조회, 등록, 수정, 삭제</li>
-									<li>경력관리(2) - 자격증 조회, 등록, 수정, 삭제</li>
-									<li>경력관리(3) - 포트폴리오 조회, 등록, 수정, 삭제</li>
-									<li>파일 업로드 및 다운로드, 파일 수정</li>
-								</ul>
-								<BR>
-								<H5>3. 마이페이지 (멘토)</H5>
-								<p>멘토의 마이페이지 화면</p>
-								<ul class="sub-list">
-									<li>계정 정보 조회, 수정</li>
-									<li>경력관리(1) - 근무 경력 조회, 등록, 수정, 삭제</li>
-									<li>경력관리(2) - 프로젝트 경력 조회, 등록, 수정, 삭제</li>
-									<li>경력관리(3) - 학력 조회, 등록, 수정, 삭제</li>
-									<li>경력관리(4) - 자격증 조회, 등록, 수정, 삭제</li>
-									<li>경력관리(5) - 포트폴리오 조회, 등록, 수정, 삭제</li>
-									<li>파일 업로드 및 다운로드, 파일 수정</li>
-								</ul>
-							</li>
-							<li class="title-li">
-								<a class="menu-title" target="_blank">관리자</a>
-								<H5>1. 자료 승인</H5>
-								<p>회원(멘토)의 자료를 다운로드 후 검토 및 승인하는 있는 화면</p>
-								<ul class="sub-list">
-									<li>근무경력 자료 승인</li>
-									<li>프로젝트 경력 자료 승인</li>
-									<li>학력 자료 승인</li>
-									<li>자격증/어학 자료 승인</li>
-								</ul>
-							</li>
-						</ul>
-					</td>
-				</tr>
-				<tr>
-					<td class="table-th">
-						<p>서요셉</p>
-					 	<BR>
-					 	<a href="#" target="_blank" class="icon-link">
-					        <img alt="github" src="/git/img/github-logo.png" style="width: 25px">
-					    </a>
-					</td>
-					<td colspan="2">
-						<ul style="padding-left:15px;">
-							<li class="title-li">
-								<a class="menu-title" target="_blank">회원</a>
+						<ul style="padding-left: 15px;">
+							<li class="title-li"><a class="menu-title" target="_blank">회원</a>
 								<H5>1. 커뮤니티 게시판</H5>
 								<p>사용자들의 커뮤니티 공간</p>
 								<ul class="sub-list">
 									<li>게시글 조회</li>
 									<li>게시글 등록/수정</li>
 									<li>게시글 삭제</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>2. 피드</H5>
 								<p>사용자들의 피드 공간</p>
 								<ul class="sub-list">
@@ -303,10 +282,8 @@
 									<li>피드 등록</li>
 									<li>피드 수정(미구현)</li>
 									<li>피드 삭제(미구현)</li>
-								</ul>
-							</li>
-							<li class="title-li">
-								<a class="menu-title" target="_blank">관리자(미구현)</a>
+								</ul></li>
+							<li class="title-li"><a class="menu-title" target="_blank">관리자(미구현)</a>
 								<H5>1. 게시판 관리</H5>
 								<p>게시판을 관리하는 화면</p>
 								<ul class="sub-list">
@@ -314,43 +291,36 @@
 									<li>게시판 생성 및 수정</li>
 									<li>게시판의 종합적인 권한 관리</li>
 									<li>게시글 관리</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>2. 피드 관리</H5>
 								<p>피드를 관리하는 화면</p>
 								<ul class="sub-list">
 									<li>피드 목록 조회</li>
 									<li>피드 관리</li>
-								</ul>
-							</li>
+								</ul></li>
 						</ul>
 					</td>
 				</tr>
 				<tr>
 					<td class="table-th">
-						<p>이건영</p>
-					 	<BR>
-					 	<a href="#" target="_blank" class="icon-link">
-					        <img alt="github" src="/git/img/github-logo.png" style="width: 25px">
-					    </a>
+						<p>이건영</p> <BR> <a href="#" target="_blank" class="icon-link">
+							<img alt="github" src="/git/img/github-logo.png"
+							style="width: 25px">
+					</a>
 					</td>
 					<td colspan="2">
-						<ul style="padding-left:15px;">
-							<li class="title-li">
-								<a class="menu-title" target="_blank">로그인</a>
+						<ul style="padding-left: 15px;">
+							<li class="title-li"><a class="menu-title" target="_blank">로그인</a>
 							</li>
-							<li class="title-li">
-								<a class="menu-title" target="_blank">회원</a>
+							<li class="title-li"><a class="menu-title" target="_blank">회원</a>
 								<H5>1. 멘토링 신청 관리 (멘티)</H5>
 								<p>멘토링 신청 내역 조회 및 신청 취소하는 화면</p>
 								<ul class="sub-list">
 									<li>멘토링 신청 내역 조회</li>
 									<li>멘토링 신청 취소</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>2. 멘토링 결제 (멘티)</H5>
-								<p>포트원 API를 활용하여 KAKAOPAY PG사 연동하여 결제</p>
-								<BR>
+								<p>포트원 API를 활용하여 KAKAOPAY PG사 연동하여 결제</p> <BR>
 								<H5>3. 멘토링 관리 (멘티)</H5>
 								<p>회원(멘티)이 결제한 멘토링 목록을 조회하고 관리하는 화면</p>
 								<ul class="sub-list">
@@ -358,64 +328,53 @@
 									<li>후기 등록</li>
 									<li>회원(멘티)가 작성한 후기 목록 조회</li>
 									<li>후기 수정</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>4. 멘토링 관리 (멘토)</H5>
 								<p>회원(멘토)이 신청 받은 멘토링 목록을 조회하고 정산을 신청하는 화면</p>
 								<ul class="sub-list">
 									<li>신청 받은 내역 조회</li>
 									<li>정산 신청</li>
 									<li>정산 내역 조회</li>
-								</ul>
-							</li>
-							<li class="title-li">
-								<a class="menu-title" target="_blank">관리자</a>
+								</ul></li>
+							<li class="title-li"><a class="menu-title" target="_blank">관리자</a>
 								<H5>1. 멘토링 후기 관리</H5>
-								<p>멘토링 후기 조회하고 부적절한 후기 내용은 삭제할 수 있는 화면</p>
-								<BR>
+								<p>멘토링 후기 조회하고 부적절한 후기 내용은 삭제할 수 있는 화면</p> <BR>
 								<H5>2. 정산 및 결제 관리</H5>
 								<p>정산 및 결제를 관리하는 화면</p>
 								<ul class="sub-list">
 									<li>멘토링 결제 내역 조회</li>
 									<li>멘토링 정산 신청 내역 조회</li>
 									<li>멘토링 정산 내역 조회</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>3. 명예 멘토 관리</H5>
 								<p>명예 멘토를 관리하는 화면</p>
 								<ul class="sub-list">
 									<li>명예 멘토 기준 조회 및 승인, 취소</li>
 									<li>명예 멘토 조회</li>
-								</ul>
-							</li>
+								</ul></li>
 						</ul>
 					</td>
 				</tr>
 				<tr>
 					<td class="table-th">
-						<p>이지성</p>
-					 	<BR>
-					 	<a href="#" target="_blank" class="icon-link">
-					        <img alt="github" src="/git/img/github-logo.png" style="width: 25px">
-					    </a>
+						<p>이지성</p> <BR> <a href="#" target="_blank" class="icon-link">
+							<img alt="github" src="/git/img/github-logo.png"
+							style="width: 25px">
+					</a>
 					</td>
 					<td colspan="2">
-						<ul style="padding-left:15px;">
-							<li class="title-li">
-								<a class="menu-title" target="_blank">로그인</a>
+						<ul style="padding-left: 15px;">
+							<li class="title-li"><a class="menu-title" target="_blank">로그인</a>
 							</li>
-							<li class="title-li">
-								<a class="menu-title" target="_blank">회원</a>
+							<li class="title-li"><a class="menu-title" target="_blank">회원</a>
 								<H5>1. 멘토링 신청 관리 (멘티)</H5>
 								<p>멘토링 신청 내역 조회 및 신청 취소하는 화면</p>
 								<ul class="sub-list">
 									<li>멘토링 신청 내역 조회</li>
 									<li>멘토링 신청 취소</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>2. 멘토링 결제 (멘티)</H5>
-								<p>포트원 API를 활용하여 KAKAOPAY PG사 연동하여 결제</p>
-								<BR>
+								<p>포트원 API를 활용하여 KAKAOPAY PG사 연동하여 결제</p> <BR>
 								<H5>3. 멘토링 관리 (멘티)</H5>
 								<p>회원(멘티)이 결제한 멘토링 목록을 조회하고 관리하는 화면</p>
 								<ul class="sub-list">
@@ -423,64 +382,53 @@
 									<li>후기 등록</li>
 									<li>회원(멘티)가 작성한 후기 목록 조회</li>
 									<li>후기 수정</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>4. 멘토링 관리 (멘토)</H5>
 								<p>회원(멘토)이 신청 받은 멘토링 목록을 조회하고 정산을 신청하는 화면</p>
 								<ul class="sub-list">
 									<li>신청 받은 내역 조회</li>
 									<li>정산 신청</li>
 									<li>정산 내역 조회</li>
-								</ul>
-							</li>
-							<li class="title-li">
-								<a class="menu-title" target="_blank">관리자</a>
+								</ul></li>
+							<li class="title-li"><a class="menu-title" target="_blank">관리자</a>
 								<H5>1. 멘토링 후기 관리</H5>
-								<p>멘토링 후기 조회하고 부적절한 후기 내용은 삭제할 수 있는 화면</p>
-								<BR>
+								<p>멘토링 후기 조회하고 부적절한 후기 내용은 삭제할 수 있는 화면</p> <BR>
 								<H5>2. 정산 및 결제 관리</H5>
 								<p>정산 및 결제를 관리하는 화면</p>
 								<ul class="sub-list">
 									<li>멘토링 결제 내역 조회</li>
 									<li>멘토링 정산 신청 내역 조회</li>
 									<li>멘토링 정산 내역 조회</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>3. 명예 멘토 관리</H5>
 								<p>명예 멘토를 관리하는 화면</p>
 								<ul class="sub-list">
 									<li>명예 멘토 기준 조회 및 승인, 취소</li>
 									<li>명예 멘토 조회</li>
-								</ul>
-							</li>
+								</ul></li>
 						</ul>
 					</td>
 				</tr>
 				<tr>
 					<td class="table-th">
-						<p>염가은</p>
-					 	<BR>
-					 	<a href="#" target="_blank" class="icon-link">
-					        <img alt="github" src="/git/img/github-logo.png" style="width: 25px">
-					    </a>
+						<p>염가은</p> <BR> <a href="#" target="_blank" class="icon-link">
+							<img alt="github" src="/git/img/github-logo.png"
+							style="width: 25px">
+					</a>
 					</td>
 					<td colspan="2">
-						<ul style="padding-left:15px;">
-							<li class="title-li">
-								<a class="menu-title" target="_blank">로그인</a>
+						<ul style="padding-left: 15px;">
+							<li class="title-li"><a class="menu-title" target="_blank">로그인</a>
 							</li>
-							<li class="title-li">
-								<a class="menu-title" target="_blank">회원</a>
+							<li class="title-li"><a class="menu-title" target="_blank">회원</a>
 								<H5>1. 멘토링 신청 관리 (멘티)</H5>
 								<p>멘토링 신청 내역 조회 및 신청 취소하는 화면</p>
 								<ul class="sub-list">
 									<li>멘토링 신청 내역 조회</li>
 									<li>멘토링 신청 취소</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>2. 멘토링 결제 (멘티)</H5>
-								<p>포트원 API를 활용하여 KAKAOPAY PG사 연동하여 결제</p>
-								<BR>
+								<p>포트원 API를 활용하여 KAKAOPAY PG사 연동하여 결제</p> <BR>
 								<H5>3. 멘토링 관리 (멘티)</H5>
 								<p>회원(멘티)이 결제한 멘토링 목록을 조회하고 관리하는 화면</p>
 								<ul class="sub-list">
@@ -488,36 +436,30 @@
 									<li>후기 등록</li>
 									<li>회원(멘티)가 작성한 후기 목록 조회</li>
 									<li>후기 수정</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>4. 멘토링 관리 (멘토)</H5>
 								<p>회원(멘토)이 신청 받은 멘토링 목록을 조회하고 정산을 신청하는 화면</p>
 								<ul class="sub-list">
 									<li>신청 받은 내역 조회</li>
 									<li>정산 신청</li>
 									<li>정산 내역 조회</li>
-								</ul>
-							</li>
-							<li class="title-li">
-								<a class="menu-title" target="_blank">관리자</a>
+								</ul></li>
+							<li class="title-li"><a class="menu-title" target="_blank">관리자</a>
 								<H5>1. 멘토링 후기 관리</H5>
-								<p>멘토링 후기 조회하고 부적절한 후기 내용은 삭제할 수 있는 화면</p>
-								<BR>
+								<p>멘토링 후기 조회하고 부적절한 후기 내용은 삭제할 수 있는 화면</p> <BR>
 								<H5>2. 정산 및 결제 관리</H5>
 								<p>정산 및 결제를 관리하는 화면</p>
 								<ul class="sub-list">
 									<li>멘토링 결제 내역 조회</li>
 									<li>멘토링 정산 신청 내역 조회</li>
 									<li>멘토링 정산 내역 조회</li>
-								</ul>
-								<BR>
+								</ul> <BR>
 								<H5>3. 명예 멘토 관리</H5>
 								<p>명예 멘토를 관리하는 화면</p>
 								<ul class="sub-list">
 									<li>명예 멘토 기준 조회 및 승인, 취소</li>
 									<li>명예 멘토 조회</li>
-								</ul>
-							</li>
+								</ul></li>
 						</ul>
 					</td>
 				</tr>
