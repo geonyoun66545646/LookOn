@@ -114,12 +114,14 @@
     <!-- USER_PROFILE 테이블에 데이터 삽입 -->
     <insert id="addUserProfile" parameterType="ks55team02.customer.register.domain.UserProfile">
         INSERT INTO user_profiles (
-	        user_no, 
+	        user_no,
+	        prfl_img, 
 	        push_ntfctn_rcptn_agre_yn,
 	        eml_rcptn_agre_yn
 	    ) 
 	    VALUES (
-	        #{userNo}, 
+	        #{userNo},
+	        '/uploads/profiles/defaultprofile.jpg', 
 	        #{pushNtfctnRcptnAgreYn}, 
 	        #{emlRcptnAgreYn}
 	    )
