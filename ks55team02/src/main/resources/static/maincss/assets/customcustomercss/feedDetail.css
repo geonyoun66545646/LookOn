@@ -1,177 +1,79 @@
 @charset "UTF-8";
 
 /* ======================================================= */
-/* LookOn - Feed Detail Page Stylesheet (v2.0 - 2-Column)  */
+/* LookOn - Feed Detail Page Stylesheet (FINAL Version)    */
 /* ======================================================= */
 
-
 /* --- 1. Main Layout --- */
-.feed-detail-container {
-    padding-top: 20px;
-    padding-bottom: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-/* 2단 레이아웃을 감싸는 전체 래퍼 */
+.feed-detail-container { padding-top: 20px; padding-bottom: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
 .feed-post-wrapper {
     display: flex;
-    max-width: 935px; /* 콘텐츠 최대 너비 */
+    max-width: 935px;
     width: 100%;
-    margin: 0 auto 24px auto; /* 중앙 정렬 및 피드 간 하단 여백 */
+    margin: 0 auto 24px auto;
     border: 1px solid #dbdbdb;
     background-color: #fff;
-    border-radius: 8px; /* 래퍼에 둥근 모서리 적용 */
-    overflow: hidden; /* 둥근 모서리 밖으로 내용이 나가지 않도록 함 */
+    border-radius: 8px;
+    overflow: hidden;
+    /* [핵심 수정] 뷰포트 높이를 기준으로 최대 높이를 설정하여, 내용이 많아져도 컨테이너가 무한정 늘어나는 것을 방지합니다. */
+    /* 120px는 헤더/푸터 등 다른 UI 요소를 고려한 여유 공간이며, 필요시 조정 가능합니다. */
+    max-height: calc(100vh - 120px);
 }
 
 
 /* --- 2. Left Column (Media) --- */
-.post-media-section {
-    flex: 1 1 60%; /* 너비 비율 조정 (flex-grow, flex-shrink, flex-basis) */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #000; /* 이미지가 꽉 차지 않을 때를 대비한 검은 배경 */
-}
-
-.post-media-section .feed-post-content .main-feed-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* 이미지가 잘리지 않고 비율에 맞게 표시 */
-    display: block;
-}
-
+.post-media-section { flex: 1 1 60%; display: flex; align-items: center; justify-content: center; background-color: #000; }
+.post-media-section .feed-post-content .main-feed-image { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
 
 /* --- 3. Right Column (Info) --- */
-.post-info-section {
-    flex: 1 1 40%;
-    display: flex;
-    flex-direction: column; /* 헤더-콘텐츠-푸터를 수직으로 배치 */
-    min-width: 340px; /* 정보 영역의 최소 너비 확보 */
-}
-
-/* 오른쪽 정보 영역의 루트 article 태그 */
-.post-info-section .feed-post {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-/* 3-1. Header */
-.post-info-section .feed-post-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
-    border-bottom: 1px solid #efefef;
-}
-
-.post-info-section .user-profile {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.post-info-section .user-profile .profile-image {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.post-info-section .user-profile .username {
-    font-weight: 600;
-}
-
-.post-info-section .more-options-btn {
-    background: none; border: none; cursor: pointer; padding: 8px;
-}
-
-
-/* 3-2. Scrollable Content Area */
-.post-info-section .post-scrollable-content {
-    flex-grow: 1; /* 남는 공간을 모두 차지하여 푸터를 하단으로 밀어냄 */
-    overflow-y: auto; /* 내용이 길어지면 수직 스크롤바 생성 */
-    padding: 16px;
-}
-
-.post-scrollable-content .feed-content-body {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-/* 피드 본문 작성자 프로필 (댓글과 통일성을 위해 추가) */
-.post-scrollable-content .feed-content-body .writer-profile-img {
-    width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
-}
-.post-scrollable-content .feed-content-body p {
-    margin: 0; line-height: 1.5;
-}
-
-.post-scrollable-content .hashtags {
-    color: #00376b; margin: 0 0 16px 0;
-}
-.post-scrollable-content .hashtags a {
-    color: inherit; text-decoration: none; margin-right: 5px;
-}
-
-
-/* 3-3. Footer */
-.post-info-section .feed-post-footer {
-    padding: 16px;
-    border-top: 1px solid #efefef;
-    margin-top: auto; /* 내용이 짧아도 항상 하단에 위치 */
-}
-
-.post-info-section .interaction-buttons {
-    display: flex; gap: 16px; margin-bottom: 8px;
-}
-.post-info-section .interaction-buttons button {
-    background: none; border: none; padding: 0; cursor: pointer;
-}
-.post-info-section .interaction-buttons svg {
-    width: 24px; height: 24px;
-}
-
-.post-info-section .like-count {
-    font-weight: 600; margin-bottom: 8px;
-}
-
-.post-info-section .post-timestamp {
-    font-size: 12px; color: #8e8e8e; margin-bottom: 16px;
-}
-
+.post-info-section { flex: 1 1 40%; display: flex; flex-direction: column; min-width: 340px; overflow: hidden; }
+.post-info-section .feed-post { display: flex; flex-direction: column; height: 100%; }
+.post-info-section .feed-post-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #efefef; flex-shrink: 0; }
+.post-info-section .user-profile { display: flex; align-items: center; gap: 12px; }
+.post-info-section .user-profile .profile-image { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.post-info-section .user-profile .username { font-weight: 600; }
+.post-info-section .post-scrollable-content { flex-grow: 1; overflow-y: auto; padding: 16px; min-height: 0; }
+.post-scrollable-content .feed-content-body { display: flex; gap: 8px; margin-bottom: 16px; }
+.post-scrollable-content .feed-content-body .writer-profile-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.post-scrollable-content .feed-content-body p { margin: 0; line-height: 1.5; }
+.post-scrollable-content .hashtags { color: #00376b; margin: 0 0 16px 0; }
+.post-scrollable-content .hashtags a { color: inherit; text-decoration: none; margin-right: 5px; }
+.post-info-section .feed-post-footer { padding: 16px; border-top: 1px solid #efefef; margin-top: auto; flex-shrink: 0; }
+.post-info-section .interaction-buttons { display: flex; gap: 16px; margin-bottom: 8px; }
+.post-info-section .interaction-buttons button { background: none; border: none; padding: 0; cursor: pointer; }
+.post-info-section .interaction-buttons svg { width: 24px; height: 24px; }
+.post-info-section .like-count { font-weight: 600; margin-bottom: 8px; }
+.post-info-section .post-timestamp { font-size: 0.75rem; color: #8e8e8e; margin-bottom: 16px; }
 .post-info-section .comment-input-area { width: 100%; }
-.post-info-section .comment-input {
-    width: 100%; border: none; padding: 8px 0; font-size: 14px;
-}
+.post-info-section .comment-input { width: 100%; border: none; padding: 8px 0; font-size: 14px; }
 .post-info-section .comment-input:focus { outline: none; }
 
-
-/* --- 4. Comment List Styles (오른쪽 스크롤 영역 내부) --- */
+/* --- 4. Comment & Button Styles --- */
 .comment-list { list-style: none; padding: 0; margin: 0; }
-
-.comment-item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
+.comment-item { display: flex; align-items: flex-start; margin-bottom: 16px; }
 .comment-item:last-child { margin-bottom: 0; }
-
-.comment-writer-profile {
-    margin-right: 12px;
-    flex-shrink: 0;
-}
-
-.comment-writer-profile img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    background-color: #f0f0f0;
-}
-
-.comment-content { display: flex; flex-direction: column; }
-.comment-content p { margin: 0; line-height: 1.4; }
+.comment-writer-profile { margin-right: 12px; flex-shrink: 0; }
+.comment-writer-profile img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background-color: #f0f0f0; }
+.comment-content { display: flex; flex-direction: column; width: 100%; }
+.comment-content p { margin: 0; line-height: 1.4; word-break: break-all; }
 .comment-content .comment-writer-username { font-weight: 600; margin-right: 6px; }
-.comment-content .comment-timestamp { font-size: 12px; color: #8e8e8e; margin-top: 4px; }
+.comment-content .comment-timestamp { font-size: 0.75rem; color: #8e8e8e; margin-top: 4px; }
+.interaction-buttons button.liked svg { fill: #ed4956; stroke: #ed4956; }
+.hidden-comment { display: none; }
+.show-more-comments-btn { background: none; border: none; padding: 8px 0; margin-left: 50px; cursor: pointer; font-size: 0.8rem; color: #8e8e8e; font-weight: 600; }
+.show-more-comments-btn:hover { color: #262626; }
+.comment-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; visibility: hidden; opacity: 0; transition: visibility 0s, opacity 0.2s linear; }
+.comment-item:hover .comment-actions { visibility: visible; opacity: 1; }
+.comment-actions button { background: none; border: none; padding: 4px; margin: 0; cursor: pointer; line-height: 0; }
+.comment-actions button svg { fill: #8e8e8e; transition: fill 0.2s; }
+.comment-actions button:hover svg { fill: #262626; }
+.post-actions > div, .comment-actions { display: flex; align-items: center; gap: 12px; }
+.post-actions button { background: none; border: none; cursor: pointer; color: #8e8e8e; font-weight: 600; }
+.post-actions button:hover { color: #262626; }
+
+/* --- 5. Comment Edit Mode Styles --- */
+.comment-edit-mode { width: 100%; }
+.comment-edit-input { width: 100%; border: 1px solid #dbdbdb; border-radius: 4px; padding: 8px; resize: vertical; min-height: 60px; font-size: 14px; margin-bottom: 8px; }
+.edit-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.edit-actions button { border: 1px solid #dbdbdb; background-color: #fff; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; line-height: normal; }
+.edit-actions .save-edit-btn { background-color: #0095f6; color: white; border-color: #0095f6; }
