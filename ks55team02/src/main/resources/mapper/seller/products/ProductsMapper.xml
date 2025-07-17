@@ -89,6 +89,26 @@
 		</association>
 	</resultMap>
 	
+	
+	<select id="selectProductStatusOptions" parameterType="String" resultType="map">
+        SELECT
+            ps.gds_stts_no,
+            GROUP_CONCAT(som.opt_vl_no ORDER BY som.opt_vl_no) AS opt_vl_nos,
+            ps.sel_psblty_qntty
+        FROM
+            product_status ps
+        LEFT JOIN
+            status_option_mappings som ON ps.gds_stts_no = som.gds_stts_no
+        WHERE
+            ps.gds_no = #{gdsNo}
+            AND ps.actvtn_yn = TRUE
+            AND ps.sel_psblty_qntty > 0
+        GROUP BY
+            ps.gds_stts_no, ps.sel_psblty_qntty
+        ORDER BY
+            ps.gds_stts_no
+    </select>
+	
 	<!-- ⭐⭐⭐⭐⭐ [4단계: 쿼리 추가] 시작 ⭐⭐⭐⭐⭐ -->
 
 	<!-- 이미지 순서(img_indct_sn) 업데이트 -->

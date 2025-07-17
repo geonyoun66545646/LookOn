@@ -116,8 +116,8 @@ public class CustomerProductController {
 
 	/**
 	 * 특정 브랜드의 상품 목록 페이지를 처리합니다.
-	 * 
-	 * @param storeId            URL 경로에서 추출된 브랜드(상점) ID
+	 * 
+	 * @param storeId            URL 경로에서 추출된 브랜드(상점) ID
 	 * @param redirectAttributes 리다이렉트 시 파라미터 전달을 위함
 	 * @return /customer/products/list?brandId={storeId} 로 리다이렉트
 	 */
@@ -325,7 +325,11 @@ public class CustomerProductController {
 					product.getGdsNo());
 			model.addAttribute("similarProducts", similarProducts);
 		}
-
+		
+		// ⭐⭐ [추가] 상품 옵션 조합 데이터를 모델에 추가
+		List<Map<String, Object>> productStatusData = productsService.getProductStatusOptions(productCode);
+		model.addAttribute("productStatusData", productStatusData);
+		
 		// 리뷰 추가(ljs)
 		model.addAttribute("reviews", reviews);
 

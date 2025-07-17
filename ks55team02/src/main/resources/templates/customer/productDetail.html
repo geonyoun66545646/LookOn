@@ -71,8 +71,8 @@
 						<div class="col-md-6">
 							<div class="product-details">
 								<a th:if="${product.store != null}"
-									th:href="@{/customer/products/brand/{brandId}(brandId=${product.store.storeId})}" style="text-decoration: none; color:
-									inherit;">
+									th:href="@{/customer/products/brand/{brandId}(brandId=${product.store.storeId})}"
+									style="text-decoration: none; color: inherit;">
 									<div class="product-brand-info">
 										<div class="product-brand-icon"
 											th:if="${product.store.storeLogoImg != null}">
@@ -95,7 +95,8 @@
 
 								<div class="product-details-top">
 									<div class="product-cat">
-										<a	th:href="@{/products/category/{categoryId}(categoryId=${product.productCategory.categoryId})}"
+										<a
+											th:href="@{/products/category/{categoryId}(categoryId=${product.productCategory.categoryId})}"
 											th:text="${product?.productCategory?.categoryName ?: '카테고리	없음'}">카테고리
 										</a>
 									</div>
@@ -238,14 +239,14 @@
 
 						<div class="tab-pane fade" id="product-review-tab" role="tabpanel"
 							aria-labelledby="product-review-link">
-							
 
-									<div
-										th:replace="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">
-									</div>
-								
+
+							<div
+								th:replace="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">
+							</div>
+
 						</div>
-						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -319,7 +320,8 @@
 
 
 	<th:block layout:fragment="jsFile">
-		<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+		<script
+			src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 		<script th:src="@{/maincss/assets/js/jquery.elevateZoom.min.js}"></script>
 		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
 		<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
@@ -327,24 +329,32 @@
 
 	<th:block layout:fragment="jsScript">
 		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-		
+
 		<script th:inline="javascript">
-			let isLoggedIn = /*[[${isLoggedIn}]]*/ false;
-			let currentProductGdsNo = /*[[${product?.gdsNo}]]*/ null;
-			let currentProductStoreId = /*[[${product.store?.storeId}]]*/ null;
-			let productDataOptions = /*[[${product?.productOptions}]]*/ []; 
-	
+			let isLoggedIn = /*[[${isLoggedIn}]]*/false;
+			let currentProductGdsNo = /*[[${product?.gdsNo}]]*/null;
+			let currentProductStoreId = /*[[${product.store?.storeId}]]*/null;
+			let productDataOptions = /*[[${product?.productOptions}]]*/[];
+
 			// [디버깅 코드 추가] 페이지 로드 시 받은 원본 데이터를 콘솔에 출력합니다.
 			console.log("=============== 원본 데이터 확인 ===============");
-			console.log("서버로부터 받은 productDataOptions:", JSON.stringify(productDataOptions, null, 2));
+			console.log("서버로부터 받은 productDataOptions:", JSON.stringify(
+					productDataOptions, null, 2));
 			console.log("============================================");
-			
+
 			console.log("현재 상품 번호 (gdsNo):", currentProductGdsNo);
 			console.log("현재 상점 ID (storeId):", currentProductStoreId);
 			console.log("상품 옵션 데이터:", productDataOptions);
 		</script>
-		
-		
+
+		<script th:inline="javascript">
+			// 서버에서 전달받은 데이터를 안전하게 JavaScript 배열로 변환합니다.
+			// 만약 데이터가 없거나 비어있으면 빈 배열 '[]'을 사용합니다.
+			var productStatusData = /*[[${productStatusData}]]*/[];
+			console.log("서버로부터 받은 상품 상태 데이터:", productStatusData);
+		</script>
+
+
 		<script>
 			function copyShareLink() {
 				const el = document.createElement('textarea');

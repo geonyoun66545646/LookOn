@@ -43,11 +43,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label>이름</label>
-                                    <input type="text" id="userName">
+                                    <input type="text" id="userName" data-original-value="">
                                 </div>
                                 <div class="form-group">
                                     <label for="userEmail">이메일</label>
-								    <input type="email" class="form-control" id="userEmail" name="emlAddr">
+								    <input type="email" class="form-control" id="userEmail" name="emlAddr" data-original-value="">
 								    <p class="error-message" id="emailError" style="color: red; display: none;"></p>
                                 </div>
                                 <div class="form-group">
@@ -56,7 +56,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="userTelNo">전화번호</label>
-                                    <input type="text" class="form-control" id="userTelNo" name="telno">
+                                    <input type="text" class="form-control" id="userTelNo" name="telno" data-original-value="">
     								<p class="error-message" id="telError" style="color: red; display: none;"></p>
                                 </div>
                                 <div class="form-group">
@@ -66,10 +66,10 @@
                                         <button type="button">우편번호 찾기</button>
                                     </div>
                                     <input type="text" id="userAddress" placeholder="기본 주소" readonly>
-                                    <input type="text" id="userDetailAddress" placeholder="상세 주소를 입력하세요">
+                                    <input type="text" id="userDetailAddress" placeholder="상세 주소를 입력하세요" data-original-value="">
                                 </div>
                                 <div class="form-actions">
-                                    <button type="submit" class="btn-primary">수정하기</button>
+                                    <button type="submit" id="saveInfoButton" class="btn-primary" disabled>수정하기</button>
                                 </div>
                             </form>
                         </div>
@@ -93,16 +93,16 @@
 							        <!-- 닉네임 -->
 							        <div class="form-group">
 							            <label>닉네임 *</label>
-							            <input type="text" id="userNickname" name="userNcnm">
+							            <input type="text" id="userNickname" name="userNcnm" data-original-value="">
 							            <p class="error-message" id="nicknameError" style="color: red; display: none;"></p>
 							        </div>
 							
 							        <!-- 자기소개 -->
 							        <div class="form-group">
 							            <label>자기소개</label>
-							            <textarea id="userSelfIntro" name="selfIntroCn"></textarea>
+							            <textarea id="userSelfIntro" name="selfIntroCn" data-original-value=""></textarea>
 							        </div>
-							        <button type="submit" class="btn-primary">저장하기</button>
+							        <button type="submit" id="saveProfileButton" class="btn-primary" disabled>저장하기</button>
                             </form>
                         </div>
 
@@ -149,6 +149,49 @@
     <!-- 2. 이 페이지에서만 실행될 직접 작성한 스크립트 -->
     <th:block layout:fragment="jsScript">
         <script>
+        function setupSaveButtonToggle(formSelector, saveButtonId) {
+            const form = document.querySelector(formSelector);
+            const saveButton = document.getElementById(saveButtonId);
+
+            if (!form || !saveButton) {
+                console.warn(`[SaveButtonToggle] Form "${formSelector}" or Button "${saveButtonId}" not found.`);
+                return;
+            }
+
+            // 폼 내의 모든 입력 필드 (input, textarea, select) 선택
+            const inputFields = form.querySelectorAll('input, textarea, select');
+
+            function checkFormChanges() {
+                let hasChanges = false;
+                inputFields.forEach(field => {
+                    // data-original-value가 없는 필드(예: 히든 필드)는 무시
+                    if (field.dataset.originalValue !== undefined) {
+                        // 현재 값과 HTML에 저장된 초기 값 비교
+                        // textarea의 경우 .value가 아닌 .innerText 또는 .textContent로 비교
+                        const currentValue = field.tagName === 'TEXTAREA' ? field.value : field.value;
+                        const originalValue = field.dataset.originalValue;
+
+                        if (currentValue !== originalValue) {
+                            hasChanges = true;
+                            // 변경 사항이 하나라도 있으면 더 이상 검사할 필요 없음 (성능 최적화)
+                            // forEach 루프는 break가 안되므로, hasChanges가 true가 되면 추가 로직을 생략하는 방식으로 처리
+                        }
+                    }
+                });
+
+                // 변경 사항이 있으면 버튼 활성화, 없으면 비활성화
+                saveButton.disabled = !hasChanges;
+            }
+
+            // 각 입력 필드의 값 변경을 감지하는 이벤트 리스너 추가
+            inputFields.forEach(field => {
+                field.addEventListener('input', checkFormChanges); // 텍스트 입력 시
+                field.addEventListener('change', checkFormChanges); // select, checkbox, radio 등 변경 시
+            });
+
+            // 초기 상태 설정 (페이지 로드 시 모든 필드가 원본값과 일치하므로 버튼은 비활성화되어야 함)
+            checkFormChanges();
+        }
         const loadMyInfo = () => {
             $.ajax({
                 type: 'GET',
@@ -175,25 +218,21 @@
 
              	// ▼▼▼▼▼ 프로필 이미지 설정 부분을 이 코드로 교체해주세요 ▼▼▼▼▼
                 const profileImageElement = $('#profileImagePreview');
-                
-                // DB에 저장된 이미지 경로(prflImg)가 있는지 확인
-                if (userInfo.prflImg) {
-                    
-                    // WebConfig가 /attachment/ 경로를 직접 처리하므로,
-                    // DB에 저장된 경로를 아무런 조작 없이 그대로 사용합니다.
-                    const imageUrl = userInfo.prflImg;
-                    profileImageElement.attr('src', imageUrl).show();
-                    
-                } else {
-                    // 혹시라도 DB에 null 값이 있는 경우를 대비한 방어 코드
-                    // static 폴더에 있는 기본 이미지를 보여줍니다.
-                    // 기본 이미지의 웹 경로는 /static/을 제외한 경로입니다.
-                    profileImageElement.attr('src', '/uploads/profiles/defaultprofile.jpg').show();
-                }
+			        if (userInfo.prflImg) {
+			            const imageUrl = userInfo.prflImg;
+			            profileImageElement.attr('src', imageUrl).show();
+			        } else {
+			            profileImageElement.attr('src', '/uploads/profiles/defaultprofile.jpg').show();
+			        }
                 
                 // 초기 데이터 유효성 검사
                 validateEmail(userInfo.emlAddr);
                 validateTelno(userInfo.telno);
+                
+                setupSaveButtonToggle('#edit-info form', 'saveUserInfoButton'); // assuming your form has ID 'edit-info' or a parent div
+                
+                // 프로필 관리 폼에 대한 버튼 토글 설정
+                setupSaveButtonToggle('#profile-update-form', 'saveProfileButton');
             })
             .fail(xhr => {
                 if (xhr.status === 401) {

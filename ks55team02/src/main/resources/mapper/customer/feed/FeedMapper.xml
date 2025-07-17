@@ -169,9 +169,7 @@
 	    VALUES (#{feedIntractSn}, #{feedSn}, #{userNo}, 'like', NOW())
 	</insert>
 	
-	<!-- ========================================================== -->
-	<!-- 5. [신규] 댓글 기능 관련 쿼리 -->
-	<!-- ========================================================== -->
+	<!-- 5. 댓글 기능 관련 쿼리 -->
 	<select id="selectLastFeedCommentSn" resultType="string">
 		SELECT feed_cmnt_sn FROM feed_comments
 		ORDER BY CAST(REPLACE(feed_cmnt_sn, 'feed_cmnt_', '') AS UNSIGNED) DESC LIMIT 1
@@ -198,5 +196,24 @@
 		WHERE
 			fc.feed_cmnt_sn = #{feedCmntSn}
 	</select>
+	
+	<!-- [신규] 댓글 논리적 삭제 쿼리 -->
+	<update id="deleteComment">
+		UPDATE feed_comments
+		SET
+			del_dt = NOW(),
+			del_user_no = #{delUserNo}
+		WHERE
+			feed_cmnt_sn = #{feedCmntSn}
+	</update>
+	<!-- [신규] 댓글 수정 쿼리 -->
+	<update id="updateComment">
+		UPDATE feed_comments
+		SET
+			cmnt_cn = #{commentText},
+			mdfcn_dt = NOW()
+		WHERE
+			feed_cmnt_sn = #{feedCmntSn}
+	</update>
 
 </mapper>

@@ -270,3 +270,81 @@
 .mypage-w-style .order-table thead th {
     font-size: 13px; /* 헤더 글자 크기 조금 크게 */
 }
+
+/* ===================================================
+    회원 탈퇴 페이지 전용 스타일 (Withdrawal Page)
+   =================================================== */
+
+/* 1. 페이지 배경 스타일 */
+.withdrawal-page-background {
+    
+    /* 콘텐츠를 수직 중앙에 배치하기 위한 Flexbox 설정 */
+    display: flex;
+    align-items: center;
+    
+    /* 최소 높이를 지정하여 콘텐츠가 적어도 화면의 일정 부분을 차지하도록 함 */
+    min-height: 80vh;
+    
+    /* 레이아웃의 다른 부분과 겹치지 않도록 위아래 패딩 */
+    padding: 5rem 0;
+}
+
+/* 2. 중앙의 하얀색 콘텐츠 박스 스타일 */
+.withdrawal-content-box {
+    max-width: 550px; /* 박스의 최대 너비 제한 */
+    margin: 0 auto; /* 수평 중앙 정렬 */
+    background-color: #ffffff;
+    border-radius: 12px; /* 둥근 모서리 */
+    padding: 2.5rem 3rem; /* 내부 여백 (상하, 좌우) */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* 입체감을 위한 그림자 */
+    text-align: left; /* 내부 텍스트 왼쪽 정렬 */
+}
+
+/* 3. 폼 내부 요소들 스타일 */
+.withdrawal-content-box h2 {
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.withdrawal-content-box .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.withdrawal-content-box .form-group label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.withdrawal-content-box .form-control {
+    border-radius: 8px;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+}
+
+.withdrawal-content-box .withdrawal-info-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.withdrawal-content-box .form-check {
+    margin-bottom: 2rem;
+}
+
+/* 4. 최종 탈퇴 버튼 스타일 */
+.withdrawal-content-box .btn-withdrawal {
+    background-color: #343a40; /* 어두운 회색 계열 */
+    color: #ffffff;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.withdrawal-content-box .btn-withdrawal:hover {
+    background-color: #495057; /* 마우스 올렸을 때 약간 밝게 */
+}```
