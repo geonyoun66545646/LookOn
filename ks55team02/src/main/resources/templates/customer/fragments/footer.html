@@ -8,10 +8,12 @@
 				<div class="col-sm-6 col-lg-3">
 					<div class="widget">
 						<h4 class="widget-title">김성주</h4>
+
                         <ul class="widget-list">
                             <li><a th:href="@{/customer/mypage}">마이페이지</a></li>
                             <li><a th:href="@{/aditinfo}">회원정보수정</a></li>
                         </ul>
+
 					</div>
 				</div>
 				<div class="col-sm-6 col-lg-3">
@@ -60,9 +62,9 @@
 					<div class="widget">
 						<h4 class="widget-title">이지성</h4>
 						<ul class="widget-list">
-							<li><a href="#">기능1</a></li>
-							<li><a href="#">기능2</a></li>
-							<li><a href="#">기능3</a></li>
+							<li><a href="#">문의 조회</a></li>
+							<li><a href="#">스토어 관리</a></li>
+							<li><a href="#"></a></li>
 							<li><a href="#">기능4</a></li>
 							<li><a href="#">기능5</a></li>
 							<li><a href="#">기능6</a></li>
@@ -70,28 +72,29 @@
 						</ul>
 					</div>
 				</div>
+				
 				<div class="col-sm-6 col-lg-3">
 					<div class="widget">
 						<h4 class="widget-title">정성훈</h4>
 						<ul class="widget-list">
-							<li><a href="#">기능1</a></li>
-							<li><a href="#">기능2</a></li>
-							<li><a href="#">기능3</a></li>
-							<li><a href="#">기능4</a></li>
-							<li><a href="#">기능5</a></li>
-							<li><a href="#">기능6</a></li>
-							<li><a href="#">기능7</a></li>
+							<li><a th:href="@{/}">메인페이지</a></li>
+							<li><a th:href="@{/seller/products/list}">상품관리</a></li>
+							<li><a th:href="@{/customer/products/list?brand=store_1}">브랜드페이지</a></li>
+							<li><a th:href="@{/products/detail/gds_no_2049}">상품디테일</a></li>
+							<li><a th:href="@{/customer/products/list}">상품목록</a></li>
+							<li><a th:href="@{/adminpage/productadmin/adminProductManagement}">상품 승인/반려</a></li>
+							<li><a th:href="@{/adminpage/productadmin/adminCategoryManagement}">카테고리관리</a></li>
 						</ul>
 					</div>
 				</div>
-			</div>
+				
+			</div>	
 		</div>
 	</div>
 	<div class="footer-bottom">
 		<div class="container">
 			<a th:href="@{/main}" class="lookon-brand-logo">LookOn</a>
-			<p class="footer-copyright">Copyright © 2025 LookOn. All
-				Rights Reserved.</p>
+			<p class="footer-copyright">Copyright © 2025 LookOn. All Rights Reserved.</p>
 		</div>
 	</div>
 </footer>

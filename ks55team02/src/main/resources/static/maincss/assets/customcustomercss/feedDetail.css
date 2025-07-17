@@ -1,236 +1,79 @@
 @charset "UTF-8";
 
-/* 피드 상세보기 페이지 전용 CSS */
+/* ======================================================= */
+/* LookOn - Feed Detail Page Stylesheet (FINAL Version)    */
+/* ======================================================= */
 
-/* 전체 레이아웃 컨테이너 */
-.feed-detail-container {
-    max-width: 850px; /* 페이지 너비를 1024px로 확장 */
-    margin: 2rem auto; /* 상하 여백 및 중앙 정렬 */
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-.feed-post {
+/* --- 1. Main Layout --- */
+.feed-detail-container { padding-top: 20px; padding-bottom: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+.feed-post-wrapper {
+    display: flex;
+    max-width: 935px;
+    width: 100%;
+    margin: 0 auto 24px auto;
     border: 1px solid #dbdbdb;
-    border-radius: 8px;
     background-color: #fff;
-    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    /* [핵심 수정] 뷰포트 높이를 기준으로 최대 높이를 설정하여, 내용이 많아져도 컨테이너가 무한정 늘어나는 것을 방지합니다. */
+    /* 120px는 헤더/푸터 등 다른 UI 요소를 고려한 여유 공간이며, 필요시 조정 가능합니다. */
+    max-height: calc(100vh - 120px);
 }
 
-/* 1. 상단 헤더: 프로필, 팔로우 버튼 */
-.feed-post-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-}
 
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+/* --- 2. Left Column (Media) --- */
+.post-media-section { flex: 1 1 60%; display: flex; align-items: center; justify-content: center; background-color: #000; }
+.post-media-section .feed-post-content .main-feed-image { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
 
-.user-profile .profile-image {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    object-fit: cover;
-}
+/* --- 3. Right Column (Info) --- */
+.post-info-section { flex: 1 1 40%; display: flex; flex-direction: column; min-width: 340px; overflow: hidden; }
+.post-info-section .feed-post { display: flex; flex-direction: column; height: 100%; }
+.post-info-section .feed-post-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #efefef; flex-shrink: 0; }
+.post-info-section .user-profile { display: flex; align-items: center; gap: 12px; }
+.post-info-section .user-profile .profile-image { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.post-info-section .user-profile .username { font-weight: 600; }
+.post-info-section .post-scrollable-content { flex-grow: 1; overflow-y: auto; padding: 16px; min-height: 0; }
+.post-scrollable-content .feed-content-body { display: flex; gap: 8px; margin-bottom: 16px; }
+.post-scrollable-content .feed-content-body .writer-profile-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.post-scrollable-content .feed-content-body p { margin: 0; line-height: 1.5; }
+.post-scrollable-content .hashtags { color: #00376b; margin: 0 0 16px 0; }
+.post-scrollable-content .hashtags a { color: inherit; text-decoration: none; margin-right: 5px; }
+.post-info-section .feed-post-footer { padding: 16px; border-top: 1px solid #efefef; margin-top: auto; flex-shrink: 0; }
+.post-info-section .interaction-buttons { display: flex; gap: 16px; margin-bottom: 8px; }
+.post-info-section .interaction-buttons button { background: none; border: none; padding: 0; cursor: pointer; }
+.post-info-section .interaction-buttons svg { width: 24px; height: 24px; }
+.post-info-section .like-count { font-weight: 600; margin-bottom: 8px; }
+.post-info-section .post-timestamp { font-size: 0.75rem; color: #8e8e8e; margin-bottom: 16px; }
+.post-info-section .comment-input-area { width: 100%; }
+.post-info-section .comment-input { width: 100%; border: none; padding: 8px 0; font-size: 14px; }
+.post-info-section .comment-input:focus { outline: none; }
 
-.user-profile .username {
-    font-weight: 600;
-    font-size: 18px; /* 글씨 크기 확대 (16px -> 17.6px) */
-}
+/* --- 4. Comment & Button Styles --- */
+.comment-list { list-style: none; padding: 0; margin: 0; }
+.comment-item { display: flex; align-items: flex-start; margin-bottom: 16px; }
+.comment-item:last-child { margin-bottom: 0; }
+.comment-writer-profile { margin-right: 12px; flex-shrink: 0; }
+.comment-writer-profile img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background-color: #f0f0f0; }
+.comment-content { display: flex; flex-direction: column; width: 100%; }
+.comment-content p { margin: 0; line-height: 1.4; word-break: break-all; }
+.comment-content .comment-writer-username { font-weight: 600; margin-right: 6px; }
+.comment-content .comment-timestamp { font-size: 0.75rem; color: #8e8e8e; margin-top: 4px; }
+.interaction-buttons button.liked svg { fill: #ed4956; stroke: #ed4956; }
+.hidden-comment { display: none; }
+.show-more-comments-btn { background: none; border: none; padding: 8px 0; margin-left: 50px; cursor: pointer; font-size: 0.8rem; color: #8e8e8e; font-weight: 600; }
+.show-more-comments-btn:hover { color: #262626; }
+.comment-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; visibility: hidden; opacity: 0; transition: visibility 0s, opacity 0.2s linear; }
+.comment-item:hover .comment-actions { visibility: visible; opacity: 1; }
+.comment-actions button { background: none; border: none; padding: 4px; margin: 0; cursor: pointer; line-height: 0; }
+.comment-actions button svg { fill: #8e8e8e; transition: fill 0.2s; }
+.comment-actions button:hover svg { fill: #262626; }
+.post-actions > div, .comment-actions { display: flex; align-items: center; gap: 12px; }
+.post-actions button { background: none; border: none; cursor: pointer; color: #8e8e8e; font-weight: 600; }
+.post-actions button:hover { color: #262626; }
 
-.post-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.follow-btn {
-    background-color: #0095f6;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 12px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.follow-btn:hover {
-    background-color: #0077c2;
-}
-
-.more-options-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-}
-.more-options-btn svg {
-    fill: #262626;
-}
-
-/* 2. 메인 이미지 */
-.feed-post-content {
-    position: relative; /* 신체 정보 태그의 기준점 */
-}
-
-.main-feed-image {
-    width: 100%;
-    height: auto;
-    display: block; /* 이미지 하단 여백 제거 */
-}
-
-.user-spec-tag {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background-color: rgba(0, 0, 0, 0.4);
-    color: white;
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-}
-
-/* 3. 착용 상품 정보 */
-.tagged-products-section {
-    padding: 12px 16px;
-    border-top: 1px solid #efefef;
-    border-bottom: 1px solid #efefef;
-}
-
-.products-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
-    margin-bottom: 10px;
-    cursor: pointer; /* 토글 기능을 암시 */
-}
-
-.products-header .arrow-down {
-    fill: #8e8e8e;
-}
-
-.product-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.product-item {
-    margin-bottom: 10px;
-}
-.product-item:last-child {
-    margin-bottom: 0;
-}
-
-.product-item a {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-    gap: 15px;
-}
-
-.product-image {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 4px;
-    border: 1px solid #efefef;
-}
-
-.product-info {
-    flex-grow: 1; /* 남는 공간을 모두 차지 */
-}
-
-.brand-name {
-    font-size: 1rem; /* 글씨 크기 확대 (14.4px -> 16px) */
-    font-weight: 600;
-}
-.product-name {
-    font-size: 1rem; /* 글씨 크기 확대 */
-    color: #555;
-    margin: 2px 0;
-}
-.price-info .final-price {
-    font-weight: 700;
-    font-size: 1.1rem; /* 가격 강조를 위해 크기 확대 */
-}
-
-.price-info .discount {
-    color: #f04444;
-    font-weight: 700;
-    margin-right: 8px;
-}
-
-/* 4. 하단 푸터: 인터랙션 버튼, 좋아요, 해시태그 등 */
-.feed-post-footer {
-    padding: 8px 16px 16px 16px;
-}
-
-.interaction-buttons {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 8px;
-}
-
-.interaction-buttons button {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-}
-
-.interaction-buttons svg {
-    width: 24px;
-    height: 24px;
-}
-
-.like-count {
-    font-weight: 600;
-    font-size: 14px; /* 글씨 크기 확대 */
-    margin: 0 0 8px 0;
-}
-.hashtags {
-    margin: 8px 0;
-    color: #00376b;
-    font-size: 13px; /* 글씨 크기 확대 */
-    line-height: 1.5;
-}
-
-.hashtags a {
-    color: inherit;
-    text-decoration: none;
-    margin-right: 5px;
-}
-.hashtags a:hover {
-    text-decoration: underline;
-}
-
-.comment-input-area {
-    margin: 12px 0;
-}
-
-.comment-input {
-    width: 100%;
-    border: none;
-    border-bottom: 1px solid #dbdbdb;
-    padding: 8px 0;
-    background-color: transparent;
-    font-size: 14px; /* 입력창 글씨 크기 설정 */
-}
-.comment-input:focus {
-    outline: none;
-    border-bottom: 1px solid #a8a8a8;
-}
-
-.post-timestamp {
-    font-size: 13px;
-    color: #8e8e8e;
-    text-transform: uppercase;
-    margin: 0;
-}
+/* --- 5. Comment Edit Mode Styles --- */
+.comment-edit-mode { width: 100%; }
+.comment-edit-input { width: 100%; border: 1px solid #dbdbdb; border-radius: 4px; padding: 8px; resize: vertical; min-height: 60px; font-size: 14px; margin-bottom: 8px; }
+.edit-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.edit-actions button { border: 1px solid #dbdbdb; background-color: #fff; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; line-height: normal; }
+.edit-actions .save-edit-btn { background-color: #0095f6; color: white; border-color: #0095f6; }

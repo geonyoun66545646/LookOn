@@ -35,9 +35,12 @@
 	        u.user_status, 
 	        u.join_dt,
 	        (
-	            SELECT MAX(lh.lgn_dt) 
-	            FROM login_history lh 
-	            WHERE lh.user_no = u.user_no AND lh.lgn_fail_nmtm = 0
+	            SELECT 
+	            	MAX(lh.lgn_dt) 
+	            FROM 
+	            	login_history lh 
+	            WHERE 
+	            	lh.user_no = u.user_no AND lh.lgn_fail_nmtm = 0
 	        ) AS last_login_dt
 	    FROM
 	        users u
@@ -151,16 +154,32 @@
 	
 	<!-- 회원 상태 일괄 변경 -->
 	<update id="updateUserStatus" parameterType="map">
-        UPDATE
-            users
-        SET
-            user_status = #{status} 
-        WHERE
-            user_no IN 
-            <foreach collection="userNos" item="userNo" open="(" close=")" separator=",">
-                #{userNo}
-            </foreach>
-    </update>
+    UPDATE
+        users
+    <set>
+        user_status = #{status},
+        
+        <!-- 만약 전달된 status 값이 '탈퇴'라면, 탈퇴일자에 현재 시간을 기록합니다. -->
+        <if test="'탈퇴'.equals(status)">
+            whdwl_dt = NOW()
+        </if>
+        
+        <!-- 만약 전달된 status 값이 '활동'이라면, 기존 탈퇴일자 기록을 삭제(NULL)합니다. -->
+        <if test="'활동'.equals(status)">
+            whdwl_dt = NULL
+        </if>
+        
+        <!-- 
+            '휴면' 상태로 변경 시에는 이 if문들이 모두 거짓이므로, 
+            user_status만 변경되고 whdwl_dt는 변경되지 않습니다.
+	        -->
+	    </set>
+	    WHERE
+	        user_no IN 
+	        <foreach collection="userNos" item="userNo" open="(" close=")" separator=",">
+	            #{userNo}
+	        </foreach>
+	</update>
     <!-- '활동' 상태로 변경된 회원들의 로그인 기록을 일괄 추가 -->
     <insert id="insertLoginHistoryForActivatedUsers" parameterType="list">
 	    INSERT INTO login_history 

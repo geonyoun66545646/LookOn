@@ -1,15 +1,23 @@
 /* 기존 reports.css에서 body { ... } 부분을 완전히 제거합니다. */
 
+:root {
+	--molla-main-color: #D2B48C;
+	--molla-darker-color: #A98B6D;
+	--molla-light-color: #F0E6D8;
+	--molla-lighter-color: #F8F4EF;
+	--card-border-color: #e9ecef;
+	--text-dark: #343a40;
+	--text-muted: #6c757d;
+}
+
 /* .report-container 에 너비 제한을 걸어야 한다면 여기에 추가합니다. */
-.report-container {
-    background-color: #ffffff;
+.reports-receive-container {
     padding: 40px; /* 기존 패딩 값 */
     margin-top: 20px;    /* 상단 외부 여백 20px 추가 */
     margin-bottom: 20px; /* 하단 외부 여백 20px 추가 */
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 800px; /* 중앙 정렬을 위한 max-width 예시 (필요시 조절) */
     margin-left: auto; /* margin-top, margin-bottom 적용 후 margin: 0 auto;를 쓰면 */
     margin-right: auto; /* 상하 마진이 덮어씌워지므로 개별 지정 */
     box-sizing: border-box;
@@ -79,7 +87,7 @@ textarea {
 }
 
 .submit-btn {
-    background-color: #ff9900;
+    background-color: var(--molla-main-color);
     color: white;
     padding: 15px 30px;
     border: none;
@@ -93,8 +101,28 @@ textarea {
     margin-top: 20px;
 }
 
+.cancel-btn {
+    background-color: rgb(149, 149, 149);
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.cancel-btn:hover {
+    background-color: rgb(126, 126, 126);
+}
+
+
 .submit-btn:hover {
-    background-color: #e68a00;
+    background-color: var(--molla-darker-color);
 }
 
 .info-message {

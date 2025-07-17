@@ -5,7 +5,6 @@
 <head>
     <meta charset="UTF-8">
     <title>피드 상세보기</title>
-    <!-- 피드 상세보기 전용 CSS 파일을 연결합니다. -->
     <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/feedDetail.css}">
 </head>
 
@@ -13,79 +12,53 @@
 	<script th:src="@{/maincss/assets/js/customer/feedDetail.js}"></script>
 </th:block>
 
-<th:block layout:fragment="jsScript">
-</th:block>
-
 <th:block layout:fragment="contents">
-    <!-- 페이지 중앙 정렬을 위한 컨테이너 -->
-    <div class="feed-detail-container" 
-    	id="feed-container"
-    	th:data-context="${context}"
-    	th:data-user-no="${userNo}">
-        <!-- 하나의 피드 게시물을 감싸는 article 태그 -->
-        <article class="feed-post" 
-        		th:object="${feed}" 
-        		th:attr="data-crt-dt=*{crtDt}, data-wrtr-user-no=*{wrtrUserNo}">
-            <!-- 1. 작성자 정보 및 팔로우/더보기 버튼 -->
-            <header class="feed-post-header">
-                <div class="user-profile">
-                    <a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=*{writerInfo.userNo})}">
-                        <img th:src="@{/uploads/profiles/defaultprofile.jpg}" alt="프로필 사진" class="profile-image">
-                    </a>
-                    <div class="user-info">
-                        <span class="username" th:text="*{writerInfo?.userNcnm}">유저닉네임</span>
-                        <!-- 추가 정보가 있다면 여기에 표시 -->
+    <div class="feed-detail-container" id="feed-container" th:data-context="${context}" th:data-user-no="${userNo}" th:data-login-user-no="${session.loginUser?.userNo ?: ''}">
+        <div class="feed-post-wrapper" th:object="${feed}" th:attr="data-crt-dt=*{crtDt}, data-wrtr-user-no=*{wrtrUserNo}, data-feed-sn=*{feedSn}">
+            <section class="post-media-section">
+                <div class="feed-post-content">
+                    <div th:each="image : *{imageList}"><img th:src="${image.imgFilePathNm}" alt="피드 이미지" class="main-feed-image"></div>
+                </div>
+            </section>
+            <section class="post-info-section">
+                <article class="feed-post">
+                    <header class="feed-post-header">
+                        <div class="user-profile"><a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=*{writerInfo.userNo})}"><img th:src="*{writerInfo.prflImg ?: '/uploads/profiles/defaultprofile.jpg'}" alt="프로필 사진" class="profile-image"></a><div class="user-info"><span class="username" th:text="*{writerInfo?.userNcnm}">유저닉네임</span></div></div>
+                        <div class="post-actions"><div th:if="${session.loginUser != null and session.loginUser.userNo == feed.wrtrUserNo}"><button class="edit-post-btn">수정</button><button class="delete-post-btn">삭제</button></div></div>
+                    </header>
+                    <div class="post-scrollable-content">
+                        <!-- [핵심 수정] 피드 본문과 해시태그를 ul 태그 밖으로 이동 -->
+                        <div class="feed-content-wrapper">
+                            <div class="feed-content-body" th:if="*{feedCn != null and !feedCn.isEmpty()}">
+                                <a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=*{writerInfo.userNo})}"><img th:src="*{writerInfo.prflImg ?: '/uploads/profiles/defaultprofile.jpg'}" th:alt="*{writerInfo.userNcnm} + ' 프로필'" class="writer-profile-img"></a>
+                                <p><a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=*{writerInfo.userNo})}" class="comment-writer-username" th:text="*{writerInfo.userNcnm}"></a> <span class="feed-text" th:text="*{feedCn}"></span></p>
+                            </div>
+                            <div class="hashtags" th:if="*{tagList != null and !tagList.isEmpty()}">
+                                <a th:each="tag : *{tagList}" href="#" th:text="|#${tag.tagNm}|">#해시태그</a>
+                            </div>
+                        </div>
+                        <ul class="comment-list">
+                            <li class="comment-item" th:each="comment, iterStat : *{commentList}" th:attr="data-comment-sn=${comment.feedCmntSn}, data-writer-user-no=${comment.wrtrUserNo}" th:classappend="${iterStat.index >= 5} ? 'hidden-comment' : ''">
+                                <div class="comment-writer-profile"><a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=${comment.writerInfo.userNo})}"><img th:src="${comment.writerInfo?.prflImg ?: '/uploads/profiles/defaultprofile.jpg'}" alt="프로필 사진"></a></div>
+                                <div class="comment-content">
+                                    <div class="comment-view-mode"><p><a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=${comment.writerInfo.userNo})}" class="comment-writer-username" th:text="${comment.writerInfo?.userNcnm}">작성자</a> <span class="comment-text" th:text="${comment.cmntCn}">댓글 내용입니다.</span></p><span class="comment-timestamp" th:text="${#strings.substring(comment.crtDt, 0, 16)}">댓글 작성 시간</span></div>
+                                    <div class="comment-edit-mode" style="display: none;"><textarea class="comment-edit-input" th:text="${comment.cmntCn}"></textarea><div class="edit-actions"><button class="cancel-edit-btn">취소</button><button class="save-edit-btn">저장</button></div></div>
+                                </div>
+                                <div class="comment-actions"></div>
+                            </li>
+                        </ul>
+                        <div class="show-more-wrapper" th:if="${#lists.size(feed.commentList) > 5}"><button class="show-more-comments-btn" th:text="|댓글 ${#lists.size(feed.commentList) - 5}개 더 보기|"></button></div>
                     </div>
-                </div>
-                <div class="post-actions">
-                    <button class="follow-btn">+ 팔로우</button>
-                    <button class="more-options-btn" aria-label="더보기">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
-                    </button>
-                </div>
-            </header>
-
-            <!-- 2. 피드 메인 이미지 -->
-            <div class="feed-post-content">
-            	<div th:each="image : *{imageList}">
-	                <img th:src="${image.imgFilePathNm}" alt="피드 이미지" class="main-feed-image">
-	                <!-- 이미지 위 신체 정보 태그 -->
-	                <!-- <div class="user-spec-tag">173cm·73kg·가을 웜톤</div> -->
-            	</div>
-            </div>
-            
-            <!-- 4. 좋아요, 댓글, 공유 버튼 및 관련 정보 -->
-            <footer class="feed-post-footer">
-                <div class="interaction-buttons">
-                    <button aria-label="좋아요">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
-                    </button>
-                    <button aria-label="댓글">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"></path></svg>
-                    </button>
-                    <button aria-label="공유">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"></path></svg>
-                    </button>
-                </div>
-                <p class="like-count" th:text="|좋아요 *{likeCount}개|">좋아요개수</p>
-                <!-- 실제 피드 내용이 있다면 여기에 추가 -->
-                <!-- <p class="feed-content-body">오늘 날씨가 너무 좋아서 산책 나왔어요!</p> -->
-				<div class="feed-content-body" th:if="*{feedCn != null and !feedCn.isEmpty()}">
-					<p th:text="*{feedCn}"></p>
-				</div>
-                <div class="hashtags">
-                    <a href="#">#오늘의코디</a> <a href="#">#여행코디</a> <a href="#">#클럽</a> <a href="#">#빈티지</a> <a href="#">#아웃핏</a> <a href="#">#마실룩</a> <a href="#">#데일리룩</a>
-                </div>
-                <div class="comment-input-area">
-                    <input type="text" placeholder="첫 댓글을 남겨주세요" class="comment-input">
-                </div>
-                <p class="post-timestamp" th:text="*{crtDt}">타임스탬프</p>
-            </footer>
-        </article>
-
+                    <footer class="feed-post-footer">
+                        <div class="interaction-buttons"><button aria-label="좋아요"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button><button aria-label="댓글"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"></path></svg></button><button aria-label="공유"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"></path></svg></button></div>
+                        <p class="like-count" th:text="|좋아요 *{likeCount}개|">좋아요 개수</p>
+                        <p class="post-timestamp" th:text="${#strings.substring(feed.crtDt, 0, 16)}">타임스탬프</p>
+                        <div class="comment-input-area"><input type="text" placeholder="댓글 남기기..." class="comment-input"></div>
+                    </footer>
+                </article>
+            </section>
+        </div>
+        <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;"><p>Loading...</p></div>
     </div>
-	<div id="loading-indicator" style="display: none; text-align: center; padding: 20px;">
-		<p>Loading...</p>
-	</div>
 </th:block>
 </html>

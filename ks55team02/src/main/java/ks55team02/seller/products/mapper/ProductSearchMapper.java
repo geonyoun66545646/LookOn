@@ -3,6 +3,8 @@ package ks55team02.seller.products.mapper;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.domain.Products;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,10 @@ public interface ProductSearchMapper {
     List<Products> getActiveProductsForCustomerByCategory(String categoryId);
     
     List<ProductCategory> getTopLevelCategoriesByStoreId(String storeId);
+
+    
+    List<ProductCategory> getSubCategoriesWithProductsByBrand(@Param("upCtgryNo") String upCtgryNo,
+            @Param("storeId") String storeId);
 
     
     /**

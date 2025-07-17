@@ -5,14 +5,10 @@ $(() => {
 
     // 피드 데이터를 받아 HTML 문자열을 생성하는 함수
     const createFeedItemHtml = (feed) => {
-        // 기본 이미지 경로
         const defaultImageUrl = '/images/default-feed.png'; 
         const imageUrl = feed.representativeImage?.imgFilePathNm || defaultImageUrl;
         const imageAlt = feed.representativeImage?.imgAltTxtCn || '피드 대표 이미지';
-
-        // 작성자 닉네임 (null일 경우 '알 수 없는 사용자' 등으로 표시)
         const writerNickname = feed.writerInfo?.userNcnm || '알 수 없는 사용자';
-        
 		const detailLink = `/customer/feed/feedDetail/${feed.feedSn}?context=all`;
 		
         return `
@@ -51,7 +47,8 @@ $(() => {
         $('#loading-indicator').show();
 
         $.ajax({
-            url: '/customer/feed/list', // 전체 피드 목록 API 엔드포인트
+            // [핵심 수정] 변경된 RestController의 경로에 맞춰 API URL을 수정합니다.
+            url: '/customer/api/feeds/list', 
             type: 'GET',
             data: { page: currentPage },
             dataType: 'json'
@@ -59,7 +56,6 @@ $(() => {
         .done(response => {
 			if (currentPage === 1) {
 			    const totalCount = response.totalCount || 0;
-			    // toLocaleString()을 사용하여 1000단위 콤마를 추가합니다. (예: 12345 -> 12,345)
 			    $('.content-count').text(`총 ${totalCount.toLocaleString()}개`);
 			}
             renderFeeds(response.feedList); 
@@ -68,7 +64,6 @@ $(() => {
         })
         .fail((jqXHR) => {
             console.error('피드 로딩 중 오류 발생:', jqXHR.statusText);
-            // 필요 시 에러 처리 로직 추가
         })
         .always(() => {
             isLoading = false;

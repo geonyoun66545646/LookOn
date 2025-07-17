@@ -1,5 +1,6 @@
 package ks55team02.customer.feed.domain;
 
+import ks55team02.customer.login.domain.UserInfoResponse;
 import lombok.Data;
 
 @Data
@@ -15,4 +16,6 @@ public class FeedComment {
 	private String mdfcnDt;
 	private String delDt;
 	private String delUserNo;
+	
+	private UserInfoResponse writerInfo;
 }

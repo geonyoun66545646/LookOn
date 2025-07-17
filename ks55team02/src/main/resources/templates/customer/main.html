@@ -46,13 +46,13 @@
 			</div>
 		</div>
 
-		<!-- Weekly Best -->
+		<!-- 이번달 신상 -->
 		<div class="weekly-best-section">
 			<div class="weekly-best-container">
 				<div class="weekly-best-heading">
 					<h2 class="weekly-best-title">이번달 신상</h2>
 					<div class="weekly-best-more-link">
-						<a th:href="@{/customer/products(type='new')}"
+						<a th:href="@{/customer/products(type='new-products')}"
 							class="btn btn-outline-dark-2"> <span>더보기</span>
 						</a>
 					</div>
@@ -76,26 +76,30 @@
 		</div>
 
 		<!-- ⭐ 세일 상품 ⭐ -->
-		<div class="sale-products-section"> <div class="weekly-best-container container"> <div class="weekly-best-heading">
+		<div class="sale-products-section">
+			<div class="weekly-best-container container">
+				<div class="weekly-best-heading">
 					<h2 class="weekly-best-title">놓치기 아까운 특가 상품</h2>
 					<div class="weekly-best-more-link">
-						<a th:href="@{/customer/products(type='sale')}"
+						<a
+							th:href="@{/customer/products/list(sortBy='discountDesc', discountRate='30')}"
 							class="btn btn-outline-dark-2"> <span>더보기</span>
 						</a>
 					</div>
 				</div>
 
-				<div
-					class="sale-products-slider-container"> <div class="sale-products-swiper swiper">
+				<div class="sale-products-slider-container">
+					<div class="sale-products-swiper swiper">
 						<div
 							th:replace="~{customer/fragments/products :: saleProductsFragment(${saleProductList})}"></div>
 					</div>
 					<div class="swiper-button-prev sale-products-button-prev"></div>
 					<div class="swiper-button-next sale-products-button-next"></div>
 				</div>
-                <div th:if="${saleProductList.isEmpty()}" class="col-12 text-center mt-4">
-                    <p>현재 특가 상품이 없습니다.</p>
-                </div>
+				<div th:if="${saleProductList.isEmpty()}"
+					class="col-12 text-center mt-4">
+					<p>현재 특가 상품이 없습니다.</p>
+				</div>
 			</div>
 		</div>
 	</main>
