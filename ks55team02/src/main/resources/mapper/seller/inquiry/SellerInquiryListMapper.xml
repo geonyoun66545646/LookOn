@@ -64,6 +64,18 @@
         
         <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage" resultMap="inquiryImageResultMap"/>
     </resultMap>
+    
+    <select id="getStoreIdByUserLgnId" parameterType="String" resultType="String">
+        SELECT
+            s.store_id
+        FROM
+            stores s
+        JOIN
+            users u ON s.seller_user_no = u.user_no
+        WHERE
+            u.user_lgn_id = #{userLgnId}
+    </select>
+    
 
     <select id="getSellerInquiryCnt" parameterType="ks55team02.common.domain.inquiry.Inquiry" resultType="int">
         SELECT

@@ -39,7 +39,7 @@ public class SellerInquiryController {
 	        Model model,
 	        Inquiry inquiry,
 	        @RequestParam(value = "filterConditions", required = false) String filterConditionsString,
-	        HttpSession session // HttpSession 주입
+	        HttpSession session
 	) {
 		log.info("컨트롤러: sellerInquiryList 호출 - 현재 페이지: {}, 페이지 크기: {}, 검색 키: {}, 검색 값: {}",
 	             inquiry.getCurrentPage(), inquiry.getPageSize(), inquiry.getSearchKey(), inquiry.getSearchValue());
@@ -54,19 +54,26 @@ public class SellerInquiryController {
 		    inquiry.setFilterConditions(null);
 		}
 
-		// ⭐ 세션에서 로그인된 상점 ID(사용자 ID) 가져오기
+		// ⭐ 세션에서 로그인된 사용자 ID를 가져옴
 		LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
-		String loggedInStoreId = null; // 변경된 로그인 관련 변수명
+		String userLoginId = null; // 로그인 ID (예: fashionking150)
+		String storeId = null; // 실제 상점 ID (예: store_1)
+
 		if (loginUser != null) {
-		    loggedInStoreId = loginUser.getUserLgnId(); // LoginUser 객체에 getUserLgnId() 메소드가 있다고 가정
-		    log.info("세션에서 가져온 로그인된 상점 ID (사용자 ID): {}", loggedInStoreId);
+		    userLoginId = loginUser.getUserLgnId();
+		    log.info("세션에서 가져온 로그인 사용자 ID: {}", userLoginId);
+
+		    // ⭐ 로그인 사용자 ID를 사용하여 실제 상점 ID를 조회
+		    // 이 메서드는 SellerInquiryService에 구현되어야 합니다.
+		    storeId = sellerInquiryService.getStoreIdByUserLgnId(userLoginId);
+		    log.info("로그인 사용자 ID({})에 해당하는 상점 ID: {}", userLoginId, storeId);
 		} else {
-		    // 로그인 정보가 없는 경우 처리 (예: 로그인 페이지로 리다이렉트 또는 에러 메시지 표시)
 		    log.warn("세션에 로그인 정보가 없습니다.");
-		    // return "redirect:/seller/login"; // 필요 시 로그인 페이지로 리다이렉트 처리
+		    // 필요 시 로그인 페이지로 리다이렉트 처리 또는 에러 메시지
+		    // return "redirect:/seller/login";
 		}
 		
-		inquiry.setInqryStoreId(loggedInStoreId); // 동적으로 가져온 ID 설정
+		inquiry.setInqryStoreId(storeId); // ⭐ 조회된 실제 상점 ID 설정 (여기가 변경된 부분입니다!)
 
 		int totalRecordCount = sellerInquiryService.getSellerInquiryCnt(inquiry);
 		log.info("컨트롤러: 문의 전체 개수: {}", totalRecordCount);
@@ -117,23 +124,30 @@ public class SellerInquiryController {
 			@RequestParam("inqryId") String inqryId,
 			@RequestParam(value = "ansId", required = false) String ansId,
 			@RequestParam("ansCn") String ansCn,
-			HttpSession session // HttpSession 주입
+			HttpSession session
 			) {
 
 		log.info("컨트롤러: AJAX 답변 요청 수신 - inqryId: {}, ansId: {}, ansCn: {}", inqryId, ansId, ansCn);
 
 		Map<String, Object> response = new HashMap<>();
 		
-		// ⭐ 세션에서 로그인된 상점 ID(사용자 ID) 가져오기
+		// ⭐ 세션에서 로그인된 사용자 ID를 가져옴
 		LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
-		String loggedInStoreId = null; // 변경된 로그인 관련 변수명
+		String userLoginId = null; // 로그인 ID (예: fashionking150)
+		String storeId = null; // 실제 상점 ID (예: store_1)
 		String answrUserNo = null;
 
 		if (loginUser != null) {
-		    loggedInStoreId = loginUser.getUserLgnId(); // LoginUser 객체에 getUserLgnId() 메소드가 있다고 가정
-		    log.info("세션에서 가져온 로그인된 상점 ID (사용자 ID): {}", loggedInStoreId);
-		    // sellerInquiryService.getSellerUserNoByStoreId(loggedInStoreId) 호출 전에 loggedInStoreId가 유효한지 확인
-		    answrUserNo = sellerInquiryService.getSellerUserNoByStoreId(loggedInStoreId);
+		    userLoginId = loginUser.getUserLgnId();
+		    log.info("세션에서 가져온 로그인 사용자 ID: {}", userLoginId);
+
+		    // ⭐ 로그인 사용자 ID를 사용하여 실제 상점 ID를 조회
+		    // 이 메서드는 SellerInquiryService에 구현되어야 합니다.
+		    storeId = sellerInquiryService.getStoreIdByUserLgnId(userLoginId);
+		    log.info("로그인 사용자 ID({})에 해당하는 상점 ID: {}", userLoginId, storeId);
+
+		    // ⭐ 조회된 상점 ID를 사용하여 판매자 사용자 번호 조회
+		    answrUserNo = sellerInquiryService.getSellerUserNoByStoreId(storeId); // ⭐ 여기도 storeId 사용
 		} else {
 		    log.error("컨트롤러: 로그인된 사용자 정보가 세션에 없습니다.");
 		    response.put("status", "error");
@@ -142,7 +156,7 @@ public class SellerInquiryController {
 		}
 
 		if (answrUserNo == null || answrUserNo.isEmpty()) {
-		    log.error("컨트롤러: 로그인된 상점 ID({})에 해당하는 판매자 사용자 번호를 찾을 수 없습니다.", loggedInStoreId);
+		    log.error("컨트롤러: 상점 ID({})에 해당하는 판매자 사용자 번호를 찾을 수 없습니다.", storeId);
 		    response.put("status", "error");
 		    response.put("message", "답변자 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
 		    return ResponseEntity.status(500).body(response);
