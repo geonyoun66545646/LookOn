@@ -51,7 +51,11 @@ public class WebConfig implements WebMvcConfigurer{
         
         if(os.contains("win")) {
 
+<<<<<<< HEAD
             rootPath = "file:///c:"; // Windows 접두사
+=======
+            rootPath = "file:///C"; // Windows 접두사
+>>>>>>> refs/heads/develop
 
         }
         

@@ -5,31 +5,27 @@
 	<div class="product-toolbar-container">
 		<!-- customer/fragments/productToolbar.html -->
 
-		<!-- customer/fragments/productToolbar.html -->
+		<nav class="main-category-nav">
+			<ul class="main-category-list">
+				<li class="main-category-item"><a class="main-category-link"
+					th:classappend="${#strings.isEmpty(currentCategoryId) or currentCategoryId == parentCategoryId} ? 'active' : ''"
+					th:href="${currentBrandId != null} 
+					? @{/customer/products/brand/{brandId}(brandId=${currentBrandId})} 
+					: @{/customer/products/list}">
+						전체 </a></li>
 
-		
-<nav class="main-category-nav">
-    <ul class="main-category-list">
-        <!-- '전체' 링크 -->
-        <li class="main-category-item">
-            <a class="main-category-link"
-               th:classappend="${#strings.isEmpty(currentCategoryId)} ? 'active' : ''"
-               th:href="${currentBrandId != null} ? @{/customer/products/brand/{brandId}(brandId=${currentBrandId})} : @{/customer/products/list}">
-               전체
-            </a>
-        </li>
-        
-        <!-- 카테고리 목록 (브랜드/일반 페이지 공통) -->
-        <li class="main-category-item" th:each="subCategory : ${subCategories}">
-            <a class="main-category-link"
-               th:classappend="${currentCategoryId == subCategory.categoryId} ? 'active' : ''"
-               th:href="${currentBrandId != null} 
-                         ? @{/customer/products/list(brands=${currentBrandId}, categoryId=${subCategory.categoryId})} 
-                         : @{/products/category/{categoryId}(categoryId=${subCategory.categoryId})}"
-               th:text="${subCategory.categoryName}">카테고리명</a>
-        </li>
-    </ul>
-</nav>
+				<li class="main-category-item"
+					th:each="subCategory : ${subCategories}"
+					th:if="${subCategory != null}">
+					<a class="main-category-link"
+					th:classappend="${currentCategoryId == subCategory.categoryId} ? 'active' : ''"
+					th:href="${currentBrandId != null} 
+					? @{/customer/products/list(brand=${currentBrandId}, categoryId=${subCategory.categoryId})} 
+					: @{/products/category/{categoryId}(categoryId=${subCategory.categoryId})}"
+					th:text="${subCategory.categoryName}"> 카테고리명 </a>
+				</li>
+			</ul>
+		</nav>
 
 		<!-- ... (다른 툴바 요소들은 그대로 유지) ... -->
 
