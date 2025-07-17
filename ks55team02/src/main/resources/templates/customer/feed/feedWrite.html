@@ -4,57 +4,86 @@
       layout:decorate="~{customer/layout/layoutMain}">
 
 <head>
-    <title>새 피드 작성</title>
-    <!-- [신규] 피드 작성 페이지 전용 CSS 파일을 연결합니다. (향후 생성 필요) -->
+    <!-- [수정] th:with를 사용하여 isEditMode 변수 정의, 페이지 제목 동적 변경 -->
+    <th:block th:with="isEditMode = ${feed != null}">
+        <title th:text="${isEditMode} ? '피드 수정' : '새 피드 작성'"></title>
+    </th:block>
     <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/feedWrite.css}">
 </head>
 
-
-<!-- 이 블록은 비워둡니다. -->
-<th:block layout:fragment="jsScript">
+<th:block layout:fragment="jsFile">
 	<script th:src="@{/maincss/assets/js/customer/feedWrite.js}"></script>
 </th:block>
 
-<!-- [핵심] 페이지의 실제 내용을 이 블록 안에 작성합니다. -->
 <th:block layout:fragment="contents">
-    <div class="feed-write-container">
+    <!-- [수정] isEditMode 변수를 여기서 다시 정의하여 컨텐츠 전체에서 사용 -->
+    <div class="feed-write-container" th:with="isEditMode = ${feed != null}">
         
-        <h2 class="page-title">새 게시물 만들기</h2>
+        <h2 class="page-title" th:text="${isEditMode} ? '게시물 수정' : '새 게시물 만들기'">새 게시물 만들기</h2>
 
-        <!-- multipart/form-data 형식으로 데이터를 전송할 폼 -->
-        <form id="feed-form">
+        <!-- 
+            [수정] form 태그에 data-feed-sn 속성을 추가하여 수정 모드일 때 피드 번호를 JS에서 사용 
+            action과 method는 JS에서 Ajax로 처리하므로 제거.
+        -->
+        <form id="feed-form" th:data-feed-sn="${isEditMode ? feed.feedSn : ''}">
             
-            <!-- 1. 이미지 업로드 영역 -->
-            <div class="form-section image-upload-section">
-                <div id="image-preview-container" class="image-preview-container">
-					<div class="upload-placeholder">
-					    <!-- [핵심 수정] label 태그가 모든 요소를 감싸도록 변경합니다. -->
-					    <label for="image-input" class="upload-label-wrapper">
-					        <svg>...</svg>
-					        <p>사진과 동영상을 여기에 끌어다 놓으세요</p>
-					        <span class="btn btn-primary">컴퓨터에서 선택</span>
-					    </label>
-					</div>
-                </div>
-                <input type="file" id="image-input" accept="image/*" multiple style="display: none;">
-            </div>
+            <div class="form-columns">
+                <!-- 왼쪽 컬럼: 이미지 업로드 -->
+                <div class="form-section image-upload-section">
+                    
+                    <!-- [신규] 수정 모드일 때만 보이는 '기존 이미지' 영역 -->
+                    <div th:if="${isEditMode}" class="existing-images-group">
+                        <label>기존 이미지 (삭제하려면 X)</label>
+                        <div id="existing-images-preview" class="image-preview-container">
+                            <div th:each="image : ${feed.imageList}" class="preview-image-wrapper" th:attr="data-image-sn=${image.feedImgSn}">
+                                <img th:src="${image.imgFilePathNm}" alt="기존 이미지" class="preview-image">
+                                <button type="button" class="delete-existing-image-btn">×</button>
+                            </div>
+                        </div>
+                        <!-- 삭제할 이미지 번호를 저장할 hidden input -->
+                        <input type="hidden" name="deleteImageSns" id="delete-image-sns">
+                    </div>
 
-            <!-- 2. 피드 내용 입력 영역 -->
-            <div class="form-section content-section">
-                <div class="writer-profile">
-                    <!-- 로그인한 사용자 정보를 표시 (세션이 있을 경우) -->
-                    <img th:if="${session.loginUser != null}" th:src="@{/uploads/profiles/profiles.jpg}" alt="프로필 사진" class="profile-image-small">
-                    <span th:if="${session.loginUser != null}" th:text="${session.loginUser.userNcnm}" class="writer-nickname">사용자 닉네임</span>
+                    <!-- '새 이미지 추가' 영역 (작성/수정 모드 공통) -->
+                    <div class="new-images-group">
+                        <label th:text="${isEditMode} ? '새 이미지 추가' : '이미지 선택'"></label>
+                        <div id="new-image-preview-container" class="image-preview-container">
+                            <div class="upload-placeholder">
+                                <label for="image-input" class="upload-label-wrapper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor"><path d="M16.5,6V3.5A2.5,2.5,0,0,0,14,1H3.5A2.5,2.5,0,0,0,1,3.5V17.5A2.5,2.5,0,0,0,3.5,20H8V16.5A2.5,2.5,0,0,1,10.5,14H18V10.5A2.5,2.5,0,0,0,16.5,8V6M20,10.5A1.5,1.5,0,1,1,18.5,12,1.5,1.5,0,0,1,20,10.5M16.5,6H18V8H16.5M20.5,14H10.5A.5.5,0,0,0,10,14.5V22.5A.5.5,0,0,0,10.5,23H22.5A.5.5,0,0,0,23,22.5V16.5L20.5,14Z"/></svg>
+                                    <p>사진을 여기에 끌어다 놓으세요</p>
+                                    <span class="btn btn-primary">컴퓨터에서 선택</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="file" id="image-input" name="newImageFiles" accept="image/*" multiple style="display: none;">
                 </div>
-                <textarea id="feed-content" class="form-control" rows="8" placeholder="문구 입력..."></textarea>
-            </div>
-            
-            <!-- 3. 작성/취소 버튼 영역 -->
-            <div class="form-section action-section">
-                <button type="button" class="btn btn-secondary" onclick="history.back();">취소</button>
-                <button type="submit" id="submit-btn" class="btn btn-primary">작성하기</button>
-            </div>
 
+                <!-- 오른쪽 컬럼: 내용 입력 -->
+                <div class="form-section content-section">
+                    <div class="writer-profile">
+                        <img th:src="${loginUser?.prflImg ?: '/uploads/profiles/defaultprofile.jpg'}" alt="프로필 사진" class="profile-image-small">
+                        <span th:text="${loginUser?.userNcnm}" class="writer-nickname">사용자 닉네임</span>
+                    </div>
+                    <!-- [수정] th:text로 수정 시 기존 내용 채우기 -->
+                    <textarea id="feed-content" name="feedCn" class="form-control" rows="8" placeholder="문구 입력..." th:text="${feed?.feedCn}"></textarea>
+                    
+                    <!-- [신규] 해시태그 입력 필드 추가 -->
+                    <div class="hashtag-group">
+                        <label for="feed-hashtags">해시태그</label>
+                        <input type="text" id="feed-hashtags" name="hashtags" class="form-control" placeholder="#태그 #공백으로 #구분" 
+                               th:value="${isEditMode ? #strings.listJoin(feed.tagList.![ '#'+tagNm ], ' ') : ''}">
+                    </div>
+
+                    <div class="action-section">
+                        <!-- [수정] onclick 제거, JS에서 이벤트 처리 -->
+                        <button type="button" id="cancel-btn" class="btn btn-secondary">취소</button>
+                        <!-- [수정] 버튼 텍스트 동적 변경 -->
+                        <button type="submit" id="submit-btn" class="btn btn-primary" th:text="${isEditMode} ? '수정하기' : '작성하기'">작성하기</button>
+                    </div>
+                </div>
+            </div>
         </form>
     </div>
 </th:block>
