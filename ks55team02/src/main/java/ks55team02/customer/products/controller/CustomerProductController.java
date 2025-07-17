@@ -150,7 +150,6 @@ public class CustomerProductController {
 			categoryId = pathCategoryId;
 		}
 
-
 		String title = "상품 목록";
 		String breadCrumbTitle = "상품";
 
@@ -163,22 +162,29 @@ public class CustomerProductController {
 		filterParams.put("sizes", sizes);
 		filterParams.put("brands", brands);
 		filterParams.put("styles", styles);
-		filterParams.put("discountRates", discountRates);
+		/* filterParams.put("discountRates", discountRates); */
 		filterParams.put("isNewProductPage", isNewProductPage);
 		filterParams.put("categoryId", categoryId);
 
 		String parentCategoryName = "전체";
 		String parentCategoryId = null;
 
+		// ⭐⭐ 할인율 파라미터 처리 로직 추가 ⭐⭐
+		if (discountRates != null && !discountRates.isEmpty()) {
+			// 리스트의 첫 번째 값만 사용 (일반적으로 단일 값만 넘어옴)
+			String rate = discountRates.get(0);
+			if (!"all".equalsIgnoreCase(rate)) {
+				filterParams.put("discountRate", rate);
+			}
+		}
+
 		if (brands != null && !brands.isEmpty()) {
 			// --- 1. 브랜드 페이지 로직 ---
 			String brandId = brands.get(0);
 			Stores currentBrand = productsService.getStoreByStoreId(brandId);
-
 			if (currentBrand != null) {
 				title = currentBrand.getStoreConm();
 				breadCrumbTitle = currentBrand.getStoreConm();
-				
 				List<Products> brandSnapProducts = productSearchService.getRecentProductsByStoreId(brandId, 4);
 				model.addAttribute("brandSnapProducts", brandSnapProducts);
 				model.addAttribute("currentBrand", currentBrand);
@@ -186,31 +192,41 @@ public class CustomerProductController {
 				title = "알 수 없는 브랜드";
 				breadCrumbTitle = "알 수 없는 브랜드";
 			}
-			
 			model.addAttribute("currentBrandId", brandId);
 			model.addAttribute("currentBrandName", title);
-			
-			// ⭐ 브랜드 페이지의 카테고리 계층 처리 로직 (수정) ⭐
-	        // 해당 브랜드가 판매하는 상품의 상위 카테고리 목록을 조회하여 subCategories에 담음
-	        List<ProductCategory> topLevelBrandCategories = productSearchService.getTopLevelCategoriesByStoreId(brandId);
-	        model.addAttribute("subCategories", topLevelBrandCategories);
-			
-		} else {
-	        // --- 2. 브랜드 페이지가 아닐 경우 (기존 로직 그대로 유지) ---
-			if (categoryId != null && !categoryId.isEmpty()) {
-				Map<String, Object> categoryHierarchyData = productCategoryService.getCategoryHierarchy(categoryId);
-				if (categoryHierarchyData != null) {
-	                parentCategoryName = (String) categoryHierarchyData.get("parentCategoryName");
-	                parentCategoryId = (String) categoryHierarchyData.get("parentCategoryId");
-	                List<ProductCategory> subCategories = (List<ProductCategory>) categoryHierarchyData.get("subCategories");
-	                model.addAttribute("subCategories", subCategories);
+		}
 
-	                ProductCategory currentCategory = (ProductCategory) categoryHierarchyData.get("currentCategory");
-	                if (currentCategory != null) {
+		// ⭐⭐ 브랜드/일반 페이지 공통 카테고리 처리 로직 ⭐⭐
+		if (categoryId != null && !categoryId.isEmpty()) {
+			Map<String, Object> categoryHierarchyData = productCategoryService.getCategoryHierarchy(categoryId);
+			if (categoryHierarchyData != null) {
+				parentCategoryName = (String) categoryHierarchyData.get("parentCategoryName");
+				parentCategoryId = (String) categoryHierarchyData.get("parentCategoryId");
+
+				List<ProductCategory> subCategories;
+
+				if (brands != null && !brands.isEmpty()) {
+					// 브랜드가 있을 경우: 해당 브랜드의 상품이 있는 하위 카테고리만 보여주기
+					String storeId = brands.get(0);
+					subCategories = productSearchService.getSubCategoriesWithProductsByBrand(categoryId, storeId);
+				} else {
+					// 기존 일반 카테고리용 로직
+					subCategories = (List<ProductCategory>) categoryHierarchyData.get("subCategories");
+				}
+				model.addAttribute("subCategories", subCategories);
+
+				if (brands == null || brands.isEmpty()) {
+					ProductCategory currentCategory = (ProductCategory) categoryHierarchyData.get("currentCategory");
+					if (currentCategory != null) {
 						title = currentCategory.getCategoryName();
 						breadCrumbTitle = currentCategory.getCategoryName();
 					}
 				}
+			}
+		} else {
+			// 브랜드 페이지일 때는 해당 브랜드의 상위 카테고리만, 아닐 때는 전체 상위 카테고리
+			if (brands != null && !brands.isEmpty()) {
+				model.addAttribute("subCategories", productSearchService.getTopLevelCategoriesByStoreId(brands.get(0)));
 			} else {
 				parentCategoryName = "전체 상품";
 				title = "전체 상품";
@@ -218,7 +234,7 @@ public class CustomerProductController {
 				model.addAttribute("subCategories", productCategoryService.getAllTopLevelCategories());
 			}
 		}
-	    
+
 		Map<String, Object> productsResult = productSearchService.getFilteredAndSortedProducts(categoryId, sortBy,
 				filterParams, currentPage);
 		List<Products> productList = (List<Products>) productsResult.get("productsList");
