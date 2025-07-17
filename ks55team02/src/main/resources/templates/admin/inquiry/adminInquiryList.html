@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}">
+
+     <head>
+        <meta name="description" content="한국스마트정보교육원 ksmybatis" />
+        <link rel="stylesheet" th:href="@{/admincss/assets/css/customadminpagecss/userList.css}">
+     </head>
+
+     <th:block layout:fragment="jsFile">
+     </th:block>
+
+     <th:block layout:fragment="jsScript">
+     </th:block>
+
+     <th:block layout:fragment="contents">
+        <main class="main-content">
+            <section class="content-header">
+                <h2 class="content-title">어드민 문의 목록</h2>
+            </section>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form id="searchForm" th:action="@{/admin/inquiry/adminInquiryList}" method="get">
+                        <input type="hidden" name="currentPage" th:value="${searchCriteria.currentPage}" id="currentPageInput"/>
+                        <input type="hidden" name="pageSize" th:value="${searchCriteria.pageSize}" id="pageSizeInput"/>
+                        <input type="hidden" name="sortKey" th:value="${searchCriteria.sortKey}" id="sortKeyInput"/>
+                        <input type="hidden" name="sortOrder" th:value="${searchCriteria.sortOrder}" id="sortOrderInput"/>
+                        <input type="hidden" name="filterConditions" th:value="${filterConditionsString}" id="filterConditionsInput"/>
+                        <input type="hidden" name="inquiryType" th:value="${searchCriteria.inqryTypeCd}" id="inquiryTypeInput"/>
+                        <input type="hidden" name="inqryTrgtTypeCd" th:value="${searchCriteria.inqryTrgtTypeCd}" id="inquiryTargetTypeInput"/>
+
+
+                        <div class="row gx-3 align-items-center">
+                            <div class="col-lg-8 d-flex align-items-center">
+                                <label class="form-label mb-0 me-3">문의 처리 상태</label>
+                                <div class="d-flex align-items-center flex-wrap">
+                                    <div class="form-check me-4">
+                                        <input class="form-check-input filter-checkbox" type="checkbox" id="filterAll" value="" checked>
+                                        <label class="form-check-label" for="filterAll">전체</label>
+                                    </div>
+                                    <div class="form-check me-4" th:each="status : ${processStatuses}" th:if="${status != '진행중'}">
+                                        <input class="form-check-input filter-checkbox" type="checkbox" th:id="${'filter' + status}" th:value="${status}"
+                                               th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, status)}">
+                                        <label class="form-check-label" th:for="${'filter' + status}" th:text="${status}"></label>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="col-lg-4 d-flex align-items-center justify-content-end">
+                                <label class="form-label mb-0 me-2">문의 대상:</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input inquiry-target-radio" type="radio" name="inquiryTargetRadio" id="targetAll" value=""
+                                           th:checked="${searchCriteria.inqryTrgtTypeCd == null or searchCriteria.inqryTrgtTypeCd == ''}">
+                                    <label class="form-check-label" for="targetAll">전체</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input inquiry-target-radio" type="radio" name="inquiryTargetRadio" id="targetStore" value="STORE"
+                                           th:checked="${searchCriteria.inqryTrgtTypeCd == 'STORE'}">
+                                    <label class="form-check-label" for="targetStore">상점 문의</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input inquiry-target-radio" type="radio" name="inquiryTargetRadio" id="targetAdmin" value="ADMIN"
+                                           th:checked="${searchCriteria.inqryTrgtTypeCd == 'ADMIN'}">
+                                    <label class="form-check-label" for="targetAdmin">어드민 문의</label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row gx-3 align-items-end">
+                            <div class="col-lg-4">
+                                <label class="form-label">기간 (등록일)</label>
+                                <div class="d-flex">
+                                    <input type="date" class="form-control" id="startDate" name="startDate" th:value="${searchCriteria.startDate}">
+                                    <span class="mx-2 d-flex align-items-center">-</span>
+                                    <input type="date" class="form-control" id="endDate" name="endDate" th:value="${searchCriteria.endDate}">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <label class="form-label">검색 키워드</label>
+                                <div class="input-group">
+                                    <select id="searchKey" name="searchKey" class="form-select" style="max-width: 120px; background-color: #fff;">
+                                        <option value="">전체</option>
+                                        <option value="inquiryTitle" th:selected="${searchCriteria.searchKey == 'inquiryTitle'}">문의 제목</option>
+                                        <option value="inquiryContent" th:selected="${searchCriteria.searchKey == 'inquiryContent'}">문의 내용</option>
+                                        <option value="writerName" th:selected="${searchCriteria.searchKey == 'writerName'}">작성자</option>
+                                    </select>
+                                    <input type="text" id="searchValue" name="searchValue" class="form-control" th:value="${searchCriteria.searchValue}" placeholder="검색어 입력">
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <button type="submit" class="btn btn-primary btn-block" id="searchBtn">검색</button>
+                            </div>
+                        </div>
+                        <div class="row gx-2 mt-2">
+                            <div class="col-sm-auto mb-2">
+                                <label for="dateRange" class="form-label visually-hidden">날짜 범위</label>
+                                <select id="dateRange" class="form-select">
+                                    <option value="">날짜 범위 선택</option>
+                                    <option value="today">오늘</option>
+                                    <option value="1week">1주</option>
+                                    <option value="1month">1개월</option>
+                                </select>
+                            </div>
+                            </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h6 class="m-0 font-weight-bold text-success">문의 목록</h6>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row gx-3 align-items-center mb-4">
+                        <div class="col-md-6">
+                            <div class="search-result-info">
+                                총 <b class="text-brand" th:text="${pagination.totalRecordCount}"></b> 건의 문의가 검색되었습니다.
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <div class="d-inline-block">
+                                <select class="form-select d-inline-block" id="sortOrderSelect" style="width: auto;">
+                                    <option value="" data-sort-key="regYmd" data-sort-order="DESC" th:selected="${searchCriteria.sortKey == 'regYmd' and searchCriteria.sortOrder == 'DESC'}">최신 등록일순</option>
+                                    <option value="" data-sort-key="regYmd" data-sort-order="ASC" th:selected="${searchCriteria.sortKey == 'regYmd' and searchCriteria.sortOrder == 'ASC'}">오래된 등록일순</option>
+                                    <option value="" data-sort-key="inqryId" data-sort-order="DESC" th:selected="${searchCriteria.sortKey == 'inqryId' and searchCriteria.sortOrder == 'DESC'}">문의ID (내림차순)</option>
+                                    <option value="" data-sort-key="inqryId" data-sort-order="ASC" th:selected="${searchCriteria.sortKey == 'inqryId' and searchCriteria.sortOrder == 'ASC'}">문의ID (오름차순)</option>
+                                </select>
+                                <select class="form-select d-inline-block" id="pageSizeSelect" name="pageSize" style="width: auto;">
+                                    <option value="10" th:selected="${searchCriteria.pageSize == 10}">10개씩 보기</option>
+                                    <option value="25" th:selected="${searchCriteria.pageSize == 25}">25개씩 보기</option>
+                                    <option value="50" th:selected="${searchCriteria.pageSize == 50}">50개씩 보기</option>
+                                    <option value="100" th:selected="${searchCriteria.pageSize == 100}">100개씩 보기</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover member-table" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr class="text-center">
+                                    <th scope="col" class="col-checkbox">
+                                        <input class="form-check-input" type="checkbox" id="checkAll">
+                                    </th>
+                                    <th scope="col">번호</th>
+                                    <th scope="col">문의 유형</th>
+                                    <th scope="col">문의 대상</th>
+                                    <th scope="col">제목</th>
+                                    <th scope="col">작성자 (ID)</th>
+                                    <th scope="col">등록일</th>
+                                    <th scope="col">처리 상태</th>
+                                    <th scope="col">상세 보기</th>
+                                    <th scope="col">수정</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                <tr th:if="${inquiryList.size() > 0}" th:each="inquiry, i : ${inquiryList}">
+                                    <td> <input class="form-check-input member-check" type="checkbox" th:value="${inquiry.inqryId}"></td>
+                                    <td th:text="${pagination.totalRecordCount - pagination.limitStart - i.index}"></td>
+                                    <td th:text="${inquiry.inqryTypeCd}"></td>
+                                    <td th:text="${inquiry.inqryTrgtTypeCd}"></td>
+                                    <td><a class="text" th:href="@{/admin/inquiry/adminInquiryDetail(inqryId=${inquiry.inqryId})}" th:text="${inquiry.inqryTtl}"></a></td>
+                                    <td th:text="${inquiry.writerInfo.userNcnm} + ' (' + ${inquiry.wrtrId} + ')'"></td>
+                                    <td th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></td>
+                                    <td>
+                                        <span class="badge custom-badge"
+                                              th:text="${inquiry.prcsStts}"
+                                              th:classappend="${inquiry.prcsStts == '진행중'} ? 'bg-warning' :
+                                                             (${inquiry.prcsStts == '완료'} ? 'bg-success' :
+                                                             ('bg-secondary'))"> </span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/admin/inquiry/adminInquiryDetail(inqryId=${inquiry.inqryId})}" class="btn btn-sm btn-light">상세</a>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/admin/inquiry/modifyAdminInquiry(inqryId=${inquiry.inqryId})}" class="btn btn-info btn-sm">수정</a>
+                                    </td>
+                                </tr>
+                                <tr th:unless="${inquiryList.size() > 0}">
+                                    <td colspan="10" class="text-center py-5">조회된 문의 내역이 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <nav class="mt-4" aria-label="Page navigation" th:if="${pagination.totalRecordCount > 0}">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item" th:if="${pagination.existPrevBlock}">
+                                <a class="page-link page-num" href="#" th:data-page="${pagination.startPage - 1}">이전</a>
+                            </li>
+
+                            <li class="page-item" th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+                                th:classappend="${page == pagination.currentPage} ? 'active' : ''">
+                                <a class="page-link page-num" href="#" th:text="${page}" th:data-page="${page}"></a>
+                            </li>
+
+                            <li class="page-item" th:if="${pagination.existNextBlock}">
+                                <a class="page-link page-num" href="#" th:data-page="${pagination.endPage + 1}">다음</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </main>
+     </th:block>
+
+     <th:block layout:fragment="jsScript">
+     <script th:inline="javascript">
+    /*<![CDATA[*/
+    $(document).ready(function() {
+        const mainContent = $('main.main-content');
+        const searchForm = $('#searchForm');
+        const currentPageInput = $('#currentPageInput');
+        const pageSizeInput = $('#pageSizeInput');
+        const sortKeyInput = $('#sortKeyInput');
+        const sortOrderInput = $('#sortOrderInput');
+        const pageSizeSelect = $('#pageSizeSelect');
+        const filterCheckAll = $('#filterAll');
+        const statusCheckboxes = $('.filter-checkbox').not(filterCheckAll); 
+        const filterConditionsInput = $('#filterConditionsInput');
+        const startDateInput = $('#startDate');
+        const endDateInput = $('#endDate');
+        const dateRangeSelect = $('#dateRange');
+        const sortOrderSelect = $('#sortOrderSelect');
+        const inquiryTargetRadio = $('.inquiry-target-radio'); // 문의 대상 라디오 버튼 그룹
+        const inquiryTargetTypeInput = $('#inquiryTargetTypeInput'); // 문의 대상 hidden input
+
+        // 검색 폼 제출 함수
+        function submitSearchForm() {
+            console.log("--- submitSearchForm() 호출 시작 ---");
+
+            const selectedStatuses = [];
+            statusCheckboxes.each(function() {
+                if ($(this).is(':checked')) {
+                    if ($(this).val() !== '') {
+                        selectedStatuses.push($(this).val());
+                    }
+                }
+            });
+            filterConditionsInput.val(selectedStatuses.join(','));
+            console.log("1. 필터 조건 (filterConditionsInput):", filterConditionsInput.val());
+
+            // 선택된 '문의 대상' 라디오 버튼의 값을 hidden input에 설정
+            const selectedInquiryTargetValue = $('input[name="inquiryTargetRadio"]:checked').val();
+            inquiryTargetTypeInput.val(selectedInquiryTargetValue);
+            console.log("2. 선택된 문의 대상 라디오 값 (selectedInquiryTargetValue):", selectedInquiryTargetValue);
+            console.log("3. 히든 인풋 #inquiryTargetTypeInput 값:", inquiryTargetTypeInput.val());
+
+            console.log("4. 현재 페이지 (currentPageInput):", currentPageInput.val());
+            console.log("5. 페이지 크기 (pageSizeInput):", pageSizeInput.val());
+            console.log("6. 정렬 키 (sortKeyInput):", sortKeyInput.val());
+            console.log("7. 정렬 순서 (sortOrderInput):", sortOrderInput.val());
+            console.log("8. 검색 시작일 (startDate):", startDateInput.val());
+            console.log("9. 검색 종료일 (endDate):", endDateInput.val());
+            console.log("10. 검색 키 (searchKey):", $('#searchKey').val());
+            console.log("11. 검색 값 (searchValue):", $('#searchValue').val());
+
+            searchForm.submit();
+            console.log("--- submitSearchForm() 호출 종료: 폼 제출됨 ---");
+        }
+
+        // [테이블] 헤더 체크박스로 전체 선택/해제
+        mainContent.on('click', '#checkAll', function() {
+            $('.member-check').prop('checked', $(this).is(':checked'));
+        });
+
+        // [테이블] 개별 체크박스 선택 시, 헤더 체크박스 상태 동기화
+        mainContent.on('click', '.member-check', () => {
+            const totalChecks = $('.member-check').length;
+            const checkedChecks = $('.member-check:checked').length;
+            $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
+        });
+
+        // 페이지 번호 클릭 시
+        mainContent.on('click', '.page-num', function(e) {
+            e.preventDefault();
+            currentPageInput.val($(this).data('page'));
+            submitSearchForm();
+        });
+
+        // 페이지 크기 변경 시
+        pageSizeSelect.on('change', function() {
+            pageSizeInput.val($(this).val());
+            currentPageInput.val(1);
+            submitSearchForm();
+        });
+
+        // 정렬 순서 변경 시
+        sortOrderSelect.on('change', function() {
+            const selectedOption = $(this).find('option:selected');
+            sortKeyInput.val(selectedOption.data('sort-key'));
+            sortOrderInput.val(selectedOption.data('sort-order'));
+            currentPageInput.val(1);
+            submitSearchForm();
+        });
+
+        // '전체' (filterAll) 체크박스 변경 시 이벤트 핸들러
+        filterCheckAll.off('change').on('change', function() {
+            statusCheckboxes.prop('checked', $(this).is(':checked'));
+            submitSearchForm();
+        });
+
+        // 개별 상태 체크박스 (filterAll 제외) 변경 시 이벤트 핸들러
+        statusCheckboxes.off('change').on('change', function() {
+            if (!$(this).is(':checked')) {
+                filterCheckAll.prop('checked', false);
+            } else {
+                const allIndividualChecked = statusCheckboxes.filter(':checked').length === statusCheckboxes.length;
+                filterCheckAll.prop('checked', allIndividualChecked);
+            }
+            submitSearchForm();
+        });
+
+        // 날짜 범위 선택 시
+        dateRangeSelect.on('change', function() {
+            const range = $(this).val();
+            const today = new Date();
+            let newStartDate = '';
+            let newEndDate = '';
+
+            if (range === 'today') {
+                newStartDate = formatDate(today);
+                newEndDate = formatDate(today);
+            } else if (range === '1week') {
+                const oneWeekAgo = new Date(today);
+                oneWeekAgo.setDate(today.getDate() - 7);
+                newStartDate = formatDate(oneWeekAgo);
+                newEndDate = formatDate(today);
+            } else if (range === '1month') {
+                const oneMonthAgo = new Date(today);
+                oneMonthAgo.setMonth(today.getMonth() - 1);
+                newStartDate = formatDate(oneMonthAgo);
+                newEndDate = formatDate(today);
+            }
+            if (range === '') {
+                newStartDate = '';
+                newEndDate = '';
+            }
+
+            startDateInput.val(newStartDate);
+            endDateInput.val(newEndDate);
+            submitSearchForm(); // 날짜 범위 선택 시 바로 검색
+        });
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 문의 대상 라디오 버튼 선택 시 폼 제출
+        inquiryTargetRadio.on('change', function() {
+            console.log("문의 대상 라디오 버튼 변경 감지:", $(this).val());
+            submitSearchForm();
+        });
+
+        // 검색 버튼 클릭 시
+        $('#searchBtn').on('click', function(e) {
+            e.preventDefault();
+            currentPageInput.val(1);
+            submitSearchForm();
+        });
+
+        // 페이지 로드 시 초기 상태 설정
+        $(document).ready(function() {
+            console.log("--- 페이지 로드 시 초기 상태 설정 시작 ---");
+            // 필터 체크박스 초기 상태 설정
+            const initialFilterConditionsString = filterConditionsInput.val();
+            const initialFilterConditions = initialFilterConditionsString ? initialFilterConditionsString.split(',') : [];
+
+            if (initialFilterConditions.length > 0) {
+                statusCheckboxes.each(function() {
+                    if (initialFilterConditions.includes($(this).val())) {
+                        $(this).prop('checked', true);
+                    } else {
+                        $(this).prop('checked', false);
+                    }
+                });
+                const currentAllChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+                filterCheckAll.prop('checked', currentAllChecked);
+            } else {
+                statusCheckboxes.prop('checked', true);
+                filterCheckAll.prop('checked', true);
+            }
+            console.log("초기 필터 조건:", filterConditionsInput.val());
+
+            // 정렬 select box 초기 선택값 설정
+            const initialSortKey = /*[[${searchCriteria.sortKey}]]*/ '';
+            const initialSortOrder = /*[[${searchCriteria.sortOrder}]]*/ '';
+
+            $('#sortOrderSelect option').each(function() {
+                const optionSortKey = $(this).data('sort-key');
+                const optionSortOrder = $(this).data('sort-order');
+
+                if (optionSortKey === initialSortKey && optionSortOrder === initialSortOrder) {
+                    $(this).prop('selected', true);
+                    return false;
+                }
+            });
+            console.log("초기 정렬 키:", sortKeyInput.val(), "초기 정렬 순서:", sortOrderInput.val());
+
+            // 문의 대상 라디오 버튼 초기 선택값 설정
+            const initialInquiryTargetType = /*[[${searchCriteria.inqryTrgtTypeCd}]]*/ '';
+            inquiryTargetRadio.each(function() {
+                if ($(this).val() === initialInquiryTargetType) {
+                    $(this).prop('checked', true);
+                } else {
+                    $(this).prop('checked', false);
+                }
+            });
+            // 초기 로드 시 선택된 라디오 값에 따라 hidden input 업데이트
+            inquiryTargetTypeInput.val($('input[name="inquiryTargetRadio"]:checked').val());
+            console.log("초기 문의 대상 유형:", inquiryTargetTypeInput.val());
+            console.log("--- 페이지 로드 시 초기 상태 설정 종료 ---");
+        });
+    });
+    /*]]>*/
+</script>
+     </th:block>
+</html>
