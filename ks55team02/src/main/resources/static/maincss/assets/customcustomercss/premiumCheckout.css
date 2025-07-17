@@ -102,7 +102,6 @@
 .order-item-display .item-quantity-display {
     font-size: 1.2em;
     font-weight: 500;
-    color: #a38b5d; /* 강조 색상 */
     white-space: nowrap; /* 줄바꿈 방지 */
 }
 /* ⭐ 주문 정보 표시 섹션 스타일 끝 ⭐ */
@@ -152,7 +151,6 @@
 .summary-line.total .highlight {
     font-size: 1.6em; /* 최종 금액 크게 */
     font-weight: 700;
-    color: #a38b5d; /* 강조 색상 */
     letter-spacing: -0.5px;
     white-space: nowrap; /* 줄바꿈 방지 */
 }
@@ -189,7 +187,6 @@
     margin-right: 10px;
     width: 18px;
     height: 18px;
-    accent-color: #a38b5d; /* 라디오 버튼 강조 색상 */
 }
 
 /* 약관 동의 섹션 */
@@ -228,8 +225,8 @@
 }
 
 .checkbox-container input:checked ~ .checkmark {
-    background-color: #a38b5d; /* 체크 시 색상 */
-    border-color: #a38b5d;
+    background-color: #3bb77e; /* 체크 시 색상 */
+    border-color: #3bb77e;
 }
 
 .checkbox-container .checkmark:after {
@@ -265,7 +262,7 @@
 
 /* 결제 버튼 */
 .confirm-button {
-    background: linear-gradient(45deg, #a38b5d, #bda67f);
+    background: linear-gradient(45deg, #3bb77e, #4CAF50); /* 시작색 #3bb77e, 끝색 좀 더 밝은 초록색 */
     color: #fff;
     padding: 18px 25px;
     font-size: 1.4em;
@@ -274,14 +271,14 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(163, 139, 93, 0.2);
+    box-shadow: 0 4px 10px rgba(59, 183, 126, 0.2); /* 그림자 색상도 변경된 배경색과 어울리게 */
     width: 100%;
     margin-top: 40px;
 }
 
 .confirm-button:hover {
-    background: linear-gradient(45deg, #bda67f, #a38b5d);
-    box-shadow: 0 6px 15px rgba(163, 139, 93, 0.3);
+    background: linear-gradient(45deg, #4CAF50, #3bb77e); /* 호버 시 색상 반전 또는 더 진한 색으로 */
+    box-shadow: 0 6px 15px rgba(59, 183, 126, 0.3); /* 호버 시 그림자 색상도 변경 */
     transform: translateY(-2px);
 }
 

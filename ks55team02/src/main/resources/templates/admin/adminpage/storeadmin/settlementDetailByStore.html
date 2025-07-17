@@ -184,12 +184,32 @@
                 const formData = new FormData(searchForm);
                 const params = new URLSearchParams();
 
+                // 기존 FormData를 통한 파라미터 추가 (filterConditions 제외)
                 for (const [key, value] of formData.entries()) {
-                    if (value) {
-                        params.append(key, value);
+                    // filterConditions는 수동으로 처리할 것이므로 건너뜀
+                    if (key !== 'filterConditions' && value) { //
+                        params.append(key, value); //
                     }
                 }
                 
+                // filterConditions 체크박스 값들을 수동으로 수집하여 추가
+                const selectedStatuses = Array.from(document.querySelectorAll('.status-check:checked')) //
+                                             .map(checkbox => checkbox.value); //
+                
+                selectedStatuses.forEach(status => { //
+                    params.append('filterConditions', status); //
+                });
+                // 만약 아무것도 선택되지 않았을 때 모든 상태를 검색하고 싶다면,
+                // 또는 특정 기본값을 서버로 보내고 싶다면 추가 로직 필요
+                if (selectedStatuses.length === 0 && document.querySelectorAll('.status-check').length > 0) { // 모든 체크박스가 해제된 경우
+                    // 여기에 모든 상태를 포함시키거나 (예: params.append('filterConditions', 'ALL');)
+                    // 또는 서버가 filterConditions가 없으면 전체를 검색하도록 처리
+                    // 현재 코드의 초기화 로직 (모두 체크)을 고려하면, 
+                    // 선택된 것이 없다는 것은 '아무것도 필터링하지 않겠다'는 의도일 수 있으므로
+                    // 이 경우 빈 상태로 두는 것이 맞을 수도 있습니다.
+                    // 서버에서 filterConditions 파라미터가 없으면 모든 상태를 조회하도록 로직을 짜는 것이 일반적입니다.
+                }
+
                 params.set('currentPage', page);
 
                 const baseUrl = /*[[@{/adminpage/storeadmin/settlementDetailByStore}]]*/ '/adminpage/storeadmin/settlementDetailByStore';
@@ -269,14 +289,56 @@
                 if (!row) return;
 
                 const storeId = row.dataset.storeId;
-                const storeClclnId = row.dataset.storeClclnId;
+                const storeClclnId = row.dataset.storeClclnId; // 이 ID를 사용하여 특정 정산 항목을 처리합니다.
                 const settleButton = event.target.closest('.settle-single-button');
                 const historyButton = event.target.closest('.view-history-button');
 
                 if (settleButton) {
-                    // ... (정산 로직)
+                    // 단일 정산 로직 시작
+                    const isCompleted = row.querySelector('.col-status .badge').textContent === '판매정산완료';
+                    if (isCompleted) {
+                        Swal.fire({ title: "정산 완료", text: "이미 정산이 완료된 항목입니다.", icon: "info" });
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: "정산하시겠습니까?",
+                        text: "이 상점의 정산을 처리합니다. 이 작업은 되돌릴 수 없습니다.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "네, 정산합니다!",
+                        cancelButtonText: "취소"
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                // 서버의 단일 정산 API 엔드포인트로 요청 보냄
+                                // 경로는 백엔드 API 설계에 따라 달라질 수 있습니다.
+                                // 예를 들어, /adminpage/storeadmin/api/process-single 또는 /adminpage/storeadmin/api/settle/{storeClclnId}
+                                const response = await fetch(/*[[@{/adminpage/storeadmin/api/process-single}]]*/ '', { // 이 URL을 실제 단일 정산 API 경로로 변경해야 합니다.
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ storeClclnId: storeClclnId }) // 단일 정산 ID 전송
+                                });
+                                const processResult = await response.json();
+                                if (response.ok) {
+                                    Swal.fire({ title: "정산 완료!", text: processResult.message, icon: "success" }).then(() => {
+                                        location.reload(); // 성공 시 페이지 새로고침하여 상태 반영
+                                    });
+                                } else {
+                                    Swal.fire({ title: "정산 실패", text: processResult.message, icon: "error" });
+                                }
+                            } catch (error) {
+                                Swal.fire({ title: "오류 발생", text: "정산 처리 중 네트워크 오류가 발생했습니다.", icon: "error" });
+                            }
+                        }
+                    });
+                    // 단일 정산 로직 끝
                 } else if (historyButton) {
-                    // ... (내역보기 로직)
+                    // 기존 내역보기 로직
+                    const storeName = row.querySelector('.col-store span').textContent;
+                    await viewSettlementHistory(storeId, storeName);
                 }
             });
 
