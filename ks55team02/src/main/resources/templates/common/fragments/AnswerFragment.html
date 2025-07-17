@@ -21,9 +21,9 @@
                                           th:text="${isEditMode ? inquiryData.answer.ansCn : ''}"></textarea>
                             </div>
                             <div class="form-group d-flex justify-content-end mt-3">
-                                <button type="button" id="submitAnswerBtn" class="btn btn-primary btn-rounded"
+                                <button type="button" id="submitAnswerBtn" class="btn-bottom"
                                         th:text="${isEditMode ? '수정 완료' : '답변 제출'}"></button>
-                                <button type="button" id="cancelAnswerBtn" class="btn btn-secondary btn-rounded ms-2"
+                                <button type="button" id="cancelAnswerBtn" class="btn-bottom"
                                         th:if="${isEditMode}">취소</button>
                             </div>
                         </form>

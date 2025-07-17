@@ -83,7 +83,10 @@ public class SellerInquiryController {
 	    Inquiry inquiryDetail = sellerInquiryService.getSellerInquiryByStoreId(inqryId);
 
 	    log.info("컨트롤러: sellerInquiryService.getSellerInquiryByStoreId 결과: {}", inquiryDetail);
-
+	    
+	    // 답변 수정 삽입 api 경로
+	    model.addAttribute("answerApiUrl", "/seller/inquiry/answerProcess");
+	    
 	    if (inquiryDetail != null) {
 	        model.addAttribute("title", "판매자 문의 상세");
 	        model.addAttribute("inquiryDetail", inquiryDetail);
@@ -94,9 +97,10 @@ public class SellerInquiryController {
 	        model.addAttribute("errorMessage", "문의 정보를 찾을 수 없습니다.");
 	        return "error/dataNotFound";
 	    }
+	    
 	}
 
-	@PostMapping("/answer")
+	@PostMapping("/answerProcess")
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> processAnswer(
 			@RequestParam("inqryId") String inqryId,

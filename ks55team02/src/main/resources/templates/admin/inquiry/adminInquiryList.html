@@ -154,7 +154,7 @@
                                     <td th:text="${pagination.totalRecordCount - pagination.limitStart - i.index}"></td>
                                     <td th:text="${inquiry.inqryTypeCd}"></td>
                                     <td th:text="${inquiry.inqryTrgtTypeCd}"></td>
-                                    <td><a class="text" th:href="@{/admin/inquiry/adminInquiryDetail(inqryId=${inquiry.inqryId})}" th:text="${inquiry.inqryTtl}"></a></td>
+                                    <td><a class="text" th:href="@{/admin/inquiry/adminInquiryDetailView(inqryId=${inquiry.inqryId})}" th:text="${inquiry.inqryTtl}"></a></td>
                                     <td th:text="${inquiry.writerInfo.userNcnm} + ' (' + ${inquiry.wrtrId} + ')'"></td>
                                     <td th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></td>
                                     <td>

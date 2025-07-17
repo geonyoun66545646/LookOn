@@ -20,6 +20,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.format.annotation.DateTimeFormat;
 
+// --- 새로 추가될 임포트 시작 ---
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import ks55team02.customer.login.domain.LoginUser; // LoginUser 클래스 임포트 (경로 확인)
+// --- 새로 추가될 임포트 끝 ---
+
 import ks55team02.admin.common.domain.Pagination;
 import ks55team02.admin.inquiry.service.AdminInquiryService;
 import ks55team02.common.domain.inquiry.Answer;
@@ -39,17 +45,14 @@ public class AdminInquiryController {
     @GetMapping("/adminInquiryList")
     public String adminInquiryList(
             Model model,
-            // 이전 @RequestParam들은 @ModelAttribute Inquiry searchInquiry 로 대체됩니다.
-            // filterConditionsString 은 List<String>으로 자동 바인딩되지 않으므로 유지합니다.
             @RequestParam(name = "filterConditions", required = false) String filterConditionsString,
-            @ModelAttribute Inquiry searchInquiry // ⭐ 모든 검색 조건이 Inquiry 객체에 자동으로 바인딩됩니다.
+            @ModelAttribute Inquiry searchInquiry
     ) {
         log.info("관리자 문의 목록 요청 - currentPage: {}, pageSize: {}", searchInquiry.getCurrentPage(), searchInquiry.getPageSize());
         log.info("검색 조건: searchKey={}, searchValue={}, startDate={}, endDate={}, filterConditions={}, sortKey={}, sortOrder={}, inqryTrgtTypeCd={}",
                  searchInquiry.getSearchKey(), searchInquiry.getSearchValue(), searchInquiry.getStartDate(), searchInquiry.getEndDate(),
                  searchInquiry.getFilterConditions(), searchInquiry.getSortKey(), searchInquiry.getSortOrder(), searchInquiry.getInqryTrgtTypeCd());
 
-        // filterConditionsString을 List<String>으로 변환하여 searchInquiry에 설정
         if (filterConditionsString != null && !filterConditionsString.isEmpty()) {
             List<String> filterConditions = Arrays.asList(filterConditionsString.split(","));
             searchInquiry.setFilterConditions(filterConditions);
@@ -58,39 +61,30 @@ public class AdminInquiryController {
             searchInquiry.setFilterConditions(null);
         }
 
-        // 1. 전체 문의 개수 조회
         int totalInquiryCnt = adminInquiryService.getAdminInquiryCnt(searchInquiry);
         log.info("총 문의 개수: {}", totalInquiryCnt);
 
-        // 2. Pagination 객체 생성 (SearchCriteria를 상속받는 searchInquiry 객체를 전달)
-        // searchInquiry는 Inquiry 타입이지만, Pagination 생성자가 SearchCriteria를 받으므로 호환됩니다.
         Pagination pagination = new Pagination(totalInquiryCnt, searchInquiry);
         log.info("페이지네이션 정보: {}", pagination);
 
-        // 3. limitStart를 searchInquiry에 설정 (MyBatis 쿼리에서 사용)
         searchInquiry.setOffset(pagination.getLimitStart());
         
-        // 4. 문의 목록 조회 (페이지네이션 및 검색 조건 적용)
         List<Inquiry> inquiryList = adminInquiryService.getAdminInquiryList(searchInquiry, pagination.getLimitStart(), pagination.getRecordSize());
         log.info("조회된 문의 목록: {}", inquiryList);
 
-        // 문의 처리 상태 목록을 모델에 추가하여 Thymeleaf 템플릿에서 직접 접근 가능하도록 함
         List<String> processStatuses = Arrays.asList("접수", "완료", "진행중");
         model.addAttribute("processStatuses", processStatuses);
 
         model.addAttribute("title", "관리자 문의 목록");
         model.addAttribute("inquiryList", inquiryList);
         model.addAttribute("pagination", pagination);
-        model.addAttribute("searchCriteria", searchInquiry); // 현재 검색 조건을 뷰에 전달
+        model.addAttribute("searchCriteria", searchInquiry);
 
-        // filterConditionsString은 @RequestParam으로 받기 때문에 여전히 모델에 추가합니다.
-        // 다른 검색 조건들은 searchInquiry 객체 내에 있으므로 별도 추가가 필요 없습니다.
         model.addAttribute("filterConditionsString", filterConditionsString); 
         
-        // inqryTrgtTypeCd 값이 searchInquiry 객체에 제대로 바인딩되었는지 확인용 로그
         System.out.println("Received inqryTrgtTypeCd at Controller: " + searchInquiry.getInqryTrgtTypeCd());
 
-        return "admin/inquiry/adminInquiryList"; // 뷰 경로 확인
+        return "admin/inquiry/adminInquiryList";
     }
 
     // 관리자 문의 상세 조회
@@ -106,6 +100,8 @@ public class AdminInquiryController {
 
         model.addAttribute("title", "관리자 문의 상세");
         model.addAttribute("inquiryDetail", inquiryDetail);
+        
+        model.addAttribute("answerApiUrl", "/admin/inquiry/answerProcess");
 
         return "admin/inquiry/adminInquiryDetailView";
     }
@@ -117,19 +113,49 @@ public class AdminInquiryController {
             @RequestParam("inqryId") String inqryId,
             @RequestParam("ansCn") String ansCn,
             @RequestParam(name = "ansId", required = false) String ansId,
-            @RequestParam(name = "answrUserNo") String answrUserNo
+            // --- 기존 @RequestParam(name = "answrUserNo") String answrUserNo 제거 ---
+            HttpServletRequest request // HttpServletRequest를 파라미터로 받습니다.
     ) {
         Map<String, Object> response = new HashMap<>();
-        log.info("컨트롤러: 답변 처리 요청 수신 - inqryId: {}, ansCn: {}, ansId: {}, answrUserNo: {}", inqryId, ansCn, ansId, answrUserNo);
+        
+        // --- 세션에서 로그인된 관리자 닉네임 (userNcnm) 가져오는 로직 시작 ---
+        String answrUserNo = null; // answrUserNo 변수는 이제 사용자 번호가 아닌, 닉네임/이름으로 활용됩니다.
+                                   // 만약 DB에 userNo를 저장해야 한다면 이 부분만 변경해주세요.
+        HttpSession session = request.getSession(false); // 기존 세션이 없으면 새로 생성하지 않음 (false)
+
+        if (session != null) {
+            LoginUser loginUser = (LoginUser) session.getAttribute("loginAdmin"); // 세션에서 LoginUser 객체 조회
+            // LoginUser 객체에서 userNcnm (사용자 닉네임/이름) 추출
+            log.info("로그인 성공: {}", loginUser.getUserNcnm());
+            session.setAttribute("loginUser", loginUser);
+            answrUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
+            
+            String adminUserNo = loginUser.getUserNo();
+            String adminNick = loginUser.getUserNcnm();
+            log.info("로그인 성공 - 관리자 번호: {}, 닉네임: {}", adminUserNo, adminNick);
+        }
+
+        // 로그인된 사용자 닉네임(userNcnm)이 없으면 오류 처리 (로그인되지 않은 상태)
+        if (answrUserNo == null || answrUserNo.isEmpty()) {
+            log.error("로그인된 사용자 정보 (닉네임)를 찾을 수 없습니다. 로그인이 필요합니다.");
+            response.put("status", "error");
+            response.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+        // --- 세션에서 로그인된 관리자 닉네임 가져오는 로직 끝 ---
+
+        log.info("컨트롤러: 답변 처리 요청 수신 - inqryId: {}, ansCn: {}, ansId: {}, answrUserNo (로그인된 관리자 닉네임): {}", inqryId, ansCn, ansId, answrUserNo); // 로그 메시지 수정
 
         try {
             Answer processedAnswer;
             if (ansId == null || ansId.isEmpty()) {
                 log.info("컨트롤러: 신규 답변 등록 로직 실행");
-                processedAnswer = adminInquiryService.registerAnswer(inqryId, ansCn, answrUserNo);
+                // answrUserNo는 이제 세션에서 가져온 관리자 닉네임/이름입니다.
+                processedAnswer = adminInquiryService.registerAnswer(inqryId, ansCn, answrUserNo); 
                 response.put("message", "답변이 성공적으로 등록되었습니다.");
             } else {
                 log.info("컨트롤러: 기존 답변 수정 로직 실행 - 대상 ansId: {}", ansId);
+                // answrUserNo는 이제 세션에서 가져온 관리자 닉네임/이름입니다.
                 processedAnswer = adminInquiryService.updateAnswer(ansId, inqryId, ansCn, answrUserNo);
                 response.put("message", "답변이 성공적으로 수정되었습니다.");
             }
