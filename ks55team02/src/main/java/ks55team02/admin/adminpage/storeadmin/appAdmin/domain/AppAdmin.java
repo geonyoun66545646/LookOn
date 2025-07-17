@@ -30,8 +30,8 @@ public class AppAdmin extends SearchCriteria  {
 	private String 			aplyStts;           // 신청(승인) 상태 (aply_stts)
 	private String 			aprvRjctRsn;        // 승인 반려 사유 (aprv_rjct_rsn)
 	private String 			UserNm;
-	private String sortKey; 					// 정렬 기준 컬럼 (예: "aplyId", "ctrtAplyYmd")
-    private String sortOrder; 					// 정렬 방향 (예: "ASC", "DESC")
+	private String 			sortKey; 			// 정렬 기준 컬럼 (예: "aplyId", "ctrtAplyYmd")
+    private String 			sortOrder; 			// 정렬 방향 (예: "ASC", "DESC")
 
     
     

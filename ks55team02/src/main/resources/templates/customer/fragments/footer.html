@@ -1,45 +1,101 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"> <footer class="footer" th:fragment="footerFragment">
-            <div class="footer-middle">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-6 col-lg-3">
-                            <div class="widget widget-about">
-                                <h4 class="widget-title">about molla</h4><p>Praesent dapibus, neque id cursus ucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. </p>
+<html xmlns:th="http://www.thymeleaf.org">
+<footer class="footer" th:fragment="footerFragment">
+	<div class="footer-middle">
+		<div class="container">
+			<div class="row">
 
-                                <div class="social-icons">
-                                    <a href="#" class="social-icon" title="Facebook" target="_blank"><i class="icon-facebook-f"></i></a>
-                                    <a href="#" class="social-icon" title="Twitter" target="_blank"><i class="icon-twitter"></i></a>
-                                    <a href="#" class="social-icon" title="Instagram" target="_blank"><i class="icon-instagram"></i></a>
-                                    <a href="#" class="social-icon" title="Youtube" target="_blank"><i class="icon-youtube"></i></a>
-                                </div></div></div><div class="col-sm-6 col-lg-3">
-                            <div class="widget">
-                                <h4 class="widget-title">Useful Links</h4><ul class="widget-list">
-                                    <li><a href="about.html">About Molla</a></li>
-                                    <li><a href="#">How to shop on Molla</a></li>
-                                    <li><a href="#">FAQ</a></li>
-                                    <li><a href="contact.html">Contact us</a></li>
-                                    <li><a href="login.html">Log in</a></li>
-                                </ul></div></div><div class="col-sm-6 col-lg-3">
-                            <div class="widget">
-                                <h4 class="widget-title">Customer Service</h4><ul class="widget-list">
-                                    <li><a href="#">Payment Methods</a></li>
-                                    <li><a href="#">Money-back guarantee!</a></li>
-                                    <li><a href="#">Returns</a></li>
-                                    <li><a href="#">Shipping</a></li>
-                                    <li><a href="#">Terms and conditions</a></li>
-                                    <li><a href="#">Privacy Policy</a></li>
-                                </ul></div></div><div class="col-sm-6 col-lg-3">
-                            <div class="widget">
-                                <h4 class="widget-title">My Account</h4><ul class="widget-list">
-                                    <li><a href="#">Sign In</a></li>
-                                    <li><a href="cart.html">View Cart</a></li>
-                                    <li><a href="#">My Wishlist</a></li>
-                                    <li><a href="#">Track My Order</a></li>
-                                    <li><a href="#">Help</a></li>
-                                </ul></div></div></div></div></div><div class="footer-bottom">
-                <div class="container">
-                    <figure class="footer-payments">
-                        <img th:src="@{/maincss/assets/images/payments.png}" alt="Payment methods" width="272" height="20">
-                    </figure><img th:src="@{/maincss/assets/images/demos/demo-6/logo-footer.png}" alt="Molla Logo" width="82" height="25">
-                    <p class="footer-copyright">Copyright © 2019 Molla Store. All Rights Reserved.</p></div></div></footer></html>
+				<div class="col-sm-6 col-lg-3">
+					<div class="widget">
+						<h4 class="widget-title">김성주</h4>
+
+                        <ul class="widget-list">
+                            <li><a th:href="@{/customer/mypage}">마이페이지</a></li>
+                            <li><a th:href="@{/aditinfo}">회원정보수정</a></li>
+                        </ul>
+
+					</div>
+				</div>
+				<div class="col-sm-6 col-lg-3">
+					<div class="widget">
+						<h4 class="widget-title">서요셉</h4>
+                        <ul class="widget-list">
+                            <li><a th:href="@{/customer/post/postList}">커뮤니티 게시판</a></li>
+                            <li><a th:href="@{/customer/feed/feedList}">피드 게시판</a></li>
+                        </ul>
+					</div>
+				</div>
+				<div class="col-sm-6 col-lg-3">
+					<div class="widget">
+						<h4 class="widget-title">염가은</h4>
+						<ul class="widget-list">
+                            <li><a th:href="@{/customer/chat}">사용자 채팅</a></li>
+                            <li><a th:href="@{/customer/coupons}">사용자 쿠폰</a></li>
+                            <li><a th:href="@{/customer/searchResult}">사용자 검색 결과</a></li>
+                            <li><a th:href="@{/customer/reports}">사용자 신고 접수</a></li>
+                            <li><a th:href="@{/customer/myReports}">사용자 내 신고 내역</a></li>
+                            <li><a th:href="@{/adminpage/useradmin/chatLog}">관리자 채팅 로그 조회</a></li>
+                            <li><a th:href="@{/adminpage/useradmin/search}">관리자 검색 기록 조회</a></li>
+                            <li><a th:href="@{/adminpage/inquiryadmin/reportsList}">관리자 신고 목록 조회</a></li>
+                            <li><a th:href="@{/adminpage/inquiryadmin/reportsDetail}">관리자 신고 상세 처리</a></li>
+                            <li><a th:href="@{/adminpage/useradmin/createCoupons}">관리자 쿠폰 생성</a></li>
+                            <li><a th:href="@{/adminpage/useradmin/memberCoupons}">관리자 회원 쿠폰 조회</a></li>
+                            <li><a th:href="@{/adminpage/useradmin/couponsList}">관리자 쿠폰 목록 조회</a></li>
+                        </ul>
+					</div>
+				</div>
+				<div class="col-sm-6 col-lg-3">
+					<div class="widget">
+						<h4 class="widget-title">이건영</h4>
+						<ul class="widget-list">
+							<li><a th:href="@{/cart}">장바구니</a></li>
+							<li><a th:href="@{/checkout}">결제</a></li>
+							<li><a th:href="@{/paymentHistory}">결제 내역</a></li>
+							<li><a th:href="@{/track-delivery}">배송</a></li>
+							<li><a th:href="@{/adminpage/storeadmin/premiumAdd}">관리자/구독권등록</a></li>
+							<li><a th:href="@{/adminpage/storeadmin/list}">판매하는 구독권 리스트</a></li>
+							<li><a th:href="@{/adminpage/storeadmin/settlementDetailByStore}">스토어 정산</a></li>				
+						</ul>
+					</div>
+				</div>
+				<div class="col-sm-6 col-lg-3">
+					<div class="widget">
+						<h4 class="widget-title">이지성</h4>
+						<ul class="widget-list">
+							<li><a href="#">문의 조회</a></li>
+							<li><a href="#">스토어 관리</a></li>
+							<li><a href="#"></a></li>
+							<li><a href="#">기능4</a></li>
+							<li><a href="#">기능5</a></li>
+							<li><a href="#">기능6</a></li>
+							<li><a href="#">기능7</a></li>
+						</ul>
+					</div>
+				</div>
+				
+				<div class="col-sm-6 col-lg-3">
+					<div class="widget">
+						<h4 class="widget-title">정성훈</h4>
+						<ul class="widget-list">
+							<li><a th:href="@{/}">메인페이지</a></li>
+							<li><a th:href="@{/seller/products/list}">상품관리</a></li>
+							<li><a th:href="@{/customer/products/list?brand=store_1}">브랜드페이지</a></li>
+							<li><a th:href="@{/products/detail/gds_no_2049}">상품디테일</a></li>
+							<li><a th:href="@{/customer/products/list}">상품목록</a></li>
+							<li><a th:href="@{/adminpage/productadmin/adminProductManagement}">상품 승인/반려</a></li>
+							<li><a th:href="@{/adminpage/productadmin/adminCategoryManagement}">카테고리관리</a></li>
+						</ul>
+					</div>
+				</div>
+				
+			</div>	
+		</div>
+	</div>
+	<div class="footer-bottom">
+		<div class="container">
+			<a th:href="@{/main}" class="lookon-brand-logo">LookOn</a>
+			<p class="footer-copyright">Copyright © 2025 LookOn. All Rights Reserved.</p>
+		</div>
+	</div>
+</footer>
+</html>

@@ -1,21 +1,22 @@
 package ks55team02.customer.store.service.impl;
 
-import ks55team02.customer.store.domain.StoreImage;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import ks55team02.common.domain.store.StoreImage;
 import ks55team02.customer.store.mapper.StoreImageMapper;
 import ks55team02.customer.store.service.StoreImageService;
 import ks55team02.util.FileDetail; // 변경된 FilesUtils 패키지 및 FileDetail import
 import ks55team02.util.FilesUtils; // 변경된 FilesUtils 패키지 import
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional

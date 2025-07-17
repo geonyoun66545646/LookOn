@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout/layoutMain}">
+
+<head>
+<title>검색 기록 조회</title>
+</head>
+<th:block layout:fragment="contents">
+	<main class="main-content">
+		<section class="content-header">
+			<h2 class="content-title">검색 기록 조회</h2>
+		</section>
+
+		<div class="card mb-4">
+			<div class="card-body">
+				<!-- ✅ [HTML 수정] 검색창을 form 태그로 감싸고, '검색어'와 '기간'만 남겨 단순화합니다. -->
+				<form id="searchForm">
+					<div class="row gx-3 align-items-end">
+						<div class="col-lg-5 mb-3">
+							<label class="form-label">검색 기간</label>
+							<div class="d-flex">
+								<input type="date" class="form-control" name="searchStartDate">
+								<span class="mx-2 d-flex align-items-center">-</span> <input
+									type="date" class="form-control" name="searchEndDate">
+							</div>
+						</div>
+						<div class="col-lg-5 mb-3">
+							<label class="form-label">검색어</label> <input type="text"
+								class="form-control" name="searchValue"
+								placeholder="검색할 키워드를 입력하세요.">
+						</div>
+						<div class="col-lg-2 mb-3 d-flex align-items-end">
+							<button type="submit" class="btn btn-primary btn-block me-2">검색</button>
+							<button class="btn btn-light btn-block" type="reset">초기화</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- 탭 구조는 기존과 동일하게 유지합니다. -->
+		<ul class="nav nav-tabs" id="viewTabs" role="tablist">
+			<li class="nav-item" role="presentation">
+				<button class="nav-link active" id="stats-tab" type="button">📈
+					통계 보기</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="log-tab" type="button">📄 로그
+					보기</button>
+			</li>
+		</ul>
+
+		<div class="card mb-4" id="stats-view-container">
+			<!-- 통계 보기 테이블 구조는 기존과 동일 -->
+			<div class="card-body">
+				<div class="row gx-3 align-items-center mb-3">
+					<div class="col-md-6">
+						<div class="search-result-info">
+							<span id="stats-total-info"></span>
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr class="text-center">
+								<th style="width: 15%;">순위</th>
+								<th>검색 키워드</th>
+								<th style="width: 20%;">검색 횟수</th>
+							</tr>
+						</thead>
+						<tbody id="stats-table-body" class="text-center"></tbody>
+					</table>
+				</div>
+				<nav class="mt-4">
+					<ul class="pagination justify-content-center" id="stats-pagination"></ul>
+				</nav>
+			</div>
+		</div>
+
+		<div class="card mb-4" id="log-view-container" style="display: none;">
+			<!-- 로그 보기 테이블 구조는 기존과 동일 -->
+			<div class="card-body">
+				<div class="row gx-3 align-items-center mb-3">
+					<div class="col-md-6">
+						<div class="search-result-info">
+							<span id="log-total-info"></span>
+						</div>
+					</div>
+				</div>
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr class="text-center">
+								<th>검색 로그 ID</th>
+								<th>사용자 번호</th>
+								<th>검색 키워드</th>
+								<th>검색 일시</th>
+								<th>검색 IP 주소</th>
+							</tr>
+						</thead>
+						<tbody id="log-table-body" class="text-center"></tbody>
+					</table>
+				</div>
+				<nav class="mt-4">
+					<ul class="pagination justify-content-center" id="log-pagination"></ul>
+				</nav>
+			</div>
+		</div>
+	</main>
+</th:block>
+
+<th:block layout:fragment="jsScript">
+	<!-- ✅ [JS 수정] 전체 스크립트를 새로운 통합 구조로 변경합니다. -->
+	<script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ===== 1. 전역 변수 및 DOM 요소 선언 =====
+            const searchForm = document.getElementById('searchForm');
+            const statsTab = document.getElementById('stats-tab');
+            const logTab = document.getElementById('log-tab');
+
+            const statsContainer = document.getElementById('stats-view-container');
+            const logContainer = document.getElementById('log-view-container');
+            const statsTableBody = document.getElementById('stats-table-body');
+            const logTableBody = document.getElementById('log-table-body');
+            const statsPagination = document.getElementById('stats-pagination');
+            const logPagination = document.getElementById('log-pagination');
+			
+            const statsTotalInfo = document.getElementById('stats-total-info');
+            const logTotalInfo = document.getElementById('log-total-info');
+
+            let currentView = 'stats'; // 현재 활성화된 뷰 (기본값: 통계)
+            let currentPage = 1;
+
+            // ===== 2. 이벤트 리스너 바인딩 =====
+
+            // 탭 클릭 이벤트
+            statsTab.addEventListener('click', () => switchTab('stats'));
+            logTab.addEventListener('click', () => switchTab('logs'));
+			
+            // 검색 버튼 클릭 (form의 submit 이벤트 활용)
+            searchForm.addEventListener('submit', e => {
+                e.preventDefault();
+                currentPage = 1;
+                loadData();
+            });
+            
+            // 초기화 버튼 클릭
+            searchForm.addEventListener('reset', () => {
+                setTimeout(() => loadData(), 0);
+            });
+
+            // 페이지네이션 클릭 이벤트 (이벤트 위임)
+            statsPagination.addEventListener('click', e => handlePaginationClick(e));
+            logPagination.addEventListener('click', e => handlePaginationClick(e));
+
+            function handlePaginationClick(e) {
+                e.preventDefault();
+                const pageLink = e.target.closest('.page-link');
+                if (pageLink && pageLink.dataset.page) {
+                    currentPage = parseInt(pageLink.dataset.page);
+                    loadData();
+                }
+            }
+
+            // ===== 3. 핵심 기능 함수 =====
+            function switchTab(viewName) {
+                currentView = viewName;
+                currentPage = 1;
+
+                const isActive = (viewName === 'stats');
+                statsTab.classList.toggle('active', isActive);
+                logTab.classList.toggle('active', !isActive);
+                statsContainer.style.display = isActive ? 'block' : 'none';
+                logContainer.style.display = !isActive ? 'block' : 'none';
+
+                loadData();
+            }
+
+            async function loadData() {
+                const formData = new FormData(searchForm);
+                const params = new URLSearchParams(formData);
+                params.append('page', currentPage);
+                
+                // ✅ [수정] 불필요하고 오류를 유발했던 if문을 완전히 삭제합니다.
+                // 이제 폼에 있는 'searchValue'가 그대로 백엔드에 전달됩니다.
+
+                const endpoint = (currentView === 'stats') ? '/api/admin/search/stats' : '/api/admin/search/logs';
+                
+                try {
+                    const response = await fetch(`${endpoint}?${params.toString()}`);
+                    if (!response.ok) throw new Error(`${currentView} data load failed`);
+                    
+                    const data = await response.json();
+                    
+                    if (currentView === 'stats') {
+                        renderStats(data.statsList);
+                        renderPagination(statsPagination, data.pagination, data.statsList.length);
+                        statsTotalInfo.innerHTML = `총 <b class="text-brand">${data.pagination.totalRecordCount}</b>개의 키워드 통계입니다.`;
+                    } else {
+                        renderLogs(data.logList);
+                        renderPagination(logPagination, data.pagination, data.logList.length);
+                        logTotalInfo.innerHTML = `총 <b class="text-brand">${data.pagination.totalRecordCount}</b>건의 검색 기록이 검색되었습니다.`;
+                    }
+                } catch (error) {
+                    console.error(error);
+                    const tableBody = (currentView === 'stats') ? statsTableBody : logTableBody;
+                    const colspan = (currentView === 'stats') ? 3 : 5;
+                    tableBody.innerHTML = `<tr><td colspan="${colspan}">데이터를 불러오는 중 오류가 발생했습니다.</td></tr>`;
+                }
+            }
+            
+            // ===== 4. 렌더링 함수 (기존 코드 재활용 및 개선) =====
+            function renderStats(statsList) {
+                statsTableBody.innerHTML = '';
+                if (!statsList || statsList.length === 0) {
+                    statsTableBody.innerHTML = '<tr><td colspan="3">통계 데이터가 없습니다.</td></tr>';
+                    return;
+                }
+                const startRank = (currentPage - 1) * 10 + 1; // 가정: 페이지당 10개
+                statsList.forEach((stat, index) => {
+                    statsTableBody.innerHTML += `<tr><td>${startRank + index}</td><td>${stat.srchKeywordNm}</td><td>${stat.searchCount}</td></tr>`;
+                });
+            }
+
+            function renderLogs(logList) {
+                logTableBody.innerHTML = '';
+                if (!logList || logList.length === 0) {
+                    logTableBody.innerHTML = '<tr><td colspan="5">검색 결과가 없습니다.</td></tr>';
+                    return;
+                }
+                logList.forEach(log => {
+                    logTableBody.innerHTML += `<tr><td>${log.srchLogId}</td><td>${log.userNo || '비회원'}</td><td>${log.srchKeywordNm}</td><td>${new Date(log.srchDt).toLocaleString()}</td><td>${log.srchUserIpAddr}</td></tr>`;
+                });
+            }
+
+         // 이 함수만 아래 내용으로 통째로 바꿔주세요.
+            function renderPagination(container, pagination, listSize) {
+                container.innerHTML = '';
+                // ✅ [수정] pagination 객체가 없거나, 목록 사이즈가 0이면 페이지네이션을 그리지 않습니다.
+                if (!pagination || listSize === 0) return;
+                
+                // 이전 페이지 버튼
+                // ✅ [수정] 현재 페이지(currentPage)를 기준으로 계산합니다.
+                const prevPage = pagination.currentPage - 1;
+                const prevDisabled = !pagination.existPrevBlock && pagination.currentPage === 1 ? 'disabled' : '';
+                container.innerHTML += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" data-page="${prevPage}">이전</a></li>`;
+
+                // 페이지 번호
+                for (let i = pagination.startPage; i <= pagination.endPage; i++) {
+                    const activeClass = (i === pagination.currentPage) ? 'active' : '';
+                    container.innerHTML += `<li class="page-item ${activeClass}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                }
+
+                // 다음 페이지 버튼
+                // ✅ [수정] 현재 페이지(currentPage)를 기준으로 계산합니다.
+                const nextPage = pagination.currentPage + 1;
+                const nextDisabled = !pagination.existNextBlock && pagination.currentPage === pagination.lastPage ? 'disabled' : '';
+                container.innerHTML += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" data-page="${nextPage}">다음</a></li>`;
+            }
+
+            // ===== 5. 페이지 최초 로딩 =====
+            loadData();
+        });
+    </script>
+</th:block>
+</html>

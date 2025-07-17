@@ -19,6 +19,10 @@ public class ProductRegistrationRequest {
  private List<MultipartFile> mainImage;      // 대표 이미지 (최소 1장, 최대 15장)
  private List<MultipartFile> detailImage;    // 상세 페이지 이미지 (최소 1장, 최대 20장)
  private String videoUrl; // 동영상 URL
+ //⭐ 추가: 수정 시 삭제할 이미지의 ID 목록
+ private List<String> deletedImageIds;
+ // ⭐ 추가: 수정 시 유지할 기존 이미지의 경로 목록
+ private List<String> existingImagePaths;
 
  // 가격 및 재고
  private Long basePrice;       // bas_prc
@@ -34,7 +38,15 @@ public class ProductRegistrationRequest {
  private List<String> colorOptions;  // opt_vl_nm (색상 옵션 값 목록)
  private String sizeOptionType;    // 사이즈 옵션 유형 (예: size_apparel, size_shoes)
  private List<String> sizeOptions;   // opt_vl_nm (사이즈 옵션 값 목록)
+ //추가: 실제 선택된 옵션을 저장할 필드
+ private List<String> selectedColorOptions;
+ private List<String> selectedSizeOptions;
 
+//⭐⭐⭐⭐⭐ [2단계: 필드 추가] 시작 ⭐⭐⭐⭐⭐
+ private List<String> imageOrderMain;
+ private List<String> imageOrderDetail;
+ // ⭐⭐⭐⭐⭐ [2단계: 필드 추가] 끝 ⭐⭐⭐⭐⭐
+ 
  // 옵션 조합별 재고 (이 부분은 Map<String, Integer> 등으로 복합적으로 받아야 할 수 있음)
  // 예: "빨강_M": 10, "파랑_L": 5
  // 여기서는 일단 단순화하여, 각 조합은 서비스 로직에서 생성한다고 가정합니다.

@@ -5,15 +5,17 @@
 <head>
     <title>문의 등록</title>
     <th:block layout:fragment="customCss">
+    	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/addInquiryView.css}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     </th:block>
 </head>
 <body>
     <th:block layout:fragment="contents">
         <main class="main">
-            <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+            <div class="page-header text-center" th:style="'background-image: url(' + @{/assets/images/page-header-bg.jpg} + ')'">
                 <div class="container">
                     <h1 class="page-title">INQUIRY REGISTRATION<span>문의 등록</span></h1>
                 </div>
@@ -36,14 +38,36 @@
                         <table class="table table-bordered">
                             <tbody>
                                 <tr class="inquiry-row">
-                                    <th scope="row">문의 유형</th>
+                                    <th scope="row">문의 대상</th>
                                     <td colspan="2" class="type-column">
-                                        <select name="inqryTypeCd" class="form-control" required>
+                                        <select id="inqryTrgtTypeCd" name="inqryTrgtTypeCd" class="form-control" required>
 										    <option value="">선택하세요</option>
-										    <option th:each="option : ${inquiryType}"
-										            th:value="${option.inquiryOption}"     
-										            th:text="${option.inquiryOption}"></option>
+										    <option th:each="option : ${inquiryTargetOptions}"
+										            th:value="${option.name()}"     
+										            th:text="${option.getTargetOption()}"></option>
 										</select>
+                                    </td>
+                                    <td colspan="" class="type-column">
+                                        <select id ="inqryStoreId" name ="inqryStoreId" class="form-control" required>
+                                    		<option value ="">상점을 선택하세요</option>
+                                    		<option th:each="option : ${storeList}"
+                                    				th:value="${option.storeId}" th:text="${option.storeConm}"></option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            
+                                    
+                                
+                                   <tr class="inquiry-row">
+                                   	<th scope="row">문의 유형</th>
+                                   	<td colspan="2" class ="type-column" >
+                                   		<select id="inqryTypeCd" name="inqryTypeCd" class="form-control required">
+                                   			<option value="">선택하세요!</option>
+                                   			<option th:if="${inquiryOption != null}" 
+                                   					th:each="l : ${inquiryOption}" 
+                                   					th:value="${l.name()}" 
+                                   					th:text="${l.inquiryOption}" ></option>
+                               			</select>
                                     </td>
                                     <td>
                                     	<div class="custom-control custom-checkbox ml-3">
@@ -90,132 +114,12 @@
         </main>
     </th:block>
 
-    <th:block layout:fragment="jsScript">
-        <script>
-            console.log("문의 등록 스크립트 실행!");
+ <th:block layout:fragment="jsScript">
+    <script th:inline="javascript">
+        
+    </script>
 
-            // 폼 제출 이벤트 리스너
-            document.getElementById('inquiryForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                const form = event.target;
-                const formData = new FormData(form);
-                
-                // 클라이언트 사이드 유효성 검사 예시
-                const inquiryType = this.elements['inqryTypeCd'].value;
-                const inquiryTitle = this.elements['inqryTtl'].value;
-                const inquiryContent = this.elements['inqryCn'].value;
-
-                if (!inquiryType || inquiryType === "") {
-                    alert("문의 유형을 선택해주세요."); 
-                    return;
-                }
-                if (!inquiryTitle.trim()) {
-                    alert("제목을 입력해주세요.");
-                    return;
-                }
-                if (!inquiryContent.trim()) {
-                    alert("내용을 입력해주세요.");
-                    return;
-                }
-                // --- 유효성 검사 끝 ---
-                // AJAX 요청 시작
-                fetch(form.action, {
-                    method : form.method,
-                    body : formData
-                }) 
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => {
-                            throw new Error(err.message || `HTTP error! status: ${response.status}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.status === 'success') {
-                        alert(data.message);
-                        window.location.href = '/customer/inquiry/inquiryList';
-                    } else {
-                        alert('문의 등록 실패' + (data.message || '오류발생'));
-                    }
-                })
-                .catch(error => {
-                    alert('오류! 잠시 후 다시 시도해주세요.');
-                });
-            });
-
-            // --- 파일 미리보기 스크립트 시작 ---
-            document.getElementById('attachedFilesInput').addEventListener('change', function(event) {
-                const previewContainer = document.getElementById('filePreviewContainer');
-                previewContainer.innerHTML = ''; // 기존 미리보기 초기화
-
-                const files = event.target.files;
-
-                if (files.length > 0) {
-                    Array.from(files).forEach(file => {
-                        const fileItem = document.createElement('div');
-                        fileItem.className = 'file-preview-item d-flex align-items-center mt-2'; 
-                        fileItem.style.marginBottom = '5px'; 
-                        
-                        // 파일 이름과 아이콘/이미지를 감싸는 래퍼
-                        const fileNameWrapper = document.createElement('div');
-                        fileNameWrapper.className = 'file-name-wrapper';
-                        
-                        const fileNameSpan = document.createElement('span');
-                        fileNameSpan.className = 'file-name-text';
-                        fileNameSpan.textContent = file.name;
-
-                        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-                        if (file.size > MAX_FILE_SIZE) {
-                            const sizeWarning = document.createElement('span');
-                            sizeWarning.textContent = ` (파일 크기 초과: ${Math.round(file.size / (1024 * 1024))}MB)`;
-                            sizeWarning.style.color = 'red';
-                            fileNameSpan.appendChild(sizeWarning);
-                        }
-                        
-                        // 이미지 파일 미리보기
-                        if (file.type.startsWith('image/')) {
-                            const reader = new FileReader();
-                            reader.onload = function(e) {
-                                const img = document.createElement('img');
-                                img.src = e.target.result;
-                                img.style.maxWidth = '100px'; 
-                                img.style.maxHeight = '100px';
-                                fileNameWrapper.prepend(img); 
-                            };
-                            reader.readAsDataURL(file);
-                        } else {
-                            const fileIcon = document.createElement('i');
-                            fileIcon.className = 'fa fa-file-alt'; 
-                            fileIcon.style.fontSize = '24px';
-                            fileNameWrapper.prepend(fileIcon);
-                        }
-
-                        fileNameWrapper.appendChild(fileNameSpan); 
-                        fileItem.appendChild(fileNameWrapper); 
-
-                        const deleteButtonContainer = document.createElement('div');
-                        deleteButtonContainer.className = 'file-delete-button-container';
-
-                        const deleteButton = document.createElement('button');
-                        deleteButton.type = 'button';
-                        deleteButton.className = 'btn btn-danger btn-extra-small'; 
-                        deleteButton.textContent = 'x'; 
-
-                        deleteButton.addEventListener('click', function() {
-                            fileItem.remove();
-                        });
-                        deleteButtonContainer.appendChild(deleteButton);
-                        fileItem.appendChild(deleteButtonContainer);
-
-
-                        previewContainer.appendChild(fileItem);
-                    });
-                }
-            });
-            // --- 파일 미리보기 스크립트 끝 ---
-        </script>
-    </th:block>
+    <script th:src="@{/js/customerjs/addInquiryView.js}"></script>
+</th:block>
 </body>
 </html>

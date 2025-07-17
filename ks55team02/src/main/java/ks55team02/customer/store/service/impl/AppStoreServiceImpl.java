@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ks55team02.admin.adminpage.useradmin.userlist.domain.UserList;
 import ks55team02.admin.adminpage.useradmin.userlist.mapper.UserListMapper;
-import ks55team02.customer.store.domain.AppStore;
 import ks55team02.customer.store.mapper.AppStoreMapper;
 import ks55team02.customer.store.service.AppStoreService;
 import lombok.RequiredArgsConstructor;

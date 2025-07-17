@@ -1,670 +1,1106 @@
 /* style.css */
-
 /* Bootstrap의 .col-x 클래스 기본 패딩 재정의 (이 부분은 신중하게 사용해야 합니다.) */
 /* 이 규칙이 필요한 경우, 항상 Bootstrap CSS 파일보다 나중에 로드되도록 해야 합니다. */
-.col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto, 
-.col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, 
-.col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, 
-.col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, 
-.col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
-    padding-right: 5px; /* 두 번째 정의가 첫 번째 정의를 덮어씁니다. */
-    padding-left: 5px;  /* 이 부분이 최종 적용됩니다. */
+.col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5,
+	.col-6, .col-7, .col-8, .col-9, .col-auto, .col-lg, .col-lg-1,
+	.col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4,
+	.col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto,
+	.col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2,
+	.col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8,
+	.col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11,
+	.col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6,
+	.col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1,
+	.col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4,
+	.col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+	padding-right: 5px; /* 두 번째 정의가 첫 번째 정의를 덮어씁니다. */
+	padding-left: 5px; /* 이 부분이 최종 적용됩니다. */
 }
 
 /* 기존 불필요한 중복 제거 (padding-right: 0; padding-left: 0;) */
 /* .col-1, .col-2, ... 이 중복 정의는 제거됩니다. */
 
-
 /* 상품 상세 정보 섹션 */
 .product-details {
-    background-color: #f8f8f8;
-    border-radius: 10px;
-    padding: 20px;
+	background-color: #f8f8f8;
+	border-radius: 10px;
+	padding: 20px;
 }
 
 .product-details-top {
-    border-top: none;
-    margin-bottom: 15px;
+	border-top: none;
+	margin-bottom: 15px;
+	margin-top: 10px;
 }
 
 .product-details .product-cat {
-    font-weight: 400;
-    font-size: 1.4rem;
-    line-height: 24px;
+	font-weight: 400;
+	font-size: 1.4rem;
+	line-height: 24px;
 }
 
-.product-cat { /* 중복된 선택자이지만, .product-details .product-cat이 더 구체적이라 해당 규칙이 우선 */
-    font-size: 13px;
-    margin: 0;
+.product-details .product-cat {
+	/* 중복된 선택자이지만, .product-details .product-cat이 더 구체적이라 해당 규칙이 우선 */
+	font-size: 13px;
+	margin: 0;
 }
 
 .product-details .product-title {
-    font-weight: 500;
-    font-size: 28px;
-    letter-spacing: -.025em;
-    margin-bottom: 1.2rem;
-    margin-top: -.5rem;
+	font-weight: 500;
+	font-size: 28px;
+	letter-spacing: -.025em;
+	margin-bottom: 1.2rem;
+	margin-top: -.5rem;
 }
 
+/* 버튼 스타일 시작 */
 .product-details-action {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-direction: row;
+	display: flex;
+	align-items: center;
+	gap: 10px; /* 버튼 사이의 간격 */
+	flex-direction: row;
 }
 
+/* ⭐ [추가] 버튼들을 감싸는 컨테이너, flex를 적용하여 자식 요소들이 공간을 나눠 갖도록 함 */
+.product-details-action .product-main-buttons {
+	display: flex;
+	flex-grow: 1; /* 남은 공간을 모두 차지하도록 */
+	gap: 10px;
+}
+
+/* ⭐ [수정] 모든 버튼의 기본 스타일 */
 .product-details-action .btn-product {
-    height: 40px;
-    padding: 0;
-    text-align: center;
-    border-radius: 5px;
-    text-transform: uppercase;
-    font-weight: 600;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	height: 40px;
+	padding: 0;
+	text-align: center;
+	border-radius: 5px;
+	text-transform: uppercase;
+	font-weight: 600;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
 }
 
-/* 장바구니 버튼과 공유 버튼 스타일 */
-.product-details-action .btn-cart,
-.product-details-action .btn-share {
-    background-color: #fff;
-    color: #333;
-    border: 1px solid #ccc;
+/* ⭐ [수정] 장바구니 버튼과 구매하기 버튼 스타일 (비율 2) */
+.product-details-action .btn-cart, .product-details-action .btn-buy-now
+	{
+	background-color: #fff;
+	color: #333;
+	border: 1px solid #ccc;
+	flex-grow: 2; /* 비율 2 */
 }
 
-/* 구매하기 버튼 스타일 */
+/* ⭐ [수정] 구매하기 버튼 스타일 */
 .product-details-action .btn-buy-now {
-    background-color: #000;
-    color: #fff;
-    border: 1px solid #000;
+	background-color: #000;
+	color: #fff;
+	border: 1px solid #000;
 }
 
-.wishlist-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 50px;
+/* ⭐ [수정] 공유하기 버튼 스타일 (비율 1) */
+.product-details-action .btn-share {
+	background-color: #fff;
+	color: #333;
+	border: 1px solid #ccc;
+	flex-grow: 1; /* 비율 1 */
 }
 
-.btn-wishlist {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    margin-bottom: 5px;
-    font-size: 24px;
-    color: #ccc;
-    transition: color 0.3s;
+/* 공유하기 버튼 아이콘 스타일 (기존 스타일과 충돌 방지를 위해 별도 지정) */
+.product-details-action .btn-share i {
+	margin-right: 5px; /* 아이콘과 텍스트 사이 간격 */
 }
 
-.btn-wishlist.liked {
-    color: #ff0000;
-}
-
-.likes-count {
-    font-size: 14px;
-    color: #666;
-}
-
-.social-icons.social-icons-sm {
-    display: none; /* 이 클래스가 HTML에 사용되지 않는다면 제거 가능 */
-}
-
+/* 공유하기 버튼 스타일 (이 부분은 이전 코드에 있었으나, 역할이 중복될 수 있으므로 주석 처리하거나 필요에 따라 수정) */
 .share-button {
-    font-weight: 500;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-    color: #333;
-    border-radius: 5px;
-    font-size: 12px;
-    padding: 0 8px;
+	font-weight: 500;
+	background-color: #fff;
+	border: 1px solid #ccc;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	margin-left: auto;
+	color: #333;
+	border-radius: 5px;
+	font-size: 12px;
+	padding: 0 8px;
 }
 
+/* 버튼 스타일 끝 */
 .product-brand-info {
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+	border-bottom: 1px solid #eee;
+	padding-bottom: 15px;
+	margin-bottom: 15px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
 .product-brand-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	background-color: #333;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-weight: bold;
 }
 
 /* --- 새로운 클래스와 ID에 대한 스타일 규칙들 --- */
 
 /* 전체 박스 스타일 */
 .product-selection-summary {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px 15px;
-    margin-bottom: 2rem;
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	padding: 10px 15px;
+	margin-bottom: 2rem;
 }
 
 /* 옵션 항목 */
 .selected-option-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 0;
+	border-bottom: 1px solid #eee;
 }
 
 /* 옵션 이름 */
 .option-name-display {
-    font-size: 14px;
-    color: #333;
-    flex: 1;
+	font-size: 14px;
+	color: #333;
+	flex: 1;
 }
 
 /* 수량, 삭제버튼, 가격 묶음 */
 .option-controls {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
 }
 
 /* 수량 조절 버튼 */
 .qty-btn {
-    width: 28px;
-    height: 28px;
-    border: 1px solid #ccc;
-    background: #fff;
-    font-size: 14px;
-    cursor: pointer;
+	width: 28px;
+	height: 28px;
+	border: 1px solid #ccc;
+	background: #fff;
+	font-size: 14px;
+	cursor: pointer;
 }
 
 /* 수량 입력 */
 .qty-input {
-    width: 36px;
-    height: 28px;
-    text-align: center;
-    border: 1px solid #ccc;
+	width: 36px;
+	height: 28px;
+	text-align: center;
+	border: 1px solid #ccc;
 }
 
 /* 삭제 버튼 */
 .remove-btn {
-    width: 28px;
-    height: 28px;
-    border: 1px solid #ccc;
-    background: #fff;
-    font-size: 18px;
-    line-height: 26px;
-    color: #333;
-    cursor: pointer;
+	width: 28px;
+	height: 28px;
+	border: 1px solid #ccc;
+	background: #fff;
+	font-size: 18px;
+	line-height: 26px;
+	color: #333;
+	cursor: pointer;
 }
 
 /* 가격 */
 .option-price {
-    font-size: 14px;
-    color: #333;
-    margin-left: 10px;
+	font-size: 14px;
+	color: #333;
+	margin-left: 10px;
 }
 
 /* 총 가격 영역 */
 .summary-total-price-area {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #ddd;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid #ddd;
 }
 
 /* 총 개수 및 가격 */
 .total-price-heading {
-    font-size: 16px;
-    font-weight: 600;
+	font-size: 16px;
+	font-weight: 600;
 }
 
 .final-total-price {
-    font-size: 18px;
-    font-weight: 700;
+	font-size: 18px;
+	font-weight: 700;
 }
 
 /* 개별 선택 옵션 항목 (기존과 거의 동일) */
 .selected-option-item-custom {
-    display: flex; /* Flexbox 레이아웃 유지 */
-    align-items: center; /* 세로 중앙 정렬 */
-    justify-content: space-between; /* 양 끝 정렬 */
-    background-color: #ffffff;
-    border: 1px solid #e9e9e9;
-    border-radius: 6px;
-    padding: 10px 15px;
-    margin-bottom: 8px;
-    /* 필요한 경우 min-height 등을 추가하여 높이를 일정하게 유지할 수 있습니다. */
+	display: flex; /* Flexbox 레이아웃 유지 */
+	align-items: center; /* 세로 중앙 정렬 */
+	justify-content: space-between; /* 양 끝 정렬 */
+	background-color: #ffffff;
+	border: 1px solid #e9e9e9;
+	border-radius: 6px;
+	padding: 10px 15px;
+	margin-bottom: 8px;
+	/* 필요한 경우 min-height 등을 추가하여 높이를 일정하게 유지할 수 있습니다. */
 }
 
 /* 옵션명 표시 영역 */
 .selected-option-item-custom .option-name-display-custom {
-    flex-grow: 1; /* 남은 공간의 대부분을 차지하도록 설정 */
-    flex-basis: 0; /* flex-grow와 함께 사용 시 초기 크기 0으로 설정 */
-    font-size: 1.4rem;
-    font-weight: 500;
-    color: #555;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-right: 15px; /* 수량 조절 영역과의 간격 확보 */
+	flex-grow: 1; /* 남은 공간의 대부분을 차지하도록 설정 */
+	flex-basis: 0; /* flex-grow와 함께 사용 시 초기 크기 0으로 설정 */
+	font-size: 1.4rem;
+	font-weight: 500;
+	color: #555;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding-right: 15px; /* 수량 조절 영역과의 간격 확보 */
 }
 
 /* 수량 조절 및 삭제 버튼 그룹을 감싸는 컨테이너 */
 .selected-option-item-custom .option-controls-custom {
-    display: flex; /* 내부 요소들을 Flexbox로 배치 */
-    align-items: center;
-    /* gap: 5px; 제거: 수량 조절 그룹과 삭제 버튼 사이 간격은 직접 부여 */
-    flex-shrink: 0; /* 공간이 부족해도 줄어들지 않음 */
+	display: flex; /* 내부 요소들을 Flexbox로 배치 */
+	align-items: center;
+	/* gap: 5px; 제거: 수량 조절 그룹과 삭제 버튼 사이 간격은 직접 부여 */
+	flex-shrink: 0; /* 공간이 부족해도 줄어들지 않음 */
 }
 
 /* 수량 조절 그룹 (+,-, input) */
 /* 이 부분은 별도의 컨테이너가 없으므로, 인접한 요소들을 그룹으로 스타일링합니다. */
 /* 만약 이 세 요소를 별도의 div로 감싼다면 더 깔끔하게 제어할 수 있습니다. */
 .selected-option-item-custom .qty-control-button {
-    width: 20px;
-    height: 30px;
-    background-color: #e0e0e0;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #555;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background-color 0.2s;
+	width: 20px;
+	height: 30px;
+	background-color: #e0e0e0;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	font-size: 1.1rem;
+	font-weight: bold;
+	color: #555;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: background-color 0.2s;
 }
 
 .selected-option-item-custom .qty-control-button.minus {
-    margin-right: -1px; /* 입력 필드와 붙도록 왼쪽 테두리 제거 */
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+	margin-right: -1px; /* 입력 필드와 붙도록 왼쪽 테두리 제거 */
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
 }
 
 .selected-option-item-custom .qty-control-button.plus {
-    margin-left: -1px; /* 입력 필드와 붙도록 오른쪽 테두리 제거 */
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+	margin-left: -1px; /* 입력 필드와 붙도록 오른쪽 테두리 제거 */
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
 }
 
 .selected-option-item-custom .qty-control-button:hover {
-    background-color: #d0d0d0;
+	background-color: #d0d0d0;
 }
 
 /* 수량 입력 필드 */
 .selected-option-item-custom .option-qty-input-custom {
-    width: 45px;
-    height: 30px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 0; /* 버튼과 연결되도록 둥글기 제거 */
-    padding: 0 3px;
-    font-size: 0.95rem;
+	width: 45px;
+	height: 30px;
+	text-align: center;
+	border: 1px solid #ccc;
+	border-radius: 0; /* 버튼과 연결되도록 둥글기 제거 */
+	padding: 0 3px;
+	font-size: 0.95rem;
 }
 
 /* 제거 버튼 */
 .selected-option-item-custom .remove-option-button {
-    margin-left: 10px; /* 수량 조절 그룹과 삭제 버튼 사이 간격 */
-    height: 30px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 2.0rem;
-    color: #dc3545;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: color 0.2s;
-    flex-shrink: 0; /* 줄어들지 않도록 */
+	margin-left: 10px; /* 수량 조절 그룹과 삭제 버튼 사이 간격 */
+	height: 30px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 2.0rem;
+	color: #dc3545;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: color 0.2s;
+	flex-shrink: 0; /* 줄어들지 않도록 */
 }
 
 .selected-option-item-custom .remove-option-button:hover {
-    color: #c82333;
+	color: #c82333;
 }
 
 .option-qty-input-custom::-webkit-inner-spin-button,
-.option-qty-input-custom::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+	.option-qty-input-custom::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
 }
 
 /* 나머지 CSS 규칙은 이전과 동일합니다. */
 
-
 /* --- 기존 나머지 CSS 규칙들 (변동 없음) --- */
-
 .select-custom {
-    width: 100%;
+	width: 100%;
 }
 
 .details-filter-row {
-    display: block; /* 이전에 display: block; 으로 변경됨 */
-    align-items: center; /* display: flex 일 때만 유효 */
-    flex-flow: row wrap; /* display: flex 일 때만 유효 */
-    margin-bottom: 2rem;
+	display: block; /* 이전에 display: block; 으로 변경됨 */
+	align-items: center; /* display: flex 일 때만 유효 */
+	flex-flow: row wrap; /* display: flex 일 때만 유효 */
+	margin-bottom: 2rem;
 }
 
 .btn-product:before {
-    font-family: "molla";
-    margin-right: 0;
+	font-family: "molla";
+	margin-right: 0;
 }
 
 /* 장바구니 버튼과 공유 버튼 아이콘 제거 */
-.btn-product.btn-cart::before,
-.btn-product.btn-cart:before,
-.btn-product.btn-share::before,
-.btn-product.btn-share:before {
-    content: none !important;
+.btn-product.btn-cart::before, .btn-product.btn-cart:before,
+	.btn-product.btn-share::before, .btn-product.btn-share:before {
+	content: none !important;
 }
 
 /* 구매하기 버튼 호버/포커스 시 스타일 */
-.btn-product.btn-buy-now:hover,
-.btn-product.btn-buy-now:focus {
-    background-color: #000 !important;
-    color: #fff !important;
-    border-color: #000 !important;
-    box-shadow: none !important;
-    transform: none !important;
-    opacity: 1 !important;
-    transition: none !important;
-    text-decoration: none !important;
-    outline: none !important;
+.btn-product.btn-buy-now:hover, .btn-product.btn-buy-now:focus {
+	background-color: #000 !important;
+	color: #fff !important;
+	border-color: #000 !important;
+	box-shadow: none !important;
+	transform: none !important;
+	opacity: 1 !important;
+	transition: none !important;
+	text-decoration: none !important;
+	outline: none !important;
 }
 
 /* 장바구니 버튼과 공유 버튼 호버/포커스 시 스타일 */
-.btn-product.btn-cart:hover,
-.btn-product.btn-cart:focus,
-.btn-product.btn-share:hover,
-.btn-product.btn-share:focus {
-    background-color: #fff !important;
-    color: #000 !important;
-    border-color: #ccc !important;
-    box-shadow: none !important;
-    transform: none !important;
-    opacity: 1 !important;
-    transition: none !important;
-    text-decoration: none !important;
-    outline: none !important;
+.btn-product.btn-cart:hover, .btn-product.btn-cart:focus, .btn-product.btn-share:hover,
+	.btn-product.btn-share:focus {
+	background-color: #fff !important;
+	color: #000 !important;
+	border-color: #ccc !important;
+	box-shadow: none !important;
+	transform: none !important;
+	opacity: 1 !important;
+	transition: none !important;
+	text-decoration: none !important;
+	outline: none !important;
 }
 
 /* btn-product 내부 span 스타일 */
 .btn-product span {
-    color: #fff;
-    font-weight: 400;
-    font-size: 1.3rem;
+	color: #fff;
+	font-weight: 400;
+	font-size: 1.3rem;
 }
 
 /* btn-product 내부 span 호버/포커스 시 스타일 */
 .btn-product:hover span, .btn-product:focus span {
-    color: #fff;
-    box-shadow: none;
+	color: #fff;
+	box-shadow: none;
 }
 
 /* 장바구니 버튼과 공유 버튼 내부 span 텍스트 스타일 */
-.product-details-action .btn-cart span,
-.product-details-action .btn-share span {
-    color: #333;
-    font-weight: 400;
-    font-size: 1.3rem;
+.product-details-action .btn-cart span, .product-details-action .btn-share span
+	{
+	color: #333;
+	font-weight: 400;
+	font-size: 1.3rem;
 }
 
 /* 장바구니 버튼과 공유 버튼 내부 span 호버/포커스 시 스타일 */
-.product-details-action .btn-cart:hover span,
-.product-details-action .btn-cart:focus span,
-.product-details-action .btn-share:hover span,
-.product-details-action .btn-share:focus span {
-    color: #333;
-    box-shadow: none;
+.product-details-action .btn-cart:hover span, .product-details-action .btn-cart:focus span,
+	.product-details-action .btn-share:hover span, .product-details-action .btn-share:focus span
+	{
+	color: #333;
+	box-shadow: none;
 }
 
 /* product-brand-info와 브랜드 위시리스트를 감싸는 컨테이너 스타일 */
 .product-details-brand-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20px;
+	width: 100%;
 }
 
 /* 새로운 '브랜드 위시리스트' 버튼 스타일 */
 .btn-brand-wishlist {
-    background-color: #f8f8f8;
-    border: 1px solid #ccc;
-    color: #333;
-    cursor: pointer;
-    border-radius: 5px;
-    padding: 3px 6px;
-    font-size: 1rem;
-    gap: 2px;
-    height: 28px;
-    width: auto;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    font-weight: 600;
-    transition: background-color .3s, border-color .3s, color .3s;
-    justify-content: center;
-    flex-shrink: 0;
-    flex-grow: 0;
+	background-color: #f8f8f8;
+	border: 1px solid #ccc;
+	color: #333;
+	cursor: pointer;
+	border-radius: 5px;
+	padding: 3px 6px;
+	font-size: 1rem;
+	gap: 2px;
+	height: 28px;
+	width: auto;
+	white-space: nowrap;
+	display: flex;
+	align-items: center;
+	font-weight: 600;
+	transition: background-color .3s, border-color .3s, color .3s;
+	justify-content: center;
+	flex-shrink: 0;
+	flex-grow: 0;
 }
 
 /* '브랜드 위시리스트' 버튼 호버/활성화 시 스타일 */
 .btn-brand-wishlist:hover {
-    background-color: #e2e2e2;
-    border-color: #bbb;
+	background-color: #e2e2e2;
+	border-color: #bbb;
 }
 
 .btn-brand-wishlist.liked {
-    background-color: #fcb911;
-    border-color: #fcb911;
-    color: #fff;
+	background-color: #fcb911;
+	border-color: #fcb911;
+	color: #fff;
 }
 
 /* 브랜드 위시리스트 버튼 내부 아이콘 스타일 */
 .btn-brand-wishlist i {
-    font-size: 1.1rem;
-    line-height: 1;
-}
-
-/* 주요 버튼 그룹 Flexbox 설정 */
-.product-details-action .product-main-buttons {
-    display: flex;
-    flex-grow: 1;
-    gap: 10px;
-}
-
-/* 장바구니 및 구매하기 버튼 너비 설정 */
-.product-details-action .product-main-buttons .btn-cart,
-.product-details-action .product-main-buttons .btn-buy-now {
-    flex: 4;
-}
-
-/* 공유 버튼 너비 설정 */
-.product-details-action .product-main-buttons .btn-share {
-    flex: 1;
-    min-width: 50px;
+	font-size: 1.1rem;
+	line-height: 1;
 }
 
 /* 기본 모달 스타일 (Bootstrap 기반) */
 /* 공유 모달 관련 스타일 */
 .modal-backdrop.fade {
-    opacity: 0.5;
-    background-color: #000;
+	opacity: 0.5;
+	background-color: #000;
 }
 
 .modal-content {
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,.3);
-    border: none;
+	border-radius: 10px;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+	border: none;
 }
 
 .modal-header {
-    border-bottom: 1px solid #eee;
-    padding: 0.8rem 1.5rem;
+	border-bottom: 1px solid #eee;
+	padding: 0.8rem 1.5rem;
 }
 
 .modal-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
+	font-size: 18px;
+	font-weight: 600;
+	color: #333;
 }
 
 .modal-body {
-    padding: 2rem 1.5rem;
+	padding: 2rem 1.5rem;
 }
 
 .share-icon-btn {
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.2s;
+	text-decoration: none;
+	color: inherit;
+	transition: transform 0.2s;
 }
 
 .share-icon-btn:hover {
-    transform: translateY(-5px);
+	transform: translateY(-5px);
 }
 
 .share-icon {
-    width: 55px;
-    height: 55px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    color: #fff;
-    border-radius: 50%;
-    overflow: hidden;
+	width: 55px;
+	height: 55px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 24px;
+	color: #fff;
+	border-radius: 50%;
+	overflow: hidden;
 }
 
 /* 소셜 미디어별 배경색 */
 .instagram-bg {
-    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+	background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,
+		#d6249f 60%, #285AEB 90%);
 }
 
 .kakao-bg {
-    background-color: #FEE500;
-    color: #3C1E1E;
+	background-color: #FEE500;
+	color: #3C1E1E;
 }
+
 .kakao-bg img {
-    filter: brightness(0.2) saturate(0%);
+	filter: brightness(0.2) saturate(0%);
 }
 
 .facebook-bg {
-    background-color: #3b5998;
+	background-color: #3b5998;
 }
 
 .url-bg {
-    background-color: #6c757d;
+	background-color: #6c757d;
 }
 
-.share-icon .icon-link,
-.share-icon .icon-instagram,
-.share-icon .icon-facebook {
-    color: #fff;
+.share-icon .icon-link, .share-icon .icon-instagram, .share-icon .icon-facebook
+	{
+	color: #fff;
 }
 
 .share-icon.kakao-bg i {
-    color: #3C1E1E;
+	color: #3C1E1E;
 }
 
 .share-text {
-    font-weight: 500;
-    font-size: 15px;
-    color: #555;
-    text-align: center;
+	font-weight: 500;
+	font-size: 15px;
+	color: #555;
+	text-align: center;
 }
 
 .mt-2 {
-    margin-top: 10px !important;
+	margin-top: 10px !important;
 }
 
 .input-group .form-control {
-    border-radius: .25rem 0 0 .25rem;
+	border-radius: .25rem 0 0 .25rem;
 }
 
 .input-group-append .btn {
-    border-radius: 0 .25rem .25rem 0;
+	border-radius: 0 .25rem .25rem 0;
 }
 
 .modal-footer {
-    border-top: 1px solid #eee;
-    padding: 1rem 1.5rem;
+	border-top: 1px solid #eee;
+	padding: 1rem 1.5rem;
 }
 
 .btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
-    font-weight: 500;
+	background-color: #6c757d;
+	border-color: #6c757d;
+	font-weight: 500;
 }
 
 .mb-4 {
-    margin-bottom: 20px !important;
+	margin-bottom: 20px !important;
 }
 
 .close {
-    font-weight: normal;
-    font-size: 28px;
-    color: #333;
-    opacity: 1;
-    transition: all .3s;
+	font-weight: normal;
+	font-size: 28px;
+	color: #333;
+	opacity: 1;
+	transition: all .3s;
 }
 
-@media screen and (min-width: 768px) and (max-width: 991px) {
-    .product-details-action .btn-cart {
-        min-width: initial !important;
-    }
-}
 /* 가격 전체를 감싸는 섹션 */
 .product-price-section {
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
+	margin-top: 1.5rem;
+	margin-bottom: 1.5rem;
 }
 
 .original-price {
-    font-size: 1.6rem; /* 16px */
-    color: #999;
-    text-decoration: line-through; /* 취소선 */
+	font-size: 1.6rem; /* 16px */
+	color: #999;
+	text-decoration: line-through; /* 취소선 */
 }
 
 /* 최종 가격 라인 (할인율 + 할인가) */
 .final-price-wrapper {
-    display: flex;
-    align-items: baseline; /* 텍스트 베이스라인 정렬 */
-    gap: 1rem; /* 할인율과 가격 사이 간격 */
+	display: flex;
+	align-items: baseline; /* 텍스트 베이스라인 정렬 */
+	gap: 1rem; /* 할인율과 가격 사이 간격 */
 }
 
 /* 할인율 텍스트 스타일 */
 .discount-rate {
-    font-size: 2.2rem; /* 22px, 더 크게 */
-    font-weight: 700;
-    color: #c96; /* 빨간색으로 강조 */
+	font-size: 2.2rem; /* 22px, 더 크게 */
+	font-weight: 700;
+	color: #c96; /* 빨간색으로 강조 */
 }
 
 /* 최종 가격 텍스트 스타일 */
-.final-price {
-    font-size: 2.4rem; /* 24px, 가장 크게 */
-    font-weight: 500;
-    color: #333;
+.final-price-wrapper .final-price {
+	font-size: 2.4rem; /* 24px, 가장 크게 */
+	font-weight: 500;
+	color: #333;
 }
-.product-content{
+
+.product-content {
 	display: none;
 }
 /* .product-option-price-preview {
     display: none;
 } */
+
+/* ----------------------------------------- */
+/* =========================================================================
+   Product Detail Gallery Styles (Prefix: product-detail-)
+   ========================================================================= */
+
+/* Overall container for main image and thumbnails */
+.product-detail-gallery-container {
+	margin-bottom: 30px; /* Adjust as needed */
+	display: flex; /* Ensures columns align properly */
+	align-items: flex-start; /* Align items to the top */
+}
+
+/* Left: Thumbnails Wrapper */
+.product-detail-thumbnails-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center; /* Center buttons and gallery */
+	padding-right: 15px; /* Spacing between thumbnails and main image */
+}
+
+/* Thumbnails list container */
+.product-detail-image-gallery {
+	width: 100%; /* Take full width of its column */
+	max-height: 500px;
+	/* Adjust this height based on your main image height or desired scroll area */
+	overflow-y: auto;
+	/* Enable vertical scrolling if content exceeds max-height */
+	padding: 5px; /* Inner padding for the scroll area */
+	border: 1px solid #f0f0f0; /* Light border around the thumbnail area */
+	border-radius: 5px;
+	background-color: #fff;
+	display: flex;
+	flex-direction: column; /* Stack items vertically */
+	gap: 10px; /* Space between each thumbnail */
+	scrollbar-width: thin; /* Firefox */
+	scrollbar-color: #ddd #f1f1f1; /* Firefox */
+}
+
+/* Custom scrollbar for Webkit browsers */
+.product-detail-image-gallery::-webkit-scrollbar {
+	width: 8px;
+}
+
+.product-detail-image-gallery::-webkit-scrollbar-track {
+	background: #f1f1f1;
+	border-radius: 4px;
+}
+
+.product-detail-image-gallery::-webkit-scrollbar-thumb {
+	background: #ddd;
+	border-radius: 4px;
+}
+
+.product-detail-image-gallery::-webkit-scrollbar-thumb:hover {
+	background: #bbb;
+}
+
+/* Individual thumbnail item */
+.product-detail-gallery-item {
+	display: block;
+	border: 2px solid transparent; /* Default transparent border */
+	border-radius: 5px;
+	overflow: hidden; /* Ensures image fits within rounded corners */
+	transition: border-color 0.2s ease, transform 0.1s ease;
+	cursor: pointer;
+	background-color: #fff; /* Background for thumb item */
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+}
+
+.product-detail-gallery-item:hover {
+	border-color: #ccc; /* Border on hover */
+	transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Active thumbnail item */
+.product-detail-gallery-item.active {
+	border-color: #333; /* Darker border for active item */
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	/* More prominent shadow for active */
+}
+
+.product-detail-gallery-item img {
+	width: 100%; /* Make image fill its container */
+	height: 80px; /* Fixed height for consistent thumbnail size */
+	object-fit: cover;
+	/* Crop image to cover the area without distortion */
+	display: block; /* Remove extra space below image */
+}
+
+/* Placeholder for no images */
+.product-detail-no-image-placeholder {
+	text-align: center;
+	padding: 20px;
+	background-color: #f9f9f9;
+	border: 1px dashed #ddd;
+	color: #999;
+	font-size: 0.9em;
+	border-radius: 5px;
+}
+
+.product-detail-no-image-placeholder img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+	margin: 0 auto;
+	opacity: 0.7;
+}
+
+/* Thumbnail navigation buttons */
+.product-detail-thumbnail-nav-btn {
+	background: #f8f8f8;
+	border: 1px solid #e0e0e0;
+	border-radius: 5px;
+	padding: 5px 10px;
+	margin: 5px 0;
+	cursor: pointer;
+	font-size: 1.2em;
+	color: #555;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
+	width: 100%; /* Make buttons full width of the column */
+}
+
+.product-detail-thumbnail-nav-btn:hover {
+	background-color: #e5e5e5;
+	border-color: #ccc;
+}
+
+.product-detail-thumbnail-nav-btn:active {
+	background-color: #ddd;
+	border-color: #bbb;
+}
+
+/* Right: Main Image Wrapper */
+.product-detail-main-image-wrapper {
+	position: relative; /* Needed for absolute positioning of children */
+	padding-left: 15px; /* Spacing from thumbnails */
+}
+
+/* Main image figure */
+.product-detail-main-image {
+	position: relative; /* Needed for absolute positioning of children */
+	margin: 0; /* Remove default figure margin */
+	border: 1px solid #e0e0e0; /* Subtle border */
+	border-radius: 5px;
+	overflow: hidden; /* Ensure rounded corners */
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Soft shadow */
+	background-color: #fff;
+}
+
+.product-detail-main-image img {
+	width: 100%;
+	height: auto;
+	display: block;
+}
+
+/* Main image expand button */
+.product-detail-btn-gallery {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	background-color: rgba(0, 0, 0, 0.6);
+	color: #fff;
+	border-radius: 50%; /* Circular button */
+	width: 40px;
+	height: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 1.2em;
+	transition: background-color 0.3s ease;
+	text-decoration: none; /* Remove underline */
+}
+
+.product-detail-btn-gallery:hover {
+	background-color: rgba(0, 0, 0, 0.8);
+	color: #fff; /* Ensure text color stays white on hover */
+}
+
+/* Image counter */
+.product-detail-image-counter {
+	position: absolute;
+	bottom: 15px;
+	right: 15px;
+	background-color: rgba(0, 0, 0, 0.6);
+	color: #fff;
+	padding: 8px 12px;
+	border-radius: 20px; /* Pill shape */
+	font-size: 0.9em;
+	font-weight: 500;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.product-detail-image-counter i {
+	font-size: 0.8em; /* Adjust icon size within counter */
+}
+
+/* 갤러리 아이템 (썸네일) */
+.product-gallery-item img {
+	height: 130px; /* 데스크탑용 썸네일 높이 */
+	object-fit: cover;
+	width: 100%;
+}
+
+.product-gallery-vertical .product-gallery-item {
+	flex: 0 0 100%;
+	max-width: 100%;
+	padding-left: 0;
+	padding-right: 0;
+	margin-bottom: 5px;
+}
+
+/* 메인 이미지 */
+.product-main-image img {
+	height: 620px; /* 데스크탑용 메인 이미지 고정 높이 */
+	object-fit: cover;
+	width: 100%;
+}
+
+.product-gallery-vertical .row {
+	margin-left: 0;
+	margin-right: 0;
+	overflow-x: hidden;
+}
+
+/* --- 모바일 반응형 스타일 --- */
+@media ( max-width : 767px) {
+	.product-gallery-item img {
+		height: 130px; /* 데스크탑용 썸네일 높이 */
+		object-fit: cover;
+		width: 100%;
+	}
+
+	/* 1. 메인 이미지 고정 높이 해제 */
+	.product-main-image img {
+		height: auto; /* 고정 높이를 auto로 변경 */
+		object-fit: contain; /* 이미지가 잘리지 않도록 변경 */
+	}
+
+	/* 2. 기존의 다른 모바일 스타일 */
+	.product-detail-thumbnails-wrapper, .product-detail-main-image-wrapper {
+		padding-left: 0;
+		padding-right: 0;
+	}
+	.product-detail-thumbnails-wrapper {
+		order: 2;
+		margin-top: 20px;
+		max-height: unset;
+	}
+	.product-detail-main-image-wrapper {
+		order: 1;
+	}
+	.product-detail-image-gallery {
+		flex-direction: row;
+		overflow-x: auto;
+		overflow-y: hidden;
+		white-space: nowrap;
+		gap: 10px;
+		padding: 5px;
+		margin-bottom: 10px;
+	}
+	.product-detail-image-gallery::-webkit-scrollbar {
+		height: 8px;
+	}
+	.product-detail-gallery-item {
+		flex: 0 0 auto;
+		width: 80px;
+		height: 80px;
+	}
+	.product-detail-thumbnail-nav-btn {
+		display: none;
+	}
+	.product-detail-image-counter {
+		bottom: 10px;
+		right: 10px;
+		padding: 6px 10px;
+		font-size: 0.8em;
+	}
+	.product-detail-btn-gallery {
+		width: 35px;
+		height: 35px;
+		font-size: 1.1em;
+		top: 10px;
+		right: 10px;
+	}
+	#product-zoom-gallery { /* ID 선택자로 변경 */
+		display: flex !important; /* display: flex를 강제 적용 */
+		flex-wrap: nowrap !important; /* 중요! 줄바꿈을 강제로 막습니다. */
+		overflow-x: auto; /* 가로로 내용이 넘칠 경우 스크롤 생성 */
+		overflow-y: hidden; /* 세로 스크롤은 확실히 비활성화 */
+		/* 여백 및 커서 스타일 */
+		padding-bottom: 1rem; /* 스크롤바가 숨겨질 때 콘텐츠와 겹치지 않도록 여백 추가 */
+		cursor: grab;
+		/* --- 스크롤바 시각적으로 숨기기 --- */
+		-ms-overflow-style: none; /* IE and Edge */
+		scrollbar-width: none; /* Firefox */
+	}
+
+	/* Chrome, Safari 등 Webkit 브라우저에서 스크롤바 숨기기 */
+	#product-zoom-gallery::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* 드래그하는 동안 커서 모양을 '잡는 손'으로 변경 (JS와 연동) */
+	#product-zoom-gallery.active {
+		cursor: grabbing;
+	}
+
+	/* 2. 개별 아이템 (.product-gallery-item) 스타일 */
+	/* .product-zoom-gallery 안의 아이템에 적용됩니다. */
+	#product-zoom-gallery .product-gallery-item {
+		flex: 0 0 100px; /* 중요: 아이템 너비를 100px로 고정 (늘어나거나 줄지 않음) */
+		width: 100px; /* 원하는 가로 크기로 조절하세요 */
+		margin-bottom: 0; /* 가로 스크롤에서는 아래쪽 마진이 필요 없습니다. */
+		/* 기존 스타일 유지 또는 필요에 맞게 수정 */
+		position: relative;
+		display: block;
+		padding-left: .5rem;
+		padding-right: .5rem;
+		box-sizing: border-box;
+	}
+}
+
+/* --- 기타 스타일 --- */
+.product-detail-col-md-6 {
+	display: flex;
+}
+
+.product-gallery {
+	margin-bottom: 0rem;
+}
+
+.product-details {
+	margin-bottom: 0rem;
+}
+
+/* 하단 */
+.product-desc-content .container, .reviews .container {
+	box-sizing: border-box;
+}
+
+.container-bottom {
+	width: 100%;
+	padding-right: 0px;
+	padding-left: 0px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.zoomContainer {
+	display: none;
+}
+
+/* --- 태블릿 반응형 스타일 (768px ~ 991px) --- */
+@media screen and (min-width: 768px) and (max-width: 992px) {
+	/* 1. 부모 컨테이너 (#product-zoom-gallery) 스타일 */
+	#product-zoom-gallery {
+		display: flex !important; /* 가로 정렬 강제 */
+		flex-wrap: nowrap !important; /* 줄바꿈 방지 강제 */
+		overflow-x: auto; /* 가로 스크롤 활성화 */
+		overflow-y: hidden; /* 세로 스크롤 비활성화 */
+		padding-bottom: 1rem;
+		cursor: grab;
+		/* 스크롤바 시각적으로 숨기기 */
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+	#product-zoom-gallery::-webkit-scrollbar {
+		display: none;
+	}
+	#product-zoom-gallery.active {
+		cursor: grabbing;
+	}
+
+	/* 2. 개별 아이템 (.product-gallery-item) 스타일 */
+	#product-zoom-gallery .product-gallery-item {
+		flex: 0 0 100px;
+		width: 100px;
+		margin-bottom: 0;
+		position: relative;
+		display: block;
+		padding-left: .5rem;
+		padding-right: .5rem;
+		box-sizing: border-box;
+		width: 100px;
+	}
+	.product-desc-content .container, .reviews .container {
+		padding: 0 15px;
+		box-sizing: border-box;
+	}
+}
+
+@media screen and (min-width: 992px) {
+	.product-gallery-vertical .product-image-gallery {
+		/* ... 데스크탑 갤러리 스크롤 스타일 ... */
+		flex: 0 0 20%;
+		max-width: 20%;
+		max-height: 620px;
+		overflow-y: auto;
+		cursor: grab;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+		gap: 5px;
+	}
+	.product-gallery-vertical .product-image-gallery::-webkit-scrollbar {
+		display: none;
+	}
+	.product-gallery-vertical .product-image-gallery.active {
+		cursor: grabbing;
+	}
+	.product-desc-content .container, .reviews .container {
+		padding: 0 15px;
+		box-sizing: border-box;
+	}
+}
+
+.product-detail-image-wrapper img {
+	display: block;
+	width: 100%;
+	height: auto;
+	padding: 0 150px; /* 데스크탑용 좌우 패딩 150px */
+	box-sizing: border-box; /* 패딩이 너비에 포함되도록 설정 */
+}
+
+/* 2. 태블릿 화면 스타일 (768px ~ 991px) */
+@media ( max-width : 991px) {
+	.product-detail-image-wrapper img {
+		padding: 0 100px; /* 태블릿용 좌우 패딩 50px */
+	}
+}
+
+@media screen and (min-width: 991px) {
+	.product-gallery-vertical .product-gallery-item {
+		flex: 0 0 100%;
+		max-width: 100%;
+		padding-left: 0;
+		padding-right: 0;
+		margin-bottom: 0rem;
+	}
+	.product-gallery-item {
+		position: relative;
+		display: block;
+		flex: 0 0 25%;
+		max-width: 25%;
+		padding-left: .5rem;
+		padding-right: .5rem;
+		margin-bottom: 0rem;
+	}
+}
+
+/* 3. 모바일 화면 스타일 (767px 이하) */
+@media ( max-width : 767px) {
+	.product-detail-image-wrapper img {
+		padding: 0; /* 모바일용 좌우 패딩 15px */
+	}
+	.product-details-extended .tab-content {
+		border: none;
+		padding: 15px;
+	}
+	.container-bottom {
+		padding: 15px;
+	}
+}

@@ -12,6 +12,50 @@ $(document).ready(function() {
     // 예: <div class="container" th:data-initial-bbsClsfCd="${bbsClsfCd}" ... >
 
     // --- 2. 이벤트 핸들러 바인딩 ---
+	
+	/* ============================================================
+	    카테고리 탭 드래그-스크롤 기능 구현
+	   ============================================================ */
+	const slider = document.querySelector('#tabsContainer');
+	let isDown = false; // 마우스 클릭 여부
+	let startX;         // 클릭 시점의 X 좌표
+	let scrollLeft;     // 클릭 시점의 스크롤 위치
+
+	if (slider) { // #tabsContainer 요소가 존재할 때만 스크립트 실행
+	    
+	    // 1. 마우스를 누를 때 (드래그 시작)
+	    slider.addEventListener('mousedown', (e) => {
+	        isDown = true;
+	        slider.classList.add('active-drag'); // (선택사항) 드래그 중임을 나타내는 클래스 추가
+	        startX = e.pageX - slider.offsetLeft;
+	        scrollLeft = slider.scrollLeft;
+	        slider.style.cursor = 'grabbing'; // 커서를 잡는 모양으로 변경
+	    });
+
+	    // 2. 마우스가 요소 밖으로 나갔을 때
+	    slider.addEventListener('mouseleave', () => {
+	        isDown = false;
+	        slider.classList.remove('active-drag');
+	        slider.style.cursor = 'grab'; // 커서 모양 복원
+	    });
+
+	    // 3. 마우스를 뗄 때 (드래그 종료)
+	    slider.addEventListener('mouseup', () => {
+	        isDown = false;
+	        slider.classList.remove('active-drag');
+	        slider.style.cursor = 'grab'; // 커서 모양 복원
+	    });
+
+	    // 4. 마우스를 움직일 때 (실제 스크롤 발생)
+	    slider.addEventListener('mousemove', (e) => {
+	        if (!isDown) return; // 마우스가 눌리지 않았으면 아무것도 하지 않음
+	        e.preventDefault();
+	        const x = e.pageX - slider.offsetLeft;
+	        const walk = (x - startX) * 2; // 이동 거리 계산 (곱하는 숫자로 스크롤 속도 조절 가능)
+	        slider.scrollLeft = scrollLeft - walk;
+	    });
+
+	}
 
     // 게시판 탭(카테고리) 클릭 이벤트
     $('.board-tabs-container').on('click', '.nav-link', function(e) {

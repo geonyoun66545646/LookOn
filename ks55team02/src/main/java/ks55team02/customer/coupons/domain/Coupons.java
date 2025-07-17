@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 public class Coupons {
     private String pblcnCpnId;
-    private String pblcnCpnCd;
     private String userNo;
     private String cpnNm;
     private double dscntVl;
@@ -19,6 +18,9 @@ public class Coupons {
     private boolean actvtnYn;
     private LocalDateTime crtDt;
     private LocalDateTime mdfcnDt;
+    
+    private boolean owned;
+
     
     private String issueConditionType; // issue_condition_type 컬럼과 연결될 필드
     private String reissueCycle;       // reissue_cycle 컬럼과 연결될 필드

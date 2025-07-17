@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ks55team02.customer.cart.mapper.CartMapper">
+
+    <resultMap id="cartDTOResultMap" type="ks55team02.customer.cart.domain.CartDTO">
+        <id     column="cart_item_id"   property="cartItemId"/>
+        <result column="user_no"        property="userNo"/>
+        <result column="gds_no"         property="gdsNo"/>
+        <result column="store_id"       property="storeId"/>
+        <result column="gds_stts_no"    property="gdsSttsNo"/> <result column="quantity"       property="quantity"/>
+        <result column="added_at"       property="addedAt"/>
+        <result column="updated_at"     property="updatedAt"/>
+        <result column="is_chc_ord"     property="isChcOrd"/>
+        <result column="gds_nm"         property="gdsNm"/>
+        <result column="last_sel_prc"   property="gdsPrc"/>
+        <result column="opt_nm"         property="optNm"/>
+    </resultMap>
+
+    <select id="selectCartItemsByUserNo" parameterType="String" resultMap="cartDTOResultMap">
+        SELECT
+	        ci.cart_item_id,
+	        ci.user_no,
+	        ci.gds_no,
+	        ci.store_id,
+	        ci.gds_stts_no,   ci.quantity,
+	        ci.added_at,
+	        ci.updated_at,
+	        ci.is_chc_ord,  
+	        p.gds_nm,
+	        p.last_sel_prc,
+	        GROUP_CONCAT(pov.vl_nm SEPARATOR ', ') AS opt_nm
+	    FROM
+	        cart_items ci
+	    LEFT JOIN
+	        products p ON ci.gds_no = p.gds_no
+	    LEFT JOIN
+	        product_status ps ON ci.gds_stts_no = ps.gds_stts_no
+	    LEFT JOIN
+	        status_option_mappings som ON ps.gds_stts_no = som.gds_stts_no
+	    LEFT JOIN
+	        product_option_values pov ON som.opt_vl_no = pov.opt_vl_no
+	    WHERE
+	        ci.user_no = #{userNo}
+	    GROUP BY
+	        ci.cart_item_id
+	    ORDER BY
+	        ci.added_at DESC
+    </select>
+
+    <select id="getExistingCartItem" resultMap="cartDTOResultMap">
+        SELECT
+            cart_item_id, user_no, gds_no, store_id, gds_stts_no, quantity, added_at, updated_at, is_chc_ord
+        FROM
+            cart_items
+        WHERE
+            user_no = #{userNo}
+            AND gds_no = #{gdsNo}
+            <if test="gdsSttsNo != null and gdsSttsNo != ''">
+                AND gds_stts_no = #{gdsSttsNo}
+            </if>
+            <if test="gdsSttsNo == null or gdsSttsNo == ''">
+                AND gds_stts_no IS NULL
+            </if>
+    </select>
+
+    <insert id="insertCartItem" parameterType="ks55team02.customer.cart.domain.CartDTO">
+        INSERT INTO cart_items (
+            cart_item_id, user_no, gds_no, store_id, gds_stts_no, quantity, added_at, is_chc_ord
+        ) VALUES (
+            #{cartItemId}, #{userNo}, #{gdsNo}, #{storeId}, #{gdsSttsNo}, #{quantity}, #{addedAt}, #{isChcOrd}
+        )
+    </insert>
+    
+    <select id="getMaxCartItemId" resultType="String">
+        SELECT
+            MAX(CAST(SUBSTRING_INDEX(cart_item_id, '_', -1) AS UNSIGNED))
+        FROM
+            cart_items
+        WHERE
+            cart_item_id LIKE 'cart_id_%';
+    </select>
+
+    <update id="updateCartItemQuantity" parameterType="ks55team02.customer.cart.domain.CartDTO">
+        UPDATE cart_items
+        SET
+            quantity = #{quantity},
+            updated_at = #{updatedAt}
+        WHERE
+            cart_item_id = #{cartItemId}
+            AND gds_stts_no = #{gdsSttsNo}
+    </update>
+
+    <select id="getCartItemById" parameterType="String" resultMap="cartDTOResultMap">
+        SELECT
+            cart_item_id, user_no, gds_no, store_id, gds_stts_no, quantity, added_at, updated_at, is_chc_ord
+        FROM
+            cart_items
+        WHERE
+            cart_item_id = #{cartItemId}
+    </select>
+
+    <delete id="deleteCartItem" parameterType="String">
+        DELETE FROM
+            cart_items
+        WHERE
+            cart_item_id = #{cartItemId}
+    </delete>
+
+    <delete id="clearCartByUserNo" parameterType="String">
+        DELETE FROM
+            cart_items
+        WHERE
+            user_no = #{userNo}
+    </delete>
+</mapper>

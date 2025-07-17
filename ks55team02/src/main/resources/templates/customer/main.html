@@ -3,7 +3,6 @@
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{customer/layout/layoutMain}">
 
-<!-- 1. 이 페이지 전용 CSS 파일들을 "cssFile" 프래그먼트에 정의합니다. -->
 <head>
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -11,16 +10,13 @@
 	th:href="@{/maincss/assets/mainSlide/mainSlide.css}" />
 </head>
 
-<!-- 2. 페이지의 실제 메인 콘텐츠를 "contents" 프래그먼트에 정의합니다. -->
-
 <th:block layout:fragment="contents">
 	<main class="main">
 
-		<!-- 고유한 클래스명을 가진 슬라이더 컨테이너 -->
+		<!-- 메인 슬라이더 -->
 		<div class="main-page-slider-container">
 			<div class="main-page-swiper swiper">
 				<div class="swiper-wrapper">
-					<!-- DB에서 가져온 상품 목록으로 슬라이드 동적 생성 -->
 					<div class="swiper-slide" th:each="product : ${mainSlideProducts}">
 						<a th:href="@{/products/detail/{id}(id=${product.gdsNo})}"> <img
 							th:src="${product.thumbnailImagePath}" th:alt="${product.gdsNm}"
@@ -40,65 +36,79 @@
 					</div>
 				</div>
 			</div>
-
-			<!-- 슬라이더 컨트롤러 UI -->
 			<div class="main-swiper-controls">
 				<div class="swiper-button-prev"></div>
 				<div class="swiper-pagination"></div>
 				<div class="swiper-button-next"></div>
 				<button class="swiper-autoplay-button">
-					<span class="icon-pause">||</span> <span class="icon-play">▶</span>
+					<span class="icon-pause">||</span> <span class="icon-play"></span>
 				</button>
 			</div>
 		</div>
-		
-		<!-- 상품영역 -->
-		<!-- main.html -->
-		
-		<!-- ⭐ 수정: Weekly Best 상품 목록 (고유 클래스명 사용) -->
+
+		<!-- 이번달 신상 -->
 		<div class="weekly-best-section">
 			<div class="weekly-best-container">
 				<div class="weekly-best-heading">
-					<h2 class="weekly-best-title">Weekly Best</h2>
-					<ul class="nav nav-pills justify-content-center" role="tablist">
-						<li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#new-all-tab" role="tab">전체상품</a></li>
-						<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#new-sale-tab" role="tab">할인</a></li>
-						<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#new-new-tab" role="tab">신상</a></li>
-					</ul>
+					<h2 class="weekly-best-title">이번달 신상</h2>
+					<div class="weekly-best-more-link">
+						<a th:href="@{/customer/products(type='new-products')}"
+							class="btn btn-outline-dark-2"> <span>더보기</span>
+						</a>
+					</div>
 				</div>
-				<div class="tab-content">
-					<!-- 전체상품 탭 -->
-					<div class="tab-pane fade show active" id="new-all-tab" role="tabpanel">
-                        <div th:replace="~{customer/fragments/mainProductList :: productListFragment(${allTabProducts})}"></div>
-                        <div class="weekly-best-more-link">
-                            <a th:href="@{/customer/products/list}" class="btn btn-outline-dark-2"><span>더보러가기</span><i class="icon-long-arrow-right"></i></a>
-                        </div>
+
+				<div class="weekly-best-slider-container">
+					<div class="swiper weekly-best-swiper">
+						<div class="swiper-wrapper">
+							<div class="swiper-slide"
+								th:each="product : ${weeklyBestProducts}">
+								<div
+									th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
+							</div>
+						</div>
 					</div>
-					<!-- 할인 탭 -->
-					<div class="tab-pane fade" id="new-sale-tab" role="tabpanel">
-                        <div th:replace="~{customer/fragments/mainProductList :: productListFragment(${saleTabProducts})}"></div>
-                         <div class="weekly-best-more-link">
-                            <a th:href="@{/customer/products/list(sortBy='discountDesc', discountRate='1')}" class="btn btn-outline-dark-2"><span>더보러가기</span><i class="icon-long-arrow-right"></i></a>
-                        </div>
+					<!-- 버튼에 고유 클래스 부여 -->
+					<div class="swiper-button-prev weekly-best-button-prev"></div>
+					<div class="swiper-button-next weekly-best-button-next"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ⭐ 세일 상품 ⭐ -->
+		<div class="sale-products-section">
+			<div class="weekly-best-container container">
+				<div class="weekly-best-heading">
+					<h2 class="weekly-best-title">놓치기 아까운 특가 상품</h2>
+					<div class="weekly-best-more-link">
+						<a
+							th:href="@{/customer/products/list(sortBy='discountDesc', discountRate='30')}"
+							class="btn btn-outline-dark-2"> <span>더보기</span>
+						</a>
 					</div>
-					<!-- 신상 탭 -->
-					<div class="tab-pane fade" id="new-new-tab" role="tabpanel">
-                        <div th:replace="~{customer/fragments/mainProductList :: productListFragment(${newTabProducts})}"></div>
-                         <div class="weekly-best-more-link">
-                            <a th:href="@{/customer/products/list(isNewProductPage='true')}" class="btn btn-outline-dark-2"><span>더보러가기</span><i class="icon-long-arrow-right"></i></a>
-                        </div>
+				</div>
+
+				<div class="sale-products-slider-container">
+					<div class="sale-products-swiper swiper">
+						<div
+							th:replace="~{customer/fragments/products :: saleProductsFragment(${saleProductList})}"></div>
 					</div>
+					<div class="swiper-button-prev sale-products-button-prev"></div>
+					<div class="swiper-button-next sale-products-button-next"></div>
+				</div>
+				<div th:if="${saleProductList.isEmpty()}"
+					class="col-12 text-center mt-4">
+					<p>현재 특가 상품이 없습니다.</p>
 				</div>
 			</div>
 		</div>
 	</main>
 </th:block>
 
-<!-- 3. 이 페이지 전용 JavaScript 파일들을 "jsScript" 프래그먼트에 정의합니다. -->
 <th:block layout:fragment="jsScript">
 	<script
 		src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-	<!-- ⭐ 수정: th:src="@{/maincss/...}" 로 변경 -->
 	<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
 </th:block>
+
 </html>

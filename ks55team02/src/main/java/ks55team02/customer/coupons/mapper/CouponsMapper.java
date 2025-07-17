@@ -47,6 +47,12 @@ public interface CouponsMapper {
      */
     void issueUserCoupon(UserCoupons userCoupon);
     
+    
+    /**
+     * [추가] 사용 완료된 쿠폰을 재발급 처리 (상태 갱신)
+     */
+    int reissueUserCoupon(UserCoupons userCoupon);
+    
     /**
      * 새로운 사용자 쿠폰 ID를 생성하기 위한 쿼리
      * @return 생성될 다음 사용자 쿠폰 ID (예: USRCPN_055)
@@ -101,6 +107,13 @@ public interface CouponsMapper {
      */
     int countActiveUserCouponByCouponId(@Param("userNo") String userNo, @Param("pblcnCpnId") String pblcnCpnId);
     
+    /**
+     * 사용 가능한 사용자 쿠폰 목록 조회
+     * (2025.07.11 gy - checkOut.html에서 사용)
+     */
+    List<UserCoupons> getUserAvailableCoupons(String userNo);
+    
+    List<String> getOwnedCouponIds(String userNo);
     
 
 }

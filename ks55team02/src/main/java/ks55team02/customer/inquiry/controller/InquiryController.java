@@ -18,7 +18,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
-import ks55team02.customer.inquiry.domain.Inquiry;
+import ks55team02.common.domain.inquiry.Inquiry;
+import ks55team02.common.domain.store.Store;
+import ks55team02.customer.inquiry.domain.InquiryOption;
+import ks55team02.customer.inquiry.domain.InquiryTargetOption;
 import ks55team02.customer.inquiry.service.InquiryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +43,8 @@ public class InquiryController {
      * @return 로그인된 사용자 ID (현재는 'user_no_1000'으로 고정)
      */
     private String getCurrentUserId(HttpSession session) {
-        // 현재는 user_no_1000이 로그인 되어있다고 가정.
-        log.info("[임시] 현재 로그인된 사용자 ID: user_no_1000"); // 로그 추가
+        // 현재는 user_no_100이 로그인 되어있다고 가정.
+        log.info("[임시] 현재 로그인된 사용자 ID: user_no_100"); // 로그 추가
         return "user_no_100";
 
         /*
@@ -127,8 +130,21 @@ public class InquiryController {
         //3. Model에 필요한 데이터를 담아 뷰로 전달합니다.
         model.addAttribute("title", "문의 등록");
         model.addAttribute("inquiry", new Inquiry());
-        model.addAttribute("inquiryType", inquiryService.getInquiryTypeOptions());
-        model.addAttribute("currentUserId", currentUserId); // 쉼표(`,`) 추가
+        
+        // 문의 대상(상점/관리자) 옵션 추가
+        List<InquiryTargetOption> inquiryTargetOptions = inquiryService.getInquiryTargetOptions();
+        model.addAttribute("inquiryTargetOptions", inquiryTargetOptions);
+        
+        // 관리자 문의 유형 옵션( 상품, 배송, SNS, 기타)
+        List<InquiryOption> adminInquiryOptions = inquiryService.getAdminInquiryOptions();
+        model.addAttribute("adminInquiryOptions", adminInquiryOptions);
+        model.addAttribute("inquiryOption", InquiryOption.values());
+        
+        // 상점 목록 추가(상점 문의)
+        List<Store> storeList = inquiryService.getStoreList();
+        model.addAttribute("storeList", storeList);
+        
+        model.addAttribute("currentUserId", currentUserId);
         return "customer/inquiry/addInquiryView";
     }
 
@@ -146,9 +162,11 @@ public class InquiryController {
             Inquiry inquiry,
             @RequestPart(name="attachedFiles", required=false) MultipartFile[] attachedFiles,
             HttpSession session) { // MultipartFile[] 사용
-        log.info("AJAX 요청 수신된 문의 정보 (전체): {}", inquiry);
+    	log.info("AJAX 요청 수신된 문의 정보 (전체): {}", inquiry);
         log.info("AJAX 요청 수신된 문의 prvtYn 값: {}", inquiry.isPrvtYn());
-        log.info("AJAX 요청 수신된 문의 inqryTypeCd 값: {}", inquiry.getInqryTypeCd());
+        log.info("AJAX 요청 수신된 문의 inqryTypeCd 값: {}", inquiry.getInqryTypeCd()); // 세부 유형 (상품, 배송 등)
+        log.info("AJAX 요청 수신된 문의 inqryTrgtTypeCd 값: {}", inquiry.getInqryTrgtTypeCd()); // 문의 대상 (상점, 관리자)
+        log.info("AJAX 요청 수신된 문의 inqryStoreId 값: {}", inquiry.getInqryStoreId()); // 선택된 상점 ID
         log.info("수신된 첨부 파일 개수: {}", attachedFiles != null ? attachedFiles.length : 0);
 
         //1. 현재 로그인된 사용자 ID를 가져옵니다
@@ -213,8 +231,9 @@ public class InquiryController {
         int pageBlockSize = 5;
         int startPage = ((currentPage - 1) / pageBlockSize) * pageBlockSize + 1;
         int endPage = Math.min(startPage + pageBlockSize - 1, totalPages);
+        
 
-        //4. Model에 데이터를 담아 뷰로 전달합니다.
+        //5. Model에 데이터를 담아 뷰로 전달합니다.
         model.addAttribute("title", "문의 목록");
         model.addAttribute("inquiryList", inquiryList);
         model.addAttribute("currentPage", currentPage);
@@ -227,4 +246,5 @@ public class InquiryController {
 
         return "customer/inquiry/inquiryListView";
     }
+    
 }

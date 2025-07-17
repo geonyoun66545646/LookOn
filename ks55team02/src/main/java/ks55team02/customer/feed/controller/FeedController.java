@@ -1,7 +1,5 @@
 package ks55team02.customer.feed.controller;
 
-import java.util.Map;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,80 +8,85 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
-import jakarta.servlet.http.HttpSession;
 import ks55team02.customer.feed.domain.Feed;
 import ks55team02.customer.feed.service.FeedService;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.customer.login.domain.UserInfoResponse;
 import ks55team02.customer.login.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequestMapping("/customer/feed")
 @RequiredArgsConstructor
+@Slf4j
 public class FeedController {
 
     private final FeedService feedService;
     private final UserInfoService userInfoService;
-    private static final int PAGE_SIZE = 12; // 한 페이지에 보여줄 피드 개수
 
-    // 피드 목록 조회
     @GetMapping("/feedList")
-    public String selectFeedList(Model model) {
-        Map<String, Object> result = feedService.selectFeedList(1, PAGE_SIZE);
-        model.addAttribute("feedList", result.get("feedList"));
-        model.addAttribute("hasNext", result.get("hasNext"));
+    public String selectFeedList(
+            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
+            Model model) {
+        model.addAttribute("loginUser", loginUser);
+        model.addAttribute("showFab", true);
         return "customer/feed/feedList";
     }
-    
-    // 피드 상세 조회
-    @GetMapping("/feedDetail/{feedSn}")
-    public String selectFeedDetail(@PathVariable String feedSn, Model model) {
-        Feed feed = feedService.selectFeedDetail(feedSn);
-        model.addAttribute("feed", feed);
-        return "customer/feed/feedDetail";
-    }
-    
-    // 마이 피드 조회
-    @GetMapping("/feedListByMe")
-    public String selectFeedListByMe(HttpSession session, Model model) {
-    	// 세션 처리
-    	Object sessionObj = session.getAttribute("loginUser");
-    	if(sessionObj == null) {
-    		return "redirect:/customer/login/login?redirectUrl=/customer/feed/feedListByMe";
+     
+	 @GetMapping("/feedDetail/{feedSn}")
+	 public String selectFeedDetail(@PathVariable String feedSn, 
+			 			@RequestParam(name = "context", defaultValue = "all") String context,
+			 			@RequestParam(name = "userNo", required = false) String userNo,
+                        @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
+			 			Model model) {
+		 
+	     Feed feed = feedService.selectFeedDetail(feedSn);
+	     model.addAttribute("feed", feed);
+	     model.addAttribute("context", context);
+	     model.addAttribute("userNo", userNo);
+         // [핵심 추가] 현재 로그인 사용자 정보를 모델에 추가
+         model.addAttribute("loginUser", loginUser);
+	     model.addAttribute("showFab", true);
+
+	     return "customer/feed/feedDetail";
+	 }
+	    
+    @GetMapping("/feedListByUserNo")
+    public String selectFeedListByUserNo(
+            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, 
+            Model model) {
+    	if(loginUser == null) {
+    		return "redirect:/customer/login/login?redirectUrl=/customer/feed/feedListByUserNo";
     	}
-    	// 세션 처리 끝
-    	LoginUser loginUser = (LoginUser) sessionObj;
-    	
-    	
     	String userNo = loginUser.getUserNo();
     	UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
-    	Map<String, Object> feedData = feedService.selectFeedListByMe(userNo, 1, PAGE_SIZE);
-    	
     	model.addAttribute("userInfo", userInfo);
-    	model.addAttribute("feedList", feedData.get("feedList"));
-    	model.addAttribute("hasNext", feedData.get("hasNext"));
-    	
-    	return "customer/feed/feedListByMe";
+    	model.addAttribute("showFab", true);
+    	return "customer/feed/feedListByUserNo";
     }
     
-    // 마이 피드 조회 무한스크롤
-    @GetMapping("/myFeed")
-    public String getMyFeeds(
-    		@RequestParam(name = "page", defaultValue = "1") int page,
-    		@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
-    		Model model) {
-    	
-        if (loginUser == null) {
-            // 로그인하지 않은 사용자의 요청은 처리하지 않음
-            return "error/401"; // 혹은 적절한 에러 페이지
+    @GetMapping("/feedListByUserNo/{userNo}")
+    public String userFeedPage(@PathVariable("userNo") String userNo,
+    					@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, 
+    					Model model) {
+        UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
+        model.addAttribute("userInfo", userInfo);
+        model.addAttribute("showFab", true);
+        if (loginUser != null) {
+            model.addAttribute("loginUserNo", loginUser.getUserNo());
+        } else {
+            model.addAttribute("loginUserNo", "");
         }
-        
-        String userNo = loginUser.getUserNo();
-        Map<String, Object> feedData = feedService.selectFeedListByMe(userNo, page, PAGE_SIZE);
-
-        model.addAttribute("feedList", feedData.get("feedList"));
-    	
-    	return "customer/feed/feedListByMe :: feedListFragment";
+        return "customer/feed/feedListByUserNo";
+    }
+    
+    @GetMapping("/feedWrite")
+    public String feedWritePage(
+            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
+        if (loginUser == null) {
+            return "redirect:/customer/login/login?redirectUrl=/customer/feed/write";
+        }
+        return "customer/feed/feedWrite";
     }
 }

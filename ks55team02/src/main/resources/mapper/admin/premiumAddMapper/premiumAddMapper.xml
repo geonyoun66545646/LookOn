@@ -79,5 +79,23 @@
         DELETE FROM subscription_plans
         WHERE sbscr_plan_id = #{sbscrPlanId}
     </delete>
+    
+    <!-- 구독 플랜 조회 -->
+	<select id="getPlanById" resultType="ks55team02.admin.adminpage.storeadmin.premiumadd.domain.PremiumAddDTO">
+	    SELECT * FROM subscription_plans 
+	    WHERE sbscr_plan_id = #{planId}
+	</select>
+	
+	<!-- 구독 플랜 수정 -->
+	<update id="modifySubscriptionPlan" parameterType="ks55team02.admin.adminpage.storeadmin.premiumadd.domain.PremiumAddDTO">
+	    UPDATE subscription_plans
+	    SET
+	        sbscr_plan_nm = #{sbscrPlanNm},
+	        sbscr_plan_prc = #{sbscrPlanPrc},
+	        sbscr_plan_term_val = #{sbscrPlanTermVal},
+	        sbscr_plan_expln = #{sbscrPlanExpln},
+	        sbscr_plan_mdfcn_dt = NOW()
+	    WHERE sbscr_plan_id = #{sbscrPlanId}
+	</update>
 	
     </mapper>

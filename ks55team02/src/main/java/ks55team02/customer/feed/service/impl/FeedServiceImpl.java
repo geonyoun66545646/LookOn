@@ -1,85 +1,171 @@
 package ks55team02.customer.feed.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import ks55team02.customer.feed.domain.Feed;
+import ks55team02.customer.feed.domain.FeedComment;
+import ks55team02.customer.feed.domain.FeedImage;
+import ks55team02.customer.feed.domain.FeedInteraction;
 import ks55team02.customer.feed.mapper.FeedMapper;
 import ks55team02.customer.feed.service.FeedService;
+import ks55team02.customer.login.domain.LoginUser;
+import ks55team02.util.FileDetail;
+import ks55team02.util.FilesUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FeedServiceImpl implements FeedService {
 	
 	private final FeedMapper feedMapper;
-	
-	
-	// 피드 목록 조회
+	private final FilesUtils filesUtils;
+
+	// ... (selectFeedList, selectFeedDetail 등 다른 메소드는 기존과 동일) ...
 	@Override
-    public Map<String, Object> selectFeedList(int page, int pageSize) {
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("limit", pageSize);
-        paramMap.put("offset", (page - 1) * pageSize);
+    public Map<String, Object> selectFeedList(String userNo, int page, int size) {
+		int offset = (page - 1) * size;
+        List<Feed> feedList = feedMapper.selectFeedList(userNo, size, offset);
+        int totalCount = feedMapper.selectFeedCount(userNo);
+        boolean hasNext = (offset + feedList.size()) < totalCount;
 
-        List<Feed> feedList = feedMapper.selectFeedList(paramMap);
-        int totalCount = feedMapper.selectFeedCount();
-
-        boolean hasNext = (page * pageSize) < totalCount;
-
-        Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("feedList", feedList);
-        resultMap.put("hasNext", hasNext);
-
-        return resultMap;
+        Map<String, Object> result = new HashMap<>();
+        result.put("feedList", feedList);
+        result.put("hasNext", hasNext);
+        result.put("totalCount", totalCount);
+        return result;
     }
 	
-	// 피드 상세 조회
     @Override
     public Feed selectFeedDetail(String feedSn) {
         return feedMapper.selectFeedDetail(feedSn);
     }
     
-    // 피드 다음 페이지 조회
     @Override
-    public Feed selectNextFeed(String currentFeedCrtDt, String wrtrUserNo) {
-    	Map<String, Object> params = new HashMap<>();
-    	params.put("currentFeedCrtDt", currentFeedCrtDt);
-    	params.put("wrtrUserNo", wrtrUserNo);
-        return feedMapper.selectNextFeed(params);
+    public List<Feed> selectNextFeedList(String currentFeedCrtDt, int limit, String context, String userNo) {
+        return feedMapper.selectNextFeedList(currentFeedCrtDt, limit, context, userNo);
     }
     
-    // 마이 피드 목록 조회
     @Override
-    public Map<String, Object> selectFeedListByMe(String userNo, int page, int size) {
-        // 1. DB에 요청할 개수 설정 (페이지 사이즈 + 1)
-        int limit = size;
-        int limitPlusOne = size + 1;
-        int offset = (page - 1) * size;
+    @Transactional
+	public void insertFeed(String feedCn, List<MultipartFile> imageFiles, LoginUser loginUser) {
+		String lastFeedSn = feedMapper.selectLastFeedSn();
+		int newFeedNum = 1;
+		if (lastFeedSn != null) {
+			newFeedNum = Integer.parseInt(lastFeedSn.replace("feed_", "")) + 1;
+		}
+		String newFeedSn = "feed_" + String.format("%03d", newFeedNum);
+		Feed newFeed = new Feed();
+		newFeed.setFeedSn(newFeedSn);
+		newFeed.setFeedCn(feedCn);
+		newFeed.setWrtrUserNo(loginUser.getUserNo());
+		feedMapper.insertFeed(newFeed);
+		if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
+			String lastFeedImgSn = feedMapper.selectLastFeedImageSn();
+			int newFeedImgNum = 1;
+			if (lastFeedImgSn != null) {
+				newFeedImgNum = Integer.parseInt(lastFeedImgSn.replace("feed_img_", "")) + 1;
+			}
+			List<FeedImage> imageListForDb = new ArrayList<>();
+			for (int i = 0; i < imageFiles.size(); i++) {
+				MultipartFile file = imageFiles.get(i);
+				if (file == null || file.isEmpty()) continue;
+				FileDetail fileDetail = filesUtils.saveFile(file, "feeds");
+				if (fileDetail != null) {
+					FeedImage feedImage = new FeedImage();
+					String newFeedImgSn = "feed_img_" + String.format("%03d", (newFeedImgNum + i));
+					feedImage.setFeedImgSn(newFeedImgSn);
+					feedImage.setFeedSn(newFeedSn);
+					feedImage.setImgFilePathNm(fileDetail.getSavedPath());
+					feedImage.setFeedImgSortSn(String.valueOf(i));
+					imageListForDb.add(feedImage);
+				}
+			}
+			if (!imageListForDb.isEmpty()) {
+				feedMapper.insertFeedImages(imageListForDb);
+			}
+		}
+	}
+	
+	@Override
+	@Transactional
+	public Map<String, Object> addLike(String feedSn, String userNo) {
+		String existingLike = feedMapper.findLikeByFeedSnAndUserNo(feedSn, userNo);
+		if (existingLike == null) {
+			String lastSn = feedMapper.selectLastFeedInteractionSn();
+			int newNum = 1;
+			if (lastSn != null) {
+				newNum = Integer.parseInt(lastSn.replace("feed_intrcn_", "")) + 1;
+			}
+			String newSn = "feed_intrcn_" + String.format("%03d", newNum);
+			FeedInteraction like = new FeedInteraction();
+			like.setFeedIntractSn(newSn);
+			like.setFeedSn(feedSn);
+			like.setUserNo(userNo);
+			feedMapper.insertLike(like);
+		}
+		int likeCount = feedMapper.countLikes(feedSn);
+		Map<String, Object> result = new HashMap<>();
+		result.put("likeCount", likeCount);
+		return result;
+	}
 
-        // 2. Mapper에 전달할 파라미터 Map 생성
-        Map<String, Object> params = new HashMap<>();
-        params.put("userNo", userNo); // XML의 #{userNo}와 매칭
-        params.put("limitPlusOne", limitPlusOne); // XML의 #{limitPlusOne}와 매칭
-        params.put("offset", offset); // XML의 #{offset}와 매칭
-        
-        // 3. DB에서 'size + 1' 만큼의 피드 목록 조회
-        List<Feed> feedListWithExtra = feedMapper.selectFeedListByMe(params);
+	@Override
+	@Transactional
+	public FeedComment addComment(String feedSn, String commentText, String userNo) {
+		String lastSn = feedMapper.selectLastFeedCommentSn();
+		int newNum = 1;
+		if (lastSn != null) {
+			newNum = Integer.parseInt(lastSn.replace("feed_cmnt_", "")) + 1;
+		}
+		String newCommentSn = "feed_cmnt_" + String.format("%03d", newNum);
+		FeedComment newComment = new FeedComment();
+		newComment.setFeedCmntSn(newCommentSn);
+		newComment.setFeedSn(feedSn);
+		newComment.setWrtrUserNo(userNo);
+		newComment.setCmntCn(commentText);
+		feedMapper.insertComment(newComment);
+		return feedMapper.selectCommentBySn(newCommentSn);
+	}
 
-        // 4. 다음 페이지 존재 여부(hasNext) 판별
-        boolean hasNext = feedListWithExtra.size() > limit;
+	// [신규] 댓글 삭제 로직
+	@Override
+	@Transactional
+	public boolean deleteComment(String feedCmntSn, String userNo) {
+		// [핵심] DB에서 실제 댓글 정보를 가져와 작성자 본인인지 서버에서 한번 더 확인합니다.
+		FeedComment comment = feedMapper.selectCommentBySn(feedCmntSn);
 
-        // 5. 뷰에 전달할 실제 피드 리스트 생성 (만약 더 있다면 마지막 항목은 제거)
-        List<Feed> feedList = hasNext ? feedListWithExtra.subList(0, limit) : feedListWithExtra;
+		// 댓글이 존재하고, 요청한 사용자가 댓글 작성자와 일치하는 경우에만 삭제를 진행합니다.
+		if (comment != null && comment.getWrtrUserNo().equals(userNo)) {
+			feedMapper.deleteComment(feedCmntSn, userNo);
+			return true; // 삭제 성공
+		}
 
-        // 6. 컨트롤러에 반환할 결과 Map 생성
-        Map<String, Object> result = new HashMap<>();
-        result.put("feedList", feedList);
-        result.put("hasNext", hasNext);
+		return false; // 삭제 실패 (댓글이 없거나, 권한이 없음)
+	}
+	// [신규] 댓글 수정 로직
+	@Override
+	@Transactional
+	public FeedComment updateComment(String feedCmntSn, String commentText, String userNo) {
+		// [핵심] DB에서 실제 댓글 정보를 가져와 작성자 본인인지 서버에서 한번 더 확인합니다.
+		FeedComment comment = feedMapper.selectCommentBySn(feedCmntSn);
 
-        return result;
-    }
+		// 댓글이 존재하고, 요청한 사용자가 댓글 작성자와 일치하는 경우에만 수정을 진행합니다.
+		if (comment != null && comment.getWrtrUserNo().equals(userNo)) {
+			feedMapper.updateComment(feedCmntSn, commentText);
+			// 수정된 최신 정보를 다시 조회하여 반환
+			return feedMapper.selectCommentBySn(feedCmntSn);
+		}
+		
+		// 권한이 없거나 댓글이 없는 경우 null 반환
+		return null;
+	}
 }

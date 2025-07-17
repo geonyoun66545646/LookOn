@@ -2,7 +2,7 @@
 /* 전체 피드 컨테이너 */
 .feed-container {
     width: 100%;
-    max-width: 1200px; /* 사이트 너비에 맞게 조절 */
+    max-width: 850px; /* 사이트 너비에 맞게 조절 */
     margin: 20px auto;
     padding: 0 20px;
 }
@@ -11,7 +11,7 @@
 .page-title-container {
     /* 다른 콘텐츠와 동일한 너비 및 중앙 정렬을 위해 설정 */
     width: 100%;
-    max-width: 1200px; /* .feed-container와 동일한 너비 */
+    max-width: 850px; /* .feed-container와 동일한 너비 */
     margin: 0 auto;    /* 중앙 정렬 */
     padding: 0 20px;   /* 좌우 여백 */
 }

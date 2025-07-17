@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.store.mapper.CustomerStoreMapper"> 
+
+
+     <resultMap id="storeResultMap" 			type="ks55team02.common.domain.store.Store">
+        <id property="storeId" 					column="store_id"/>   
+        <result property="aplyId" 				column="aply_id"/> 
+        <result property="sellerUserNo" 		column="seller_user_no"/>
+        <result property="storeConm" 			column="store_conm"/>
+        <result property="storeIntroCn" 		column="store_intro_cn"/>
+        <result property="storeLogoImg" 		column="store_logo_img"/>
+        <result property="storeStts" 			column="store_stts"/>
+        <result property="infoMdfcnDt" 			column="info_mdfcn_dt"/>
+        <result property="inactvtnDt" 			column="inactvtn_dt"/>
+        <result property="delPrcrYn" 			column="del_prcr_yn"/>
+        
+    </resultMap>
+
+<select id="getAllStores" resultMap="storeResultMap">
+	SELECT 
+		store_id, 
+		aply_id, 
+		store_conm, 
+		store_intro_cn, 
+		store_logo_img, 
+		store_stts, 
+		info_mdfcn_dt, 
+		inactvtn_dt, 
+		del_prcr_yn
+	FROM 
+		stores;
+</select>
+    </mapper>

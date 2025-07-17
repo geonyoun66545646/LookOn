@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{seller/layout/layout_Main}">
+
+<head>
+    <meta name="appDetail" content="appDetail" />
+    <th:block layout:fragment="customCss">
+        <link rel="stylesheet" th:href="@{/maincss/assets/customsellercss/sellerInquiryDetailView.css}">
+    </th:block>
+</head>
+<th:block layout:fragment="jsFile"></th:block>
+
+<th:block layout:fragment="contents">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">스토어 문의 상세</h2>
+        </div>
+    </div>
+    <div class="card">
+        <div class="page-content">
+            <div class="container">
+                <div th:replace="~{/common/fragments/inquiryDetailFragment :: inquiryDetailFragment(inquiryData=${inquiryDetail})}"></div>
+
+                <th:block th:if="${inquiryDetail.answer == null}">
+                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false, answerApiUrl=@{/seller/inquiry/answerProcess})}"></div>
+                </th:block>
+                <th:block th:if="${inquiryDetail.answer != null}">
+                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true, answerApiUrl=@{/seller/inquiry/answerProcess})}"></div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</th:block>
+</html>

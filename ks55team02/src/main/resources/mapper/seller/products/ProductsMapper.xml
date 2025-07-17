@@ -89,6 +89,100 @@
 		</association>
 	</resultMap>
 	
+	
+	<select id="selectProductStatusOptions" parameterType="String" resultType="map">
+        SELECT
+            ps.gds_stts_no,
+            GROUP_CONCAT(som.opt_vl_no ORDER BY som.opt_vl_no) AS opt_vl_nos,
+            ps.sel_psblty_qntty
+        FROM
+            product_status ps
+        LEFT JOIN
+            status_option_mappings som ON ps.gds_stts_no = som.gds_stts_no
+        WHERE
+            ps.gds_no = #{gdsNo}
+            AND ps.actvtn_yn = TRUE
+            AND ps.sel_psblty_qntty > 0
+        GROUP BY
+            ps.gds_stts_no, ps.sel_psblty_qntty
+        ORDER BY
+            ps.gds_stts_no
+    </select>
+	
+	<!-- ⭐⭐⭐⭐⭐ [4단계: 쿼리 추가] 시작 ⭐⭐⭐⭐⭐ -->
+
+	<!-- 이미지 순서(img_indct_sn) 업데이트 -->
+	<update id="updateImageOrder">
+	    UPDATE product_images
+	    SET img_indct_sn = #{param2}
+	    WHERE img_no = #{param1}
+	</update>
+	
+	<!-- 상품 번호와 이미지 타입으로 이미지 조회 -->
+	<select id="getProductImagesByGdsNoAndType" resultType="ks55team02.seller.products.domain.ProductImage">
+	    SELECT 
+	        img_no, gds_no, img_file_path_nm, img_indct_sn, img_type, actvtn_yn
+	    FROM 
+	        product_images
+	    WHERE 
+	        gds_no = #{param1}
+	    AND img_type = #{param2, typeHandler=ks55team02.seller.products.handler.ProductImageTypeHandler}
+	</select>
+	
+	<!-- 상품 번호와 이미지 타입으로 이미지 삭제 -->
+	<delete id="deleteImagesByGdsNoAndType">
+	    DELETE FROM product_images
+	    WHERE
+	        gds_no = #{param1}
+	    AND img_type = #{param2, typeHandler=ks55team02.seller.products.handler.ProductImageTypeHandler}
+	</delete>
+	
+	<!-- ⭐⭐⭐⭐⭐ [4단계: 쿼리 추가] 끝 ⭐⭐⭐⭐⭐ -->
+	
+	<!-- 상태-옵션 매핑 삭제 추가 -->
+	<delete id="deleteStatusOptionMappingsByGdsNo" parameterType="string">
+	    DELETE som FROM status_option_mappings som
+	    JOIN product_status ps ON som.gds_stts_no = ps.gds_stts_no
+	    WHERE ps.gds_no = #{gdsNo}
+	</delete>
+	
+	<!-- 옵션 값 삭제 쿼리 수정 -->
+	<delete id="deleteOptionValuesByGdsNo" parameterType="string">
+	    DELETE pov FROM product_option_values pov
+	    JOIN product_options po ON pov.opt_no = po.opt_no
+	    WHERE po.gds_no = #{gdsNo}
+	</delete>
+	
+	<!-- 옵션 삭제 쿼리 유지 -->
+	<delete id="deleteOptionsByGdsNo" parameterType="string">
+	    DELETE FROM product_options WHERE gds_no = #{gdsNo}
+	</delete>
+	
+	<!-- 상태 삭제 쿼리 유지 -->
+	<delete id="deleteStatusByGdsNo" parameterType="string">
+	    DELETE FROM product_status WHERE gds_no = #{gdsNo}
+	</delete>
+	
+	<!-- 이미지 개별 삭제용 -->
+	<delete id="deleteImagesByImageNos" parameterType="java.util.List">
+	    DELETE FROM product_images
+	    WHERE img_no IN
+	    <foreach item="imgNo" collection="list" open="(" separator="," close=")">
+	        #{imgNo}
+	    </foreach>
+	</delete>
+	
+	<!-- 특정 상품의 모든 이미지 정보를 조회 -->
+	<select id="getProductImagesByGdsNo" parameterType="string" resultType="ks55team02.seller.products.domain.ProductImage">
+	    SELECT 
+	        img_no, gds_no, img_file_path_nm, img_indct_sn, img_type, actvtn_yn
+	    FROM 
+	        ks55team02db.product_images
+	    WHERE 
+	        gds_no = #{gdsNo}
+	        AND img_file_path_nm IS NOT NULL
+	</select>
+
 	<!-- 특정 카테고리에 속한 모든 상품을 비노출 처리 -->
     <update id="deactivateProductsByCategoryId" parameterType="string">
         UPDATE

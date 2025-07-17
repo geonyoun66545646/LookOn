@@ -1,8 +1,9 @@
+<!-- customer/fragments/mainProductList.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-    <!-- 상품 목록을 표시하는 프래그먼트 -->
+    <!-- ⭐ 수정: 파라미터 이름을 'products'로 고정 -->
     <div th:fragment="productListFragment(products)">
         <div class="owl-carousel owl-simple carousel-equal-height" data-toggle="owl"
              data-owl-options='{
@@ -11,7 +12,7 @@
             }'>
             
             <!-- 컨트롤러에서 받은 products 리스트를 순회 -->
-            <div class="product product-7 text-center" th:each="p : ${products}">
+            <div class="product product-7 text-center" th:if="${products != null}" th:each="p : ${products}">
                 <figure class="product-media">
                     <a th:href="@{/products/detail/{id}(id=${p.gdsNo})}">
                         <img th:src="${p.thumbnailImagePath ?: '/maincss/assets/images/no_image.jpg'}" alt="Product image" class="product-image">
@@ -21,12 +22,13 @@
 
                 <div class="product-body">
                     <div class="product-cat">
+                        <!-- ⭐ 수정: store가 null일 경우를 대비한 안전한 호출 -->
                         <a href="#" th:text="${p.store?.storeConm}">브랜드명</a>
                     </div>
                     <h3 class="product-title"><a th:href="@{/products/detail/{id}(id=${p.gdsNo})}" th:text="${p.gdsNm}">상품명</a></h3>
                     <div class="product-price">
                         <span class="new-price" th:text="${#numbers.formatDecimal(p.lastSelPrc, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
-                        <span class="old-price" th:if="${p.dscntRt > 0}" th:text="'( ' + ${#numbers.formatDecimal(p.basPrc, 0, 'COMMA', 0, 'POINT')} + '원 )'"></span>
+                        <span class="old-price" th:if="${p.dscntRt != null and p.dscntRt > 0}" th:text="'(' + ${#numbers.formatDecimal(p.basPrc, 0, 'COMMA', 0, 'POINT')} + '원)'"></span>
                     </div>
                 </div>
             </div>

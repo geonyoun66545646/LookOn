@@ -35,9 +35,9 @@
                                     <th scope="col">번호</th>
                                     <th scope="col">비밀글</th>
                                     <th scope="col">제목</th>
+                                    <th scope="col">작성자</th>
                                     <th scope="col">질문유형</th>
                                     <th scope="col">상태</th>
-                                    <th scope="col">작성자</th>
                                     <th scope="col">작성일</th>
                                 </tr>
                             </thead>
@@ -52,9 +52,9 @@
                                     <td>
                                         <a th:href="@{/customer/inquiry/inquiryDetail(inquiryId=${l.inqryId})}" th:text="${l.inqryTtl}"></a>
                                     </td>
+                                    <td th:text="${l.writerInfo?.userNcnm}"></td>
                                     <td th:text="${l.inqryTypeCd}"></td>
                                     <td th:text="${l.prcsStts}"></td>
-                                    <td th:text="${l.wrtrId}"></td>
                                     <td th:text="${#temporals.format(l.regYmd, 'yyyy-MM-dd')}" th:if="${l.regYmd != null}"></td>
                                 </tr>
                             </tbody>

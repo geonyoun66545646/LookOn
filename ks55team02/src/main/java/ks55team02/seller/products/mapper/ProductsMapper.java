@@ -22,7 +22,38 @@ public interface ProductsMapper {
 	void insertProductOptionValue(ProductOptionValue value);
 	void insertProductStatus(ProductStatus productStatus);
 	void insertStatusOptionMapping(StatusOptionMapping mapping);
+	
+	/**
+     * 특정 상품의 모든 옵션 조합(gds_stts_no)과 그에 속한 옵션 값(opt_vl_no)들을 조회
+     * @param gdsNo 상품 코드
+     * @return 옵션 조합과 값 매핑 정보 리스트
+     */
+    public List<Map<String, Object>> selectProductStatusOptions(String gdsNo);
 
+    /**
+     * 특정 이미지의 순서(img_indct_sn)를 업데이트합니다.
+     * @param imgNo 순서를 변경할 이미지의 고유 ID
+     * @param order 새로 지정할 순번
+     */
+    void updateImageOrder(String imgNo, int order);
+
+    /**
+     * 특정 상품의 특정 타입에 해당하는 모든 이미지를 조회합니다.
+     * @param gdsNo 상품의 고유 ID
+     * @param imageType 조회할 이미지 타입 (THUMBNAIL, MAIN, DETAIL)
+     * @return 해당 타입의 이미지 목록
+     */
+    List<ProductImage> getProductImagesByGdsNoAndType(String gdsNo, ProductImageType imageType);
+
+    /**
+     * 특정 상품의 특정 타입에 해당하는 모든 이미지를 삭제합니다. (주로 썸네일 교체 시 사용)
+     * @param gdsNo 상품의 고유 ID
+     * @param imageType 삭제할 이미지 타입
+     */
+    void deleteImagesByGdsNoAndType(String gdsNo, ProductImageType imageType);
+
+    // ⭐⭐⭐⭐⭐ [추가 끝] ⭐⭐⭐⭐⭐
+	
 	// 새로 추가: 최근 반려된 이력 조회
     ProductApprovalHistory getLatestRejectedHistory(String gdsNo);
     
@@ -34,7 +65,10 @@ public interface ProductsMapper {
 
 	// 최초 승인 이력을 추가하는 메소드
 	void addInitialApprovalHistory(Products product);
-
+	
+	// 특정상품 모든 이밎 조회
+	List<ProductImage> getProductImagesByGdsNo(String gdsNo);
+	
 	/* */
 	void deactivateProductsByCategoryId(String categoryId);
 
@@ -45,27 +79,14 @@ public interface ProductsMapper {
 	 * @param product 수정할 정보가 담긴 Products 객체
 	 */
 	void updateProduct(Products product);
-
-	/**
-	 * 특정 상품에 속한 모든 이미지를 비활성화 처리합니다.
-	 * 
-	 * @param gdsNo 상품 ID
-	 */
-	void deactivateImagesByGdsNo(String gdsNo);
-
-	/**
-	 * 특정 상품에 속한 모든 옵션을 비활성화 처리합니다.
-	 * 
-	 * @param gdsNo 상품 ID
-	 */
-	void deactivateOptionsByGdsNo(String gdsNo);
-
-	/**
-	 * 특정 상품에 속한 모든 재고/상태 정보를 비활성화 처리합니다.
-	 * 
-	 * @param gdsNo 상품 ID
-	 */
-	void deactivateStatusByGdsNo(String gdsNo);
+	
+	// 수정시 기존정보 삭제
+	void deleteStatusOptionMappingsByGdsNo(String gdsNo);
+	void deleteOptionValuesByGdsNo(String gdsNo);
+	void deleteImagesByGdsNo(String gdsNo);
+    void deleteOptionsByGdsNo(String gdsNo);
+    void deleteStatusByGdsNo(String gdsNo);
+    void deleteImagesByImageNos(List<String> imageNoList);
 
 	// -- 상품 삭제
 	/**

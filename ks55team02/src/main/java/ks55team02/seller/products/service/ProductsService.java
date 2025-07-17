@@ -2,10 +2,11 @@ package ks55team02.seller.products.service;
 
 import ks55team02.seller.products.domain.Products;
 import ks55team02.seller.products.domain.ProductRegistrationRequest;
-import ks55team02.seller.products.domain.ProductOptionValue; // ProductOptionValue 임포트 확인
-import ks55team02.seller.stores.domain.Stores;
+import ks55team02.seller.products.domain.ProductOptionValue;
+import ks55team02.seller.stores.domain.Stores; // Stores 도메인 import 확인
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 상품 관련 비즈니스 로직을 정의하는 서비스 인터페이스입니다.
@@ -13,6 +14,13 @@ import java.util.List;
  */
 public interface ProductsService {
 	
+	/**
+     * 특정 상품의 모든 옵션 조합(gds_stts_no)과 그에 속한 옵션 값(opt_vl_no)들을 조회
+     * @param gdsNo 상품 코드
+     * @return 옵션 조합과 값 매핑 정보 리스트
+     */
+    public List<Map<String, Object>> getProductStatusOptions(String gdsNo);
+    
 	/**
      * 키워드로 브랜드를 검색합니다.
      * @param keyword 검색어
@@ -44,16 +52,22 @@ public interface ProductsService {
     // 특정 상품의 상세 정보를 조회하고, 연관된 이미지 및 카테고리 정보까지 반환합니다.
     Products getProductDetailWithImages(String gdsNo);
 
-    
-
     // 모든 상품 컬러 옵션 값을 조회합니다.
     List<ProductOptionValue> getAllProductColors();
     // 모든 의류 표준 사이즈 옵션 값을 조회합니다.
     List<ProductOptionValue> getAllApparelSizes();
     // 모든 신발 표준 사이즈 옵션 값을 조회합니다.
     List<ProductOptionValue> getAllShoeSizes();
-    // ⭐ 모든 패션 소품 표준 사이즈 옵션 값을 조회합니다. (이 줄이 추가되었습니다!) ⭐
-    List<ProductOptionValue> getAllFashionSizes(); // <--- 이 라인이 추가되어야 합니다.
+    // ⭐ 모든 패션 소품 표준 사이즈 옵션 값을 조회합니다. ⭐
+    List<ProductOptionValue> getAllFashionSizes(); 
     // 모든 브랜드(상점) 목록을 조회합니다.
     List<Stores> getAllBrands();
+
+    /**
+     * 특정 상점 ID로 상점 정보를 조회합니다.
+     * 이 메서드는 StoreMapper의 getStoreById를 호출합니다.
+     * @param storeId 상점 고유 ID
+     * @return 해당 ID의 Stores 객체 (삭제 처리되지 않은 상점만)
+     */
+    Stores getStoreByStoreId(String storeId); // ⭐ 이 메서드를 추가합니다.
 }
