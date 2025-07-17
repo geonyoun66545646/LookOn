@@ -23,17 +23,13 @@
                 <div th:replace="~{/common/fragments/inquiryDetailFragment :: inquiryDetailFragment(inquiryData=${inquiryDetail})}"></div>
 
                 <th:block th:if="${inquiryDetail.answer == null}">
-                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false)}"></div>
+                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false, answerApiUrl=@{/seller/inquiry/answerProcess})}"></div>
                 </th:block>
                 <th:block th:if="${inquiryDetail.answer != null}">
-                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true)}"></div>
+                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true, answerApiUrl=@{/seller/inquiry/answerProcess})}"></div>
                 </th:block>
             </div>
         </div>
     </div>
-
-    </th:block>
-
-<th:block layout:fragment="jsScript"></th:block>
-
+</th:block>
 </html>

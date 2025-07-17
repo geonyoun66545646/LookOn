@@ -6,10 +6,9 @@
     <title th:text="${title}">Nest Dashboard</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" th:href="@{/admincss/assets/imgs/theme/favicon.svg}" />
     <!-- Template CSS -->
-    <link href="/admincss/assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+    <link th:href="@{/admincss/assets/css/main.css?v=1.1}" rel="stylesheet" type="text/css" />
+        <link th:href="@{/maincss/assets/customsellercss/layoutSeller.css}" rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div class="screen-overlay"></div>

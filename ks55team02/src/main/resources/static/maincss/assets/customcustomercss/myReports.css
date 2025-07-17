@@ -36,7 +36,6 @@
 
 /* 기존 myReports-container 스타일은 유지 */
 .myReports-container {
-    max-width: 1000px;
     margin-top: 20px;
     margin-bottom: 20px;
     padding: 0 15px;
