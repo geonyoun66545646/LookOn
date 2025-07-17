@@ -3,7 +3,8 @@ package ks55team02.seller.inquiry.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
-import ks55team02.common.domain.inquiry.Answer;
+import org.apache.ibatis.annotations.Param;
+
 import ks55team02.common.domain.inquiry.Inquiry;
 import ks55team02.common.domain.inquiry.InquiryAnswerHistory; // 추가
 
@@ -12,7 +13,9 @@ public interface SellerInquiryMapper {
 
 	int getSellerInquiryCnt(Inquiry inquiry);
 		
-	List<Inquiry> getSellerInquiryList(Inquiry inquiry, int limitStart, int pageSize);
+	List<Inquiry> getSellerInquiryList(@Param("param1") Inquiry inquiry,
+	        @Param("param2") int limitStart,
+	        @Param("param3") int pageSize);
 	
 	Inquiry getSellerInquiryByStoreId(String inqryId);
 

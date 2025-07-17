@@ -43,6 +43,10 @@ public class Inquiry extends SearchCriteria{
     
     private Store 			storeInfo;
     
+ // 검색 필터 조건을 담을 리스트
+    private List<String>    filterConditions; 
+
+    
 	   // inq_ 제거
     public String getInqryIdNum() {
         if (this.inqryId == null) {
