@@ -38,7 +38,7 @@ $(() => {
     };
 
     /**
-     * 피드 객체를 받아 전체 피드 포스트 HTML 구조를 생성합니다.
+     * 피드 객체를 받아 전체 피드 포스트 HTML 구조를 생성합니다. (무한 스크롤용)
      */
     const createFeedDetailHtml = (feed) => {
         const writerNickname = feed.writerInfo?.userNcnm || '알 수 없는 사용자';
@@ -209,7 +209,7 @@ $(() => {
                 } else { alert('댓글 수정에 실패했습니다.'); }
             });
         })
-        // [신규] 피드 '수정' 버튼 클릭 이벤트
+        // [핵심 수정] 피드 '수정' 버튼 클릭 이벤트
         .on('click', '.edit-post-btn', function(e) {
             e.preventDefault();
             const wrapper = $(this).closest('.feed-post-wrapper');
@@ -222,7 +222,7 @@ $(() => {
             window.location.href = `/customer/feed/edit/${feedSn}`;
         })
 
-        // [신규] 피드 '삭제' 버튼 클릭 이벤트
+        // [핵심 수정] 피드 '삭제' 버튼 클릭 이벤트
         .on('click', '.delete-post-btn', function(e) {
             e.preventDefault();
             const wrapper = $(this).closest('.feed-post-wrapper');
@@ -232,12 +232,12 @@ $(() => {
                 return;
             }
             
-            if (confirm('정말로 이 피드를 삭제하시겠습니까? 관련된 모든 데이터(댓글, 좋아요)가 함께 삭제되며 복구할 수 없습니다.')) {
+            if (confirm('정말로 이 피드를 삭제하시겠습니까? 삭제된 피드는 복구할 수 없습니다.')) {
                 $.ajax({
                     url: `/customer/api/feeds/${feedSn}`,
                     type: 'DELETE'
                 })
-                .done(response => {
+                .done(() => {
                     alert('피드가 성공적으로 삭제되었습니다.');
                     // 피드 목록 또는 메인 페이지로 이동
                     window.location.href = '/customer/feed/feedList'; 

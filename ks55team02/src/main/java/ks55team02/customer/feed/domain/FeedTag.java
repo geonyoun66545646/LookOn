@@ -12,4 +12,5 @@ public class FeedTag {
 	private String crtDt;
 	
 	private String tagNm; 
+	private String creatrUserNo;
 }
