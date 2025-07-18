@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.customer.mypage.mapper.OrderHistoryMapper">
+    <!-- 1. 사용자의 전체 주문 건수 조회 -->
+    <select id="countMyOrders" parameterType="String" resultType="long">
+        SELECT
+            COUNT(DISTINCT O.ordr_no)
+        FROM
+            orders O
+        WHERE
+            O.user_no = #{userNo}
+    </select>
+
+    <!-- 2. 사용자의 주문 내역 페이징 조회 (JOIN 포함) -->
+    <select id="findMyOrders" parameterType="map" resultType="ks55team02.customer.mypage.domain.OrderHistory">
+        SELECT
+            DATE(O.ordr_dt) AS orderDate,
+            O.ordr_no AS orderNumber,
+            P.gds_nm AS productName,
+            OI.ordr_qntty AS quantity,
+            OI.ordr_tm_untprc AS price
+        FROM
+            orders O
+        JOIN
+            order_items OI ON O.ordr_no = OI.ordr_no
+        JOIN
+            products P ON OI.gds_no = P.gds_no
+        WHERE
+            O.user_no = #{userNo}
+        ORDER BY
+            O.ordr_dt DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+</mapper>
