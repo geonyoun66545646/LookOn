@@ -12,4 +12,5 @@ public class ProductCategory {
     private Integer categoryLevel;   // ctgry_dpth 와 매핑 (카테고리 깊이)
     private LocalDateTime regDate;   // reg_dt 와 매핑 (등록일)
     private Boolean activationYn;    // actvtn_yn 와 매핑 (활성화 여부) - ⭐ 이 필드가 추가되었습니다. ⭐
+    private String categoryImagePath;
 }

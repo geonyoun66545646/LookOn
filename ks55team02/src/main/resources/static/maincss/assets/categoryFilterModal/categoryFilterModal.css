@@ -120,3 +120,64 @@
         flex-basis: 140px;
     }
 }
+
+
+/* =================================================================== */
+/* ⭐ 모바일/태블릿 반응형 스타일 (991px 이하) ⭐ */
+/* =================================================================== */
+@media (max-width: 991px) {
+    
+    /* 1. 헤더를 Flexbox 컨테이너로 만듭니다. */
+    .lookon-category-header {
+        display: flex;
+        align-items: center; /* 세로 중앙 정렬 */
+        flex-wrap: nowrap; /* 줄바꿈 방지 */
+        overflow-x: auto; /* 내용이 넘칠 경우 가로 스크롤 허용 */
+        -ms-overflow-style: none;  /* IE, Edge 스크롤바 숨김 */
+        scrollbar-width: none;     /* Firefox 스크롤바 숨김 */
+    }
+    .lookon-category-header::-webkit-scrollbar {
+        display: none; /* Webkit 스크롤바 숨김 */
+    }
+
+    /* 2. 기존 메인 탭(카테고리)과 모바일 메뉴의 스타일을 통일합니다. */
+    .lookon-main-tabs,
+    .lookon-mobile-nav-links {
+        display: flex; /* 내부 아이템들을 가로로 배치 */
+        padding: 0;
+        margin: 0;
+    }
+
+    .lookon-main-tabs li,
+    .lookon-mobile-nav-links a {
+        padding: 1rem 1.5rem; /* 동일한 패딩 적용 */
+        font-size: 1.6rem;    /* 동일한 폰트 크기 */
+        font-weight: 600;       /* 동일한 폰트 두께 */
+        color: #888;           /* 비활성 색상 통일 */
+        white-space: nowrap;  /* 줄바꿈 방지 */
+        text-decoration: none;
+        position: relative;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+    
+    /* 3. 활성화된 탭/링크 스타일 */
+    .lookon-main-tabs li.active a,
+    .lookon-mobile-nav-links a:hover, /* 호버 시에도 활성 스타일 적용 */
+    .lookon-mobile-nav-links a.active { /* JS로 active 클래스 추가 시 */
+        color: #333; /* 활성 색상 */
+    }
+
+    /* 4. 활성화된 탭/링크의 밑줄 스타일 */
+    .lookon-main-tabs li.active a::after,
+    .lookon-mobile-nav-links a.active::after {
+        content: '';
+        position: absolute;
+        bottom: 10px; /* 위치 조정 */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%; /* 밑줄 너비 */
+        height: 2px;
+        background-color: #333;
+    }
+}

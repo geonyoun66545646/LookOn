@@ -14,10 +14,10 @@
 		<result property="categoryLevel" column="ctgry_dpth" />
 		<result property="regDate" column="reg_dt" />
 		<result property="activationYn" column="actvtn_yn" />
+		<result property="categoryImagePath" column="ctgry_img_path" />
 	</resultMap>
 	
-	<!-- 카테고리 활성화 -->
-    <update id="activateCategory" parameterType="string">
+	<update id="activateCategory" parameterType="string">
         UPDATE
             product_categories
         SET
@@ -28,30 +28,27 @@
             ctgry_no = #{categoryId}
     </update>
 	
-	<!-- 카테고리 ID 중복 체크 -->
-    <select id="countCategoryById" parameterType="string" resultType="int">
+	<select id="countCategoryById" parameterType="string" resultType="int">
         SELECT COUNT(*) FROM product_categories WHERE ctgry_no = #{categoryId}
     </select>
 
-    <!-- 카테고리명 중복 체크 -->
-    <select id="countCategoryByName" parameterType="string" resultType="int">
+	<select id="countCategoryByName" parameterType="string" resultType="int">
         SELECT COUNT(*) FROM product_categories WHERE ctgry_nm = #{categoryName}
     </select>
 
-    <!-- 카테고리 정보 수정 -->
+    <!-- ⭐ [수정] 카테고리 정보 수정 쿼리 -->
     <update id="updateCategory" parameterType="ks55team02.seller.products.domain.ProductCategory">
         UPDATE product_categories
         <set>
-            <!-- 카테고리 ID는 PK이므로 수정하지 않음 -->
             <if test="categoryName != null and categoryName != ''"> ctgry_nm = #{categoryName}, </if>
             <if test="parentCategoryId != null"> up_ctgry_no = #{parentCategoryId}, </if>
             <if test="categoryLevel != null"> ctgry_dpth = #{categoryLevel}, </if>
+            <if test="categoryImagePath != null"> ctgry_img_path = #{categoryImagePath}, </if>
             mdfcn_dt = CURRENT_TIMESTAMP
         </set>
         WHERE ctgry_no = #{categoryId}
     </update>
 	
-	<!--  -->
 	<select id="getCategoryListCount"
 		parameterType="ks55team02.admin.common.domain.SearchCriteria"
 		resultType="int">
@@ -60,7 +57,6 @@
 		<include refid="categorySearchCondition" />
 	</select>
 	
-	<!-- 카테고리 비활성화 -->
     <update id="deactivateCategory" parameterType="string">
         UPDATE
             product_categories
@@ -75,7 +71,7 @@
 		parameterType="ks55team02.admin.common.domain.SearchCriteria"
 		resultMap="productCategoryResultMap">
 		SELECT
-		ctgry_no, up_ctgry_no, ctgry_nm, ctgry_dpth, actvtn_yn, reg_dt
+		ctgry_no, up_ctgry_no, ctgry_nm, ctgry_dpth, actvtn_yn, reg_dt, ctgry_img_path
 		FROM
 		product_categories
 		<include refid="categorySearchCondition" />
@@ -83,12 +79,13 @@
 		LIMIT #{offset}, #{pageSize}
 	</select>
 
+	<!-- ⭐ [수정] 카테고리 추가 쿼리 -->
 	<insert id="addCategory"
 		parameterType="ks55team02.seller.products.domain.ProductCategory">
 		INSERT INTO product_categories
-		(ctgry_no, ctgry_nm, up_ctgry_no, ctgry_dpth, creatr_no, actvtn_yn)
+		(ctgry_no, ctgry_nm, up_ctgry_no, ctgry_dpth, creatr_no, actvtn_yn, ctgry_img_path)
 		VALUES
-		(#{categoryId}, #{categoryName}, #{parentCategoryId}, #{categoryLevel}, #{userNo}, #{activationYn})
+		(#{categoryId}, #{categoryName}, #{parentCategoryId}, #{categoryLevel}, #{userNo}, #{activationYn}, #{categoryImagePath})
 	</insert>
 
 	<sql id="categorySearchCondition">
@@ -101,7 +98,7 @@
 				</choose>
 			</if>
 			<if test="startDate != null"> AND reg_dt >= #{startDate} </if>
-			<if test="endDate != null"> AND reg_dt <![CDATA[ <= ]]> DATE_ADD(#{endDate}, INTERVAL 1 DAY) </if>
+			<if test="endDate != null"> AND reg_dt &gt; DATE_ADD(#{endDate}, INTERVAL 1 DAY) </if>
 			<if test="levels != null and levels.size() > 0">
 				AND ctgry_dpth IN
 				<foreach item="level" collection="levels" open="(" separator="," close=")">
@@ -115,7 +112,7 @@
 		resultMap="productCategoryResultMap">
 		SELECT
 		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
-		ctgry_dpth, reg_dt, actvtn_yn
+		ctgry_dpth, reg_dt, actvtn_yn, ctgry_img_path
 		FROM ks55team02db.product_categories
 		WHERE ctgry_no = #{categoryId};
 	</select>
@@ -124,7 +121,7 @@
 		resultMap="productCategoryResultMap">
 		SELECT
 		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
-		ctgry_dpth, reg_dt, actvtn_yn
+		ctgry_dpth, reg_dt, actvtn_yn, ctgry_img_path
 		FROM ks55team02db.product_categories
 		WHERE up_ctgry_no = #{parentCategoryId} AND actvtn_yn = TRUE
 		ORDER BY
@@ -135,7 +132,7 @@
 		resultMap="productCategoryResultMap">
 		SELECT
 		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
-		ctgry_dpth, reg_dt, actvtn_yn
+		ctgry_dpth, reg_dt, actvtn_yn, ctgry_img_path
 		FROM ks55team02db.product_categories
 		WHERE up_ctgry_no IS NULL AND actvtn_yn = TRUE
 		ORDER BY ctgry_nm;
@@ -155,7 +152,7 @@
 		resultMap="productCategoryResultMap">
 		SELECT
 		ctgry_no, up_ctgry_no, creatr_no, ctgry_nm,
-		ctgry_dpth, reg_dt, actvtn_yn
+		ctgry_dpth, reg_dt, actvtn_yn, ctgry_img_path
 		FROM ks55team02db.product_categories
 		WHERE actvtn_yn = TRUE
 		ORDER BY ctgry_nm;

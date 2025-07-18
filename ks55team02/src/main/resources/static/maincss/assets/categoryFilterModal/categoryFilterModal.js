@@ -96,34 +96,43 @@ $(document).ready(function() {
         });
     }
 
-    /**
-     * 선택된 메인 카테고리에 해당하는 서브 카테고리(2차 카테고리)를 서버에서 AJAX로 가져와 렌더링합니다.
-     * @param {string} mainCategoryId - 선택된 메인 카테고리 ID
-     */
-    function loadSubCategories(mainCategoryId) {
-        $.ajax({
-            // CustomerProductController에 추가한 2차 카테고리 API 엔드포인트
-            url: '/products/categories/sub/' + mainCategoryId,
-            type: 'GET',
-            dataType: 'json',
-            success: function(subCategories) {
-                $subCategoryGridItemsContainer.empty(); // 기존 서브 카테고리 아이템 모두 제거
+	/**
+	     * ⭐ [수정] 선택된 메인 카테고리에 해당하는 서브 카테고리를 AJAX로 가져와 이미지와 함께 렌더링합니다.
+	     * @param {string} mainCategoryId - 선택된 메인 카테고리 ID
+	     */
+	    function loadSubCategories(mainCategoryId) {
+	        $.ajax({
+	            url: '/products/categories/sub/' + mainCategoryId,
+	            type: 'GET',
+	            dataType: 'json',
+	            success: function(subCategories) {
+	                $subCategoryGridItemsContainer.empty();
 
-                if (subCategories && subCategories.length > 0) {
-                    $.each(subCategories, function(i, subCategory) {
-                        const $gridItem = $('<div></div>').addClass('lookon-grid-item');
-                        // ProductCategory 도메인의 categoryId 필드 사용 (서브 카테고리 ID)
-                        $gridItem.data('subCategoryId', subCategory.categoryId); 
-                        $gridItem.data('subCategoryName', subCategory.categoryName); // 서브 카테고리 이름도 저장
+	                if (subCategories && subCategories.length > 0) {
+	                    $.each(subCategories, function(i, subCategory) {
+	                        const $gridItem = $('<div></div>').addClass('lookon-grid-item');
+	                        $gridItem.data('subCategoryId', subCategory.categoryId); 
+	                        $gridItem.data('subCategoryName', subCategory.categoryName);
 
-                        const $iconPlaceholder = $('<div></div>').addClass('lookon-icon-placeholder');
-                        const $span = $('<span></span>').text(subCategory.categoryName);
+	                        // ⭐⭐ 이 부분을 수정합니다. (이미지 처리) ⭐⭐
+	                        const $iconPlaceholder = $('<div></div>').addClass('lookon-icon-placeholder');
+	                        
+	                        // categoryImagePath가 존재하고 비어있지 않으면 img 태그 생성
+	                        if (subCategory.categoryImagePath && subCategory.categoryImagePath.trim() !== '') {
+	                            const $img = $('<img>').attr('src', subCategory.categoryImagePath)
+	                                                   .attr('alt', subCategory.categoryName);
+	                            $iconPlaceholder.append($img);
+	                        } else {
+	                            // 이미지가 없으면 기본 아이콘이나 빈 공간 유지 (현재는 빈 공간)
+	                        }
+	                        
+	                        const $span = $('<span></span>').text(subCategory.categoryName);
 
-                        $gridItem.append($iconPlaceholder).append($span);
-                        $subCategoryGridItemsContainer.append($gridItem);
+	                        $gridItem.append($iconPlaceholder).append($span);
+	                        $subCategoryGridItemsContainer.append($gridItem);
+	                        // ⭐⭐ 수정 끝 ⭐⭐
 
-                        // ⭐⭐⭐ 변경된 부분: 서브 카테고리 클릭 시 상품 목록 페이지로 이동 ⭐⭐⭐
-                        $gridItem.on('click', function() {
+	                        $gridItem.on('click', function() {
                             const clickedSubCategoryId = $(this).data('subCategoryId');
                             const clickedSubCategoryName = $(this).data('subCategoryName');
                             console.log('서브 카테고리 클릭:', clickedSubCategoryName, clickedSubCategoryId);

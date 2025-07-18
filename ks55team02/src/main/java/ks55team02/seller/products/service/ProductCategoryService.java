@@ -1,9 +1,12 @@
 package ks55team02.seller.products.service;
 
-import ks55team02.admin.common.domain.SearchCriteria;
-import ks55team02.seller.products.domain.ProductCategory;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile; // ⭐ import 추가
+
+import ks55team02.admin.common.domain.SearchCriteria;
+import ks55team02.seller.products.domain.ProductCategory;
 
 public interface ProductCategoryService {
 	
@@ -13,16 +16,27 @@ public interface ProductCategoryService {
 	/* */
 	boolean isCategoryIdExists(String categoryId);
     boolean isCategoryNameExists(String categoryName);
-    void updateCategory(ProductCategory productCategory);
+
+    /**
+     * ⭐ [수정] 카테고리 정보와 이미지를 함께 수정합니다.
+     * @param productCategory 수정할 카테고리 정보
+     * @param categoryImageFile 새로 업로드된 이미지 파일
+     * @param deleteCategoryImage 기존 이미지 삭제 여부
+     */
+    void updateCategory(ProductCategory productCategory, MultipartFile categoryImageFile, boolean deleteCategoryImage);
 	
 	/* */
 	void deactivateCategoryAndRelatedProducts(String categoryId);
 	
 	Map<String, Object> getCategoryList(SearchCriteria searchCriteria);
 	
-	void addCategory(ProductCategory productCategory);
+	/**
+     * ⭐ [수정] 카테고리와 이미지를 함께 등록합니다.
+     * @param productCategory 등록할 카테고리 정보
+     * @param categoryImageFile 업로드된 이미지 파일
+     */
+	void addCategory(ProductCategory productCategory, MultipartFile categoryImageFile);
 	
-	// ProductCategoryService.java 에 추가
     /**
      * 카테고리 ID로 단일 카테고리 정보를 조회합니다.
      * @param categoryId 조회할 카테고리 ID
@@ -38,7 +52,6 @@ public interface ProductCategoryService {
 
     /**
      * 카테고리 ID를 기반으로 해당 카테고리의 계층 정보를 조회합니다.
-     * (예: 현재 카테고리, 부모 카테고리, 형제 카테고리 목록 등)
      * @param categoryId 조회할 카테고리 ID
      * @return 카테고리 계층 정보가 담긴 Map
      */
