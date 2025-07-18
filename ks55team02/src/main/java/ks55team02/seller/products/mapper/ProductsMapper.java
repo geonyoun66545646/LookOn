@@ -18,6 +18,8 @@ import ks55team02.seller.products.domain.StatusOptionMapping;
 @Mapper
 public interface ProductsMapper {
 	
+	void deactivateProductsByCategoryId(String categoryId, String adminId);
+
 	
 	// --- 상품 등록(Create) 관련 메소드 ---
 	String getMaxProductCode();

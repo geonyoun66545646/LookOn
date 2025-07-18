@@ -295,7 +295,8 @@
             products
         SET
             expsr_yn = false,
-            mdfcn_dt = CURRENT_TIMESTAMP
+	        mdfcn_dt = CURRENT_TIMESTAMP, <!-- ⭐ 이 쉼표를 추가합니다. ⭐ -->
+	        del_user_no = #{adminId}
         WHERE
             ctgry_no = #{categoryId}
     </update>

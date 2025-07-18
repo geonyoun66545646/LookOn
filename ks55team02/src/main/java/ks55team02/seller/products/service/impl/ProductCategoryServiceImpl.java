@@ -29,6 +29,16 @@ public class ProductCategoryServiceImpl implements ProductCategoryService {
     private final FilesUtils filesUtils; // ⭐ FilesUtils 의존성 주입 추가
     
     @Override
+    @Transactional
+    public void deactivateCategoryAndRelatedProducts(String categoryId, String adminId) {
+        // 1. 해당 카테고리에 속한 상품들을 먼저 비활성화
+        productsMapper.deactivateProductsByCategoryId(categoryId, adminId); // ⭐ Mapper 호출 시 ID 전달
+        
+        // 2. 카테고리 자체를 비활성화
+        productCategoryMapper.deactivateCategory(categoryId, adminId); // ⭐ Mapper 호출 시 ID 전달
+    }
+    
+    @Override
     public void activateCategory(String categoryId) {
         productCategoryMapper.activateCategory(categoryId);
     }

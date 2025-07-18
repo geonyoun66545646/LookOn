@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile; // ⭐ import 추가
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import ks55team02.admin.common.domain.SearchCriteria;
+import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.service.ProductCategoryService;
 import lombok.RequiredArgsConstructor;
@@ -59,19 +61,26 @@ public class AdminCategoryManagementController {
         return "admin/adminpage/productadmin/adminAddCategory";
     }
 
-    // ⭐ 카테고리 수정 처리 메서드 수정 ⭐
     @PostMapping("/updateCategory")
     public String updateCategory(
             @ModelAttribute ProductCategory productCategory,
-            @RequestParam("categoryImageFile") MultipartFile categoryImageFile, // ⭐ 파라미터 추가
-            @RequestParam(value = "deleteCategoryImage", defaultValue = "false") boolean deleteCategoryImage, // ⭐ 파라미터 추가
-            RedirectAttributes redirectAttributes) {
+            @RequestParam("categoryImageFile") MultipartFile categoryImageFile,
+            @RequestParam(value = "deleteCategoryImage", defaultValue = "false") boolean deleteCategoryImage,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
+        
+        LoginUser loginAdmin = (LoginUser) session.getAttribute("loginUser"); // ⭐ "loginAdmin" -> "loginUser"
+        if (loginAdmin == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "세션이 만료되었거나 로그인이 필요합니다.");
+            return "redirect:/adminpage/login"; // ⭐ "/admin/login" -> "/adminpage/login"
+        }
+        
         try {
-            // ⭐ 서비스 호출 시 파라미터 추가 ⭐
+            productCategory.setMdfrNo(loginAdmin.getUserNo());
             productCategoryService.updateCategory(productCategory, categoryImageFile, deleteCategoryImage);
             redirectAttributes.addFlashAttribute("message", "카테고리가 성공적으로 수정되었습니다.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "수정에 실패했습니다. 이 카테고리를 참조하는 하위 카테고리나 상품이 있는지 확인해주세요.");
+            redirectAttributes.addFlashAttribute("errorMessage", "수정에 실패했습니다: " + e.getMessage());
         }
         return "redirect:/adminpage/productadmin/adminCategoryManagement";
     }
@@ -96,9 +105,18 @@ public class AdminCategoryManagementController {
     
     @PostMapping("/deactivateCategory")
     public String deactivateCategory(@RequestParam("categoryId") String categoryId,
-                                     RedirectAttributes redirectAttributes) {
+                                     RedirectAttributes redirectAttributes,
+                                     HttpSession session) {
+        
+        LoginUser loginAdmin = (LoginUser) session.getAttribute("loginUser"); // ⭐ "loginAdmin" -> "loginUser"
+        if (loginAdmin == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "세션이 만료되었거나 로그인이 필요합니다.");
+            return "redirect:/adminpage/login"; // ⭐ "/admin/login" -> "/adminpage/login"
+        }
+        
         try {
-            productCategoryService.deactivateCategoryAndRelatedProducts(categoryId);
+            String adminId = loginAdmin.getUserNo();
+            productCategoryService.deactivateCategoryAndRelatedProducts(categoryId, adminId);
             redirectAttributes.addFlashAttribute("message", "카테고리가 성공적으로 비활성화되었습니다.");
         } catch (Exception e) {
             System.err.println("카테고리 비활성화 중 오류 발생: " + e.getMessage());
@@ -121,16 +139,21 @@ public class AdminCategoryManagementController {
         return "admin/adminpage/productadmin/adminAddCategory";
     }
     
-    // ⭐ 신규 카테고리 등록 처리 메서드 수정 ⭐
     @PostMapping("/addCategory")
     public String addCategory(
             @ModelAttribute ProductCategory productCategory,
-            @RequestParam("categoryImageFile") MultipartFile categoryImageFile, // ⭐ 파라미터 추가
-            RedirectAttributes redirectAttributes) {
+            @RequestParam("categoryImageFile") MultipartFile categoryImageFile,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
         
-        productCategory.setUserNo("user_no_9");
+        LoginUser loginAdmin = (LoginUser) session.getAttribute("loginUser"); // ⭐ "loginAdmin" -> "loginUser"
+        if (loginAdmin == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "세션이 만료되었거나 로그인이 필요합니다.");
+            return "redirect:/adminpage/login"; // ⭐ "/admin/login" -> "/adminpage/login"
+        }
+        
+        productCategory.setUserNo(loginAdmin.getUserNo());
 
-        // ⭐ 서비스 호출 시 파라미터 추가 ⭐
         productCategoryService.addCategory(productCategory, categoryImageFile);
         
         redirectAttributes.addFlashAttribute("message", "새로운 카테고리가 성공적으로 등록되었습니다.");

@@ -10,6 +10,9 @@ import ks55team02.seller.products.domain.ProductCategory;
 
 public interface ProductCategoryService {
 	
+	void deactivateCategoryAndRelatedProducts(String categoryId, String adminId);
+
+	
 	/*활성*/
 	void activateCategory(String categoryId);
 	

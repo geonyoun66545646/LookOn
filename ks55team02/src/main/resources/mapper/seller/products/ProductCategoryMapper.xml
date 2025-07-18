@@ -6,15 +6,17 @@
 <mapper namespace="ks55team02.seller.products.mapper.ProductCategoryMapper">
 
 	<resultMap id="productCategoryResultMap"
-		type="ks55team02.seller.products.domain.ProductCategory">
-		<id property="categoryId" column="ctgry_no" />
-		<result property="parentCategoryId" column="up_ctgry_no" />
-		<result property="userNo" column="creatr_no" />
-		<result property="categoryName" column="ctgry_nm" />
-		<result property="categoryLevel" column="ctgry_dpth" />
-		<result property="regDate" column="reg_dt" />
-		<result property="activationYn" column="actvtn_yn" />
-		<result property="categoryImagePath" column="ctgry_img_path" />
+	    type="ks55team02.seller.products.domain.ProductCategory">
+	    <id property="categoryId" column="ctgry_no" />
+	    <result property="parentCategoryId" column="up_ctgry_no" />
+	    <result property="userNo" column="creatr_no" />
+	    <result property="mdfrNo" column="mdfr_no" /> <!-- ⭐ 이 라인을 추가합니다. -->
+	    <result property="delUserNo" column="del_user_no" /> <!-- ⭐ 이 라인을 추가합니다. -->
+	    <result property="categoryName" column="ctgry_nm" />
+	    <result property="categoryLevel" column="ctgry_dpth" />
+	    <result property="regDate" column="reg_dt" />
+	    <result property="activationYn" column="actvtn_yn" />
+	    <result property="categoryImagePath" column="ctgry_img_path" />
 	</resultMap>
 	
 	<update id="activateCategory" parameterType="string">
@@ -62,7 +64,8 @@
             product_categories
         SET
             actvtn_yn = false,
-            inactvtn_dt = CURRENT_TIMESTAMP
+            inactvtn_dt = CURRENT_TIMESTAMP,
+            del_user_no = #{adminId} <!-- ⭐ 삭제자 ID 추가 -->
         WHERE
             ctgry_no = #{categoryId}
     </update>
