@@ -1,6 +1,8 @@
 package ks55team02.seller.products.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession; // HttpSession import
+import ks55team02.admin.common.domain.SearchCriteria;
 import ks55team02.customer.login.domain.LoginUser; // LoginUser import
 import ks55team02.seller.common.service.impl.StoreMngService;
 import ks55team02.seller.products.domain.ProductCategory;
@@ -173,9 +176,11 @@ public class ProductController {
         }
     }
 
-    // 판매자 상품 목록
+ // 판매자 상품 목록
     @GetMapping("/list")
-    public String myProductList(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String myProductList(Model model, HttpSession session, RedirectAttributes redirectAttributes,
+                                @ModelAttribute SearchCriteria searchCriteria) {
+
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         if (loginUser == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "로그인이 필요합니다.");
@@ -189,10 +194,23 @@ public class ProductController {
             redirectAttributes.addFlashAttribute("errorMessage", "상점 정보가 없습니다. 상점 신청을 완료해주세요.");
             return "redirect:/seller";
         }
+
+        searchCriteria.setSelUserNo(selUserNo);
+        searchCriteria.setStoreId(storeId);
         
-        List<Products> productList = productsService.getProductsBySellerAndStore(selUserNo, storeId);
+        // ⭐ 이 부분을 추가합니다. ⭐
+        // 템플릿 렌더링 오류 방지를 위해 filterConditions가 null이면 빈 리스트로 초기화
+        if (searchCriteria.getFilterConditions() == null) {
+            searchCriteria.setFilterConditions(new ArrayList<>());
+        }
         
-        model.addAttribute("productList", productList);
+        Map<String, Object> resultMap = productsService.getProductsBySellerAndStore(searchCriteria);
+        
+        model.addAttribute("productList", resultMap.get("productList"));
+        model.addAttribute("pagination", resultMap.get("pagination"));
+        model.addAttribute("searchCriteria", searchCriteria);
+        model.addAttribute("title", "상품 목록 조회");
+
         return "seller/products/sellerProductList";
     }
     
