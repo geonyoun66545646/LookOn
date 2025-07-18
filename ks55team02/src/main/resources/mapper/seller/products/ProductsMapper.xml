@@ -151,20 +151,31 @@
 	            ORDER BY pi.img_indct_sn ASC
 	            LIMIT 1
 	        ) AS thumbnail_image_path,
-	        pah.aprv_stts_cd AS latestApprovalStatus
+	        
+	        -- ⭐ 최신 승인 상태 조회 로직 수정 ⭐
+	        COALESCE(
+	            (
+	                SELECT pah_processed.aprv_stts_cd
+	                FROM ks55team02db.product_approval_history pah_processed
+	                WHERE pah_processed.gds_no = p.gds_no
+	                  AND pah_processed.aprv_stts_cd != '대기'
+	                ORDER BY pah_processed.prcs_dt DESC, pah_processed.aprv_rjct_cycl DESC
+	                LIMIT 1
+	            ),
+	            (
+	                SELECT pah_latest.aprv_stts_cd
+	                FROM ks55team02db.product_approval_history pah_latest
+	                WHERE pah_latest.gds_no = p.gds_no
+	                ORDER BY pah_latest.prcs_dt DESC, pah_latest.aprv_rjct_cycl DESC
+	                LIMIT 1
+	            )
+	        ) AS latestApprovalStatus
+	
 	    FROM
 	        ks55team02db.products p
 	    LEFT JOIN
 	        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
-	    LEFT JOIN (
-	        SELECT gds_no, aprv_stts_cd
-	        FROM product_approval_history
-	        WHERE (gds_no, aprv_rjct_cycl) IN (
-	            SELECT gds_no, MAX(aprv_rjct_cycl)
-	            FROM product_approval_history
-	            GROUP BY gds_no
-	        )
-	    ) pah ON p.gds_no = pah.gds_no
+	    <!-- ⭐ pah 조인은 검색 조건에서만 필요하므로, 여기서는 제거합니다. ⭐ -->
 	    <include refid="productSearchCondition" />
 	    <choose>
 	        <when test="sortKey != null and sortKey != ''">
