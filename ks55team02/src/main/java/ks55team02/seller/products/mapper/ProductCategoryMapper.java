@@ -9,7 +9,10 @@ import ks55team02.seller.products.domain.ProductCategory;
 
 @Mapper
 public interface ProductCategoryMapper {
+	
+	void deactivateCategory(String categoryId, String adminId);
 
+	
 	// 카테고리 ID로 카운트 (중복 체크용)
     int countCategoryById(String categoryId);
 

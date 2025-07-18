@@ -53,16 +53,18 @@ public class CartController {
             return new ResponseEntity<>("상품 번호 및 선택된 옵션이 필요합니다.", HttpStatus.BAD_REQUEST);
         }
         try {
-            Map<String, Integer> optionQuantityMap = new HashMap<>();
             for (Map<String, Object> option : selectedOptions) {
-                String optNo = (String) option.get("optNo");
+                // ⭐⭐ 이 부분을 수정합니다. ⭐⭐
+                String gdsSttsNo = (String) option.get("gdsSttsNo"); // "optNo" -> "gdsSttsNo"
                 Integer quantity = (Integer) option.get("quantity");
-                if (optNo != null && quantity != null && quantity > 0) {
-                    optionQuantityMap.merge(optNo, quantity, Integer::sum);
+                
+                // ⭐ gdsSttsNo로 변경되었으므로, addProductToCart 메서드 호출 시 gdsSttsNo를 전달해야 합니다.
+                //    기존 addProductToCart가 optNo를 받는다면, gdsSttsNo를 받도록 서비스/매퍼 수정이 필요할 수 있습니다.
+                //    우선은 gdsSttsNo를 사용하도록 변경합니다.
+                if (gdsSttsNo != null && quantity != null && quantity > 0) {
+                    // cartService.addProductToCart가 4개의 파라미터를 받는다고 가정
+                    cartService.addProductToCart(userNo, gdsNo, quantity, gdsSttsNo, storeId);
                 }
-            }
-            for (Map.Entry<String, Integer> entry : optionQuantityMap.entrySet()) {
-                cartService.addProductToCart(userNo, gdsNo, entry.getValue(), entry.getKey(), storeId);
             }
             return ResponseEntity.ok("상품이 장바구니에 성공적으로 추가되었습니다.");
         } catch (Exception e) {
