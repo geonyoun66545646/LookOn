@@ -3,7 +3,7 @@
 package ks55team02.seller.inquiry.controller;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays; // Arrays 임포트 추가
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import jakarta.servlet.http.HttpSession; // HttpSession 임포트 추가
 import ks55team02.admin.common.domain.Pagination;
 import ks55team02.common.domain.inquiry.Answer;
 import ks55team02.common.domain.inquiry.Inquiry;
+import ks55team02.customer.login.domain.LoginUser; // LoginUser 임포트 추가
 import ks55team02.seller.inquiry.service.SellerInquiryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -35,26 +37,43 @@ public class SellerInquiryController {
 	@GetMapping("/sellerInquiryList")
 	public String sellerInquiryList(
 	        Model model,
-	        Inquiry inquiry, // Inquiry 객체는 SearchCriteria를 상속하므로 검색 조건 포함
-	        @RequestParam(value = "filterConditions", required = false) String filterConditionsString // ⭐ 추가: filterConditions를 String으로 직접 받음
+	        Inquiry inquiry,
+	        @RequestParam(value = "filterConditions", required = false) String filterConditionsString,
+	        HttpSession session
 	) {
 		log.info("컨트롤러: sellerInquiryList 호출 - 현재 페이지: {}, 페이지 크기: {}, 검색 키: {}, 검색 값: {}",
 	             inquiry.getCurrentPage(), inquiry.getPageSize(), inquiry.getSearchKey(), inquiry.getSearchValue());
-		log.info("컨트롤러: filterConditionsString (Raw): {}", filterConditionsString); // ⭐ 추가: 로그 확인
+		log.info("컨트롤러: filterConditionsString (Raw): {}", filterConditionsString);
 
-		// ⭐ 추가: filterConditionsString을 파싱하여 Inquiry 객체에 설정
+		// filterConditionsString을 파싱하여 Inquiry 객체에 설정
 		if (filterConditionsString != null && !filterConditionsString.trim().isEmpty()) {
 		    List<String> filterConditions = Arrays.asList(filterConditionsString.split(","));
-		    inquiry.setFilterConditions(filterConditions); // Inquiry 객체의 List<String> 필드에 설정
-		    log.info("컨트롤러: 파싱된 filterConditions: {}", filterConditions); // ⭐ 추가: 로그 확인
+		    inquiry.setFilterConditions(filterConditions);
+		    log.info("컨트롤러: 파싱된 filterConditions: {}", filterConditions);
 		} else {
-		    inquiry.setFilterConditions(null); // 필터 조건이 없으면 null로 설정하여 MyBatis에서 조건 건너뛰도록 함
+		    inquiry.setFilterConditions(null);
 		}
 
-		String loggedInStoreId = "store_1"; // 실제 로그인 로직으로 대체 필요
+		// ⭐ 세션에서 로그인된 사용자 ID를 가져옴
+		LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+		String userLoginId = null; // 로그인 ID (예: fashionking150)
+		String storeId = null; // 실제 상점 ID (예: store_1)
+
+		if (loginUser != null) {
+		    userLoginId = loginUser.getUserLgnId();
+		    log.info("세션에서 가져온 로그인 사용자 ID: {}", userLoginId);
+
+		    // ⭐ 로그인 사용자 ID를 사용하여 실제 상점 ID를 조회
+		    // 이 메서드는 SellerInquiryService에 구현되어야 합니다.
+		    storeId = sellerInquiryService.getStoreIdByUserLgnId(userLoginId);
+		    log.info("로그인 사용자 ID({})에 해당하는 상점 ID: {}", userLoginId, storeId);
+		} else {
+		    log.warn("세션에 로그인 정보가 없습니다.");
+		    // 필요 시 로그인 페이지로 리다이렉트 처리 또는 에러 메시지
+		    // return "redirect:/seller/login";
+		}
 		
-		inquiry.setInqryStoreId(loggedInStoreId);
-		log.info("로그인된 상점 ID (하드코딩): {}", loggedInStoreId);
+		inquiry.setInqryStoreId(storeId); // ⭐ 조회된 실제 상점 ID 설정 (여기가 변경된 부분입니다!)
 
 		int totalRecordCount = sellerInquiryService.getSellerInquiryCnt(inquiry);
 		log.info("컨트롤러: 문의 전체 개수: {}", totalRecordCount);
@@ -71,7 +90,7 @@ public class SellerInquiryController {
 		model.addAttribute("title", "판매자 문의 목록");
 		model.addAttribute("sellerInquiryList", sellerInquiryList);
 		model.addAttribute("pagination", pagination);
-		model.addAttribute("searchCriteria", inquiry); // inquiry 객체를 searchCriteria로 모델에 추가
+		model.addAttribute("searchCriteria", inquiry);
 		
 		return "seller/inquiry/sellerInquiryListView";
 	}
@@ -84,7 +103,6 @@ public class SellerInquiryController {
 
 	    log.info("컨트롤러: sellerInquiryService.getSellerInquiryByStoreId 결과: {}", inquiryDetail);
 	    
-	    // 답변 수정 삽입 api 경로
 	    model.addAttribute("answerApiUrl", "/seller/inquiry/answerProcess");
 	    
 	    if (inquiryDetail != null) {
@@ -105,17 +123,40 @@ public class SellerInquiryController {
 	public ResponseEntity<Map<String, Object>> processAnswer(
 			@RequestParam("inqryId") String inqryId,
 			@RequestParam(value = "ansId", required = false) String ansId,
-			@RequestParam("ansCn") String ansCn) {
+			@RequestParam("ansCn") String ansCn,
+			HttpSession session
+			) {
 
 		log.info("컨트롤러: AJAX 답변 요청 수신 - inqryId: {}, ansId: {}, ansCn: {}", inqryId, ansId, ansCn);
 
 		Map<String, Object> response = new HashMap<>();
 		
-		String loggedInStoreId = "store_1"; // 실제 로그인 로직으로 대체 필요
-		String answrUserNo = sellerInquiryService.getSellerUserNoByStoreId(loggedInStoreId);
+		// ⭐ 세션에서 로그인된 사용자 ID를 가져옴
+		LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+		String userLoginId = null; // 로그인 ID (예: fashionking150)
+		String storeId = null; // 실제 상점 ID (예: store_1)
+		String answrUserNo = null;
+
+		if (loginUser != null) {
+		    userLoginId = loginUser.getUserLgnId();
+		    log.info("세션에서 가져온 로그인 사용자 ID: {}", userLoginId);
+
+		    // ⭐ 로그인 사용자 ID를 사용하여 실제 상점 ID를 조회
+		    // 이 메서드는 SellerInquiryService에 구현되어야 합니다.
+		    storeId = sellerInquiryService.getStoreIdByUserLgnId(userLoginId);
+		    log.info("로그인 사용자 ID({})에 해당하는 상점 ID: {}", userLoginId, storeId);
+
+		    // ⭐ 조회된 상점 ID를 사용하여 판매자 사용자 번호 조회
+		    answrUserNo = sellerInquiryService.getSellerUserNoByStoreId(storeId); // ⭐ 여기도 storeId 사용
+		} else {
+		    log.error("컨트롤러: 로그인된 사용자 정보가 세션에 없습니다.");
+		    response.put("status", "error");
+		    response.put("message", "로그인 정보가 없어 답변 처리를 할 수 없습니다.");
+		    return ResponseEntity.status(401).body(response); // Unauthorized
+		}
 
 		if (answrUserNo == null || answrUserNo.isEmpty()) {
-		    log.error("컨트롤러: 로그인된 상점 ID({})에 해당하는 판매자 사용자 번호를 찾을 수 없습니다.", loggedInStoreId);
+		    log.error("컨트롤러: 상점 ID({})에 해당하는 판매자 사용자 번호를 찾을 수 없습니다.", storeId);
 		    response.put("status", "error");
 		    response.put("message", "답변자 정보를 찾을 수 없습니다. 관리자에게 문의하세요.");
 		    return ResponseEntity.status(500).body(response);

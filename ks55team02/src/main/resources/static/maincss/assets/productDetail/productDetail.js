@@ -10,18 +10,6 @@ $(document).ready(function() {
     const selectedOptionCurrentPriceSpan = $('#selectedOptionCurrentPrice');
     let selectedOptions = [];
     
-    // ⭐⭐ 새로 추가: 서버에서 제공하는 상품 상태 데이터 (예시)
-    // 이 데이터는 백엔드에서 뷰로 전달되어야 합니다.
-    // 예를 들어, Thymeleaf를 사용한다면:
-    // <script th:inline="javascript">
-    //     var productStatusData = [[${productStatus}]];
-    // </script>
-    // 현재 로그를 기반으로 임시 데이터를 생성합니다.
-    const productStatusData = [
-        { gds_stts_no: 'gds_stts_no_123', opt_vl_no: ['opt_vl_no_2657', 'opt_vl_no_2658'] },
-        { gds_stts_no: 'gds_stts_no_124', opt_vl_no: ['opt_vl_no_2657', 'opt_vl_no_2659'] },
-        { gds_stts_no: 'gds_stts_no_125', opt_vl_no: ['opt_vl_no_2658', 'opt_vl_no_2660'] }
-    ];
 
     // 이미지 갤러리 관련 요소
     const mainImage = document.getElementById('product-detail-zoom');
@@ -78,59 +66,84 @@ $(document).ready(function() {
         updateTotalPrice();
     }
     
-    // ⭐⭐ 새로 추가: 옵션 번호로 상품 상태 번호를 찾는 함수
-    function findProductStatus(colorOptNo, sizeOptNo) {
-        const selectedOptNos = [colorOptNo, sizeOptNo].sort();
-        const status = productStatusData.find(status => {
-            const statusOptNos = status.opt_vl_no.sort();
-            return statusOptNos.length === 2 && 
-                   statusOptNos[0] === selectedOptNos[0] && 
-                   statusOptNos[1] === selectedOptNos[1];
-        });
-        return status ? status.gds_stts_no : null;
-    }
+	/**
+	 * ⭐⭐[최종] 선택된 옵션 값들의 조합에 해당하는 상품 재고 상태 데이터를 찾습니다.
+	 * @param {string[]} selectedOptVlNos - 사용자가 선택한 옵션 값 ID들의 배열
+	 * @returns {object | null} - 찾은 재고 상태 객체 또는 null
+	 */
+	function findProductStatus(selectedOptVlNos) {
+	    // 선택된 옵션 ID들을 항상 동일한 순서로 정렬하여 비교용 문자열을 만듭니다.
+	    const sortedSelectedOptVlNos = selectedOptVlNos.sort().join(',');
 
-    /**
-     * ⭐ 최종 수정된 옵션 선택 시 처리 로직입니다.
-     * 이제 고유한 gds_stts_no를 찾아서 저장합니다.
-     */
-    function handleOptionSelection() {
-        const selectedColorText = colorSelect.find('option:selected').text();
-        const selectedSizeText = sizeSelect.find('option:selected').text();
-        
-        const selectedColorOptNo = colorSelect.val();
-        const selectedSizeOptNo = sizeSelect.val();
+	    // productStatusData 배열을 순회하며 일치하는 조합을 찾습니다.
+	    for (const status of productStatusData) {
+	        const sortedStatusOptVlNos = status.opt_vl_nos.split(',').sort().join(',');
+	        if (sortedSelectedOptVlNos === sortedStatusOptVlNos) {
+	            return status; // 객체 전체 반환
+	        }
+	    }
+	    return null;
+	}
+	
+	/* 옵션 */
+	/**
+	 * ⭐⭐[최종 수정] 옵션 선택 시 처리 로직입니다.
+	 * 재고를 확인하고 UI를 업데이트합니다.
+	 */
+	function handleOptionSelection() {
+	    // 1. 색상과 사이즈 옵션 요소를 선택합니다.
+	    const colorSelect = $('.details-row-color .product-option-select');
+	    const sizeSelect = $('.details-row-size .product-option-select');
+	    
+	    // 2. 색상과 사이즈의 텍스트와 값을 가져옵니다.
+	    const selectedColorText = colorSelect.find('option:selected').text();
+	    const selectedSizeText = sizeSelect.find('option:selected').text();
+	    
+	    const selectedColorOptNo = colorSelect.val();
+	    const selectedSizeOptNo = sizeSelect.val();
+	    
+	    // 3. 성별 옵션 값은 productDataOptions에서 고정된 값을 찾아서 사용합니다.
+	    const genderOptionData = productDataOptions.find(opt => opt.optNm === '성별');
+	    const selectedGenderText = genderOptionData ? genderOptionData.optionValues[0].vlNm : '';
+	    const selectedGenderOptNo = genderOptionData ? genderOptionData.optionValues[0].optVlNo : '';
 
-        if (!selectedColorOptNo || !selectedSizeOptNo) {
-            selectedOptionCurrentPriceSpan.text('옵션을 모두 선택해주세요.');
-            return;
-        }
+	    // 4. 모든 필수 옵션을 선택했는지 확인합니다.
+	    if (!selectedGenderOptNo || !selectedColorOptNo || !selectedSizeOptNo) {
+	        selectedOptionCurrentPriceSpan.text('옵션을 모두 선택해주세요.');
+	        selectionSummary.hide();
+	        return;
+	    }
+	    
+	    // 5. 재고 데이터에서 일치하는 3가지 조합을 찾습니다.
+	    const foundStatus = findProductStatus([selectedGenderOptNo, selectedColorOptNo, selectedSizeOptNo]);
 
-        // ⭐⭐ 수정: 선택된 옵션 번호에 해당하는 gds_stts_no를 찾습니다.
-        const gdsSttsNo = findProductStatus(selectedColorOptNo, selectedSizeOptNo);
-        if (!gdsSttsNo) {
-             alert('선택하신 옵션 조합은 재고가 없습니다.');
-             return;
-        }
+	    // 6. 재고 조합이 존재하지 않거나, 재고 수량이 0인 경우
+	    if (!foundStatus || foundStatus.sel_psblty_qntty <= 0) {
+	    	alert('선택하신 옵션 조합은 재고가 없거나 품절입니다.');
+	        selectedOptionCurrentPriceSpan.text('재고 없음');
+	        selectionSummary.hide();
+	        return;
+	    }
 
-        selectedOptionCurrentPriceSpan.text(formatPrice(getBaseProductPrice()));
+	    // 7. 이미 추가된 옵션인지 확인
+	    const isExisting = selectedOptions.some(opt => opt.gdsSttsNo === foundStatus.gds_stts_no);
 
-        // ⭐⭐ 수정: 고유 번호(gdsSttsNo)를 사용하여 이미 추가된 옵션인지 확인
-        const isExisting = selectedOptions.some(opt => opt.gdsSttsNo === gdsSttsNo);
-
-        if (isExisting) {
-            alert('이미 추가된 옵션입니다.');
-        } else {
-            selectedOptions.push({
-                color: selectedColorText,
-                size: selectedSizeText,
-                quantity: 1,
-                gdsSttsNo: gdsSttsNo // ⭐⭐ 이제 gdsSttsNo를 저장합니다.
-            });
-            updateOptionsDisplay();
-        }
-        selectedOptionCurrentPriceSpan.text('옵션을 모두 선택해주세요.');
-    }
+	    if (isExisting) {
+	        alert('이미 추가된 옵션입니다.');
+	    } else {
+	        selectedOptions.push({
+	            gender: selectedGenderText,
+	            color: selectedColorText,
+	            size: selectedSizeText,
+	            quantity: 1,
+	            gdsSttsNo: foundStatus.gds_stts_no
+	        });
+	        updateOptionsDisplay();
+	    }
+	    
+	    // 8. 옵션 선택 후 가격을 다시 표시
+	    selectedOptionCurrentPriceSpan.text(formatPrice(getBaseProductPrice()));
+	}
 
     // --- 3. 이벤트 리스너 등록 ---
 
@@ -176,8 +189,12 @@ $(document).ready(function() {
         const index = $item.data('index');
         let option = selectedOptions[index];
 
-        if ($target.hasClass('plus') && option.quantity < 10) {
-            option.quantity++;
+        if ($target.hasClass('plus')) {
+            if (option.quantity < 10) { // 임의의 최대 수량
+                option.quantity++;
+            } else {
+                alert('최대 구매 수량입니다.');
+            }
         } else if ($target.hasClass('minus') && option.quantity > 1) {
             option.quantity--;
         } else if ($target.hasClass('remove-option-button')) {
@@ -201,15 +218,15 @@ $(document).ready(function() {
         const gdsNo = currentProductGdsNo;
         const storeId = currentProductStoreId;
 
-        const payload = {
-            gdsNo: gdsNo,
-            storeId: storeId,
-            selectedOptions: selectedOptions.map(option => ({
-                // ⭐⭐ 이제 optNo 대신 gdsSttsNo를 사용합니다.
-                optNo: option.gdsSttsNo, 
-                quantity: option.quantity
-            }))
-        };
+		const payload = {
+		    gdsNo: gdsNo,
+		    storeId: storeId,
+		    selectedOptions: selectedOptions.map(option => ({
+		        // ⭐⭐ 키 이름을 gdsSttsNo로 변경
+		        gdsSttsNo: option.gdsSttsNo, 
+		        quantity: option.quantity
+		    }))
+		};
 
         console.log("전송할 페이로드:", JSON.stringify(payload, null, 2));
 

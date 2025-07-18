@@ -23,6 +23,7 @@ import ks55team02.common.domain.store.Store;
 import ks55team02.customer.inquiry.domain.InquiryOption;
 import ks55team02.customer.inquiry.domain.InquiryTargetOption;
 import ks55team02.customer.inquiry.service.InquiryService;
+import ks55team02.customer.login.domain.LoginUser; // LoginUser 클래스 import
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,29 +36,22 @@ public class InquiryController {
     private final InquiryService inquiryService;
 
     /**
-     * 💡 **[임시 설정]** 현재 로그인된 사용자 ID를 'user_no_1000'으로 가정하는 유틸리티 메서드
-     *
-     * TODO: [로그인 기능 연동 시 교체 필수] 동료가 로그인 기능 구현 후 이 메서드를 실제 로그인 정보에서 ID를 가져오도록 수정해야 합니다.
+     * 현재 로그인된 사용자 ID를 세션에서 가져오는 유틸리티 메서드
      *
      * @param session 현재 HTTP 세션
-     * @return 로그인된 사용자 ID (현재는 'user_no_1000'으로 고정)
+     * @return 로그인된 사용자 ID 또는 로그인 정보가 없으면 null
      */
     private String getCurrentUserId(HttpSession session) {
-        // 현재는 user_no_100이 로그인 되어있다고 가정.
-        log.info("[임시] 현재 로그인된 사용자 ID: user_no_100"); // 로그 추가
-        return "user_no_100";
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
 
-        /*
-         * ==== 로그인 기능 완성 후 아래 주석 해제 및 위 'return "user_no_1000";' 라인 제거 ====
-         * // 세션에 저장된 사용자 ID (예시)
-         * String loggedInUserId = (String) session.getAttribute("loggedInUserId");
-         *
-         * // 실제 배포 환경에서는 null을 반환하거나 로그인 페이지로 리다이렉션 로직 추가
-         * if (loggedInUserId == null) {
-         * log.warn("세션에 로그인된 사용자 ID가 없습니다. 실제 환경에서는 로그인 페이지로 리다이렉트되어야 합니다.");
-         * }
-         * return loggedInUserId;
-         */
+        if (loginUser != null) {
+            String userNo = loginUser.getUserNo();
+            log.info("현재 로그인된 사용자 번호: {}", userNo);
+            return userNo;
+        } else {
+            log.warn("세션에 로그인된 사용자 정보 (LoginUser)가 없습니다.");
+            return null;
+        }
     }
 
     // 자주묻는 질문 페이지
@@ -78,16 +72,16 @@ public class InquiryController {
      */
     @GetMapping("/inquiryDetail")
     public String getInquiryDetail(@RequestParam("inquiryId") String inquiryId, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
-        //1. 현재 로그인된 사용자 ID를 가져옵니다.(현재는 user_no_1000)
+        //1. 현재 로그인된 사용자 ID를 가져옵니다.
         String currentUserId = getCurrentUserId(session);
 
-        //2. 임시 로그인 기능 구현 후 이 로직의 주석을 해제하고 실제 로그인 여부를 확인해야 합니다.
-        /*
-         *if(currentUserId == null){
-         * redirectAttributes.addFlashAttribute("errorMessage","로그인 후 문의를 열람 가능합니다");
-         * return "redirect:/customer/user/login"; // 로그인 페이지 경로로 리다이렉트
-         *}
-         */
+        //2. 로그인 여부 확인 (주석 해제)
+        if(currentUserId == null){
+            log.warn("문의 상세 조회 시도 - 로그인되지 않은 사용자 접근.");
+            redirectAttributes.addFlashAttribute("errorMessage","로그인 후 문의를 열람 가능합니다.");
+            redirectAttributes.addFlashAttribute("showAlert", true);
+            return "redirect:/customer/login"; // 로그인 페이지 경로로 리다이렉트 (경로가 올바른지 확인 필요)
+        }
 
         //3. InquiryService를 호출하여 문의 정보를 가져옵니다.
         // 이때 문의 ID와 함께 현재 로그인된 사용자 ID를 전달하여 서비스 계층에서 비밀글 권한을 확인하도록 합니다.
@@ -98,6 +92,7 @@ public class InquiryController {
         if(inquiry == null) {
             log.warn("문의 상세 조회 실패: ID = {}, 사용자 = {}. 사유: 찾을 수 없거나 권한 없음.", inquiryId, currentUserId);
             redirectAttributes.addFlashAttribute("errorMessage", "해당 문의를 찾을 수 없거나 열람 권한이 없습니다.");
+            redirectAttributes.addFlashAttribute("showAlert", true);
             return "redirect:/customer/inquiry/inquiryList";
         }
         //5. 문의 정보가 정상적으로 조회되었고 권한도 확인된 경우,
@@ -120,13 +115,13 @@ public class InquiryController {
         //1 현재 로그인된 사용자 ID를 가져옵니다
         String currentUserId = getCurrentUserId(session);
 
-        // 2. [임시] 로그인 기능 구현 전이므로, 실제 서비스에서는 이 로그인 여부 확인 로직이 필요합니다.
-        // 현재는 getCurrentUserId()가 'user_no_1000'을 항상 반환하므로 이 조건문은 항상 false가 됩니다.
-        // if (currentUserId == null) {
-        //     log.warn("로그인되지 않은 사용자가 문의 등록 폼에 접근 시도.");
-        //     redirectAttributes.addFlashAttribute("errorMessage", "로그인 후 문의를 작성할 수 있습니다.");
-        //     return "redirect:/customer/user/login"; // 로그인 페이지로 리다이렉트
-        // }
+        // 2. 로그인 여부 확인 (주석 해제)
+        if (currentUserId == null) {
+            log.warn("로그인되지 않은 사용자가 문의 등록 폼에 접근 시도.");
+            redirectAttributes.addFlashAttribute("errorMessage", "로그인 후 문의를 작성할 수 있습니다.");
+            redirectAttributes.addFlashAttribute("showAlert", true);
+            return "redirect:/customer/login"; // 로그인 페이지로 리다이렉트 (경로가 올바른지 확인 필요)
+        }
         //3. Model에 필요한 데이터를 담아 뷰로 전달합니다.
         model.addAttribute("title", "문의 등록");
         model.addAttribute("inquiry", new Inquiry());
@@ -161,8 +156,8 @@ public class InquiryController {
     public ResponseEntity<Map<String, Object>> addInquiry(
             Inquiry inquiry,
             @RequestPart(name="attachedFiles", required=false) MultipartFile[] attachedFiles,
-            HttpSession session) { // MultipartFile[] 사용
-    	log.info("AJAX 요청 수신된 문의 정보 (전체): {}", inquiry);
+            HttpSession session) {
+        log.info("AJAX 요청 수신된 문의 정보 (전체): {}", inquiry);
         log.info("AJAX 요청 수신된 문의 prvtYn 값: {}", inquiry.isPrvtYn());
         log.info("AJAX 요청 수신된 문의 inqryTypeCd 값: {}", inquiry.getInqryTypeCd()); // 세부 유형 (상품, 배송 등)
         log.info("AJAX 요청 수신된 문의 inqryTrgtTypeCd 값: {}", inquiry.getInqryTrgtTypeCd()); // 문의 대상 (상점, 관리자)
@@ -170,17 +165,16 @@ public class InquiryController {
         log.info("수신된 첨부 파일 개수: {}", attachedFiles != null ? attachedFiles.length : 0);
 
         //1. 현재 로그인된 사용자 ID를 가져옵니다
-        String currentUserId = getCurrentUserId(session); // 세미콜론(;) 추가
+        String currentUserId = getCurrentUserId(session);
 
-        // 2. [임시] 로그인 기능 구현 전이므로, 실제 서비스에서는 이 로그인 여부 확인 로직이 필요합니다.
-        // 현재는 getCurrentUserId()가 'user_no_1000'을 항상 반환하므로 이 조건문은 항상 false가 됩니다.
-        // if (currentUserId == null) {
-        //     log.warn("로그인되지 않은 사용자가 문의 등록을 시도.");
-        //     Map<String, Object> errorResponse = new HashMap<>();
-        //     errorResponse.put("status", "error");
-        //     errorResponse.put("message", "로그인 후 문의를 작성할 수 있습니다.");
-        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse); // 401 Unauthorized 응답
-        // }
+        // 2. 로그인 여부 확인 (주석 해제)
+        if (currentUserId == null) {
+            log.warn("로그인되지 않은 사용자가 문의 등록을 시도.");
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", "로그인 후 문의를 작성할 수 있습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse); // 401 Unauthorized 응답
+        }
 
         Map<String, Object> response = new HashMap<>();
         try {
