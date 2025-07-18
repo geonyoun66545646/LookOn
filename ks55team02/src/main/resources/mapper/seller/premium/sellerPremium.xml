@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ks55team02.seller.premiumcheckout.mapper.SellerPremiumMapper">
+
+	<resultMap id="subscriptionPlanResultMap" type="ks55team02.seller.premiumcheckout.domain.SellerPremiumDTO">
+       	<id 	property="sbscrPlanId"      column="sbscr_plan_id"/>
+        <result property="sbscrPlanNm"      column="sbscr_plan_nm"/>
+        <result property="sbscrPlanPrc"     column="sbscr_plan_prc"/>
+        <result property="sbscrPlanTermVal" column="sbscr_plan_term_val"/>
+        <result property="sbscrPlanExpln"   column="sbscr_plan_expln"/>
+        <result property="sbscrPlanCrtDt"   column="sbscr_plan_crt_dt"/>
+        <result property="sbscrPlanMdfcnDt" column="sbscr_plan_mdfcn_dt"/>
+    </resultMap>
+    
+    <resultMap id="paymentResultMap" type="ks55team02.seller.premiumcheckout.domain.SellerPremiumPaymentDTO">
+        <id     property="sbscrStlmId"      column="sbscr_stlm_id"/>
+        <result property="userNo"           column="user_no"/>
+        <result property="sbscrPlanId"      column="sbscr_plan_id"/>
+        <result property="sbscrPrchsNocs"   column="sbscr_prchs_nocs"/>
+        <result property="sbscrBgngDt"      column="sbscr_bgng_dt"/>
+        <result property="sbscrEndDt"       column="sbscr_end_dt"/>
+        <result property="sbscrTotStlmAmt"  column="sbscr_tot_stlm_amt"/>
+        <result property="sbscrStlmMthdCd"  column="sbscr_stlm_mthd_cd"/>
+        <result property="sbscrStlmSttsCd"  column="sbscr_stlm_stts_cd"/>
+        <result property="pgDlngId"         column="pg_dlng_id"/>
+        <result property="pgCoInfo"         column="pg_co_info"/>
+        <result property="stlmCmptnDt"      column="stlm_cmptn_dt"/>
+        <result property="stlmDmndDt"       column="stlm_dmnd_dt"/>
+        <result property="sbscrPlanNm" 		column="sbscr_plan_nm"/>
+    </resultMap>
+
+	<select id="getSubscriptionPlanCount" parameterType="ks55team02.seller.premiumcheckout.domain.SellerPremiumDTO" resultType="int">
+        SELECT 
+        	COUNT(*)
+        FROM 
+        	subscription_plans
+    </select>
+
+    <select id="getSubscriptionPlanList" parameterType="ks55team02.seller.premiumcheckout.domain.SellerPremiumDTO" resultMap="subscriptionPlanResultMap">
+        SELECT
+            sbscr_plan_id,
+            sbscr_plan_nm,
+            sbscr_plan_prc,
+            sbscr_plan_term_val,
+            sbscr_plan_expln,
+            sbscr_plan_crt_dt,
+            sbscr_plan_mdfcn_dt
+        FROM
+            subscription_plans
+        ORDER BY sbscr_plan_crt_dt DESC <!-- 기본적으로 최신 생성일순으로 정렬 -->
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="getSubscriptionPlanById" parameterType="string" resultMap="subscriptionPlanResultMap">
+        SELECT
+            sbscr_plan_id,
+            sbscr_plan_nm,
+            sbscr_plan_prc,
+            sbscr_plan_term_val,
+            sbscr_plan_expln,
+            sbscr_plan_crt_dt,
+            sbscr_plan_mdfcn_dt
+        FROM
+            subscription_plans
+        WHERE
+            sbscr_plan_id = #{sbscrPlanId}
+    </select>
+    
+   <insert id="insertPremiumOrder" parameterType="ks55team02.seller.premiumcheckout.domain.SellerPremiumPaymentDTO">
+        INSERT INTO subscription_payments (
+            sbscr_stlm_id,
+            user_no,
+            sbscr_plan_id,
+            sbscr_prchs_nocs,       -- [추가됨]
+            sbscr_tot_stlm_amt,
+            sbscr_stlm_stts_cd,
+            stlm_dmnd_dt
+        ) VALUES (
+            #{sbscrStlmId},
+            #{userNo},
+            #{sbscrPlanId},
+            #{sbscrPrchsNocs},       -- [추가됨] DTO에 담겨온 수량 값
+            #{sbscrTotStlmAmt},
+            'PENDING',
+            NOW()
+        )
+    </insert>
+    
+    <!--  플랜 ID로 플랜의 기본 기간(sbscr_plan_term_val)을 조회하는 쿼리 -->
+    <select id="findPlanTermById" parameterType="string" resultType="int">
+        SELECT 
+            sbscr_plan_term_val
+        FROM 
+            subscription_plans
+        WHERE 
+            sbscr_plan_id = #{planId}
+    </select>
+
+    <!-- 결제 성공 시 업데이트하는 쿼리도 확인합니다. -->
+    <update id="updatePaymentSuccess">
+	    UPDATE subscription_payments
+        SET
+            sbscr_stlm_stts_cd = 'COMPLETED',       -- 상태를 '완료'로 변경
+            pg_dlng_id = #{paymentKey},             -- Toss에서 받은 결제 키 저장
+            sbscr_bgng_dt = #{startDate},           -- [추가] 구독 시작일 저장
+            sbscr_end_dt = #{endDate},              -- [추가] 구독 종료일 저장
+            stlm_cmptn_dt = NOW()                   -- 결제 완료 일시 저장
+        WHERE
+            sbscr_stlm_id = #{orderId}
+	</update>
+	
+	<!-- ✅ [추가] ID로 결제 정보를 조회하는 쿼리 -->
+    <select id="findPaymentById" parameterType="string" resultMap="paymentResultMap">
+        SELECT *
+        FROM subscription_payments
+        WHERE sbscr_stlm_id = #{orderId}
+    </select>
+      
+    
+    <!-- ✅ [추가] ID로 구독 플랜 정보를 조회하는 쿼리 (기존에 있다면 재활용) -->
+    <select id="findPlanById" parameterType="string" resultMap="subscriptionPlanResultMap">
+	    SELECT
+	        sbscr_plan_id,
+	        sbscr_plan_nm,
+	        sbscr_plan_prc,
+	        sbscr_plan_term_val,
+	        sbscr_plan_expln,
+	        sbscr_plan_crt_dt,
+	        sbscr_plan_mdfcn_dt
+	    FROM
+	        subscription_plans
+	    WHERE
+	        sbscr_plan_id = #{planId}
+	</select>
+
+	<!-- 주문 ID로 결제 정보와 '플랜 명칭'을 함께 조회하는 쿼리 -->
+	<select id="findPaymentWithPlanNameByOrderId" parameterType="string"
+            resultType="ks55team02.seller.premiumcheckout.domain.SellerPremiumPaymentDTO">
+        SELECT
+            p.sbscr_stlm_id,
+            p.user_no,
+            p.sbscr_plan_id,
+            p.sbscr_tot_stlm_amt,
+            p.sbscr_stlm_mthd_cd,
+            p.sbscr_bgng_dt,      -- [추가] 구독 시작일
+            p.sbscr_end_dt,       -- [추가] 구독 종료일
+            s.sbscr_plan_nm
+        FROM
+            subscription_payments p
+        LEFT JOIN
+            subscription_plans s ON p.sbscr_plan_id = s.sbscr_plan_id
+        WHERE
+            p.sbscr_stlm_id = #{orderId}
+    </select>
+
+	<select id="findPlanNameByOrderId" parameterType="string" resultType="string">
+        SELECT
+            s.sbscr_plan_nm
+        FROM
+            subscription_payments p
+        JOIN
+            subscription_plans s ON p.sbscr_plan_id = s.sbscr_plan_id
+        WHERE
+            p.sbscr_stlm_id = #{orderId}
+    </select>
+
+</mapper>
