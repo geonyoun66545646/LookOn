@@ -7,7 +7,10 @@ import ks55team02.seller.common.domain.Store;
 import ks55team02.seller.common.domain.TopSellingProduct;
 
 public interface StoreMngService {
+	
+	String getStoreIdBySellerId(String sellerId); // ⭐ 이 메서드를 추가합니다.
 
+	
 	// List<Store> getSotreList();
 	Store getStoreInfoById(String storeId);
 	

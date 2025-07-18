@@ -1,5 +1,7 @@
 package ks55team02.util;
 
+import java.io.File;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -106,24 +108,41 @@ public class FilesUtils {
 	}
 
 	/**
-	 * 지정된 경로의 파일을 삭제합니다.
-	 *
-	 * @param filePath 삭제할 파일의 상대 경로 (fileRealPath를 제외한 부분)
-	 * 예: /attachment/store_images/20231026/image/uuid.jpg
-	 * @return 파일 삭제 성공 여부
-	 */
-	public boolean deleteFileByPath(String filePath) {
-		// fileRealPath를 다시 붙여서 전체 절대 경로를 구성
-		Path deletePath = Paths.get(fileRealPath, filePath);
-		try {
-			System.out.println("삭제 시도 경로: " + deletePath);
-			return Files.deleteIfExists(deletePath); // 파일이 존재하면 삭제하고 true 반환, 없으면 false 반환
-		} catch (Exception e) {
-			e.printStackTrace();
-			// 파일 삭제 실패 시 예외 처리
-			throw new RuntimeException("파일 삭제 실패: " + filePath, e);
-		}
-	}
+     * ⭐ [추가] 지정된 상대 경로의 파일을 삭제합니다.
+     * saveFile 메서드에서 반환된 savedPath를 인자로 받습니다.
+     *
+     * @param savedRelativePath 삭제할 파일의 상대 경로 (예: /attachment/category/20240718/image/uuid.jpg)
+     * @return 파일 삭제 성공 시 true, 파일이 없거나 삭제 실패 시 false
+     */
+    public boolean deleteFile(String savedRelativePath) {
+        if (savedRelativePath == null || savedRelativePath.isBlank()) {
+            return false;
+        }
+
+        // fileRealPath와 상대 경로를 조합하여 전체 절대 경로를 생성
+        // savedRelativePath가 슬래시(/)로 시작하므로, File.separator를 사용하여 OS에 맞게 경로를 조합
+        String fullPath = fileRealPath + savedRelativePath.replace("/", File.separator);
+        File fileToDelete = new File(fullPath);
+
+        try {
+            if (fileToDelete.exists()) {
+                if (fileToDelete.delete()) {
+                    System.out.println("파일 삭제 성공: " + fullPath);
+                    return true;
+                } else {
+                    System.err.println("파일 삭제 실패: " + fullPath);
+                    return false;
+                }
+            } else {
+                System.out.println("삭제할 파일이 존재하지 않음: " + fullPath);
+                return false;
+            }
+        } catch (SecurityException e) {
+            System.err.println("파일 삭제 보안 예외 발생: " + fullPath);
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 	// --- 내부 헬퍼 메서드 ---
 
