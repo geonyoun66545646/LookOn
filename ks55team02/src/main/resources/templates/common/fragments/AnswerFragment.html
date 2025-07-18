@@ -20,11 +20,10 @@
                                 <textarea class="form-control" id="answerContentInput" name="ansCn" rows="5" required
                                           th:text="${isEditMode ? inquiryData.answer.ansCn : ''}"></textarea>
                             </div>
-                            <div class="form-group d-flex justify-content-end mt-3">
+                            <div id="ans-button" class="form-group d-flex justify-content-end mt-3">
                                 <button type="button" id="submitAnswerBtn" class="btn-bottom"
                                         th:text="${isEditMode ? '수정 완료' : '답변 제출'}"></button>
-                                <button type="button" id="cancelAnswerBtn" class="btn-bottom"
-                                        th:if="${isEditMode}">취소</button>
+                                <button type="button" id="cancelAnswerBtn" class="btn-bottom" th:if="${isEditMode}">취소</button>
                             </div>
                         </form>
                     </td>
@@ -36,21 +35,25 @@
     <script th:inline="javascript">
         /* <![CDATA[ */
         document.addEventListener('DOMContentLoaded', function() {
+            const answerHandlingForm = document.getElementById('answerHandlingForm');
             const submitAnswerBtn = document.getElementById('submitAnswerBtn');
             const cancelAnswerBtn = document.getElementById('cancelAnswerBtn');
-            const answerHandlingForm = document.getElementById('answerHandlingForm');
             const answerContentInput = document.getElementById('answerContentInput');
             const answerFormContainer = document.getElementById('answerFormContainer');
+            const answerSection = document.getElementById('answerSection'); // 답변 조회 영역
 
-            // answerApiUrl 변수 추가
-            const answerApiUrl = /*[[${answerApiUrl}]]*/ ''; // 컨트롤러에서 전달받은 API URL
+            // AJAX 요청 URL은 컨트롤러에서 Model에 담아 전달
+            const answerApiUrl = /*[[${answerApiUrl}]]*/ '';
 
             if (submitAnswerBtn) {
                 submitAnswerBtn.addEventListener('click', function() {
                     const ansCn = answerContentInput.value;
                     const inqryId = answerHandlingForm.inqryId.value;
                     const ansId = answerHandlingForm.ansId ? answerHandlingForm.ansId.value : ''; // 수정 모드일 때만 ansId 가져옴
-                    const answrUserNo = 'admin001'; // FIXME: 실제 로그인한 관리자 userNo로 대체 필요
+
+                    // const answrUserNo = 'admin001'; // FIXME: 이 줄은 삭제하거나 주석 처리!
+                    // 백엔드 컨트롤러에서 로그인된 사용자 정보를 자동으로 가져와 처리하므로
+                    // 클라이언트에서 answrUserNo를 보낼 필요가 없습니다.
 
                     if (!ansCn.trim()) {
                         alert('답변 내용을 입력해주세요.');
@@ -59,8 +62,8 @@
 
                     const formData = {
                         inqryId: inqryId,
-                        ansCn: ansCn,
-                        answrUserNo: answrUserNo
+                        ansCn: ansCn
+                        // answrUserNo: answrUserNo // 이 줄도 삭제하거나 주석 처리!
                     };
 
                     if (ansId) {
@@ -70,7 +73,7 @@
                     console.log('AJAX 요청 전송 데이터:', formData);
                     console.log('AJAX 요청 전송 URL:', answerApiUrl);
 
-                    fetch(answerApiUrl, { // ⭐⭐ URL 변경 ⭐⭐
+                    fetch(answerApiUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -78,45 +81,78 @@
                         body: new URLSearchParams(formData).toString()
                     })
                     .then(response => {
-                        console.log('서버 응답:', response);
                         if (!response.ok) {
-                            return response.text().then(text => { throw new Error(text); });
+                            // HTTP 오류 상태 코드 (4xx, 5xx) 처리
+                            return response.json().then(errorData => {
+                                throw new Error(errorData.message || '서버 오류 발생');
+                            });
                         }
                         return response.json();
                     })
                     .then(data => {
-                        console.log('서버로부터 받은 JSON 데이터:', data);
                         if (data.status === 'success') {
                             alert(data.message);
-                            // 답변 내용 업데이트 또는 새로운 답변 표시
-                            const answerContentBody = document.querySelector('.answer-content-row');
-                            // 여기에 답변 내용을 업데이트하는 로직 추가
-                            // 예: answerContentBody.textContent = data.ansCn;
-                            // 혹은 페이지를 새로고침하여 최신 상태 반영
-                            
-                            // 동적으로 답변 내용을 업데이트하는 로직 (선택 사항)
-                            // const updatedAnswerHtml = `
-                            //     <td colspan="3" class="answer-cn">
-                            //         <div id="displayAnswerContent" class="answer-content-box">
-                            //             <p class="answer-content-text">${data.ansCn.replace(/\n/g, '<br>')}</p>
-                            //         </div>
-                            //     </td>
-                            // `;
-                            // if (answerContentBody) {
-                            //     answerContentBody.innerHTML = updatedAnswerHtml;
+                            // 답변 성공 시 처리 로직
+                            // 예를 들어, 답변 조회 영역을 업데이트
+                            // window.location.reload() 대신 동적 업데이트를 시도할 수 있으나,
+                            // 현재는 단순성을 위해 새로고침을 유지합니다.
+
+                            // 현재 답변 조회 영역을 숨기고 답변 폼을 숨깁니다.
+                            // answerSection.style.display = 'block';
+                            answerFormContainer.style.display = 'none';
+
+                            // 기존 답변 내용을 업데이트하거나 추가
+                            // const existingAnswerContent = document.getElementById('displayAnswerContent');
+                            // const existingAnswerTime = document.getElementById('displayAnswerTime');
+                            // const existingModifiedTime = document.getElementById('displayModifiedTime');
+                            // const noAnswerMessageRow = document.getElementById('noAnswerMessageRow');
+
+                            // if (noAnswerMessageRow) {
+                            //     noAnswerMessageRow.remove();
                             // }
-                            
+
+                            // if (existingAnswerContent) {
+                            //     existingAnswerContent.innerHTML = `<p class="answer-content-text">${data.ansCn.replace(/\n/g, '<br>')}</p>`;
+                            //     existingAnswerTime.textContent = data.ansTm;
+                            //     if (data.lastMdfcnDt) {
+                            //         existingModifiedTime.textContent = data.lastMdfcnDt;
+                            //     }
+                            // } else {
+                            //     // 기존 답변이 없었던 경우 새로운 답변 정보 행을 생성하여 추가
+                            //     const newAnswerHtml = `
+                            //         <tr class="answer-info-row">
+                            //             <td class="answer-sub">
+                            //                 <span>답변자 : </span>
+                            //                 <span>${data.answrUserNo}</span>
+                            //             </td>
+                            //             <td class="answer-sub">
+                            //                 <span>작성 시간 : </span>
+                            //                 <span>${data.ansTm}</span>
+                            //             </td>
+                            //             <td class="answer-sub">
+                            //                 <span>수정 시간 : </span>
+                            //                 <span>${data.lastMdfcnDt ? data.lastMdfcnDt : ''}</span>
+                            //             </td>
+                            //         </tr>
+                            //         <tr class="answer-content-row">
+                            //             <td colspan="3" class="answer-cn">
+                            //                 <div id="displayAnswerContent" class="answer-content-box">
+                            //                     <p class="answer-content-text">${data.ansCn.replace(/\n/g, '<br>')}</p>
+                            //                 </div>
+                            //             </td>
+                            //         </tr>
+                            //     `;
                             // answerContentBody.insertAdjacentHTML('beforeend', updatedAnswerHtml);
 
                             const answerHeader = document.getElementById('answer-header');
                             if (answerHeader) {
                                 // inqryId는 inquiryData에서 가져와야 함
-                                const inqryTtl = /*[[${inquiryData.inqryTtl}]]*/ '문의'; 
+                                const inqryTtl = /*[[${inquiryData.inqryTtl}]]*/ '문의';
                                 answerHeader.textContent = `${inqryTtl}에 대한 답변`;
                             }
-                            
+
                             // 페이지 새로고침하여 최종 상태 반영
-                            window.location.reload(); 
+                            window.location.reload();
 
                         } else {
                             console.error('서버에서 반환된 오류 상태:', data);
