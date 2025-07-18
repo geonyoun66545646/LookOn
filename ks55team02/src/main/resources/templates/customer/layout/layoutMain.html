@@ -111,10 +111,15 @@
 
 	<script
 		th:src="@{/maincss/assets/categoryFilterModal/categoryFilterModal.js}"></script>
+		
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 	<!-- <script th:src="@{/maincss/assets/js/customer/feedWriteBtn.js}"></script> 지성 수정 경로에 없다는데 이거 왜있는거야? -->
 	<!-- 이건 따로 빼서 사용할수없어서 여기 있는 거에여 -->
 	<!-- 이스크립트 코드 사용처는 비로그인 사용자 접근 막는 용도 에여 -->
+	
+	
+	
 	<script th:inline="javascript">
 		/*<![CDATA[*/
 		// authAlert 값이 실제로 존재하는 경우에만 세션 클리어 요청을 보냅니다.
@@ -128,6 +133,9 @@
 		}
 		/*]]>*/
 	</script>
+	
+	
+	
 	<th:block layout:fragment="jsScript"></th:block>
 </body>
 </html>

@@ -3,13 +3,13 @@ package ks55team02.admin.inquiry.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param; // @Param 임포트
+import org.apache.ibatis.annotations.Param;
 
 import ks55team02.common.domain.inquiry.Answer;
 import ks55team02.common.domain.inquiry.Inquiry;
 import ks55team02.common.domain.inquiry.InquiryAnswerHistory;
 
-@Mapper // MyBatis 매퍼임을 나타냄
+@Mapper
 public interface AdminInquiryMapper {
 
     // 전체 문의 개수 조회
@@ -25,7 +25,7 @@ public interface AdminInquiryMapper {
     // 문의 상세 조회 (ID 기준)
     Inquiry getInquiryById(String inqryId);
 
-    // 답변 ID의 최대값 조회
+    // 답변 ID의 숫자 부분 중 최댓값을 조회하는 메서드
     Integer getMaxAnsIdNumber();
 
     // 새로운 답변 등록
@@ -42,10 +42,13 @@ public interface AdminInquiryMapper {
         @Param("inqryId") String inqryId,
         @Param("prcsStts") String prcsStts
     );
-    
+
+    // 문의 처리 상태 조회
+    String getInquiryProcessStatus(String inqryId);
+
     // 문의 답변 이력 기록
     int insertInquiryAnswerHistory(InquiryAnswerHistory history);
 
-    // 추가적으로 문의 상태를 조회하는 메서드가 필요할 수도 있음 (serviceImpl 주석 참고)
-    // String getInquiryProcessStatus(String inqryId);
+    // 문의 답변 이력 ID의 최대값 조회
+    Integer getMaxAnsHstryIdNumber();
 }
