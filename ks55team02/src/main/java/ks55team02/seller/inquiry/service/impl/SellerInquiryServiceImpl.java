@@ -32,72 +32,84 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 	@Override
 	public List<Inquiry> getSellerInquiryList(Inquiry inquiry, int limitStart, int pageSize) {
 		log.info("서비스: getSellerInquiryList 호출 - 페이지네이션/검색 조건: {}, limitStart: {}, pageSize: {}", inquiry, limitStart, pageSize);
-		return sellerInquiryMapper.getSellerInquiryList(inquiry,limitStart,pageSize);
+		return sellerInquiryMapper.getSellerInquiryList(inquiry, limitStart, pageSize);
 	}
-	
+
 	@Override
 	public Inquiry getSellerInquiryByStoreId(String inqryId) {
+		log.info("서비스: getSellerInquiryByStoreId 호출 - 문의 ID: {}", inqryId);
 		return sellerInquiryMapper.getSellerInquiryByStoreId(inqryId);
 	}
 
 	@Override
+	public String getSellerUserNoByStoreId(String storeId) {
+		log.info("서비스: getSellerUserNoByStoreId 호출 - 상점 ID: {}", storeId);
+		return sellerInquiryMapper.getSellerUserNoByStoreId(storeId);
+	}
+	
+	@Override
 	@Transactional
 	public Answer registerAnswer(String inqryId, String ansCn, String answrUserNo) {
-		// 현재 ans_ID 중 최대 숫자 부분을 가져옵니다.
-		Integer maxAnsNum = answerMapper.getMaxAnsIdNumber();
-		int nextAnsNum = (maxAnsNum != null) ? maxAnsNum + 1 : 1; // 최대값이 없으면 1부터 시작
-		String ansId = "ans_" + nextAnsNum; // 새로운 ansId 생성
+	    log.info("서비스: registerAnswer 호출 - 문의 ID: {}, 답변 내용: {}, 답변자 번호: {}", inqryId, ansCn, answrUserNo);
 
-		Answer answer = new Answer();
-		answer.setAnsId(ansId);
-		answer.setInqryId(inqryId);
-		answer.setAnswrUserNo(answrUserNo);
-		answer.setAnsCn(ansCn);
-		answer.setAnsTm(LocalDateTime.now());
-		answer.setAnswrTypeCd("SELLER");
-		answer.setRlsYn(true);
-		answer.setActvtnYn(true);
+	    String prcsStts = sellerInquiryMapper.getInquiryProcessStatus(inqryId); // 현재 처리 상태 조회
+	    log.info("서비스: 문의 ID {}의 현재 처리 상태: {}", inqryId, prcsStts);
 
-		log.info("서비스: 답변 등록 시도 - {}", answer);
-		int affectedRows = answerMapper.insertAnswer(answer);
-		if (affectedRows > 0) {
-			log.info("서비스: 답변 등록 성공 - 삽입된 행 수: {}, 답변 ID: {}", affectedRows, ansId);
-			
-			// 문의 처리 상태를 '완료'로 업데이트하기 전, 현재 상태 조회
-			String chgBfrStts = sellerInquiryMapper.getInquiryProcessStatus(inqryId);
-			
-			// 문의 처리 상태를 '완료'로 업데이트
-			sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "완료");
-			log.info("서비스: 문의 처리 상태 '완료'로 업데이트 성공 - 문의 ID: {}", inqryId);
+	    Answer answer = new Answer();
+	    // 답변 ID 생성 로직 (예: ans_1, ans_2...)
+	    Integer maxAnsIdNum = answerMapper.getMaxAnsIdNumber();
+	    int nextAnsIdNum = (maxAnsIdNum != null) ? maxAnsIdNum + 1 : 1;
+	    String ansId = "ans_" + nextAnsIdNum;
+	    answer.setAnsId(ansId);
+	    answer.setInqryId(inqryId);
+	    answer.setAnsCn(ansCn);
+	    answer.setAnswrUserNo(answrUserNo);
+	    answer.setAnsTm(LocalDateTime.now());
+	    answer.setLastMdfcnDt(LocalDateTime.now());
+	    answer.setRlsYn(true); // 기본적으로 공개
+	    answer.setActvtnYn(true); // 기본적으로 활성화
 
-			// 문의 답변 이력 기록
-			Integer maxAnsHstryNum = sellerInquiryMapper.getMaxAnsHstryIdNumber();
-			int nextAnsHstryNum = (maxAnsHstryNum != null) ? maxAnsHstryNum + 1 : 1;
-			String ansHstryId = "ans_hstry_" + nextAnsHstryNum;
+	    int result = answerMapper.insertAnswer(answer);
+	    if (result > 0) {
+	        log.info("서비스: 답변 등록 성공 - 답변 ID: {}", ansId);
 
-			InquiryAnswerHistory history = new InquiryAnswerHistory();
-			history.setAnsHstryId(ansHstryId);
-			history.setAnswerId(ansId);
-			history.setInqryId(inqryId);
-			history.setPrcsUserNo(answrUserNo); // 처리 사용자 번호는 답변자 번호와 동일
-			history.setChgBfrStts(chgBfrStts); // 변경 전 상태
-			history.setChgAftrStts("완료"); // 변경 후 상태
-			history.setChgCn("답변 등록으로 인한 상태 변경"); // 변경 내용
-			// chgDt는 DB에서 NOW()로 자동 설정됩니다.
+	        // 문의 처리 상태 '완료'로 업데이트
+	        sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "완료");
+	        log.info("서비스: 문의 처리 상태 '완료'로 업데이트 성공 - 문의 ID: {}", inqryId);
 
-			sellerInquiryMapper.insertInquiryAnswerHistory(history);
-			log.info("서비스: 문의 답변 이력 기록 성공 - 이력 ID: {}", ansHstryId);
+	        // 문의 답변 이력 기록
+	        Integer maxAnsHstryNum = sellerInquiryMapper.getMaxAnsHstryIdNumber();
+	        int nextAnsHstryNum = (maxAnsHstryNum != null) ? maxAnsHstryNum + 1 : 1;
+	        String ansHstryId = "ans_hstry_" + nextAnsHstryNum;
 
-			return answerMapper.getAnswerById(ansId);
-		} else {
-			log.error("서비스: 답변 등록 실패 - 삽입된 행 수: 0, 답변 객체: {}", answer);
-			throw new RuntimeException("답변 등록에 실패했습니다. 데이터베이스에 삽입되지 않았습니다.");
-		}
+	        InquiryAnswerHistory history = new InquiryAnswerHistory();
+	        history.setAnsHstryId(ansHstryId);
+	        history.setAnswerId(ansId);
+	        history.setInqryId(inqryId);
+	        history.setPrcsUserNo(answrUserNo); // 처리 사용자 번호는 답변자 번호와 동일
+	        history.setChgBfrStts(prcsStts); // 변경 전 상태
+	        history.setChgAftrStts("완료"); // 변경 후 상태
+	        history.setChgCn("새로운 답변 등록으로 인한 상태 변경"); // 변경 내용
+	        // chgDt는 DB에서 NOW()로 자동 설정됩니다.
+
+	        sellerInquiryMapper.insertInquiryAnswerHistory(history);
+	        log.info("서비스: 문의 답변 이력 기록 성공 - 이력 ID: {}", ansHstryId);
+
+	        return answer;
+	    } else {
+	        log.error("서비스: 답변 등록 실패 - 삽입된 행 수: 0");
+	        throw new RuntimeException("답변 등록 실패.");
+	    }
 	}
-
+	
 	@Override
 	@Transactional
 	public Answer updateAnswer(String ansId, String inqryId, String ansCn, String answrUserNo) {
+		log.info("서비스: updateAnswer 호출 - 답변 ID: {}, 문의 ID: {}, 답변 내용: {}, 답변자 번호: {}", ansId, inqryId, ansCn, answrUserNo);
+
+		String chgBfrStts = sellerInquiryMapper.getInquiryProcessStatus(inqryId); // 변경 전 상태 조회
+		log.info("서비스: 문의 ID {}의 변경 전 처리 상태: {}", inqryId, chgBfrStts);
+
 		Answer answer = new Answer();
 		answer.setAnsId(ansId);
 		answer.setInqryId(inqryId);
@@ -105,15 +117,11 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 		answer.setAnswrUserNo(answrUserNo);
 		answer.setLastMdfcnDt(LocalDateTime.now());
 
-		log.info("서비스: 답변 수정 시도 - {}", answer);
-		int affectedRows = answerMapper.updateAnswer(answer);
-		if (affectedRows > 0) {
-			log.info("서비스: 답변 수정 성공 - 업데이트된 행 수: {}, 답변 ID: {}", affectedRows, ansId);
-			
-			// 문의 처리 상태를 '완료'로 업데이트하기 전, 현재 상태 조회
-			String chgBfrStts = sellerInquiryMapper.getInquiryProcessStatus(inqryId);
+		int result = answerMapper.updateAnswer(answer);
+		if (result > 0) {
+			log.info("서비스: 답변 수정 성공 - 답변 ID: {}", ansId);
 
-			// 문의 처리 상태를 '완료'로 업데이트 (수정 시에도 완료 상태 유지 또는 다시 완료로 변경)
+			// 문의 처리 상태 '완료'로 업데이트
 			sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "완료");
 			log.info("서비스: 문의 처리 상태 '완료'로 업데이트 성공 - 문의 ID: {}", inqryId);
 
@@ -137,20 +145,15 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 
 			return answerMapper.getAnswerById(ansId);
 		} else {
-			log.error("서비스: 답변 수정 실패 - 업데이트된 행 수: 0, 답변 객체: {}", answer);
-			throw new RuntimeException("답변 수정에 실패했습니다. 대상 답변이 없거나 업데이트되지 않았습니다.");
+			log.error("서비스: 답변 수정 실패 - 업데이트된 행 수: 0. 답변 ID: {}", ansId);
+			throw new RuntimeException("답변 수정 실패.");
 		}
 	}
 
+	// ⭐ 추가: 로그인 ID로 상점 ID 조회 구현
 	@Override
-	public String getSellerUserNoByStoreId(String storeId) {
-		log.info("서비스: getSellerUserNoByStoreId 호출 - storeId: {}", storeId);
-		return sellerInquiryMapper.getSellerUserNoByStoreId(storeId);
-	}
-	
-	// 문의 처리 상태를 업데이트하는 메서드 구현 (SellerInquiryService 인터페이스에서 추가된 메서드)
-	@Override
-	public void updateInquiryProcessStatus(String inqryId, String prcsStts) {
-	    sellerInquiryMapper.updateInquiryProcessStatus(inqryId, prcsStts);
+	public String getStoreIdByUserLgnId(String userLgnId) {
+		log.info("서비스: getStoreIdByUserLgnId 호출 - 로그인 ID: {}", userLgnId);
+		return sellerInquiryMapper.getStoreIdByUserLgnId(userLgnId);
 	}
 }

@@ -30,104 +30,11 @@
             </nav>
             <div class="page-content">
                 <div class="container">
-                	<div class="inquiryTable">
-                    <form id="inquiryDetailForm">
-                        <table class="table table-bordered">
-                            <tbody>
-                                <tr class="inquiry-row">
-                                    <td th:text="${inquiry.inqryTtl}" colspan="5" scope="row"></td>
-                                </tr>
+                    <div th:insert="~{common/fragments/inquiryDetailFragment :: inquiryDetailFragment(${inquiry})}"></div>
 
-                                <tr class="inquiry-row title-row">
-                                    <td>
-                                        <div class="lock-status-box">
-                                        	<span>비밀글 &nbsp;&nbsp;:</span>
-                                            <span th:text="${inquiry.prvtYn ? '🔒':'🔓'}"></span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                    <span>문의 대상 &nbsp;&nbsp;:</span>&nbsp;
-                                   	<span th:if="${inquiry.inqryTrgtTypeCd == 'STORE'}">상점</span>
-   									<span th:if="${inquiry.inqryTrgtTypeCd == 'ADMIN'}">관리자</span>
-                                    </td>
-                                    <td>
-                                    <span>문의 유형 &nbsp;&nbsp;:</span>&nbsp;
-                                   <span th:if="${inquiry.inqryTypeCd == 'PRODUCT'}">상품</span>
-                                   <span th:if="${inquiry.inqryTypeCd == 'DELIVERY'}">배송</span>
-                                   <span th:if="${inquiry.inqryTypeCd == 'SNS'}">SNS</span>
-                                   <span th:if="${inquiry.inqryTypeCd == 'ETC'}">기타</span>
-                                    </td>
-                                    <td>
-                                    <span>작성자 &nbsp;&nbsp;: </span>
-                                    <span th:text="${inquiry.writerInfo.userNcnm}">작성자</span>
-                                    </td>
-                                    <td>
-                                    <span>작성일&nbsp;&nbsp;: </span>
-                                    <span th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}" th:if="${inquiry.regYmd != null}"></span>
-                                    </td>
-                                </tr>
-                                <tr class="inquiry-row content-row">
-                                    <td colspan="5">
-                                        <div class="inquiry-content-box">
-                                            <p class="inquiry-content-text" th:utext="${#strings.replace(inquiry.inqryCn, '\n', '<br>') ?: '내용 없음'}"></p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        
-                    <div class="inquiry-images-section mt-4">
-					    <h4>첨부 이미지</h4>
-					    <div class="row">
-					        <div class="col-md-4 mb-3" th:each="image : ${inquiry.inquiryImages}">
-					            <img th:src="@{${image.imgAddr}}" alt="첨부 이미지" class="img-fluid rounded shadow-sm">
-					        </div>
-					        <div th:if="${inquiry.inquiryImages == null || inquiry.inquiryImages.isEmpty()}" class="col-12">
-					            <p>첨부된 이미지가 없습니다.</p>
-					        </div>
-					    </div>
-					</div>
-                    </form>
-                    </div>
-
-					<div class="inquiryTable" >
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th colspan="2" id="answer-header" class="table-header" th:text="${inquiry.answer != null ? inquiry.inqryTtl + '에 대한 답변' :'문의가 접수되었습니다'}"></th> <!-- 답변 헤더를 2칸으로 통합 -->
-            </tr>
-        </thead>
-        <tbody>
-            <!-- 답변이 있을 경우에만 이 행들을 표시 -->
-            <tr th:if="${inquiry.answer != null}" class="answer-info-row">
-                <td class="answer-sub"> <!-- 답변자 정보 -->
-                    <span>답변자 : </span>
-                    <span th:text="${inquiry.answer.answrUserNo}">답변자 이름</span>
-                    <!-- TODO: answrUserNo가 사용자 번호이므로, 실제 사용자 닉네임 등을 조회하여 표시하려면
-                                Answer DTO에 answererInfo 같은 association을 추가하고 매퍼에서 JOIN해야 합니다. -->
-                </td >
-                <td class="answer-sub"> <!-- 답변 시간 -->
-                    <span>답변 시간 : </span>
-                    <span th:text="${#temporals.format(inquiry.answer.ansTm, 'yyyy-MM-dd HH:mm')}" th:if="${inquiry.answer.ansTm != null}"></span>
-                </td>
-            </tr>
-            <tr th:if="${inquiry.answer != null}" class="answer-content-row">
-                <td colspan="2" class="answer-cn"> <!-- 답변 내용 -->
-                    <div class="answer-content-box">
-                        <p class="answer-content-text" th:utext="${#strings.replace(inquiry.answer.ansCn, '\n', '<br>') ?: '답변 내용 없음'}"></p>
-                    </div>
-                </td>
-            </tr>
-            <tr th:if="${inquiry.answer == null}">
-                <td colspan="2" class="text-center">빠른 시일 내에 답변드리겠습니다.</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-					
+                    
                     <div class="form-group d-flex justify-content-end mt-4 mb-3">
                      	    <a href="#" class="btn btn-primary btn-rounded">문의 수정</a> 
-	   				<!-- 	    <button type="submit" class="btn btn-primary btn-rounded">문의 수정</button> -->
                             <a th:href="@{/customer/inquiry/inquiryList}" class="btn btn-outline-secondary btn-rounded ml-2">목록으로</a>
                         </div>
                     </div>

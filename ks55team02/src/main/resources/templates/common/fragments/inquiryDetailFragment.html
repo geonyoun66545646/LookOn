@@ -72,7 +72,8 @@
                     <td class="answer-sub">
                         <span>답변자 : </span>
                         <!-- 답변자 스토어 이름을 inquiryData.storeInfo.storeConm에서 가져옵니다. -->
-                        <span id="displayAnswerWriter" th:text="${inquiryData.storeInfo.storeConm ?: inquiryData.answer.answrUserNo}"></span>
+                        <span th:if="${inquiryData.storeInfo != null}" th:text="${inquiryData.storeInfo.storeConm}"></span>
+						<span th:if="${inquiryData.storeInfo == null}" th:text="${inquiryData.answer?.answrUserNo}"></span>
                     </td>
                     <td class="answer-sub">
                         <span>작성 시간 : </span>

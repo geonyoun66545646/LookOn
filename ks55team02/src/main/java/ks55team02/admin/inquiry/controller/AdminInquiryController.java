@@ -124,11 +124,11 @@ public class AdminInquiryController {
         HttpSession session = request.getSession(false); // 기존 세션이 없으면 새로 생성하지 않음 (false)
 
         if (session != null) {
-            LoginUser loginUser = (LoginUser) session.getAttribute("loginAdmin"); // 세션에서 LoginUser 객체 조회
+            LoginUser loginUser = (LoginUser) session.getAttribute("loginUser"); // 세션에서 LoginUser 객체 조회
             // LoginUser 객체에서 userNcnm (사용자 닉네임/이름) 추출
             log.info("로그인 성공: {}", loginUser.getUserNcnm());
             session.setAttribute("loginUser", loginUser);
-            answrUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
+            answrUserNo = (loginUser != null) ? loginUser.getUserNcnm() : null; 
             
             String adminUserNo = loginUser.getUserNo();
             String adminNick = loginUser.getUserNcnm();
