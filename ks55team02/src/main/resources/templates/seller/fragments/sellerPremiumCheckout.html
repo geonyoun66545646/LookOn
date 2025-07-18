@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{seller/layout/layout_main}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프리미엄 멤버십 결제</title>
+<link
+	href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/customcustomercss/premiumCheckout.css}">
+<script src="https://js.tosspayments.com/v1"></script>
+
+<!-- '쌈뽕한' 수량 조절 버튼을 위한 CSS -->
+<style>
+.quantity-selector-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+.quantity-label {
+	font-weight: 500;
+	color: #495057;
+}
+
+.quantity-selector {
+	display: flex;
+	align-items: center;
+	border: 1px solid #dee2e6;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.quantity-selector input[type="number"] {
+	width: 60px;
+	height: 40px;
+	text-align: center;
+	font-size: 1.1em;
+	font-weight: 600;
+	color: #343a40;
+	border: none;
+	border-left: 1px solid #dee2e6;
+	border-right: 1px solid #dee2e6;
+	-moz-appearance: textfield;
+}
+
+.quantity-selector input[type="number"]::-webkit-outer-spin-button,
+	.quantity-selector input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.quantity-selector .quantity-button {
+	width: 40px;
+	height: 40px;
+	background-color: #f8f9fa;
+	border: none;
+	cursor: pointer;
+	font-size: 1.4em;
+	font-weight: 500;
+	color: #495057;
+	transition: background-color 0.2s ease;
+}
+
+.quantity-selector .quantity-button:hover {
+	background-color: #e9ecef;
+}
+</style>
+</head>
+
+<body>
+	<th:block layout:fragment="contents">
+		<div class="page-container">
+			<h2 class="page-title">구독권 결제하기</h2>
+			<p class="page-subtitle">선택하신 구독 플랜의 결제를 완료해주세요.</p>
+
+			<div class="content-wrapper">
+				<div class="checkout-details-panel">
+					<h2 class="panel-title">주문 정보</h2>
+
+					<!-- 수량 선택 UI -->
+					<div class="order-item-display">
+						<span class="item-name" th:text="${planName}">프리미엄 플랜</span>
+						<div class="quantity-selector-wrapper">
+							<label class="quantity-label">수량</label>
+							<div class="quantity-selector">
+								<button type="button" class="quantity-button minus"
+									id="quantity-minus" aria-label="수량 감소">-</button>
+								<input type="number" id="quantity" name="quantity" value="1"
+									min="1" aria-label="수량">
+								<button type="button" class="quantity-button plus"
+									id="quantity-plus" aria-label="수량 증가">+</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- 주문 요약 정보 -->
+					<div class="order-summary-box">
+						<div class="summary-line">
+							<span class="label">상품 단가</span> <span class="value"
+								th:text="${#numbers.formatCurrency(amount)}">0원</span>
+						</div>
+						<div class="summary-line total">
+							<span class="label">총 결제 금액</span>
+							<!-- ✅ [수정 완료] 여기에 id를 정확히 추가했습니다. -->
+							<span class="value highlight" id="dynamic-total-amount"></span>
+						</div>
+					</div>
+
+					<!-- ✅ [수정 완료] '...' 대신 실제 HTML 코드를 복원했습니다. -->
+					<div class="payment-methods-section">
+						<h3 class="section-heading">결제 수단</h3>
+						<div class="payment-options">
+							<label class="payment-option"> <input type="radio"
+								name="payment-method" value="credit-card" checked>
+								신용/체크카드
+							</label> <label class="payment-option"> <input type="radio"
+								name="payment-method" value="bank-transfer"> 계좌이체
+							</label> <label class="payment-option"> <input type="radio"
+								name="payment-method" value="mobile-pay"> 휴대폰 결제
+							</label>
+						</div>
+					</div>
+
+					<div class="terms-agreement-section">
+						<label class="checkbox-container"> <input type="checkbox"
+							id="agree-terms"> <span class="checkmark"></span>
+							<p>
+								서비스 약관 및 결제 내용에 동의합니다. <a href="#" class="link-text">(필수)</a>
+							</p>
+						</label>
+					</div>
+
+					<button class="confirm-button" id="payButton">결제하기</button>
+				</div>
+			</div>
+		</div>
+
+		<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    // 1. Controller로부터 받은 기본 정보를 변수에 할당
+    const tossClientKey = /*[[${tossClientKey}]]*/ 'test_ck_xxxxxxxxxxxx';
+    const planId = /*[[${planId}]]*/ 'default_plan_id';
+    const planName = /*[[${planName}]]*/ '프리미엄 플랜';
+    const baseAmount = /*[[${amount}]]*/ 10000;
+    const userName = /*[[${userName}]]*/ '구매자';
+    const userNo = /*[[${userNo}]]*/ 'defaultUser';
+
+    // 2. HTML 문서가 완전히 로드된 후에 모든 스크립트를 실행
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // 2-1. 수량 조절 기능에 필요한 요소들을 모두 가져옵니다.
+        const quantityInput = document.getElementById('quantity');
+        const totalAmountElement = document.getElementById('dynamic-total-amount');
+        const minusButton = document.getElementById('quantity-minus');
+        const plusButton = document.getElementById('quantity-plus');
+        const maxQuantity = parseInt(quantityInput.max) || 99;
+        const minQuantity = parseInt(quantityInput.min) || 1;
+
+        // 2-2. 총 금액을 계산하고 화면에 실시간으로 업데이트하는 함수
+        function updateTotalAmount() {
+            const quantity = parseInt(quantityInput.value) || 1;
+            const totalAmount = baseAmount * quantity;
+            // totalAmountElement가 null이 아닐 때만 실행하도록 방어 코드 추가
+            if (totalAmountElement) {
+                totalAmountElement.textContent = totalAmount.toLocaleString('ko-KR') + '원';
+            }
+        }
+
+        // 2-3. 이벤트 리스너들을 등록
+        updateTotalAmount();
+        quantityInput.addEventListener('input', updateTotalAmount);
+
+        minusButton.addEventListener('click', () => {
+            let currentValue = parseInt(quantityInput.value);
+            if (currentValue > minQuantity) {
+                quantityInput.value = currentValue - 1;
+                quantityInput.dispatchEvent(new Event('input'));
+            }
+        });
+
+        plusButton.addEventListener('click', () => {
+            let currentValue = parseInt(quantityInput.value);
+            if (currentValue < maxQuantity) {
+                quantityInput.value = currentValue + 1;
+                quantityInput.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // 2-4. '결제하기' 버튼 클릭 시의 최종 로직
+        const tossPayments = TossPayments(tossClientKey);
+        const payButton = document.getElementById('payButton');
+        const customerKey = "customerKey_" + userNo;
+
+        payButton.addEventListener("click", async function() {
+            if (!document.getElementById('agree-terms').checked) {
+                alert('서비스 약관 및 결제 내용에 동의하셔야 합니다.');
+                return;
+            }
+
+            const currentQuantity = parseInt(quantityInput.value) || 1;
+            const currentTotalAmount = baseAmount * currentQuantity;
+
+            const orderRequest = {
+                planId: planId,
+                planName: planName,
+                quantity: currentQuantity,
+                amount: currentTotalAmount
+            };
+
+            try {
+                payButton.disabled = true;
+                payButton.textContent = "주문 처리 중...";
+
+                const response = await fetch('/seller/premium/api/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderRequest)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || '주문 생성에 실패했습니다.');
+                }
+
+                const serverOrderData = await response.json();
+
+                tossPayments.requestPayment('카드', {
+                    orderId: serverOrderData.orderId,
+                    orderName: serverOrderData.orderName,
+                    customerName: serverOrderData.customerName,
+                    amount: serverOrderData.amount,
+                    customerKey: customerKey,
+                    successUrl: window.location.origin + '/seller/premium/success',
+                    failUrl: window.location.origin + '/seller/premium/fail',
+                }).catch(function(error) {
+                    if (error.code !== 'USER_CANCEL') {
+                        alert('결제 중 오류가 발생했습니다: ' + error.message);
+                    }
+                }).finally(() => {
+                    payButton.disabled = false;
+                    payButton.textContent = "결제하기";
+                });
+
+            } catch (error) {
+                alert('오류가 발생했습니다: ' + error.message);
+                payButton.disabled = false;
+                payButton.textContent = "결제하기";
+            }
+        });
+    });
+
+    /*]]>*/
+    </script>
+	</th:block>
+</body>
+</html>
