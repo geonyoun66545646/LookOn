@@ -3,16 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>관리자 로그인</title>
-    <!-- 간단한 스타일링을 위한 CSS (선택사항) -->
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f4; }
-        .login-container { padding: 40px; background-color: white; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 5px; }
-        input { width: 100%; padding: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .error { color: red; margin-top: 10px; }
-    </style>
+    <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/adminLogin.css}">
 </head>
 <body>
     <div class="login-container">
