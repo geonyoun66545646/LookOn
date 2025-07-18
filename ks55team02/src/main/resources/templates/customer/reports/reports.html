@@ -13,20 +13,25 @@
 <th:block layout:fragment="contents">
 	<div class="container">
 		<div class="reports-receive-container">
-		
+
 			<h2>통합 신고하기</h2>
 			<p class="description">신고하시려는 대상 유형과 사유를 선택하고 내용을 상세히 기재해주세요. 모든
 				신고는 신중하게 검토됩니다.</p>
 
 			<form id="reportForm">
-				<div class="form-group full-width">
+				<!-- 이 div에 th:if 조건을 추가합니다 -->
+				<div class="form-group full-width"
+					th:if="${session.loginUser != null}">
 					<div class="form-field full-width">
 						<label>신고하는 계정</label>
-						<!-- TODO: 실제 로그인한 유저 정보를 서버에서 받아와야 함 -->
-						<!-- Thymeleaf를 사용해 로그인 유저의 번호와 닉네임을 data-* 속성에 저장 -->
+						<!-- 이제 이 부분은 th:if 조건 안에서만 렌더링되므로 안전합니다. -->
 						<input type="text"
 							th:value="${session.loginUser.userNcnm} + ' (ID: ' + ${session.loginUser.userLgnId} + ')'"
-							th:data-user-no="${session.loginUser.userNo}" readonly>
+							readonly>
+						<!-- 
+            참고: th:data-user-no 속성은 우리가 JavaScript에서 더 이상 사용하지 않기로 했으므로,
+            코드를 더 깔끔하게 하기 위해 지워도 괜찮습니다. 하지만 그냥 둬도 문제는 없습니다.
+            -->
 					</div>
 				</div>
 
@@ -99,157 +104,142 @@
 </th:block>
 
 
-<th:block layout:fragment="jsFile">
-</th:block>
-
 <th:block layout:fragment="jsScript">
 	<script th:inline="javascript">
-	/*<![CDATA[*/
-	document.addEventListener('DOMContentLoaded', function() {
-		
+/*<![CDATA[*/
+document.addEventListener('DOMContentLoaded', function() {
 
-	    const alertMessage = /*[[${alertMessage}]]*/ null;
-	    const redirectUri = /*[[${redirectUri}]]*/ null;
+    // [1. 추가된 인증 체크 로직]
+    // 페이지 로드 시, 가장 먼저 로그인 상태를 확인합니다.
+    fetch('/api/customer/reports/check-auth')
+        .then(response => {
+            if (response.status === 401) { // 401 Unauthorized 응답을 받으면
+                // 비로그인 상태로 간주하고 SweetAlert 실행
+                Swal.fire({
+                    icon: 'warning',
+                    title: '로그인 필요',
+                    text: '신고 기능은 로그인 후 이용 가능합니다.',
+                    confirmButtonText: '확인'
+                }).then(() => {
+                    // 확인 버튼 클릭 시 로그인 페이지로 이동
+                    window.location.href = '/';
+                });
+                // 아래의 다른 스크립트들이 실행되지 않도록 에러를 발생시켜 중단시킵니다.
+                throw new Error('Not Authenticated');
+            }
+            // 인증된 사용자면 조용히 통과
+            console.log("사용자 인증 완료. 페이지 기능을 활성화합니다.");
+        })
+        .catch(error => {
+            // 인증 실패 또는 네트워크 에러 시, 이후 스크립트 실행을 막기 위함
+            // SweetAlert는 then()에서 이미 처리했으므로, 여기선 콘솔에만 기록합니다.
+            console.error(error.message);
+        });
 
-	    if (alertMessage) {
-	        Swal.fire({
-	            title: '접근 불가',
-	            text: alertMessage,
-	            icon: 'warning',
-	            confirmButtonText: '확인'
-	        }).then(() => {
-	            if (redirectUri) {
-	                window.location.href = redirectUri;
-	            }
-	        });
-	        return; // 아래의 다른 스크립트들이 실행되지 않도록 여기서 함수 종료
-	    }
-		
-	    // 주요 DOM 요소 선택
-	    const reportTypeSelect = document.getElementById('reportType');
-	    const reportReasonSelect = document.getElementById('reportReason');
-	    const contentReportFields = document.getElementById('contentReportFields');
-	    const userReportFields = document.getElementById('userReportFields');
-	    const reportForm = document.getElementById('reportForm');
-	    
-	    // Thymeleaf를 통해 세션의 userNo를 JavaScript 변수로 저장
-	    const loggedInUserNo = /*[[${session.loginUser.userNo}]]*/ null;
+    // 주요 DOM 요소 선택
+    const reportTypeSelect = document.getElementById('reportType');
+    const reportReasonSelect = document.getElementById('reportReason');
+    const contentReportFields = document.getElementById('contentReportFields');
+    const userReportFields = document.getElementById('userReportFields');
+    const reportForm = document.getElementById('reportForm');
 
-	    // --- 여기부터 추가된 부분 ---
+    // [페이지 로드 시 실행] 신고 대상 유형 목록을 동적으로 불러오기
+    fetch('/api/customer/reports/target-types')
+        .then(response => response.json())
+        .then(types => {
+            const typeNames = {
+                'POST': '게시글',
+                'COMMENT': '댓글',
+                'PRODUCT': '상품',
+                'USER': '사용자 계정'
+            };
+            types.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = typeNames[type] || type;
+                reportTypeSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('신고 대상 유형 목록 로딩 실패:', error));
 
-	    // [페이지 로드 시 실행] 신고 대상 유형 목록을 동적으로 불러오기
-	    // 서버에서 받은 ["POST", "COMMENT", "PRODUCT", "USER"] 같은 배열을 옵션으로 만듦
-	    fetch('/api/customer/reports/target-types')
-	        .then(response => response.json())
-	        .then(types => {
-	            // 임시로 한글 이름을 매핑하는 객체 (실제로는 DB에 이름 컬럼이 있는 것이 더 좋음)
-	            const typeNames = {
-	                'POST': '게시글',
-	                'COMMENT': '댓글',
-	                'PRODUCT': '상품',
-	                'USER': '사용자 계정'
-	            };
+    // 초기 상태: 입력 필드 숨기기
+    contentReportFields.style.display = 'none';
+    userReportFields.style.display = 'none';
 
-	            types.forEach(type => {
-	                const option = document.createElement('option');
-	                option.value = type; // 예: "PRODUCT"
-	                option.textContent = typeNames[type] || type; // 한글 이름이 있으면 보여주고, 없으면 그냥 코드값 보여줌
-	                reportTypeSelect.appendChild(option);
-	            });
-	        })
-	        .catch(error => console.error('신고 대상 유형 목록 로딩 실패:', error));
-	    
-	    
+    // 함수: 신고 사유 목록을 서버에서 가져와 업데이트 (변경 없음)
+    function updateReportReasons(targetType) {
+        while (reportReasonSelect.options.length > 1) {
+            reportReasonSelect.remove(1);
+        }
+        if (!targetType) return;
+        fetch(`/api/customer/reports/reasons/${targetType}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('서버에서 신고 사유를 불러오는데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(reasons => {
+                reasons.forEach(reason => {
+                    const option = document.createElement('option');
+                    option.value = reason.dclrRsnCd;
+                    option.textContent = reason.dclrRsnCn;
+                    reportReasonSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching report reasons:', error);
+                Swal.fire('오류', '신고 사유 목록을 불러올 수 없습니다.', 'error');
+            });
+    }
 
-	    // --- 여기까지 추가된 부분 ---
+    // 이벤트 리스너: 신고 대상 유형 변경 시 (변경 없음)
+    reportTypeSelect.addEventListener('change', function() {
+        const selectedValue = this.value;
+        userReportFields.style.display = (selectedValue === 'USER') ? 'block' : 'none';
+        contentReportFields.style.display = (selectedValue && selectedValue !== 'USER') ? 'block' : 'none';
+        updateReportReasons(selectedValue);
+    });
 
+    // 이벤트 리스너: 폼 제출 시
+    reportForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        try {
+            // [2. 수정된 데이터 생성 로직]
+            // 신고자 번호(dclrUserNo)는 더 이상 프론트에서 보내지 않습니다.
+            const reportData = {
+                dclrTrgtTypeCd: reportTypeSelect.value,
+                dclrRsnCd: reportReasonSelect.value,
+                dtlDclrRsnCn: document.getElementById('detailReason').value,
+                dclrTrgtUserNo: (reportTypeSelect.value === 'USER') ? document.getElementById('targetUserId').value : null,
+                dclrTrgtContsId: (reportTypeSelect.value && reportTypeSelect.value !== 'USER') ? document.getElementById('targetContentId').value : null
+            };
 
-	    // 초기 상태: 입력 필드 숨기기
-	    contentReportFields.style.display = 'none';
-	    userReportFields.style.display = 'none';
+            fetch('/api/customer/reports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reportData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    Swal.fire({ title: '접수 완료', text: result.message, icon: 'success' })
+                        .then(() => { window.location.href = '/customer/myReports'; });
+                } else {
+                    Swal.fire('오류 발생', result.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch 에러 발생:', error);
+                Swal.fire('네트워크 오류', '서버와 통신 중 문제가 발생했습니다.', 'error');
+            });
 
-	    // 함수: 신고 사유 목록을 서버에서 가져와 업데이트
-	    function updateReportReasons(targetType) {
-	        // ... (이 부분은 변경 없음)
-	        while (reportReasonSelect.options.length > 1) {
-	            reportReasonSelect.remove(1);
-	        }
-	        if (!targetType) return;
-	        fetch(`/api/customer/reports/reasons/${targetType}`)
-	            .then(response => {
-	                if (!response.ok) {
-	                    throw new Error('서버에서 신고 사유를 불러오는데 실패했습니다.');
-	                }
-	                return response.json();
-	            })
-	            .then(reasons => {
-	                reasons.forEach(reason => {
-	                    const option = document.createElement('option');
-	                    option.value = reason.dclrRsnCd;
-	                    option.textContent = reason.dclrRsnCn;
-	                    reportReasonSelect.appendChild(option);
-	                });
-	            })
-	            .catch(error => {
-	                console.error('Error fetching report reasons:', error);
-	                Swal.fire('오류', '신고 사유 목록을 불러올 수 없습니다.', 'error');
-	            });
-	    }
-
-	    // 이벤트 리스너: 신고 대상 유형 변경 시
-	    reportTypeSelect.addEventListener('change', function() {
-	        // ... (이 부분은 변경 없음)
-	        const selectedValue = this.value;
-	        userReportFields.style.display = (selectedValue === 'USER') ? 'block' : 'none'; // 'user_account' -> 'USER'
-	        contentReportFields.style.display = (selectedValue && selectedValue !== 'USER') ? 'block' : 'none'; // 'user_account' -> 'USER'
-	        updateReportReasons(selectedValue);
-	    });
-
-	    // 이벤트 리스너: 폼 제출 시
-	    reportForm.addEventListener('submit', function(event) {
-	        // ... (이 부분은 변경 없음)
-	        event.preventDefault(); 
-	        console.log('1. "신고 접수" 버튼 클릭 이벤트 감지 성공!'); 
-	        try {
-	            const reportData = {
-	                dclrUserNo: loggedInUserNo,
-	                dclrTrgtTypeCd: reportTypeSelect.value,
-	                dclrRsnCd: reportReasonSelect.value,
-	                dtlDclrRsnCn: document.getElementById('detailReason').value,
-	                dclrTrgtUserNo: (reportTypeSelect.value === 'USER') ? document.getElementById('targetUserId').value : null, // 'user_account' -> 'USER'
-	                dclrTrgtContsId: (reportTypeSelect.value && reportTypeSelect.value !== 'USER') ? document.getElementById('targetContentId').value : null // 'user_account' -> 'USER'
-	            };
-	            console.log('2. 전송할 데이터 수집 완료:', reportData);
-	            console.log('3. fetch API 호출 직전');
-	            fetch('/api/customer/reports', {
-	                method: 'POST',
-	                headers: { 'Content-Type': 'application/json' },
-	                body: JSON.stringify(reportData)
-	            })
-	            .then(response => {
-	                console.log('4. 서버로부터 응답 받음');
-	                return response.json();
-	            })
-	            .then(result => {
-	                console.log('5. 최종 결과 처리:', result);
-	                if (result.success) {
-	                    Swal.fire({ title: '접수 완료', text: result.message, icon: 'success' })
-	                        .then(() => { window.location.href = '/customer/myReports'; });
-	                } else {
-	                    Swal.fire('오류 발생', result.message, 'error');
-	                }
-	            })
-	            .catch(error => {
-	                console.error('6. Fetch 에러 발생:', error);
-	                Swal.fire('네트워크 오류', '서버와 통신 중 문제가 발생했습니다.', 'error');
-	            });
-
-	        } catch (e) {
-	            console.error('7. 데이터 수집 중 심각한 에러 발생:', e);
-	        }
-	    });
-	});
-	/*]]>*/
+        } catch (e) {
+            console.error('데이터 수집 중 심각한 에러 발생:', e);
+        }
+    });
+});
+/*]]>*/
 </script>
 </th:block>
 

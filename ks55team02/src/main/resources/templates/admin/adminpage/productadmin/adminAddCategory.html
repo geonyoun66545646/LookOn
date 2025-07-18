@@ -20,20 +20,21 @@
                             <h4>카테고리 정보</h4>
                         </div>
                         <div class="card-body">
+                            <!-- ⭐ form 태그에 enctype="multipart/form-data" 추가 ⭐ -->
                             <form id="categoryForm" 
                                   th:action="${isUpdate ? '/adminpage/productadmin/updateCategory' : '/adminpage/productadmin/addCategory'}" 
-                                  th:object="${productCategory}" method="post">
+                                  th:object="${productCategory}" method="post"
+                                  enctype="multipart/form-data">
                                 
-                                <!-- 수정 모드일 때만 원본 이름 저장용 hidden input -->
                                 <input th:if="${isUpdate}" type="hidden" id="originalCategoryName" th:value="${productCategory.categoryName}">
 
                                 <div class="mb-4">
                                     <label for="categoryId" class="form-label">카테고리 ID</label>
                                     <span id="categoryIdFeedback" class="text-danger float-right font-sm"></span>
                                     <input type="text" placeholder="예: cat_new" class="form-control" id="categoryId" th:field="*{categoryId}" required
-                                           th:readonly="${isUpdate}"> <!-- 수정 시 ID 변경 불가 -->
+                                           th:readonly="${isUpdate}">
                                     <small class="form-text text-muted" th:if="${!isUpdate}">영문, 숫자, 언더스코어(_)만 사용 가능하며, 중복될 수 없습니다.</small>
-                                    <small class="form-text text-danger" th:if="${isUpdate}">카테고리 ID는 수정할 수 없습니다. (하위 카테고리 및 상품 연결 때문)</small>
+                                    <small class="form-text text-danger" th:if="${isUpdate}">카테고리 ID는 수정할 수 없습니다.</small>
                                 </div>
                                 <div class="mb-4">
                                     <label for="categoryName" class="form-label">카테고리명</label>
@@ -47,10 +48,29 @@
                                         <option th:each="cat : ${topLevelCategories}"
                                                 th:value="${cat.categoryId}"
                                                 th:text="${cat.categoryName}"
-                                                th:disabled="${isUpdate and cat.categoryId == productCategory.categoryId}"></option> <!-- 자기 자신을 부모로 선택 불가 -->
+                                                th:disabled="${isUpdate and cat.categoryId == productCategory.categoryId}"></option>
                                     </select>
                                     <small class="form-text text-muted">상위 카테고리를 선택하면 2차 카테고리로 등록됩니다.</small>
                                 </div>
+                                
+                                <!-- ⭐⭐ 카테고리 이미지 업로드 섹션 추가 ⭐⭐ -->
+                                <div class="mb-4">
+                                    <label for="categoryImageFile" class="form-label">카테고리 이미지 (선택)</label>
+                                    
+                                    <!-- 수정 모드이고 기존 이미지가 있을 때 미리보기 및 삭제 옵션 표시 -->
+                                    <div th:if="${isUpdate and productCategory.categoryImagePath != null and !#strings.isEmpty(productCategory.categoryImagePath)}" class="current-image-preview mb-2">
+                                        <img th:src="@{${productCategory.categoryImagePath}}" alt="Current Category Image" style="max-width: 150px; height: auto; border: 1px solid #ddd; padding: 5px; border-radius: 4px;">
+                                        <div class="form-check mt-2">
+                                            <input type="checkbox" class="form-check-input" id="deleteCategoryImage" name="deleteCategoryImage" value="true">
+                                            <label class="form-check-label" for="deleteCategoryImage">기존 이미지 삭제</label>
+                                        </div>
+                                    </div>
+
+                                    <input type="file" class="form-control" id="categoryImageFile" name="categoryImageFile">
+                                    <small class="form-text text-muted">카테고리 모달에 표시될 이미지를 등록합니다. (권장 사이즈: 200x200)</small>
+                                </div>
+                                <!-- ⭐⭐ 여기까지 추가 ⭐⭐ -->
+                                
                             </form>
                         </div>
                     </div>
@@ -59,26 +79,20 @@
 		</main>
 	</th:block>
 
-    <!-- JavaScript 추가 -->
     <th:block layout:fragment="jsScript">
     <script th:inline="javascript">
         /*<![CDATA[*/
-            // isUpdate 값을 body 태그의 data 속성에 저장
             document.body.dataset.isUpdate = /*[[${isUpdate}]]*/ 'false';
         /*]]>*/
     </script>
     <script>
         $(document).ready(function() {
-            // ⭐ 수정: body의 data 속성에서 isUpdate 값을 읽어옴
             const isUpdate = document.body.dataset.isUpdate === 'true';
 
-            // 카테고리 ID 중복 체크 (등록 시에만)
             $('#categoryId').on('focusout', function() {
-                if (isUpdate) return; // 수정 모드에서는 실행 안 함
-
+                if (isUpdate) return;
                 const categoryId = $(this).val();
                 if (!categoryId) return;
-
                 $.get('/adminpage/productadmin/checkCategoryId', { categoryId: categoryId }, function(isExists) {
                     if (isExists) {
                         $('#categoryIdFeedback').text('*이미 사용중인 ID입니다.');
@@ -88,17 +102,15 @@
                 });
             });
 
-            // 카테고리명 중복 체크
             $('#categoryName').on('focusout', function() {
                 const categoryName = $(this).val();
                 const originalName = $('#originalCategoryName').val() || '';
                 if (!categoryName) return;
-
                 $.get('/adminpage/productadmin/checkCategoryName', { categoryName: categoryName, originalName: originalName }, function(isExists) {
                     if (isExists) {
                         $('#categoryNameFeedback').text('*이미 사용중인 이름입니다.');
                     } else {
-                        $('#categoryNameFeedback').text('');
+                        $('#categoryIdFeedback').text('');
                     }
                 });
             });

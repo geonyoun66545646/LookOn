@@ -5,6 +5,9 @@
 
 <head>
 <meta name="description" content="한국스마트정보교육원 ksmybatis" />
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/css/customadminpagecss/userList.css}">
+
 <style>
 /* 상품 썸네일 이미지 스타일 */
 .product-image {
@@ -33,137 +36,290 @@
 </style>
 </head>
 
-<th:block layout:fragment="jsFile">
+<
+<!-- sellerProductList.html -->
+<th:block layout:fragment="contents">
+	<main class="main-content">
+		<section class="content-header">
+			<h2 class="content-title card-title" th:text="${title}">상품 목록 조회</h2>
+		</section>
+
+		<div class="card mb-4">
+			<div class="card-body">
+				<form id="searchForm" th:action="@{/seller/products/list}"
+					method="get">
+					<input type="hidden" name="currentPage"
+						th:value="${searchCriteria.currentPage}" id="currentPageInput" />
+					<input type="hidden" name="pageSize"
+						th:value="${searchCriteria.pageSize}" id="pageSizeInput" /> <input
+						type="hidden" name="sortKey" th:value="${searchCriteria.sortKey}"
+						id="sortKeyInput" /> <input type="hidden" name="sortOrder"
+						th:value="${searchCriteria.sortOrder}" id="sortOrderInput" /> <input
+						type="hidden" name="filterConditions"
+						th:value="${#strings.arrayJoin(searchCriteria.filterConditions, ',')}"
+						id="filterConditionsInput" />
+
+					<div class="row gx-3">
+						<div class="col-lg-12">
+							<label class="form-label">승인 상태</label>
+							<div class="d-flex align-items-center">
+								<div class="form-check me-4">
+									<input class="form-check-input status-check" type="checkbox"
+										name="filterConditions" value="대기"
+										th:checked="${#lists.contains(searchCriteria.filterConditions, '대기')}">
+									<label class="form-check-label">대기</label>
+								</div>
+								<div class="form-check me-4">
+									<input class="form-check-input status-check" type="checkbox"
+										name="filterConditions" value="승인"
+										th:checked="${#lists.contains(searchCriteria.filterConditions, '승인')}">
+									<label class="form-check-label">승인</label>
+								</div>
+								<div class="form-check me-4">
+									<input class="form-check-input status-check" type="checkbox"
+										name="filterConditions" value="반려"
+										th:checked="${#lists.contains(searchCriteria.filterConditions, '반려')}">
+									<label class="form-check-label">반려</label>
+								</div>
+								<div class="form-check me-4">
+									<input class="form-check-input" type="checkbox"
+										id="filterCheckAll"> <label class="form-check-label">전체선택</label>
+								</div>
+							</div>
+						</div>
+					</div>
+					<hr>
+					<div class="row gx-3 align-items-end">
+						<div class="col-lg-4">
+							<label class="form-label">기간 (등록일)</label>
+							<div class="d-flex">
+								<input type="date" class="form-control" name="startDate"
+									th:value="${searchCriteria.startDate}"> <span
+									class="mx-2 d-flex align-items-center">-</span> <input
+									type="date" class="form-control" name="endDate"
+									th:value="${searchCriteria.endDate}">
+							</div>
+						</div>
+						<div class="col-lg-4">
+							<label class="form-label">검색 키워드</label>
+							<div class="input-group">
+								<select class="form-select" name="searchKey"
+									style="max-width: 120px; background-color: #fff;">
+									<option value="gdsNm"
+										th:selected="${searchCriteria.searchKey == 'gdsNm'}">상품명</option>
+									<option value="gdsNo"
+										th:selected="${searchCriteria.searchKey == 'gdsNo'}">상품번호</option>
+								</select> <input type="text" class="form-control" name="searchValue"
+									placeholder="검색어를 입력하세요"
+									th:value="${searchCriteria.searchValue}">
+							</div>
+						</div>
+						<div class="col-lg-2">
+							<button class="btn btn-primary btn-block" type="submit"
+								id="searchBtn">검색</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<div class="card">
+			<div class="card-body">
+				<div class="row gx-3 align-items-center mb-4">
+					<div class="col-md-6">
+						<div class="search-result-info">
+							총 <b class="text-brand" th:text="${pagination.totalRecordCount}">0</b>
+							건의 상품이 검색되었습니다.
+						</div>
+					</div>
+					<div class="col-md-6 text-md-end">
+						<div class="d-inline-block">
+							<select class="form-select d-inline-block" id="sortOrderSelect"
+								style="width: auto;">
+								<option value="" data-sort-key="regDt" data-sort-order="DESC"
+									th:selected="${searchCriteria.sortKey == 'regDt' and searchCriteria.sortOrder == 'DESC'}">최신
+									등록일순</option>
+								<option value="" data-sort-key="regDt" data-sort-order="ASC"
+									th:selected="${searchCriteria.sortKey == 'regDt' and searchCriteria.sortOrder == 'ASC'}">오래된
+									등록일순</option>
+								<option value="" data-sort-key="gdsNm" data-sort-order="ASC"
+									th:selected="${searchCriteria.sortKey == 'gdsNm' and searchCriteria.sortOrder == 'ASC'}">상품명순</option>
+							</select> <select class="form-select d-inline-block" id="pageSizeSelect"
+								name="pageSize" style="width: auto;">
+								<option value="10"
+									th:selected="${searchCriteria.pageSize == 10}">10개씩 보기</option>
+								<option value="30"
+									th:selected="${searchCriteria.pageSize == 30}">30개씩 보기</option>
+								<option value="50"
+									th:selected="${searchCriteria.pageSize == 50}">50개씩 보기</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead>
+							<tr class="text-center">
+								<th scope="col">상품이미지</th>
+								<th scope="col">상품명</th>
+								<th scope="col">가격</th>
+								<th scope="col">할인율</th>
+								<th scope="col">최종가격</th>
+								<th scope="col">등록일자</th>
+								<th scope="col">승인상태</th>
+								<th scope="col">활성상태</th>
+								<th scope="col">수정/삭제</th>
+							</tr>
+						</thead>
+						<tbody class="text-center">
+							<tr th:if="${#lists.isEmpty(productList)}">
+								<td colspan="9" class="text-center py-5">조회된 상품이 없습니다.</td>
+							</tr>
+							<tr th:unless="${#lists.isEmpty(productList)}"
+								th:each="p : ${productList}">
+								<td><img th:src="@{${p.thumbnailImagePath}}" alt="상품 이미지"
+									class="product-image"
+									onerror="this.onerror=null; this.src='/maincss/assets/images/no_image.jpg';"></td>
+								<td class="product-name" th:text="${p.gdsNm}"></td>
+								<td><span
+									th:text="${#numbers.formatDecimal(p.basPrc, 0, 'COMMA', 0, 'POINT') + '원'}"></span></td>
+								<td><span th:if="${p.dscntRt != null and p.dscntRt > 0}"
+									th:text="${#numbers.formatDecimal(p.dscntRt, 0, 'COMMA', 0, 'POINT') + '%'}"></span>
+									<span th:unless="${p.dscntRt != null and p.dscntRt > 0}">-</span>
+								</td>
+								<td><span
+									th:text="${#numbers.formatDecimal(p.lastSelPrc, 0, 'COMMA', 0, 'POINT') + '원'}"></span></td>
+								<td th:text="${#temporals.format(p.regDt, 'yyyy-MM-dd')}"></td>
+								<td><span class="badge" th:text="${p.latestApprovalStatus}"
+									th:classappend="${p.latestApprovalStatus == '승인' ? 'bg-success' : (p.latestApprovalStatus == '반려' ? 'bg-danger' : 'bg-warning')}"></span></td>
+								<td th:text="${p.actvtnYn ? '활성' : '비활성'}"></td>
+								<td class="text-center action-buttons"><a
+									th:href="@{/seller/products/update/{gdsNo}(gdsNo=${p.gdsNo})}"
+									class="btn btn-warning font-sm text-white">수정</a>
+									<form th:action="@{/seller/products/deactivate}" method="post"
+										style="display: inline;">
+										<input type="hidden" name="gdsNo" th:value="${p.gdsNo}" />
+										<button type="submit"
+											class="btn btn-danger font-sm text-white"
+											onclick="return confirm('이 상품을 삭제(비활성) 처리하시겠습니까?');">삭제</button>
+									</form></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<nav class="mt-4" aria-label="Page navigation"
+					th:if="${pagination.totalRecordCount > 0}">
+					<ul class="pagination justify-content-center">
+						<li class="page-item" th:if="${pagination.existPrevBlock}"><a
+							class="page-link page-num" href="#"
+							th:data-page="${pagination.startPage - 1}">이전</a></li>
+						<li class="page-item"
+							th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+							th:classappend="${page == pagination.currentPage} ? 'active' : ''">
+							<a class="page-link page-num" href="#" th:text="${page}"
+							th:data-page="${page}"></a>
+						</li>
+						<li class="page-item" th:if="${pagination.existNextBlock}"><a
+							class="page-link page-num" href="#"
+							th:data-page="${pagination.endPage + 1}">다음</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</main>
 </th:block>
 
 <th:block layout:fragment="jsScript">
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		const mainContent = $('main.main-content');
+		const searchForm = $('#searchForm');
+		const currentPageInput = $('#currentPageInput');
+		const pageSizeInput = $('#pageSizeInput');
+		const sortKeyInput = $('#sortKeyInput');
+		const sortOrderInput = $('#sortOrderInput');
+		const filterConditionsInput = $('#filterConditionsInput');
+		const statusCheckboxes = $('.status-check');
+		const filterCheckAll = $('#filterCheckAll');
+
+		function submitSearchForm() {
+			const selectedStatuses = [];
+			statusCheckboxes.filter(':checked').each(function() {
+				selectedStatuses.push($(this).val());
+			});
+			filterConditionsInput.val(selectedStatuses.join(','));
+			searchForm.submit();
+		}
+
+		mainContent.on('click', '.page-num', function(e) {
+			e.preventDefault();
+			currentPageInput.val($(this).data('page'));
+			submitSearchForm();
+		});
+
+		$('#pageSizeSelect').on('change', function() {
+			pageSizeInput.val($(this).val());
+			currentPageInput.val(1);
+			submitSearchForm();
+		});
+
+		$('#sortOrderSelect').on('change', function() {
+			const selectedOption = $(this).find('option:selected');
+			sortKeyInput.val(selectedOption.data('sort-key'));
+			sortOrderInput.val(selectedOption.data('sort-order'));
+			currentPageInput.val(1);
+			submitSearchForm();
+		});
+
+		statusCheckboxes.on('change', function() {
+			const allChecked = statusCheckboxes.length === statusCheckboxes
+					.filter(':checked').length;
+			filterCheckAll.prop('checked', allChecked);
+			currentPageInput.val(1);
+		});
+
+		filterCheckAll.on('change', function() {
+			statusCheckboxes.prop('checked', $(this).is(':checked'));
+			currentPageInput.val(1);
+		});
+
+		$(document)
+				.ready(
+						function() {
+							const initialFilterConditions = filterConditionsInput
+									.val();
+							if (initialFilterConditions) {
+								const conditionsArray = initialFilterConditions
+										.split(',');
+								statusCheckboxes.each(function() {
+									$(this).prop(
+											'checked',
+											conditionsArray.includes($(this)
+													.val()));
+								});
+							}
+							const allChecked = statusCheckboxes.length > 0
+									&& statusCheckboxes.length === statusCheckboxes
+											.filter(':checked').length;
+							filterCheckAll.prop('checked', allChecked);
+
+							const initialSortKey = /*[[${searchCriteria.sortKey}]]*/'regDt';
+							const initialSortOrder = /*[[${searchCriteria.sortOrder}]]*/'DESC';
+							$('#sortOrderSelect option')
+									.each(
+											function() {
+												if ($(this).data('sort-key') === initialSortKey
+														&& $(this).data(
+																'sort-order') === initialSortOrder) {
+													$(this).prop('selected',
+															true);
+													return false;
+												}
+											});
+						});
+		/*]]>*/
+	</script>
 </th:block>
-
-<th:block layout:fragment="contents">
-
-	<div class="content-header">
-		<div>
-			<h2 class="content-title card-title" th:text="${title}">상품목록조회</h2>
-		</div>
-		<div class="content-header-right">
-			<a href="/seller/products/registration" class="btn btn-primary">
-				<i class="material-icons md-plus"></i>상품 등록
-			</a>
-		</div>
-	</div>
-
-
-	<div class="card mb-4">
-		<header class="card-header">
-			<div class="row gx-3">
-				<div class="col-lg-4 col-md-6 me-auto">
-					<input type="text" placeholder="Search..." class="form-control" />
-				</div>
-				<div class="col-lg-2 col-6 col-md-3">
-					<select class="form-select">
-						<option>Status</option>
-						<option>Active</option>
-						<option>Disabled</option>
-						<option>Show all</option>
-					</select>
-				</div>
-				<div class="col-lg-2 col-6 col-md-3">
-					<select class="form-select">
-						<option>Show 20</option>
-						<option>Show 30</option>
-						<option>Show 40</option>
-					</select>
-				</div>
-			</div>
-		</header>
-		<div class="card-body">
-			<div class="table-responsive">
-				<table class="table table-hover">
-					<thead>
-						<tr class="text-center">
-							<th scope="col">
-								<div class="form-check align-middle">
-									<input type="checkbox" class="form-check-input" id="allCheck" />
-								</div>
-							</th>
-							<th scope="col">상품이미지</th>
-							<th scope="col">상품명</th>
-							<th scope="col">가격</th>
-							<th scope="col">할인율</th>
-							<th scope="col">최종가격</th>
-							<th scope="col">등록일자</th>
-							<th scope="col">승인상태</th>
-							<th scope="col">활성상태</th>
-							<th scope="col">수정/삭제</th>
-						</tr>
-					</thead>
-					<tbody class="text-center">
-						<tr th:if="${not #lists.isEmpty(productList)}"
-							th:each="p : ${productList}">
-							<td>
-								<div class="form-check align-middle">
-									<input type="checkbox" class="form-check-input checkId"
-										th:value="${p.gdsNo}" />
-								</div>
-							</td>
-							<td><img th:src="@{${p.thumbnailImagePath}}" alt="상품 이미지"
-								class="product-image"></td>
-							<td class="product-name" th:text="${p.gdsNm}">상품명</td>
-							<td><span
-								th:text="${#numbers.formatDecimal(p.basPrc, 0, 'COMMA', 0, 'POINT') + '원'}"
-								class="original-price">12,000원</span></td>
-							<td><span th:if="${p.dscntRt != null and p.dscntRt > 0}"
-								th:text="${#numbers.formatDecimal(p.dscntRt, 0, 'COMMA', 0, 'POINT') + '%'}"
-								class="discount-rate">10%</span> <span
-								th:unless="${p.dscntRt != null and p.dscntRt > 0}">-</span></td>
-							<td><span
-								th:text="${#numbers.formatDecimal(p.lastSelPrc, 0, 'COMMA', 0, 'POINT') + '원'}"
-								class="final-price">10,800원</span></td>
-							<td th:text="${#temporals.format(p.regDt, 'yyyy-MM-dd')}">2023-01-01</td>
-							<!-- expsr_yn이 실질적인 '승인' 상태를 나타냅니다. -->
-							<td>
-								<span class="badge"
-									  th:text="${p.latestApprovalStatus}"
-									  th:classappend="${p.latestApprovalStatus == '승인' ? 'bg-success' : (p.latestApprovalStatus == '반려' ? 'bg-danger' : 'bg-warning')}">
-								</span>
-							</td>
-							<!-- actvtn_yn은 판매자 관리 목록에서의 '활성' 상태입니다. -->
-							<td th:text="${p.actvtnYn ? '활성' : '비활성'}"></td>
-							<td class="text-center action-buttons">
-								<!-- 수정 버튼: 링크는 이전에 만든 컨트롤러 주소 /seller/products/update/{gdsNo}로 변경 -->
-								<a
-								th:href="@{/seller/products/update/{gdsNo}(gdsNo=${p.gdsNo})}"
-								class="btn btn-warning font-sm text-white">수정</a> <!-- 삭제 버튼: POST 요청을 보내기 위해 <form>으로 감싸줍니다. -->
-								<form th:action="@{/seller/products/deactivate}" method="post"
-									style="display: inline;">
-									<!-- 삭제할 상품의 ID를 hidden input으로 함께 전송합니다. -->
-									<input type="hidden" name="gdsNo" th:value="${p.gdsNo}" />
-
-									<!-- 삭제 확인 JavaScript 경고창을 추가합니다. -->
-									<button type="submit" class="btn btn-danger font-sm text-white"
-										onclick="return confirm('이 상품을 삭제(비활성) 처리하시겠습니까? 판매자 목록에서 사라집니다.');">
-										삭제</button>
-								</form>
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-	<div class="pagination-area mt-15 mb-50 d-flex justify-content-center">
-		<nav aria-label="Page navigation example">
-			<ul class="pagination justify-content-start">
-				<li class="page-item active"><a class="page-link" href="#">01</a></li>
-				<li class="page-item"><a class="page-link" href="#">02</a></li>
-				<li class="page-item"><a class="page-link" href="#">03</a></li>
-				<li class="page-item"><a class="page-link dot" href="#">...</a></li>
-				<li class="page-item"><a class="page-link" href="#">16</a></li>
-				<li class="page-item"><a class="page-link" href="#"><i
-						class="material-icons md-chevron_right"></i></a></li>
-			</ul>
-		</nav>
-	</div>
-</th:block>
-
 </html>
