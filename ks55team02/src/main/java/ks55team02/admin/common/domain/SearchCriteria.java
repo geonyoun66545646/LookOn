@@ -14,6 +14,7 @@ public class SearchCriteria {
     private int pageSize = 10;
     private int offset;
     private String sortOrder;
+    private String sortKey;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -24,4 +25,8 @@ public class SearchCriteria {
     
     // ⭐ 추가: 카테고리 레벨 필터링 (예: [1, 2])
     private List<Integer> levels; 
+    
+    // 스토어
+    private String storeId; 
+    private String selUserNo; 
 }

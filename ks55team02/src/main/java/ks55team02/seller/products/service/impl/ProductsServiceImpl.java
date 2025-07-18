@@ -1,9 +1,33 @@
 package ks55team02.seller.products.service.impl;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory;
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.mapper.AdminProductManagementMapper;
-import ks55team02.seller.products.domain.*;
+import ks55team02.admin.common.domain.Pagination;
+import ks55team02.admin.common.domain.SearchCriteria;
+import ks55team02.seller.products.domain.ProductImage;
+import ks55team02.seller.products.domain.ProductImageType;
+import ks55team02.seller.products.domain.ProductOption;
+import ks55team02.seller.products.domain.ProductOptionValue;
+import ks55team02.seller.products.domain.ProductRegistrationRequest;
 import ks55team02.seller.products.domain.ProductRegistrationRequest.ProductCombinationData;
+import ks55team02.seller.products.domain.ProductStatus;
+import ks55team02.seller.products.domain.Products;
+import ks55team02.seller.products.domain.StatusOptionMapping;
 import ks55team02.seller.products.mapper.ProductOptionMapper;
 import ks55team02.seller.products.mapper.ProductsMapper;
 import ks55team02.seller.products.service.ProductsService;
@@ -11,19 +35,8 @@ import ks55team02.seller.stores.domain.Stores;
 import ks55team02.seller.stores.mapper.StoreMapper;
 import ks55team02.util.FileDetail;
 import ks55team02.util.FilesUtils;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +49,6 @@ public class ProductsServiceImpl implements ProductsService {
 	private final FilesUtils filesUtils;
 	private final AdminProductManagementMapper adminProductManagementMapper;
 	
-	/**
-     * 특정 상품의 모든 옵션 조합(gds_stts_no)과 그에 속한 옵션 값(opt_vl_no)들을 조회
-     */
     @Override
     public List<Map<String, Object>> getProductStatusOptions(String gdsNo) {
         return productsMapper.selectProductStatusOptions(gdsNo);
@@ -85,7 +95,7 @@ public class ProductsServiceImpl implements ProductsService {
 		ProductApprovalHistory initialHistory = new ProductApprovalHistory();
 		initialHistory.setAprvRjctHstryCd(newHistoryCode);
 		initialHistory.setGdsNo(gdsNo);
-		initialHistory.setPrcsMngrId(request.getSelUserNo()); // 판매자 ID를 처리자로 설정
+		initialHistory.setPrcsMngrId(request.getSelUserNo());
 		initialHistory.setAprvSttsCd("대기");
 		initialHistory.setPrcsDt(LocalDateTime.now());
 		initialHistory.setAprvRjctCycl(1); // 최초 등록은 무조건 1차수
@@ -220,11 +230,18 @@ public class ProductsServiceImpl implements ProductsService {
 	}
 
 	@Override
-	public List<Products> getProductsBySellerAndStore(String selUserNo, String storeId) {
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("selUserNo", selUserNo);
-		paramMap.put("storeId", storeId);
-		return productsMapper.getProductsBySellerAndStore(paramMap);
+	public Map<String, Object> getProductsBySellerAndStore(SearchCriteria searchCriteria) {
+	    int productListCount = productsMapper.getSearchedProductListCount(searchCriteria);
+	    Pagination pagination = new Pagination(productListCount, searchCriteria);
+	    searchCriteria.setOffset(pagination.getLimitStart());
+	    
+	    List<Products> productList = productsMapper.getSearchedProductList(searchCriteria);
+	    
+	    Map<String, Object> resultMap = new HashMap<>();
+	    resultMap.put("pagination", pagination);
+	    resultMap.put("productList", productList);
+	    
+	    return resultMap;
 	}
 
 	@Override

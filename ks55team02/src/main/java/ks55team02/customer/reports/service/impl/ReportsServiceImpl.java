@@ -1,10 +1,21 @@
 package ks55team02.customer.reports.service.impl;
 
+// --- [ 1. 수정된 Import 목록 ] ---
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.multipart.MultipartFile;
+import ks55team02.customer.reports.domain.ReportAttachment;
 import ks55team02.customer.reports.domain.Reports;
 import ks55team02.customer.reports.domain.ReportsReasons;
 import ks55team02.customer.reports.mapper.ReportsMapper;
@@ -14,44 +25,72 @@ import ks55team02.customer.reports.service.ReportsService;
 @Transactional
 public class ReportsServiceImpl implements ReportsService {
 
-	private final ReportsMapper reportsMapper;
+    // --- [ 2. 추가된 멤버 변수 ] ---
+    private static final Logger log = LoggerFactory.getLogger(ReportsServiceImpl.class);
+    @Value("${file.path}")
+    private String fileRealPath;
 
-	// 생성자 주입 (Constructor Injection)
-	public ReportsServiceImpl(ReportsMapper reportsMapper) {
-		this.reportsMapper = reportsMapper;
-	}
+    private final ReportsMapper reportsMapper;
 
-	@Override
-	public List<String> getReportTargetTypeList() {
-		return reportsMapper.getReportTargetTypeList();
-	}
+    public ReportsServiceImpl(ReportsMapper reportsMapper) {
+        this.reportsMapper = reportsMapper;
+    }
 
-	@Override
-	public List<ReportsReasons> getActiveReportReasonList(String targetType) {
-		// 별도의 비즈니스 로직 없이 Mapper 호출만으로 충분
-		return reportsMapper.getActiveReportReasonList(targetType);
-	}
+    @Override
+    public List<String> getReportTargetTypeList() {
+        return reportsMapper.getReportTargetTypeList();
+    }
 
-	@Override
-	public void addReport(Reports report) {
-		// [핵심 비즈니스 로직]
-		// 1. 새로운 신고 ID 생성 (RPT_ID_XXX 형식)
-		String latestId = reportsMapper.getLatestReportId(); // DB에서 가장 마지막 ID 가져오기
-		int newIdNum = 1;
+    @Override
+    public List<ReportsReasons> getActiveReportReasonList(String targetType) {
+        return reportsMapper.getActiveReportReasonList(targetType);
+    }
 
-		if (latestId != null && latestId.startsWith("RPT_ID_")) {
-			// 마지막 ID가 존재하면, 숫자 부분만 잘라내서 1을 더함
-			String numericPart = latestId.substring(7); // "RPT_ID_" 다음부터 자르기
-			newIdNum = Integer.parseInt(numericPart) + 1;
-		}
+    // --- [ 3. 로직이 추가된 addReport 메소드 ] ---
+    @Override
+    public void addReport(Reports report, List<MultipartFile> evidenceFiles) throws IOException {
 
-		// 새로운 ID를 3자리 숫자로 포맷팅 (예: 1 -> "001", 12 -> "012")
-		String newReportId = String.format("RPT_ID_%03d", newIdNum);
+        String latestId = reportsMapper.getLatestReportId();
+        int newIdNum = 1;
+        if (latestId != null && latestId.startsWith("RPT_ID_")) {
+            String numericPart = latestId.substring(7);
+            newIdNum = Integer.parseInt(numericPart) + 1;
+        }
+        String newReportId = String.format("RPT_ID_%03d", newIdNum);
+        report.setDclrId(newReportId);
 
-		report.setDclrId(newReportId);
+        reportsMapper.addReport(report);
 
-		// 2. Mapper를 통해 DB에 신고 정보 INSERT
-		reportsMapper.addReport(report);
-	}
+        if (evidenceFiles != null && !evidenceFiles.isEmpty()) {
+            for (MultipartFile file : evidenceFiles) {
+                if (file.isEmpty()) continue;
 
+                String saveDirectory = fileRealPath + "/attachment/reports";
+                String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
+                String dateDirectory = saveDirectory + "/" + today;
+
+                File dir = new File(dateDirectory);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+
+                String originalFilename = file.getOriginalFilename();
+                String uniqueFilename = UUID.randomUUID().toString() + "_" + originalFilename;
+
+                Path filePath = Paths.get(dateDirectory, uniqueFilename);
+                file.transferTo(filePath);
+
+                ReportAttachment attachment = new ReportAttachment();
+                attachment.setFileId(UUID.randomUUID().toString());
+                attachment.setDclrId(newReportId);
+                attachment.setOriginalFilename(originalFilename);
+                attachment.setFilePath("/attachment/reports/" + today + "/" + uniqueFilename);
+                attachment.setFileSize(file.getSize());
+
+                // ※ 아직 ReportsMapper에 이 메소드가 없어서 여기서 오류가 날 겁니다.
+                //   다음 단계에서 바로 추가할 예정입니다.
+                reportsMapper.insertReportAttachment(attachment);
+            }
+        }
+    }
 }

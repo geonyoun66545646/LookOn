@@ -83,7 +83,7 @@ public class StoreImageServiceImpl implements StoreImageService {
     public void deleteStoreImage(StoreImage storeImage) {
         // 실제 파일 삭제 (FilesUtils 사용)
         String fullPath = storeImage.getImgAddr();
-        Boolean isDeleted = filesUtils.deleteFileByPath(fullPath);
+        Boolean isDeleted = filesUtils.deleteFile(fullPath);
 
         if (isDeleted) {
             // 데이터베이스에서 del_yn을 1로 업데이트 (실제 삭제 대신 논리적 삭제)
