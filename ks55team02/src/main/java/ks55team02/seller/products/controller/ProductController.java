@@ -1,21 +1,29 @@
 package ks55team02.seller.products.controller;
 
-import ks55team02.seller.products.domain.ProductRegistrationRequest;
-import ks55team02.seller.products.service.ProductsService;
-import ks55team02.seller.products.domain.ProductCategory;
-import ks55team02.seller.products.service.ProductCategoryService;
-import ks55team02.seller.products.domain.Products;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession; // HttpSession import
+import ks55team02.customer.login.domain.LoginUser; // LoginUser import
+import ks55team02.seller.common.service.impl.StoreMngService;
+import ks55team02.seller.products.domain.ProductCategory;
+import ks55team02.seller.products.domain.ProductRegistrationRequest;
+import ks55team02.seller.products.domain.Products;
+import ks55team02.seller.products.service.ProductCategoryService;
+import ks55team02.seller.products.service.ProductsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/seller/products")
@@ -25,14 +33,31 @@ public class ProductController {
 	
     private final ProductsService productsService;
     private final ProductCategoryService productCategoryService;
+    private final StoreMngService storeMngService;
 
     // 상품 등록 폼
     @GetMapping("/registration")
-    public String registerProductForm(Model model) {
-        model.addAttribute("productRegistrationRequest", new ProductRegistrationRequest());
-        List<ProductCategory> primaryProductCategories = productCategoryService.getAllTopLevelCategories();
-        model.addAttribute("primaryProductCategories", primaryProductCategories);
+    public String registerProductForm(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "로그인이 필요합니다.");
+            return "redirect:/seller/login";
+        }
         
+        String selUserNo = loginUser.getUserNo();
+        String storeId = storeMngService.getStoreIdBySellerId(selUserNo);
+        
+        if (storeId == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "상점 정보가 없습니다. 상점 신청을 완료해주세요.");
+            return "redirect:/seller";
+        }
+
+        ProductRegistrationRequest requestDto = new ProductRegistrationRequest();
+        requestDto.setSelUserNo(selUserNo);
+        requestDto.setStoreId(storeId);
+        
+        model.addAttribute("productRegistrationRequest", requestDto);
+        model.addAttribute("primaryProductCategories", productCategoryService.getAllTopLevelCategories());
         model.addAttribute("isUpdate", false);
         return "seller/products/sellerProductRegistration";
     }
@@ -43,17 +68,23 @@ public class ProductController {
                                   @RequestParam(value = "thumbnailImage", required = false) List<MultipartFile> thumbnailImage,
                                   @RequestParam(value = "mainImage", required = false) List<MultipartFile> mainImage,
                                   @RequestParam(value = "detailImage", required = false) List<MultipartFile> detailImage,
-                                  RedirectAttributes redirectAttributes) {
+                                  RedirectAttributes redirectAttributes,
+                                  HttpSession session) {
         try {
+            LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+            if (loginUser == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "세션이 만료되었거나 로그인이 필요합니다.");
+                return "redirect:/seller/login";
+            }
+
             productRegistrationRequest.setThumbnailImage(thumbnailImage);
             productRegistrationRequest.setMainImage(mainImage);
             productRegistrationRequest.setDetailImage(detailImage);
-
             productRegistrationRequest.calculateFinalPrice();
             
-            // TODO: 로그인 유저 정보로 대체할 것
-            productRegistrationRequest.setStoreId("store_1");
-            productRegistrationRequest.setSelUserNo("user_no_150");
+            // 하드코딩된 값 교체
+            productRegistrationRequest.setStoreId(storeMngService.getStoreIdBySellerId(loginUser.getUserNo()));
+            productRegistrationRequest.setSelUserNo(loginUser.getUserNo());
 
             productsService.addProduct(productRegistrationRequest);
 
@@ -61,8 +92,7 @@ public class ProductController {
             return "redirect:/seller/products/list";
 
         } catch (Exception e) {
-            System.err.println("상품 등록 중 오류 발생: " + e.getMessage());
-            e.printStackTrace();
+            log.error("상품 등록 중 오류 발생", e);
             redirectAttributes.addFlashAttribute("errorMessage", "상품 등록에 실패했습니다: " + e.getMessage());
             return "redirect:/seller/products/registration";
         }
@@ -70,7 +100,8 @@ public class ProductController {
 
     // 상품 수정 폼
     @GetMapping("/update/{gdsNo}")
-    public String updateProductForm(@PathVariable("gdsNo") String gdsNo, Model model) {
+    public String updateProductForm(@PathVariable("gdsNo") String gdsNo, Model model, HttpSession session) {
+        // TODO: 로그인된 판매자의 상품이 맞는지 권한 체크 로직 추가 필요
         Products product = productsService.getProductDetailWithImages(gdsNo);
         if(product == null) {
             return "redirect:/error/404";
@@ -98,10 +129,7 @@ public class ProductController {
         model.addAttribute("productData", product);
         model.addAttribute("productRegistrationRequest", requestDto);
         model.addAttribute("isUpdate", true);
-
-        List<ProductCategory> primaryProductCategories = productCategoryService.getAllTopLevelCategories();
-        model.addAttribute("primaryProductCategories", primaryProductCategories);
-
+        model.addAttribute("primaryProductCategories", productCategoryService.getAllTopLevelCategories());
         return "seller/products/sellerProductRegistration";
     }
 
@@ -113,29 +141,25 @@ public class ProductController {
             @RequestParam(value = "thumbnailImage", required = false) List<MultipartFile> thumbnailImage,
             @RequestParam(value = "mainImage", required = false) List<MultipartFile> mainImage,
             @RequestParam(value = "detailImage", required = false) List<MultipartFile> detailImage,
-            RedirectAttributes redirectAttributes) {
-    	
-    	
-    	// ========================> 디버깅 로그 추가 <========================
-        log.info("============== [Controller] Paramerter Check ==============");
-        if (deletedImageIds != null) {
-            log.info("deletedImageIds의 타입: {}", deletedImageIds.getClass().getName());
-            log.info("deletedImageIds의 내용: {}", deletedImageIds);
-            log.info("deletedImageIds의 첫번째 요소: {}", deletedImageIds.isEmpty() ? "비어있음" : deletedImageIds.get(0));
-        } else {
-            log.info("deletedImageIds가 null입니다.");
-        }
-        log.info("==========================================================");
-        // ====================================================================
+            RedirectAttributes redirectAttributes,
+            HttpSession session) {
     	
         try {
+            LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+            if (loginUser == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "세션이 만료되었거나 로그인이 필요합니다.");
+                return "redirect:/seller/login";
+            }
+            
         	productUpdateRequest.setDeletedImageIds(deletedImageIds);
             productUpdateRequest.setThumbnailImage(thumbnailImage);
             productUpdateRequest.setMainImage(mainImage);
             productUpdateRequest.setDetailImage(detailImage);
             productUpdateRequest.calculateFinalPrice();
-            productUpdateRequest.setSelUserNo("user_no_150");
-            productUpdateRequest.setStoreId("store_1");
+            
+            // 하드코딩된 값 교체
+            productUpdateRequest.setSelUserNo(loginUser.getUserNo());
+            productUpdateRequest.setStoreId(storeMngService.getStoreIdBySellerId(loginUser.getUserNo()));
             
             productsService.updateProduct(productUpdateRequest);
             
@@ -143,8 +167,7 @@ public class ProductController {
             return "redirect:/seller/products/list";
 
         } catch (Exception e) {
-            System.err.println("상품 수정 중 오류 발생: " + e.getMessage());
-            e.printStackTrace();
+            log.error("상품 수정 중 오류 발생", e);
             redirectAttributes.addFlashAttribute("errorMessage", "상품 수정에 실패했습니다: " + e.getMessage());
             return "redirect:/seller/products/update/" + productUpdateRequest.getGdsNo();
         }
@@ -152,26 +175,41 @@ public class ProductController {
 
     // 판매자 상품 목록
     @GetMapping("/list")
-    public String myProductList(Model model) {
-        String selUserNoToFilter = "user_no_150"; 
-        String storeIdToFilter = "store_1";       
+    public String myProductList(Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "로그인이 필요합니다.");
+            return "redirect:/seller/login";
+        }
         
-        List<Products> productList = productsService.getProductsBySellerAndStore(selUserNoToFilter, storeIdToFilter);
-
+        String selUserNo = loginUser.getUserNo();
+        String storeId = storeMngService.getStoreIdBySellerId(selUserNo);
+        
+        if (storeId == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "상점 정보가 없습니다. 상점 신청을 완료해주세요.");
+            return "redirect:/seller";
+        }
+        
+        List<Products> productList = productsService.getProductsBySellerAndStore(selUserNo, storeId);
+        
         model.addAttribute("productList", productList);
         return "seller/products/sellerProductList";
     }
     
     // 상품 삭제(비활성) 처리
     @PostMapping("/deactivate")
-    public String deactivateProduct(@RequestParam("gdsNo") String gdsNo, RedirectAttributes redirectAttributes) {
+    public String deactivateProduct(@RequestParam("gdsNo") String gdsNo, RedirectAttributes redirectAttributes, HttpSession session) {
         try {
-            String selUserNo = "user_no_150"; 
-            productsService.deactivateProduct(gdsNo, selUserNo);
+            LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+            if (loginUser == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "세션이 만료되었거나 로그인이 필요합니다.");
+                return "redirect:/seller/login";
+            }
+            // TODO: 해당 상품이 정말 이 판매자의 상품인지 권한 체크 로직 추가 필요
+            productsService.deactivateProduct(gdsNo, loginUser.getUserNo());
             redirectAttributes.addFlashAttribute("message", "상품이 삭제되었습니다.");
         } catch (Exception e) {
-            System.err.println("상품 삭제 중 오류 발생: " + e.getMessage());
-            e.printStackTrace();
+            log.error("상품 삭제 중 오류 발생", e);
             redirectAttributes.addFlashAttribute("errorMessage", "상품 삭제에 실패했습니다.");
         }
         return "redirect:/seller/products/list";

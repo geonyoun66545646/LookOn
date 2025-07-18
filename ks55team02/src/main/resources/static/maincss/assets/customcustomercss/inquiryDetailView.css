@@ -155,3 +155,20 @@ body {
 	font-weight: 500;
     color: #495057;
 }
+.answer-info-row td {
+    width: 33.33%; /* 각 셀이 전체 너비의 1/3을 차지하도록 설정 */
+    box-sizing: border-box; /* padding과 border가 width에 포함되도록 설정 */
+    vertical-align: top; /* 내용이 위쪽에 정렬되도록 (선택 사항) */
+}
+
+/* 필요에 따라 추가적인 스타일링 */
+.answer-info-row .answer-sub {
+    padding: 8px 15px; /* 내부 여백 */
+    /* border-right: 1px solid #dee2e6; /* 셀 구분선 (선택 사항) */
+}
+
+.btn-fixed-width {
+    min-width: 100px; /* '수정 완료' 버튼의 너비에 맞춰 이 값을 조절하세요. */
+    text-align: center; /* 텍스트가 이 최소 너비 안에서 가운데 정렬되도록 다시 한번 명시 */
+}
+
