@@ -28,7 +28,6 @@
 						</a>
 					</nav>
 				</div>
-
 				<div class="member-coupon__search">
 					<div class="custom-input-form">
 						<input type="text" id="coupon-search-input"
@@ -137,13 +136,24 @@
             couponListContainer.innerHTML = '<li><p class="text-center p-5">로딩 중...</p></li>';
 
             fetch(`${apiUrl}?${params.toString()}`)
-                .then(response => {
-                    if (response.status === 401) {
-                        Swal.fire('로그인 필요', '이 기능을 사용하려면 로그인이 필요합니다.', 'warning');
-                        throw new Error('UNAUTHORIZED');
-                    }
-                    return response.json().then(data => ({ ok: response.ok, data: data }));
-                })
+            .then(response => {
+                if (response.status === 401) {
+                    // [수정] Swal.fire에 객체 형태로 옵션을 전달하고 .then()을 추가합니다.
+                    Swal.fire({
+                        title: '로그인 필요',
+                        text: '이 기능을 사용하려면 로그인이 필요합니다.',
+                        icon: 'warning',
+                        confirmButtonText: '확인' // 버튼 텍스트 지정
+                    }).then(() => {
+                        // 사용자가 '확인' 버튼을 누르면, 메인 페이지로 이동시킵니다.
+                        window.location.href = '/';
+                    });
+
+                    // 에러를 발생시켜 아래의 .then() 로직이 실행되지 않도록 하는 것은 그대로 유지합니다.
+                    throw new Error('UNAUTHORIZED');
+                }
+                return response.json().then(data => ({ ok: response.ok, data: data }));
+            })
                 .then(({ ok, data }) => {
                     if (!ok) throw new Error(data.message || '데이터 로딩 실패');
                     
