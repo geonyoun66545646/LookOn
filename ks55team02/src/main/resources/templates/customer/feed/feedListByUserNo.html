@@ -8,7 +8,10 @@
 	</head>
 	
 	<th:block layout:fragment="jsFile">
-		<script th:src="@{/maincss/assets/js/customer/feedListByUserNo.js}"></script>
+		<script th:src="@{/js/customerjs/follow.js}"></script>
+	    <script th:src="@{/js/customerjs/feedOptionModal.js}"></script>
+		<script th:src="@{/js/customerjs/feedListByUserNo.js}"></script>
+		
 	</th:block>
 	
 	<th:block layout:fragment="jsScript">
@@ -60,8 +63,20 @@
 	
 	                <!-- 프로필 액션 버튼 (href는 실제 프로필 수정 페이지 경로로 변경해야 함) -->
 	                <div class="profile-actions">
-	                    <a href="#" class="btn btn-profile-edit">프로필 수정</a>
-	                </div>
+					    <!-- ▼▼▼ [수정] th:if를 사용하여 버튼 분기 처리 ▼▼▼ -->
+					    <div th:if="${userInfo.userNo == loginUserNo}">
+					        <a th:href="@{/customer/my/profile}" class="btn btn-profile-edit">프로필 수정</a>
+					    </div>
+					    <div th:if="${userInfo.userNo != loginUserNo}" class="other-user-actions">
+					        <!-- follow.js가 사용할 팔로우 버튼 영역 (비어있음) -->
+					        <div class="follow-action-area"></div> 
+					        <!-- '...' 옵션 버튼 -->
+					        <button class="options-menu-btn" aria-label="옵션 더 보기">
+					            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><circle cx="12" cy="12" r="1.5"></circle><circle cx="6" cy="12" r="1.5"></circle><circle cx="18" cy="12" r="1.5"></circle></svg>
+					        </button>
+					    </div>
+					    <!-- ▲▲▲ [수정] ▲▲▲ -->
+					</div>
 	            </div>
 	        </section>
 	
@@ -83,6 +98,47 @@
 	        <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;">
 	            <p>로딩 중...</p>
 	        </div>
+	        
+	        <!-- ▼▼▼ [신규 추가] 피드 상세 정보를 보여줄 모달 ▼▼▼ -->
+        <div class="modal fade" id="feed-detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                <div class="modal-content">
+                    <!-- JS가 여기에 피드 상세 내용(feedDetail.html과 유사한 구조)을 동적으로 삽입합니다. -->
+                </div>
+            </div>
+        </div>
+        <!-- ▲▲▲ [신규 추가] ▲▲▲ -->
+
+        <!-- ▼▼▼ [신규 추가] ... 버튼 클릭 시 나올 옵션 모달 (기존 feedDetail.html에서 복사) ▼▼▼ -->
+        <div class="modal fade" id="feed-options-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content options-modal-content">
+                    <ul class="list-group list-group-flush" id="feed-options-list">
+                        <!-- JS가 메뉴를 동적으로 생성합니다. -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- ▲▲▲ [신규 추가] ▲▲▲ -->
+
+        <!-- ▼▼▼ [신규 추가] 언팔로우 확인 모달 (기존 feedDetail.html에서 복사) ▼▼▼ -->
+        <div class="modal fade" id="unfollow-confirm-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content unfollow-modal-content">
+                    <div class="modal-body">
+                        <div class="unfollow-profile">
+                            <img id="unfollow-modal-img" src="" alt="프로필 이미지">
+                        </div>
+                        <p id="unfollow-modal-text">님의 팔로우를 취소하시겠어요?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" id="unfollow-confirm-btn">팔로우 취소</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ▲▲▲ [신규 추가] ▲▲▲ -->
 	    </div>
 	</th:block>
 </html>

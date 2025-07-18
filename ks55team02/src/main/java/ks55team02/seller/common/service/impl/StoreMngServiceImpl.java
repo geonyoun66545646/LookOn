@@ -25,6 +25,11 @@ public class StoreMngServiceImpl implements StoreMngService{
 	 */
 	
 	@Override
+	public String getStoreIdBySellerId(String sellerId) {
+	    return storeMngMapper.getStoreIdBySellerId(sellerId); // ⭐ 이 메서드를 추가합니다.
+	}
+	
+	@Override
 	public Store getStoreInfoById(String storeId) {
 		Store store = storeMngMapper.getStoreInfoById(storeId);
 		

@@ -163,24 +163,20 @@
                         <th>상품정보</th>
                         <th>수량</th>
                         <th>상품금액</th>
-                        <th>진행상황</th>
-                        <th>리뷰</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- 주문 내역이 없을 경우 -->
-                    <tr>
-                        <td colspan="7">최근 주문 내역이 없습니다.</td>
-                    </tr>
-                    <!-- 주문 내역이 있을 경우, Thymeleaf 반복문으로 아래 tr을 생성합니다 -->
-                    <!-- 
-                    <tr th:each="order : ${orderList}">
-                        <td th:text="${order.date}">2024-05-22</td>
-                        ...
-                    </tr> 
-                    -->
+                <tbody id="order-history-tbody">
                 </tbody>
             </table>
+            <!-- [핵심 수정 2] 주문 내역이 없을 때 보여줄 메시지 -->
+		    <div id="no-orders-message" class="empty-message" style="display: none;">
+		        최근 주문 내역이 없습니다.
+		    </div>
+		
+		    <!-- [핵심 수정 3] 페이지 번호들이 동적으로 추가될 div 영역 -->
+		    <div class="pagination-container" id="pagination-container">
+		        <!-- 자바스크립트가 이 안에 <a href="#">1</a>, <a href="#">2</a>... 링크들을 채울 것입니다. -->
+		    </div>
         </div>
     </div><!-- End .container -->
 
@@ -188,6 +184,7 @@
 </th:block>
 
     <th:block layout:fragment="jsFile">
+    
     <!-- 페이지 전용 JS 파일 -->
 
     <!-- 모달 및 JS 기능에 필요한 파일들 (경로는 실제 프로젝트에 맞게 확인해주세요) -->
@@ -201,6 +198,7 @@
     <script th:src="@{/maincss/assets/js/owl.carousel.min.js}"></script>
     <script th:src="@{/maincss/assets/js/main.js}"></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script th:src="@{/js/customerjs/myPage.js}"></script>
 </th:block>
     
 
