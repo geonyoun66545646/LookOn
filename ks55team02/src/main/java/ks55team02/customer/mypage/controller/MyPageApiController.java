@@ -23,12 +23,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import ks55team02.customer.login.domain.LoginUser;
+import ks55team02.customer.mypage.domain.OrderHistory;
 import ks55team02.customer.mypage.domain.PasswordChangeRequest;
 import ks55team02.customer.mypage.domain.UserUpdateRequest;
 import ks55team02.customer.mypage.mapper.ProfileMapper;
 import ks55team02.customer.mypage.service.MyPageUserInfoService;
+import ks55team02.customer.mypage.service.OrderHistoryService;
 import ks55team02.customer.mypage.service.ProfileService;
 import ks55team02.customer.mypage.service.SecuritySettingsService;
+import ks55team02.util.CustomerPagination;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,6 +46,7 @@ public class MyPageApiController {
 	private final SecuritySettingsService securitySettingsService;
 	private final ProfileService profileService;
 	private final ProfileMapper profileMapper;
+	private final OrderHistoryService orderHistoryService;
 
 
 	// 회원 정보 수정
@@ -241,4 +245,35 @@ public class MyPageApiController {
         return ResponseEntity.status(500).body("파일 업로드 실패");
     }
 
+    
+    
+    
+    /**
+     * 현재 로그인된 사용자의 주문 내역을 페이징하여 조회합니다.
+     * @param page 요청된 페이지 번호 (기본값 1)
+     * @param session 현재 세션 객체
+     * @return 페이징된 주문 내역 정보
+     */
+    @GetMapping("/orders")
+    public ResponseEntity<CustomerPagination<OrderHistory>> getMyOrderHistory(
+            @RequestParam(defaultValue = "1") int page,
+            HttpSession session) {
+
+        // 1. 세션에서 로그인된 사용자 정보 가져오기
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            // 로그인되어 있지 않으면, 빈 데이터를 담아 401 Unauthorized 응답
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        String userNo = loginUser.getUserNo();
+        
+        // 2. 한 페이지에 보여줄 데이터 개수는 10개로 고정
+        int pageSize = 10;
+
+        // 3. Service를 호출하여 페이징된 주문 내역 데이터 가져오기
+        CustomerPagination<OrderHistory> orderHistoryData = orderHistoryService.getMyOrderHistory(userNo, page, pageSize);
+        
+        // 4. 성공 응답 (HTTP 200 OK)과 함께 데이터 반환
+        return ResponseEntity.ok(orderHistoryData);
+    }
 }

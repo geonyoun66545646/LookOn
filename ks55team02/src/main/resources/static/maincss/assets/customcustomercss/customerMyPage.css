@@ -344,7 +344,36 @@
     border: none;
     transition: background-color 0.3s ease;
 }
+/* 페이지네이션 컨테이너 스타일 */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+}
 
+/* 페이지 번호 링크 스타일 */
+.pagination-container a {
+    color: #555;
+    padding: 8px 16px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    margin: 0 4px;
+    border-radius: 4px;
+    transition: background-color .3s;
+}
+
+/* 현재 활성화된 페이지 번호 스타일 */
+.pagination-container a.active {
+    background-color: #007bff; /* 원하는 활성 색상으로 변경하세요 */
+    color: white;
+    border: 1px solid #007bff;
+}
+
+/* 마우스를 올렸을 때 스타일 */
+.pagination-container a:hover:not(.active) {
+    background-color: #f4f4f4;
+}
 .withdrawal-content-box .btn-withdrawal:hover {
     background-color: #495057; /* 마우스 올렸을 때 약간 밝게 */
-}```
+}
