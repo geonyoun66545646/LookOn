@@ -81,6 +81,9 @@
 	            		class="btn btn-danger"
 	       				th:data-post-delete-url="@{/customer/post/postDelete/{pstSn}(pstSn=${postDetail.pstSn})}"
 	       				th:if="${session.loginUser != null and session.loginUser.userNo == postDetail.wrtrUserNo}">삭제</button>
+					        
+										       
+	        
 	        </div>
 	    </div>
 	    
@@ -147,6 +150,9 @@
 	                        <button type="button" class="btn btn-danger delete-comment-btn"
 	                                th:data-comment-delete-url="@{/customer/post/commentDelete/{pstCmntSn}(pstCmntSn=${c.pstCmntSn})}"
 	                                th:if="${session.loginUser != null and session.loginUser.userNo == c.wrtrUserNo}">삭제</button>
+	                    
+															                
+	                    
 	                    </div>
 	                </div>
 	            </th:block>
