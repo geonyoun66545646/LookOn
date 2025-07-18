@@ -20,7 +20,7 @@
                                 <textarea class="form-control" id="answerContentInput" name="ansCn" rows="5" required
                                           th:text="${isEditMode ? inquiryData.answer.ansCn : ''}"></textarea>
                             </div>
-                            <div class="form-group d-flex justify-content-end mt-3">
+                            <div id="ans-button" class="form-group d-flex justify-content-end mt-3">
                                 <button type="button" id="submitAnswerBtn" class="btn-bottom"
                                         th:text="${isEditMode ? '수정 완료' : '답변 제출'}"></button>
                                 <button type="button" id="cancelAnswerBtn" class="btn-bottom" th:if="${isEditMode}">취소</button>
