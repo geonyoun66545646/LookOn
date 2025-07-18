@@ -5,561 +5,679 @@
     <head>
         <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/appStoreView.css}">
         <title>스토어 신청 페이지</title>
+        <!-- 인라인 스타일 제거됨. 모든 CSS는 appStoreView.css에서 관리됩니다. -->
     </head>
     <body>
-        <th:block layout:fragment="contents">
+            <th:block layout:fragment="contents">
             <main class="main">
-        <div class="container">
-            <div th:replace="~{customer/fragments/brnoModal :: brnoModalFragment}"></div>
-                <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
-                    <div class="container">
-                        <h1 class="page-title">스토어신청<span>Store</span></h1>
-                    </div>
-                </div>
-                <nav aria-label="breadcrumb" class="breadcrumb-nav">
-                    <div class="container">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a th:href="@{/main}">Home</a></li>
-                            <li class="breadcrumb-item"><a th:href="@{/customer/mypage}">My page</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Checkout</li>
-                        </ol>
-                    </div>
-                </nav>  
-                
-               <div class="summary" id="container-body"> 
-               	<div class="row">
-              	 <div class="col-lg-12 mx-auto"> <div class="row justify-content-center mt-5"> 
-              		 <div class="col-lg-10"> 
-             	 		 <div class="row"> 
-              				 <div class="col-md-2"> 
-                               <div class="nav flex-column nav-pills me-3 border border-secondary rounded" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                                   <a class="nav-link active" id="tab1" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">신청자 정보 입력</a>
-                                   <a class="nav-link" id="tab2" data-bs-toggle="pill" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">스토어 정보 입력</a>
-                                   <a class="nav-link" id="tab3" data-bs-toggle="pill" data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">제출 서류</a>
-                               </div>
-                           </div>
-
-                           <div class="col-md-10">
-                               <div class="tab-content tab-content-border" id="v-pills-tabContent">
-                                   
-                                   <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-                                       <h6>신청자 정보</h6>
-                                       <div class="row mb-3"> 
-                                           <div class="col-lg-6">
-                                               <label>신청자 ID</label>
-                                               <div class="user-info" th:text="${userInfo.userLgnId}"></div>
-                                               <label>신청자 이름</label>
-                                               <div class="user-info" th:text="${userInfo.userNm}"></div>
-                                               <label>신청자 연락처</label>
-                                               <div class="user-info" th:text="${userInfo.telno}"></div>
-                                           </div>
-                                           <div class="col-lg-6">                                        
-                                               <label>예금 주</label>                                                 
-                                               <input type="text" class="form-control">                                                                                 
-                                               <label>계좌 은행</label>
-                                               <input type="text" class="form-control">                                                                                     
-                                               <label>계좌번호</label>
-                                               <input type="text" class="form-control">
-                                           </div>
-                                       </div>
-                                   </div>
-
-                                   <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
-                                       <h6>스토어 정보</h6>
-                                       <div class="row mb-3"> 
-                                       <div class="col-lg-6">
-                                           
-                                        <label>스토어 명</label>
-                                        <input type="text" class="form-control">
-                                        
-                                        <label>매니저 명</label>
-                                        <input type="text" class="form-control">
-
-                                        <label>매니저 연락처</label>
-                                        <input type="text" class="form-control">
-
-                                        <label>매니저 이메일</label>
-                                        <input type="text" class="form-control">
-                                        
-                                         <label>스토어 한줄 소개</label>                                      
-                                        <input type="text" class="form-control">
-                                        
-                                         <label>수수료 비율</label>
-                                        <input type="text" class="form-control">
-                                          </div>
-                                          
-                                           <div class="col-lg-6">                                        
-                                              <div class="address-container">
-                                            <label>스토어 주소</label>
-                                            <input type="button" onclick="sample2_execDaumPostcode()" value="우편번호 찾기" class="address-btn">
-                                        </div>
-                                        <input type="text" id="sample2_postcode" placeholder="우편번호" readonly="readonly">
-                                        <input type="text" id="sample2_address" placeholder="주소" readonly="readonly">
-                                        <input type="text" id="sample2_detailAddress" placeholder="상세주소">
-                                        <div id="layer">
-                                            <img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" onclick="closeDaumPostcode()" alt="닫기 버튼">
-                                        </div>
-                                        
-                                        <label>계약 신청일</label>
-                                        <input type="text" class="form-control" >
-
-                                        <label>계약 기간</label>
-                                        <input type="text" class="form-control">
-                                        
-                                        <label>구독 기간</label>
-                                        <input type="text" class="form-control">
-                                        
-                                        <!-- 사업자등록번호 조회 -->
-                                       <form action="#" onsubmit="return false;">
-                                            <label class="checkout-title">사업자등록번호 조회</label>
-                                            <div id="brnoStatusForm"> 
-                                                <label for="brno"></label>
-                                                <input class="brno-input" type="text" id="brno" name="brno" placeholder="'-' 없이 10자리 숫자를 입력하세요." pattern="[0-9]{10}" title="숫자 10자리를 입력해주세요." required>
-                                                <button type="submit" id="checkBrnoButton">조회</button> 
-                                            </div> 
-                                            <p class="re-btn">
-                                                <button type="button" onclick="resetBrnoForm()" class="btn re-input">다시 입력하기</button>
-                                            </p>
-                                        </form>
-
-                                        
-                                        
-                                        </div>                 
-                                           </div>
-                                  
-                                   </div><!-- 모달 끝 -->
-                                       
-
-                                   <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
-                                       <h6>제출 요구 서류</h6>
-                                       <div class="row mb-3"> 
-                                           <div class="col-lg-12">
-                                                   <div id="table-head">
-                                            <label>첨부 파일</label>
-                                        </div>
-                                        <table class="table table-reg">
-                                            <thead>
-                                                <tr class="table-head">
-                                                    <th>필요 문서</th>
-                                                    <th>첨부된 문서</th>
-                                                    <th>첨부 하기</th>
-                                                    <th>취소</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                <tr>
-                                                    <td>사업자 등록증</td>
-                                                    <td id="attachedDocName1">
-                                                        <div class="fileName"></div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="file-upload-container">
-                                                            <label for="file-upload-1" class="custom-file-upload">
-                                                                파일 선택
-                                                            </label>
-                                                            <input id="file-upload-1" type="file"/>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn-cancel-file" id="cancel-file-1">취소</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>통신 판매업 신고증</td>
-                                                    <td id="attachedDocName2">
-                                                        <div class="fileName"></div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="file-upload-container">
-                                                            <label for="file-upload-2" class="custom-file-upload">
-                                                                파일 선택
-                                                            </label>
-                                                            <input id="file-upload-2" type="file"/>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn-cancel-file" id="cancel-file-2">취소</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>주민등록증 사본</td>
-                                                    <td id="attachedDocName4">
-                                                        <div class="fileName"></div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="file-upload-container">
-                                                            <label for="file-upload-4" class="custom-file-upload">
-                                                                파일 선택
-                                                            </label>
-                                                            <input id="file-upload-4" type="file"/>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn-cancel-file" id="cancel-file-4">취소</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>통장 사본</td>
-                                                    <td id="attachedDocName5">
-                                                        <div class="fileName"></div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="file-upload-container">
-                                                            <label for="file-upload-5" class="custom-file-upload">
-                                                                파일 선택
-                                                            </label>
-                                                            <input id="file-upload-5" type="file"/>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn-cancel-file" id="cancel-file-5">취소</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>판매상품 관련 증빙</td>
-                                                    <td id="attachedDocName3">
-                                                        <div class="fileName"></div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="file-upload-container">
-                                                            <label for="file-upload-3" class="custom-file-upload">
-                                                                파일 선택
-                                                            </label>
-                                                            <input id="file-upload-3" type="file"/>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn-cancel-file" id="cancel-file-3">취소</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>기타 서류</td>
-                                                    <td id="attachedDocNameETC">
-                                                        <div class="fileName"></div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="file-upload-container">
-                                                            <label for="file-upload-6" class="custom-file-upload">
-                                                                파일 선택
-                                                            </label>
-                                                            <input id="file-upload-6" type="file"/>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn-cancel-file" id="cancel-file-6">취소</button>
-                                                    </td>
-                                                     <tr>
-                                                    <td>상점 로고</td>
-                                                    <td id="storeLogo">
-                                                        <div class="fileName"></div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="file-upload-container">
-                                                            <label for="file-upload-7" class="custom-file-upload">
-                                                                파일 선택
-                                                            </label>
-                                                            <input id="file-upload-7" type="file"/>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn-cancel-file" id="cancel-file-7">취소</button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>										 
-										    </div>
-										</div>
-
-										</div>
-										        
-										       
-										   
-										</div>
-                                           </div>                                                               
-                                   </div>                                
-                                       </div>
-                                   </div>
-							 </div>
+                <div class="container">
+                    <!-- brnoModalFragment는 Thymeleaf 레이아웃에서 제공될 것으로 예상 -->
+                    <div th:replace="~{customer/fragments/brnoModal :: brnoModalFragment}"></div>
+                    <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
+                        <div class="container">
+                            <h1 class="page-title">스토어신청<span>Store</span></h1>
                         </div>
+                    </div>
+                    <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                        <div class="container">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a th:href="@{/main}">Home</a></li>
+                                <li class="breadcrumb-item"><a th:href="@{/customer/mypage}">My page</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Checkout</li>
+                            </ol>
                         </div>
-							 
+                    </nav>  
+                    
+                    <div class="summary" id="container-body"> 
+                        <div class="row">
+                            <div class="col-lg-12 mx-auto"> 
+                                <div class="row justify-content-center mt-5"> 
+                                    <div class="col-lg-10"> 
+                                        <div class="row"> 
+                                            <div class="col-md-2"> 
+                                                <div class="nav flex-column nav-pills me-3 border border-secondary rounded" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                                                    <a class="nav-link active" id="tab1" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">신청자 정보 입력</a>
+                                                    <a class="nav-link" id="tab2" data-bs-toggle="pill" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">스토어 정보 입력</a>
+                                                    <a class="nav-link" id="tab3" data-bs-toggle="pill" data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">제출 서류</a>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-10">
+                                                <div class="tab-content tab-content-border" id="v-pills-tabContent">
+                                                    
+                                                    <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+                                                        <h6>신청자 정보</h6>
+                                                        <div class="row mb-3"> 
+                                                            <div class="col-lg-6">
+                                                                <label>신청자 ID</label>
+                                                                <div class="user-info" th:text="${userInfo.userLgnId}" id="applicantIdDisplay"></div>
+                                                                <label>신청자 이름</label>
+                                                                <div class="user-info" th:text="${userInfo.userNm}" id="applicantNameDisplay"></div>
+                                                                <label>신청자 연락처</label>
+                                                                <div class="user-info" th:text="${userInfo.telno}" id="applicantTelDisplay"></div>
+                                                            </div>
+                                                            <div class="col-lg-6">                                        
+                                                                <label>예금 주</label>                                                 
+                                                                <input type="text" class="form-control" id="dpstrNm" name="dpstrNm" required>                                                                                 
+                                                                <label>은행 명</label>
+                                                                <input type="text" class="form-control" id="bankNm" name="bankNm" required>                                                                                     
+                                                                <label>계좌번호</label>
+                                                                <input type="text" class="form-control" id="actno" name="actno" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                                                        <h6>스토어 정보</h6>
+                                                        <div class="row mb-3"> 
+                                                            <div class="col-lg-6">
+                                                                <label>스토어 명</label>
+                                                                <input type="text" class="form-control" id="storeNameInput" name="storeNm"> <!-- name 추가 -->
+                                                                
+                                                                <label>매니저 명</label>
+                                                                <input type="text" class="form-control" id="managerNameInput" name="mngrNm"> <!-- name 추가 -->
+
+                                                                <label>매니저 연락처</label>
+                                                                <input type="text" class="form-control" id="managerTelInput" name="mngrTelNo"> <!-- name 추가 -->
+
+                                                                <label>매니저 이메일</label>
+                                                                <input type="text" class="form-control" id="managerEmailInput" name="mngrEml"> <!-- name 추가 -->
+                                                                
+                                                                 <label>수수료 비율</label>
+                                                                <div class="row mb-3"> 
+                                                            <div class="col-lg-3">
+                                                                <div class="user-info" id="commissionRateCn">plcy_1</div>                                                                                                                       
+                                                            </div>
+                                                            <div class="col-lg-9">
+                                                                <div class="user-info" id="commissionRateDisplay">일반 판매자 수수료 (18%)</div>    <!-- commissionRateDisplay -->                                                                                                                   
+                                                            </div>
+                                                            </div>
+                                                            </div>
+                                                            <div class="col-lg-6">    
+                                                                <!-- 우편번호 찾기 -->                                    
+                                                                <div class="address-container">
+                                                                    <label>스토어 주소</label>
+                                                                </div>
+                                                                <input type="text" id="sample2_postcode" placeholder="우편번호" readonly="readonly" name="bplcPostCode"> <!-- name 추가 -->
+                                                                <div class="postcode-search-wrapper"> 
+                                                                    <input type="button" onclick="sample2_execDaumPostcode()" value="우편번호 찾기" class="address-btn">
+                                                                </div>
+                                                                
+                                                                <input type="text" id="sample2_address" placeholder="주소" readonly="readonly" name="bplcAddr"> <!-- name 추가 -->
+                                                                <input type="text" id="sample2_detailAddress" placeholder="상세주소" name="bplcDaddr"> <!-- name 추가 -->
+                                                                <div id="layer">
+                                                                    <img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" onclick="closeDaumPostcode()" alt="닫기 버튼">
+                                                                </div>
+                                                                
+                                                                <label class="cont">계약 신청일</label>
+                                                                <input type="text" class="form-control" id="contractApplyDateInput" th:value="${todayDate}" readonly name="contractApplyDateInput"> <!-- name 추가 -->
+
+                                                                <label>계약 기간</label>
+                                                                <input type="text" class="form-control" id="contractTermInput" name="contractTermInput"> <!-- name 추가 -->
+                                                                
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-lg-12 brno-intro">    
+                                                            <!-- 사업자등록번호 조회 -->
+                                                            <form action="#" onsubmit="return false;">
+                                                                <label class="checkout-title">사업자등록번호 조회</label>
+                                                                <div id="brnoStatusForm"> 
+                                                                    <label for="brno"></label>
+                                                                    <input class="brno-input" type="text" id="brno" name="brno" placeholder="'-' 없이 10자리 숫자를 입력하세요." pattern="[0-9]{10}" title="숫자 10자리를 입력해주세요." required>
+                                                                    <button type="submit" id="checkBrnoButton" >조회</button> 
+                                                                </div> 
+                                                                <p class="re-btn">
+                                                                    <button type="button" onclick="resetBrnoForm()" class="reinput">다시 입력하기</button>
+                                                                </p>
+                                                                <div id="apiResponseContainer" style="margin-top: 10px; font-weight: bold;"></div>
+                                                            </form>
+                                                            
+                                                            <label>스토어 소개</label>
+                                                            <textarea class="form-control" rows="5" placeholder="스토어 소개를 입력해주세요." id="storeIntroTextarea" name="storeIntroCn"></textarea> <!-- name 추가 -->
+                                                        </div><!-- 모달 끝 -->
+                                                    </div>
+
+                                                    <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
+                                                        <h6>제출 요구 서류</h6>
+                                                        <div class="row mb-3"> 
+                                                            <div class="col-lg-12">
+                                                                <div id="table-head">
+                                                                    <label>첨부 파일</label>
+                                                                </div>
+                                                                <table class="table table-reg">
+                                                                    <thead>
+                                                                        <tr class="table-head">
+                                                                            <th>필요 문서</th>
+                                                                            <th>첨부된 문서</th>
+                                                                            <th>첨부 하기</th>
+                                                                            <th>취소</th>
+                                                                        </tr>
+                                                                    </thead>
+
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>사업자 등록증</td>
+                                                                            <td id="attachedDocName1">
+                                                                                <div class="fileName"></div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="file-upload-container">
+                                                                                    <label for="file-upload-1" class="custom-file-upload">
+                                                                                        파일 선택
+                                                                                    </label>
+                                                                                    <input id="file-upload-1" type="file"/>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <button type="button" class="btn-cancel-file" id="cancel-file-1">취소</button>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>통신 판매업 신고증</td>
+                                                                            <td id="attachedDocName2">
+                                                                                <div class="fileName"></div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="file-upload-container">
+                                                                                    <label for="file-upload-2" class="custom-file-upload">
+                                                                                        파일 선택
+                                                                                    </label>
+                                                                                    <input id="file-upload-2" type="file"/>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <button type="button" class="btn-cancel-file" id="cancel-file-2">취소</button>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>주민등록증 사본</td>
+                                                                            <td id="attachedDocName4">
+                                                                                <div class="fileName"></div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="file-upload-container">
+                                                                                    <label for="file-upload-4" class="custom-file-upload">
+                                                                                        파일 선택
+                                                                                    </label>
+                                                                                    <input id="file-upload-4" type="file"/>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <button type="button" class="btn-cancel-file" id="cancel-file-4">취소</button>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>통장 사본</td>
+                                                                            <td id="attachedDocName5">
+                                                                                <div class="fileName"></div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="file-upload-container">
+                                                                                    <label for="file-upload-5" class="custom-file-upload">
+                                                                                        파일 선택
+                                                                                    </label>
+                                                                                    <input id="file-upload-5" type="file"/>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <button type="button" class="btn-cancel-file" id="cancel-file-5">취소</button>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>판매상품 관련 증빙</td>
+                                                                            <td id="attachedDocName3">
+                                                                                <div class="fileName"></div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="file-upload-container">
+                                                                                    <label for="file-upload-3" class="custom-file-upload">
+                                                                                        파일 선택
+                                                                                    </label>
+                                                                                    <input id="file-upload-3" type="file"/>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <button type="button" class="btn-cancel-file" id="cancel-file-3">취소</button>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>기타 서류</td>
+                                                                            <td id="attachedDocNameETC">
+                                                                                <div class="fileName"></div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="file-upload-container">
+                                                                                    <label for="file-upload-6" class="custom-file-upload">
+                                                                                        파일 선택
+                                                                                    </label>
+                                                                                    <input id="file-upload-6" type="file"/>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <button type="button" class="btn-cancel-file" id="cancel-file-6">취소</button>
+                                                                            </td>
+                                                                            <tr>
+                                                                                <td>상점 로고</td>
+                                                                                <td id="storeLogo">
+                                                                                    <div class="fileName"></div>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <div class="file-upload-container">
+                                                                                        <label for="file-upload-7" class="custom-file-upload">
+                                                                                            파일 선택
+                                                                                        </label>
+                                                                                        <input id="file-upload-7" type="file"/>
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <button type="button" class="btn-cancel-file" id="cancel-file-7">취소</button>
+                                                                                </td>
+                                                                            </tr>
+                                                                    </tbody>
+                                                                </table>										 
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>                                                               
+                                        </div>                                
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="button-wrapper">
-                            <button type="button" class="btn btn-outline-primary-2 btn-order btn-block" id="submitApplication" onclick="confirmReload();">
-                            <span class="btn-text">제출 하기</span>
+                            <button type="button" class="btn btn-outline-primary-2 btn-order btn-block" id="submitApplication">
+                                <span class="btn-text">제출 하기</span>
                                 <span class="btn-hover-text">제출 하기</span>
                             </button>
                         </div>
-                        </div>
-                        
-							 
+                    </div>
+                </div>
             </main>
         </th:block>
 
-
         <th:block layout:fragment="jsFile">
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-            
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
             <script th:src="@{/maincss/assets/js/home_specific.js}"></script>
             <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
         </th:block>
 
-
         <th:block layout:fragment="jsScript">
-            <script>
-                console.log("홈 페이지 스크립트 실행!");
+        <script>
+    console.log("홈 페이지 스크립트 실행!");
 
-                document.addEventListener('DOMContentLoaded', function(){
-                    //모든 file input필드를 가져옵니다.
-                    const fileInputs = document.querySelectorAll('input[type="file"]');
-
-                    fileInputs.forEach(function(inputElement){
-                        // 각 input 요소에 해당하는 취소 버튼을 찾습니다.
-                        const inputIdNum = inputElement.id.split('-').pop();
-                        const cancelButton = document.getElementById('cancel-file-'+inputIdNum);
-
-
-                        //1. 파일 선택 시.
-                        inputElement.addEventListener('change', function(){
-                            // 선택된 파일유무 확인
-                            // input 요소의 부모 td 찾습니다
-                            const currentTd = this.closest('td');
-                            //현재 td의 이전 td를 찾습니다
-                            const prevTd = currentTd.previousElementSibling;
-                            // div fileName을 찾음
-                            const fileDiv = prevTd ? prevTd.querySelector('.fileName'):null;
-
-                            if(this.files && this.files.length >0){
-                                const fileName = this.files[0].name;
-
-                                if(fileDiv){
-                                    // fileName에 파일명으로 업데이트 합니다
-                                    fileDiv.textContent = fileName;
-                                }
-                                if(cancelButton){
-                                    cancelButton.style.background = 'red';
-
-                                }
-                            }else{
-                                //파일 선택이 취소되었을 경우, 해당 div의 텍스트를 비웁니다
-                                if(fileDiv){
-                                    fileDiv.textContent='';
-                                }
-                                if(cancelButton){
-                                    cancelButton.style.background = 'grey';
-                                }
-                            }
-                        });
-                        // 2. 취소버튼 클릭 시.
-                        if(cancelButton){
-                            cancelButton.addEventListener('click',function(){
-                                // 해당 파일의 입력 필드 초기화
-                                inputElement.value='';
-
-                                const currentTd=inputElement.closest('td');
-                                const prevTd = currentTd.previousElementSibling;
-
-                                // 파일명 영역 초기화
-                                const fileDiv = prevTd ? prevTd.querySelector('.fileName') : null;
-                                if(fileDiv){
-                                    fileDiv.textContent="";
-                                }
-                                //취소버튼 비활성화
-                                this.style.background= 'grey';
-
-                            })
-                        }
-
-                    });
-
-                });
-
-                /* 주소 api */
-                // 우편번호 찾기 화면을 넣을 element
-                var element_layer = document.getElementById('layer');
-
-                function closeDaumPostcode() {
-                    // iframe을 넣은 element를 안보이게 한다.
-                    element_layer.style.display = 'none';
-                }
-
-                function sample2_execDaumPostcode() {
-                    new daum.Postcode({
-                        oncomplete: function(data) {
-                            // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
-
-                            // 각 주소의 노출 규칙에 따라 주소를 조합한다.
-                            // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
-                            var addr = ''; // 주소 변수
-                            var extraAddr = ''; // 참고항목 변수
-
-                            //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-                            if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
-                                addr = data.roadAddress;
-                            } else { // 사용자가 지번 주소를 선택했을 경우(J)
-                                addr = data.jibunAddress;
-                            }
-
-                            // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
-                            if(data.userSelectedType === 'R'){
-                                // 법정동명이 있을 경우 추가한다. (법정리는 제외)
-                                // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
-                                if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
-                                    extraAddr += data.bname;
-                                }
-                                // 건물명이 있고, 공동주택일 경우 추가한다.
-                                if(data.buildingName !== '' && data.apartment === 'Y'){
-                                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                                }
-                                // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-                                if(extraAddr !== ''){
-                                    extraAddr = ' (' + extraAddr + ')';
-                                }
-                            }
-
-                            // 우편번호와 주소 정보를 해당 필드에 넣는다.
-                            document.getElementById('sample2_postcode').value = data.zonecode;
-                            document.getElementById("sample2_address").value = addr;
-                            // 커서를 상세주소 필드로 이동한다.
-                            document.getElementById("sample2_detailAddress").focus();
-
-                            // iframe을 넣은 element를 안보이게 한다.
-                            // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
-                            element_layer.style.display = 'none';
-                        },
-                        width : '100%',
-                        height : '100%',
-                        maxSuggestItems : 5
-                    }).embed(element_layer);
-
-                    // iframe을 넣은 element를 보이게 한다.
-                    element_layer.style.display = 'block';
-
-                    // iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
-                    initLayerPosition();
-                }
-
-                // 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
-                // resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
-                // 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
-                function initLayerPosition(){
-                    var width = 300; //우편번호서비스가 들어갈 element의 width
-                    var height = 400; //우편번호서비스가 들어갈 element의 height
-                    var borderWidth = 5; //샘플에서 사용하는 border의 두께
-
-                    // 위에서 선언한 값들을 실제 element에 넣는다.
-                    element_layer.style.width = width + 'px';
-                    element_layer.style.height = height + 'px';
-                    element_layer.style.border = borderWidth + 'px solid';
-                    // 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
-                    element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width)/2 - borderWidth) + 'px';
-                    element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height)/2 - borderWidth) + 'px';
-                }
-
-                /* 사업자 등록정보 조회 */
-                const checkBrnoButton = document.getElementById('checkBrnoButton');
-                const brnoInput = document.getElementById('brno');
-                
-                // **모달 인스턴스 생성 시 'brnoModal' ID 사용**
-                const brnoModal = new bootstrap.Modal(document.getElementById('brnoModal')); 
-                const modalApiResponseContainer = document.getElementById('modalApiResponseContainer'); 
-
-                if (checkBrnoButton) {
-                    checkBrnoButton.addEventListener('click', function(event) {
-                        event.preventDefault();
-
-                        const brno = brnoInput.value;
-
-                        if (!brno) {
-                            alert('사업자등록번호를 입력해주세요.');
-                            return;
-                        }
-
-                        fetch(`/api/brno/status?brno=${brno}`)
-                            .then(response => {
-                                if (!response.ok) {
-                                    return response.json().then(errorData => {
-                                        const errorMessage = errorData.message || '알 수 없는 서버 오류';
-                                        throw new Error(`HTTP 오류 ${response.status}: ${errorMessage}`);
-                                    });
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                console.log('국세청 API 응답:', data);
-
-                                let html = '';
-                                if (data && data.data && data.data.length > 0) {
-                                    html += '<p>조회된 사업자등록번호: <strong>' + brno + '</strong></p>';
-                                    html += '<table><thead><tr><th>사업자번호</th><th>상태</th><th>상태 코드</th><th>과세 유형</th><th>폐업일자</th></tr></thead><tbody>';
-                                    data.data.forEach(result => {
-                                        html += `<tr><td>${result.b_no}</td><td>${result.b_stt}</td><td>${result.b_stt_cd}</td><td>${result.tax_type}</td><td>${result.end_dt || '해당 없음'}</td></tr>`;
-                                    });
-                                    html += '</tbody></table>';
-                                } else {
-                                    html += '<p>조회된 사업자등록번호: <strong>' + brno + '</strong></p>';
-                                    html += '<div class="error-message"><p>조회 결과가 없습니다. 사업자등록번호를 확인해주세요.</p></div>';
-                                }
-                                modalApiResponseContainer.innerHTML = html;
-                                brnoModal.show(); // 올바른 변수명으로 모달 띄우기**
-                            })
-                            .catch(error => {
-                                console.error('Fetch 에러:', error);
-                                modalApiResponseContainer.innerHTML = `<div class="error-message"><p>네트워크 오류 또는 예상치 못한 오류가 발생했습니다.</p><p>${error.message}</p></div>`;
-                                brnoModal.show(); // 오류 시에도 올바른 변수명으로 모달 띄우기**
-                            });
-                    });
-                }
-
-                // "다시 입력하기" 버튼을 위한 함수
-                function resetBrnoForm() {
-                    document.getElementById('brno').value = '';
-                    modalApiResponseContainer.innerHTML = ''; // 모달 내부 내용 초기화
-                    // **필요하다면, 모달이 열려있을 경우 닫는 로직 추가 (선택 사항)**
-                    // brnoModal.hide(); // 이 줄을 추가하여 다시 입력 시 모달을 닫을 수 있습니다.
-                }
-                
-                /* 버튼 기능만 삽입 수정 필요 */
-   				 function confirmReload() {
-   			        if (confirm("새로고침을 하시겠습니까?")) {
-   			            location.reload();
-   			        }
-   			    }
-                
-                /* 탭 버튼 활성화 */
-                
-                document.addEventListener('DOMContentLoaded', function() {
-    const tabs = document.querySelectorAll('#tab1, #tab2, #tab3, #tab4'); // 모든 탭 요소를 선택
-
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // 1. 현재 활성화된 탭에서 'active-tab' 클래스 제거
-            tabs.forEach(t => t.classList.remove('active-tab'));
-
-            // 2. 클릭된 탭에 'active-tab' 클래스 추가
-            this.classList.add('active-tab');
-
-            // --- 추가: 탭 내용 변경 로직 (필요하다면 여기에 구현) ---
-            // 예: 탭 클릭 시 특정 div의 내용을 보여주거나 숨기는 로직
-            // const tabContentId = this.dataset.targetContent; // data-target-content="tabContent1" 같은 속성 사용
-            // document.querySelectorAll('.tab-content').forEach(content => {
-            //     if (content.id === tabContentId) {
-            //         content.style.display = 'block';
-            //     } else {
-            //         content.style.display = 'none';
-            //     }
-            // });
-        });
-    });
-
-    // --- 페이지 로드 시 기본 활성화 탭 설정 (선택 사항) ---
-    // 예: 페이지 로드 시 첫 번째 탭이 기본으로 활성화되도록 설정
-    if (tabs.length > 0) {
-        tabs[0].classList.add('active-tab');
-        // 그리고 해당 탭 내용도 보이도록 초기 설정
+    // UUID 생성 함수
+    function generateUUID() {
+        return crypto.randomUUID();
     }
-});
-            </script>
+
+    // HTML 본문 메시지 컨테이너 초기화 함수
+    const apiResponseContainer = document.getElementById('apiResponseContainer');
+    function clearApiResponseContainer() {
+        if (apiResponseContainer) {
+            apiResponseContainer.innerHTML = '';
+            apiResponseContainer.style.color = 'inherit';
+            apiResponseContainer.style.display = 'none';
+        }
+    }
+
+    // 모달 내용 초기화 함수
+    const brnoModalElement = document.getElementById('brnoModal');
+    const brnoModal = new bootstrap.Modal(brnoModalElement);
+    const modalApiResponseContainer = document.getElementById('modalApiResponseContainer');
+    function clearModalContent() {
+        if (modalApiResponseContainer) {
+            modalApiResponseContainer.innerHTML = '';
+        }
+    }
+    
+    // "다시 입력하기" 버튼을 위한 함수
+    function resetBrnoForm() {
+        document.getElementById('brno').value = ''; 
+        clearApiResponseContainer(); 
+        clearModalContent(); 
+        if (brnoModalElement) { 
+            brnoModal.hide(); 
+        }
+        // 사업자등록번호 초기화 시, 조회 성공 플래그도 초기화
+        isBrnoVerified = false; 
+    }
+
+    // 새로고침 기능
+    function confirmReload() {
+        if (confirm("새로고침을 하시겠습니까?")) {
+            location.reload();
+        }
+    }
+
+    // 주소 api
+    var element_layer = document.getElementById('layer');
+    function closeDaumPostcode() {
+        element_layer.style.display = 'none';
+    }
+    function sample2_execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                var addr = '';
+                var extraAddr = '';
+
+                if (data.userSelectedType === 'R') {
+                    addr = data.roadAddress;
+                } else {
+                    addr = data.jibunAddress;
+                }
+
+                if (data.userSelectedType === 'R') {
+                    if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                        extraAddr += data.bname;
+                    }
+                    if (data.buildingName !== '' && data.apartment === 'Y') {
+                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    if (extraAddr !== '') {
+                        extraAddr = ' (' + extraAddr + ')';
+                    }
+                }
+
+                document.getElementById('sample2_postcode').value = data.zonecode;
+                document.getElementById("sample2_address").value = addr;
+                document.getElementById("sample2_detailAddress").focus();
+                element_layer.style.display = 'none';
+            },
+            width: '100%',
+            height: '100%',
+            maxSuggestItems: 5
+        }).embed(element_layer);
+        element_layer.style.display = 'block';
+        initLayerPosition();
+    }
+
+    function initLayerPosition() {
+        var width = 300;
+        var height = 400;
+        var borderWidth = 5;
+        element_layer.style.width = width + 'px';
+        element_layer.style.height = height + 'px';
+        element_layer.style.border = borderWidth + 'px solid';
+        element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width) / 2 - borderWidth) + 'px';
+        element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height) / 2 - borderWidth) + 'px';
+    }
+
+
+    // --- 전역 변수로 사업자 번호 인증 상태 관리 ---
+    let isBrnoVerified = false;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 파일 등록 로직 (기존과 동일)
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(function(inputElement) {
+            const inputIdNum = inputElement.id.split('-').pop();
+            const cancelButton = document.getElementById('cancel-file-' + inputIdNum);
+
+            inputElement.addEventListener('change', function() {
+                const currentTd = this.closest('td');
+                const prevTd = currentTd.previousElementSibling;
+                const fileDiv = prevTd ? prevTd.querySelector('.fileName') : null;
+
+                if (this.files && this.files.length > 0) {
+                    const fileName = this.files[0].name;
+                    if (fileDiv) {
+                        fileDiv.textContent = fileName;
+                    }
+                    if (cancelButton) {
+                        cancelButton.style.background = 'red';
+                    }
+                } else {
+                    if (fileDiv) {
+                        fileDiv.textContent = '';
+                    }
+                    if (cancelButton) {
+                        cancelButton.style.background = 'grey';
+                    }
+                }
+            });
+            if (cancelButton) {
+                cancelButton.addEventListener('click', function() {
+                    inputElement.value = '';
+                    const currentTd = inputElement.closest('td');
+                    const prevTd = currentTd.previousElementSibling;
+                    const fileDiv = prevTd ? prevTd.querySelector('.fileName') : null;
+                    if (fileDiv) {
+                        fileDiv.textContent = "";
+                    }
+                    this.style.background = 'grey';
+                })
+            }
+        });
+        
+        // 사업자 등록정보 조회 로직
+        const checkBrnoButton = document.getElementById('checkBrnoButton');
+        const brnoInput = document.getElementById('brno');
+
+        if (checkBrnoButton) {
+            checkBrnoButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                const brno = brnoInput.value;
+                
+                // 조회 시도 시, 이전 인증 상태 초기화
+                isBrnoVerified = false;
+
+                clearApiResponseContainer();
+                clearModalContent();
+                if (apiResponseContainer) {
+                    apiResponseContainer.style.display = 'block';
+                }
+
+                if (!brno) {
+                    if (apiResponseContainer) {
+                        apiResponseContainer.innerHTML = '<span style="color: red;">사업자등록번호를 입력해주세요.</span>';
+                    }
+                    if (modalApiResponseContainer) {
+                        modalApiResponseContainer.innerHTML = '<div class="error-message"><p>사업자등록번호를 입력해주세요.</p></div>';
+                    }
+                    brnoModal.show();
+                    return;
+                }
+
+                fetch(`/api/brno/status?brno=${brno}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                const errorMessage = errorData.message || '알 수 없는 서버 오류';
+                                throw new Error(`HTTP 오류 ${response.status}: ${errorMessage}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('국세청 API 응답:', data);
+
+                        let modalHtml = '';
+                        let mainMessage = '';
+
+                        if (data && data.data && data.data.length > 0) {
+                            const businessStatus = data.data[0];
+
+                            if (businessStatus.b_stt_cd === '01') {
+                                isBrnoVerified = true; // --- 인증 성공 플래그 설정 ---
+                                mainMessage = '<span style="color: green;">조회에 성공했습니다. 이제 신청서를 제출할 수 있습니다.</span>';
+                                modalHtml += '<div class="success-message"><p>조회에 성공했습니다.</p></div>';
+                                brnoInput.value = businessStatus.b_no;
+                            } else {
+                                isBrnoVerified = false; // 인증 실패
+                                mainMessage = '<span style="color: red;">잘못된 사업자 등록번호 입니다.</span>';
+                                modalHtml += '<div class="error-message"><p>국세청에 등록되었으나, 현재 **' + (businessStatus.b_stt || '알 수 없는 상태') + '** 입니다.</p></div>';
+                            }
+                            
+                            // (이하 모달 내용 생성 로직은 기존과 동일)
+                            modalHtml += '<p>조회된 사업자등록번호: <strong>' + brno + '</strong></p>';
+                            modalHtml += '<div class="brno-detail-table">'; 
+                            modalHtml += '<div class="brno-row"><div class="brno-header">사업자번호</div><div class="brno-content">' + (businessStatus.b_no || '해당 없음') + '</div></div>'; 
+                            modalHtml += '<div class="brno-row"><div class="brno-header">상태</div><div class="brno-content">' + (businessStatus.b_stt || '해당 없음') + ' (' + (businessStatus.b_stt_cd || '코드 없음') + ')</div></div>'; 
+                            modalHtml += '<div class="brno-row"><div class="brno-header">과세 유형</div><div class="brno-content">' + (businessStatus.tax_type || '해당 없음') + '</div></div>'; 
+                            if (businessStatus.end_dt && businessStatus.end_dt !== 'null') { 
+                                modalHtml += '<div class="brno-row"><div class="brno-header">폐업일자</div><div class="brno-content">' + businessStatus.end_dt + '</div></div>'; 
+                            }
+                            modalHtml += '</div>'; 
+                            
+                        } else {
+                            isBrnoVerified = false; // 인증 실패
+                            mainMessage = '<span style="color: red;">잘못된 사업자 등록번호 입니다.</span>';
+                            modalHtml += '<div class="error-message"><p>조회 결과가 없습니다. 사업자등록번호를 확인해주세요.</p></div>';
+                            modalHtml += '<p>조회된 사업자등록번호: <strong>' + brno + '</strong></p>';
+                        }
+
+                        if (apiResponseContainer) {
+                            apiResponseContainer.innerHTML = mainMessage;
+                        }
+                        if (modalApiResponseContainer) {
+                            modalApiResponseContainer.innerHTML = modalHtml;
+                        }
+                        brnoModal.show();
+                    })
+                    .catch(error => {
+                        isBrnoVerified = false; // 인증 실패
+                        console.error('Fetch 에러:', error);
+                        if (apiResponseContainer) {
+                            apiResponseContainer.innerHTML = `<span style="color: red;">잘못된 사업자 등록번호 입니다.</span>`;
+                        }
+                        if (modalApiResponseContainer) {
+                            modalApiResponseContainer.innerHTML = `<div class="error-message"><p>네트워크 오류 또는 예상치 못한 오류가 발생했습니다.</p><p>오류: ${error.message}</p></div>`;
+                        }
+                        brnoModal.show();
+                    });
+            });
+        }
+        
+        // --- ★ 신규: 유효성 검사 및 포커스 이동 함수 ---
+        function validateAndFocus() {
+            const fieldsToValidate = [
+                // [ID, 필드 이름]
+                ['dpstrNm', '예금주'],
+                ['bankNm', '은행명'],
+                ['actno', '계좌번호'],
+                ['storeNameInput', '스토어 명'],
+                ['managerNameInput', '매니저 명'],
+                ['managerTelInput', '매니저 연락처'],
+                ['managerEmailInput', '매니저 이메일'],
+                ['sample2_postcode', '우편번호'],
+                ['sample2_address', '주소'],
+                ['sample2_detailAddress', '상세주소'],
+                ['contractTermInput', '계약 기간'],
+                ['brno', '사업자등록번호'],
+                ['storeIntroTextarea', '스토어 소개'],
+                // 파일 유효성 검사 (필수 파일만)
+                ['file-upload-1', '사업자 등록증'],
+                // 필요 시 다른 필수 파일도 추가
+                // ['file-upload-2', '통신 판매업 신고증'], 
+            ];
+
+            for (const [id, name] of fieldsToValidate) {
+                const element = document.getElementById(id);
+                if (!element.value) {
+                    alert(`'${name}' 항목을(를) 입력 또는 첨부해주세요.`);
+                    element.focus();
+                    return false; // 유효성 검사 실패
+                }
+            }
+            return true; // 모든 필드 유효
+        }
+
+
+        // "제출 하기" 버튼 클릭 이벤트 핸들러
+        const submitApplicationButton = document.getElementById('submitApplication');
+        if (submitApplicationButton) {
+            submitApplicationButton.addEventListener('click', async function(event) {
+                event.preventDefault();
+
+                // --- ★ 신규: 사업자 번호 인증 여부 먼저 확인 ---
+                if (!isBrnoVerified) {
+                    alert('사업자등록번호를 조회하고 인증을 완료해주세요.');
+                    document.getElementById('brno').focus(); // 사업자 번호 입력칸에 포커스
+                    return; // 제출 프로세스 중단
+                }
+                
+                // --- ★ 신규: 유효성 검사 및 포커스 이동 실행 ---
+                if (!validateAndFocus()) {
+                    return; // 유효성 검사 실패 시 제출 프로세스 중단
+                }
+
+                // (이하 로직은 기존과 동일, DTO에 맞춰 key값 수정된 버전)
+                const formData = new FormData();
+                
+                formData.append('aplyUserNo', document.getElementById('applicantIdDisplay').textContent);
+                formData.append('dpstrNm', document.getElementById('dpstrNm').value);
+                formData.append('bankNm', document.getElementById('bankNm').value);
+                formData.append('actno', document.getElementById('actno').value);
+                formData.append('storeNm', document.getElementById('storeNameInput').value);
+                formData.append('mngrNm', document.getElementById('managerNameInput').value);
+                formData.append('mngrTelNo', document.getElementById('managerTelInput').value);
+                formData.append('mngrEml', document.getElementById('managerEmailInput').value);
+                formData.append('plcyId', document.getElementById('commissionRateCn').textContent);
+                formData.append('storeIntroCn', document.getElementById('storeIntroTextarea').value);
+                formData.append('brno', document.getElementById('brno').value);
+                formData.append('bplcPostCode', document.getElementById('sample2_postcode').value);
+                formData.append('bplcAddr', document.getElementById('sample2_address').value);
+                formData.append('bplcDaddr', document.getElementById('sample2_detailAddress').value);
+                formData.append('ctrtAplyYmd', document.getElementById('contractApplyDateInput').value); // DTO 필드명 ctrtAplyYmd
+                formData.append('ctrtTermVal', document.getElementById('contractTermInput').value);   // DTO 필드명 ctrtTermVal
+                
+
+                const fileMappings = {
+                    'file-upload-1': 'businessRegistrationDoc',
+                    'file-upload-2': 'telecommunicationLicense',
+                    'file-upload-3': 'productEvidence',
+                    'file-upload-4': 'idCardCopy',
+                    'file-upload-5': 'bankAccountCopy',
+                    'file-upload-6': 'etcDocs',
+                    'file-upload-7': 'storeLogoImg'
+                };
+                for (const [fileId, formFieldName] of Object.entries(fileMappings)) {
+                    const fileInput = document.getElementById(fileId);
+                    if (fileInput && fileInput.files.length > 0) {
+                        formData.append(formFieldName, fileInput.files[0]);
+                    }
+                }
+
+                console.log("---------- 전송될 FormData ----------");
+                for (let [key, value] of formData.entries()) {
+                    console.log(`${key}:`, value);
+                }
+                console.log("------------------------------------");
+
+                try {
+                    const response = await fetch('/store/appStore', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!response.ok) {
+                        const errorMessage = await response.text();
+                        alert(`신청 실패 (HTTP ${response.status}): \n${errorMessage}`);
+                        return;
+                    }
+                    const successMessage = await response.text();
+                    alert(successMessage);
+                    location.reload();
+                } catch (error) {
+                    console.error('신청 제출 중 오류 발생:', error);
+                    alert(`신청 제출 중 오류가 발생했습니다: ${error.message}`);
+                }
+            });
+        }
+        
+        // 탭 버튼 활성화 로직 (기존과 동일)
+        const tabs = document.querySelectorAll('#tab1, #tab2, #tab3, #tab4');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active-tab'));
+                this.classList.add('active-tab');
+            });
+        });
+        if (tabs.length > 0) {
+            tabs[0].classList.add('active-tab');
+        }
+    });
+</script>
         </th:block>
     </body>
 </html>

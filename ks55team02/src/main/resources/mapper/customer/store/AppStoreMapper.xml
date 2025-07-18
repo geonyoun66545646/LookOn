@@ -2,28 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ks55team02.customer.store.mapper.AppStoreMapper">
 
-    <resultMap id="appStoreResultMap" 			type="ks55team02.common.domain.store.AppStore">
-	  	<id property="aplyId"         				column="aply_id"/>
-		<result property ="aplyUserNo"     			column="aply_user_no"/>
-		<result property ="storeNm"        	 		column="store_nm"/>
-		<result property ="brnoImgId"       		column="brno_img_id"/>
-		<result property ="cmmDclrImgId"    		column="cmm_dclr_img_id"/>
-		<result property ="selGdsProofImgId" 		column="sel_gds_proof_img_id"/>
-		<result property ="rrnoCardCopyImgId" 		column="rrno_card_copy_img_id"/>
-		<result property ="bankbookCopyImgId" 		column="bankbook_copy_img_id"/>
-		<result property ="etcDocImgId"     		column="etc_doc_img_id"/>
-		<result property ="plcyId"          		column="plcy_id"/>
-		<result property ="ctrtAplyYmd"     		column="ctrt_aply_ymd"/>
-		<result property ="ctrtBgngYmd"     		column="ctrt_bgng_ymd"/>
-		<result property ="ctrtTermVal"     		column="ctrt_term_val"/>
-		<result property ="rvwMngrNo"       		column="rvw_mngr_no"/>
-		<result property ="mngrNm"          		column="mngr_nm"/>
-		<result property ="mngrEml"         		column="mngr_eml"/>
-		<result property ="mngrTelNo"       		column="mngr_tel_no"/>
-		<result property ="bplcAddr"        		column="bplc_addr"/>
-		<result property ="aplyStts"        		column="aply_stts"/>
-		<result property ="aprvRjctRsn"     		column="aprv_rjct_rsn"/>
+    <resultMap id="appStoreResultMap" type="ks55team02.common.domain.store.AppStore">
+	  	<id property="aplyId"         		column="aply_id"/>
+		<result property ="aplyUserNo"     	column="aply_user_no"/>
+		<result property ="storeNm"        	 column="store_nm"/>
+		<result property ="brnoImgId"       column="brno_img_id"/>
+		<result property ="cmmDclrImgId"    column="cmm_dclr_img_id"/>
+		<result property ="selGdsProofImgId" column="sel_gds_proof_img_id"/>
+		<result property ="rrnoCardCopyImgId" column="rrno_card_copy_img_id"/>
+		<result property ="bankbookCopyImgId" column="bankbook_copy_img_id"/>
+		<result property ="etcDocImgId"     column="etc_doc_img_id"/>
+		<result property ="plcyId"          column="plcy_id"/>
+		<result property ="ctrtAplyYmd"     column="ctrt_aply_ymd"/>
+        <result property ="ctrtTermVal"     column="ctrt_term_val"/>
+        <result property ="rvwMngrNo"       column="rvw_mngr_no"/>
+        <result property ="mngrNm"          column="mngr_nm"/>
+        <result property ="mngrEml"         column="mngr_eml"/>
+        <result property ="mngrTelNo"       column="mngr_tel_no"/>
+        <result property ="bplcAddr"        column="bplc_addr"/>
+        <result property ="aplyStts"        column="aply_stts"/>
+        <result property ="aprvRjctRsn"     column="aprv_rjct_rsn"/>
+        <result property ="storeIntroCn"    column="store_intro_cn"/>
+        <result property ="brno"            column="brno"/>
+        <result property ="bplcDaddr"       column="bplc_daddr"/>
+        <result property ="bplcPostCode"    column="bplc_post_code"/>
+        <result property ="bankNm"          column="bank_nm"/>
+        <result property ="actno"           column="act_no"/>
+        <result property ="dpstrNm"         column="dpstr_nm"/>
     </resultMap>
+    
+    
    <!--*/  <select id="getAppStoreByUserNo" parameterType="string" resultMap="appStoreResultMap">
     SELECT
 		sa.aply_id,
@@ -37,7 +45,6 @@
 		sa.etc_doc_img_id,
 		sa.plcy_id,
 		sa.ctrt_aply_ymd,
-		sa.ctrt_bgng_ymd,
 		sa.ctrt_term_val,
 		sa.rvw_mngr_no,
 		sa.mngr_nm,
@@ -55,6 +62,43 @@
  		aply_user_no = #{aplyUserNo}; 
     </select> */-->
     
-    
-    
-   </mapper>
+    <!-- 상점 신청 정보 삽입 -->
+    <insert id="addAppStore" parameterType="ks55team02.common.domain.store.AppStore">
+        INSERT INTO store_application (
+            aply_id, aply_user_no, store_nm, brno_img_id, cmm_dclr_img_id,
+            sel_gds_proof_img_id, rrno_card_copy_img_id, bankbook_copy_img_id,
+            etc_doc_img_id, plcy_id, ctrt_aply_ymd,
+            ctrt_term_val, rvw_mngr_no, mngr_nm, mngr_eml,
+            mngr_tel_no, bplc_addr, aply_stts, aprv_rjct_rsn, store_intro_cn,
+            brno, bplc_daddr, bplc_post_code,
+            bank_nm, act_no, dpstr_nm) VALUES (
+            #{aplyId}, #{aplyUserNo}, #{storeNm}, #{brnoImgId}, #{cmmDclrImgId},
+            #{selGdsProofImgId}, #{rrnoCardCopyImgId}, #{bankbookCopyImgId},
+            #{etcDocImgId}, #{plcyId}, #{ctrtAplyYmd},
+            #{ctrtTermVal}, #{rvwMngrNo}, #{mngrNm}, #{mngrEml},
+            #{mngrTelNo}, #{bplcAddr}, #{aplyStts}, #{aprvRjctRsn}, #{storeIntroCn},
+            #{brno}, #{bplcDaddr}, #{bplcPostCode},
+            #{bankNm}, #{actno}, #{dpstrNm})
+    </insert>
+
+    <!-- 상점 계좌 정보 삽입 -->
+    <insert id="addStoreAccount" parameterType="ks55team02.common.domain.store.StoreAccount">
+        INSERT INTO store_account (
+            actno_id, store_id, bank_nm, actno, dpstr_nm,
+            main_actno_yn, crt_dt, actvtn_yn, del_dt, del_user_no
+        ) VALUES (
+            #{actnoId}, #{storeId}, #{bankNm}, #{actno}, #{dpstrNm},
+            #{mainActnoYn}, #{crtDt}, #{actvtnYn}, #{delDt}, #{delUserNo}
+        )
+    </insert>
+
+    <!-- 가장 큰 신청 ID의 숫자 부분 조회 -->
+    <select id="getMaxAplyIdNum" resultType="java.lang.Integer">
+        SELECT 
+            MAX(CAST(SUBSTRING_INDEX(aply_id, '_', -1) AS UNSIGNED)) 
+        FROM 
+            store_application
+        WHERE 
+            aply_id LIKE 'aply_%'
+    </select>
+</mapper>

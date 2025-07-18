@@ -13,8 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import ks55team02.common.domain.store.StoreImage;
 import ks55team02.customer.store.mapper.StoreImageMapper;
 import ks55team02.customer.store.service.StoreImageService;
-import ks55team02.util.FileDetail; // 변경된 FilesUtils 패키지 및 FileDetail import
-import ks55team02.util.FilesUtils; // 변경된 FilesUtils 패키지 import
+import ks55team02.util.FileDetail;
+import ks55team02.util.FilesUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,43 +24,41 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class StoreImageServiceImpl implements StoreImageService {
 
-    private final FilesUtils filesUtils; // 파일 저장 및 삭제 유틸리티
-    private final StoreImageMapper storeImageMapper; // StoreImage 데이터베이스 매퍼
+    private final FilesUtils filesUtils;
+    private final StoreImageMapper storeImageMapper;
 
     @Override
-    public void addStoreImage(MultipartFile file) {
-        // FilesUtils를 사용하여 파일을 저장하고 FileDetail 객체를 반환받습니다.
-        // "store_images"는 이 파일이 저장될 서브 디렉토리입니다.
+    public String addStoreImage(MultipartFile file) { // String 반환 타입으로 변경
         FileDetail fileDetail = filesUtils.saveFile(file, "store_images");
         
         if (fileDetail != null) {
-            // FileDetail 정보를 사용하여 StoreImage 객체를 구성합니다.
-            // imgId는 StoreImage의 고유 ID로, FileDetail의 정보와는 별개로 생성합니다.
+            // 파일 저장 성공 시 이미지 ID 생성 및 DB 저장
             String imgId = "img_" + LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(FilesUtils.FILEIDX_DATE_FORMATTER)
                            + UUID.randomUUID().toString().replace("-", "").substring(0, 16);
 
             StoreImage storeImage = StoreImage.builder()
                     .imgId(imgId)
                     .imgFileNm(fileDetail.getOriginalFileName())
-                    .imgAddr(fileDetail.getSavedPath()) // FileDetail에서 저장된 상대 경로 사용
+                    .imgAddr(fileDetail.getSavedPath())
                     .imgFileSz(fileDetail.getFileSize())
-                    .imgTypeCd(fileDetail.getFileExtension()) // FileDetail에서 확장자 가져오기
+                    .imgTypeCd(fileDetail.getFileExtension())
                     .regYmd(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
                     .delYn(false)
                     .build();
-            storeImageMapper.addStoreImage(storeImage);
+            storeImageMapper.addStoreImage(storeImage); // DB에 이미지 정보 삽입
+            return imgId; // 생성된 imgId 반환
         }
+        return null; // 파일 저장 실패 시 null 반환
     }
 
     @Override
     public void addStoreImages(MultipartFile[] files) {
-        // FilesUtils를 사용하여 여러 파일을 저장하고 FileDetail 객체 리스트를 반환받습니다.
+        // 이 메서드는 현재 addStoreApplication에서 사용되지 않지만, 완전성을 위해 유지
         List<FileDetail> fileDetailsList = filesUtils.saveFiles(files, "store_images");
         
         if (!fileDetailsList.isEmpty()) {
             List<StoreImage> storeImageList = new ArrayList<>();
             for (FileDetail fileDetail : fileDetailsList) {
-                // 각 FileDetail 정보를 사용하여 StoreImage 객체를 구성합니다.
                 String imgId = "img_" + LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(FilesUtils.FILEIDX_DATE_FORMATTER)
                                + UUID.randomUUID().toString().replace("-", "").substring(0, 16);
 
@@ -81,12 +79,10 @@ public class StoreImageServiceImpl implements StoreImageService {
 
     @Override
     public void deleteStoreImage(StoreImage storeImage) {
-        // 실제 파일 삭제 (FilesUtils 사용)
         String fullPath = storeImage.getImgAddr();
         Boolean isDeleted = filesUtils.deleteFileByPath(fullPath);
 
         if (isDeleted) {
-            // 데이터베이스에서 del_yn을 1로 업데이트 (실제 삭제 대신 논리적 삭제)
             storeImageMapper.deleteStoreImageById(storeImage.getImgId());
         } else {
             log.warn("파일 삭제 실패: {}", fullPath);
