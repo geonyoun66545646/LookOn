@@ -86,10 +86,6 @@ public class ProductSellerHomeController {
          model.addAttribute("storeActGds", storeActGds); // 조회된 Store DTO 객체
          model.addAttribute("topSellingProduct", topSellingProducts); // 조회된 Store DTO 객체
          
-         
-         
-         
-         
          // 상점 로고 이미지 경로도 필요하다면 여기서 추가적으로 조회하여 모델에 담을 수 있습니다.
          // String storeLogoPath = storeMngService.getStoreLogoPathById(storeId);
          // model.addAttribute("storeLogoPath", storeLogoPath);

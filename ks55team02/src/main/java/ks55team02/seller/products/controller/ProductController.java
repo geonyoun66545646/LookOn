@@ -134,7 +134,7 @@ public class ProductController {
             productUpdateRequest.setMainImage(mainImage);
             productUpdateRequest.setDetailImage(detailImage);
             productUpdateRequest.calculateFinalPrice();
-            productUpdateRequest.setSelUserNo("user_no_150"); // ← 필수
+            productUpdateRequest.setSelUserNo("user_no_150");
             productUpdateRequest.setStoreId("store_1");
             
             productsService.updateProduct(productUpdateRequest);

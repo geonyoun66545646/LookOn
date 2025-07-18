@@ -36,9 +36,6 @@ public class ProductsServiceImpl implements ProductsService {
 	private final FilesUtils filesUtils;
 	private final AdminProductManagementMapper adminProductManagementMapper;
 	
-	/**
-     * 특정 상품의 모든 옵션 조합(gds_stts_no)과 그에 속한 옵션 값(opt_vl_no)들을 조회
-     */
     @Override
     public List<Map<String, Object>> getProductStatusOptions(String gdsNo) {
         return productsMapper.selectProductStatusOptions(gdsNo);
@@ -85,7 +82,7 @@ public class ProductsServiceImpl implements ProductsService {
 		ProductApprovalHistory initialHistory = new ProductApprovalHistory();
 		initialHistory.setAprvRjctHstryCd(newHistoryCode);
 		initialHistory.setGdsNo(gdsNo);
-		initialHistory.setPrcsMngrId(request.getSelUserNo()); // 판매자 ID를 처리자로 설정
+		initialHistory.setPrcsMngrId(request.getSelUserNo());
 		initialHistory.setAprvSttsCd("대기");
 		initialHistory.setPrcsDt(LocalDateTime.now());
 		initialHistory.setAprvRjctCycl(1); // 최초 등록은 무조건 1차수
