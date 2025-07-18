@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CartDTO {
 	
+	private String gdsSttsNo; // 성훈이가 추가
+	
+	
 	private String cartItemId;
 	private String userNo;
 	private String gdsNo;

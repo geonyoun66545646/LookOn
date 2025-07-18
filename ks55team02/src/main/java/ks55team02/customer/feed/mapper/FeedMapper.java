@@ -35,14 +35,13 @@ public interface FeedMapper {
 	int countLikes(String feedSn);
 	int insertLike(FeedInteraction like);
 
-	// --- [신규] 댓글 작성 기능 관련 ---
-	
-	// 1. 새로운 댓글 PK 생성을 위한 마지막 번호 조회
+	// 댓글 작성 기능 관련
 	String selectLastFeedCommentSn();
-	
-	// 2. 댓글 추가
 	int insertComment(FeedComment comment);
-	
-	// 3. 방금 추가한 댓글의 완전한 정보 조회 (UI 업데이트용)
 	FeedComment selectCommentBySn(String feedCmntSn);
+	
+	// [신규] 댓글 삭제 (논리적)
+	int deleteComment(@Param("feedCmntSn") String feedCmntSn, @Param("delUserNo") String delUserNo);
+	// [신규] 댓글 수정
+	int updateComment(@Param("feedCmntSn") String feedCmntSn, @Param("commentText") String commentText);
 }

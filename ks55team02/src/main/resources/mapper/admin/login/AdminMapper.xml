@@ -3,10 +3,11 @@
 <mapper namespace="ks55team02.admin.login.mapper.AdminMapper">
 
     <select id="getAdminInfoById" parameterType="String" resultType="ks55team02.admin.login.domain.AdminInfo">
+    <!-- 관리자 로그인 셀렉트문 -->
         SELECT
             user_no             AS userNo,
             user_lgn_id         AS userLgnId,
-            user_pswd_encpt_val AS userPswd, /* 비밀번호 컬럼 */
+            user_pswd_encpt_val AS userPswd,
             user_nm             AS userNm,
             mbr_grd_cd          AS mbrGrdCd
         FROM

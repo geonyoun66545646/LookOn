@@ -9,6 +9,6 @@ public class GitController {
 	@GetMapping("/git")
 	public String GitControllers(){
 		
-	return "/projectinfomation";
+	return "projectinfomation";
 	}
 }

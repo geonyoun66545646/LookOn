@@ -8,8 +8,7 @@
         <result column="user_no"        property="userNo"/>
         <result column="gds_no"         property="gdsNo"/>
         <result column="store_id"       property="storeId"/>
-        <result column="opt_no"         property="optNo"/>
-        <result column="quantity"       property="quantity"/>
+        <result column="gds_stts_no"    property="gdsSttsNo"/> <result column="quantity"       property="quantity"/>
         <result column="added_at"       property="addedAt"/>
         <result column="updated_at"     property="updatedAt"/>
         <result column="is_chc_ord"     property="isChcOrd"/>
@@ -24,49 +23,52 @@
 	        ci.user_no,
 	        ci.gds_no,
 	        ci.store_id,
-	        ci.opt_no,
-	        ci.quantity,
+	        ci.gds_stts_no,   ci.quantity,
 	        ci.added_at,
 	        ci.updated_at,
 	        ci.is_chc_ord,  
-	        p.gds_nm,         -- AS 별칭 제거
-	        p.last_sel_prc,   -- AS 별칭 제거
-	        po.opt_nm         -- AS 별칭 제거
+	        p.gds_nm,
+	        p.last_sel_prc,
+	        GROUP_CONCAT(pov.vl_nm SEPARATOR ', ') AS opt_nm
 	    FROM
 	        cart_items ci
 	    LEFT JOIN
 	        products p ON ci.gds_no = p.gds_no
 	    LEFT JOIN
-	        product_options po ON ci.opt_no = po.opt_no
+	        product_status ps ON ci.gds_stts_no = ps.gds_stts_no
+	    LEFT JOIN
+	        status_option_mappings som ON ps.gds_stts_no = som.gds_stts_no
+	    LEFT JOIN
+	        product_option_values pov ON som.opt_vl_no = pov.opt_vl_no
 	    WHERE
 	        ci.user_no = #{userNo}
+	    GROUP BY
+	        ci.cart_item_id
 	    ORDER BY
 	        ci.added_at DESC
     </select>
 
-    <!-- [최종 수정] parameterType="map" 속성을 제거하여 @Param 어노테이션으로 넘어오는 개별 파라미터를 받도록 수정 -->
-    <!-- 불필요한 store_id 조건도 제거 -->
     <select id="getExistingCartItem" resultMap="cartDTOResultMap">
         SELECT
-            cart_item_id, user_no, gds_no, store_id, opt_no, quantity, added_at, updated_at, is_chc_ord
+            cart_item_id, user_no, gds_no, store_id, gds_stts_no, quantity, added_at, updated_at, is_chc_ord
         FROM
             cart_items
         WHERE
             user_no = #{userNo}
             AND gds_no = #{gdsNo}
-            <if test="optNo != null and optNo != ''">
-                AND opt_no = #{optNo}
+            <if test="gdsSttsNo != null and gdsSttsNo != ''">
+                AND gds_stts_no = #{gdsSttsNo}
             </if>
-            <if test="optNo == null or optNo == ''">
-                AND opt_no IS NULL
+            <if test="gdsSttsNo == null or gdsSttsNo == ''">
+                AND gds_stts_no IS NULL
             </if>
     </select>
 
     <insert id="insertCartItem" parameterType="ks55team02.customer.cart.domain.CartDTO">
         INSERT INTO cart_items (
-            cart_item_id, user_no, gds_no, store_id, opt_no, quantity, added_at, is_chc_ord
+            cart_item_id, user_no, gds_no, store_id, gds_stts_no, quantity, added_at, is_chc_ord
         ) VALUES (
-            #{cartItemId}, #{userNo}, #{gdsNo}, #{storeId}, #{optNo}, #{quantity}, #{addedAt}, #{isChcOrd}
+            #{cartItemId}, #{userNo}, #{gdsNo}, #{storeId}, #{gdsSttsNo}, #{quantity}, #{addedAt}, #{isChcOrd}
         )
     </insert>
     
@@ -86,11 +88,12 @@
             updated_at = #{updatedAt}
         WHERE
             cart_item_id = #{cartItemId}
+            AND gds_stts_no = #{gdsSttsNo}
     </update>
 
     <select id="getCartItemById" parameterType="String" resultMap="cartDTOResultMap">
         SELECT
-            cart_item_id, user_no, gds_no, store_id, opt_no, quantity, added_at, updated_at, is_chc_ord
+            cart_item_id, user_no, gds_no, store_id, gds_stts_no, quantity, added_at, updated_at, is_chc_ord
         FROM
             cart_items
         WHERE
@@ -110,5 +113,4 @@
         WHERE
             user_no = #{userNo}
     </delete>
-
 </mapper>
