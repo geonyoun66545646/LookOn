@@ -1,7 +1,10 @@
 package ks55team02.customer.reports.mapper;
 
 import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+
+import ks55team02.customer.reports.domain.ReportAttachment;
 import ks55team02.customer.reports.domain.Reports;
 import ks55team02.customer.reports.domain.ReportsReasons;
 
@@ -20,4 +23,6 @@ public interface ReportsMapper {
 	
 	// 신고 대상 유형 목록 조회
 	List<String> getReportTargetTypeList();
+	
+	void insertReportAttachment(ReportAttachment attachment);
 }

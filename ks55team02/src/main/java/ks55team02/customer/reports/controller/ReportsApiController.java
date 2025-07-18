@@ -11,9 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpSession;
 import ks55team02.customer.login.domain.LoginUser;
@@ -74,40 +75,35 @@ public class ReportsApiController {
 		}
 	}
 
-	// 이 메소드 전체를 복사해서 기존 addReport 메소드와 교체하세요.
-
 	@PostMapping
-	public ResponseEntity<Map<String, Object>> addReport(@RequestBody Reports report, HttpSession session) { // 1. HttpSession 파라미터 추가
-	    Map<String, Object> response = new HashMap<>();
+	public ResponseEntity<Map<String, Object>> addReport(Reports report,
+			@RequestParam(value = "evidenceFile", required = false) List<MultipartFile> evidenceFiles,
+			HttpSession session) {
 
-	    // 2. 세션에서 로그인 정보 확인
-	    Object sessionUser = session.getAttribute("loginUser");
+		Map<String, Object> response = new HashMap<>();
 
-	    // 3. 비로그인 사용자가 API를 직접 호출한 경우 차단
-	    if (sessionUser == null) {
-	        response.put("success", false);
-	        response.put("message", "로그인 정보가 없습니다. 다시 로그인해주세요.");
-	        // HttpStatus.UNAUTHORIZED (401) 또는 HttpStatus.FORBIDDEN (403)을 사용합니다.
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-	    }
+		Object sessionUser = session.getAttribute("loginUser");
+		if (sessionUser == null) {
+			// ... (기존 에러 처리 로직)
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+		}
 
-	    try {
-	        // 4. 세션에서 사용자 번호(userNo)를 가져와 report 객체에 설정
-	        String userNo = ((LoginUser) sessionUser).getUserNo();
-	        report.setDclrUserNo(userNo); // 프론트가 아닌, 서버가 직접 신고자 정보를 설정
+		try {
+			String userNo = ((LoginUser) sessionUser).getUserNo();
+			report.setDclrUserNo(userNo);
 
-	        log.info("신고 접수 요청 (서버에서 사용자 정보 추가): {}", report);
-	        reportsService.addReport(report);
+			// 서비스에 report 객체와 파일 목록을 함께 전달합니다.
+			reportsService.addReport(report, evidenceFiles);
 
-	        response.put("success", true);
-	        response.put("message", "신고가 성공적으로 접수되었습니다.");
-	        return ResponseEntity.ok(response);
+			response.put("success", true);
+			response.put("message", "신고가 성공적으로 접수되었습니다.");
+			return ResponseEntity.ok(response);
 
-	    } catch (Exception e) {
-	        log.error("신고 접수 처리 중 에러 발생", e);
-	        response.put("success", false);
-	        response.put("message", "서버 내부 오류로 신고 접수에 실패했습니다. 관리자에게 문의해주세요.");
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-	    }
+		} catch (Exception e) {
+			log.error("신고 접수 처리 중 에러 발생", e);
+			response.put("success", false);
+			response.put("message", "서버 내부 오류로 신고 접수에 실패했습니다: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
 	}
 }
