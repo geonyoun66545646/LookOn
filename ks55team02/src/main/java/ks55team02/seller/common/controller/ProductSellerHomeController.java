@@ -88,7 +88,9 @@ public class ProductSellerHomeController {
             model.addAttribute("hasSubscription", true);
             model.addAttribute("earliestSubscriptionStartDate", subscription.get("earliest_sbscr_bgng_dt"));
             model.addAttribute("latestSubscriptionEndDate", subscription.get("latest_sbscr_end_dt"));
-            model.addAttribute("sbscrPrchsNocs", subscription.get("sbscr_prchs_nocs"));
+            
+            Object sbscrPrchsNocsValue = subscription.get("sbscr_prchs_nocs");
+            model.addAttribute("sbscrPrchsNocs", sbscrPrchsNocsValue != null ? sbscrPrchsNocsValue : 0);
         }
 
         Long storeSettle = storeMngService.getTotalSettleById(storeId);

@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute; // @ModelAttribute 임포트 추가
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,11 +20,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.format.annotation.DateTimeFormat;
 
-// --- 새로 추가될 임포트 시작 ---
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import ks55team02.customer.login.domain.LoginUser; // LoginUser 클래스 임포트 (경로 확인)
-// --- 새로 추가될 임포트 끝 ---
+import ks55team02.customer.login.domain.LoginUser;
 
 import ks55team02.admin.common.domain.Pagination;
 import ks55team02.admin.inquiry.service.AdminInquiryService;
@@ -90,7 +88,7 @@ public class AdminInquiryController {
     // 관리자 문의 상세 조회
     @GetMapping("/adminInquiryDetail")
     public String adminInquiryDetail(Model model,
-                                      @RequestParam(name = "inqryId") String inqryId) {
+                                     @RequestParam(name = "inqryId") String inqryId) {
         log.info("관리자 문의 상세 요청 - inqryId: {}", inqryId);
 
         Inquiry inquiryDetail = adminInquiryService.getInquiryDetailById(inqryId);
@@ -113,49 +111,54 @@ public class AdminInquiryController {
             @RequestParam("inqryId") String inqryId,
             @RequestParam("ansCn") String ansCn,
             @RequestParam(name = "ansId", required = false) String ansId,
-            // --- 기존 @RequestParam(name = "answrUserNo") String answrUserNo 제거 ---
-            HttpServletRequest request // HttpServletRequest를 파라미터로 받습니다.
+            HttpServletRequest request
     ) {
         Map<String, Object> response = new HashMap<>();
         
-        // --- 세션에서 로그인된 관리자 닉네임 (userNcnm) 가져오는 로직 시작 ---
-        String answrUserNo = null; // answrUserNo 변수는 이제 사용자 번호가 아닌, 닉네임/이름으로 활용됩니다.
-                                   // 만약 DB에 userNo를 저장해야 한다면 이 부분만 변경해주세요.
+        // --- 세션에서 로그인된 관리자 정보 가져오는 로직 시작 ---
+        String answrUserNo = null; // answrUserNo 변수에 실제 사용자 번호(userNo)를 할당할 예정
         HttpSession session = request.getSession(false); // 기존 세션이 없으면 새로 생성하지 않음 (false)
 
         if (session != null) {
             LoginUser loginUser = (LoginUser) session.getAttribute("loginUser"); // 세션에서 LoginUser 객체 조회
-            // LoginUser 객체에서 userNcnm (사용자 닉네임/이름) 추출
-            log.info("로그인 성공: {}", loginUser.getUserNcnm());
-            session.setAttribute("loginUser", loginUser);
-            answrUserNo = (loginUser != null) ? loginUser.getUserNcnm() : null; 
             
-            String adminUserNo = loginUser.getUserNo();
-            String adminNick = loginUser.getUserNcnm();
-            log.info("로그인 성공 - 관리자 번호: {}, 닉네임: {}", adminUserNo, adminNick);
+            if (loginUser != null) {
+                // 로그인된 관리자 닉네임은 로그 출력용으로만 사용합니다.
+                log.info("로그인 성공: {}", loginUser.getUserNcnm());
+                // 필요하다면 세션에 다시 설정할 수 있지만, 일반적으로 조회 후 사용이 더 일반적입니다.
+                // session.setAttribute("loginUser", loginUser); 
+                
+                // **여기서 중요한 변경: answrUserNo에 userNcnm 대신 userNo를 할당합니다.**
+                answrUserNo = loginUser.getUserNo(); // 외래 키 제약 조건에 맞는 실제 user_no 값 할당
+                
+                String adminUserNoLog = loginUser.getUserNo(); // 로그 출력용 변수
+                String adminNickLog = loginUser.getUserNcnm(); // 로그 출력용 변수
+                log.info("로그인 성공 - 관리자 번호: {}, 닉네임: {}", adminUserNoLog, adminNickLog);
+            }
         }
 
-        // 로그인된 사용자 닉네임(userNcnm)이 없으면 오류 처리 (로그인되지 않은 상태)
+        // 로그인된 사용자 번호(userNo)가 없으면 오류 처리 (로그인되지 않은 상태)
         if (answrUserNo == null || answrUserNo.isEmpty()) {
-            log.error("로그인된 사용자 정보 (닉네임)를 찾을 수 없습니다. 로그인이 필요합니다.");
+            log.error("로그인된 사용자 정보 (사용자 번호)를 찾을 수 없습니다. 로그인이 필요합니다.");
             response.put("status", "error");
             response.put("message", "로그인이 필요합니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
-        // --- 세션에서 로그인된 관리자 닉네임 가져오는 로직 끝 ---
+        // --- 세션에서 로그인된 관리자 정보 가져오는 로직 끝 ---
 
-        log.info("컨트롤러: 답변 처리 요청 수신 - inqryId: {}, ansCn: {}, ansId: {}, answrUserNo (로그인된 관리자 닉네임): {}", inqryId, ansCn, ansId, answrUserNo); // 로그 메시지 수정
+        // 로그 메시지도 answrUserNo가 사용자 번호임을 명확히 합니다.
+        log.info("컨트롤러: 답변 처리 요청 수신 - inqryId: {}, ansCn: {}, ansId: {}, answrUserNo (로그인된 관리자 번호): {}", inqryId, ansCn, ansId, answrUserNo);
 
         try {
             Answer processedAnswer;
             if (ansId == null || ansId.isEmpty()) {
                 log.info("컨트롤러: 신규 답변 등록 로직 실행");
-                // answrUserNo는 이제 세션에서 가져온 관리자 닉네임/이름입니다.
+                // answrUserNo는 이제 세션에서 가져온 관리자 번호입니다.
                 processedAnswer = adminInquiryService.registerAnswer(inqryId, ansCn, answrUserNo); 
                 response.put("message", "답변이 성공적으로 등록되었습니다.");
             } else {
                 log.info("컨트롤러: 기존 답변 수정 로직 실행 - 대상 ansId: {}", ansId);
-                // answrUserNo는 이제 세션에서 가져온 관리자 닉네임/이름입니다.
+                // answrUserNo는 이제 세션에서 가져온 관리자 번호입니다.
                 processedAnswer = adminInquiryService.updateAnswer(ansId, inqryId, ansCn, answrUserNo);
                 response.put("message", "답변이 성공적으로 수정되었습니다.");
             }
