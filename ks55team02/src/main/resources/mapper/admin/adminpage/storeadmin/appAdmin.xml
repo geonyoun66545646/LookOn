@@ -28,6 +28,7 @@
 		<result property="bankNm" 				column="bank_nm"/>
    		<result property="actno" 				column="act_no"/>
    		<result property="dpstrNm" 				column="dpstr_nm"/>
+   		<result property="storeIntroCn" 		column="store_intro_cn"/>
 		<association property="user" javaType="ks55team02.common.domain.inquiry.InquiryUser">
            <!-- users 테이블의 컬럼을 InquiryUser 객체의 필드에 매핑 -->
            <id property="userNo" column="user_no"/>
@@ -116,6 +117,7 @@
         sa.act_no,
         sa.dpstr_nm,
  	    sa.store_logo_img,
+ 	    sa.store_intro_cn,
         u.user_nm,
         u.user_no
     FROM
@@ -209,6 +211,7 @@
 			sa.bank_nm,
 			sa.act_no,
 			sa.dpstr_nm,
+			sa.store_intro_cn,
 			u.user_no,    -- users 테이블 컬럼 명시
             u.user_nm,    -- users 테이블 컬럼 명시
             u.eml_addr,   -- users 테이블 컬럼 명시
