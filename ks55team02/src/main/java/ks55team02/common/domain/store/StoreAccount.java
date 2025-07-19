@@ -9,7 +9,7 @@ public class StoreAccount {
     private String actnoId; // 계좌 ID
     private String storeId; // 상점 아이디 (store_application의 aply_id와 연결)
     private String bankNm; // 은행 명
-    private String actno; // 계좌 번호
+    private Long actno; // 계좌 번호
     private String dpstrNm; // 예금 주주
     private boolean mainActnoYn; // 주계좌 여부 (tinyint(1)은 boolean으로 매핑)
     private LocalDateTime crtDt; // 생성 일시

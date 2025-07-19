@@ -29,6 +29,8 @@
         <result property ="bankNm"          column="bank_nm"/>
         <result property ="actno"           column="act_no"/>
         <result property ="dpstrNm"         column="dpstr_nm"/>
+        <result property="storeLogoImg" 	column="store_logo_img"/>
+        <result property="lastMdfcnDt" 		column="last_mdfcn_dt"/>
     </resultMap>
     
     
@@ -70,15 +72,15 @@
             etc_doc_img_id, plcy_id, ctrt_aply_ymd,
             ctrt_term_val, rvw_mngr_no, mngr_nm, mngr_eml,
             mngr_tel_no, bplc_addr, aply_stts, aprv_rjct_rsn, store_intro_cn,
-            brno, bplc_daddr, bplc_post_code,
-            bank_nm, act_no, dpstr_nm) VALUES (
+            brno, bplc_daddr, bplc_post_code, 
+            bank_nm, act_no, dpstr_nm, store_logo_img) VALUES (
             #{aplyId}, #{aplyUserNo}, #{storeNm}, #{brnoImgId}, #{cmmDclrImgId},
             #{selGdsProofImgId}, #{rrnoCardCopyImgId}, #{bankbookCopyImgId},
             #{etcDocImgId}, #{plcyId}, #{ctrtAplyYmd},
             #{ctrtTermVal}, #{rvwMngrNo}, #{mngrNm}, #{mngrEml},
             #{mngrTelNo}, #{bplcAddr}, #{aplyStts}, #{aprvRjctRsn}, #{storeIntroCn},
             #{brno}, #{bplcDaddr}, #{bplcPostCode},
-            #{bankNm}, #{actno}, #{dpstrNm})
+            #{bankNm}, #{actno}, #{dpstrNm},#{storeLogoImg})
     </insert>
 
     <!-- 상점 계좌 정보 삽입 -->
@@ -101,4 +103,5 @@
         WHERE 
             aply_id LIKE 'aply_%'
     </select>
+    
 </mapper>

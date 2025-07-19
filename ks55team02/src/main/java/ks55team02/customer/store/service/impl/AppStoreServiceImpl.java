@@ -84,6 +84,7 @@ public class AppStoreServiceImpl implements AppStoreService{
             // 상점 로고
             if (uploadedFiles.containsKey("storeLogoImg") && uploadedFiles.get("storeLogoImg") != null && !uploadedFiles.get("storeLogoImg").isEmpty()) {
                 imgId = storeImageService.addStoreImage(uploadedFiles.get("storeLogoImg"));
+                appStore.setStoreLogoImg(imgId);
                 log.info("상점 로고 이미지 ID 생성됨: {}", imgId);
             }
 

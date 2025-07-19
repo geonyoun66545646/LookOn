@@ -94,7 +94,7 @@ public class StoreController {
 	        @RequestParam(name = "idCardCopy", required = false) MultipartFile rrnoCardCopyImg,
 	        @RequestParam(name = "bankAccountCopy", required = false) MultipartFile bankbookCopyImg,
 	        @RequestParam(name = "etcDocs", required = false) MultipartFile etcDocImg,
-	        @RequestParam(name = "storeLogoImg", required = false) MultipartFile storeLogoImg,
+	        @RequestParam(name = "storeLogoImgFile", required = false) MultipartFile storeLogoImgFile,
 	        HttpSession session
 	) {
 	    try {
@@ -108,7 +108,7 @@ public class StoreController {
 	        // String -> LocalDate, String -> Integer/Long 같은 타입 변환은 Spring이 자동으로 처리해줍니다.
 
 	        // 초기 신청 상태 설정
-	        appStore.setAplyStts("APLY_WAIT");
+	        appStore.setAplyStts("APPLY");
 
 	        // 파일 묶음 생성
 	        Map<String, MultipartFile> uploadedFiles = new HashMap<>();
@@ -118,7 +118,7 @@ public class StoreController {
 	        uploadedFiles.put("rrnoCardCopyImg", rrnoCardCopyImg);
 	        uploadedFiles.put("bankbookCopyImg", bankbookCopyImg);
 	        uploadedFiles.put("etcDocImg", etcDocImg);
-	        uploadedFiles.put("storeLogoImg", storeLogoImg);
+	        uploadedFiles.put("storeLogoImg", storeLogoImgFile);
 
 	        // 서비스 호출
 	        appStoreService.addStoreApplication(appStore, uploadedFiles);
