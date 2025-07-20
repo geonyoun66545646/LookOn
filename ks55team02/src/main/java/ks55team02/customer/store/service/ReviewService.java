@@ -14,6 +14,15 @@ public interface ReviewService {
   * @return 해당 상품의 리뷰 목록
   */
  List<ProductReview> getReviewsByProductCode(String productCode);
+ 
+ /**
+  * 새로운 리뷰를 등록합니다.
+  * 내부적으로 구매 이력, 중복 작성 여부를 검증합니다.
+  * @param reviewForm 사용자가 폼에서 작성한 데이터
+  * @param currentUserNo 현재 로그인한 사용자의 ID
+  */
+ void addReview(ProductReview productReview, String currentUserNo);
+ // ProductReview가 아닌 ReviewFormDTO를 받는 것이 더 명확합니다.
+}
 
  // TODO: 리뷰 작성, 수정, 삭제, 좋아요/취소 등의 메서드를 여기에 추가할 수 있습니다.
-}

@@ -35,4 +35,39 @@ public class ReviewServiceImple implements ReviewService { // 클래스명 수�
         // ProductReview 객체 내의 reviewImages 리스트까지 모두 채워서 반환해 줍니다.
         return reviewMapper.selectReviewsByProductCode(productCode);
     }
+    
+    @Override
+    public void addReview(ProductReview productReview, String currentUserNo) {
+        
+        // 1. 리뷰 작성 자격 검증 (구매 이력 확인)
+        String ordrDtlArtclNo = reviewMapper.findReviewableOrderItem(
+                currentUserNo,
+                productReview.getOrdrNo(),
+                productReview.getGdsNo()
+        );
+        
+        if (ordrDtlArtclNo == null) {
+            throw new IllegalArgumentException("리뷰를 작성할 권한이 없습니다. (구매 내역 불일치)");
+        }
+        
+        // 2. 중복 리뷰 작성 검증
+        int reviewCount = reviewMapper.countReviewByOrderItem(ordrDtlArtclNo);
+        if (reviewCount > 0) {
+            throw new IllegalStateException("이미 리뷰를 작성한 상품입니다.");
+        }
+        
+        // 3. 새로운 리뷰 ID 생성 로직
+        Integer maxIdNum = reviewMapper.findMaxReviewIdNumber();
+        int nextIdNum = (maxIdNum == null) ? 1 : maxIdNum + 1; // maxIdNum이 null이면 (첫 리뷰) 1부터 시작
+        String newReviewId = "review_" + nextIdNum;
+
+        // 4. [수정됨] 컨트롤러에서 받은 productReview 객체에 서버에서 생성/검증한 값을 설정
+        productReview.setReviewId(newReviewId);
+        productReview.setOrdrDtlArtclNo(ordrDtlArtclNo);
+        productReview.setPrchsrUserNo(currentUserNo);
+        productReview.setReviewStts(true); // '게시됨' 상태를 true로 가정
+        
+        // 5. [수정됨] 사용자가 입력한 값과 서버가 추가한 값을 모두 가진 객체를 DB에 INSERT
+        reviewMapper.insertReview(productReview);
+    }
 }

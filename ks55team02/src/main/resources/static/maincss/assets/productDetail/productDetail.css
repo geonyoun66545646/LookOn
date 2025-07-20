@@ -1161,7 +1161,7 @@
 }
 
 /* ================================================== */
-/*          프로필 및 상하 레이아웃을 위한 CSS          */
+/*        리뷰  프로필 및 상하 레이아웃을 위한 CSS          */
 /* ================================================== */
 
 /* 프로필 이미지를 감싸는 컨테이너 */
@@ -1182,4 +1182,30 @@
 /* 닉네임, 별점 등이 있는 메타 정보 영역 */
 .review-meta-info {
     width: 100%;
+}
+
+.review .review-header {
+    align-items: flex-start !important; /* 자식 요소들을 컨테이너의 위쪽으로 정렬 */
+}
+
+.review .ratings-container {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.btn-helpful{
+	display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.85rem 1.5rem;
+    font-weight: 400;
+    font-size: 1.2rem;
+    line-height: 1;
+    letter-spacing: -.01em;
+    min-width: 92px;
+    border-radius: 0;
+    white-space: normal;
+    transition: all 0.3s;
+    box-shadow: none;
 }

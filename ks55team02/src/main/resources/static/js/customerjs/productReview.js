@@ -8,15 +8,18 @@
 
     // HTML에서 호출할 초기화 함수
     window.initReviewSection = function(reviewData) {
-        allReviews = reviewData || [];
+        allReviews = reviewData.map((review, index) => ({
+            ...review,
+            id: review.reviewId || review.gdsEvlNo || `temp-id-${index}`, 
+            helpfulCount: review.helpfulCount || Math.floor(Math.random() * 20),
+            isLiked: false
+        })) || [];
         
         const reviewTabLink = document.getElementById('product-review-link');
         if (reviewTabLink) {
-            // [핵심 수정] jQuery 없이 순수 JavaScript의 click 이벤트 리스너를 사용합니다.
             reviewTabLink.addEventListener('click', function() {
-                // 이미 렌더링되었다면 다시 작업하지 않도록 플래그로 제어합니다.
                 if (!reviewsRendered) {
-                    renderReviewPage(1); // 1페이지부터 렌더링 시작
+                    renderReviewPage(1);
                     reviewsRendered = true;
                 }
             });
@@ -32,7 +35,6 @@
         const totalPages = Math.ceil(totalCount / REVIEWS_PAGE_SIZE);
         const startIndex = (page - 1) * REVIEWS_PAGE_SIZE;
         const endIndex = startIndex + REVIEWS_PAGE_SIZE;
-        // slice()는 endIndex 바로 앞까지 자르므로, endIndex 계산은 그대로 둡니다.
         const reviewsForPage = allReviews.slice(startIndex, endIndex);
 
         const reviewsHtml = generateReviewsHtml(reviewsForPage);
@@ -47,9 +49,10 @@
 
         attachPaginationEvents();
         applyDragScrollToSliders(reviewSection);
+        attachHelpfulButtonEvents(reviewSection);
     }
 
-    // 리뷰 목록 HTML을 생성하는 함수 (변경 없음)
+    // [수정됨] 리뷰 목록 HTML을 생성하는 함수
     function generateReviewsHtml(reviewList) {
         if (!reviewList || reviewList.length === 0) {
             return '<p class="text-center py-3">등록된 리뷰가 없습니다.</p>';
@@ -73,17 +76,22 @@
                     </div>
                 </div>
             ` : '';
+            
+            const likedClass = review.isLiked ? 'active' : '';
 
+            // [수정] 아래 return 문의 HTML 구조가 변경되었습니다.
             return `
                 <div class="review ${index < reviewList.length - 1 ? 'review-item-border' : ''}">
-                    <div class="review-header d-flex align-items-center mb-3">
+                    <div class="review-header d-flex align-items-center mb-1">
                         <div class="profile-image-wrapper mr-3"><img src="${profileImg}" alt="프로필" class="rounded-circle"></div>
                         <div class="review-meta-info w-100">
-                            <div class="d-flex justify-content-between align-items-center">
+                            
+                            <div class="d-flex align-items-baseline">
                                 <h5 class="mb-0"><a href="#">${nickname}</a></h5>
-                                <span class="review-date">${writtenDate}</span>
+                                <span class="review-date text-muted ml-2" style="font-size: 0.85em;">${writtenDate}</span>
                             </div>
-                            <div class="review-meta mt-1">
+
+                            <div class="review-meta">
                                 <div class="ratings-container">
                                     <div class="ratings"><div class="ratings-val" style="width: ${ratingWidth}%;"></div></div>
                                     <span class="ratings-text ml-1">${review.evlScr || 0}</span>
@@ -93,7 +101,12 @@
                     </div>
                     <div class="review-body">
                         ${imagesHtml}
-                        <div class="review-content"><p>${review.reviewCn || ''}</p></div>
+                        <div class="review-content mb-3"><p>${review.reviewCn || ''}</p></div>
+                        <div class="review-footer">
+                            <button class="btn btn-sm btn-outline-primary btn-helpful ${likedClass}" data-review-id="${review.id}">
+                                <i class="far fa-thumbs-up"></i> 도움이 돼요 <span class="helpful-count">${review.helpfulCount}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -128,6 +141,37 @@
         }
     }
 
+    // '도움이 돼요' 버튼에 대한 이벤트 처리 함수 (변경 없음)
+    function attachHelpfulButtonEvents(container) {
+        container.addEventListener('click', function(event) {
+            const button = event.target.closest('.btn-helpful');
+            if (!button) return;
+
+            event.preventDefault();
+
+            const reviewId = button.dataset.reviewId;
+            const review = allReviews.find(r => r.id == reviewId);
+            if (!review) return;
+
+            const countSpan = button.querySelector('.helpful-count');
+
+            if (review.isLiked) {
+                review.isLiked = false;
+                review.helpfulCount--;
+                button.classList.remove('active');
+            } else {
+                review.isLiked = true;
+                review.helpfulCount++;
+                button.classList.add('active');
+            }
+            
+            countSpan.textContent = review.helpfulCount;
+
+            // TODO: 실제 서버와 통신하는 AJAX/fetch 로직 추가
+            console.log(`Review ID ${reviewId}의 좋아요 상태: ${review.isLiked}`);
+        });
+    }
+
     // 드래그 스크롤 기능 적용 함수 (변경 없음)
     function applyDragScrollToSliders(container) {
         const sliders = container.querySelectorAll('.review-image-slider');
@@ -138,32 +182,6 @@
             slider.addEventListener('mouseup', () => { isDown = false; slider.classList.remove('active'); });
             slider.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); const x = e.pageX - slider.offsetLeft; const walk = (x - startX) * 2; slider.scrollLeft = scrollLeft - walk; });
         });
-    }
-
-    // [수정] renderReviewPage 함수에서 endIndex 계산 오류 수정
-    function renderReviewPage(page) {
-        const reviewSection = document.getElementById('review-section-content');
-        if (!reviewSection) return;
-    
-        const totalCount = allReviews.length;
-        const totalPages = Math.ceil(totalCount / REVIEWS_PAGE_SIZE);
-        const startIndex = (page - 1) * REVIEWS_PAGE_SIZE;
-        // slice()는 endIndex를 포함하지 않으므로, 계산은 그대로 둡니다.
-        const endIndex = startIndex + REVIEWS_PAGE_SIZE;
-        const reviewsForPage = allReviews.slice(startIndex, endIndex);
-    
-        const reviewsHtml = generateReviewsHtml(reviewsForPage);
-        const paginationHtml = generatePaginationHtml(page, totalPages);
-    
-        reviewSection.innerHTML = `
-            <h3>리뷰 (<span>${totalCount}</span>)</h3>
-            <hr class="mt-2 mb-4">
-            <div id="review-list-container">${reviewsHtml}</div>
-            <nav id="pagination-container" class="pagination-container">${paginationHtml}</nav>
-        `;
-    
-        attachPaginationEvents();
-        applyDragScrollToSliders(reviewSection);
     }
 
 })();
