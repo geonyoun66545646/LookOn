@@ -240,10 +240,15 @@
 						<div class="tab-pane fade" id="product-review-tab" role="tabpanel"
      						aria-labelledby="product-review-link">
 
-
-							<div th:replace="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">
+							<div th:if="${canWriteReview}">
+							        <div th:replace="~{customer/fragments/insertReviewFragment :: insertReviewFragment(
+							                        gdsNo=${product.gdsNo},
+							                        ordNo=${reviewableOrder.ordNo})}">
+							        </div>
+							        <hr class="mt-4 mb-4">
+							    </div>																		   
+							    <div th:replace="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">							  							
 							</div>
-
 						</div>
 					</div>
 				</div>
