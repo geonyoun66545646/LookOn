@@ -7,11 +7,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>나의 신고 내역</title>
 
+<!-- ★ 사용하고 계신 CSS 경로 그대로 유지했습니다. -->
 <link rel="stylesheet"
 	th:href="@{/maincss/assets/customcustomercss/myReports.css}">
 </head>
 
-</head>
 <body>
 
 	<th:block layout:fragment="contents">
@@ -20,29 +20,20 @@
 				<h2 class="mt-4 mb-4 text-center">나의 신고 내역</h2>
 				<div class="card mb-4 shadow-sm">
 					<div class="card-body">
-						<form class="row g-3">
-							<div class="col-md-3 d-flex flex-column">
-								<label for="reportType" class="form-label mb-2">신고 대상 유형</label>
-								<select id="reportType" name="reportType" class="form-select">
-									<option value="">-- 신고 대상 유형 선택 --</option>
-								</select>
-							</div>
-							<div class="col-md-3 d-flex flex-column">
-								<label for="reportStatus" class="form-label mb-2">처리 상태</label>
-								<select id="reportStatus" name="reportStatus"
-									class="form-select">
-									<option value="">-- 처리 상태 선택 --</option>
-								</select>
-							</div>
-							<div class="col-md-6 d-flex flex-column">
+						<!-- ★★★ [최종 수정] 검색창 레이아웃 ★★★ -->
+						<!-- 1. justify-content-center 클래스를 추가하여 자식 요소를 중앙 정렬합니다. -->
+						<div class="row g-3 justify-content-center">
+							<!-- 2. col-md-8 로 변경하여 너비를 적절하게 늘립니다. -->
+							<div class="col-md-8">
 								<label for="searchKeyword" class="form-label mb-2">검색어</label>
 								<div class="input-group">
 									<input type="text" id="searchKeyword" name="searchKeyword"
-										class="form-control" placeholder="신고 번호 또는 내용 검색">
-									<button type="submit" class="btn btn-primary">검색</button>
+										class="form-control" placeholder="신고 번호, 신고 사유로 검색해 보세요.">
+									<button type="button" id="search-btn" class="btn btn-primary">검색</button>
 								</div>
 							</div>
-						</form>
+						</div>
+						<!-- </form> 대신 </div>로 닫기 -->
 					</div>
 				</div>
 
@@ -62,69 +53,347 @@
 										<th scope="col">상세 보기</th>
 									</tr>
 								</thead>
-								<tbody>
-									<tr>
-										<th scope="row">1</th>
-										<td>REP-001</td>
-										<td>상품</td>
-										<td>허위 광고 신고</td>
-										<td>2025-06-20 14:30</td>
-										<td><span class="badge bg-success">처리 완료</span></td>
-										<td><a href="#"
-											class="btn btn-sm btn-outline-primary">보기</a></td>
-									</tr>
-									<tr>
-										<th scope="row">2</th>
-										<td>REP-002</td>
-										<td>판매자</td>
-										<td>불량 판매자 신고</td>
-										<td>2025-06-22 09:15</td>
-										<td><span class="badge bg-info text-dark">처리 중</span></td>
-										<td><a href="#"
-											class="btn btn-sm btn-outline-primary">보기</a></td>
-									</tr>
-									<tr>
-										<th scope="row">3</th>
-										<td>REP-003</td>
-										<td>게시글</td>
-										<td>욕설 사용 신고</td>
-										<td>2025-06-23 11:00</td>
-										<td><span class="badge bg-secondary">접수 완료</span></td>
-										<td><a href="#"
-											class="btn btn-sm btn-outline-primary">보기</a></td>
-									</tr>
+								<!-- ★★★ [수정 1] 기존의 정적 데이터를 모두 지우고 id를 부여했습니다. ★★★ -->
+								<tbody id="my-reports-tbody">
+									<!-- JavaScript가 이 안을 동적으로 채울 것입니다. -->
 								</tbody>
 							</table>
 						</div>
-						
+
 
 						<nav aria-label="Page navigation">
-							<ul class="pagination justify-content-center mt-3">
-								<li class="page-item disabled"><a class="page-link"
-									href="#">이전</a></li>
-								<li class="page-item active"><a class="page-link" href="#">1</a></li>
-								<li class="page-item"><a class="page-link" href="#">2</a></li>
-								<li class="page-item"><a class="page-link" href="#">3</a></li>
-								<li class="page-item"><a class="page-link" href="#">다음</a></li>
+							<ul class="pagination justify-content-center mt-3"
+								id="pagination-ul">
+								<!-- JavaScript가 이 안을 채울 것입니다. -->
 							</ul>
 						</nav>
-						
+
 						<div class="d-flex justify-content-end mt-4">
 							<a href="/customer/reports" class="btn btn-info btn-lg">새로운
 								신고 접수하기</a>
 						</div>
 
-					
-
 					</div>
 				</div>
 			</div>
 		</div>
+
+		<!-- ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ -->
+		<!-- ★ [추가] 신고 상세 정보 표시를 위한 Bootstrap Modal ★ -->
+		<!-- ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ -->
+		<div class="modal fade" id="reportDetailModal" tabindex="-1"
+			aria-labelledby="reportDetailModalLabel" aria-hidden="true">
+			<div
+				class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="reportDetailModalLabel">신고 상세 정보</h5>
+
+					</div>
+					<div class="modal-body">
+						<!-- 데이터가 여기에 동적으로 채워집니다. -->
+						<dl class="row">
+							<dt class="col-sm-3">신고 번호</dt>
+							<dd class="col-sm-9" id="modal-report-id">데이터 로딩 중...</dd>
+
+							<dt class="col-sm-3">신고 대상 유형</dt>
+							<dd class="col-sm-9" id="modal-target-type">데이터 로딩 중...</dd>
+
+							<dt class="col-sm-3">신고 대상 ID/내용</dt>
+							<dd class="col-sm-9" id="modal-target-identifier">데이터 로딩
+								중...</dd>
+
+							<dt class="col-sm-3">신고 사유</dt>
+							<dd class="col-sm-9" id="modal-report-reason">데이터 로딩 중...</dd>
+
+							<dt class="col-sm-3">접수 일시</dt>
+							<dd class="col-sm-9" id="modal-receipt-date">데이터 로딩 중...</dd>
+
+							<dt class="col-sm-3">처리 상태</dt>
+							<dd class="col-sm-9" id="modal-process-status">데이터 로딩 중...</dd>
+
+							<!-- ★★★ [추가] 관리자 답변을 표시할 영역 ★★★ -->
+							<dt class="col-sm-3">처리 일시</dt>
+							<dd class="col-sm-9" id="modal-process-date">데이터 로딩 중...</dd>
+
+							<dt class="col-sm-3">처리 결과</dt>
+							<dd class="col-sm-9" id="modal-admin-reply">데이터 로딩 중...</dd>
+							<!-- ★★★★★★★★★★★★★★★★★★★★★★★★★★ -->
+
+							<hr class="my-3">
+
+							<!-- ★★★ [추가] 빠져있던 '상세 신고 내용' 영역 ★★★ -->
+							<dt class="col-sm-12">상세 신고 내용</dt>
+							<dd class="col-sm-12">
+								<div id="modal-detail-content"
+									class="p-2 bg-light border rounded"
+									style="min-height: 100px; white-space: pre-wrap;">데이터 로딩
+									중...</div>
+							</dd>
+							<!-- ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ -->
+
+							<hr class="my-3">
+
+							<dt class="col-sm-12">첨부 파일</dt>
+							<dd class="col-sm-12">
+								<ul class="list-group" id="modal-attachments-list">
+									<!-- 첨부파일 링크가 여기에 동적으로 추가됩니다. -->
+								</ul>
+							</dd>
+						</dl>
+					</div>
+					<div class="modal-footer">
+						<!-- ★★★ [수정] id="modalCloseBtn"을 추가합니다. ★★★ -->
+						<button type="button" class="btn btn-secondary" id="modalCloseBtn"
+							data-bs-dismiss="modal">닫기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- ★★★★★★★★★★★★★★★★★★★★★★ 모달 코드 끝 ★★★★★★★★★★★★★★★★★★★★★ -->
+
+
 	</th:block>
 
+	<!-- jsFile 프래그먼트는 비워둡니다. -->
 	<th:block layout:fragment="jsFile">
 	</th:block>
+
 	<th:block layout:fragment="jsScript">
+		<script>
+    // ===================================================================
+    // 1. 상태 및 요소 관리
+    // ===================================================================
+    let detailModal = null;
+    let currentState = { keyword: '', page: 1 };
+    
+    const searchInput = document.getElementById('searchKeyword');
+    const searchBtn = document.getElementById('search-btn');
+    const tbody = document.getElementById('my-reports-tbody');
+    const paginationUl = document.getElementById('pagination-ul');
+
+    // ===================================================================
+    // 2. 초기화 및 이벤트 핸들러 바인딩
+    // ===================================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        detailModal = new bootstrap.Modal(document.getElementById('reportDetailModal'));
+        
+        searchBtn.addEventListener('click', () => {
+            currentState.keyword = searchInput.value.trim();
+            currentState.page = 1;
+            fetchMyReports();
+        });
+
+        searchInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchBtn.click();
+            }
+        });
+
+        paginationUl.addEventListener('click', e => {
+            const pageLink = e.target.closest('.page-link'); 
+            if (pageLink && pageLink.dataset.page) {
+                e.preventDefault();
+                currentState.page = parseInt(pageLink.dataset.page, 10);
+                fetchMyReports();
+            }
+        });
+        
+        tbody.addEventListener('click', e => {
+            const viewBtn = e.target.closest('.view-detail-btn');
+            if (viewBtn) {
+                const dclrId = viewBtn.dataset.dclrId;
+                showReportDetail(dclrId);
+            }
+        });
+        
+     // ★★★ [추가] 모달의 '닫기' 버튼에 수동으로 닫기 기능을 부여합니다. ★★★
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        if(modalCloseBtn) {
+            modalCloseBtn.addEventListener('click', function() {
+                detailModal.hide(); // detailModal 객체를 사용해 모달을 숨깁니다.
+            });
+        }
+
+        fetchMyReports();
+    });
+
+    // ===================================================================
+    // 3. 핵심 로직 함수 (데이터 로딩 및 화면 그리기)
+    // ===================================================================
+
+    function fetchMyReports() {
+        const scrollPosition = window.scrollY;
+        const params = new URLSearchParams({
+            searchKeyword: currentState.keyword,
+            page: currentState.page
+        });
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5">로딩 중...</td></tr>`;
+
+        fetch(`/api/customer/reports/my-list?${params.toString()}`)
+            .then(response => {
+                if (response.status === 401) throw new Error('UNAUTHORIZED');
+                if (!response.ok) throw new Error('데이터 로딩에 실패했습니다.');
+                return response.json();
+            })
+            .then(pageData => {
+                renderReportList(pageData.list);
+                renderPagination(pageData);
+                window.scrollTo(0, scrollPosition);
+            })
+            .catch(error => {
+                const message = error.message === 'UNAUTHORIZED' ? '로그인이 필요합니다.' : '오류가 발생했습니다.';
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-danger">${message}</td></tr>`;
+                paginationUl.innerHTML = '';
+            });
+    }
+
+    function renderReportList(reportList) {
+        tbody.innerHTML = ''; 
+        if (!reportList || reportList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5">조회된 신고 내역이 없습니다.</td></tr>`;
+            return;
+        }
+        reportList.forEach((report, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <th scope="row">${index + 1}</th>
+                <td>${formatReportId(report.dclrId, report.dclrRcptDt)}</td>
+                <td>${translateTargetType(report.dclrTrgtTypeCd)}</td>
+                <td>${report.dclrRsnCn}</td>
+                <td>${report.dclrRcptDt.replace('T', ' ').substring(0, 16)}</td>
+                <td>${renderStatusBadge(report.prcsSttsCd)}</td>
+                <td><button type="button" class="btn btn-sm btn-outline-primary view-detail-btn" data-dclr-id="${report.dclrId}">보기</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+    
+    function renderPagination(pageData) {
+        paginationUl.innerHTML = '';
+        if (!pageData || pageData.totalCount === 0 || pageData.totalPages <= 1) return;
+        const { currentPage, totalPages, startPage, endPage } = pageData;
+        let paginationHtml = '';
+        paginationHtml += currentPage > 1 ? `<li class="page-item"><button type="button" class="page-link" data-page="1">처음</button></li>` : `<li class="page-item disabled"><button type="button" class="page-link">처음</button></li>`;
+        paginationHtml += currentPage > 1 ? `<li class="page-item"><button type="button" class="page-link" data-page="${currentPage - 1}">이전</button></li>` : `<li class="page-item disabled"><button type="button" class="page-link">이전</button></li>`;
+        for (let i = startPage; i <= endPage; i++) paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><button type="button" class="page-link" data-page="${i}">${i}</button></li>`;
+        paginationHtml += currentPage < totalPages ? `<li class="page-item"><button type="button" class="page-link" data-page="${currentPage + 1}">다음</button></li>` : `<li class="page-item disabled"><button type="button" class="page-link">다음</button></li>`;
+        paginationHtml += currentPage < totalPages ? `<li class="page-item"><button type="button" class="page-link" data-page="${totalPages}">마지막</button></li>` : `<li class="page-item disabled"><button type="button" class="page-link">마지막</button></li>`;
+        paginationUl.innerHTML = paginationHtml;
+    }
+    
+    // ===================================================================
+    // 4. 데이터 가공 및 모달 제어 함수 (가독성 복원)
+    // ===================================================================
+
+    /**
+     * 신고 번호를 'YYYYMMDD_XXX' 형식으로 가공하는 함수
+     */
+    function formatReportId(reportId, dateString) {
+        const datePart = dateString.substring(0, 10).replace(/-/g, '');
+        const idPart = reportId.split('_').pop();
+        return `${datePart}_${idPart}`;
+    }
+
+    /**
+     * 신고 대상 코드 값을 한글로 번역하는 함수
+     */
+     function translateTargetType(typeCode) {
+         switch (typeCode) {
+             case 'USER':    return '사용자';
+             case 'COMMENT': return '댓글';
+             case 'PRODUCT': return '상품';
+             case 'POST':    return '게시글';
+             case 'ALL':     return '전체'; // 'ALL'은 '전체'로 명시
+             default:
+                 return typeCode; // 알 수 없는 코드는 그대로 반환 (예: '기타' 없음)
+         }
+     }
+
+    /**
+     * 처리 상태 코드에 따라 다른 스타일의 뱃지를 반환하는 함수
+     */
+    function renderStatusBadge(statusCode) {
+        switch (statusCode) {
+            case 'RECEIVED':   return '<span class="badge bg-secondary">접수 완료</span>';
+            case 'PROCESSING': return '<span class="badge bg-info text-dark">처리 중</span>';
+            case 'COMPLETED':  return '<span class="badge bg-success">처리 완료</span>';
+            case 'REJECTED':   return '<span class="badge bg-danger">반려</span>';
+            default:           return `<span class="badge bg-light text-dark">${statusCode}</span>`;
+        }
+    }
+
+    /**
+     * '보기' 버튼 클릭 시 실행되는 메인 함수
+     */
+    function showReportDetail(dclrId) {
+        resetModalContent();
+        detailModal.show();
+        fetch(`/api/customer/reports/${dclrId}`)
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                populateModal(data);
+            })
+            .catch(error => {
+                console.error('상세 정보 조회 실패:', error);
+                document.getElementById('modal-body').innerText = '상세 정보를 불러오는 데 실패했습니다.';
+            });
+    }
+
+    /**
+     * 모달 내용을 API 데이터로 채워넣는 함수
+     */
+    function populateModal(data) {
+        document.getElementById('modal-report-id').textContent = formatReportId(data.dclrId, data.dclrRcptDt);
+        document.getElementById('modal-target-type').textContent = translateTargetType(data.dclrTrgtTypeCd);
+        document.getElementById('modal-target-identifier').textContent = data.targetIdentifier;
+        document.getElementById('modal-report-reason').textContent = data.dclrRsnCn;
+        document.getElementById('modal-receipt-date').textContent = data.dclrRcptDt.replace('T', ' ').substring(0, 16);
+        document.getElementById('modal-process-status').innerHTML = renderStatusBadge(data.prcsSttsCd);
+
+        if (data.processDate) {
+            document.getElementById('modal-process-date').textContent = data.processDate.replace('T', ' ').substring(0, 16);
+        } else {
+            document.getElementById('modal-process-date').textContent = '-';
+        }
+        document.getElementById('modal-admin-reply').textContent = data.adminReply || '(아직 처리 답변이 없습니다)';
+        
+        document.getElementById('modal-detail-content').textContent = data.dtlDclrRsnCn || '(작성된 상세 내용이 없습니다)';
+        
+        const attachmentsList = document.getElementById('modal-attachments-list');
+        attachmentsList.innerHTML = '';
+        if (data.attachments && data.attachments.length > 0) {
+            data.attachments.forEach(file => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = `<a href="/download${file.filePath}" download="${file.originalFilename}">${file.originalFilename} (${(file.fileSize / 1024).toFixed(2)} KB)</a>`;
+                attachmentsList.appendChild(li);
+            });
+        } else {
+            attachmentsList.innerHTML = '<li class="list-group-item">첨부된 파일이 없습니다.</li>';
+        }
+    }
+
+    /**
+     * 모달 내용을 '로딩 중...' 상태로 되돌리는 함수
+     */
+    function resetModalContent() {
+        document.getElementById('modal-report-id').textContent = '데이터 로딩 중...';
+        document.getElementById('modal-target-type').textContent = '데이터 로딩 중...';
+        document.getElementById('modal-target-identifier').textContent = '데이터 로딩 중...';
+        document.getElementById('modal-report-reason').textContent = '데이터 로딩 중...';
+        document.getElementById('modal-receipt-date').textContent = '데이터 로딩 중...';
+        document.getElementById('modal-process-status').innerHTML = '';
+        document.getElementById('modal-process-date').textContent = '데이터 로딩 중...';
+        document.getElementById('modal-admin-reply').textContent = '데이터 로딩 중...';
+        document.getElementById('modal-detail-content').textContent = '데이터 로딩 중...';
+        document.getElementById('modal-attachments-list').innerHTML = '';
+    }
+</script>
 	</th:block>
 
 </body>

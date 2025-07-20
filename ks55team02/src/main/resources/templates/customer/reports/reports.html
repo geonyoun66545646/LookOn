@@ -293,20 +293,26 @@
 	    executeSearchBtn.addEventListener('click', executeSearch);
 	    searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); executeSearch(); } });
 	    
-	    // [유지] 검색 결과의 '선택' 버튼 클릭 시, 메인 폼에 값 반영 (변경 없음)
+	    /**
+	     * '선택' 버튼 클릭 시, 올바른 ID를 폼에 반영하는 이벤트 리스너
+	     */
 	    searchResultsContainer.addEventListener('click', function(event) {
-	        // ... (기존 코드와 동일, 변경 없음)
 	        const selectBtn = event.target.closest('.select-target-btn');
 	        if (!selectBtn) return;
-	        const id = selectBtn.dataset.id;
+
 	        const name = selectBtn.dataset.name;
 	        targetDisplayName.value = name;
+
 	        if (currentSearchType === 'USER') {
-	            targetUserIdInput.value = id;
-	            targetContentIdInput.value = '';
+	            // ★ 3. '사용자' 신고일 경우, data-id 대신 data-user-no에 저장된 값을 사용합니다.
+	            const userNo = selectBtn.dataset.userNo;
+	            targetUserIdInput.value = userNo;
+	            targetContentIdInput.value = ''; // 다른 input은 비웁니다.
 	        } else {
+	            // 그 외(콘텐츠) 신고일 경우, 기존처럼 data-id 값을 사용합니다.
+	            const id = selectBtn.dataset.id;
 	            targetContentIdInput.value = id;
-	            targetUserIdInput.value = '';
+	            targetUserIdInput.value = ''; // 다른 input은 비웁니다.
 	        }
 	        searchModal.hide();
 	    });
@@ -360,27 +366,50 @@
 	            });
 	    }
 	    
-	    // [유지] 검색 결과를 HTML로 그려주는 함수
+	    /**
+	     * 검색 결과를 HTML로 그려주는 함수
+	     */
 	    function renderSearchResults(results) {
-	        // ... (기존 코드와 동일, 변경 없음)
 	        const limit = 50;
 	        if (!results || results.length === 0) {
 	            searchResultsContainer.innerHTML = '<p>검색 결과가 없습니다.</p>';
 	            return;
 	        }
+
 	        let html = '<ul class="list-group">';
+	        
 	        results.forEach(item => {
 	            const id = item.id;
 	            const name = item.name;
 	            const detail = item.detail;
-	            html += `<li class="list-group-item d-flex justify-content-between align-items-center"><div><strong>${name}</strong><small class="text-muted d-block">${detail || ''}</small></div><button type="button" class="btn btn-sm btn-outline-primary select-target-btn" data-id="${id}" data-name="${name}">선택</button></li>`;
+	            const userNo = item.userNo; 
+
+	            // ★★★ [최종 수정] 버튼 태그의 속성과 텍스트를 명확히 분리합니다. ★★★
+	            html += `
+	                <li class="list-group-item d-flex justify-content-between align-items-center">
+	                    <div>
+	                        <strong>${name}</strong>
+	                        <small class="text-muted d-block">${detail || ''}</small>
+	                    </div>
+	                    <button 
+	                        type="button" 
+	                        class="btn btn-sm btn-outline-primary select-target-btn" 
+	                        data-id="${id}" 
+	                        data-name="${name}" 
+	                        data-user-no="${userNo || ''}"
+	                    >선택</button>
+	                </li>`;
 	        });
+
 	        html += '</ul>';
+
 	        if (results.length === limit) {
 	            html += '<p class="text-muted text-center mt-2 small">결과가 너무 많습니다. 더 구체적인 검색어로 결과를 좁혀보세요.</p>';
 	        }
+	        
 	        searchResultsContainer.innerHTML = html;
 	    }
+
 	
 	    // [신규] 관리 중인 파일 목록(attachedFiles)을 기준으로 미리보기를 그리는 함수
 	    function renderPreviews() {
