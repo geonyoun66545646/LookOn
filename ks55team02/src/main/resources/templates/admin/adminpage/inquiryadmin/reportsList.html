@@ -70,7 +70,8 @@
 				<div class="d-flex justify-content-between align-items-center mb-3">
 					<div>
 						<span class="font-weight-bold">[ 전체 신고 <span
-							class="text-primary">0</span>건 ]
+							class="text-primary" th:text="${pagination.totalRecordCount}">0</span>건
+							]
 						</span>
 					</div>
 					<div></div>
@@ -94,86 +95,68 @@
 							<th>관리</th>
 						</tr>
 					</thead>
-					<tbody>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										value="DCLR_001">
-								</div></td>
-							<td>DCLR_20230710_001</td>
-							<td>2023-07-10 10:30</td>
-							<td>user_honggildong</td>
-							<td>USER</td>
-							<td>user_badguy</td>
-							<td>욕설/비방</td>
-							<td>게시글에 반복적인 욕설 사용...</td>
-							<td><span class="badge bg-warning">처리 대기</span></td>
-							<td><a
-								th:href="@{/adminpage/inquiryadmin/reportsDetail}"
-								class="btn btn-sm btn-primary" style="min-width: 90px;">처리</a></td>
+					<tbody th:with="reportList=${reportList}">
+						<tr th:if="${#lists.isEmpty(reportList)}">
+							<td colspan="10" class="text-center py-5">조회된 신고 내역이 없습니다.</td>
 						</tr>
-						<tr>
-							<td><div class="form-check">
+
+						<tr th:unless="${#lists.isEmpty(reportList)}"
+							th:each="report : ${reportList}">
+							<td>
+								<div class="form-check">
 									<input class="form-check-input" type="checkbox"
-										value="DCLR_002">
-								</div></td>
-							<td>DCLR_20230709_002</td>
-							<td>2023-07-09 15:45</td>
-							<td>user_kimchulsu</td>
-							<td>CONTENT</td>
-							<td>CONTS_POST_456</td>
-							<td>음란물/선정성</td>
-							<td>사진에 부적절한 내용 포함...</td>
-							<td><span class="badge bg-info">처리 중</span></td>
+										th:value="${report.dclrId}">
+								</div>
+							</td>
+							<td th:text="${report.dclrId}">DCLR_20230710_001</td>
+							<td
+								th:text="${#temporals.format(report.dclrRcptDt, 'yyyy-MM-dd HH:mm')}">2023-07-10
+								10:30</td>
+							<td th:text="${report.dclrUserNickname}">user_honggildong</td>
+							<td th:text="${report.dclrTrgtTypeCd}">USER</td>
+							<td th:text="${report.intelligentTargetInfo}">user_badguy</td>
+							<td th:text="${report.dclrReasonContent}">욕설/비방</td>
+							<td class="text-truncate" style="max-width: 150px;"
+								th:text="${report.dtlDclrRsnCn}">게시글에 반복적인 욕설 사용...</td>
+
+							<td><span th:switch="${report.prcsSttsCd}"
+								th:classappend="${report.prcsSttsCd == 'PENDING'} ? 'bg-warning' : (${report.prcsSttsCd == 'COMPLETED'} ? 'bg-success' : 'bg-info')"
+								class="badge"> <span th:case="'PENDING'">처리 대기</span> <span
+									th:case="'COMPLETED'">처리 완료</span> <span th:case="'REJECTED'">반려</span>
+									<span th:case="*">처리 중</span>
+							</span></td>
+
 							<td><a
-								th:href="@{/adminpage/inquiryadmin/reportsDetail}"
-								class="btn btn-sm btn-primary" style="min-width: 90px;">처리</a></td>
-						</tr>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										value="DCLR_003">
-								</div></td>
-							<td>DCLR_20230708_003</td>
-							<td>2023-07-08 09:00</td>
-							<td>user_parkyounghee</td>
-							<td>USER</td>
-							<td>user_spam_bot</td>
-							<td>도배/스팸</td>
-							<td>댓글로 광고 도배 지속...</td>
-							<td><span class="badge bg-success">처리 완료</span></td>
-							<td><a
-								th:href="@{/adminpage/inquiryadmin/reportsDetail}"
-								class="btn btn-sm btn-primary" style="min-width: 90px;">상세</a></td>
-						</tr>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										value="DCLR_004">
-								</div></td>
-							<td>DCLR_20230707_004</td>
-							<td>2023-07-07 11:20</td>
-							<td>user_leeyoungmi</td>
-							<td>CONTENT</td>
-							<td>CONTS_COMMENT_789</td>
-							<td>기타</td>
-							<td>불쾌감을 주는 댓글 작성...</td>
-							<td><span class="badge bg-danger">반려</span></td>
-							<td><a
-								th:href="@{/adminpage/inquiryadmin/reportsDetail}"
-								class="btn btn-sm btn-primary" style="min-width: 90px;">상세</a></td>
+								th:href="@{/adminpage/inquiryadmin/reports/{dclrId}(dclrId=${report.dclrId})}"
+								class="btn btn-sm btn-primary" style="min-width: 90px;"
+								th:text="${report.prcsSttsCd == 'COMPLETED' or report.prcsSttsCd == 'REJECTED'} ? '상세' : '처리'">
+									처리 </a></td>
 						</tr>
 					</tbody>
 				</table>
 
 				<nav class="d-flex justify-content-center mt-4"
-					aria-label="Page navigation">
+					aria-label="Page navigation"
+					th:if="${pagination.totalRecordCount > 0}">
 					<ul class="pagination">
-						<li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-						<li class="page-item active"><a class="page-link" href="#">1</a></li>
-						<li class="page-item"><a class="page-link" href="#">2</a></li>
-						<li class="page-item"><a class="page-link" href="#">3</a></li>
-						<li class="page-item"><a class="page-link" href="#">다음</a></li>
+						<li class="page-item"
+							th:classappend="${!pagination.existPrevBlock} ? 'disabled'">
+							<a class="page-link"
+							th:href="@{/adminpage/inquiryadmin/reports(currentPage=${pagination.startPage - 1}, searchKey=${param.searchKey}, searchValue=${param.searchValue})}">이전</a>
+						</li>
+
+						<li class="page-item"
+							th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+							th:classappend="${page == pagination.currentPage} ? 'active'">
+							<a class="page-link" th:text="${page}"
+							th:href="@{/adminpage/inquiryadmin/reports(currentPage=${page}, searchKey=${param.searchKey}, searchValue=${param.searchValue})}"></a>
+						</li>
+
+						<li class="page-item"
+							th:classappend="${!pagination.existNextBlock} ? 'disabled'">
+							<a class="page-link"
+							th:href="@{/adminpage/inquiryadmin/reports(currentPage=${pagination.endPage + 1}, searchKey=${param.searchKey}, searchValue=${param.searchValue})}">다음</a>
+						</li>
 					</ul>
 				</nav>
 			</div>
