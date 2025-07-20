@@ -17,6 +17,28 @@
         <result property="delPrcrNo" 			column="del_prcr_no"/>
         <result property="helpdCnt" 			column="helpd_cnt"/>
         <result property="starRating" 			column="star_rating"/>
+        
+        <association property="user" 			javaType="ks55team02.common.domain.inquiry.InquiryUser">
+		<id property="userNo" 					column="user_no"/>
+        <result property="userNm" 				column="user_nm"/>
+        <result property="userNcnm" 			column="user_ncnm"/>        
+        </association>
+        <association property="userProfile" 	javaType="ks55team02.customer.register.domain.UserProfile">
+        <id property="userNo" 					column="user_no"/>
+        <result property="prflImg" 				column="prfl_img"/>
+        </association>
+        
+        <collection property="reviewImages" ofType="ks55team02.common.domain.store.ReviewImage">
+        <id property="reviewImgId" column="review_img_id"/>
+        <result property="imgId" column="img_id"/>
+        <result property="ord" column="ord"/>
+        <association property="storeImage" javaType="ks55team02.common.domain.store.StoreImage">
+        <id property="imgId" column="img_id"/>
+        <result property="imgAddr" column="img_addr"/>
+        <result property="imgFileNm" column="img_file_nm"/>
+        </association>
+    	</collection>
+        
     </resultMap>
 
     <resultMap id="reviewImageResultMap" 		type="ks55team02.common.domain.store.ReviewImage">
@@ -36,48 +58,42 @@
 
 
     <select id="selectReviewsByProductCode" parameterType="String" resultMap="productReviewResultMap">
-        SELECT
-            review_id,
-            ordr_dtl_artcl_no,
-            prchsr_user_no,
-            gds_no,
-            ordr_no,
-            evl_scr,
-            review_cn,
-            wrt_ymd,
-            review_stts,
-            last_mdfcn_dt,
-            del_dt,
-            del_prcr_no,
-            helpd_cnt,
-            star_rating
-        FROM
-            product_reviews
-        WHERE
-            gds_no = #{gdsNo}
-        AND
-            review_stts = 1 -- 정상 상태의 리뷰만 조회
-        ORDER BY
-            wrt_ymd DESC; -- 최신순 정렬
-    </select>
-
-   <select id="selectReviewImagesByReviewId" parameterType="String" resultMap="reviewImageResultMap">
     SELECT
+        pr.review_id,
+        pr.ordr_dtl_artcl_no,
+        pr.prchsr_user_no,
+        pr.gds_no,
+        pr.ordr_no,
+        pr.evl_scr,
+        pr.review_cn,
+        pr.wrt_ymd,
+        pr.review_stts,
+        pr.helpd_cnt,
+        pr.star_rating,
+        u.user_nm,
+        u.user_ncnm,
+        up.prfl_img,
         ri.review_img_id,
-        ri.review_id,
         ri.img_id,
         ri.ord,
-        si.img_addr AS img_path,      
-        si.img_file_nm AS img_org_nm
+        si.img_addr,     
+        si.img_file_nm
     FROM
-        review_images ri
+        ks55team02db.product_reviews AS pr
     JOIN
-        store_images si ON ri.img_id = si.img_id
+        ks55team02db.users AS u ON pr.prchsr_user_no = u.user_no
+    LEFT JOIN
+        ks55team02db.user_profiles AS up ON u.user_no = up.user_no
+    -- LEFT JOIN을 사용해야 이미지가 없는 리뷰도 조회됨
+    LEFT JOIN
+        ks55team02db.review_images AS ri ON pr.review_id = ri.review_id
+    LEFT JOIN
+        ks55team02db.store_images AS si ON ri.img_id = si.img_id
     WHERE
-        ri.review_id = #{reviewId}
+        pr.gds_no = #{gdsNo}
+        AND pr.review_stts = 1
     ORDER BY
-        ri.ord ASC;
-</select>
-
+        pr.wrt_ymd DESC, ri.ord ASC;
+	</select>
 
 </mapper>

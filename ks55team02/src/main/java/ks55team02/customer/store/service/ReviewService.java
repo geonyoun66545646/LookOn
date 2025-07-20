@@ -3,6 +3,7 @@ package ks55team02.customer.store.service;
 import java.util.List;
 
 import ks55team02.common.domain.store.ProductReview;
+import ks55team02.common.domain.store.ReviewImage;
 
 public interface ReviewService {
 

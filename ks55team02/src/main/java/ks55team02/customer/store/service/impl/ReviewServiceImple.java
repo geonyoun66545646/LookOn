@@ -25,25 +25,9 @@ public class ReviewServiceImple implements ReviewService {
   */
  @Override
  public List<ProductReview> getReviewsByProductCode(String productCode) {
-     List<ProductReview> reviews = reviewMapper.selectReviewsByProductCode(productCode);
-
-     // 각 리뷰에 대한 이미지 정보 조회 및 설정 (필요에 따라 최적화 가능)
-     if (reviews != null && !reviews.isEmpty()) {
-         for (ProductReview review : reviews) {
-             List<ReviewImage> images = reviewMapper.selectReviewImagesByReviewId(review.getReviewId());
-             review.setReviewImages(images);
-         }
-     }
-     return reviews;
+     // 복잡한 반복문 로직이 모두 사라지고, Mapper 호출 한 줄로 모든 작업이 완료됩니다.
+     // reviewMapper.selectReviewsByProductCode 쿼리가 JOIN과 <collection> 매핑을 통해
+     // ProductReview 객체 내의 reviewImages 리스트까지 모두 채워서 반환해 줍니다.
+     return reviewMapper.selectReviewsByProductCode(productCode);
  }
-
- // TODO: 리뷰 작성, 수정, 삭제, 좋아요/취소 등의 메서드 구현
- // @Override
- // public int addReview(ProductReview review) { ... }
- // @Override
- // public int modifyReview(ProductReview review) { ... }
- // @Override
- // public int removeReview(String reviewId) { ... }
- // @Override
- // public int toggleReviewLike(String reviewId, String userNo) { ... }
 }

@@ -18,13 +18,6 @@ public interface ReviewMapper {
   */
  List<ProductReview> selectReviewsByProductCode(String gdsNo);
 
- /**
-  * 특정 리뷰 ID에 해당하는 이미지 목록을 조회합니다.
-  *
-  * @param reviewId 리뷰 ID
-  * @return ReviewImage 목록
-  */
- List<ReviewImage> selectReviewImagesByReviewId(String reviewId);
 
  // TODO: 리뷰 등록, 수정, 삭제, 좋아요/취소 관련 메서드를 여기에 추가할 수 있습니다.
  // int insertReview(ProductReview review);
