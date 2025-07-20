@@ -80,7 +80,7 @@ public class StoreImageServiceImpl implements StoreImageService {
     @Override
     public void deleteStoreImage(StoreImage storeImage) {
         String fullPath = storeImage.getImgAddr();
-        Boolean isDeleted = filesUtils.deleteFileByPath(fullPath);
+        Boolean isDeleted = filesUtils.deleteFile(fullPath);
 
         if (isDeleted) {
             storeImageMapper.deleteStoreImageById(storeImage.getImgId());

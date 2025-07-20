@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{seller/layout/layout_main}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>결제 성공</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- ✅ UI 개선을 위한 CSS 추가 -->
+    <style>
+        body {
+            background-color: #f8f9fa; /* 전체 배경색 */
+        }
+
+        .page-container {
+            max-width: 700px; /* 최대 너비 제한 */
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .success-panel {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .success-icon {
+            margin-bottom: 20px;
+        }
+        
+        /* SVG 아이콘 색상 및 크기 조정 */
+        .success-icon svg {
+            width: 80px;
+            height: 80px;
+            stroke: #28a745; /* 더 선명한 녹색 */
+        }
+
+        .page-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #343a40;
+        }
+
+        .page-subtitle {
+            font-size: 1.1em;
+            color: #6c757d;
+            margin-bottom: 35px;
+        }
+
+        .order-summary-box {
+            border-top: 1px solid #dee2e6;
+            border-bottom: 1px solid #dee2e6;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            text-align: left; /* 내부 항목은 왼쪽 정렬 */
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between; /* 라벨과 값을 양 끝으로 분리 */
+            align-items: center;
+            font-size: 1.05em;
+            padding: 12px 10px;
+        }
+
+        .summary-line .label {
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .summary-line .value {
+            color: #212529;
+            font-weight: 700;
+        }
+
+        .summary-line:not(:last-child) {
+            border-bottom: 1px solid #f1f3f5; /* 항목 간 옅은 구분선 */
+        }
+
+        .success-message {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 35px;
+            text-align: left;
+        }
+
+        .success-message p {
+            margin: 10px 0;
+            font-size: 1em;
+            color: #495057;
+            line-height: 1.6;
+        }
+        
+        .success-message span {
+            font-weight: 500;
+            color: #343a40;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* 버튼 사이 간격 */
+            flex-wrap: wrap; /* 화면 작아지면 줄바꿈 */
+        }
+
+        .confirm-button, .cancel-button {
+            display: inline-block;
+            padding: 14px 28px;
+            font-size: 1em;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .confirm-button {
+            background-color: #3bb77e;
+            color: white;
+        }
+        .confirm-button:hover {
+            background-color: #32a06d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .cancel-button {
+            background-color: #6c757d;
+            color: white;
+        }
+        .cancel-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="contents">
+    <div class="page-container">
+        <!-- ✅ 전체를 감싸는 div에 success-panel 클래스를 적용합니다. -->
+        <div class="success-panel">
+            
+            <div class="success-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+
+            <h2 class="page-title">결제가 완료되었습니다</h2>
+            <p class="page-subtitle">프리미엄 멤버십 구독이 정상적으로 처리되었습니다.</p>
+
+            <div class="order-summary-box">
+                <!-- ✅ Controller에서 model에 orderId를 추가해야 합니다. -->
+                <div class="summary-line">
+                    <span class="label">주문 번호</span>
+                    <span class="value" th:text="${orderId}">TEST_123456789</span>
+                </div>
+                <!-- ✅ Controller에서 model에 amount를 추가해야 합니다. -->
+                <div class="summary-line">
+                    <span class="label">결제 금액</span>
+                    <span class="value" th:text="${#numbers.formatCurrency(amount)}">49,000원</span>
+                </div>
+                <!-- ✅ (선택) Controller에서 model에 결제수단 정보를 추가하면 표시됩니다. -->
+                <div class="summary-line">
+                    <span class="label">결제 수단</span>
+                    <span class="value" th:text="${paymentMethod ?: '카드'}">신용카드</span>
+                </div>
+            </div>
+
+            <!-- ✅ (선택) Controller에서 model에 구독 시작/종료일을 추가하면 표시됩니다. -->
+            <div class="success-message">
+                <p>프리미엄 멤버십 구독이 활성화되었습니다.</p>
+                <p>이용 시작일: <span th:text="${startDate != null ? #temporals.format(startDate, 'yyyy년 MM월 dd일') : '-'}">2025년 07월 18일</span></p>
+                <p>이용 종료일: <span th:text="${endDate != null ? #temporals.format(endDate, 'yyyy년 MM월 dd일') : '-'}">2026년 07월 18일</span></p>
+            </div>
+
+            <div class="button-group">
+                <a th:href="@{/seller/premium/sellerPremiumListView}" class="confirm-button">구독 관리로 이동</a>
+                <a th:href="@{/seller/dashboard}" class="cancel-button">대시보드로 이동</a>
+            </div>
+
+        </div>
+    </div>
+</th:block>
+</body>
+</html>

@@ -89,6 +89,100 @@
 		</association>
 	</resultMap>
 	
+		<!-- ⭐ [추가] 검색 조건에 맞는 상품 총 개수 조회 쿼리 ⭐ -->
+	<select id="getSearchedProductListCount" parameterType="ks55team02.admin.common.domain.SearchCriteria" resultType="int">
+	    SELECT
+	        COUNT(DISTINCT p.gds_no)
+	    FROM
+	        products p
+	    LEFT JOIN (
+	        SELECT gds_no, aprv_stts_cd
+	        FROM product_approval_history
+	        WHERE (gds_no, aprv_rjct_cycl) IN (
+	            SELECT gds_no, MAX(aprv_rjct_cycl)
+	            FROM product_approval_history
+	            GROUP BY gds_no
+	        )
+	    ) pah ON p.gds_no = pah.gds_no
+	    <include refid="productSearchCondition" />
+	</select>
+	
+	<!-- ⭐ [추가] 판매자 상품 검색 조건을 위한 SQL 조각 ⭐ -->
+	<sql id="productSearchCondition">
+	    <where>
+	        p.store_id = #{storeId}
+	        AND p.sel_user_no = #{selUserNo}
+	        AND p.actvtn_yn = true
+	        <if test="filterConditions != null and filterConditions.size() > 0">
+	            AND pah.aprv_stts_cd IN
+	            <foreach item="status" collection="filterConditions" open="(" separator="," close=")">
+	                #{status}
+	            </foreach>
+	        </if>
+	        <if test="startDate != null and startDate != ''">
+	            AND DATE(p.reg_dt) &gt;= #{startDate}
+	        </if>
+	        <if test="endDate != null and endDate != ''">
+	            AND DATE(p.reg_dt) &lt;= #{endDate}
+	        </if>
+	        <if test="searchKey != null and searchValue != null and searchValue != ''">
+	            <choose>
+	                <when test="searchKey == 'gdsNm'">
+	                    AND p.gds_nm LIKE CONCAT('%', #{searchValue}, '%')
+	                </when>
+	                <when test="searchKey == 'gdsNo'">
+	                    AND p.gds_no LIKE CONCAT('%', #{searchValue}, '%')
+	                </when>
+	            </choose>
+	        </if>
+	    </where>
+	</sql>
+	
+	<select id="getSearchedProductList" parameterType="ks55team02.admin.common.domain.SearchCriteria" resultMap="productsResultMap">
+    SELECT
+        p.gds_no, p.store_id, p.ctgry_no, p.gds_nm, p.bas_prc, p.dscnt_rt,
+        (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
+        p.reg_dt, p.expsr_yn, p.actvtn_yn, pc.ctgry_nm,
+        (
+            SELECT pi.img_file_path_nm
+            FROM ks55team02db.product_images pi
+            WHERE pi.gds_no = p.gds_no AND pi.img_type = 1 AND pi.actvtn_yn = TRUE
+            ORDER BY pi.img_indct_sn ASC
+            LIMIT 1
+        ) AS thumbnail_image_path,
+        IFNULL(pah.aprv_stts_cd, 'P') AS latestApprovalStatus
+    FROM
+        ks55team02db.products p
+    LEFT JOIN
+        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+    LEFT JOIN (
+        SELECT gds_no, aprv_stts_cd, prcs_dt
+        FROM product_approval_history
+        WHERE (gds_no, aprv_rjct_cycl, prcs_dt) IN (
+            SELECT gds_no, MAX(aprv_rjct_cycl), MAX(prcs_dt)
+            FROM product_approval_history
+            GROUP BY gds_no
+        )
+    ) pah ON p.gds_no = pah.gds_no
+    <include refid="productSearchCondition" />
+    <choose>
+        <when test="sortKey != null and sortKey != ''">
+            ORDER BY
+            <choose>
+                <when test="sortKey == 'regDt'">p.reg_dt</when>
+                <when test="sortKey == 'gdsNm'">p.gds_nm</when>
+                <otherwise>p.reg_dt</otherwise>
+            </choose>
+            <if test="sortOrder != null and sortOrder.equalsIgnoreCase('DESC')">DESC</if>
+            <if test="sortOrder != null and sortOrder.equalsIgnoreCase('ASC')">ASC</if>
+        </when>
+        <otherwise>
+            ORDER BY p.reg_dt DESC
+        </otherwise>
+    </choose>
+    LIMIT #{offset}, #{pageSize}
+</select>
+	
 	
 	<select id="selectProductStatusOptions" parameterType="String" resultType="map">
         SELECT
@@ -189,7 +283,8 @@
             products
         SET
             expsr_yn = false,
-            mdfcn_dt = CURRENT_TIMESTAMP
+	        mdfcn_dt = CURRENT_TIMESTAMP, <!-- ⭐ 이 쉼표를 추가합니다. ⭐ -->
+	        del_user_no = #{adminId}
         WHERE
             ctgry_no = #{categoryId}
     </update>

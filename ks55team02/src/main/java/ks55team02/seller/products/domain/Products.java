@@ -46,7 +46,8 @@ public class Products {
     private ProductCategory productCategory;
     private List<ProductImage> productImages;
     private List<ProductOption> productOptions;
-
+    
+   
     public Boolean getExpsrYn() {
         return this.expsrYn;
     }

@@ -270,6 +270,7 @@ body {
     font-size: 14px;
 }
 
+
 /* ==========================================================================
    Responsive Adjustments for Comments
    ========================================================================== */
@@ -293,6 +294,10 @@ body {
 
     .comment-author {
         margin-bottom: 5px;
-    }
+    }   
 }
 @import url(//spoqa.github.io/spoqa-han-sans/stylesheets/SpoqaHanSansNeo.css);
+
+
+
+

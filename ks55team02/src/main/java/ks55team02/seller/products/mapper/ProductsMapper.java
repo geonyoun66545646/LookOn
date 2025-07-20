@@ -1,14 +1,25 @@
 package ks55team02.seller.products.mapper;
 
-import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory;
-import ks55team02.seller.products.domain.*;
-import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory;
+import ks55team02.admin.common.domain.SearchCriteria;
+import ks55team02.seller.products.domain.ProductImage;
+import ks55team02.seller.products.domain.ProductImageType;
+import ks55team02.seller.products.domain.ProductOption;
+import ks55team02.seller.products.domain.ProductOptionValue;
+import ks55team02.seller.products.domain.ProductStatus;
+import ks55team02.seller.products.domain.Products;
+import ks55team02.seller.products.domain.StatusOptionMapping;
 
 @Mapper
 public interface ProductsMapper {
 	
+	void deactivateProductsByCategoryId(String categoryId, String adminId);
+
 	
 	// --- 상품 등록(Create) 관련 메소드 ---
 	String getMaxProductCode();
@@ -52,8 +63,6 @@ public interface ProductsMapper {
      */
     void deleteImagesByGdsNoAndType(String gdsNo, ProductImageType imageType);
 
-    // ⭐⭐⭐⭐⭐ [추가 끝] ⭐⭐⭐⭐⭐
-	
 	// 새로 추가: 최근 반려된 이력 조회
     ProductApprovalHistory getLatestRejectedHistory(String gdsNo);
     
@@ -99,7 +108,7 @@ public interface ProductsMapper {
 	// --- 상품 조회(Read) 관련 메소드 (주로 판매자/관리자용) ---
 
 	/**
-	 * 특정 판매자의 특정 스토어에 속한 모든 상품 목록을 조회합니다.
+	 * 특정 판매자의 특정 스토어에 속한 모든 상품 목록을 조회합니다. (이제 사용되지 않음)
 	 * 
 	 * @param paramMap 'selUserNo', 'storeId'를 포함한 맵
 	 * @return 상품 목록
@@ -112,6 +121,20 @@ public interface ProductsMapper {
 	 * @return 모든 상품 목록
 	 */
 	List<Products> getProductList();
+
+	/**
+	 * ⭐ [추가] 검색/페이지네이션이 적용된 판매자 상품 목록의 총 개수를 조회합니다.
+	 * @param searchCriteria 검색 조건
+	 * @return 상품 총 개수
+	 */
+	int getSearchedProductListCount(SearchCriteria searchCriteria);
+
+	/**
+	 * ⭐ [추가] 검색/페이지네이션이 적용된 판매자 상품 목록을 조회합니다.
+	 * @param searchCriteria 검색 조건
+	 * @return 상품 목록
+	 */
+	List<Products> getSearchedProductList(SearchCriteria searchCriteria);
 
 	/**
 	 * 특정 상품의 모든 상세 정보를 연관된 객체(이미지, 옵션 등)와 함께 조회합니다.
