@@ -10,68 +10,63 @@
         <div class="container">
             <h3 th:if="${reviews != null}">리뷰 (<span th:text="${reviews.size()}">0</span>)</h3>
             <h3 th:unless="${reviews != null}">리뷰 (0)</h3>
+            
+            <!-- 1. 리뷰 개수와 목록 사이의 경계선 추가 -->
+            <hr class="mt-2 mb-4">
 
+            <!-- 리뷰가 있을 경우의 목록 -->
             <div th:if="${reviews != null and not #lists.isEmpty(reviews)}">
-			    <!-- th:each로 리뷰 하나씩 반복 -->
-			    <div class="review" th:each="review : ${reviews}">
-			        <div class="row no-gutters">
-			            
-			            <!-- 왼쪽: 프로필 아이콘 영역 -->
-			            <div class="col-auto pr-3">
-			                <!-- 유저 프로필 이미지가 있다면 th:src로 바인딩, 없다면 기본 이미지 표시 -->
-			                <img th:src="${review.userProfile.prflImg != null ? review.userProfile.prflImg : '/uploads/profiles/defaultprofile.jpg'}" 
-			                     alt="프로필" 
-			                     class="rounded-circle review-profile-img">
-			            </div>
-			
-			            <!-- 오른쪽: 리뷰 전체 내용 영역 -->
-			            <div class="col">
-			                <!-- 1. 닉네임과 작성일 -->
-			                <div class="d-flex justify-content-between align-items-center">
-			                    <h5 class="mb-0"><a href="#" th:text="${review.user.userNcnm}"></a></h5>
-			                    <span class="review-date" th:text="${#temporals.format(review.wrtYmd, 'yy.MM.dd')}">25.06.20</span>
-			                </div>
-			
-			                <!-- 2. 별점과 '도움돼요' 버튼 -->
-			                <div class="review-meta mt-1">
-			                    <div class="ratings-container">
-			                        <div class="ratings">
-			                            <div class="ratings-val" th:style="'width: ' + (${review.evlScr != null ? review.evlScr * 20 : 0}) + '%;'"></div>
-			                        </div>
-			                        <span class="ratings-text ml-1" th:text="${review.evlScr}">5</span>
-			                    </div>
-			                    <div class="review-action">
-			                        '도움돼요' 클릭 시 JS 함수 호출. 리뷰 ID와 클릭된 a 태그(this)를 넘겨줌
-			                        <!-- <a href="javascript:void(0);" th:onclick="|increaseHelpful('${review.reviewId}', this)|">
-			                            <i class="icon-thumbs-up"></i>도움돼요
-			                            (<span class="helpful-count" th:text="${review.helpdCnt}">0</span>)
-			                        </a> -->
-			                    </div>
-			                </div>
-			
-			                <!-- 3. 리뷰 내용 -->
-			                <div class="review-content mt-2">
-			                    <p th:text="${review.reviewCn}">리뷰 내용이 여기에 표시됩니다.</p>
-			                </div>
-			                
-			                <!-- 4. 리뷰 이미지 (기존 코드와 동일) -->
-			                <div th:if="${review.reviewImages != null and not #lists.isEmpty(review.reviewImages)}" class="review-images mt-2">
-			                    <span th:each="img : ${review.reviewImages}">
-			                        <img th:if="${img.storeImage != null and img.storeImage.imgFilePathNm != null}"
-			                             th:src="@{${img.storeImage.imgFilePathNm}}"
-			                             alt="리뷰 이미지"
-			                             style="width: 80px; height: 80px; object-fit: cover; margin-right: 5px; border: 1px solid #eee;"/>
-			                    </span>
-			                </div>
-			            </div>
-			        </div>
-			        <hr> <!-- 리뷰 사이 구분선 -->
-			    </div>
-			</div>
+                <!-- th:each로 리뷰 하나씩 반복 -->
+                <div class="review" th:each="review : ${reviews}">
+                    <!-- 1. 상단: 프로필, 닉네임, 작성일, 별점 -->
+                    <div class="review-header d-flex align-items-center mb-3">
+                        <!-- 프로필 이미지 (크기 조절을 위해 클래스 추가) -->
+                        <div class="profile-image-wrapper mr-3">
+                            <img th:src="${review.userProfile.prflImg != null ? review.userProfile.prflImg : '/uploads/profiles/defaultprofile.jpg'}"
+                                 alt="프로필" 
+                                 class="rounded-circle">
+                        </div>
+                        <!-- 닉네임, 작성일, 별점 정보 -->
+                        <div class="review-meta-info">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><a href="#" th:text="${review.user.userNcnm}"></a></h5>
+                                <span class="review-date" th:text="${#temporals.format(review.wrtYmd, 'yy.MM.dd')}">25.06.20</span>
+                            </div>
+                            <div class="review-meta mt-1">
+                                <div class="ratings-container">
+                                    <div class="ratings">
+                                        <div class="ratings-val" th:style="'width: ' + (${review.evlScr != null ? review.evlScr * 20 : 0}) + '%;'"></div>
+                                    </div>
+                                    <span class="ratings-text ml-1" th:text="${review.evlScr}">5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 하단: 이미지 슬라이더와 리뷰 내용 -->
+                    <div class="review-body">
+                        <!-- 이미지 슬라이더 -->
+                        <div th:if="${review.reviewImages != null and not #lists.isEmpty(review.reviewImages)}" class="review-image-slider mb-3">
+                            <div class="review-image-track">
+                                <div class="review-image-item" th:each="img : ${review.reviewImages}">
+                                    <img th:if="${img.storeImage != null and img.storeImage.imgAddr != null}"
+                                         th:src="@{${img.storeImage.imgAddr}}"
+                                         alt="리뷰 이미지"/>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 리뷰 내용 -->
+                        <div class="review-content">
+                            <p th:text="${review.reviewCn}">리뷰 내용이 여기에 표시됩니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 리뷰가 없을 경우의 메시지 -->
             <div th:unless="${reviews != null and not #lists.isEmpty(reviews)}">
                 <p>등록된 리뷰가 없습니다.</p>
             </div>
-
             <div class="add-review">
                 <h3>리뷰 작성</h3>
                 <form th:action="@{/customer/review/add}" method="post">
@@ -106,5 +101,41 @@
         </div>
     </div>
 </div>
-</body>
+
+ <script th:inline="javascript">
+//페이지의 모든 'review-image-slider' 요소에 드래그 스크롤 기능을 적용합니다.
+ const sliders = document.querySelectorAll('.review-image-slider');
+
+ sliders.forEach(slider => {
+     let isDown = false; // 마우스 버튼이 눌렸는지 여부
+     let startX;         // 마우스를 누른 시작점의 X좌표
+     let scrollLeft;     // 마우스를 누른 시작점의 스크롤 위치
+
+     slider.addEventListener('mousedown', (e) => {
+         isDown = true;
+         slider.classList.add('active'); // 'active' 클래스 추가 (커서 모양 변경용)
+         startX = e.pageX - slider.offsetLeft;
+         scrollLeft = slider.scrollLeft;
+     });
+
+     slider.addEventListener('mouseleave', () => {
+         isDown = false;
+         slider.classList.remove('active');
+     });
+
+     slider.addEventListener('mouseup', () => {
+         isDown = false;
+         slider.classList.remove('active');
+     });
+
+     slider.addEventListener('mousemove', (e) => {
+         if (!isDown) return; // 마우스 버튼을 누르지 않았으면 함수 종료
+         e.preventDefault(); // 기본 드래그 동작(예: 텍스트 선택) 방지
+         const x = e.pageX - slider.offsetLeft;
+         const walk = (x - startX) * 2; // 마우스 이동 거리 (곱하는 숫자를 늘리면 더 빨리 스크롤됨)
+         slider.scrollLeft = scrollLeft - walk;
+     });
+ });
+ </script>
+ </body>
 </html>

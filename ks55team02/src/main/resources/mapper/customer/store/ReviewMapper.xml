@@ -95,5 +95,7 @@
     ORDER BY
         pr.wrt_ymd DESC, ri.ord ASC;
 	</select>
+	
+	
 
 </mapper>
