@@ -2,13 +2,16 @@ package ks55team02.util;
 
 import java.util.List;
 import lombok.Getter;
+import lombok.Setter; // ★★★ @Setter 어노테이션을 import 합니다. ★★★
 import lombok.ToString;
 
 @Getter
 @ToString
 public class CustomerPagination<T> {
 
+    @Setter // ★★★ list 필드에 대한 setter를 자동으로 생성합니다. ★★★
     private List<T> list;            // 현재 페이지의 데이터 목록
+    
     private int currentPage;         // 현재 페이지 번호
     private int totalPages;          // 전체 페이지 수
     private long totalCount;         // 전체 아이템 개수
@@ -36,4 +39,6 @@ public class CustomerPagination<T> {
         this.hasPreviousBlock = this.startPage > 1;
         this.hasNextBlock = this.endPage < this.totalPages;
     }
+    
+  
 }
