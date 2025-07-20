@@ -30,32 +30,32 @@
 		                <input type="hidden" name="sortKey" th:value="${searchCriteria.sortKey}" id="sortKeyInput"/>
 		                <input type="hidden" name="sortOrder" th:value="${searchCriteria.sortOrder}" id="sortOrderInput"/>
 		                <input type="hidden" name="filterConditions" th:value="${#strings.arrayJoin(searchCriteria.filterConditions, ',')}" id="filterConditionsInput"/>
-		
+						<input type="hidden" name="filterApplied" id="filterApplied" value="false">
 		                <div class="row gx-3">
 		                    <div class="col-lg-12">
 		                    	<label class="form-label">분류</label>
 		                        <div class="d-flex align-items-center">
 		                            <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAdminList" value="접수" 
+		                                	   name="appAStoreList" value="APPLY" 
 		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '접수')}">
 		                                <label class="form-check-label">접수</label>
 		                            </div>
-		                            <div class="form-check me-4">
+		                            <!-- <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAdminList" value="보류" 
+		                                	   name="appAStoreList" value="PENDING" 
 		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '보류')}">
 		                                <label class="form-check-label">보류</label>
-		                            </div>
+		                            </div> -->
 		                            <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAdminList" value="승인" 
+		                                	   name="appAStoreList" value="APPROVED" 
 		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '승인')}">
 		                                <label class="form-check-label">승인</label>
 		                            </div>
 		                             <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAdminList" value="반려" 
+		                                	   name="appAStoreList" value="REJECTED" 
 		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '반려')}">
 		                                <label class="form-check-label">반려</label>
 		                            </div>
@@ -109,12 +109,12 @@
 		                            선택한 회원 상태 변경
 		                        </button>
 		                        <div class="dropdown-menu status">
-		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="접수">
+		                            <!-- <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="접수">
 		                            	<span class="badge-dot bg-primary"></span>접수
-		                            </a>
-		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="보류">
+		                            </a> -->
+		                           <!--  <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="보류">
 		                            	<span class="badge-dot bg-warning"></span>보류
-		                            </a>
+		                            </a> -->
 		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="승인">
 		                            	<span class="badge-dot bg-success"></span>승인
 		                            </a>
@@ -157,23 +157,23 @@
 				            <tr th:if="${#lists.isEmpty(appAdminList)}">
 				                <td colspan="8" class="text-center py-5">조회된 신청이 없습니다.</td>
 				            </tr>
-				            <tr th:unless="${#lists.isEmpty(appAdminList)}" th:each="appAdmin : ${appAdminList}">
-				                <td> <input class="form-check-input member-check" type="checkbox" th:value="${appAdmin.aplyId}"></td>
-				                <td class="ellipsis text" th:text="${appAdmin.aplyId}" th:title="${appAdmin.aplyId}"></td>
+				            <tr th:unless="${#lists.isEmpty(appAdminList)}" th:each="appStore: ${appAdminList}">
+				                <td> <input class="form-check-input member-check" type="checkbox" th:value="${appStore.aplyId}"></td>
+				                <td class="ellipsis text" th:text="${appStore.aplyId}" th:title="${appStore.aplyId}"></td>
 				                <td>
-				                	<a class="text" th:href="@{/adminpage/storeadmin/appDetail(aplyId=${appAdmin.aplyId})}" th:text="${appAdmin.storeNm}"></a>
+				                	<a class="text" th:href="@{/adminpage/storeadmin/appDetail(aplyId=${appStore.aplyId})}" th:text="${appStore.storeNm}"></a>
 				                </td>
-				                <td th:text="${appAdmin.userNm}"></td>
-				                <td th:text="${appAdmin.aplyUserNo}"></td>				                
-				                <td class="ellipsis text" th:text="${appAdmin.plcyId}"></td>
-				                <td th:text="${#temporals.format(appAdmin.ctrtAplyYmd, 'yyyy-MM-dd')}"></td>
+				                <td th:text="${appStore.user.userNm}"></td>
+				                <td th:text="${appStore.user.userNo}"></td>				                
+				                <td class="ellipsis text" th:text="${appStore.plcyId}"></td>
+				                <td th:text="${#temporals.format(appStore.ctrtAplyYmd, 'yyyy-MM-dd')}"></td>
 				                <td>
 				                    <span class="badge custom-badge"
-				                          th:text="${appAdmin.aplyStts}"
-				                          th:classappend="${appAdmin.aplyStts == '보류'} ? 'bg-warning' : 
-				                                         (${appAdmin.aplyStts == '승인'} ? 'bg-success' : 
-				                                         (${appAdmin.aplyStts == '반려'} ? 'bg-danger' : 'bg-secondary'))">
-				                    </span>
+					      th:text="${appStore.aplySttsDisplayName}"
+					      th:classappend="${appStore.aplyStts == 'PENDING'} ? 'bg-warning' :
+					                     (${appStore.aplyStts == 'APPROVED'} ? 'bg-success' :
+					                     (${appStore.aplyStts == 'REJECTED'} ? 'bg-danger' : 'bg-secondary'))">
+					</span>
 				                </td>
 				            </tr>
 				        </tbody>

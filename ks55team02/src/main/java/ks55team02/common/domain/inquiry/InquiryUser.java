@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import lombok.Data;
 
+// user 테이블
 @Data
 public class InquiryUser {
 		private String userNo; // 사용자 번호 (PK, 애플리케이션 생성 ID)
