@@ -8,73 +8,20 @@
 <div th:fragment="productReviewFragment(productCode)">
     <div class="reviews">
         <div class="container">
-            <h3 th:if="${reviews != null}">리뷰 (<span th:text="${reviews.size()}">0</span>)</h3>
-            <h3 th:unless="${reviews != null}">리뷰 (0)</h3>
-            
-            <!-- 1. 리뷰 개수와 목록 사이의 경계선 추가 -->
-            <hr class="mt-2 mb-4">
-
-            <!-- 리뷰가 있을 경우의 목록 -->
-            <div th:if="${reviews != null and not #lists.isEmpty(reviews)}">
-                <!-- th:each로 리뷰 하나씩 반복 -->
-                <div class="review" th:each="review : ${reviews}">
-                    <!-- 1. 상단: 프로필, 닉네임, 작성일, 별점 -->
-                    <div class="review-header d-flex align-items-center mb-3">
-                        <!-- 프로필 이미지 (크기 조절을 위해 클래스 추가) -->
-                        <div class="profile-image-wrapper mr-3">
-                            <img th:src="${review.userProfile.prflImg != null ? review.userProfile.prflImg : '/uploads/profiles/defaultprofile.jpg'}"
-                                 alt="프로필" 
-                                 class="rounded-circle">
-                        </div>
-                        <!-- 닉네임, 작성일, 별점 정보 -->
-                        <div class="review-meta-info">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><a href="#" th:text="${review.user.userNcnm}"></a></h5>
-                                <span class="review-date" th:text="${#temporals.format(review.wrtYmd, 'yy.MM.dd')}">25.06.20</span>
-                            </div>
-                            <div class="review-meta mt-1">
-                                <div class="ratings-container">
-                                    <div class="ratings">
-                                        <div class="ratings-val" th:style="'width: ' + (${review.evlScr != null ? review.evlScr * 20 : 0}) + '%;'"></div>
-                                    </div>
-                                    <span class="ratings-text ml-1" th:text="${review.evlScr}">5</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. 하단: 이미지 슬라이더와 리뷰 내용 -->
-                    <div class="review-body">
-                        <!-- 이미지 슬라이더 -->
-                        <div th:if="${review.reviewImages != null and not #lists.isEmpty(review.reviewImages)}" class="review-image-slider mb-3">
-                            <div class="review-image-track">
-                                <div class="review-image-item" th:each="img : ${review.reviewImages}">
-                                    <img th:if="${img.storeImage != null and img.storeImage.imgAddr != null}"
-                                         th:src="@{${img.storeImage.imgAddr}}"
-                                         alt="리뷰 이미지"/>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 리뷰 내용 -->
-                        <div class="review-content">
-                            <p th:text="${review.reviewCn}">리뷰 내용이 여기에 표시됩니다.</p>
-                        </div>
-                    </div>
-                </div>
+            <!-- ✨ 이 div의 내용물이 JS에 의해 동적으로 생성/교체됩니다. ✨ -->
+            <div id="review-section-content">
+                <p class="text-center py-5">리뷰 탭을 클릭하여 리뷰를 확인하세요.</p>
             </div>
 
-            <!-- 리뷰가 없을 경우의 메시지 -->
-            <div th:unless="${reviews != null and not #lists.isEmpty(reviews)}">
-                <p>등록된 리뷰가 없습니다.</p>
-            </div>
+            <!-- 리뷰 작성 폼은 교체 대상에서 제외됩니다. -->
             <div class="add-review">
                 <h3>리뷰 작성</h3>
                 <form th:action="@{/customer/review/add}" method="post">
                     <input type="hidden" name="gdsNo" th:value="${productCode}" />
-
                     <div class="form-group">
                         <label for="rating">평점 <span class="required">*</span></label>
-                        <select name="evlScr" id="rating" class="form-control" required> <option value="">평점을 선택하세요</option>
+                        <select name="evlScr" id="rating" class="form-control" required>
+                            <option value="">평점을 선택하세요</option>
                             <option value="5">5점 (매우 만족)</option>
                             <option value="4">4점 (만족)</option>
                             <option value="3">3점 (보통)</option>
@@ -82,17 +29,14 @@
                             <option value="1">1점 (매우 불만족)</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label for="review_cn">리뷰 내용 <span class="required">*</span></label>
                         <textarea id="review_cn" name="reviewCn" cols="30" rows="6" class="form-control" required></textarea>
                     </div>
-
                     <div class="form-group">
                         <label for="review_images">리뷰 이미지 (선택 사항)</label>
                         <input type="file" id="review_images" name="reviewImages" multiple class="form-control-file">
                     </div>
-
                     <button type="submit" class="btn btn-outline-primary-2">
                         <span>리뷰 제출</span> <i class="icon-long-arrow-right"></i>
                     </button>
@@ -103,39 +47,6 @@
 </div>
 
  <script th:inline="javascript">
-//페이지의 모든 'review-image-slider' 요소에 드래그 스크롤 기능을 적용합니다.
- const sliders = document.querySelectorAll('.review-image-slider');
-
- sliders.forEach(slider => {
-     let isDown = false; // 마우스 버튼이 눌렸는지 여부
-     let startX;         // 마우스를 누른 시작점의 X좌표
-     let scrollLeft;     // 마우스를 누른 시작점의 스크롤 위치
-
-     slider.addEventListener('mousedown', (e) => {
-         isDown = true;
-         slider.classList.add('active'); // 'active' 클래스 추가 (커서 모양 변경용)
-         startX = e.pageX - slider.offsetLeft;
-         scrollLeft = slider.scrollLeft;
-     });
-
-     slider.addEventListener('mouseleave', () => {
-         isDown = false;
-         slider.classList.remove('active');
-     });
-
-     slider.addEventListener('mouseup', () => {
-         isDown = false;
-         slider.classList.remove('active');
-     });
-
-     slider.addEventListener('mousemove', (e) => {
-         if (!isDown) return; // 마우스 버튼을 누르지 않았으면 함수 종료
-         e.preventDefault(); // 기본 드래그 동작(예: 텍스트 선택) 방지
-         const x = e.pageX - slider.offsetLeft;
-         const walk = (x - startX) * 2; // 마우스 이동 거리 (곱하는 숫자를 늘리면 더 빨리 스크롤됨)
-         slider.scrollLeft = scrollLeft - walk;
-     });
- });
  </script>
  </body>
 </html>
