@@ -1,4 +1,4 @@
-package ks55team02.customer.brnoApi.config;
+package ks55team02.customer.brnoapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
