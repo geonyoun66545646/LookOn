@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ks55team02.admin.adminpage.inquiryadmin.reports.mapper.AdminReportsMapper">
+
+	<resultMap id="adminReportResultMap"
+		type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReport">
+		<id property="dclrId" column="dclr_id" />
+		<result property="dclrTrgtTypeCd" column="dclr_trgt_type_cd" />
+		<result property="prcsSttsCd" column="prcs_stts_cd" />
+		<result property="dclrRcptDt" column="dclr_rcpt_dt" />
+		<result property="dclrUserNickname" column="dclrUserNickname" />
+		<result property="dclrUserLoginId" column="dclrUserLoginId" />
+		<result property="dclrReasonContent" column="dclrReasonContent" />
+		<result property="intelligentTargetInfo"
+			column="intelligentTargetInfo" />
+	</resultMap>
+
+	<resultMap id="adminReportDetailResultMap"
+		type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportDetail">
+		<id property="dclrId" column="dclr_id" />
+		<result property="dclrUserNo" column="dclr_user_no" />
+		<result property="dclrUserNcnm" column="dclr_user_ncnm" />
+		<result property="dclrTrgtUserNo" column="dclr_trgt_user_no" />
+		<result property="dclrTrgtUserNcnm"
+			column="dclr_trgt_user_ncnm" />
+		<result property="dclrRsnCd" column="dclr_rsn_cd" />
+		<result property="dclrRsnCn" column="dclr_rsn_cn" />
+		<result property="dclrCn" column="dclr_cn" />
+		<result property="dclrDt" column="dclr_dt" />
+		<result property="prcsSttsCd" column="prcs_stts_cd" />
+		<result property="attachmentCount" column="attachment_count" />
+		<result property="prcsPicMngrNo" column="prcs_pic_mngr_no" />
+		<result property="dclrPrcsRsltCn" column="dclr_prcs_rslt_cn" />
+	</resultMap>
+
+	<resultMap id="adminReportHistoryResultMap"
+		type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportHistory">
+		<id property="hstryId" column="hstry_id" />
+		<result property="dclrId" column="dclr_id" />
+		<result property="prcsUserNo" column="user_no" />
+		<result property="prcsUserNcnm" column="prcs_user_ncnm" />
+		<result property="prcsCn" column="prcs_cn" />
+		<result property="bfrSttsCd" column="bfr_stts_cd" />
+		<result property="crntSttsCd" column="crnt_stts_cd" />
+		<result property="prcsDt" column="prcs_dt" />
+		<result property="prcsDsctnMemoCn" column="prcs_dsctn_memo_cn" />
+	</resultMap>
+
+	<select id="getAdminTotalReportCount"
+		parameterType="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportSearch"
+		resultType="_int">
+		SELECT
+		COUNT(*)
+		FROM
+		reports AS R
+		<where>
+			<if test="prcsSttsCd != null and !prcsSttsCd.equals('')">
+				AND R.prcs_stts_cd = #{prcsSttsCd}
+			</if>
+			<if test="startDate != null">
+				AND R.dclr_rcpt_dt >= #{startDate}
+			</if>
+			<if test="endDate != null">
+				<![CDATA[
+				AND R.dclr_rcpt_dt <= DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+				]]>
+			</if>
+			<if test="searchValue != null and !searchValue.equals('')">
+				<choose>
+					<when test="searchKey == 'dclrId'">
+						AND R.dclr_id LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'dclrUserLoginId'">
+						AND R.dclr_user_no IN (SELECT user_no FROM users
+						WHERE user_lgn_id
+						LIKE CONCAT('%', #{searchValue}, '%'))
+					</when>
+					<when test="searchKey == 'dclrTrgtTypeCd'">
+						AND R.dclr_trgt_type_cd LIKE CONCAT('%',
+						#{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'dclrReasonContent'">
+						AND R.dclr_rsn_cd IN (SELECT dclr_rsn_cd FROM
+						report_reasons WHERE
+						dclr_rsn_cn LIKE CONCAT('%', #{searchValue},
+						'%'))
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
+
+	<select id="getAdminReportList" parameterType="map"
+		resultMap="adminReportResultMap">
+		SELECT
+		R.dclr_id,
+		R.dclr_trgt_type_cd,
+		R.prcs_stts_cd,
+		R.dclr_rcpt_dt,
+		U.user_ncnm AS dclrUserNickname,
+		U.user_lgn_id AS dclrUserLoginId,
+		RR.dclr_rsn_cn AS dclrReasonContent,
+		COALESCE(R.dclr_trgt_user_no,
+		R.dclr_trgt_conts_id) AS
+		intelligentTargetInfo
+		FROM
+		reports AS R
+		JOIN
+		users AS U ON R.dclr_user_no
+		= U.user_no
+		JOIN report_reasons AS RR ON
+		R.dclr_rsn_cd = RR.dclr_rsn_cd
+		<where>
+			<if
+				test="searchCriteria.prcsSttsCd != null and !searchCriteria.prcsSttsCd.equals('')">
+				AND R.prcs_stts_cd = #{searchCriteria.prcsSttsCd}
+			</if>
+			<if test="searchCriteria.startDate != null">
+				AND R.dclr_rcpt_dt >= #{searchCriteria.startDate}
+			</if>
+			<if test="searchCriteria.endDate != null">
+				<![CDATA[
+				AND R.dclr_rcpt_dt <= DATE_ADD(#{searchCriteria.endDate}, INTERVAL 1 DAY)
+				]]>
+			</if>
+			<if
+				test="searchCriteria.searchValue != null and !searchCriteria.searchValue.equals('')">
+				<choose>
+					<when test="searchCriteria.searchKey == 'dclrId'">
+						AND R.dclr_id LIKE CONCAT('%',
+						#{searchCriteria.searchValue}, '%')
+					</when>
+					<when test="searchCriteria.searchKey == 'dclrUserLoginId'">
+						AND R.dclr_user_no IN (SELECT user_no FROM users
+						WHERE user_lgn_id
+						LIKE CONCAT('%', #{searchCriteria.searchValue},
+						'%'))
+					</when>
+					<when test="searchCriteria.searchKey == 'dclrTrgtTypeCd'">
+						AND R.dclr_trgt_type_cd LIKE CONCAT('%',
+						#{searchCriteria.searchValue}, '%')
+					</when>
+					<when test="searchCriteria.searchKey == 'dclrReasonContent'">
+						AND RR.dclr_rsn_cn LIKE CONCAT('%',
+						#{searchCriteria.searchValue},
+						'%')
+					</when>
+				</choose>
+			</if>
+		</where>
+		ORDER BY
+		R.dclr_rcpt_dt DESC
+		LIMIT #{pagination.recordSize} OFFSET
+		#{pagination.limitStart}
+	</select>
+
+	<select id="getAdminReportDetailById" parameterType="String"
+		resultMap="adminReportDetailResultMap">
+		SELECT
+		r.dclr_id,
+		r.dclr_user_no,
+		dclr_user.user_ncnm AS
+		dclr_user_ncnm,
+		r.dclr_trgt_user_no,
+		trgt_user.user_ncnm AS
+		dclr_trgt_user_ncnm,
+		r.dclr_rsn_cd,
+		rr.dclr_rsn_cn,
+		r.dtl_dclr_rsn_cn AS
+		dclr_cn,
+		DATE_FORMAT(r.dclr_rcpt_dt, '%Y-%-m-%d %H:%i') AS dclr_dt,
+		r.prcs_stts_cd,
+		(SELECT COUNT(*) FROM report_attachments WHERE dclr_id
+		= r.dclr_id) AS
+		attachment_count,
+		r.prcs_pic_mngr_no,
+		r.dclr_prcs_rslt_cn
+		FROM
+		reports AS r
+		LEFT JOIN
+		users AS dclr_user ON
+		r.dclr_user_no = dclr_user.user_no
+		LEFT JOIN
+		users AS trgt_user ON
+		r.dclr_trgt_user_no = trgt_user.user_no
+		LEFT JOIN
+		report_reasons AS rr
+		ON r.dclr_rsn_cd = rr.dclr_rsn_cd
+		WHERE
+		r.dclr_id = #{dclrId};
+	</select>
+
+	<select id="getAdminReportHistoryListById"
+		parameterType="String" resultMap="adminReportHistoryResultMap">
+		SELECT
+		h.hstry_id,
+		h.dclr_id,
+		h.user_no,
+		u.user_ncnm AS prcs_user_ncnm,
+		h.actn_cn AS prcs_cn,
+		h.bfr_stts_cd,
+		h.crnt_stts_cd,
+		DATE_FORMAT(h.prcs_dt, '%Y-%m-%d %H:%i')
+		AS prcs_dt,
+		h.prcs_dsctn_memo_cn
+		FROM
+		report_history AS h
+		INNER JOIN
+		users
+		AS u ON h.user_no = u.user_no
+		WHERE
+		h.dclr_id = #{dclrId}
+		ORDER BY
+		h.prcs_dt DESC;
+	</select>
+
+	<!-- 1. 신고 처리 상태 업데이트 (UPDATE) -->
+	<update id="updateReportStatus"
+		parameterType="ks55team02.admin.adminpage.inquiryadmin.reports.domain.ReportProcessRequest">
+		UPDATE reports
+		SET
+		prcs_stts_cd = #{newStatus},
+		prcs_pic_mngr_no = #{adminId},
+		dclr_prcs_rslt_cn = #{dclrPrcsRsltCn},
+		prcs_cmptn_dt = NOW()
+		WHERE
+		dclr_id = #{dclrId};
+	</update>
+
+	<!-- 2. 신고 처리 이력 추가 (INSERT) -->
+	<insert id="insertReportHistory"
+		parameterType="ks55team02.admin.adminpage.inquiryadmin.reports.domain.ReportProcessRequest">
+		INSERT INTO report_history
+		(hstry_id, dclr_id, user_no,
+		actn_cn, prcs_dsctn_memo_cn, bfr_stts_cd,
+		crnt_stts_cd, prcs_dt)
+		VALUES
+		(
+		#{hstryId},
+		#{dclrId},
+		#{adminId},
+		#{prcsCn},
+		#{prcsDsctnMemoCn},
+		'RECEIVED',
+		#{newStatus},
+		NOW()
+		);
+	</insert>
+
+	<!-- 기존 코드 아래, </mapper> 태그 바로 위에 추가 -->
+	<select id="getNextReportHistoryId" resultType="String">
+		SELECT
+		CONCAT('HSTRY_', LPAD(IFNULL(MAX(CAST(SUBSTRING(hstry_id, 7) AS
+		UNSIGNED)), 0) + 1, 5, '0'))
+		FROM
+		report_history
+	</select>
+
+</mapper>

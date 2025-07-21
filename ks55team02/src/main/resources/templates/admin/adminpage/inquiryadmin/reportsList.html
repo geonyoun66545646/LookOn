@@ -18,29 +18,19 @@
 			<div class="card-body">
 				<form id="reportSearchForm"
 					th:action="@{/adminpage/inquiryadmin/reportsList}" method="get">
-					<div class="row gx-3 align-items-end">
+					  <div class="row gx-3 align-items-end justify-content-center">
 
-						<div class="col-lg-4 mb-3">
-							<label class="form-label">접수 기간</label>
-							<div class="d-flex">
-								<input type="date" class="form-control" name="startDate"
-									th:value="${param.startDate}"> <span
-									class="mx-2 d-flex align-items-center">~</span> <input
-									type="date" class="form-control" name="endDate"
-									th:value="${param.endDate}">
-							</div>
-						</div>
+
 
 						<div class="col-lg-4 mb-3">
 							<label class="form-label">검색 키워드</label>
 							<div class="input-group">
 								<select class="form-select" name="searchKey"
 									style="max-width: 150px;">
-									<option value="all"
-										th:selected="${param.searchKey == 'all' or param.searchKey == null}">전체</option>
 
 									<option value="dclrId"
-										th:selected="${param.searchKey == 'dclrId'}">신고 ID</option>
+										th:selected="${param.searchKey == 'dclrId' or param.searchKey == null}">신고
+										ID</option>
 
 									<option value="dclrUserLoginId"
 										th:selected="${param.searchKey == 'dclrUserLoginId'}">신고자
@@ -52,7 +42,7 @@
 										th:selected="${param.searchKey == 'dclrReasonContent'}">신고
 										사유</option>
 								</select> <input type="text" class="form-control" name="searchValue"
-									th:value="${param.searchValue}"
+									th:value="${adminReportSearch.searchValue}"
 									placeholder="신고 ID, 사용자 ID, 콘텐츠 ID">
 							</div>
 						</div>
@@ -194,7 +184,7 @@
                     <td>${report.intelligentTargetInfo}</td>
                     <td>${report.dclrReasonContent}</td>
                     <td><span class="badge ${badgeClass}">${statusText}</span></td>
-                    <td><a href="/adminpage/inquiryadmin/reportsDetail/${report.dclrId}" class="btn btn-sm btn-primary" style="min-width: 90px;">${buttonText}</a></td>
+                    <td><a href="/adminpage/inquiryadmin/reports/${report.dclrId}" class="btn btn-sm btn-primary" style="min-width: 90px;">${buttonText}</a></td>
                 </tr>
             `;
         });
@@ -241,6 +231,24 @@
         e.preventDefault();
         fetchAndRenderReports(1); // 검색 시에는 항상 1페이지부터 조회
     });
+
+    // ================= [여기에 새로운 코드를 추가해주세요] ==================
+    // '검색 키워드' 입력창에서 엔터 키를 눌렀을 때
+    const searchInput = document.querySelector('input[name="searchValue"]');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', function(event) {
+            // 1. 만약 누른 키가 'Enter'가 아니면, 아무것도 안 함
+            if (event.key !== 'Enter') {
+                return;
+            }
+
+            // 2. 'Enter' 키의 기본 동작(폼 제출)을 막음 (가장 중요!)
+            event.preventDefault();
+
+            // 3. '검색' 버튼을 코드로 대신 클릭해 줌
+            document.getElementById('searchBtn').click();
+        });
+    }
 
     // 페이지 번호 클릭 시 (이벤트 위임)
     paginationContainer.addEventListener('click', function(e) {

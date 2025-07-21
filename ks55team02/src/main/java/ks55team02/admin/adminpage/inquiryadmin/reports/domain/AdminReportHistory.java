@@ -18,4 +18,6 @@ public class AdminReportHistory {
 	private String bfrSttsCd; // 이전 상태 코드 (bfr_stts_cd)
 	private String crntSttsCd; // 현재 상태 코드 (crnt_stts_cd)
 	private String prcsDt; // 처리 일자 (prcs_dt)
+	private String prcsDsctnMemoCn; // 내부 처리 메모
+	
 }

@@ -22,10 +22,14 @@ public class AdminReportDetail {
     private String dclrCn;          // 신고 상세 내용 (dclr_cn)
     private String dclrDt;          // 신고 일자 (dclr_dt)
     private String prcsSttsCd;      // 처리 상태 코드 (prcs_stts_cd)
+    private String prcsPicMngrNo;     // 처리 담당 관리자 ID
+    private String dclrPrcsRsltCn;    // 최종 처리 결과 내용
     
     // report_attachments 테이블 정보 (우선 파일 개수만)
     private int attachmentCount;    // 첨부파일 개수
 
     // 1:N 관계: 하나의 신고 상세 정보는 여러 처리 이력을 가질 수 있습니다.
     private List<AdminReportHistory> historyList; 
+    
+    
 }
