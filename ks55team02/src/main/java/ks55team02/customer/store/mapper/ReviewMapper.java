@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 
 import ks55team02.common.domain.store.ProductReview;
 import ks55team02.common.domain.store.ReviewImage;
+import ks55team02.orderproduct.domain.OrderDTO;
+import ks55team02.seller.common.domain.Order;
 
 @Mapper
 public interface ReviewMapper {
@@ -29,7 +31,7 @@ public interface ReviewMapper {
   * @return 주문 상세 항목 번호 (결과 없으면 null)
   */
  String findReviewableOrderItem(@Param("userNo") String userNo,
-                                @Param("ordNo") String ordNo,
+                                @Param("ordrNo") String ordrNo,
                                 @Param("gdsNo") String gdsNo);
 
  /**
@@ -49,15 +51,13 @@ public interface ReviewMapper {
  
  Integer findMaxReviewIdNumber();
  
+ // 리뷰 가능 주문 조회
+ OrderDTO findReviewableOrder(@Param("userNo") String userNo, @Param("gdsNo") String gdsNo);
+ 
+ 
+ 
  
 }
 
 
- // TODO: 리뷰 등록, 수정, 삭제, 좋아요/취소 관련 메서드를 여기에 추가할 수 있습니다.
- // int insertReview(ProductReview review);
- // int updateReview(ProductReview review);
- // int deleteReview(String reviewId);
- // int insertReviewLike(ReviewLike reviewLike);
- // int deleteReviewLike(String reviewId, String likeUserNo);
- // ProductReview selectReviewById(String reviewId);
- // int updateReviewHelpfulCount(String reviewId, int increment);
+ 

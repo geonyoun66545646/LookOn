@@ -236,18 +236,18 @@
 								</div>
 							</div>
 						</div>
-
+						<!-- 리뷰 -->
 						<div class="tab-pane fade" id="product-review-tab" role="tabpanel"
      						aria-labelledby="product-review-link">
 
 							<div th:if="${canWriteReview}">
-							        <div th:replace="~{customer/fragments/insertReviewFragment :: insertReviewFragment(
+							        <div th:include="~{customer/fragments/insertReviewFragment :: insertReviewFragment(
 							                        gdsNo=${product.gdsNo},
-							                        ordNo=${reviewableOrder.ordNo})}">
+							                        ordrNo=${reviewableOrder.ordrNo})}">
 							        </div>
 							        <hr class="mt-4 mb-4">
 							    </div>																		   
-							    <div th:replace="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">							  							
+							    <div th:include="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">							  							
 							</div>
 						</div>
 					</div>
@@ -328,7 +328,7 @@
 			src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 		<script th:src="@{/maincss/assets/js/jquery.elevateZoom.min.js}"></script>
 		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
-		 <script th:src="@{/js/customerjs/productReview.js}"></script> <!-- ljs 리뷰목록  -->
+		 <script th:src="@{/js/customerjs/productReview.js}"></script>
 		<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
 	</th:block>
 

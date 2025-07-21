@@ -1,21 +1,10 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>리뷰 프래그먼트</title>
-</head>
-<body>
-<div th:fragment="productReviewFragment(productCode)">
+<th:block th:fragment="productReviewFragment(productCode)">
     <div class="reviews">
         <div class="container">
             <div id="review-section-content">
+                <!-- 이 내용은 productReview.js에 의해 동적으로 교체됩니다. -->
                 <p class="text-center py-5">리뷰 탭을 클릭하여 리뷰를 확인하세요.</p>
             </div>
         </div>
     </div>
-</div>
-
- <script th:inline="javascript">
- </script>
- </body>
-</html>
+</th:block>

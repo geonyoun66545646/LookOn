@@ -1,9 +1,13 @@
 package ks55team02.customer.store.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import ks55team02.common.domain.store.ProductReview;
 import ks55team02.common.domain.store.ReviewImage;
+import ks55team02.customer.store.domain.ReviewAddDto;
+import ks55team02.orderproduct.domain.OrderDTO;
+import ks55team02.seller.common.domain.Order;
 
 public interface ReviewService {
 
@@ -21,8 +25,11 @@ public interface ReviewService {
   * @param reviewForm 사용자가 폼에서 작성한 데이터
   * @param currentUserNo 현재 로그인한 사용자의 ID
   */
- void addReview(ProductReview productReview, String currentUserNo);
+ void addReview(ReviewAddDto reviewAddDto, String currentUserNo) throws IOException;
  // ProductReview가 아닌 ReviewFormDTO를 받는 것이 더 명확합니다.
+ 
+ // 리뷰 가능 주문내역 조회
+ OrderDTO findReviewableOrder(String userNo, String gdsNo);
 }
 
  // TODO: 리뷰 작성, 수정, 삭제, 좋아요/취소 등의 메서드를 여기에 추가할 수 있습니다.

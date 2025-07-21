@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
-import ks55team02.common.domain.store.ProductReview;
 import ks55team02.customer.login.domain.LoginUser;
+import ks55team02.customer.store.domain.ReviewAddDto;
 import ks55team02.customer.store.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -24,7 +24,7 @@ public class ReviewController {
     
 
     @PostMapping("/add")
-    public String addReview(ProductReview productReview, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String addReview(ReviewAddDto reviewAddDto, HttpSession session, RedirectAttributes redirectAttributes) {
 
         // 1. 세션에서 로그인 정보 확인
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
@@ -36,7 +36,7 @@ public class ReviewController {
 
         try {
             // 2. 서비스 레이어에 리뷰 추가 로직 위임
-            reviewService.addReview(productReview, currentUserNo);
+        	reviewService.addReview(reviewAddDto, currentUserNo);
             redirectAttributes.addFlashAttribute("successMessage", "리뷰가 성공적으로 등록되었습니다.");
 
         } catch (IllegalArgumentException | IllegalStateException e) {
@@ -50,6 +50,6 @@ public class ReviewController {
 
         // 5. 처리가 끝난 후, 원래 상품 상세 페이지로 리다이렉트
         // 상품 상세 페이지 URL이 '/customer/products/detail/{gdsNo}' 라고 가정
-        return "redirect:/customer/products/detail/" + productReview.getGdsNo();
+        return "redirect:/products/detail/" + reviewAddDto.getGdsNo();
     }
 }

@@ -97,23 +97,23 @@
 	</select>
 	
 	<!--    리뷰 인서트     -->
-	
 	<select id="findReviewableOrderItem" resultType="String">
-    SELECT
-        oi.ordr_dtl_artcl_no
-    FROM
-        orders o
-    JOIN
-        order_items oi ON o.ordr_no = oi.ordr_no
-    WHERE
-        o.user_no = #{userNo}
-      AND
-        o.ordr_no = #{ordNo}
-      AND
-        oi.gds_no = #{gdsNo}
-    LIMIT 1
-</select>
-
+	    SELECT
+	        oi.ordr_dtl_artcl_no
+	    FROM
+	        orders o
+	    JOIN
+	        order_items oi ON o.ordr_no = oi.ordr_no
+	    WHERE
+	        o.user_no = #{userNo}
+	      AND
+	        o.ordr_no = #{ordrNo}
+	      AND
+	        oi.gds_no = #{gdsNo}
+	      AND
+	        oi.ordr_dtl_artcl_dcsn_cd = 'ORDERED' -- 상태 체크 조건 추가!
+	    LIMIT 1
+	</select>
 <!-- [2] 중복 리뷰 검사를 위한 쿼리 -->
 <select id="countReviewByOrderItem" resultType="int">
     SELECT
@@ -156,6 +156,30 @@
         MAX(CAST(SUBSTRING_INDEX(review_id, '_', -1) AS UNSIGNED))
     FROM
         product_reviews
+</select>
+
+<!-- [추가] 특정 사용자가 특정 상품에 대해 리뷰를 작성할 수 있는 '주문'을 조회하는 쿼리 -->
+<!-- 가장 최근 주문 건 하나만 가져오도록 LIMIT 1을 사용합니다. -->
+<select id="findReviewableOrder" resultType="ks55team02.orderproduct.domain.OrderDTO">
+    SELECT
+	    O.ordr_no AS ordrNo,
+	    O.ordr_dt AS ordrDt
+	FROM
+	    orders O
+	INNER JOIN
+	    order_items OI ON O.ordr_no = OI.ordr_no
+	WHERE
+	    O.user_no = #{userNo}
+	  AND OI.gds_no = #{gdsNo}
+	  AND OI.ordr_dtl_artcl_dcsn_cd = 'ORDERED'
+	  AND NOT EXISTS ( 
+	        SELECT 1
+	        FROM product_reviews PR
+	        WHERE PR.ordr_dtl_artcl_no = OI.ordr_dtl_artcl_no
+	  )
+	ORDER BY
+	    O.ordr_dt DESC
+	LIMIT 1;
 </select>
 
 </mapper>
