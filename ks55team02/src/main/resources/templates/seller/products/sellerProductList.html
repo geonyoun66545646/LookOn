@@ -266,7 +266,20 @@
                 filterCheckAll.prop('checked', allChecked);
             }
         });
+		
+        // 링크간소화
+        $('#searchForm').on('submit', function(e) {
+            e.preventDefault(); // 기본 폼 제출을 막습니다.
 
+            // 폼 요소 중에서 값이 비어있지 않은 것들만 선택합니다.
+            const serializedData = $(this).find(':input[value]').filter(function() {
+                return $(this).val();
+            }).serialize();
+            
+            // 현재 경로에 정리된 파라미터를 붙여서 페이지를 이동시킵니다.
+            window.location.href = $(this).attr('action') + '?' + serializedData;
+        });
+        
         // 페이지 로드 시 '전체선택' 상태 초기화
         // th:checked에 의해 개별 체크박스 상태가 정해진 후 실행됨
         const allChecked = statusCheckboxes.length > 0 && statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
