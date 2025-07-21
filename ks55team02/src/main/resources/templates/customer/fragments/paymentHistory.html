@@ -4,6 +4,7 @@
       layout:decorate="~{customer/layout/layoutMain}">
 
 <head>
+    <!-- ... head 태그 내용은 동일 ... -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -59,11 +60,14 @@
                             <h2 class="success-title">주문이 성공적으로 완료되었습니다!</h2>
                             <p class="success-message">주문 내역을 확인해 주세요.</p>
 
+                            <!-- 서버에서 보낸 안내 메시지가 있을 경우 표시 -->
                             <div th:if="${message}" class="alert alert-info" role="alert">
                                 <p th:text="${message}"></p>
                             </div>
 
-                            <div th:if="${paymentInfo != null and !paymentInfo.isEmpty()}">
+                            <!-- ================== 수정된 부분 1 시작 ================== -->
+                            <!-- 'paymentInfo'를 'orderInfo'로 변경합니다. -->
+                            <div th:if="${orderInfo != null}">
                                 <h3 class="text-left mb-3">결제 및 배송 정보</h3>
                                 <table class="order-summary-table">
 								    <tbody>
@@ -73,27 +77,23 @@
 										</tr>
 										<tr>
 										    <th>총 결제 금액</th>
-										    <td th:text="${#numbers.formatDecimal(orderInfo.lastStlmAmt, 0, 'COMMA', 2, 'POINT') + '원'}">50,000원</td>
+                                            <!-- orderInfo.lastStlmAmt가 null일 수도 있으므로 안전하게 처리 -->
+										    <td th:if="${orderInfo.lastStlmAmt != null}"
+                                                th:text="${#numbers.formatDecimal(orderInfo.lastStlmAmt, 0, 'COMMA', 0, 'POINT') + '원'}">50,000원</td>
 										</tr>
 										<tr>
 										    <th>결제 수단</th>
 										    <td th:text="${paymentMethod ?: '신용카드'}">신용카드</td>
 										</tr>
-										
-										<!-- 상품 목록 표시 수정 -->
-										<tr th:each="product : ${orderedProducts}">
-										    <td th:text="${product['name']}">상품명</td>
-										    <td th:text="${product['quantity']}">수량</td>
-										    <td th:text="${#numbers.formatDecimal(product['price'], 0, 'COMMA', 2, 'POINT') + '원'}">가격</td>
-										    <td th:text="${#numbers.formatDecimal(product['total'], 0, 'COMMA', 2, 'POINT') + '원'}">총액</td>
-										</tr>
 								    </tbody>
 								</table>
                             </div>
                             
-                            <div th:unless="${paymentInfo != null and !paymentInfo.isEmpty()}">
+                            <!-- 'paymentInfo'를 'orderInfo'로 변경합니다. -->
+                            <div th:unless="${orderInfo != null}">
                                 <p class="text-center text-danger">결제 및 배송 정보를 불러올 수 없습니다.</p>
                             </div>
+                            <!-- ================== 수정된 부분 1 끝 ================== -->
 
                             <div th:if="${orderedProducts != null and !orderedProducts.isEmpty()}">
                                 <h3 class="text-left mt-5 mb-3">주문 상품 목록</h3>
@@ -107,17 +107,22 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="product : ${orderedProducts}">
-                                            <td th:text="${product.name}">상품 A</td>
-                                            <td th:text="${product.ordrQnty}">2</td>
-                                            <td th:text="${#numbers.formatInteger(product.gdsPrice, 0, 'COMMA') + '원'}">25,000원</td>
-                                            <td th:text="${#numbers.formatInteger(product.totalPrice, 0, 'COMMA') + '원'}">50,000원</td>
-                                        </tr>
-                                    </tbody>
+							            <th:block th:each="product : ${orderedProducts}">
+							                <tr th:if="${product != null}">
+							                    <td th:text="${product.NAME}">상품 A</td>
+							                    <td th:text="${product.QUANTITY}">2</td>
+							                    <td th:text="${#numbers.formatInteger(product.PRICE, 0, 'COMMA') + '원'}">25,000원</td>
+							                    <td th:text="${#numbers.formatInteger(product.TOTAL, 0, 'COMMA') + '원'}">50,000원</td>
+							                </tr>
+							            </th:block>
+							        </tbody>
                                 </table>
                             </div>
-                            <div th:unless="${orderedProducts != null and !orderedProducts.isEmpty()}">
-                                <p class="text-center text-danger">주문 상품 목록을 불러올 수 없습니다.</p>
+                            
+                            <!-- 주문 상품이 없을 때 메시지를 표시 -->
+                            <div th:if="${orderedProducts == null or orderedProducts.isEmpty()}">
+                                <h3 class="text-left mt-5 mb-3">주문 상품 목록</h3>
+                                <p class="text-center">주문한 상품이 없습니다.</p>
                             </div>
                             
                             <div class="order-actions text-center mt-5">
@@ -132,6 +137,7 @@
         </div>
     </div>
 </th:block>
+<!-- ... script 태그 내용은 동일 ... -->
 <script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
 <script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>

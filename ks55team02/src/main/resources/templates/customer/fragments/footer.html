@@ -32,15 +32,15 @@
                             <li><a th:href="@{/customer/chat}">사용자 채팅</a></li>
                             <li><a th:href="@{/customer/coupons}">사용자 쿠폰</a></li>
                             <li><a th:href="@{/customer/searchResult}">사용자 검색 결과</a></li>
-                            <li><a th:href="@{/customer/reports}">사용자 신고 접수</a></li>
-                            <li><a th:href="@{/customer/myReports}">사용자 내 신고 내역</a></li>
+                            <li><a th:href="@{/customer/reports}">사용자 신고</a></li>
+                            <!-- <li><a th:href="@{/customer/myReports}">사용자 내 신고 내역</a></li> -->
                             <li><a th:href="@{/adminpage/useradmin/chatLog}">관리자 채팅 로그 조회</a></li>
                             <li><a th:href="@{/adminpage/useradmin/search}">관리자 검색 기록 조회</a></li>
-                            <li><a th:href="@{/adminpage/inquiryadmin/reportsList}">관리자 신고 목록 조회</a></li>
-                            <li><a th:href="@{/adminpage/inquiryadmin/reportsDetail}">관리자 신고 상세 처리</a></li>
-                            <li><a th:href="@{/adminpage/useradmin/createCoupons}">관리자 쿠폰 생성</a></li>
-                            <li><a th:href="@{/adminpage/useradmin/memberCoupons}">관리자 회원 쿠폰 조회</a></li>
-                            <li><a th:href="@{/adminpage/useradmin/couponsList}">관리자 쿠폰 목록 조회</a></li>
+                            <li><a th:href="@{/adminpage/inquiryadmin/reportsList}">관리자 신고 관리</a></li>
+                            <!-- <li><a th:href="@{/adminpage/inquiryadmin/reportsDetail}">관리자 신고 상세 처리</a></li> -->
+                            <li><a th:href="@{/adminpage/useradmin/createCoupons}">관리자 쿠폰 관리</a></li>
+                           <!--  <li><a th:href="@{/adminpage/useradmin/memberCoupons}">관리자 회원 쿠폰 조회</a></li>
+                            <li><a th:href="@{/adminpage/useradmin/couponsList}">관리자 쿠폰 목록 조회</a></li> -->
                         </ul>
 					</div>
 				</div>
@@ -62,13 +62,16 @@
 					<div class="widget">
 						<h4 class="widget-title">이지성</h4>
 						<ul class="widget-list">
-							<li><a href="#">문의 조회</a></li>
-							<li><a href="#">스토어 관리</a></li>
-							<li><a href="#"></a></li>
-							<li><a href="#">기능4</a></li>
-							<li><a href="#">기능5</a></li>
-							<li><a href="#">기능6</a></li>
-							<li><a href="#">기능7</a></li>
+							<li><a href="/customer/inquiry/inquiryList">문의 조회 페이지</a></li>
+							<li><a href="/customer/inquiry/inquiryDetail?inquiryId=inq_111">문의 상세 페이지</a></li>
+							<li><a href="/customer/inquiry/addInquiry">문의 등록 페이지</a></li>
+							<li><a href="/store/appStore">상점 신청 페이지</a></li>
+							<li><a href="#">상점 리뷰페이지</a></li>
+							<li><a href="/seller">상점 관리 메인 페이지</a></li>
+							<li><a href="/seller/inquiry/sellerInquiryList">상점 문의 조회 페이지</a></li>
+							<li><a href="/seller/inquiry/sellerInquiryDetail?inqryId=inq_112">상점 문의 상세 페이지</a></li>
+							<li><a href="/adminpage/storeadmin/appAdmin">상점 신청 목록 조회 페이지</a></li>
+							<li><a href="/adminpage/storeadmin/appDetail?aplyId=aply_50">상점 신청 상세 페이지</a></li>
 						</ul>
 					</div>
 				</div>
@@ -93,7 +96,7 @@
 	</div>
 	<div class="footer-bottom">
 		<div class="container">
-			<a th:href="@{/main}" class="lookon-brand-logo">LookOn</a>
+			<a th:href="@{/}" class="lookon-brand-logo">LookOn</a>
 			<p class="footer-copyright">Copyright © 2025 LookOn. All Rights Reserved.</p>
 		</div>
 	</div>

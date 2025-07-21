@@ -34,30 +34,38 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Map<String, Object> getLatestOrderDetailsForUser(String userNo) {
+        // 1. 최신 주문 ID 조회
         String latestOrderId = orderMapper.findLatestOrderIdByUserNo(userNo);
         if (latestOrderId == null || latestOrderId.isEmpty()) {
-            return null;
+            return null; // 주문 내역 없으면 null 반환
         }
 
-        // OrderDTO로 직접 매핑
-        OrderDTO orderDTO = orderMapper.getCombinedOrderDetailsByOrderId(latestOrderId);
+        // 2. 주문 기본 정보 조회
+        OrderDTO orderInfo = orderMapper.getCombinedOrderDetailsByOrderId(latestOrderId);
         
-        // 상품 목록 조회
+        // 3. 주문 상품 목록 조회
         List<Map<String, Object>> orderedProducts = orderMapper.getOrderedProductsByOrderId(latestOrderId);
 
-        // 결과 맵 구성
+
+        // [디버깅 로그] 이 로그에서 orderedProducts가 정상적인 데이터로 찍히는지 확인
+        System.out.println("--- OrderServiceImpl 최종 데이터 확인 ---");
+        System.out.println("주문 상품 목록 (orderedProducts): " + orderedProducts);
+        System.out.println("------------------------------------");
+        
+        // 4. 결과를 Map에 담아 반환
         Map<String, Object> result = new HashMap<>();
-        result.put("orderInfo", orderDTO);
+        result.put("orderInfo", orderInfo);
         result.put("orderedProducts", orderedProducts);
         
         return result;
+
     }
 
     @Override
     public void saveOrder(Map<String, Object> orderData) {
         // TODO: 이 부분에 orderData Map을 OrderDTO로 변환하여
         //       Mapper를 통해 DB의 orders, order_items 테이블에 INSERT하는 로직을 구현해야 합니다.
-        log.info("saveOrder 서비스 호출. orderId: {}", orderData.get("ordrNo"));
+        log.info("saveOrder 서비스 호출. ordrNo: {}", orderData.get("ordrNo"));
         log.warn("<<<<< saveOrder: 실제 DB 저장 로직 구현이 필요합니다. >>>>>");
     }
 }

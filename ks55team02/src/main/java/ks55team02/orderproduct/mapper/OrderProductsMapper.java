@@ -18,7 +18,7 @@ public interface OrderProductsMapper {
      * @return 주문 상세 정보를 담은 Map 객체
      */
 	OrderDTO getCombinedOrderDetailsByOrderId(String ordrNo);
-    
+
     /**
      * XML ID: getOrderedProductsByOrderId
      * 주문 ID로 해당 주문에 포함된 상품 목록을 조회합니다. (JOIN 활용)
@@ -33,5 +33,14 @@ public interface OrderProductsMapper {
     String selectLatestOrderIdByUserNo(String userNo);
     
     String findLatestOrderIdByUserNo(String userNo); 
+    
+    /**
+     * 특정 사용자의 가장 최근 주문에 대한 상세 정보(기본 정보 + 상품 목록)를 조회합니다.
+     *
+     * @param userNo 조회할 사용자의 고유 번호
+     * @return 'orderInfo'와 'orderedProducts' 키를 포함하는 Map.
+     *         조회된 데이터가 없으면 비어있는 Map 또는 null을 반환합니다.
+     */
+    Map<String, Object> getLatestOrderDetailsForUser(String userNo);
     
 }

@@ -1,18 +1,23 @@
 package ks55team02.customer.feed.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import ks55team02.customer.feed.domain.Feed;
 import ks55team02.customer.feed.domain.FeedComment;
 import ks55team02.customer.feed.domain.FeedImage;
 import ks55team02.customer.feed.domain.FeedInteraction;
+import ks55team02.customer.feed.domain.FeedTag;
 import ks55team02.customer.feed.mapper.FeedMapper;
 import ks55team02.customer.feed.service.FeedService;
 import ks55team02.customer.login.domain.LoginUser;
@@ -29,10 +34,9 @@ public class FeedServiceImpl implements FeedService {
 	private final FeedMapper feedMapper;
 	private final FilesUtils filesUtils;
 
-	// ... (selectFeedList, selectFeedDetail 등 다른 메소드는 기존과 동일) ...
 	@Override
     public Map<String, Object> selectFeedList(String userNo, int page, int size) {
-		int offset = (page - 1) * size;
+        int offset = (page - 1) * size;
         List<Feed> feedList = feedMapper.selectFeedList(userNo, size, offset);
         int totalCount = feedMapper.selectFeedCount(userNo);
         boolean hasNext = (offset + feedList.size()) < totalCount;
@@ -56,43 +60,150 @@ public class FeedServiceImpl implements FeedService {
     
     @Override
     @Transactional
-	public void insertFeed(String feedCn, List<MultipartFile> imageFiles, LoginUser loginUser) {
+	public void insertFeed(String feedCn, String hashtags, List<MultipartFile> imageFiles, LoginUser loginUser) {
+		// 1. 피드 본문 저장
 		String lastFeedSn = feedMapper.selectLastFeedSn();
-		int newFeedNum = 1;
-		if (lastFeedSn != null) {
-			newFeedNum = Integer.parseInt(lastFeedSn.replace("feed_", "")) + 1;
-		}
+		int newFeedNum = (lastFeedSn == null) ? 1 : Integer.parseInt(lastFeedSn.replace("feed_", "")) + 1;
 		String newFeedSn = "feed_" + String.format("%03d", newFeedNum);
 		Feed newFeed = new Feed();
 		newFeed.setFeedSn(newFeedSn);
 		newFeed.setFeedCn(feedCn);
 		newFeed.setWrtrUserNo(loginUser.getUserNo());
 		feedMapper.insertFeed(newFeed);
-		if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-			String lastFeedImgSn = feedMapper.selectLastFeedImageSn();
-			int newFeedImgNum = 1;
-			if (lastFeedImgSn != null) {
-				newFeedImgNum = Integer.parseInt(lastFeedImgSn.replace("feed_img_", "")) + 1;
-			}
-			List<FeedImage> imageListForDb = new ArrayList<>();
-			for (int i = 0; i < imageFiles.size(); i++) {
-				MultipartFile file = imageFiles.get(i);
-				if (file == null || file.isEmpty()) continue;
-				FileDetail fileDetail = filesUtils.saveFile(file, "feeds");
-				if (fileDetail != null) {
-					FeedImage feedImage = new FeedImage();
-					String newFeedImgSn = "feed_img_" + String.format("%03d", (newFeedImgNum + i));
-					feedImage.setFeedImgSn(newFeedImgSn);
-					feedImage.setFeedSn(newFeedSn);
-					feedImage.setImgFilePathNm(fileDetail.getSavedPath());
-					feedImage.setFeedImgSortSn(String.valueOf(i));
-					imageListForDb.add(feedImage);
-				}
-			}
-			if (!imageListForDb.isEmpty()) {
-				feedMapper.insertFeedImages(imageListForDb);
-			}
-		}
+		
+		// 2. 이미지 저장
+		saveImages(newFeedSn, imageFiles);
+		
+		// 3. 해시태그 처리
+		processHashtags(newFeedSn, hashtags, loginUser);
+	}
+	
+	@Override
+	@Transactional
+	public boolean updateFeed(String feedSn, String feedCn, String hashtags, List<String> deleteImageSns, List<MultipartFile> newImageFiles, LoginUser loginUser) {
+	    // 1. 피드 존재 여부 및 소유권 확인
+	    Feed existingFeed = feedMapper.selectFeedDetail(feedSn);
+	    if (existingFeed == null || !existingFeed.getWrtrUserNo().equals(loginUser.getUserNo())) {
+	        log.warn("피드 수정 권한 없음: feedSn={}, userNo={}", feedSn, loginUser.getUserNo());
+	        return false;
+	    }
+
+	    // 2. 피드 내용 업데이트
+	    Feed feedToUpdate = new Feed();
+	    feedToUpdate.setFeedSn(feedSn);
+	    feedToUpdate.setFeedCn(feedCn);
+	    feedMapper.updateFeed(feedToUpdate);
+
+	    // 3. 기존 이미지 삭제
+	    if (deleteImageSns != null && !deleteImageSns.isEmpty()) {
+	        feedMapper.deleteFeedImagesBySn(deleteImageSns, loginUser.getUserNo());
+	    }
+	    
+	    // 4. 새 이미지 추가
+	    saveImages(feedSn, newImageFiles);
+	    
+	    // 5. 해시태그 업데이트 (기존 태그 삭제 후 새로 추가)
+	    feedMapper.deleteTagsByFeedSn(feedSn);
+	    processHashtags(feedSn, hashtags, loginUser);
+
+	    return true;
+	}
+
+	@Override
+	@Transactional
+	public boolean deleteFeed(String feedSn, String userNo) {
+	    // 1. 피드 존재 여부 및 소유권 확인
+	    Feed feed = feedMapper.selectFeedDetail(feedSn);
+	    if (feed == null || !feed.getWrtrUserNo().equals(userNo)) {
+	        return false; // 권한 없음
+	    }
+	    // 2. 피드 논리적 삭제
+	    feedMapper.deleteFeedLogically(feedSn, userNo);
+	    // (연관된 좋아요, 댓글, 이미지 등은 FK 제약조건이나 추가적인 비즈니스 로직으로 처리 필요. 현재는 피드만 논리삭제)
+	    return true;
+	}
+
+	private void saveImages(String feedSn, List<MultipartFile> imageFiles) {
+	    // [핵심 수정] 스트림 대신 for 반복문을 사용하여 문법 오류 해결
+	    if (imageFiles != null && !imageFiles.isEmpty()) {
+	        // DB에 저장할 이미지 객체 리스트
+	        List<FeedImage> imageListForDb = new ArrayList<>();
+	        
+	        // 마지막 이미지 번호를 가져와서 1 증가시킨 값을 시작점으로 사용
+	        String lastFeedImgSn = feedMapper.selectLastFeedImageSn();
+	        int newFeedImgNum = (lastFeedImgSn == null) ? 1 : Integer.parseInt(lastFeedImgSn.replace("feed_img_", "")) + 1;
+
+	        // 정렬 순서를 위한 카운터
+	        int sortOrder = 0;
+
+	        for (MultipartFile file : imageFiles) {
+	            if (file != null && !file.isEmpty()) {
+	                FileDetail fileDetail = filesUtils.saveFile(file, "feeds");
+	                if (fileDetail != null) {
+	                    FeedImage feedImage = new FeedImage();
+	                    String newImgSn = "feed_img_" + String.format("%03d", newFeedImgNum++);
+	                    feedImage.setFeedImgSn(newImgSn);
+	                    feedImage.setFeedSn(feedSn);
+	                    feedImage.setImgFilePathNm(fileDetail.getSavedPath());
+	                    // 정렬 순서를 0부터 차례대로 부여
+	                    feedImage.setFeedImgSortSn(String.valueOf(sortOrder++)); 
+	                    imageListForDb.add(feedImage);
+	                }
+	            }
+	        }
+
+	        if (!imageListForDb.isEmpty()) {
+	            feedMapper.insertFeedImages(imageListForDb);
+	        }
+	    }
+	}
+
+	private void processHashtags(String feedSn, String hashtags, LoginUser loginUser) {
+	    if (!StringUtils.hasText(hashtags)) {
+	        return;
+	    }
+	    List<String> tagNames = Arrays.stream(hashtags.replace("#", "").split("\\s+"))
+	                                  .filter(StringUtils::hasText)
+	                                  .distinct()
+	                                  .collect(Collectors.toList());
+
+	    if (tagNames.isEmpty()) {
+	        return;
+	    }
+	    
+	    // [핵심 수정] 이제 쿼리가 순수 숫자 문자열을 반환하므로, .replace() 로직을 제거합니다.
+	    String lastTagNumStr = feedMapper.selectLastTagSn();
+	    AtomicInteger lastTagSnNum = new AtomicInteger(lastTagNumStr == null ? 1 : Integer.parseInt(lastTagNumStr) + 1);
+	    
+	    String lastFeedTagNumStr = feedMapper.selectLastFeedTagSn();
+	    AtomicInteger lastFeedTagSnNum = new AtomicInteger(lastFeedTagNumStr == null ? 1 : Integer.parseInt(lastFeedTagNumStr) + 1);
+	    
+	    List<FeedTag> feedTagList = new ArrayList<>();
+	    
+	    for (String tagName : tagNames) {
+	        FeedTag tag = feedMapper.findTagByName(tagName);
+	        if (tag == null) {
+	            tag = new FeedTag();
+	            // DB에 저장할 실제 식별자는 접두사를 붙여서 생성합니다.
+	            String newTagSn = "tag_sn_" + String.format("%03d", lastTagSnNum.getAndIncrement());
+	            tag.setTagSn(newTagSn);
+	            tag.setTagNm(tagName);
+	            tag.setCreatrUserNo(loginUser.getUserNo());
+	            feedMapper.insertTag(tag);
+	        }
+	        
+	        FeedTag feedTag = new FeedTag();
+	        // DB에 저장할 실제 식별자는 접두사를 붙여서 생성합니다.
+	        String newFeedTagSn = "feed_tag_sn_" + String.format("%03d", lastFeedTagSnNum.getAndIncrement());
+	        feedTag.setFeedTagSn(newFeedTagSn);
+	        feedTag.setFeedSn(feedSn);
+	        feedTag.setTagSn(tag.getTagSn());
+	        feedTagList.add(feedTag);
+	    }
+	    
+	    if (!feedTagList.isEmpty()) {
+	        feedMapper.insertFeedTags(feedTagList);
+	    }
 	}
 	
 	@Override
@@ -136,36 +247,25 @@ public class FeedServiceImpl implements FeedService {
 		return feedMapper.selectCommentBySn(newCommentSn);
 	}
 
-	// [신규] 댓글 삭제 로직
 	@Override
 	@Transactional
 	public boolean deleteComment(String feedCmntSn, String userNo) {
-		// [핵심] DB에서 실제 댓글 정보를 가져와 작성자 본인인지 서버에서 한번 더 확인합니다.
 		FeedComment comment = feedMapper.selectCommentBySn(feedCmntSn);
-
-		// 댓글이 존재하고, 요청한 사용자가 댓글 작성자와 일치하는 경우에만 삭제를 진행합니다.
 		if (comment != null && comment.getWrtrUserNo().equals(userNo)) {
 			feedMapper.deleteComment(feedCmntSn, userNo);
-			return true; // 삭제 성공
+			return true;
 		}
-
-		return false; // 삭제 실패 (댓글이 없거나, 권한이 없음)
+		return false;
 	}
-	// [신규] 댓글 수정 로직
+	
 	@Override
 	@Transactional
 	public FeedComment updateComment(String feedCmntSn, String commentText, String userNo) {
-		// [핵심] DB에서 실제 댓글 정보를 가져와 작성자 본인인지 서버에서 한번 더 확인합니다.
 		FeedComment comment = feedMapper.selectCommentBySn(feedCmntSn);
-
-		// 댓글이 존재하고, 요청한 사용자가 댓글 작성자와 일치하는 경우에만 수정을 진행합니다.
 		if (comment != null && comment.getWrtrUserNo().equals(userNo)) {
 			feedMapper.updateComment(feedCmntSn, commentText);
-			// 수정된 최신 정보를 다시 조회하여 반환
 			return feedMapper.selectCommentBySn(feedCmntSn);
 		}
-		
-		// 권한이 없거나 댓글이 없는 경우 null 반환
 		return null;
 	}
 }

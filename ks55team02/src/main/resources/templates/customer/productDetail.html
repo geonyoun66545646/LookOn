@@ -109,8 +109,8 @@
 									<div class="ratings">
 										<div class="ratings-val" style="width: 80%;"></div>
 									</div>
-									<a class="ratings-text" href="#product-review-link"
-										id="review-link">( 2 리뷰 )</a>
+									 <a class="ratings-text" href="#product-review-link" id="review-link"
+      									 th:text="'(' + (${reviews != null ? reviews.size() : 0}) + ' 개의 리뷰)'">( 2 리뷰 )</a>
 								</div>
 
 								<div class="product-price-section">
@@ -236,15 +236,19 @@
 								</div>
 							</div>
 						</div>
-
+						<!-- 리뷰 -->
 						<div class="tab-pane fade" id="product-review-tab" role="tabpanel"
-							aria-labelledby="product-review-link">
+     						aria-labelledby="product-review-link">
 
-
-							<div
-								th:replace="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">
+							<div th:if="${canWriteReview}">
+							        <div th:include="~{customer/fragments/insertReviewFragment :: insertReviewFragment(
+							                        gdsNo=${product.gdsNo},
+							                        ordrNo=${reviewableOrder.ordrNo})}">
+							        </div>
+							        <hr class="mt-4 mb-4">
+							    </div>																		   
+							    <div th:include="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">							  							
 							</div>
-
 						</div>
 					</div>
 				</div>
@@ -324,6 +328,7 @@
 			src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 		<script th:src="@{/maincss/assets/js/jquery.elevateZoom.min.js}"></script>
 		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
+		 <script th:src="@{/js/customerjs/productReview.js}"></script>
 		<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
 	</th:block>
 
@@ -353,6 +358,24 @@
 			var productStatusData = /*[[${productStatusData}]]*/[];
 			console.log("서버로부터 받은 상품 상태 데이터:", productStatusData);
 		</script>
+		
+		<!-- ljs 리뷰목록  -->
+		<script th:inline="javascript">
+				/*<![CDATA[*/
+					// 페이지 로딩이 완료되면 실행
+					document.addEventListener('DOMContentLoaded', function() {
+						// Thymeleaf 모델에서 전체 리뷰 목록을 가져옵니다.
+						const reviewData = /*[[${reviews}]]*/ [];
+						
+						// review.js 파일에 정의된 초기화 함수를 호출하며 데이터를 전달합니다.
+						if (typeof initReviewSection === 'function') {
+							initReviewSection(reviewData);
+						} else {
+							console.error('initReviewSection 함수를 찾을 수 없습니다. review.js 파일이 올바르게 로드되었는지 확인하세요.');
+						}
+					});
+				/*]]>*/
+				</script>
 
 
 		<script>

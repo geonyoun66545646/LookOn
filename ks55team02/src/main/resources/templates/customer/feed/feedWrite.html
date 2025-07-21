@@ -4,7 +4,7 @@
       layout:decorate="~{customer/layout/layoutMain}">
 
 <head>
-    <!-- [수정] th:with를 사용하여 isEditMode 변수 정의, 페이지 제목 동적 변경 -->
+    <!-- [수정 1] th:with를 사용하여 isEditMode 변수 정의, 페이지 제목 동적 변경 -->
     <th:block th:with="isEditMode = ${feed != null}">
         <title th:text="${isEditMode} ? '피드 수정' : '새 피드 작성'"></title>
     </th:block>
@@ -16,15 +16,12 @@
 </th:block>
 
 <th:block layout:fragment="contents">
-    <!-- [수정] isEditMode 변수를 여기서 다시 정의하여 컨텐츠 전체에서 사용 -->
+    <!-- [수정 2] isEditMode 변수를 컨텐츠 전체에서 사용 -->
     <div class="feed-write-container" th:with="isEditMode = ${feed != null}">
         
         <h2 class="page-title" th:text="${isEditMode} ? '게시물 수정' : '새 게시물 만들기'">새 게시물 만들기</h2>
 
-        <!-- 
-            [수정] form 태그에 data-feed-sn 속성을 추가하여 수정 모드일 때 피드 번호를 JS에서 사용 
-            action과 method는 JS에서 Ajax로 처리하므로 제거.
-        -->
+        <!-- [수정 3] form 태그에 data-feed-sn 속성 추가, JS에서 Ajax로 처리하므로 action, method 제거 -->
         <form id="feed-form" th:data-feed-sn="${isEditMode ? feed.feedSn : ''}">
             
             <div class="form-columns">
@@ -32,7 +29,7 @@
                 <div class="form-section image-upload-section">
                     
                     <!-- [신규] 수정 모드일 때만 보이는 '기존 이미지' 영역 -->
-                    <div th:if="${isEditMode}" class="existing-images-group">
+                    <div th:if="${isEditMode and feed.imageList != null and !feed.imageList.isEmpty()}" class="existing-images-group">
                         <label>기존 이미지 (삭제하려면 X)</label>
                         <div id="existing-images-preview" class="image-preview-container">
                             <div th:each="image : ${feed.imageList}" class="preview-image-wrapper" th:attr="data-image-sn=${image.feedImgSn}">
@@ -57,29 +54,29 @@
                             </div>
                         </div>
                     </div>
+                    <!-- [수정 4] name을 'newImageFiles'로 명확히 하여 RestController와 일치시킴 -->
                     <input type="file" id="image-input" name="newImageFiles" accept="image/*" multiple style="display: none;">
                 </div>
 
                 <!-- 오른쪽 컬럼: 내용 입력 -->
                 <div class="form-section content-section">
                     <div class="writer-profile">
-                        <img th:src="${loginUser?.prflImg ?: '/uploads/profiles/defaultprofile.jpg'}" alt="프로필 사진" class="profile-image-small">
+                        <img th:src="${userInfo?.prflImg ?: '/uploads/profiles/defaultprofile.jpg'}" alt="프로필 사진" class="profile-image-small">
                         <span th:text="${loginUser?.userNcnm}" class="writer-nickname">사용자 닉네임</span>
                     </div>
-                    <!-- [수정] th:text로 수정 시 기존 내용 채우기 -->
+                    <!-- [수정 5] th:text로 수정 시 기존 내용 채우기 -->
                     <textarea id="feed-content" name="feedCn" class="form-control" rows="8" placeholder="문구 입력..." th:text="${feed?.feedCn}"></textarea>
                     
-                    <!-- [신규] 해시태그 입력 필드 추가 -->
+                    <!-- [수정 6] 해시태그 입력 필드, th:value로 기존 태그 채우기 -->
                     <div class="hashtag-group">
                         <label for="feed-hashtags">해시태그</label>
                         <input type="text" id="feed-hashtags" name="hashtags" class="form-control" placeholder="#태그 #공백으로 #구분" 
-                               th:value="${isEditMode ? #strings.listJoin(feed.tagList.![ '#'+tagNm ], ' ') : ''}">
+                               th:value="${isEditMode and feed.tagList != null and !feed.tagList.isEmpty() ? #strings.listJoin(feed.tagList.![tagNm], ' #') : ''}">
                     </div>
 
                     <div class="action-section">
-                        <!-- [수정] onclick 제거, JS에서 이벤트 처리 -->
                         <button type="button" id="cancel-btn" class="btn btn-secondary">취소</button>
-                        <!-- [수정] 버튼 텍스트 동적 변경 -->
+                        <!-- [수정 7] 버튼 텍스트 동적 변경 -->
                         <button type="submit" id="submit-btn" class="btn btn-primary" th:text="${isEditMode} ? '수정하기' : '작성하기'">작성하기</button>
                     </div>
                 </div>
