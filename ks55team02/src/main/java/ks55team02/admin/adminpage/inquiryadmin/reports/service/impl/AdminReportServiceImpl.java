@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReport;
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportSearch;
 import ks55team02.admin.adminpage.inquiryadmin.reports.mapper.AdminReportMapper;
 import ks55team02.admin.adminpage.inquiryadmin.reports.service.AdminReportService;
 import ks55team02.admin.common.domain.Pagination;
-import ks55team02.admin.common.domain.SearchCriteria;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,7 +25,7 @@ public class AdminReportServiceImpl implements AdminReportService {
      * 관리자용 신고 목록과 페이지네이션 정보를 함께 조회
      */
     @Override
-    public Map<String, Object> getAdminReportList(SearchCriteria searchCriteria) {
+    public Map<String, Object> getAdminReportList(AdminReportSearch searchCriteria) {
 
         // 1. 조건에 맞는 전체 데이터 개수 조회 (from Mapper)
         int totalReportCount = adminReportMapper.getAdminTotalReportCount(searchCriteria);

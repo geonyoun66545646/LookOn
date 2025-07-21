@@ -1,42 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ks55team02.admin.adminpage.inquiryadmin.reports.mapper.AdminReportMapper">
+<mapper
+	namespace="ks55team02.admin.adminpage.inquiryadmin.reports.mapper.AdminReportMapper">
 
-    <resultMap id="adminReportResultMap" type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReport">
-        <id     property="dclrId"               column="dclr_id" />
-        <result property="dclrTrgtTypeCd"       column="dclr_trgt_type_cd" />
-        <result property="prcsSttsCd"           column="prcs_stts_cd" />
-        <result property="dclrRcptDt"           column="dclr_rcpt_dt" />
-        <result property="dclrUserNickname"     column="dclrUserNickname" />    <result property="dclrReasonContent"    column="dclrReasonContent" />   <result property="intelligentTargetInfo" column="intelligentTargetInfo" /> <result property="dtlDclrRsnCn"         column="dtl_dclr_rsn_cn" />
-        </resultMap>
+	<resultMap id="adminReportResultMap"
+		type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReport">
+		<id property="dclrId" column="dclr_id" />
+		<result property="dclrTrgtTypeCd" column="dclr_trgt_type_cd" />
+		<result property="prcsSttsCd" column="prcs_stts_cd" />
+		<result property="dclrRcptDt" column="dclr_rcpt_dt" />
+		<result property="dclrUserNickname" column="dclrUserNickname" />
+		<result property="dclrUserLoginId" column="dclrUserLoginId" />
+		<result property="dclrReasonContent" column="dclrReasonContent" />
+		<result property="intelligentTargetInfo"
+			column="intelligentTargetInfo" />
+	</resultMap>
 
-    <select id="getAdminTotalReportCount" parameterType="ks55team02.admin.common.domain.SearchCriteria" resultType="_int">
-        SELECT
-            COUNT(*)
-        FROM
-            reports AS R
-    </select>
+	<select id="getAdminTotalReportCount"
+		parameterType="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportSearch"
+		resultType="_int">
+		SELECT
+		COUNT(*)
+		FROM
+		reports AS R
+		<where>
+			<if test="prcsSttsCd != null and !prcsSttsCd.equals('')">
+				AND R.prcs_stts_cd = #{prcsSttsCd}
+			</if>
+			<if test="startDate != null">
+				AND R.dclr_rcpt_dt >= #{startDate}
+			</if>
+			<if test="endDate != null">
+				AND R.dclr_rcpt_dt &lt;= DATE_ADD(#{endDate}, INTERVAL 1
+				DAY)
+			</if>
+			<if test="searchValue != null and !searchValue.equals('')">
+				<choose>
+					<when test="searchKey == 'dclrId'">
+						AND R.dclr_id LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'dclrUserLoginId'">
+						AND R.dclr_user_no IN (SELECT user_no FROM users
+						WHERE user_lgn_id
+						LIKE CONCAT('%', #{searchValue}, '%'))
+					</when>
+					<when test="searchKey == 'dclrTrgtTypeCd'">
+						AND R.dclr_trgt_type_cd LIKE CONCAT('%',
+						#{searchValue}, '%')
+					</when>
+					<when test="searchKey == 'dclrReasonContent'">
+						AND R.dclr_rsn_cd IN (SELECT dclr_rsn_cd FROM
+						report_reasons WHERE
+						dclr_rsn_cn LIKE CONCAT('%', #{searchValue},
+						'%'))
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
 
-    <select id="getAdminReportList" parameterType="map" resultMap="adminReportResultMap">
-        SELECT
-            R.dclr_id,
-            R.dclr_trgt_type_cd,
-            R.prcs_stts_cd,
-            R.dclr_rcpt_dt,
-            R.dtl_dclr_rsn_cn, /* resultMap에 추가했으므로 SELECT 절에도 추가 */
-            U.user_ncnm AS dclrUserNickname,
-            RR.dclr_rsn_cn AS dclrReasonContent,
-            CASE
-                WHEN R.dclr_trgt_type_cd = 'U' THEN (SELECT user_ncnm FROM users WHERE user_no = R.dclr_trgt_user_no)
-                WHEN R.dclr_trgt_type_cd = 'P' THEN (SELECT gds_nm FROM products WHERE gds_no = R.dclr_trgt_conts_id)
-                ELSE '기타'
-            END AS intelligentTargetInfo
-        FROM
-            reports AS R
-            JOIN users AS U ON R.dclr_user_no = U.user_no
-            JOIN report_reasons AS RR ON R.dclr_rsn_cd = RR.dclr_rsn_cd
-        ORDER BY
-            R.dclr_rcpt_dt DESC
-        LIMIT #{pagination.recordSize} OFFSET #{pagination.limitStart}
-    </select>
+	<select id="getAdminReportList" parameterType="map"
+		resultMap="adminReportResultMap">
+		SELECT
+		R.dclr_id,
+		R.dclr_trgt_type_cd,
+		R.prcs_stts_cd,
+		R.dclr_rcpt_dt,
+		U.user_lgn_id AS dclrUserLoginId,
+		RR.dclr_rsn_cn AS dclrReasonContent,
+		COALESCE(R.dclr_trgt_user_no, R.dclr_trgt_conts_id) AS intelligentTargetInfo
+		FROM
+		reports AS R
+		JOIN users AS U ON R.dclr_user_no = U.user_no
+		JOIN report_reasons AS RR ON R.dclr_rsn_cd = RR.dclr_rsn_cd
+		<where>
+			<if
+				test="searchCriteria.prcsSttsCd != null and !searchCriteria.prcsSttsCd.equals('')">
+				AND R.prcs_stts_cd = #{searchCriteria.prcsSttsCd}
+			</if>
+			<if test="searchCriteria.startDate != null">
+				AND R.dclr_rcpt_dt >= #{searchCriteria.startDate}
+			</if>
+			<if test="searchCriteria.endDate != null">
+				AND R.dclr_rcpt_dt &lt;= DATE_ADD(#{searchCriteria.endDate}, INTERVAL 1
+				DAY)
+			</if>
+			<if
+				test="searchCriteria.searchValue != null and !searchCriteria.searchValue.equals('')">
+				<choose>
+					<when test="searchCriteria.searchKey == 'dclrId'">
+						AND R.dclr_id LIKE CONCAT('%', #{searchCriteria.searchValue}, '%')
+					</when>
+					<when test="searchCriteria.searchKey == 'dclrUserLoginId'">
+						AND R.dclr_user_no IN (SELECT user_no FROM users WHERE user_lgn_id
+						LIKE CONCAT('%', #{searchCriteria.searchValue}, '%'))
+					</when>
+					<when test="searchCriteria.searchKey == 'dclrTrgtTypeCd'">
+						AND R.dclr_trgt_type_cd LIKE CONCAT('%',
+						#{searchCriteria.searchValue}, '%')
+					</when>
+					<when test="searchCriteria.searchKey == 'dclrReasonContent'">
+						AND RR.dclr_rsn_cn LIKE CONCAT('%', #{searchCriteria.searchValue},
+						'%')
+					</when>
+				</choose>
+			</if>
+		</where>
+		ORDER BY
+		R.dclr_rcpt_dt DESC
+		LIMIT #{pagination.recordSize} OFFSET #{pagination.limitStart}
+	</select>
 </mapper>

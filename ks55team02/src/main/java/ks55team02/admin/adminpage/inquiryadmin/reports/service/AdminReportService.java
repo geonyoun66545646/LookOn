@@ -1,7 +1,8 @@
 package ks55team02.admin.adminpage.inquiryadmin.reports.service;
 
 import java.util.Map;
-import ks55team02.admin.common.domain.SearchCriteria;
+
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportSearch;
 
 public interface AdminReportService {
 
@@ -10,6 +11,6 @@ public interface AdminReportService {
      * @param searchCriteria 검색 조건 (currentPage, pageSize, searchKey, searchValue...)
      * @return Map<String, Object> - "reportList"와 "pagination" 객체가 담긴 맵
      */
-    Map<String, Object> getAdminReportList(SearchCriteria searchCriteria);
+	Map<String, Object> getAdminReportList(AdminReportSearch searchCriteria);
 
 }

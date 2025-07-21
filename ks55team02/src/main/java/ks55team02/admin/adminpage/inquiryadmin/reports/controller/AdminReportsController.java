@@ -1,6 +1,5 @@
 package ks55team02.admin.adminpage.inquiryadmin.reports.controller;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
@@ -10,10 +9,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReport;
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportSearch;
 import ks55team02.admin.adminpage.inquiryadmin.reports.service.AdminReportService;
-import ks55team02.admin.common.domain.Pagination;
-import ks55team02.admin.common.domain.SearchCriteria;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -26,7 +23,7 @@ public class AdminReportsController {
 
 	// 2. 목록 조회 메소드에 나머지 주소인 "/reportsList"를 직접 지정합니다.
 	@GetMapping("/reportsList")
-	public String getAdminReportsList(@ModelAttribute SearchCriteria searchCriteria, Model model) {
+	public String getAdminReportsList(@ModelAttribute AdminReportSearch searchCriteria, Model model) {
 		Map<String, Object> resultMap = adminReportService.getAdminReportList(searchCriteria);
 
 		model.addAttribute("reportList", resultMap.get("reportList"));
