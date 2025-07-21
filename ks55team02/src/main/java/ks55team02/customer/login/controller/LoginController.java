@@ -41,8 +41,9 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response); 
         }
     	
+    	String clientIp = request.getHeader("X-Real-IP");
         // 1. 클라이언트의 IP 주소 가져오기
-        String clientIp = request.getRemoteAddr();
+        clientIp = (clientIp == null) ? request.getRemoteAddr() : clientIp;
         loginInfo.setIpAddress(clientIp);
         log.info("로그인 시도 => ID: {}, IP: {}, 복귀주소: {}", loginInfo.getUserLgnId(), clientIp, loginInfo.getRedirectUrl());
         

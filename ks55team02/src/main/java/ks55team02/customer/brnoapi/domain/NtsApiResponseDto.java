@@ -1,4 +1,4 @@
-package ks55team02.customer.brnoApi.domain;
+package ks55team02.customer.brnoapi.domain;
 
 import lombok.Data; // Lombok의 @Data 어노테이션을 사용하여 getter, setter, toString 등을 자동 생성합니다.
 import java.util.List;
