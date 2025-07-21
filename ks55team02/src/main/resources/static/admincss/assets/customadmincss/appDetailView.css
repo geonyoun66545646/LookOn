@@ -46,9 +46,18 @@
 	background : #00B517 !important;
 }
 .btn-primary:hover{
-	background : #fec825!important;
+	background : rgb(0, 128, 255)!important;
 	transform: scale(1.05);
 	transition : 0.2s ;
+}
+.btn-warning{
+	color : white;
+}
+.btn-warning:hover{
+	background : #F30000;
+	transform: scale(1.05);
+	transition : 0.2s ;
+	color : white;
 }
 
 

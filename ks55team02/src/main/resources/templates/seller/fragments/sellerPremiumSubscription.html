@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프리미엄 구독권 구매</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="maincss/assets/customcustomercss/premiumSubscription.css">
+</head>
+<body>
+<th:block layout:fragment="contents">
+    <div class="page-container">
+        <h1 class="page-title">프리미엄 멤버십</h1>
+        <p class="page-subtitle">최고의 비즈니스 성장을 위한 특별한 선택입니다.</p>
+
+        <div class="content-wrapper">
+            <div class="subscription-details-panel">
+                <h2 class="panel-title">구독권 정보</h2>
+                <div class="product-item">
+                    <div class="item-info">
+                        <span class="item-name">프리미엄 구독 코인</span>
+                        <span class="item-duration"> (30일 사용)</span>
+                        <p class="item-description">최상의 판매 환경과 독점적인 혜택을 제공합니다.</p>
+                    </div>
+                    <div class="item-price">
+                        <span class="price-value" id="base-price" data-price="2990000">2,990,000</span>원
+                    </div>
+                </div>
+
+                <div class="quantity-control">
+                    <label for="quantity">수량:</label>
+                    <div class="quantity-input-group">
+                        <button type="button" id="decrease-qty">-</button>
+                        <input type="number" id="quantity" value="1" min="1">
+                        <button type="button" id="increase-qty">+</button>
+                    </div>
+                </div>
+
+                <div class="feature-section">
+                    <h3 class="section-heading">주요 혜택</h3>
+                    <ul class="features-list">
+                        <li>
+                            <span class="feature-icon">✔</span>
+                            <p><strong>프리미엄 판매자</strong> 자격 부여</p>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✔</span>
+                            <p>기본 수수료 18%에서 <strong>14% 우대</strong> 적용</p>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✔</span>
+                            <p>구독 기간 1년마다 <strong>수수료 1% 추가 할인</strong> (최대 4년, 총 수수료 10%까지)</p>
+                        </li>
+                        <li>
+                            <span class="feature-icon">✔</span>
+                            <p>모든 상품 <strong>무료 배송</strong> (배송비 전액 플랫폼 부담)</p>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="additional-info">
+                    <p>* 본 구독권은 30일 단위로 자동 갱신됩니다. 해지는 언제든지 가능합니다.</p>
+                    <p>* 자세한 내용은 <a href="premium_checkout.html" class="link-text">서비스 약관</a>을 참조해주세요.</p>
+                </div>
+            </div>
+
+            <div class="order-summary-panel">
+                <h2 class="panel-title">결제 요약</h2>
+                <div class="summary-item">
+                    <span class="label">상품 금액</span>
+                    <span class="value" id="summary-product-total">2,990,000원</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">할인 금액</span>
+                    <span class="value">-0원</span>
+                </div>
+                <div class="summary-item total">
+                    <div class="total-label-and-value">
+                        <span class="label">최종 결제 금액</span>
+                        <span class="value highlight" id="summary-final-total">2,990,000원</span>
+                    </div>
+                </div>
+                
+                <button class="proceed-button" id="proceed-to-checkout">결제 진행하기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const basePriceElement = document.getElementById('base-price');
+            const quantityInput = document.getElementById('quantity');
+            const decreaseButton = document.getElementById('decrease-qty');
+            const increaseButton = document.getElementById('increase-qty');
+            const summaryProductTotal = document.getElementById('summary-product-total');
+            const summaryFinalTotal = document.getElementById('summary-final-total');
+            const proceedToCheckoutButton = document.getElementById('proceed-to-checkout');
+
+            const unitPrice = parseInt(basePriceElement.dataset.price);
+
+            function formatCurrency(number) {
+                return number.toLocaleString('ko-KR') + '원';
+            }
+
+            function updateTotals() {
+                let currentQuantity = parseInt(quantityInput.value);
+                if (isNaN(currentQuantity) || currentQuantity < 1) {
+                    currentQuantity = 1;
+                    quantityInput.value = 1;
+                }
+
+                const totalAmount = unitPrice * currentQuantity;
+
+                summaryProductTotal.textContent = formatCurrency(totalAmount);
+                summaryFinalTotal.textContent = formatCurrency(totalAmount);
+            }
+
+            quantityInput.addEventListener('change', updateTotals);
+            quantityInput.addEventListener('keyup', updateTotals);
+
+            decreaseButton.addEventListener('click', () => {
+                let currentQuantity = parseInt(quantityInput.value);
+                if (currentQuantity > 1) {
+                    quantityInput.value = currentQuantity - 1;
+                    updateTotals();
+                }
+            });
+
+            increaseButton.addEventListener('click', () => {
+                let currentQuantity = parseInt(quantityInput.value);
+                quantityInput.value = currentQuantity + 1;
+                updateTotals();
+            });
+
+            proceedToCheckoutButton.addEventListener('click', () => {
+                const finalQuantity = parseInt(quantityInput.value);
+                const finalAmount = unitPrice * finalQuantity;
+
+                // URL 쿼리 파라미터로 데이터 전달
+                window.location.href = `/sellerPremiumCheckout?qty=${finalQuantity}&amount=${finalAmount}`;
+            });
+
+            updateTotals();
+        });
+    </script>
+</th:block>
+</body>
+</html>

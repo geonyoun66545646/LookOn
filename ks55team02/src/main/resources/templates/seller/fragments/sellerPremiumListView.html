@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{seller/layout/layout_main}">
+
+<head>
+<meta name="description" content="한국스마트정보교육원 ksmybatis" />
+<link rel="stylesheet" th:href="@{/admincss/assets/css/customadminpagecss/userList.css}">
+</head>
+
+<th:block layout:fragment="jsFile">
+</th:block>
+
+<th:block layout:fragment="jsScript">
+</th:block>
+
+<th:block layout:fragment="contents">
+	<main class="main-content">
+		<section class="content-header">
+			<h2 class="content-title">프리미엄 상품 목록</h2>
+		</section>
+
+		<div class="card" id="premiumListContainer"
+			th:fragment="premiumListFragment">
+			<div class="card-body">
+				<div class="row gx-3 align-items-center mb-4">
+					<div class="col-md-6">
+						<div class="search-result-info">
+							총 <b class="text-brand" th:text="${totalRecordCount}"></b> 건의
+							프리미엄 상품이 조회되었습니다.
+						</div>
+					</div>
+				</div>
+
+				<div class="table-responsive">
+					<table class="table table-hover member-table">
+						<thead>
+							<tr class="text-center">
+								<th scope="col" class="col-checkbox"><input
+									class="form-check-input" type="checkbox" id="checkAll">
+								</th>
+								<!-- ⭐ 플랜 ID 컬럼 제거 ⭐ -->
+								<!-- <th scope="col">플랜 ID</th> -->
+								<th scope="col">플랜 명칭</th>
+								<th scope="col">가격</th>
+								<th scope="col">기간 (일)</th>
+								<th scope="col">설명</th>
+								<th scope="col">상세 보기</th>
+							</tr>
+						</thead>
+						<tbody class="text-center">
+							<tr th:if="${#lists.isEmpty(subscriptionPlanList)}">
+								<td colspan="6" class="text-center py-5">조회된 구독 플랜이 없습니다.</td>
+								<!-- colspan 변경 -->
+							</tr>
+							<tr th:unless="${#lists.isEmpty(subscriptionPlanList)}"
+								th:each="plan : ${subscriptionPlanList}">
+								<td><input class="form-check-input member-check"
+									type="checkbox" th:value="${plan.sbscrPlanId}"></td>
+								<!-- ⭐ 플랜 ID 데이터 제거 ⭐ -->
+								<!-- <td class="ellipsis text" th:text="${plan.sbscrPlanId}" th:title="${plan.sbscrPlanId}"></td> -->
+								<td th:text="${plan.sbscrPlanNm}"></td>
+								<td
+									th:text="${#numbers.formatInteger(plan.sbscrPlanPrc, 0, 'COMMA')} + '원'"></td>
+								<td th:text="${plan.sbscrPlanTermVal}"></td>
+								<td class="ellipsis text" th:text="${plan.sbscrPlanExpln}"
+									th:title="${plan.sbscrPlanExpln}"></td>
+								<td><a
+									th:href="@{/seller/premium/sellerPremiumDetail(sbscrPlanId=${plan.sbscrPlanId})}"
+									class="btn btn-sm btn-light">상세</a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</main>
+</th:block>
+<th:block layout:fragment="jsFile">
+</th:block>
+<th:block layout:fragment="jsScript">
+	<script th:inline="javascript">
+	 /*<![CDATA[*/
+	 const mainContent = $('main.main-content');
+
+	 // [테이블] 헤더 체크박스로 전체 선택/해제
+	 mainContent.on('click', '#checkAll', function() {
+	     $('.member-check').prop('checked', $(this).is(':checked'));
+	 });
+
+	 // [테이블] 개별 체크박스 선택 시, 헤더 체크박스 상태 동기화
+	 mainContent.on('click', '.member-check', () => {
+	     const totalChecks = $('.member-check').length;
+	     const checkedChecks = $('.member-check:checked').length;
+	     $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
+	 });
+
+	 /*]]>*/
+	 </script>
+</th:block>
+</html>

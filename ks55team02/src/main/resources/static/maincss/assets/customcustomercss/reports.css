@@ -145,3 +145,50 @@ textarea {
     content: ' *';
     color: #ff0000;
 }
+
+/* 신고 폼 - 첨부파일 미리보기 컨테이너 스타일 */
+.image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* 개별 미리보기 이미지 썸네일 스타일 */
+.image-preview-thumbnail {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+/* 개별 미리보기 아이템을 감싸는 컨테이너 (상대 위치 기준점) */
+.preview-item {
+    position: relative; /* 자식 요소인 삭제 버튼을 위한 위치 기준 */
+    display: inline-block; /* 다른 아이템과 나란히 배치 */
+}
+
+/* 미리보기 삭제 버튼 스타일 */
+.delete-preview-btn {
+    position: absolute;   /* 부모(.preview-item) 기준으로 위치 지정 */
+    top: -5px;            /* 오른쪽 상단 모서리 살짝 바깥쪽으로 */
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.6); /* 반투명 검정 배경 */
+    color: white;
+    border: none;
+    border-radius: 50%;   /* 동그란 모양 */
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 20px;    /* 텍스트 세로 중앙 정렬 */
+    text-align: center;   /* 텍스트 가로 중앙 정렬 */
+    cursor: pointer;      /* 마우스 올리면 손가락 모양으로 */
+    opacity: 0;           /* 평소에는 숨겨둠 */
+    transition: opacity 0.2s;
+}
+
+/* 미리보기 아이템에 마우스를 올렸을 때, 삭제 버튼을 보여줌 */
+.preview-item:hover .delete-preview-btn {
+    opacity: 1;
+}

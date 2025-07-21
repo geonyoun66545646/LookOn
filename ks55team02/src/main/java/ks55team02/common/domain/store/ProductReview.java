@@ -3,6 +3,8 @@ package ks55team02.common.domain.store;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import ks55team02.common.domain.inquiry.InquiryUser;
+import ks55team02.customer.register.domain.UserProfile;
 import lombok.Data;
 
 @Data
@@ -22,6 +24,10 @@ public class ProductReview {
 	private Integer 		helpdCnt;           // 도움돼요 수 (helpd_cnt) - int로 변경 (DEFAULT '0')
 	private String 			starRating;          // star_rating
 
+	private InquiryUser 	user;				// 유저 테이블
+	private UserProfile 	userProfile;		// 유저 프로필 테이블
+	
+	
 	private List<ReviewImage> reviewImages; // 리뷰 이미지 목록
 
 }

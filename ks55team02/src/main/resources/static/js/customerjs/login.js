@@ -76,21 +76,25 @@ $('#login-btn').on('click', (e) => {
         contentType: 'application/json',
         data: JSON.stringify(loginData),
 		success: (response) => {
-		    console.log(response); // 서버 응답을 콘솔에서 확인하는 것은 디버깅에 좋으니 그대로 둡니다.
+			console.log("서버 응답:", response);
+			// 1. 로그인 성공 시
+					    if (response.status === 'success') {
+					        alert(response.message);
+					        window.location.href = response.redirectUrl || '/main';
+					    
+					    // 2. 로그인 실패 시 (비밀번호 불일치, 관리자 로그인 시도 등 모든 실패 케이스)
+			            } else if (response.status === 'fail') {
+			                alert(response.message);
+			                // 아이디와 비밀번호를 모두 지웁니다.
+			                $('#login-id').val('');
+			                $('#login-pw').val('');
+			                $('#login-id').focus();
 
-		    // 1. 로그인 성공 시
-		    if (response.status === 'success') {
-		        alert(response.message);
-		        window.location.href = response.redirectUrl ? response.redirectUrl : '/main';
-
-		    // 2. 그 외 모든 실패 및 예외 케이스 처리
-		    } else {
-		        // 'fail', 'locked', 'inactive', 'already_logged_in' 등 모든 경우
-		        // 서버가 보내주는 message를 그대로 alert 창으로 띄워줍니다.
-		        alert(response.message);
-				$('#login-id').val('').focus();
-		    }
-		},
+					    // 3. 그 외 모든 케이스 (계정 잠금, 비활성 등)
+					    } else {
+					        alert(response.message);
+					    }
+					},
         error: (xhr, status, error) => {
             console.error("로그인 요청 실패: ", error);
             alert("로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");

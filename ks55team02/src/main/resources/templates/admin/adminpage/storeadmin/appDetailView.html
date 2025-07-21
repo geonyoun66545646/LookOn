@@ -21,14 +21,14 @@
             <h2 class="content-title card-title">신청 상세</h2>
         </div>
         <span class="badge custom-badge"
-              th:if="${appAdmin != null and appAdmin.aplyStts != null}"
-              th:text="${appAdmin.aplyStts}"
-              th:classappend="${appAdmin.aplyStts == '보류'} ? 'bg-warning' :
-                             (${appAdmin.aplyStts == '승인'} ? 'bg-success' :
-                             (${appAdmin.aplyStts == '반려'} ? 'bg-danger' : 'bg-secondary'))">
+              th:if="${appStore != null and appStore.aplyStts != null}"
+              th:text="${appStore.aplySttsDisplayName}"
+              th:classappend="${appStore.aplyStts == 'APPLY'} ? 'bg-secondary' :
+                             (${appStore.aplyStts == 'APPROVED'} ? 'bg-success' :
+                             (${appStore.aplyStts == 'REJECTED'} ? 'bg-danger' : 'bg-secondary'))">
         </span>
         <span class="badge custom-badge bg-secondary"
-              th:if="${appAdmin == null or appAdmin.aplyStts == null}">
+              th:if="${appStore == null or appStore.aplyStts == null}">
               상태 없음
         </span>
     </div>
@@ -39,23 +39,23 @@
                     <form>
                         <div  class="mb-4">
                             <label for="aply_id" class="form-label">신청 ID</label>
-                            <div class="form-control"  id="aply_id" th:text="${appAdmin.aplyId}"></div>
+                            <div class="form-control"  id="aply_id" th:text="${appStore.aplyId}"></div>
                         </div>
                         <div class="mb-4">
                             <label for="store_nm" class="form-label">상점</label>
-                            <div class="form-control" id="store_nm" th:text="${appAdmin.storeNm}"></div>
+                            <div class="form-control" id="store_nm" th:text="${appStore.storeNm}"></div>
                         </div>
                         <div class="mb-4">
                             <label for="user_nm" class="form-label">신청자</label>
-                            <div class="form-control" id="user_nm" th:text="${appAdmin.userNm}"></div>
+                            <div class="form-control" id="user_nm" th:text="${appStore.user.userNm}"></div>
                         </div>
                         <div class="mb-4">
                             <label class="ctrt_aply_ymd">계약 신청일</label>
-                            <div class="form-control" id="ctrt_aply_ymd" th:text="${#temporals.format(appAdmin.ctrtAplyYmd, 'yyyy-MM-dd')}"></div>
+                            <div class="form-control" id="ctrt_aply_ymd" th:text="${#temporals.format(appStore.ctrtAplyYmd, 'yyyy-MM-dd')}"></div>
                         </div>
                         <div class="mb-4">
-                            <label for="ctrt_bgng_ymd" class="form-label">계약 시작일</label>
-                            <div class="form-control" id="ctrt_bgng_ymd"  th:text="${#temporals.format(appAdmin.ctrtBgngYmd, 'yyyy-MM-dd')}"></div>
+                            <label for="ctrt_bgng_ymd" class="form-label">사업자 등록 번호</label>
+                            <div class="form-control" id="brno"  th:text="${appStore.brno}"></div>
                         </div>
                     </form>
                 </div>
@@ -63,23 +63,23 @@
                     <form>
                         <div class="mb-4">
                             <label for="mngr_nm" class="form-label">매니저명</label>
-                            <div  class="form-control" id="mngr_nm" th:text="${appAdmin.mngrNm}"></div>
+                            <div  class="form-control" id="mngr_nm" th:text="${appStore.mngrNm}"></div>
                         </div>
                         <div class="mb-4">
                             <label for="mngr_tel_no" class="form-label">매니저 연락처</label>
-                            <div class="form-control" id="mngr_tel_no" th:text="${appAdmin.mngrTelNo}"></div>
+                            <div class="form-control" id="mngr_tel_no" th:text="${appStore.mngrTelNo}"></div>
                         </div>
                         <div class="mb-4">
                             <label for="mngr_eml" class="form-label">매니저 이메일</label>
-                            <div class="form-control" id="mngr_eml" th:text="${appAdmin.mngrEml}"></div>
+                            <div class="form-control" id="mngr_eml" th:text="${appStore.mngrEml}"></div>
                         </div>
                         <div class="mb-4">
                             <label class="bplc_addr">사업장 주소</label>
-                            <div class="form-control" id="bplc_addr" th:text="${appAdmin.bplcAddr}"></div>
+                            <div class="form-control" id="bplc_addr" th:text="${appStore.bplcAddr}"></div>
                         </div>
                         <div class="mb-4">
                             <label for="plcy_id" class="form-label">수수료 비율</label>
-                            <div class="form-control" id="plcy_id" th:text="${appAdmin.plcyId}"></div>
+                            <div class="form-control" id="plcy_id" th:text="${appStore.plcyId}"></div>
                         </div>
                     </form>
                 </div>
@@ -107,7 +107,7 @@
                                     </div>
                                 </td>
                                 <td>사업자 등록증</td>
-                                <td th:text="${appAdmin.brnoImgId}"></td>
+                                <td th:text="${appStore.brnoImgId}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
@@ -116,7 +116,6 @@
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item" href="#">자세히 보기</a>
                                             <a class="dropdown-item" href="#">다운 로드</a>
-                                            <a class="dropdown-item text-danger" href="#">Delete</a>
                                         </div>
                                     </div>
                                 </td>
@@ -128,16 +127,15 @@
                                     </div>
                                 </td>
                                 <td>통신 판매업 신고증</td>
-                                <td th:text="${appAdmin.cmmDclrImgId}"></td>
+                                <td th:text="${appStore.cmmDclrImgId}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
                                             <i class="material-icons md-more_horiz"></i>
                                         </a>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">View detail</a>
-                                            <a class="dropdown-item" href="#">Edit info</a>
-                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                            <a class="dropdown-item" href="#">자세히 보기</a>
+                                            <a class="dropdown-item" href="#">다운 로드</a>
                                         </div>
                                     </div>
                                 </td>
@@ -149,16 +147,15 @@
                                     </div>
                                 </td>
                                 <td>판매 상품 관련 증빙서류</td>
-                                <td th:text="${appAdmin.selGdsProofImgId}"></td>
+                                <td th:text="${appStore.selGdsProofImgId}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
                                             <i class="material-icons md-more_horiz"></i>
                                         </a>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">View detail</a>
-                                            <a class="dropdown-item" href="#">Edit info</a>
-                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                            <a class="dropdown-item" href="#">자세히 보기</a>
+                                            <a class="dropdown-item" href="#">다운 로드</a>
                                         </div>
                                     </div>
                                 </td>
@@ -170,16 +167,15 @@
                                     </div>
                                 </td>
                                 <td>주민등록 증 사본</td>
-                                <td th:text="${appAdmin.rrnoCardCopyImgId}"></td>
+                                <td th:text="${appStore.rrnoCardCopyImgId}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
                                             <i class="material-icons md-more_horiz"></i>
                                         </a>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">View detail</a>
-                                            <a class="dropdown-item" href="#">Edit info</a>
-                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                            <a class="dropdown-item" href="#">자세히 보기</a>
+                                            <a class="dropdown-item" href="#">다운 로드</a>
                                         </div>
                                     </div>
                                 </td>
@@ -191,16 +187,15 @@
                                     </div>
                                 </td>
                                 <td>통장 사본</td>
-                                <td th:text="${appAdmin.bankbookCopyImgId}"></td>
+                                <td th:text="${appStore.bankbookCopyImgId}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
                                             <i class="material-icons md-more_horiz"></i>
                                         </a>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">View detail</a>
-                                            <a class="dropdown-item" href="#">Edit info</a>
-                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                           <a class="dropdown-item" href="#">자세히 보기</a>
+                                            <a class="dropdown-item" href="#">다운 로드</a>
                                         </div>
                                     </div>
                                 </td>
@@ -212,14 +207,31 @@
                                     </div>
                                 </td>
                                 <td>기타</td>
-                                <td th:text="${appAdmin.etcDocImgId}"></td>
+                                <td th:text="${appStore.etcDocImgId}"></td>
                                 <td class="text-end">
                                     <div class="dropdown">
                                         <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">View detail</a>
-                                            <a class="dropdown-item" href="#">Edit info</a>
-                                            <a class="dropdown-item text-danger" href="#">Delete</a>
+                                            <a class="dropdown-item" href="#">자세히 보기</a>
+                                            <a class="dropdown-item" href="#">다운 로드</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" />
+                                    </div>
+                                </td>
+                                <td>상점 로고</td>
+                                <td th:text="${appStore.storeLogoImg}"></td>
+                                <td class="text-end">
+                                    <div class="dropdown">
+                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="#">자세히 보기</a>
+                                            <a class="dropdown-item" href="#">다운 로드</a>
                                         </div>
                                     </div>
                                 </td>
@@ -232,31 +244,122 @@
             </div>
         </div>
     </div>
-    <div class="content-header">
+   <th:block th:if="${appStore != null and appStore.aplyStts == 'APPLY'}">
+    <div class="content-header d-flex justify-content-between align-items-center">
         <div>
-            <h2 class="content-title card-title">반려/보류</h2>
+            <h2 class="content-title card-title">승인/반려</h2>
         </div>
-        <button class="btn btn-primary" >
-            반려/보류 사항 입력
-        </button>
-        <span class="badge custom-badge bg-secondary"
-              th:if="${appAdmin == null or appAdmin.aplyStts == null}">
-              상태 없음
-        </span>
-   </div>
+        <div class="button-group d-flex gap-2">
+            <button class="btn btn-primary" id="approveBtn">
+                승인
+            </button>
+            <button class="btn btn-warning" id="rejectBtn">
+                반려 사항 입력하고 반려하기
+            </button>
+        </div>
+    </div>
     <div class="card">
         <div class="card-body">
             <div class="container">
-			<textarea >
-			</textarea>
-		</div>
-
+                <textarea id="rejectionReasonTextarea" class="form-control" rows="5" placeholder="반려 사유를 입력하세요."></textarea>
+            </div>
         </div>
     </div>
+    
+    
     </th:block>
 
 <th:block layout:fragment="jsScript">
- 
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+// DOM 콘텐츠가 모두 로드된 후 스크립트를 실행합니다.
+document.addEventListener('DOMContentLoaded', function() {
+
+    // 1. 변수 선언
+    const aplyId = /*[[${appStore != null ? appStore.aplyId : null}]]*/ null;
+
+    const rejectBtn = document.querySelector('#rejectBtn');
+    const approveBtn = document.querySelector('#approveBtn');
+    const rejectionReasonTextarea = document.querySelector('#rejectionReasonTextarea');
+
+    // aplyId가 없으면 아무 작업도 하지 않음 (오류 방지)
+    if (!aplyId) {
+        console.error("aplyId를 찾을 수 없어 스크립트를 초기화할 수 없습니다.");
+        return;
+    }
+
+    // 2. 반려 버튼 클릭 이벤트
+    if (rejectBtn) {
+        rejectBtn.addEventListener('click', function() {
+            let rejectionReason = rejectionReasonTextarea.value;
+            
+            if (!rejectionReason.trim()) {
+                if (!confirm('반려 사유를 입력하지 않았습니다. 기본 사유로 처리하시겠습니까?')) {
+                    return;
+                }
+            }
+
+            const updateData = {
+                aplyId: aplyId,
+                aplyStts: 'REJECTED',
+                aprvRjctRsn: rejectionReason
+            };
+            
+            updateApplicationStatus(updateData, '반려');
+        });
+    }
+
+    // 3. 승인 버튼 클릭 이벤트
+    if (approveBtn) {
+        approveBtn.addEventListener('click', function() {
+            if (!confirm('정말로 승인 처리하시겠습니까?')) {
+                return;
+            }
+            
+            const updateData = {
+                aplyId: aplyId,
+                aplyStts: 'APPROVED',
+                aprvRjctRsn: null
+            };
+
+            updateApplicationStatus(updateData, '승인');
+        });
+    }
+
+    // 4. AJAX 통신 함수 (fetch API 사용)
+    function updateApplicationStatus(data, actionType) {
+        fetch('/adminpage/storeadmin/updateStatus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            if (!response.ok) {
+                // 서버 응답이 200-299 범위가 아닐 때 오류 발생
+                throw new Error('서버 응답 오류: ' + response.status);
+            }
+            return response.json(); // 응답 본문을 JSON으로 파싱
+        })
+        .then(result => {
+            if (result.status === 'success') {
+                alert('신청이 성공적으로 ' + actionType + ' 처리되었습니다.');
+                window.location.href = '/adminpage/storeadmin/appAdmin';
+            } else {
+                alert('처리 실패: ' + result.message);
+            }
+        })
+        .catch(error => {
+            alert('처리 중 오류가 발생했습니다. 자세한 내용은 콘솔을 확인하세요.');
+            console.error('Fetch Error:', error);
+        });
+    }
+});
+
+/*]]>*/
+</script>
 </th:block>
 
 

@@ -8,7 +8,8 @@ import ks55team02.common.domain.store.StoreImage;
 
 public interface StoreImageService {
 
-    void addStoreImage(MultipartFile file);
+    // imgId를 반환하도록 변경
+    String addStoreImage(MultipartFile file);
 
     void addStoreImages(MultipartFile[] files);
 
