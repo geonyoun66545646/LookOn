@@ -79,6 +79,8 @@
         <result column="issue_condition_type" 	property="issueConditionType"/>
     </resultMap>
     
+    
+    
     <!-- <<<<<<<<< [위치변경 및 추가] ID 생성 쿼리 섹션 >>>>>>>>> -->
     <select id="selectNextOrderId" resultType="String">
 	    SELECT CONCAT(
@@ -163,7 +165,8 @@
             oi.ordr_tm_untprc,
             oi.ordr_dtl_artcl_dcsn_cd,
             p.gds_nm AS product_name,          -- 상품 이름
-            po.opt_nm AS option_name           -- 옵션 이름
+            po.opt_nm AS option_name,          -- 옵션 이름
+            oi.ordr_qntty AS ordr_qntty
         FROM
             order_items oi
         JOIN
@@ -299,6 +302,24 @@
             user_cpn_id = #{userCpnId}
             AND use_yn = 1 -- 아직 사용하지 않은 상태일 때만 업데이트
     </update>
+    
+    <select id="findUserCouponsByUserId" resultMap="UserCouponDetailsMap">
+        SELECT
+	        uc.user_cpn_id AS userCpnId,
+	        c.cpn_nm AS couponName,
+	        c.dscnt_vl AS discountValue
+	    FROM
+	        user_coupons uc
+	    JOIN
+	        coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+	    WHERE
+	        uc.user_no = #{userNo}
+	        AND uc.use_yn = TRUE
+	        AND (uc.indiv_expry_dt IS NULL OR uc.indiv_expry_dt > NOW())
+	        AND (c.vld_end_dt IS NULL OR c.vld_end_dt > NOW())
+	        AND c.actvtn_yn = TRUE
+    </select>
+    
     <!-- <<<<<<<<< [위치변경 및 추가] 쿠폰 관련 쿼리 섹션 끝 >>>>>>>>> -->
 
     <!-- <<<<<<<<< [기존] getUserOrderPaymentHistory는 기존 위치에 유지 >>>>>>>>> -->

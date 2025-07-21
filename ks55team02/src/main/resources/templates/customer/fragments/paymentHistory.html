@@ -107,19 +107,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <th:block th:each="product : ${orderedProducts}">
+							            <th:block th:each="product : ${orderedProducts}">
 							                <tr th:if="${product != null}">
-							                    <!--
-							                      Map의 Key에 접근할 때는 로그에서 확인된 대소문자를 정확히 맞춰야 합니다.
-							                      product.name -> product.NAME
-							                    -->
 							                    <td th:text="${product.NAME}">상품 A</td>
 							                    <td th:text="${product.QUANTITY}">2</td>
 							                    <td th:text="${#numbers.formatInteger(product.PRICE, 0, 'COMMA') + '원'}">25,000원</td>
 							                    <td th:text="${#numbers.formatInteger(product.TOTAL, 0, 'COMMA') + '원'}">50,000원</td>
 							                </tr>
 							            </th:block>
-                                    </tbody>
+							        </tbody>
                                 </table>
                             </div>
                             

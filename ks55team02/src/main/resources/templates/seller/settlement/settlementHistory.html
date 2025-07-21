@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{seller/layout/layout_main}">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>상점 관리 - 정산 내역</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+.settlement-table {
+	table-layout: fixed;
+	width: 100%;
+}
+
+.settlement-table th, .settlement-table td {
+	vertical-align: middle;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+/* ★★★ 컬럼 비율 조정 (관리 컬럼 제거) ★★★ */
+.settlement-table .col-store {
+	width: 25%;
+} /* 상점명 비중 확대 */
+.settlement-table .col-sales {
+	width: 15%;
+}
+
+.settlement-table .col-fee {
+	width: 15%;
+}
+
+.settlement-table .col-payable {
+	width: 15%;
+}
+
+.settlement-table .col-date {
+	width: 15%;
+}
+
+.settlement-table .col-status {
+	width: 10%;
+}
+/* .col-check, .col-manage 스타일 제거 */
+</style>
+</head>
+<body>
+	<th:block layout:fragment="contents">
+		<section class="content-main">
+			<div class="content-header">
+				<div>
+					<h2 class="content-title card-title">정산 내역</h2>
+					<p>상점의 판매 수수료 정산 내역을 확인합니다.</p>
+				</div>
+			</div>
+
+			<div class="card mb-4">
+				<div class="card-body">
+					<form id="settlementSearchForm">
+						<div class="row gx-3">
+							<div class="col-lg-12">
+								<label class="form-label">정산 상태</label>
+								<div class="d-flex align-items-center">
+									<div class="form-check me-4">
+										<input class="form-check-input status-check" type="checkbox"
+											name="filterConditions" value="판매정산대기"> <label
+											class="form-check-label">정산대기</label>
+									</div>
+									<div class="form-check me-4">
+										<input class="form-check-input status-check" type="checkbox"
+											name="filterConditions" value="판매정산완료"> <label
+											class="form-check-label">정산완료</label>
+									</div>
+									<div class="form-check me-4">
+										<input class="form-check-input" type="checkbox"
+											id="filterCheckAll"> <label class="form-check-label">전체선택</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<hr>
+						<div class="row gx-3 align-items-end">
+							<div class="col-lg-6">
+								<label class="form-label">기간 (정산일 기준)</label>
+								<div class="d-flex">
+									<input type="date" class="form-control" name="startDate"
+										th:value="${searchCriteria.startDate}"> <span
+										class="mx-2 d-flex align-items-center">-</span> <input
+										type="date" class="form-control" name="endDate"
+										th:value="${searchCriteria.endDate}">
+								</div>
+							</div>
+							<div class="col-lg-2">
+								<button class="btn btn-primary btn-block" type="button"
+									id="searchBtn">검색</button>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<div class="card mb-4">
+				<div class="card-body">
+					<div class="row gx-3 align-items-center mb-4">
+						<div class="col-md-12">
+							<div class="search-result-info">
+								총 <b class="text-brand" th:text="${pagination.totalCount}">0</b>
+								건의 정산 내역이 검색되었습니다.
+							</div>
+						</div>
+					</div>
+
+					<div class="table-responsive">
+						<table class="table table-hover settlement-table">
+							<thead>
+								<tr class="text-center">
+									<th class="col-store text-start">상점명</th>
+									<th class="col-sales text-end">총 판매액</th>
+									<th class="col-fee text-end">수수료</th>
+									<th class="col-payable text-end">정산 예정액</th>
+									<th class="col-date">최근 정산일</th>
+									<th class="col-status">상태</th>
+								</tr>
+							</thead>
+							<tbody id="settlement-list-body">
+								<tr th:if="${#lists.isEmpty(pagination.list)}">
+									<td colspan="6" class="text-center py-5">검색된 정산 내역이 없습니다.</td>
+								</tr>
+								<tr class="text-center"
+									th:each="settlement : ${pagination.list}"
+									th:data-store-id="${settlement.storeId}"
+									th:data-store-clcln-id="${settlement.storeClclnId}">
+									<td class="col-store text-start"
+										th:title="${settlement.storeConm}"><span
+										th:text="${settlement.storeConm}"></span></td>
+									<td class="col-sales text-end"
+										th:text="${#numbers.formatDecimal(settlement.totSelAmt, 0, 'COMMA', 0, 'POINT') + '원'}"></td>
+									<td class="col-fee text-end"
+										th:text="${#numbers.formatDecimal(settlement.totSelAmt - settlement.clclnAmt, 0, 'COMMA', 0, 'POINT') + '원'}"></td>
+									<td class="col-payable text-end fw-bold"
+										th:text="${#numbers.formatDecimal(settlement.clclnAmt, 0, 'COMMA', 0, 'POINT') + '원'}"></td>
+									<td class="col-date"
+										th:text="${settlement.clclnPrcsYmd != null ? #temporals.format(settlement.clclnPrcsYmd, 'yy.MM.dd') : '-'}"></td>
+									<td class="col-status"><span class="badge"
+										th:classappend="${settlement.clclnSttsCd == '판매정산대기' ? 'bg-danger' : 'bg-success'}"
+										th:text="${settlement.clclnSttsCd}"></span></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<nav class="mt-4" aria-label="Page navigation"
+						th:if="${pagination.totalCount > 0}">
+						<ul class="pagination justify-content-center">
+							<li class="page-item" th:if="${pagination.hasPreviousBlock}">
+								<a class="page-link page-num" href="#"
+								th:data-page="${pagination.startPage - 1}">이전</a>
+							</li>
+							<li class="page-item"
+								th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+								th:classappend="${page == pagination.currentPage} ? 'active' : ''">
+								<a class="page-link page-num" href="#" th:data-page="${page}"
+								th:text="${page}"></a>
+							</li>
+							<li class="page-item" th:if="${pagination.hasNextBlock}"><a
+								class="page-link page-num" href="#"
+								th:data-page="${pagination.endPage + 1}">다음</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+
+			<div class="card mb-4" id="settlement-history-panel"
+				style="display: none;">
+				<div class="card-header bg-white">
+					<h5 class="card-title mb-0">
+						<span id="history-shop-name"></span> 정산 상세 내역
+						<button type="button" class="btn-close float-end"
+							aria-label="Close" id="close-history-button"></button>
+					</h5>
+				</div>
+				<div class="card-body">
+					<div id="settlement-history-detail-list"></div>
+					<div id="no-individual-history-message"
+						class="text-center text-muted py-3" style="display: none;">
+						상세 정산 내역이 없습니다.</div>
+				</div>
+			</div>
+		</section>
+
+		<script th:inline="javascript">
+		    document.addEventListener('DOMContentLoaded', () => {
+		        const searchForm = document.getElementById('settlementSearchForm');
+		        const paginationEl = document.querySelector('.pagination');
+		        
+		        function submitSearch(page = 1) {
+		            const params = new URLSearchParams();
+		            
+		            // 기간 필터 파라미터 추가
+		            const startDate = searchForm.querySelector('[name="startDate"]').value;
+		            const endDate = searchForm.querySelector('[name="endDate"]').value;
+		            if(startDate) params.append('startDate', startDate);
+		            if(endDate) params.append('endDate', endDate);
+		            
+		            // 상태 필터 파라미터 추가
+		            const selectedStatuses = Array.from(document.querySelectorAll('.status-check:checked'))
+		                                         .map(checkbox => checkbox.value);
+		            
+		            // 상태가 선택되지 않았을 경우 기본값 처리 (모두 선택)
+		            if(selectedStatuses.length === 0) {
+		                document.querySelectorAll('.status-check').forEach(check => {
+		                    params.append('filterConditions', check.value);
+		                });
+		            } else {
+		                selectedStatuses.forEach(status => {
+		                    params.append('filterConditions', status);
+		                });
+		            }
+		
+		            params.set('currentPage', page);
+		            const baseUrl = /*[[@{/seller/settlement/settlementHistory}]]*/ '/seller/settlement/settlementHistory'; 
+		            window.location.href = `${baseUrl}?${params.toString()}`;
+		        }
+		
+		        document.getElementById('searchBtn').addEventListener('click', () => submitSearch(1));
+		
+		        if(paginationEl) {
+		            paginationEl.addEventListener('click', (e) => {
+		                e.preventDefault();
+		                const target = e.target.closest('.page-num');
+		                if (target) {
+		                    const page = target.dataset.page;
+		                    submitSearch(page);
+		                }
+		            });
+		        }
+		
+		        // 페이지 로드 시 URL 파라미터 기반으로 체크박스 상태 복원
+		        const currentParams = new URLSearchParams(window.location.search);
+		        const conditionsFromServer = currentParams.getAll('filterConditions');
+		        const statusChecks = document.querySelectorAll('.status-check');
+		        
+		        if (conditionsFromServer.length > 0) {
+		            statusChecks.forEach(check => {
+		                check.checked = conditionsFromServer.includes(check.value);
+		            });
+		        } else {
+		            // 기본값: 모두 선택
+		            statusChecks.forEach(check => check.checked = true);
+		        }
+		
+		        // 전체 선택/해제 기능
+		        const filterCheckAll = document.getElementById('filterCheckAll');
+		        function updateFilterCheckAllState() {
+		            const allChecked = Array.from(statusChecks).every(c => c.checked);
+		            filterCheckAll.checked = allChecked;
+		        }
+		        filterCheckAll.addEventListener('change', () => {
+		            statusChecks.forEach(check => check.checked = filterCheckAll.checked);
+		        });
+		        statusChecks.forEach(check => {
+		            check.addEventListener('change', updateFilterCheckAllState);
+		        });
+		        updateFilterCheckAllState();
+		
+		        // 테이블 행 클릭 이벤트 (상세 내역 표시)
+		        const settlementListBody = document.getElementById('settlement-list-body');
+		        settlementListBody.addEventListener('click', async (event) => {
+		            const row = event.target.closest('tr');
+		            if (!row) return;
+		
+		            const storeId = row.dataset.storeId;
+		            const storeName = row.querySelector('.col-store span').textContent;
+		            
+		            // 행 클릭 시 상세 내역 표시
+		            await viewSettlementHistory(storeId, storeName);
+		        });
+		
+		        function formatCurrency(number) {
+		            return isNaN(number) ? '0원' : parseFloat(number).toLocaleString('ko-KR') + '원';
+		        }
+		
+		        // 상세 내역 패널 관련 요소
+		        const settlementHistoryPanel = document.getElementById('settlement-history-panel');
+		        const historyShopName = document.getElementById('history-shop-name');
+		        const settlementHistoryDetailList = document.getElementById('settlement-history-detail-list');
+		        const closeHistoryButton = document.getElementById('close-history-button');
+		        const noIndividualHistoryMessage = document.getElementById('no-individual-history-message');
+		
+		        // 상세 정산 내역 조회 함수
+		        async function viewSettlementHistory(storeId, storeName) {
+		            historyShopName.textContent = storeName;
+		            settlementHistoryDetailList.innerHTML = '';
+		            noIndividualHistoryMessage.style.display = 'none';
+		            
+		            try {
+		                const response = await fetch(`/seller/settlement/api/history/${storeId}`);
+		                if (!response.ok) {
+		                    throw new Error(`HTTP error! status: ${response.status}`);
+		                }
+		                const history = await response.json();
+		                
+		                if (history.length === 0) {
+		                    noIndividualHistoryMessage.style.display = 'block';
+		                } else {
+		                    const table = document.createElement('table');
+		                    table.className = 'table table-hover';
+		                    table.innerHTML = `
+		                        <thead>
+		                            <tr class="text-center">
+		                                <th>정산일</th>
+		                                <th>총 판매액</th>
+		                                <th>수수료</th>
+		                                <th>정산 금액</th>
+		                                <th>상태</th>
+		                            </tr>
+		                        </thead>
+		                        <tbody></tbody>
+		                    `;
+		                    const tbody = table.querySelector('tbody');
+		                    history.forEach(item => {
+		                        const statusText = item.clclnSttsCd;
+		                        const statusClass = statusText === '판매정산완료' ? 'bg-success' : 'bg-danger';
+		                        const row = tbody.insertRow();
+		                        row.className = 'text-center';
+		                        row.innerHTML = `
+		                            <td>${item.clclnPrcsYmd || '-'}</td>
+		                            <td class="text-end">${formatCurrency(item.totSelAmt || 0)}</td>
+		                            <td class="text-end">${formatCurrency((item.totSelAmt || 0) - (item.clclnAmt || 0))}</td>
+		                            <td class="text-end fw-bold">${formatCurrency(item.clclnAmt || 0)}</td>
+		                            <td><span class="badge ${statusClass}">${statusText}</span></td>
+		                        `;
+		                    });
+		                    settlementHistoryDetailList.appendChild(table);
+		                }
+		            } catch (error) {
+		                console.error('정산 내역 조회 오류:', error);
+		                Swal.fire({ 
+		                    title: "오류 발생", 
+		                    text: "정산 내역을 불러오는 중 오류가 발생했습니다.", 
+		                    icon: "error" 
+		                });
+		            }
+		            
+		            settlementHistoryPanel.style.display = 'block';
+		            settlementHistoryPanel.scrollIntoView({ behavior: 'smooth' });
+		        }
+		
+		        closeHistoryButton.addEventListener('click', () => {
+		            settlementHistoryPanel.style.display = 'none';
+		        });
+		    });
+		</script>
+	</th:block>
+</body>
+</html>
