@@ -37,11 +37,11 @@
 
 				<!-- 성별 필터 버튼: 모달을 열지 않고 즉시 필터링 적용 -->
 				<button class="filter-button" data-filter-group="gender"
-					data-gender="M"
-					th:classappend="${currentGender == 'M' ? 'active' : ''}">남</button>
+					data-gender="남성"
+					th:classappend="${currentGender == '남성' ? 'active' : ''}">남</button>
 				<button class="filter-button" data-filter-group="gender"
-					data-gender="F"
-					th:classappend="${currentGender == 'F' ? 'active' : ''}">여</button>
+					data-gender="여성"
+					th:classappend="${currentGender == '여성' ? 'active' : ''}">여</button>
 
 				<!-- 각 항목별 필터 버튼: 클릭 시 모달이 열리고 해당 탭이 표시됨 -->
 				<button class="filter-dropdown app-modal-trigger"

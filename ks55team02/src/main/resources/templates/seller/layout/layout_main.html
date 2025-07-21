@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-	<meta charset="utf-8" />
-    <title th:text="${title}">Nest Dashboard</title>
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- Template CSS -->
-    <link th:href="@{/admincss/assets/css/main.css?v=1.1}" rel="stylesheet" type="text/css" />
-        <link th:href="@{/maincss/assets/customsellercss/layoutSeller.css}" rel="stylesheet" type="text/css" />
+<meta charset="utf-8" />
+<title th:text="${title}">Nest Dashboard</title>
+<meta http-equiv="x-ua-compatible" content="ie=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>룩온(LookOn)</title>
+<!-- ⭐⭐⭐ Favicon 설정 추가 시작 ⭐⭐⭐ -->
+<link rel="icon" type="image/png"
+	th:href="@{/favicons/lookonfavicon1.png}">
+
+<!-- ⭐⭐⭐ Favicon 설정 추가 끝 ⭐⭐⭐ -->
+
+
+<!-- 스타일 -->
+<!-- Template CSS -->
+<link th:href="@{/admincss/assets/css/main.css?v=1.1}" rel="stylesheet"
+	type="text/css" />
+<link th:href="@{/maincss/assets/customsellercss/layoutSeller.css}"
+	rel="stylesheet" type="text/css" />
 </head>
 <body>
 	<div class="screen-overlay"></div>
@@ -19,12 +30,12 @@
 	<!-- aside start -->
 	<aside th:replace="~{seller/fragments/aside :: asideFragment}"></aside>
 	<!-- aside end -->
-	
+
 	<main class="main-wrap">
 		<!-- header start -->
 		<header th:replace="~{seller/fragments/header :: headerFragment}"></header>
 		<!-- header end -->
-		
+
 		<section class="content-main">
 			<!-- contents start -->
 			<!--/* 삽입할 부분을 선언 */-->
@@ -36,19 +47,21 @@
 		<!-- footer end -->
 	</main>
 	<script th:src="@{/admincss/assets/js/vendors/jquery-3.6.0.min.js}"></script>
-    <script th:src="@{/admincss/assets/js/vendors/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/admincss/assets/js/vendors/select2.min.js}"></script>
-    <script th:src="@{/admincss/assets/js/vendors/perfect-scrollbar.js}"></script>
-    <script th:src="@{/admincss/assets/js/vendors/jquery.fullscreen.min.js}"></script>
-    
-    <!--/* 개발시 추가할 스크립트 파일 영역 정의 */-->
-    <th:block layout:fragment="jsFile"></th:block>
-    
-    <!-- Main Script -->
-    <script th:src="@{/admincss/assets/js/main.js?v=1.1}" type="text/javascript"></script>
-    
-    <!--/* 개발시 추가할 스크립트 영역 정의 */-->
-    <th:block layout:fragment="jsScript"></th:block>
+	<script th:src="@{/admincss/assets/js/vendors/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/admincss/assets/js/vendors/select2.min.js}"></script>
+	<script th:src="@{/admincss/assets/js/vendors/perfect-scrollbar.js}"></script>
+	<script
+		th:src="@{/admincss/assets/js/vendors/jquery.fullscreen.min.js}"></script>
+
+	<!--/* 개발시 추가할 스크립트 파일 영역 정의 */-->
+	<th:block layout:fragment="jsFile"></th:block>
+
+	<!-- Main Script -->
+	<script th:src="@{/admincss/assets/js/main.js?v=1.1}"
+		type="text/javascript"></script>
+
+	<!--/* 개발시 추가할 스크립트 영역 정의 */-->
+	<th:block layout:fragment="jsScript"></th:block>
 </body>
 </html>
 

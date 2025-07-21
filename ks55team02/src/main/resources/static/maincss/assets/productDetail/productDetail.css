@@ -1209,3 +1209,13 @@
     transition: all 0.3s;
     box-shadow: none;
 }
+
+/* 프리뷰 */
+.alert-info {
+    color: #fff;
+    background-color: #c96;
+    max-width: 1200px;
+    margin: 10px 5px 0px 10px;
+    border-radius: 10px;
+    /* box-sizing: border-box; */
+}

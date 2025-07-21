@@ -183,6 +183,7 @@ html, body {
 	background-color: #fdfdfd;
 	padding-top: 30px;
 	padding-bottom: 20px;
+	border-top: 1px solid #eee;
 }
 
 /* 내부 컨텐츠 컨테이너 */

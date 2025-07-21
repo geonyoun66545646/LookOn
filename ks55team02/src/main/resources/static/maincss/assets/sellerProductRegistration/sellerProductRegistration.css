@@ -243,12 +243,12 @@ html, body, .page-wrapper {
 }
 
 .fixed-bottom-bar .btn {
-	margin-left: 10px;
-	padding: 8px 20px;
-	font-size: 13px; /* 모든 폰트 크기 11px 이상으로 통일 */
-	border-radius: 6px; /* border-radius 통일 */
-	background-color: #3bb772; /* 저장/제출 버튼 색상 변경 */
-	border-color: #3bb772; /* 저장/제출 버튼 색상 변경 */
+    margin-left: 10px;
+    padding: 11px 20px;
+    font-size: 13px;
+    border-radius: 9px;
+    background-color: #3bb772;
+    border-color: #3bb772;
 }
 
 .fixed-bottom-bar .btn-light {

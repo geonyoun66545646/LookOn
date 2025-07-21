@@ -40,6 +40,7 @@
 	<!-- 상품 상세 정보 최종 ResultMap -->
 	 <resultMap id="productDetailWithImagesResultMap" type="ks55team02.seller.products.domain.Products">
 		<id column="gds_no" property="gdsNo" />
+		<result column="sel_user_no" property="selUserNo" />
 		<result column="gds_nm" property="gdsNm" />
 		<result column="gds_expln" property="gdsExpln" />
         <result column="bas_prc" property="basPrc" jdbcType="DECIMAL"/>
@@ -89,7 +90,7 @@
 		</association>
 	</resultMap>
 	
-		<!-- ⭐ [추가] 검색 조건에 맞는 상품 총 개수 조회 쿼리 ⭐ -->
+	<!-- ⭐ [추가] 검색 조건에 맞는 상품 총 개수 조회 쿼리 ⭐ -->
 	<select id="getSearchedProductListCount" parameterType="ks55team02.admin.common.domain.SearchCriteria" resultType="int">
 	    SELECT
 	        COUNT(DISTINCT p.gds_no)
@@ -107,7 +108,6 @@
 	    <include refid="productSearchCondition" />
 	</select>
 	
-	<!-- ⭐ [추가] 판매자 상품 검색 조건을 위한 SQL 조각 ⭐ -->
 	<sql id="productSearchCondition">
 	    <where>
 	        p.store_id = #{storeId}
@@ -119,12 +119,14 @@
 	                #{status}
 	            </foreach>
 	        </if>
-	        <if test="startDate != null and startDate != ''">
-	            AND DATE(p.reg_dt) &gt;= #{startDate}
+	        <!-- ========== 날짜 필터 수정 시작 ========== -->
+	        <if test="startDate != null">
+	            AND p.reg_dt >= #{startDate}
 	        </if>
-	        <if test="endDate != null and endDate != ''">
-	            AND DATE(p.reg_dt) &lt;= #{endDate}
+	        <if test="endDate != null">
+	            AND p.reg_dt <![CDATA[ < ]]> DATE_ADD(#{endDate}, INTERVAL 1 DAY)
 	        </if>
+	        <!-- ========== 날짜 필터 수정 끝 ========== -->
 	        <if test="searchKey != null and searchValue != null and searchValue != ''">
 	            <choose>
 	                <when test="searchKey == 'gdsNm'">
@@ -139,49 +141,49 @@
 	</sql>
 	
 	<select id="getSearchedProductList" parameterType="ks55team02.admin.common.domain.SearchCriteria" resultMap="productsResultMap">
-    SELECT
-        p.gds_no, p.store_id, p.ctgry_no, p.gds_nm, p.bas_prc, p.dscnt_rt,
-        (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
-        p.reg_dt, p.expsr_yn, p.actvtn_yn, pc.ctgry_nm,
-        (
-            SELECT pi.img_file_path_nm
-            FROM ks55team02db.product_images pi
-            WHERE pi.gds_no = p.gds_no AND pi.img_type = 1 AND pi.actvtn_yn = TRUE
-            ORDER BY pi.img_indct_sn ASC
-            LIMIT 1
-        ) AS thumbnail_image_path,
-        IFNULL(pah.aprv_stts_cd, 'P') AS latestApprovalStatus
-    FROM
-        ks55team02db.products p
-    LEFT JOIN
-        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
-    LEFT JOIN (
-        SELECT gds_no, aprv_stts_cd, prcs_dt
-        FROM product_approval_history
-        WHERE (gds_no, aprv_rjct_cycl, prcs_dt) IN (
-            SELECT gds_no, MAX(aprv_rjct_cycl), MAX(prcs_dt)
-            FROM product_approval_history
-            GROUP BY gds_no
-        )
-    ) pah ON p.gds_no = pah.gds_no
-    <include refid="productSearchCondition" />
-    <choose>
-        <when test="sortKey != null and sortKey != ''">
-            ORDER BY
-            <choose>
-                <when test="sortKey == 'regDt'">p.reg_dt</when>
-                <when test="sortKey == 'gdsNm'">p.gds_nm</when>
-                <otherwise>p.reg_dt</otherwise>
-            </choose>
-            <if test="sortOrder != null and sortOrder.equalsIgnoreCase('DESC')">DESC</if>
-            <if test="sortOrder != null and sortOrder.equalsIgnoreCase('ASC')">ASC</if>
-        </when>
-        <otherwise>
-            ORDER BY p.reg_dt DESC
-        </otherwise>
-    </choose>
-    LIMIT #{offset}, #{pageSize}
-</select>
+	    SELECT
+	        p.gds_no, p.store_id, p.ctgry_no, p.gds_nm, p.bas_prc, p.dscnt_rt,
+	        (p.bas_prc * (100 - IFNULL(p.dscnt_rt, 0.00)) / 100) AS last_sel_prc,
+	        p.reg_dt, p.expsr_yn, p.actvtn_yn, pc.ctgry_nm,
+	        (
+	            SELECT pi.img_file_path_nm
+	            FROM ks55team02db.product_images pi
+	            WHERE pi.gds_no = p.gds_no AND pi.img_type = 1 AND pi.actvtn_yn = TRUE
+	            ORDER BY pi.img_indct_sn ASC
+	            LIMIT 1
+	        ) AS thumbnail_image_path,
+	        IFNULL(pah.aprv_stts_cd, 'P') AS latestApprovalStatus
+	    FROM
+	        ks55team02db.products p
+	    LEFT JOIN
+	        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+	    LEFT JOIN (
+	        SELECT gds_no, aprv_stts_cd, prcs_dt
+	        FROM product_approval_history
+	        WHERE (gds_no, aprv_rjct_cycl, prcs_dt) IN (
+	            SELECT gds_no, MAX(aprv_rjct_cycl), MAX(prcs_dt)
+	            FROM product_approval_history
+	            GROUP BY gds_no
+	        )
+	    ) pah ON p.gds_no = pah.gds_no
+	    <include refid="productSearchCondition" />
+	    <choose>
+	        <when test="sortKey != null and sortKey != ''">
+	            ORDER BY
+	            <choose>
+	                <when test="sortKey == 'regDt'">p.reg_dt</when>
+	                <when test="sortKey == 'gdsNm'">p.gds_nm</when>
+	                <otherwise>p.reg_dt</otherwise>
+	            </choose>
+	            <if test="sortOrder != null and sortOrder.equalsIgnoreCase('DESC')">DESC</if>
+	            <if test="sortOrder != null and sortOrder.equalsIgnoreCase('ASC')">ASC</if>
+	        </when>
+	        <otherwise>
+	            ORDER BY p.reg_dt DESC
+	        </otherwise>
+	    </choose>
+	    LIMIT #{offset}, #{pageSize}
+	</select>
 	
 	
 	<select id="selectProductStatusOptions" parameterType="String" resultType="map">
@@ -551,23 +553,24 @@
 	<!-- ProductsMapper.xml -->
 	<!-- 상품 상세 정보 조회 (최종 수정 버전) -->
 	<select id="getProductDetailWithImages" parameterType="String" resultMap="productDetailWithImagesResultMap">
-		SELECT
-			gds_no,
-			gds_nm,
-			store_id,
-			gds_expln,
-            bas_prc,
-            dscnt_rt,
-            (bas_prc * (1 - IFNULL(dscnt_rt / 100.0, 0.00))) AS last_sel_prc,
-            min_purchase_qty,
-            max_purchase_qty,
-            ctgry_no,
-            expsr_yn,
-            actvtn_yn
-		FROM
-			products
-		WHERE
-			gds_no = #{gdsNo}
+	    SELECT
+	        gds_no,
+	        gds_nm,
+	        store_id,
+	        sel_user_no,
+	        gds_expln,
+	        bas_prc,
+	        dscnt_rt,
+	        (bas_prc * (1 - IFNULL(dscnt_rt / 100.0, 0.00))) AS last_sel_prc,
+	        min_purchase_qty,
+	        max_purchase_qty,
+	        ctgry_no,
+	        expsr_yn,
+	        actvtn_yn
+	    FROM
+	        products
+	    WHERE
+	        gds_no = #{gdsNo}
 	</select>
 	
 	<!-- ===================== 유틸리티 쿼리 ===================== -->
