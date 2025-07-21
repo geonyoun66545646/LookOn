@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ks55team02.customer.reports.mapper.ReportsValueSearchMapper">
+
+	<!-- 게시글 검색 (제목으로) -->
+	<select id="findPostsForReport" parameterType="String"
+		resultType="map">
+		SELECT
+		p.pst_sn AS id,
+		p.pst_ttl AS name,
+		u.user_ncnm AS detail
+		FROM
+		posts p
+		LEFT JOIN
+		users u ON p.wrtr_user_no = u.user_no
+		WHERE
+		p.pst_ttl LIKE CONCAT('%', #{keyword}, '%') AND p.del_dt IS NULL
+		LIMIT 50
+	</select>
+
+	<!-- 댓글 검색 (내용으로) -->
+	<select id="findCommentsForReport" parameterType="String"
+		resultType="map">
+		SELECT
+		c.pst_cmnt_sn AS id,
+		c.cmnt_cn AS name,
+		u.user_ncnm AS detail
+		FROM
+		post_comments c
+		LEFT JOIN
+		users u ON c.wrtr_user_no = u.user_no
+		WHERE
+		c.cmnt_cn LIKE CONCAT('%', #{keyword}, '%') AND c.del_dt IS NULL
+		LIMIT 50
+	</select>
+
+	<!-- 상품 검색 (이름으로) -->
+	<select id="findProductsForReport" parameterType="String"
+		resultType="map">
+		SELECT
+		p.gds_no AS id,
+		p.gds_nm AS name,
+		s.store_conm AS detail
+		FROM
+		products p
+		LEFT JOIN
+		stores s ON p.store_id = s.store_id
+		WHERE
+		p.gds_nm LIKE CONCAT('%', #{keyword}, '%') AND p.actvtn_yn = 1
+		LIMIT 50
+	</select>
+
+	<!-- [최종 수정] 사용자 검색 (ID 또는 닉네임으로, user_no 포함) -->
+	<select id="findUsersForReport" parameterType="String"
+		resultType="map">
+		SELECT
+		user_lgn_id AS id,
+		user_ncnm AS name,
+		user_lgn_id AS detail,
+		user_no AS userNo
+		FROM
+		users
+		WHERE
+		(user_lgn_id LIKE CONCAT('%', #{keyword}, '%') OR user_ncnm LIKE CONCAT('%',
+		#{keyword}, '%'))
+		AND user_status = '활동'
+		LIMIT 50
+	</select>
+
+</mapper>
