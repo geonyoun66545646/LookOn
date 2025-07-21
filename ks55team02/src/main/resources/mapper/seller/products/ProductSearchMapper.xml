@@ -326,17 +326,28 @@
 	        </if>
 	        
 	        <!-- 성별 필터 (옵션 테이블을 통해 조회) -->
-	        <if test="gender != null and gender != ''">
-	            AND p.gds_no IN (
-	                SELECT po.gds_no
-	                FROM ks55team02db.product_options po
-	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
-	                WHERE
-	                    po.opt_nm = '성별'
-	                    AND pov.vl_nm IN (#{gender}, '공용') -- '남성'/'여성'과 '공용'을 함께 조회
-	                    AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
-	            )
-	        </if>
+			<if test="gender != null and gender != ''">
+			    AND p.gds_no IN (
+			        SELECT po.gds_no
+			        FROM ks55team02db.product_options po
+			        JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+			        WHERE
+			            po.opt_nm = '성별'
+			            AND 
+			            <choose>
+			                <when test="gender == '남성'">
+			                    pov.vl_nm IN ('남성', '공용')
+			                </when>
+			                <when test="gender == '여성'">
+			                    pov.vl_nm IN ('여성', '공용')
+			                </when>
+			                <otherwise>
+			                    pov.vl_nm = #{gender}
+			                </otherwise>
+			            </choose>
+			            AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
+			    )
+			</if>
 	        
 	        <choose>
 	            <when test="minPrice != null and maxPrice != null">
@@ -412,6 +423,8 @@
 	            <when test="sortBy == 'old'">p.reg_dt ASC</when>
 	            <when test="sortBy == 'priceAsc'">last_sel_prc ASC</when>
 	            <when test="sortBy == 'priceDesc'">last_sel_prc DESC</when>
+	            <!-- ⭐⭐⭐ 이 라인을 추가하세요. ⭐⭐⭐ -->
+        		<when test="sortBy == 'discountDesc'">p.dscnt_rt DESC</when>
 	            <when test="sortBy == 'popularity'">p.gds_view_cnt DESC</when>
 	            <otherwise>p.reg_dt DESC</otherwise>
 	        </choose>
@@ -450,17 +463,29 @@
 	        
             <!-- 성별 필터 -->
 	        <!-- 성별 필터 (옵션 테이블을 통해 조회) -->
-	        <if test="gender != null and gender != ''">
-	            AND p.gds_no IN (
-	                SELECT po.gds_no
-	                FROM ks55team02db.product_options po
-	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
-	                WHERE
-	                    po.opt_nm = '성별'
-	                    AND pov.vl_nm IN (#{gender}, '공용')
-	                    AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
-	            )
-	        </if>
+	        <!-- 성별 필터 (옵션 테이블을 통해 조회) -->
+			<if test="gender != null and gender != ''">
+			    AND p.gds_no IN (
+			        SELECT po.gds_no
+			        FROM ks55team02db.product_options po
+			        JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+			        WHERE
+			            po.opt_nm = '성별'
+			            AND 
+			            <choose>
+			                <when test="gender == '남성'">
+			                    pov.vl_nm IN ('남성', '공용')
+			                </when>
+			                <when test="gender == '여성'">
+			                    pov.vl_nm IN ('여성', '공용')
+			                </when>
+			                <otherwise>
+			                    pov.vl_nm = #{gender}
+			                </otherwise>
+			            </choose>
+			            AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
+			    )
+			</if>
 	        
             <!-- 가격 필터 -->
 	        <choose>

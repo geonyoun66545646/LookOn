@@ -411,13 +411,30 @@
 			</div>
 		</main>
 
+		<!-- sellerProductRegistration.html 파일 하단 -->
+
 		<div class="fixed-bottom-bar">
-			<div class="container">
-				<button type="button" class="btn btn-light" id="cancelBtn">취소</button>
-				<button type="submit" class="btn btn-primary"
-					form="productRegistrationForm" id="registerBtn">제출</button>
+			<div class="container d-flex justify-content-end align-items-center">
+
+				<!-- 취소 버튼 -->
+				<button type="button" class="btn btn-light me-2" id="cancelBtn"><span>취소</span></button>
+
+				<!-- 미리보기 -->
+				<button th:if="${isUpdate}" type="button"
+					class="btn btn-primary me-2"
+					th:onclick="|window.open('@{/seller/products/preview/{gdsNo}(gdsNo=${productRegistrationRequest.gdsNo})}', '_blank')|">
+					<span>미리보기</span>
+				</button>
+					
+				<!-- 제출 버튼 -->
+				<button type="submit" class="btn btn-primary "
+					form="productRegistrationForm" id="registerBtn">
+					<span th:text="${isUpdate} ? '수정' : '제출'"></span>
+				</button>
+
 			</div>
 		</div>
+
 	</div>
 	<script th:inline="javascript">
 		/* <![CDATA[ */

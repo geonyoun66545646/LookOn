@@ -7,6 +7,9 @@ import org.apache.ibatis.annotations.Param;
 
 import ks55team02.common.domain.store.ProductReview;
 import ks55team02.common.domain.store.ReviewImage;
+import ks55team02.common.domain.store.StoreImage;
+import ks55team02.orderproduct.domain.OrderDTO;
+
 
 @Mapper
 public interface ReviewMapper {
@@ -29,7 +32,7 @@ public interface ReviewMapper {
   * @return 주문 상세 항목 번호 (결과 없으면 null)
   */
  String findReviewableOrderItem(@Param("userNo") String userNo,
-                                @Param("ordNo") String ordNo,
+                                @Param("ordrNo") String ordrNo,
                                 @Param("gdsNo") String gdsNo);
 
  /**
@@ -49,15 +52,26 @@ public interface ReviewMapper {
  
  Integer findMaxReviewIdNumber();
  
+ // 리뷰 가능 주문 조회
+ OrderDTO findReviewableOrder(@Param("userNo") String userNo, 
+		 						@Param("gdsNo") String gdsNo);
+					 
+ 
+ /**
+  * 여러 StoreImage 정보를 DB에 배치 저장합니다.
+  * @param storeImages 저장할 StoreImage 객체 리스트
+  * @return INSERT된 행의 수
+  */
+ int addStoreImages(List<StoreImage> storeImages); // 배치 삽입 메서드 추가
+
+ /**
+  * 여러 ReviewImage 정보를 DB에 배치 저장합니다. (리뷰와 이미지 매핑)
+  * @param reviewImages 저장할 ReviewImage 객체 리스트
+  * @return INSERT된 행의 수
+  */
+ int addReviewImages(List<ReviewImage> reviewImages); // 배치 삽입 메서드 추가
  
 }
 
 
- // TODO: 리뷰 등록, 수정, 삭제, 좋아요/취소 관련 메서드를 여기에 추가할 수 있습니다.
- // int insertReview(ProductReview review);
- // int updateReview(ProductReview review);
- // int deleteReview(String reviewId);
- // int insertReviewLike(ReviewLike reviewLike);
- // int deleteReviewLike(String reviewId, String likeUserNo);
- // ProductReview selectReviewById(String reviewId);
- // int updateReviewHelpfulCount(String reviewId, int increment);
+ 
