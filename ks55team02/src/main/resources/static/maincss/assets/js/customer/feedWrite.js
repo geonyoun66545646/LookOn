@@ -9,91 +9,109 @@ $(() => {
     const cancelBtn = $('#cancel-btn');
     const submitBtn = $('#submit-btn');
 
-    // [수정] 폼의 data-feed-sn 속성으로 작성/수정 모드 감지
+    // [수정 1] 폼의 data-feed-sn 속성으로 작성/수정 모드 감지
     const feedSn = feedForm.data('feed-sn');
     const isEditMode = !!feedSn;
 
     // --- 2. 이벤트 핸들러 ---
 
-    // [기능] '새 이미지 추가' input의 파일 선택이 변경되었을 때 (공통 로직)
+    // '새 이미지 추가' input 파일 선택 변경 시
     imageInput.on('change', function(event) {
-        // 기존 새 이미지 미리보기 초기화
         newPreviewContainer.find('.preview-image-wrapper').remove(); 
         
         const files = event.target.files;
         if (files && files.length > 0) {
             uploadPlaceholder.hide();
-            Array.from(files).forEach(file => {
+            // FileList를 배열로 변환하여 DataTransfer 객체에 저장 (삭제 기능 구현 위함)
+            const dataTransfer = new DataTransfer();
+            Array.from(files).forEach(file => dataTransfer.items.add(file));
+            imageInput[0].files = dataTransfer.files;
+
+            Array.from(files).forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const imgWrapper = $('<div>').addClass('preview-image-wrapper');
+                    const imgWrapper = $('<div>').addClass('preview-image-wrapper').attr('data-file-index', index);
                     const img = $('<img>').attr('src', e.target.result).addClass('preview-image');
-                    imgWrapper.append(img);
+                    const deleteBtn = $('<button>').attr('type', 'button').addClass('delete-new-image-btn').html('×');
+                    imgWrapper.append(img).append(deleteBtn);
                     newPreviewContainer.append(imgWrapper);
                 };
                 reader.readAsDataURL(file);
             });
-        } else {
-            // 이미지가 없고, 기존 이미지도 없는 경우에만 placeholder 표시
+        }
+        if (newPreviewContainer.find('.preview-image-wrapper').length === 0) {
             if (existingPreviewContainer.find('.preview-image-wrapper:visible').length === 0) {
                 uploadPlaceholder.show();
             }
         }
     });
-    
-    // [신규] '기존 이미지'의 'X' 삭제 버튼 클릭 시 (수정 모드 전용)
-    if (isEditMode) {
-        existingPreviewContainer.on('click', '.delete-existing-image-btn', function() {
-            const imageContainer = $(this).closest('.preview-image-wrapper');
-            const imageSnToDelete = imageContainer.data('image-sn');
 
-            if (!imageSnToDelete) return;
+    // 새로 추가한 이미지 미리보기의 'X' 삭제 버튼
+    newPreviewContainer.on('click', '.delete-new-image-btn', function() {
+        const wrapperToRemove = $(this).closest('.preview-image-wrapper');
+        const fileIndexToRemove = parseInt(wrapperToRemove.data('file-index'), 10);
+        
+        // DataTransfer API를 사용해 input의 파일 목록에서 해당 파일 제거
+        const dataTransfer = new DataTransfer();
+        const originalFiles = imageInput[0].files;
+        
+        for (let i = 0; i < originalFiles.length; i++) {
+            if (i !== fileIndexToRemove) {
+                dataTransfer.items.add(originalFiles[i]);
+            }
+        }
+        imageInput[0].files = dataTransfer.files; // 수정된 파일 목록으로 교체
 
-            imageContainer.hide();
+        wrapperToRemove.remove(); // 화면에서 미리보기 제거
 
-            const currentDeletedSns = deleteImageSnsInput.val();
-            const newDeletedSns = currentDeletedSns ? `${currentDeletedSns},${imageSnToDelete}` : imageSnToDelete;
-            deleteImageSnsInput.val(newDeletedSns);
+        // 남은 미리보기들의 index를 재정렬
+        newPreviewContainer.find('.preview-image-wrapper').each(function(newIndex) {
+            $(this).attr('data-file-index', newIndex);
+        });
 
-            if (existingPreviewContainer.find('.preview-image-wrapper:visible').length === 0 && imageInput[0].files.length === 0) {
+        if (newPreviewContainer.find('.preview-image-wrapper').length === 0) {
+           if (existingPreviewContainer.find('.preview-image-wrapper:visible').length === 0) {
                 uploadPlaceholder.show();
             }
-        });
-    }
+        }
+    });
+    
+    // [신규 2] '기존 이미지'의 'X' 삭제 버튼 클릭 시 (수정 모드 전용)
+    existingPreviewContainer.on('click', '.delete-existing-image-btn', function() {
+        const imageWrapper = $(this).closest('.preview-image-wrapper');
+        const imageSnToDelete = imageWrapper.data('image-sn');
+        if (!imageSnToDelete) return;
 
-    // [기능] '취소' 버튼 클릭 시 (공통 로직)
+        imageWrapper.hide();
+
+        const currentDeletedSns = deleteImageSnsInput.val().split(',').filter(Boolean);
+        if (!currentDeletedSns.includes(imageSnToDelete.toString())) {
+            currentDeletedSns.push(imageSnToDelete);
+            deleteImageSnsInput.val(currentDeletedSns.join(','));
+        }
+
+        if (existingPreviewContainer.find('.preview-image-wrapper:visible').length === 0 && imageInput[0].files.length === 0) {
+            uploadPlaceholder.show();
+        }
+    });
+
+    // '취소' 버튼 클릭 시
     cancelBtn.on('click', () => {
         if (confirm('작업을 취소하고 이전 페이지로 돌아가시겠습니까?')) {
             history.back();
         }
     });
 
-    // [수정] 폼 제출(Submit) 처리 로직을 동적으로 변경
+    // [수정 3] 폼 제출(Submit) 처리 로직 통합
     feedForm.on('submit', function(event) {
         event.preventDefault(); 
         submitBtn.prop('disabled', true).text('처리 중...');
 
-        // 1. FormData 구성
-        const formData = new FormData();
-        formData.append('feedCn', $('#feed-content').val());
-        formData.append('hashtags', $('#feed-hashtags').val());
+        const formData = new FormData(this); // form 요소의 모든 input을 FormData로 만듦
 
-        // 2. 새 이미지 파일 추가
-        const newImageFiles = imageInput[0].files;
-        if (newImageFiles.length > 0) {
-            for (let i = 0; i < newImageFiles.length; i++) {
-                formData.append('newImageFiles', newImageFiles[i]);
-            }
-        }
-        
-        // 3. 수정 모드일 경우, 삭제할 이미지 정보 추가
-        if (isEditMode) {
-            formData.append('deleteImageSns', deleteImageSnsInput.val());
-        }
-
-        // 4. 유효성 검사
+        // 유효성 검사
         const hasContent = !!formData.get('feedCn')?.trim();
-        const hasNewImages = newImageFiles.length > 0;
+        const hasNewImages = imageInput[0].files.length > 0;
         const hasExistingImages = isEditMode && existingPreviewContainer.find('.preview-image-wrapper:visible').length > 0;
 
         if (!hasContent && !hasNewImages && !hasExistingImages) {
@@ -102,7 +120,12 @@ $(() => {
             return;
         }
 
-        // 5. Ajax 요청 URL 및 성공 메시지 설정
+        // 해시태그에서 # 제거하여 전송
+        let hashtags = formData.get('hashtags');
+        if (hashtags) {
+            formData.set('hashtags', hashtags.replace(/#/g, ''));
+        }
+
         const ajaxSettings = {
             url: isEditMode ? `/customer/api/feeds/edit/${feedSn}` : '/customer/api/feeds',
             type: 'POST',
@@ -113,7 +136,7 @@ $(() => {
             redirectUrl: isEditMode ? `/customer/feed/feedDetail/${feedSn}` : '/customer/feed/feedList'
         };
 
-        // 6. Ajax 요청 실행
+        // [수정 4] Ajax 요청 실행
         $.ajax(ajaxSettings)
         .done(() => {
             alert(ajaxSettings.successMessage);
@@ -123,6 +146,8 @@ $(() => {
             if (jqXHR.status === 401) {
                 alert('로그인이 필요합니다.');
                 window.location.href = '/customer/login/login';
+            } else if (jqXHR.status === 403) {
+                alert('수정할 권한이 없습니다.');
             } else {
                 alert('처리 중 오류가 발생했습니다: ' + (jqXHR.responseJSON?.message || '서버 오류'));
             }
@@ -133,12 +158,20 @@ $(() => {
     });
 
     // --- 초기 실행 ---
-    // 수정 모드이고, 기존 이미지가 없으면 placeholder를 보여줌
-    if (isEditMode && existingPreviewContainer.find('.preview-image-wrapper').length === 0) {
-        uploadPlaceholder.show();
-    } else if (!isEditMode) {
+    if (!isEditMode) {
         uploadPlaceholder.show();
     } else {
-        uploadPlaceholder.hide();
+        if (existingPreviewContainer.find('.preview-image-wrapper').length === 0) {
+            uploadPlaceholder.show();
+        } else {
+            uploadPlaceholder.hide();
+        }
+        // 수정 모드 시 해시태그 앞에 # 붙이기 (화면 표시용)
+        const hashtagInput = $('#feed-hashtags');
+        let tags = hashtagInput.val().trim();
+        if (tags && !tags.startsWith('#')) {
+            tags = '#' + tags.replace(/\s+/g, ' #');
+            hashtagInput.val(tags);
+        }
     }
 });

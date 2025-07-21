@@ -1,4 +1,4 @@
-package ks55team02.customer.brnoApi.service;
+package ks55team02.customer.brnoapi.service;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder; // URLEncoder 클래스 임포트
@@ -19,8 +19,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ks55team02.customer.brnoApi.domain.NtsApiRequestDto;
-import ks55team02.customer.brnoApi.domain.NtsApiResponseDto;
+import ks55team02.customer.brnoapi.domain.NtsApiRequestDto;
+import ks55team02.customer.brnoapi.domain.NtsApiResponseDto;
 import reactor.core.publisher.Mono;
 
 @Service // 이 클래스가 Spring의 서비스 컴포넌트임을 나타냅니다.

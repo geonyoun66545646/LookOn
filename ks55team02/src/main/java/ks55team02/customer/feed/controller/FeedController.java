@@ -42,10 +42,13 @@ public class FeedController {
 			 			Model model) {
 		 
 	     Feed feed = feedService.selectFeedDetail(feedSn);
+         // [수정] 피드가 없거나 삭제된 경우 목록으로 리다이렉트
+         if (feed == null) {
+             return "redirect:/customer/feed/feedList";
+         }
 	     model.addAttribute("feed", feed);
 	     model.addAttribute("context", context);
 	     model.addAttribute("userNo", userNo);
-         // [핵심 추가] 현재 로그인 사용자 정보를 모델에 추가
          model.addAttribute("loginUser", loginUser);
 	     model.addAttribute("showFab", true);
 
@@ -84,10 +87,39 @@ public class FeedController {
     
     @GetMapping("/feedWrite")
     public String feedWritePage(
-            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
+            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
+            Model model) {
         if (loginUser == null) {
-            return "redirect:/customer/login/login?redirectUrl=/customer/feed/write";
+            return "redirect:/customer/login/login?redirectUrl=/customer/feed/feedWrite";
         }
+        UserInfoResponse userInfo = userInfoService.getUserInfo(loginUser.getUserNo());
+        model.addAttribute("userInfo", userInfo); 
+        model.addAttribute("loginUser", loginUser);
         return "customer/feed/feedWrite";
+    }
+    
+    // =======================================================
+    // [신규] 피드 수정 페이지 이동 컨트롤러
+    // =======================================================
+    @GetMapping("/edit/{feedSn}")
+    public String feedEditPage(@PathVariable("feedSn") String feedSn,
+                               @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
+                               Model model) {
+        if (loginUser == null) {
+            return "redirect:/customer/login/login?redirectUrl=/customer/feed/edit/" + feedSn;
+        }
+
+        Feed feed = feedService.selectFeedDetail(feedSn);
+
+        // 피드가 존재하지 않거나, 현재 로그인한 사용자가 작성자가 아닌 경우 접근 차단
+        if (feed == null || !feed.getWrtrUserNo().equals(loginUser.getUserNo())) {
+            log.warn("잘못된 수정 접근: feedSn={}, accessor={}", feedSn, loginUser.getUserNo());
+            return "redirect:/customer/feed/feedList";
+        }
+        UserInfoResponse userInfo = userInfoService.getUserInfo(loginUser.getUserNo());
+        model.addAttribute("userInfo", userInfo);
+        model.addAttribute("feed", feed);
+        model.addAttribute("loginUser", loginUser);
+        return "customer/feed/feedWrite"; // 작성 페이지(feedWrite.html) 재사용
     }
 }
