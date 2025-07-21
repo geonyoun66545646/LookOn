@@ -423,6 +423,8 @@
 	            <when test="sortBy == 'old'">p.reg_dt ASC</when>
 	            <when test="sortBy == 'priceAsc'">last_sel_prc ASC</when>
 	            <when test="sortBy == 'priceDesc'">last_sel_prc DESC</when>
+	            <!-- ⭐⭐⭐ 이 라인을 추가하세요. ⭐⭐⭐ -->
+        		<when test="sortBy == 'discountDesc'">p.dscnt_rt DESC</when>
 	            <when test="sortBy == 'popularity'">p.gds_view_cnt DESC</when>
 	            <otherwise>p.reg_dt DESC</otherwise>
 	        </choose>
