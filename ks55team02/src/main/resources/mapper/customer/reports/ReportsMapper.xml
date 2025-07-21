@@ -162,8 +162,8 @@
 		r.dtl_dclr_rsn_cn AS dtlDclrRsnCn,
 		r.dclr_rcpt_dt AS dclrRcptDt,
 		r.prcs_stts_cd AS prcsSttsCd,
-		rh.actn_cn AS adminReply,
-		rh.prcs_dt AS processDate
+		MAX(rh.actn_cn) AS adminReply,
+		MAX(rh.prcs_dt) AS processDate
 		FROM
 		reports r
 		LEFT JOIN report_reasons rr ON r.dclr_rsn_cd = rr.dclr_rsn_cd
@@ -179,6 +179,8 @@
 		LEFT JOIN post_comments cmt ON r.dclr_trgt_conts_id = cmt.pst_cmnt_sn
 		WHERE
 		r.dclr_id = #{dclrId}
+		GROUP BY
+		r.dclr_id;
 	</select>
 
 	<!-- 첨부파일 객체 하나를 매핑하기 위한 resultMap -->
