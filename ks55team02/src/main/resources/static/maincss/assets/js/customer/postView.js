@@ -1,186 +1,172 @@
-/**
- * postVist.js
- * 게시글 상세 페이지의 게시글 및 댓글 관련 기능 처리 (AJAX 기반)
- */
+$(document).ready(function() {
+    function formatRelativeTime(dateString) {
+        if (!dateString) return '';
+        const now = new Date();
+        const postDate = new Date(dateString);
+        const diffInSeconds = Math.floor((now - postDate) / 1000);
+        const MINUTE = 60, HOUR = 3600, DAY = 86400, WEEK = 604800;
+        if (diffInSeconds < MINUTE) return '방금 전';
+        if (diffInSeconds < HOUR) return `${Math.floor(diffInSeconds / MINUTE)}분 전`;
+        if (diffInSeconds < DAY) return `${Math.floor(diffInSeconds / HOUR)}시간 전`;
+        if (diffInSeconds < WEEK) return `${Math.floor(diffInSeconds / DAY)}일 전`;
+        return dateString.split('T')[0].replace(/-/g, '.');
+    }
 
-$(() => {
-	// 게시글 삭제
-    $('#delete-post-btn').on('click', e => {
-        e.preventDefault();
-        
-        if(!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
-            return;
+    $('.relative-time').each(function() {
+        const datetime = $(this).data('datetime');
+        if (datetime) {
+            $(this).text(formatRelativeTime(datetime));
         }
+    });
 
+    $('.btn-more').on('click', function(e) {
+        e.stopPropagation();
+        const $menu = $(this).siblings('.more-menu');
+        $('.more-menu').not($menu).hide();
+        $menu.toggle();
+    });
+
+    $(document).on('click', function() {
+        $('.more-menu').hide();
+    });
+
+    $('#delete-post-btn').on('click', function(e) {
+        if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
         const deleteUrl = $(e.currentTarget).data('post-delete-url');
-
         $.ajax({
             url: deleteUrl,
             type: 'DELETE',
-			dataType: 'json'
+            dataType: 'json'
         }).done(response => {
-			if (response.result === 'success') {
-			    alert('게시글이 삭제되었습니다.');
-			    location.href = '/customer/post/postList';
-			} else {
-			    alert('삭제에 실패했습니다.');
-			}
-        }).fail(error => {
-            console.error("삭제 실패: ", error);
-            alert('삭제에 실패했습니다.');
+            alert(response.message || '게시글이 삭제되었습니다.');
+            location.href = '/customer/post/postList';
+        }).fail(err => {
+            alert(err.responseJSON?.message || '삭제 중 오류가 발생했습니다.');
         });
     });
-    
-	// 댓글 작성
-    const $commentForm = $('#commentForm');
-    if($commentForm.length) {
-    	$commentForm.on('submit', e => {
-    		e.preventDefault();
-    		
-	    	const formData = $commentForm.serialize(); 
-    		
-    		$.ajax({
-    			url: '/customer/post/insertComment',
-    			method: 'Post',
-    			data: formData,
-    			dataType: 'json'
-    		}).done(response => {
-    			if(response.result === "success") {
-    				window.location.reload();
-    			} else {
-    				alert(response);
-    			}
-    		}).fail(() => {
-    			alert('댓글 작성중 오류 발생')
-    		});
-    	});
-    }
-    
-    // 댓글 수정 UI 오픈
-    $('.update-comment-btn').on('click', e => {
-    	e.preventDefault();
-    	
-    	const $commentItem = $(e.currentTarget).closest('.comment-item');
-    	
-    	$commentItem.find('.comment-content-display').hide();
-    	$commentItem.find('.comment-update-input').show();
-    	$(e.currentTarget).hide();
-    	$commentItem.find('.save-comment-btn, .cancel-comment-btn').show();
-    });
-    
-    // 댓글 수정 UI 클로즈
-    $('.cancel-comment-btn').on('click', e => {
-    	e.preventDefault();
-    	
-    	const $commentItem = $(e.currentTarget).closest('.comment-item');
-    	
-    	$commentItem.find('.comment-content-display').show();
-    	$commentItem.find('.comment-update-input').hide();
-    	$commentItem.find('.update-comment-btn').show();
-    	$commentItem.find('.save-comment-btn, .cancel-comment-btn').hide();
-    });
-    
-    // 댓글 수정
-	$('.save-comment-btn').on('click', e => {
-	    e.preventDefault();
-	    
-	    const $btn = $(e.currentTarget);
-	    const updateUrl = $btn.data('comment-update-url');
-	    
-	    // 수정 1: '저장' 버튼의 data-comment-sn 속성에서 댓글 고유 번호를 가져옵니다.
-	    const pstCmntSn = $btn.data('comment-sn');
-	    
-	    // 수정 2: 클릭된 버튼을 기준으로 가장 가까운 .comment-item 요소를 찾고,
-	    // 그 안에서 수정 중인 textarea를 찾아 .val()로 실제 입력된 값을 가져옵니다.
-	    const $commentItem = $btn.closest('.comment-item');
-	    const cmntCn = $commentItem.find('.comment-update-input').val();
-	    
-	    // 수정 3: 서버의 Comment 객체 필드명과 일치하는 JSON 데이터를 생성합니다.
-	    // (pstCmntSn: 댓글 고유번호, cmntCn: 수정된 내용)
-	    const commentData = {
-	        pstCmntSn: pstCmntSn,
-	        cmntCn: cmntCn
-	    };
-	    
-	    // 이 부분은 기존 코드와 동일하며, 정상적으로 동작합니다.
-	    $.ajax({
-	        url: updateUrl,
-	        type: 'POST',
-	        contentType: 'application/json',
-	        data: JSON.stringify(commentData),
-	        dataType: 'json'
-	    }).done(response => {
-	        if(response.result === "success") {
-	            window.location.reload();			    			
-	        } else {
-	            alert("댓글 수정 실패 : " + (response.message || '알수없는오류'));
-	        }
-	    }).fail(error => {
-	        console.error("수정 실패", error);
-	        alert('수정에 실패했습니다.');
-	    });
-	});
-    
-    // 댓글 삭제
-    $('.delete-comment-btn').on('click', e => {
-    	e.preventDefault();
-    	
-    	if(!confirm('정말로 댓글을 삭제하시겠습니까?')) {
-    		return;
-    	}
-    	
-    	const deleteUrl = $(e.currentTarget).data('comment-delete-url');
-    	
-    	$.ajax({
-    		url: deleteUrl,
-    		type: 'DELETE',
-			dataType: 'json'
-    	}).done(response => {
-			if (response.result === 'success') {
-			    window.location.reload();
-			} else {
-			    alert('댓글 삭제에 실패했습니다.');
-			}
-    	}).fail(error => {
-            console.error("삭제 실패: ", error);
-            alert('삭제에 실패했습니다.');
-    	});
-    });
-    
-	 // 추천수 증가
-    $('#post_interaction_btn').on('click', e => {
-        e.preventDefault();
-        
-        const $btn = $(e.currentTarget);
-		
-		if (!$btn.data('post-interaction-insert-url')) {
-		    return;
-		}
-		
-        const insertUrl = $btn.data('post-interaction-insert-url');
-        const pstSn = $btn.data('interaction-pstsn');
-        const userNo = $btn.data('interaction-userno');
-        
+
+    // [수정] 추천(좋아요) 토글 기능 -> 이벤트 위임 방식으로 변경
+    $('.post-view-container').on('click', '#post-like-btn', function() {
+        const $btn = $(this);
+        const pstSn = $btn.data('post-sn');
+        const $container = $('.post-view-container');
+        const loginUserNo = $container.data('login-user-no');
+
+        if (!loginUserNo) {
+            alert('로그인이 필요합니다.');
+            const loginUrl = '/customer/login/login?redirectUrl=' + window.location.pathname + window.location.search;
+            window.location.href = loginUrl;
+            return;
+        }
+
+        $btn.prop('disabled', true);
+
         $.ajax({
-            url: insertUrl,
+            url: '/customer/api/post/toggle-like',
             type: 'POST',
-            data: {
-                pstSn: pstSn,
-                userNo: userNo
-            },
-            dataType: 'json' // 수정 2: 서버가 JSON 형태로 응답하므로 dataType을 추가합니다.
+            contentType: 'application/json',
+            data: JSON.stringify({ pstSn: pstSn }),
+            dataType: 'json'
         }).done(response => {
-            // 수정 3: 서버의 응답 결과에 따라 분기 처리합니다.
-            if (response.result === "success") {
-                // 성공 시 페이지를 새로고침하여 추천 수를 즉시 반영합니다.
+            $btn.toggleClass('liked', response.isLiked);
+            $btn.find('.like-count').text(response.likeCount);
+        }).fail(err => {
+            alert(err.responseJSON?.message || '오류가 발생했습니다.');
+        }).always(() => {
+            $btn.prop('disabled', false);
+        });
+    });
+
+    $('#post-share-btn').on('click', () => {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('게시글 주소가 클립보드에 복사되었습니다.');
+            }).catch(err => {
+                alert('주소 복사에 실패했습니다. 다시 시도해주세요.');
+            });
+        } else {
+            alert('이 브라우저에서는 자동 복사를 지원하지 않습니다.');
+        }
+    });
+
+    $('.report-btn').on('click', () => {
+        alert('신고 기능은 현재 준비 중입니다.');
+    });
+    
+    const $commentTextarea = $('#comment-textarea');
+    const $commentSubmitBtn = $('#comment-submit-btn');
+    if ($commentTextarea.length) {
+        $commentTextarea.on('input', function() {
+            $commentSubmitBtn.prop('disabled', $(this).val().trim() === '');
+        });
+    }
+
+    $('#commentForm').on('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const formObject = Object.fromEntries(formData.entries());
+        $.ajax({
+            url: '/customer/api/post/comments',
+            method: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(formObject),
+            dataType: 'json'
+        }).done(response => {
+            if (response.result === 'success') {
                 window.location.reload();
             } else {
-                // 실패 시 서버가 보낸 메시지를 알림창에 표시합니다.
-				 alert(response.message || '이미 추천하셨거나, 처리 중 오류가 발생했습니다.');
+                alert(response.message || '댓글 등록에 실패했습니다.');
             }
-        }).fail(error => {
-            console.error("추천 실패", error);
-			alert('추천 처리 중 오류가 발생했습니다.');
+        }).fail(err => {
+            alert(err.responseJSON?.message || '댓글 작성 중 오류가 발생했습니다.');
+        });
+    });
+
+    $('.comment-list').on('click', '.update-comment-btn', function() {
+        const $commentItem = $(this).closest('.comment-item');
+        $commentItem.find('.comment-body, .update-comment-btn, .delete-comment-btn').hide();
+        $commentItem.find('.comment-update-form, .save-comment-btn, .cancel-comment-btn').show();
+        $commentItem.find('.comment-update-input').focus();
+    });
+
+    $('.comment-list').on('click', '.cancel-comment-btn', function() {
+        const $commentItem = $(this).closest('.comment-item');
+        $commentItem.find('.comment-update-form, .save-comment-btn, .cancel-comment-btn').hide();
+        $commentItem.find('.comment-body, .update-comment-btn, .delete-comment-btn').show();
+    });
+
+    $('.comment-list').on('click', '.save-comment-btn', function(e) {
+        const $btn = $(e.currentTarget);
+        const updateUrl = $btn.data('comment-update-url');
+        const cmntCn = $btn.closest('.comment-item').find('.comment-update-input').val();
+        if (!cmntCn.trim()) {
+            alert('수정할 내용을 입력해주세요.');
+            return;
+        }
+        $.ajax({
+            url: updateUrl,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ cmntCn: cmntCn }),
+            dataType: 'json'
+        }).done(response => {
+            window.location.reload();
+        }).fail(err => {
+            alert(err.responseJSON?.message || '댓글 수정 중 오류가 발생했습니다.');
+        });
+    });
+
+    $('.comment-list').on('click', '.delete-comment-btn', function(e) {
+        if (!confirm('정말로 이 댓글을 삭제하시겠습니까?')) return;
+        const deleteUrl = $(e.currentTarget).data('comment-delete-url');
+        $.ajax({
+            url: deleteUrl,
+            type: 'DELETE',
+            dataType: 'json'
+        }).done(response => {
+            window.location.reload();
+        }).fail(err => {
+            alert(err.responseJSON?.message || '댓글 삭제 중 오류가 발생했습니다.');
         });
     });
 });

@@ -3,7 +3,6 @@ $(() => {
     let isLoading = false;
     let hasNext = true; 
 
-    // 피드 데이터를 받아 HTML 문자열을 생성하는 함수
     const createFeedItemHtml = (feed) => {
         const defaultImageUrl = '/images/default-feed.png'; 
         const imageUrl = feed.representativeImage?.imgFilePathNm || defaultImageUrl;
@@ -26,7 +25,6 @@ $(() => {
         `;
     };
 
-    // 피드 목록을 화면에 렌더링하는 함수
     const renderFeeds = (feeds) => {
         const container = $('#feed-list-grid-container');
         if (currentPage === 1 && feeds.length === 0) {
@@ -38,7 +36,6 @@ $(() => {
         });
     };
 
-    // 다음 페이지를 로드하는 Ajax 함수
     const loadNextPage = () => {
         if (isLoading || !hasNext) {
             return;
@@ -47,7 +44,6 @@ $(() => {
         $('#loading-indicator').show();
 
         $.ajax({
-            // [핵심 수정] 변경된 RestController의 경로에 맞춰 API URL을 수정합니다.
             url: '/customer/api/feeds/list', 
             type: 'GET',
             data: { page: currentPage },
@@ -80,7 +76,5 @@ $(() => {
     };
 
     $(window).on('scroll', onScroll);
-    
-    // 페이지 첫 로드 시, 첫 페이지 데이터 가져오기
     loadNextPage();
 });
