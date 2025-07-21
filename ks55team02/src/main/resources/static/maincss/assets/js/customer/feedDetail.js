@@ -63,9 +63,14 @@ $(() => {
 
         const postTimestamp = feed.crtDt ? feed.crtDt.substring(0, 16) : '';
         const isMyPost = loginUserNo && loginUserNo === feed.wrtrUserNo;
-        const postActionsHtml = isMyPost ? `<div><button class="edit-post-btn">수정</button><button class="delete-post-btn">삭제</button></div>` : '';
+		
+		// [수정] 기존 '수정/삭제' 버튼 대신 항상 '...' 버튼이 보이도록 변경
+		const postActionsHtml = `<button class="options-menu-btn" aria-label="옵션 더 보기"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><circle cx="12" cy="12" r="1.5"></circle><circle cx="6" cy="12" r="1.5"></circle><circle cx="18" cy="12" r="1.5"></circle></svg></button>`;
 
-        return `<div class="feed-post-wrapper" data-crt-dt="${feed.crtDt}" data-wrtr-user-no="${feed.wrtrUserNo}" data-feed-sn="${feed.feedSn}"><section class="post-media-section"><div class="feed-post-content">${imageListHtml}</div></section><section class="post-info-section"><article class="feed-post"><header class="feed-post-header"><div class="user-profile"><a href="${writerProfileLink}"><img src="${writerProfileImg}" alt="프로필 사진" class="profile-image"></a><div class="user-info"><span class="username">${writerNickname}</span></div></div><div class="post-actions">${postActionsHtml}</div></header><div class="post-scrollable-content">${feedContentWrapperHtml}<ul class="comment-list">${commentListHtml}</ul>${showMoreBtnHtml}</div><footer class="feed-post-footer"><div class="interaction-buttons"><button aria-label="좋아요"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button><button aria-label="댓글"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"></path></svg></button><button aria-label="공유"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"></path></svg></button></div><p class="like-count">좋아요 ${feed.likeCount}개</p><p class="post-timestamp">${postTimestamp}</p><div class="comment-input-area"><input type="text" placeholder="댓글 남기기..." class="comment-input"></div></footer></article></section></div>`;
+		// [신규 추가] 팔로우 버튼이 들어갈 영역을 생성합니다.
+        const followActionHtml = !isMyPost ? `<div class="follow-action-area"></div>` : '';
+		
+		return `<div class="feed-post-wrapper" data-crt-dt="${feed.crtDt}" data-wrtr-user-no="${feed.wrtrUserNo}" data-feed-sn="${feed.feedSn}"><section class="post-media-section">...</section><section class="post-info-section"><article class="feed-post"><header class="feed-post-header"><div class="user-profile">...<div class="user-info">...</div>${followActionHtml}</div><div class="post-actions">${postActionsHtml}</div></header>...</article></section></div>`;
     };
 
     /**
@@ -95,6 +100,9 @@ $(() => {
             if (nextFeedList?.length > 0) {
                 nextFeedList.forEach(nextFeed => container.append(createFeedDetailHtml(nextFeed)));
                 applyCommentActions();
+				// ▼▼▼ [신규 추가] 새로 로드된 피드에 팔로우 버튼을 생성하도록 함수 호출 ▼▼▼
+                initializeAllFollowButtons(); 
+                // ▲▲▲ [신규 추가] ▲▲▲
             } else {
                 hasNext = false;
                 $('#loading-indicator').html('<p>마지막 피드입니다.</p>').show();
@@ -254,4 +262,26 @@ $(() => {
 
     // --- 5. 초기 실행 ---
     applyCommentActions();
+	
+	// ▼▼▼ [신규 추가] follow.js와 연동하기 위한 함수 및 호출 코드 ▼▼▼
+   /**
+    * 화면에 있는 모든 피드 게시물에 대해 팔로우 버튼을 초기화하는 함수
+    * (이 함수는 follow.js에 있는 initializeFollowButton 함수를 호출합니다)
+    */
+   function initializeAllFollowButtons() {
+       $('.feed-post-header:not(.follow-initialized)').each(function() {
+           const $header = $(this);
+           const $wrapper = $header.closest('.feed-post-wrapper');
+           const writerUserNo = $wrapper.data('wrtr-user-no');
+
+           if (typeof initializeFollowButton === 'function') {
+               initializeFollowButton($header, writerUserNo, loginUserNo);
+           }
+           $header.addClass('follow-initialized');
+       });
+   }
+   
+   // 페이지가 처음 로딩될 때 팔로우 버튼을 초기화합니다.
+   initializeAllFollowButtons();
+   // ▲▲▲ [신규 추가] ▲▲▲
 });

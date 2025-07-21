@@ -26,6 +26,14 @@
     width: 15%; /* 이 버튼의 너비는 15%로 고정 */
 }
 
+.cont{
+	margin-top : 26px;
+}
+
+#commissionRateCn{
+	padding: .85rem 1rem;
+}
+
 /* ======================================================================== */
 /* Table Styling (상점 신청 테이블)                                          */
 /* ======================================================================== */
@@ -216,13 +224,12 @@ height: 40px;
     z-index: 1; /* HTML에 있던 인라인 스타일 */
 }
 /* 주소찾기 입력창 */
-#sample2_postcode, 
-#sample2_address, 
-#sample2_detailAddress, 
-#sample2_extraAddress{
-	display: block;
+#sample2_address,
+#sample2_detailAddress,
+#sample2_extraAddress {
+    display: block;
     width: 100%;
-	height: 40px;
+    height: 40px;
     padding: .85rem 2rem;
     font-size: 1.4rem;
     line-height: 1.5;
@@ -231,10 +238,34 @@ height: 40px;
     background-color: #fafafa;
     border: 1px solid #ebebeb;
     border-radius: 0;
-    margin-bottom: 2rem;
+    margin-bottom: 2rem; /* 다른 주소 필드들은 2rem 유지 */
     transition: all 0.3s;
     box-shadow: none;
 }
+
+/* #sample2_postcode만을 위한 새로운 규칙을 추가합니다. */
+#sample2_postcode {
+    display: block;
+    width: 100%;
+    height: 40px;
+    padding: .85rem 2rem;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    font-weight: 300;
+    color: #777;
+    background-color: #fafafa;
+    border: 1px solid #ebebeb;
+    border-radius: 0;
+    margin-bottom: 1rem; /* 여기만 1rem으로 변경 */
+    transition: all 0.3s;
+    box-shadow: none;
+}
+
+/* 주소찾기 버튼 래퍼 */
+.postcode-search-wrapper{
+	text-align:right;
+}
+
 /* 주소찾기 버튼 */
 .address-btn{
 	color: #c96;
@@ -305,11 +336,14 @@ height: 40px;
     border: 1px solid #ebebeb;
     color: #777;
     margin-bottom: 2rem;
+     padding: .85rem 2rem;
 }
+
 
 #brnoStatusForm{
 	display: flex; /* 자식 요소들을 가로로 나열 */
     align-items: center; /* 자식 요소들을 수직 중앙 정렬 */
+    box-sizing: border-box; /* 패딩과 보더가 width/height에 포함되도록 설정 */
 }
 #checkBrnoButton{
  	display: inline-flex; /* 텍스트를 가로로 정렬하고 버튼 내부 콘텐츠를 중앙에 놓기 위해 flex 사용 */
@@ -354,31 +388,41 @@ height: 40px;
     box-shadow: none;
 }
 
-.re-input{
-	color: #c96 !important;
-    background-color: transparent !important;
+.reinput{
+	display: inline-flex; /* 텍스트를 가로로 정렬하고 버튼 내부 콘텐츠를 중앙에 놓기 위해 flex 사용 */
+    align-items: center; /* 버튼 내부 텍스트를 수직 중앙 정렬 */
+    justify-content: center; /* 버튼 내부 텍스트를 수평 중앙 정렬 */
+    padding: 6px 30px;
+    background : transparent;
+    cursor: pointer;
+    color: #c96;
     background-image: none;
+    font-size: 14px;
+    /* line-height: 20px; (display:flex를 사용하면 line-height는 텍스트 자체의 높이에만 영향을 줍니다.) */
+    text-align: center; /* (display:flex를 사용하면 justify-content가 더 효과적입니다.) */
+    vertical-align: middle; /* (display:flex를 사용하면 align-items가 더 효과적입니다.) */
+    margin: 0;
     border: 1px solid #c96;
-    box-shadow: none;
-    margin-bottom : 7px;
-    font-size: 14px; /* 예시: 원하는 폰트 크기로 조절 */
-    padding: 0.15rem 0.4rem; /* 예시: 원하는 패딩으로 조절 */
-    width: auto;
+    box-sizing: border-box; /* 패딩과 보더가 width/height에 포함되도록 설정 */
+    height: 38px; /* 입력 필드의 높이와 유사하게 조절 (예시 값) */
+    margin-bottom: 2rem;
 }
-.re-input:hover{
+.reinput:hover{
 	color: #fff !important;
     background-color: #c96 !important;
     border-color: #c96;
     box-shadow: none;
 }
 
-.re-btn{
+.reinput{
 	text-align : right;
 }
 
 .tab-pane fade show active{
 	width:100%;
 }
+
+
 
 /* ======================================================================== */
 /* 탭박스 															*/
@@ -476,3 +520,9 @@ height: 40px;
     margin-bottom : 7px;
     width:15%
 }
+
+.col-lg-12 {
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+

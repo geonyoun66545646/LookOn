@@ -83,6 +83,18 @@ public class LoginServiceImpl  implements LoginService{
         // 4-2. 비밀번호 일치 (로그인 성공 처리)
         log.info("로그인 성공! ID: {}", userId);
         
+        String gradeCode = userInfoFromDb.getMbrGrdCd(); // 등급 코드를 가져옵니다.
+
+	     // 등급 코드가 'grd_cd_0'(총관리자) 또는 'grd_cd_1'(관리자)인지 확인합니다.
+        if ("grd_cd_0".equals(gradeCode) || "grd_cd_1".equals(gradeCode)) {
+            // 서버 로그에는 관리자 로그인 시도임을 명확히 기록합니다.
+            log.warn("관리자 계정으로 메인 페이지 로그인 시도 차단. ID: {}, 등급: {}", userInfoFromDb.getUserLgnId(), gradeCode);
+            
+            // 컨트롤러에는 일반적인 로그인 실패와 동일하게 null을 반환합니다.
+            return null; 
+        }
+        
+        
     	// 성공 시, 실패 횟수 초기화 (실패 기록이 있을 경우에만)
         if (userInfoFromDb.getLgnFailNmtm() > 0) {
             loginMapper.resetLoginFailCount(userId);

@@ -104,6 +104,7 @@
 .form-group.d-flex a {
     min-width: 120px;
     padding: 10px 20px;
+    margin: 0; 
 }
 
 /* 기타 폰트 설정 */
@@ -178,7 +179,7 @@ font-size: 14px;
     text-align : center;
 }
 
-/* sellerInquiryDetailView.css 또는 해당 페이지의 <style> 태그 내에 추가 */
+/* InquiryDetailView.css 또는 해당 페이지의 <style> 태그 내에 추가 */
 
 .answer-info-row td {
     width: 33.33%; /* 각 셀이 전체 너비의 1/3을 차지하도록 설정 */

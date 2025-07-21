@@ -13,67 +13,96 @@
 <th:block layout:fragment="contents">
 	<div class="container">
 		<div class="reports-receive-container">
-		
+
 			<h2>통합 신고하기</h2>
 			<p class="description">신고하시려는 대상 유형과 사유를 선택하고 내용을 상세히 기재해주세요. 모든
 				신고는 신중하게 검토됩니다.</p>
 
+			<!-- id="reportForm"은 그대로 유지합니다. -->
 			<form id="reportForm">
-				<div class="form-group full-width">
+
+				<!-- "신고하는 계정" 정보 표시는 그대로 유지합니다. 로그인한 사용자에게 좋은 피드백입니다. -->
+				<div class="form-group full-width"
+					th:if="${session.loginUser != null}">
 					<div class="form-field full-width">
-						<label>신고하는 계정</label>
-						<!-- TODO: 실제 로그인한 유저 정보를 서버에서 받아와야 함 -->
-						<!-- Thymeleaf를 사용해 로그인 유저의 번호와 닉네임을 data-* 속성에 저장 -->
-						<input type="text"
+						<label>신고하는 계정</label> <input type="text"
 							th:value="${session.loginUser.userNcnm} + ' (ID: ' + ${session.loginUser.userLgnId} + ')'"
-							th:data-user-no="${session.loginUser.userNo}" readonly>
+							class="form-control" readonly>
 					</div>
 				</div>
 
+				<!-- "신고 대상 유형" 드롭다운은 이제 사용자가 직접 선택해야 하므로, th:disabled와 th:selected 속성을 제거합니다. -->
 				<div class="form-field full-width">
 					<label for="reportType" class="required">신고 대상 유형</label> <select
-						id="reportType" name="reportType" required>
+						id="reportType" name="dclrTrgtTypeCd" class="form-control"
+						required>
 						<option value="">-- 신고 대상 유형을 선택하세요 --</option>
+						<option value="POST">게시글</option>
+						<option value="COMMENT">댓글</option>
+						<option value="PRODUCT">상품</option>
+						<option value="USER">사용자 계정</option>
 					</select>
 				</div>
 
-				<div id="contentReportFields" class="form-group full-width">
-					<div class="form-field full-width">
-						<label for="targetContentId" class="required">대상 링크 또는 ID</label>
-						<input type="text" id="targetContentId" name="targetContentId"
-							placeholder="신고할 게시글/댓글/상품의 URL을 입력하거나 ID를 입력하세요.">
+				<!-- 
+              [핵심 변경점 1]
+              콘텐츠/사용자 신고 필드를 하나로 통합하고, 선택된 유형에 따라 동적으로 라벨을 변경합니다.
+              초기에는 숨겨져 있다가, 사용자가 '신고 대상 유형'을 선택하면 JavaScript가 이 부분을 보여줍니다.
+            -->
+				<div id="targetSearchField" class="form-group full-width"
+					style="display: none;">
+					<label id="targetSearchLabel" class="required">신고할 대상</label>
+					<div class="input-group">
+						<input type="text" id="targetDisplayName" class="form-control"
+							placeholder="오른쪽 버튼을 눌러 대상을 찾아주세요." readonly>
+						<button class="btn btn-outline-secondary" type="button"
+							id="searchTargetBtn" data-bs-toggle="modal"
+							data-bs-target="#searchModal">대상 찾기</button>
 					</div>
+					<!-- 
+                  두 개의 히든 필드를 모두 준비해 둡니다.
+                  JavaScript가 선택된 유형에 따라 적절한 히든 필드에 PK 값을 채워 넣을 겁니다.
+                -->
+					<input type="hidden" id="targetContentId" name="dclrTrgtContsId">
+					<input type="hidden" id="targetUserId" name="dclrTrgtUserNo">
 				</div>
 
-				<div id="userReportFields" class="form-group full-width">
-					<div class="form-field full-width">
-						<label for="targetUserId" class="required">신고 대상 사용자
-							ID/닉네임</label> <input type="text" id="targetUserId" name="targetUserId"
-							placeholder="신고할 사용자의 ID 또는 닉네임을 입력하세요.">
-					</div>
-				</div>
-
+				<!-- 신고 사유, 상세 내용, 첨부 파일, 버튼 등 나머지 부분은 그대로 유지합니다. -->
 				<div class="form-field full-width">
 					<label for="reportReason" class="required">신고 사유</label> <select
-						id="reportReason" name="reportReason" required>
+						id="reportReason" name="dclrRsnCd" class="form-control" required>
 						<option value="">-- 신고 사유를 선택하세요 --</option>
 					</select>
-
 				</div>
+
 				<div class="form-group full-width">
 					<div class="form-field full-width">
 						<label for="detailReason" class="required">상세 신고 내용</label>
-						<textarea id="detailReason" name="detailReason" rows="6"
-							placeholder="신고 내용을 최대한 자세히 설명해주세요. (예: 어떤 내용이 문제인지, 언제 발생했는지 등)"></textarea>
+						<textarea id="detailReason" name="dtlDclrRsnCn" rows="6"
+							placeholder="신고 내용을 최대한 자세히 설명해주세요."></textarea>
 					</div>
 				</div>
 
 				<div id="fileAttachmentField" class="form-group full-width">
 					<div class="form-field full-width">
-						<label for="evidenceFile">첨부 파일 (선택)</label> <input type="file"
-							id="evidenceFile" name="evidenceFile" accept="image/*, .pdf">
-						<small style="color: #888; display: block; margin-top: 5px;">스크린샷
-							등 관련 증거 자료를 첨부해주세요. (이미지, PDF 파일만 허용)</small>
+						<!-- [★임의로 수정한 부분★] 사용자의 편의를 위해 안내 문구를 수정했습니다. -->
+						<label for="evidenceFile">첨부 파일 (선택, 여러 개 가능)</label>
+
+						<!-- 
+          [★임의로 수정한 부분★] 
+          - accept 속성을 "image/*"로 변경하여 이미지 파일만 선택하도록 유도합니다.
+          - multiple 속성은 이전에 추가한 그대로 유지합니다.
+        -->
+						<input type="file" id="evidenceFile" name="evidenceFile"
+							accept="image/*" multiple>
+
+						<!-- [★임의로 추가한 부분★] 선택된 이미지의 미리보기가 표시될 빈 컨테이너입니다. -->
+						<div id="imagePreview" class="image-preview-container"></div>
+
+						<small style="color: #888; display: block; margin-top: 5px;">
+							스크린샷 등 관련 증거 자료를 첨부해주세요. (Ctrl 키를 누른 채로 여러 개 선택 가능)<br> ※ 개별
+							파일 50MB, 총 용량 100MB를 초과할 수 없습니다.
+						</small>
 					</div>
 				</div>
 
@@ -96,90 +125,231 @@
 		</div>
 	</div>
 
+	<!-- 
+  [핵심 변경점 2]
+  페이지의 어딘가(보통은 닫는 </th:block> 태그 바로 앞)에, 검색 모달 창의 HTML 구조를 추가합니다.
+  이 모달은 평소에는 보이지 않다가, '대상 찾기' 버튼을 누르면 화면 위에 나타납니다.
+-->
+	<div class="modal fade" id="searchModal" tabindex="-1"
+		aria-labelledby="searchModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="searchModalLabel">대상 검색</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="input-group mb-3">
+						<input type="text" id="searchInput" class="form-control"
+							placeholder="검색어를 입력하세요...">
+						<button class="btn btn-primary" type="button"
+							id="executeSearchBtn">검색</button>
+					</div>
+					<div id="searchResults">
+						<!-- 검색 결과가 여기에 동적으로 표시됩니다. -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </th:block>
 
-
-<th:block layout:fragment="jsFile">
-</th:block>
 
 <th:block layout:fragment="jsScript">
 	<script th:inline="javascript">
 	/*<![CDATA[*/
 	document.addEventListener('DOMContentLoaded', function() {
 		
+		// [신규] 취소 버튼 기능 구현
+		const cancelBtn = document.querySelector('.cancel-btn'); // 클래스로 버튼을 찾습니다.
 
-	    const alertMessage = /*[[${alertMessage}]]*/ null;
-	    const redirectUri = /*[[${redirectUri}]]*/ null;
-
-	    if (alertMessage) {
-	        Swal.fire({
-	            title: '접근 불가',
-	            text: alertMessage,
-	            icon: 'warning',
-	            confirmButtonText: '확인'
-	        }).then(() => {
-	            if (redirectUri) {
-	                window.location.href = redirectUri;
-	            }
-	        });
-	        return; // 아래의 다른 스크립트들이 실행되지 않도록 여기서 함수 종료
-	    }
-		
-	    // 주요 DOM 요소 선택
+		if (cancelBtn) { // 버튼이 존재하는지 항상 확인하는 것이 안전합니다.
+		    cancelBtn.addEventListener('click', function() {
+		        
+		        // 사용자가 정말로 취소할 것인지 한번 더 물어봅니다.
+		        Swal.fire({
+		            title: '작성을 취소하시겠어요?',
+		            text: "작성 중인 내용은 저장되지 않습니다.",
+		            icon: 'warning',
+		            showCancelButton: true,
+		            confirmButtonColor: '#3085d6',
+		            cancelButtonColor: '#d33',
+		            confirmButtonText: '네, 취소할게요',
+		            cancelButtonText: '아니요, 계속 작성할래요'
+		        }).then((result) => {
+		            // 만약 사용자가 '네, 취소할게요' 버튼을 눌렀다면,
+		            if (result.isConfirmed) {
+		                // history.back() : 브라우저의 '뒤로가기' 버튼을 누른 것과 똑같은 효과를 냅니다.
+		                history.back();
+		            }
+		        });
+		    });
+		}
+	
+	    // ===================================================================
+	    // 1. 기본 요소 선택 (변경 없음)
+	    // ===================================================================
+	    const reportForm = document.getElementById('reportForm');
 	    const reportTypeSelect = document.getElementById('reportType');
 	    const reportReasonSelect = document.getElementById('reportReason');
-	    const contentReportFields = document.getElementById('contentReportFields');
-	    const userReportFields = document.getElementById('userReportFields');
-	    const reportForm = document.getElementById('reportForm');
+	    const targetSearchField = document.getElementById('targetSearchField');
+	    const targetSearchLabel = document.getElementById('targetSearchLabel');
+	    const targetDisplayName = document.getElementById('targetDisplayName');
+	    const searchTargetBtn = document.getElementById('searchTargetBtn');
+	    const targetContentIdInput = document.getElementById('targetContentId');
+	    const targetUserIdInput = document.getElementById('targetUserId');
+	    const searchModal = new bootstrap.Modal(document.getElementById('searchModal'));
+	    const searchModalLabel = document.getElementById('searchModalLabel');
+	    const searchInput = document.getElementById('searchInput');
+	    const executeSearchBtn = document.getElementById('executeSearchBtn');
+	    const searchResultsContainer = document.getElementById('searchResults');
+	    const evidenceFileInput = document.getElementById('evidenceFile');
+	    const imagePreviewContainer = document.getElementById('imagePreview');
 	    
-	    // Thymeleaf를 통해 세션의 userNo를 JavaScript 변수로 저장
-	    const loggedInUserNo = /*[[${session.loginUser.userNo}]]*/ null;
-
-	    // --- 여기부터 추가된 부분 ---
-
-	    // [페이지 로드 시 실행] 신고 대상 유형 목록을 동적으로 불러오기
-	    // 서버에서 받은 ["POST", "COMMENT", "PRODUCT", "USER"] 같은 배열을 옵션으로 만듦
-	    fetch('/api/customer/reports/target-types')
-	        .then(response => response.json())
-	        .then(types => {
-	            // 임시로 한글 이름을 매핑하는 객체 (실제로는 DB에 이름 컬럼이 있는 것이 더 좋음)
-	            const typeNames = {
-	                'POST': '게시글',
-	                'COMMENT': '댓글',
-	                'PRODUCT': '상품',
-	                'USER': '사용자 계정'
-	            };
-
-	            types.forEach(type => {
-	                const option = document.createElement('option');
-	                option.value = type; // 예: "PRODUCT"
-	                option.textContent = typeNames[type] || type; // 한글 이름이 있으면 보여주고, 없으면 그냥 코드값 보여줌
-	                reportTypeSelect.appendChild(option);
-	            });
+	    let currentSearchType = '';
+	
+	    // [신규] 사용자가 선택한 파일들을 관리할 배열 (진짜 파일 목록)
+	    let attachedFiles = [];
+	
+	    // ===================================================================
+	    // 2. 페이지 초기화 로직 (변경 없음)
+	    // ===================================================================
+	    fetch('/api/customer/reports/check-auth')
+	        .then(response => {
+	            if (response.status === 401) {
+	                Swal.fire({
+	                    icon: 'warning', title: '로그인 필요', text: '신고 기능은 로그인 후 이용 가능합니다.', confirmButtonText: '확인'
+	                }).then(() => { window.location.href = '/'; });
+	                throw new Error('Not Authenticated');
+	            }
+	            console.log("사용자 인증 완료. 페이지 기능을 활성화합니다.");
 	        })
-	        .catch(error => console.error('신고 대상 유형 목록 로딩 실패:', error));
+	        .catch(error => {
+	            console.error(error.message);
+	        });
+	
+	    // ===================================================================
+	    // 3. 핵심 이벤트 리스너 (파일 첨부 로직 변경)
+	    // ===================================================================
+	
+	    // [유지] '신고 대상 유형' 드롭다운 변경 시 이벤트 처리
+	    reportTypeSelect.addEventListener('change', function() {
+	        // ... (기존 코드와 동일, 변경 없음)
+	        const selectedType = this.value;
+	        currentSearchType = selectedType;
+	        targetDisplayName.value = '';
+	        targetContentIdInput.value = '';
+	        targetUserIdInput.value = '';
+	        updateReportReasons('');
+	        if (selectedType) {
+	            targetSearchField.style.display = 'block';
+	            let labelText = '신고할 ';
+	            let placeholderText = '오른쪽 버튼을 눌러 ';
+	            switch (selectedType) {
+	                case 'POST':    labelText += '게시글'; placeholderText += '게시글을 찾아주세요.'; break;
+	                case 'COMMENT': labelText += '댓글';   placeholderText += '댓글을 찾아주세요.'; break;
+	                case 'PRODUCT': labelText += '상품';   placeholderText += '상품을 찾아주세요.'; break;
+	                case 'USER':    labelText += '사용자';  placeholderText += '사용자를 찾아주세요.'; break;
+	            }
+	            targetSearchLabel.textContent = labelText;
+	            targetDisplayName.placeholder = placeholderText;
+	            updateReportReasons(selectedType);
+	        } else {
+	            targetSearchField.style.display = 'none';
+	        }
+	    });
+	
+	    // [유지] "대상 찾기" 버튼 클릭 및 검색 로직 (변경 없음)
+	    searchTargetBtn.addEventListener('click', function() {
+	        searchModalLabel.textContent = `${targetSearchLabel.textContent} 검색`;
+	        searchInput.value = '';
+	        searchResultsContainer.innerHTML = '';
+	        searchModal.show();
+	    });
+	    function executeSearch() {
+	        // ... (기존 코드와 동일, 변경 없음)
+	        const keyword = searchInput.value.trim();
+	        if (keyword === '') { Swal.fire('알림', '검색어를 입력해주세요.', 'info'); return; }
+	        searchResultsContainer.innerHTML = '<p>검색 중...</p>';
+	        let searchApiUrl = '/api/reports-value-search/';
+	        switch (currentSearchType) {
+	            case 'POST':    searchApiUrl += 'posts'; break;
+	            case 'COMMENT': searchApiUrl += 'comments'; break;
+	            case 'PRODUCT': searchApiUrl += 'products'; break;
+	            case 'USER':    searchApiUrl += 'users'; break;
+	            default: searchResultsContainer.innerHTML = '<p class="text-danger">검색 유형이 선택되지 않았습니다.</p>'; return;
+	        }
+	        searchApiUrl += `?keyword=${encodeURIComponent(keyword)}`;
+	        fetch(searchApiUrl)
+	            .then(response => {
+	                if (!response.ok) throw new Error(`서버 응답 오류: ${response.statusText}`);
+	                return response.json();
+	            })
+	            .then(results => { renderSearchResults(results); })
+	            .catch(error => { searchResultsContainer.innerHTML = `<p class="text-danger">검색 중 오류가 발생했습니다: ${error.message}</p>`; });
+	    }
+	    executeSearchBtn.addEventListener('click', executeSearch);
+	    searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); executeSearch(); } });
 	    
-	    
+	    /**
+	     * '선택' 버튼 클릭 시, 올바른 ID를 폼에 반영하는 이벤트 리스너
+	     */
+	    searchResultsContainer.addEventListener('click', function(event) {
+	        const selectBtn = event.target.closest('.select-target-btn');
+	        if (!selectBtn) return;
 
-	    // --- 여기까지 추가된 부분 ---
+	        const name = selectBtn.dataset.name;
+	        targetDisplayName.value = name;
 
-
-	    // 초기 상태: 입력 필드 숨기기
-	    contentReportFields.style.display = 'none';
-	    userReportFields.style.display = 'none';
-
-	    // 함수: 신고 사유 목록을 서버에서 가져와 업데이트
+	        if (currentSearchType === 'USER') {
+	            // ★ 3. '사용자' 신고일 경우, data-id 대신 data-user-no에 저장된 값을 사용합니다.
+	            const userNo = selectBtn.dataset.userNo;
+	            targetUserIdInput.value = userNo;
+	            targetContentIdInput.value = ''; // 다른 input은 비웁니다.
+	        } else {
+	            // 그 외(콘텐츠) 신고일 경우, 기존처럼 data-id 값을 사용합니다.
+	            const id = selectBtn.dataset.id;
+	            targetContentIdInput.value = id;
+	            targetUserIdInput.value = ''; // 다른 input은 비웁니다.
+	        }
+	        searchModal.hide();
+	    });
+	
+	    // [최종 수정] 파일 첨부 및 미리보기 삭제 관련 로직 전체
+	    evidenceFileInput.addEventListener('change', function(event) {
+	        const selectedFiles = event.target.files;
+	        attachedFiles = Array.from(selectedFiles);
+	        renderPreviews();
+	    });
+	
+	    imagePreviewContainer.addEventListener('click', function(event) {
+	        const deleteBtn = event.target.closest('.delete-preview-btn');
+	        if (!deleteBtn) return;
+	        
+	        const fileNameToDelete = deleteBtn.dataset.filename;
+	        attachedFiles = attachedFiles.filter(file => file.name !== fileNameToDelete);
+	        
+	        renderPreviews();
+	        updateFileInput();
+	    });
+	
+	
+	    // ===================================================================
+	    // 4. 유틸리티 함수 및 폼 제출 (신규 함수 추가)
+	    // ===================================================================
+	
+	    // [유지] 신고 사유 목록을 서버에서 가져와 업데이트하는 함수
 	    function updateReportReasons(targetType) {
-	        // ... (이 부분은 변경 없음)
+	        // ... (기존 코드와 동일, 변경 없음)
 	        while (reportReasonSelect.options.length > 1) {
 	            reportReasonSelect.remove(1);
 	        }
 	        if (!targetType) return;
 	        fetch(`/api/customer/reports/reasons/${targetType}`)
 	            .then(response => {
-	                if (!response.ok) {
-	                    throw new Error('서버에서 신고 사유를 불러오는데 실패했습니다.');
-	                }
+	                if (!response.ok) throw new Error('서버에서 신고 사유를 불러오는데 실패했습니다.');
 	                return response.json();
 	            })
 	            .then(reasons => {
@@ -195,43 +365,108 @@
 	                Swal.fire('오류', '신고 사유 목록을 불러올 수 없습니다.', 'error');
 	            });
 	    }
+	    
+	    /**
+	     * 검색 결과를 HTML로 그려주는 함수
+	     */
+	    function renderSearchResults(results) {
+	        const limit = 50;
+	        if (!results || results.length === 0) {
+	            searchResultsContainer.innerHTML = '<p>검색 결과가 없습니다.</p>';
+	            return;
+	        }
 
-	    // 이벤트 리스너: 신고 대상 유형 변경 시
-	    reportTypeSelect.addEventListener('change', function() {
-	        // ... (이 부분은 변경 없음)
-	        const selectedValue = this.value;
-	        userReportFields.style.display = (selectedValue === 'USER') ? 'block' : 'none'; // 'user_account' -> 'USER'
-	        contentReportFields.style.display = (selectedValue && selectedValue !== 'USER') ? 'block' : 'none'; // 'user_account' -> 'USER'
-	        updateReportReasons(selectedValue);
-	    });
+	        let html = '<ul class="list-group">';
+	        
+	        results.forEach(item => {
+	            const id = item.id;
+	            const name = item.name;
+	            const detail = item.detail;
+	            const userNo = item.userNo; 
 
-	    // 이벤트 리스너: 폼 제출 시
-	    reportForm.addEventListener('submit', function(event) {
-	        // ... (이 부분은 변경 없음)
-	        event.preventDefault(); 
-	        console.log('1. "신고 접수" 버튼 클릭 이벤트 감지 성공!'); 
-	        try {
-	            const reportData = {
-	                dclrUserNo: loggedInUserNo,
-	                dclrTrgtTypeCd: reportTypeSelect.value,
-	                dclrRsnCd: reportReasonSelect.value,
-	                dtlDclrRsnCn: document.getElementById('detailReason').value,
-	                dclrTrgtUserNo: (reportTypeSelect.value === 'USER') ? document.getElementById('targetUserId').value : null, // 'user_account' -> 'USER'
-	                dclrTrgtContsId: (reportTypeSelect.value && reportTypeSelect.value !== 'USER') ? document.getElementById('targetContentId').value : null // 'user_account' -> 'USER'
+	            // ★★★ [최종 수정] 버튼 태그의 속성과 텍스트를 명확히 분리합니다. ★★★
+	            html += `
+	                <li class="list-group-item d-flex justify-content-between align-items-center">
+	                    <div>
+	                        <strong>${name}</strong>
+	                        <small class="text-muted d-block">${detail || ''}</small>
+	                    </div>
+	                    <button 
+	                        type="button" 
+	                        class="btn btn-sm btn-outline-primary select-target-btn" 
+	                        data-id="${id}" 
+	                        data-name="${name}" 
+	                        data-user-no="${userNo || ''}"
+	                    >선택</button>
+	                </li>`;
+	        });
+
+	        html += '</ul>';
+
+	        if (results.length === limit) {
+	            html += '<p class="text-muted text-center mt-2 small">결과가 너무 많습니다. 더 구체적인 검색어로 결과를 좁혀보세요.</p>';
+	        }
+	        
+	        searchResultsContainer.innerHTML = html;
+	    }
+
+	
+	    // [신규] 관리 중인 파일 목록(attachedFiles)을 기준으로 미리보기를 그리는 함수
+	    function renderPreviews() {
+	        imagePreviewContainer.innerHTML = '';
+	        attachedFiles.forEach(file => {
+	            if (!file.type.startsWith('image/')) return;
+	            
+	            const reader = new FileReader();
+	            reader.onload = function(e) {
+	                const previewItem = document.createElement('div');
+	                previewItem.classList.add('preview-item');
+	                
+	                const img = document.createElement('img');
+	                img.src = e.target.result;
+	                img.classList.add('image-preview-thumbnail');
+	                
+	                const deleteBtn = document.createElement('button');
+	                deleteBtn.type = 'button';
+	                deleteBtn.classList.add('delete-preview-btn');
+	                deleteBtn.textContent = 'X';
+	                deleteBtn.dataset.filename = file.name;
+	                
+	                previewItem.appendChild(img);
+	                previewItem.appendChild(deleteBtn);
+	                imagePreviewContainer.appendChild(previewItem);
 	            };
-	            console.log('2. 전송할 데이터 수집 완료:', reportData);
-	            console.log('3. fetch API 호출 직전');
+	            reader.readAsDataURL(file);
+	        });
+	    }
+	
+	    // [신규] "진짜 파일 목록"(attachedFiles)을 실제 <input type="file">에 동기화하는 함수
+	    function updateFileInput() {
+	        const dataTransfer = new DataTransfer();
+	        attachedFiles.forEach(file => {
+	            dataTransfer.items.add(file);
+	        });
+	        evidenceFileInput.files = dataTransfer.files;
+	    }
+	
+	    // [유지] 폼 제출 시 이벤트 리스너
+	    reportForm.addEventListener('submit', function(event) {
+	        // ... (기존 코드와 동일, 변경 없음)
+	        event.preventDefault();
+	        if (reportTypeSelect.value === '') { Swal.fire('입력 필요', '신고 대상 유형을 선택해주세요.', 'warning'); return; }
+	        const targetId = (reportTypeSelect.value === 'USER') ? targetUserIdInput.value : targetContentIdInput.value;
+	        if (targetId === '') { Swal.fire('입력 필요', '신고할 대상을 찾아 선택해주세요.', 'warning'); return; }
+	        if (reportReasonSelect.value === '') { Swal.fire('입력 필요', '신고 사유를 선택해주세요.', 'warning'); return; }
+	        const detailReason = document.getElementById('detailReason').value.trim();
+	        if (detailReason.length < 10) { Swal.fire('입력 필요', '상세 내용을 10자 이상 입력해주세요.', 'warning'); return; }
+	
+	        try {
+	            const formData = new FormData(reportForm);
 	            fetch('/api/customer/reports', {
-	                method: 'POST',
-	                headers: { 'Content-Type': 'application/json' },
-	                body: JSON.stringify(reportData)
+	                method: 'POST', body: formData
 	            })
-	            .then(response => {
-	                console.log('4. 서버로부터 응답 받음');
-	                return response.json();
-	            })
+	            .then(response => response.json())
 	            .then(result => {
-	                console.log('5. 최종 결과 처리:', result);
 	                if (result.success) {
 	                    Swal.fire({ title: '접수 완료', text: result.message, icon: 'success' })
 	                        .then(() => { window.location.href = '/customer/myReports'; });
@@ -240,17 +475,15 @@
 	                }
 	            })
 	            .catch(error => {
-	                console.error('6. Fetch 에러 발생:', error);
+	                console.error('Fetch 에러 발생:', error);
 	                Swal.fire('네트워크 오류', '서버와 통신 중 문제가 발생했습니다.', 'error');
 	            });
-
 	        } catch (e) {
-	            console.error('7. 데이터 수집 중 심각한 에러 발생:', e);
+	            console.error('데이터 수집 중 심각한 에러 발생:', e);
 	        }
 	    });
 	});
 	/*]]>*/
 </script>
 </th:block>
-
 </html>

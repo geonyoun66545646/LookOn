@@ -77,3 +77,130 @@
 .edit-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .edit-actions button { border: 1px solid #dbdbdb; background-color: #fff; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; line-height: normal; }
 .edit-actions .save-edit-btn { background-color: #0095f6; color: white; border-color: #0095f6; }
+
+
+/* =================================================== */
+/*             [신규 추가] 팔로우 기능 관련 CSS           */
+/* =================================================== */
+
+/* 팔로우/팔로잉 링크 공통 스타일 */
+.follow-link, .following-link {
+    font-weight: 550; /* 폰트 굵기 */
+    margin-left: 8px; /* 닉네임과의 간격 */
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* '팔로우' 링크 스타일 */
+.follow-link {
+    color: deepskyblue; /* 인스타그램의 파란색과 유사 */
+}
+
+/* '팔로잉' 링크 스타일 */
+.following-link {
+    color: deepskyblue; /* 기본 텍스트 색상 */
+}
+/* 1. '팔로잉' 버튼에 마우스를 올렸을 때 변화 없애기 */
+.following-link:hover {
+    color: deepskyblue; /* 원래 색상과 동일하게 설정 */
+    text-decoration: none; /* 밑줄 등 장식 제거 */
+}
+
+/* 2. '팔로우' 버튼에 마우스를 올렸을 때 변화 없애기 */
+.follow-link:hover {
+    color: deepskyblue; /* 원래 색상과 동일하게 설정 */
+    text-decoration: none; /* 밑줄 등 장식 제거 */
+}
+/* 언팔로우 모달 관련 스타일 */
+.unfollow-modal-content {
+    border-radius: 12px;
+}
+.unfollow-modal-content .modal-body {
+    text-align: center;
+    padding: 32px 16px 16px;
+}
+.unfollow-profile img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 16px;
+    display: inline-block;
+}
+.unfollow-modal-content .modal-footer {
+    border-top: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+.unfollow-modal-content .modal-footer button {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #dbdbdb;
+    padding: 14px 8px;
+    margin: 0;
+    background-color: transparent;
+    font-weight: normal;
+    font-size: 14px;
+}
+.unfollow-modal-content .modal-footer .btn-danger {
+    color: #ed4956; /* 빨간색 텍스트 */
+    font-weight: 700;
+}
+.unfollow-modal-content .modal-footer .btn-secondary {
+    color: #262626;
+}
+
+/* =================================================== */
+/*        [신규 추가] 게시물 옵션 모달 관련 CSS           */
+/* =================================================== */
+
+/* '...' 옵션 버튼 스타일 */
+.options-menu-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+}
+
+/* 모달 창의 전체적인 디자인 */
+.options-modal-content {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: none;
+}
+
+/* 모달 메뉴 목록(ul)의 기본 스타일 초기화 */
+#feed-options-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+/* 모달 메뉴 항목(li) 각각의 스타일 */
+#feed-options-list li {
+    padding: 14px 8px;
+    font-size: 14px;
+    text-align: center;
+    border-top: 1px solid #dbdbdb; /* 메뉴 구분선 */
+    cursor: pointer;
+    background-color: transparent;
+    transition: background-color 0.2s;
+}
+
+/* 첫 번째 메뉴는 위쪽 구분선 제거 */
+#feed-options-list li:first-child {
+    border-top: none;
+}
+
+/* 마우스를 올렸을 때 약간의 배경색 변경 */
+#feed-options-list li:hover {
+    background-color: #f9f9f9;
+}
+
+/* '삭제', '신고', '팔로우 취소' 등 위험/중요 메뉴 스타일 */
+#feed-options-list li.text-danger b {
+    color: #ed4956; /* 빨간색 텍스트 */
+    font-weight: 700; /* 굵은 글씨 */
+}

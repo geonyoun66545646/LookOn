@@ -1,44 +1,44 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>룩온 카테고리 필터 모달</title>
+<meta charset="UTF-8">
+<title>룩온 카테고리 필터 모달</title>
 </head>
 <body>
 
-    <div class="lookon-modal-container" id="category-modal" th:fragment="categoryFilterModalFragment">
-        <div class="lookon-modal-content">
-            <button class="lookon-close-button" id="close-category-modal">×</button>
-            
-            <header class="lookon-category-header">
-                <ul class="lookon-main-tabs">
-                    <li class="active"><a>카테고리</a></li>
-                </ul>
-                <div class="lookon-mobile-nav-links">
-                    <a href="#">베스트</a>
-                    <a href="#">세일</a>
-                    <a href="#">신상</a>
-                    <a href="#">커뮤니티</a>
-                    <a href="#">피드</a>
-                </div>
-            </header>
+	<div class="lookon-modal-container" id="category-modal"
+		th:fragment="categoryFilterModalFragment">
+		<div class="lookon-modal-content">
+			<button class="lookon-close-button" id="close-category-modal">×</button>
 
-            <div class="lookon-category-body">
-                <aside class="lookon-main-category-list">
-                    <ul>
-                        </ul>
-                </aside>
-                <main class="lookon-sub-category-grid">
-                    <div class="lookon-sub-category-header">
-                        <h2>카테고리를 선택해주세요</h2> 
-                        <a href="#" class="lookon-store-link">스토어 가기</a>
-                    </div>
-                    <div class="lookon-grid-items">
-                        </div>
-                </main>
-            </div>
-        </div>
-    </div>
+			<header class="lookon-category-header">
+				<!-- ⭐ ul 태그 하나로 통합합니다. ⭐ -->
+				<ul class="lookon-main-tabs">
+					<li class="active"><a>카테고리</a></li>
+					<!-- ⭐ 여기에 직접 링크를 추가합니다. ⭐ -->
+					<li><a th:href="@{/customer/products}">전체상품</a></li>
+					<li><a th:href="@{/customer/products(type='sale')}">할인</a></li>
+					<li><a th:href="@{/customer/products(type='new-products')}">신상</a></li>
+					<li><a th:href="@{/customer/post/postList}">커뮤니티</a></li>
+					<li><a th:href="@{/customer/feed/feedList}">피드</a></li>
+				</ul>
+			</header>
+
+			<div class="lookon-category-body">
+				<aside class="lookon-main-category-list">
+					<ul>
+					</ul>
+				</aside>
+				<main class="lookon-sub-category-grid">
+					<div class="lookon-sub-category-header">
+						<h2>카테고리를 선택해주세요</h2>
+						<!-- <a href="#" class="lookon-store-link">스토어 가기</a> -->
+					</div>
+					<div class="lookon-grid-items"></div>
+				</main>
+			</div>
+		</div>
+	</div>
 
 </body>
 </html>

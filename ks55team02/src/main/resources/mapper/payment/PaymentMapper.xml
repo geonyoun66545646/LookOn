@@ -3,9 +3,9 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
-<mapper namespace="ks55team02.tossApi.mapper.PaymentMapper">
+<mapper namespace="ks55team02.tossapi.mapper.PaymentMapper">
 
-	<resultMap type="ks55team02.tossApi.domain.PaymentDTO" id="paymentResultMap">
+	<resultMap type="ks55team02.tossapi.domain.PaymentDTO" id="paymentResultMap">
         <id     column="stlm_id"        property="stlmId"/>
         <result column="ordr_no"        property="ordrNo"/>
         <result column="user_no"        property="userNo"/>
@@ -18,7 +18,7 @@
         <result column="stlm_dmnd_dt"   property="stlmDmndDt"/>
     </resultMap>
     
-    <resultMap type="ks55team02.tossApi.domain.PayOrderDTO" id="payorderResultMap">
+    <resultMap type="ks55team02.tossapi.domain.PayOrderDTO" id="payorderResultMap">
         <id     column="ordr_no"        	property="ordrNo"/>
         <result column="user_no"        	property="userNo"/>
         <result column="ordr_dt"        	property="ordrDt"/>
@@ -39,7 +39,7 @@
     </resultMap>
     
     <!-- <<<<<<<<< [추가됨] OrderItemsDTO에 대한 resultMap >>>>>>>>> -->
-    <resultMap type="ks55team02.tossApi.domain.PayOrderItemsDTO" id="payorderItemsResultMap">
+    <resultMap type="ks55team02.tossapi.domain.PayOrderItemsDTO" id="payorderItemsResultMap">
         <id     column="ordr_dtl_artcl_no"  property="ordrDtlArtclNo"/>
         <result column="ordr_no"            property="ordrNo"/>
         <result column="opt_no"             property="optNo"/>
@@ -112,7 +112,7 @@
     <!-- <<<<<<<<< [위치변경 및 추가] ID 생성 쿼리 섹션 끝 >>>>>>>>> -->
 
     <!-- <<<<<<<<< [위치변경 및 추가] 주문 (Orders) 관련 쿼리 섹션 >>>>>>>>> -->
-    <insert id="insertOrder" parameterType="ks55team02.tossApi.domain.PayOrderDTO">
+    <insert id="insertOrder" parameterType="ks55team02.tossapi.domain.PayOrderDTO">
 	    INSERT INTO orders (
 	        ordr_no, user_no, ordr_dt, gds_tot_amt, dlvy_fee_amt, pblcn_cpn_id,
 	        user_cpn_id, apld_cpn_dscnt_amt, last_stlm_amt, ordr_stts_cd,
@@ -190,7 +190,7 @@
     <!-- <<<<<<<<< [위치변경 및 추가] 주문 (Orders) 관련 쿼리 섹션 끝 >>>>>>>>> -->
 
     <!-- <<<<<<<<< [위치변경 및 추가] 결제 (Payments) 관련 쿼리 섹션 >>>>>>>>> -->
-	<insert id="insertPayment" parameterType="ks55team02.tossApi.domain.PaymentDTO">
+	<insert id="insertPayment" parameterType="ks55team02.tossapi.domain.PaymentDTO">
         INSERT INTO payments (
             stlm_id, ordr_no, user_no, stlm_mthd_cd, stlm_amt, 
             stlm_stts_cd, pg_dlng_id, pg_co_info, stlm_cmptn_dt, stlm_dmnd_dt
@@ -200,7 +200,7 @@
         )
     </insert>
 
-    <insert id="insertPaymentHistory" parameterType="ks55team02.tossApi.domain.PaymentHistoryDTO">
+    <insert id="insertPaymentHistory" parameterType="ks55team02.tossapi.domain.PaymentHistoryDTO">
         INSERT INTO payments_history (
             stlm_hstry_id, stlm_id, hstry_crt_dt, hstry_mdfcn_dt
         ) VALUES (

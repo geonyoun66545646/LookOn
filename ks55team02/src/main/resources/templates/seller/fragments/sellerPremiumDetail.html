@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{seller/layout/layout_main}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>구독권 상세화면</title>
+<link
+	href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/premiumCheckout.css}"> <!-- 결제 화면 CSS 재활용 -->
+<link rel="stylesheet" th:href="@{/admincss/assets/css/customadminpagecss/userList.css}">
+<style>
+    /* 상세 페이지에 필요한 추가 CSS */
+    body {
+        background-color: #f0f2f5; /* 전체적인 배경색을 좀 더 부드럽게 */
+    }
+    .detail-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        font-family: 'Noto Sans KR', sans-serif;
+        display: flex; /* 내부 요소 정렬을 위해 flexbox 사용 */
+        flex-direction: column; /* 세로 방향으로 정렬 */
+        gap: 25px; /* 섹션 간 간격 추가 */
+    }
+    .detail-header {
+        text-align: center;
+        margin-bottom: 10px; /* 섹션 간 gap으로 대체되므로 마진 줄임 */
+    }
+    .detail-header h1 {
+        font-size: 2.5em;
+        color: #333;
+        margin-bottom: 8px; /* 간격 조정 */
+    }
+    .detail-header p {
+        font-size: 1.1em;
+        color: #666;
+    }
+    .detail-info-grid {
+        display: grid;
+        /* ⭐ 남은 2개 항목(가격, 기간)이 나란히 배치되도록 2컬럼으로 변경 ⭐ */
+        grid-template-columns: 1fr 1fr; /* 2개의 동일한 너비 컬럼 */
+        gap: 20px; /* 그리드 항목 간 간격 */
+        margin-bottom: 0; /* 컨테이너 gap으로 대체 */
+    }
+    .detail-info-item {
+        background-color: #f9f9f9;
+        padding: 18px 22px; /* 패딩 약간 늘림 */
+        border-radius: 10px; /* 모서리 더 둥글게 */
+        border: 1px solid #eee;
+        display: flex; /* 내부 텍스트 정렬을 위해 flexbox 사용 */
+        flex-direction: column;
+        justify-content: center; /* 세로 중앙 정렬 */
+        align-items: flex-start; /* 왼쪽 정렬 */
+    }
+    .detail-info-item strong {
+        display: block;
+        font-size: 0.95em; /* 폰트 크기 약간 키움 */
+        color: #555;
+        margin-bottom: 6px; /* 간격 조정 */
+    }
+    .detail-info-item span {
+        font-size: 1.2em; /* 폰트 크기 약간 키움 */
+        color: #333;
+        font-weight: 600; /* 폰트 두께 강조 */
+    }
+    .detail-description {
+        background-color: #f9f9f9;
+        padding: 25px; /* 패딩 늘림 */
+        border-radius: 10px; /* 모서리 더 둥글게 */
+        border: 1px solid #eee;
+        margin-bottom: 0; /* 컨테이너 gap으로 대체 */
+    }
+    .detail-description h3 {
+        font-size: 1.4em; /* 폰트 크기 약간 키움 */
+        color: #333;
+        margin-bottom: 18px; /* 간격 조정 */
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 12px; /* 패딩 조정 */
+    }
+    .detail-description p {
+        font-size: 1.05em; /* 폰트 크기 약간 키움 */
+        line-height: 1.7; /* 줄 간격 늘림 */
+        color: #444;
+    }
+    .purchase-button-container {
+        text-align: center;
+        margin-top: 15px; /* 버튼 상단 마진 추가 */
+    }
+    .purchase-button {
+	    background: linear-gradient(45deg, #3bb77e, #4CAF50); /* 시작색 #3bb77e, 끝색 좀 더 밝은 초록색 */
+	    color: #fff;
+	    padding: 18px 25px;
+	    font-size: 1.4em;
+	    font-weight: 500;
+	    border: none;
+	    border-radius: 8px;
+	    cursor: pointer;
+	    transition: all 0.3s ease;
+	    box-shadow: 0 4px 10px rgba(59, 183, 126, 0.2); /* 그림자 색상도 변경된 배경색과 어울리게 */
+	    width: 100%;
+	    margin-top: 40px;
+}
+
+.purchase-button:hover {
+    background: linear-gradient(45deg, #4CAF50, #3bb77e); /* 호버 시 색상 반전 또는 더 진한 색으로 */
+    box-shadow: 0 6px 15px rgba(59, 183, 126, 0.3); /* 호버 시 그림자 색상도 변경 */
+    transform: translateY(-2px);
+}
+</style>
+</head>
+<body>
+	<th:block layout:fragment="contents">
+		<div class="page-container">
+			<div class="detail-container">
+				<div class="detail-header">
+					<h2 th:text="${subscriptionPlan.sbscrPlanNm}">구독 플랜 명칭</h2>
+					<p>선택하신 구독 플랜의 상세 정보를 확인하세요.</p>
+				</div>
+
+				<div class="detail-info-grid">
+					<div class="detail-info-item">
+						<strong>가격</strong>
+						<span th:text="${#numbers.formatInteger(subscriptionPlan.sbscrPlanPrc, 0, 'COMMA')} + '원'"></span>
+					</div>
+					<div class="detail-info-item">
+						<strong>기간</strong>
+						<span th:text="${subscriptionPlan.sbscrPlanTermVal} + '일'"></span>
+					</div>
+					<!-- 생성 일시 및 수정 일시 항목은 이전 요청에 따라 주석 처리 유지 -->
+				</div>
+
+				<div class="detail-description">
+					<h3>플랜 설명</h3>
+					<p th:text="${subscriptionPlan.sbscrPlanExpln}">
+						이곳은 구독 플랜에 대한 자세한 설명이 들어가는 부분입니다.
+						사용자에게 플랜의 특징, 혜택, 유의사항 등을 상세하게 안내할 수 있습니다.
+					</p>
+				</div>
+
+				<div class="purchase-button-container">			
+				    <a th:href="@{/seller/premium/checkout(
+					                   planId=${subscriptionPlan.sbscrPlanId},
+					                   planName=${subscriptionPlan.sbscrPlanNm},
+					                   amount=${subscriptionPlan.sbscrPlanPrc.intValue()}
+					               )}" class="purchase-button">
+					    구매하기
+					</a>
+				</div>
+			</div>
+		</div>
+	</th:block>
+</body>
+</html>

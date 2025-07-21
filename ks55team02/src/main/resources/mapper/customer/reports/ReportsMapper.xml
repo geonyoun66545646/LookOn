@@ -21,32 +21,19 @@
 		OR dclr_trgt_type_cd = 'ALL')
 	</select>
 
-	<!-- 신고 접수 (INSERT) - 실제 DB 컬럼 순서에 맞게 수정 -->
+	<!-- 신고 접수 -->
 	<insert id="addReport"
 		parameterType="ks55team02.customer.reports.domain.Reports">
 		INSERT INTO reports
-		(
-		dclr_id,
-		dclr_user_no,
-		dclr_rsn_cd,
-		dclr_trgt_user_no,
-		dclr_trgt_conts_id,
-		dtl_dclr_rsn_cn,
-		prcs_stts_cd,
-		dclr_trgt_type_cd
-		)
+		(dclr_id, dclr_user_no, dclr_rsn_cd,
+		dclr_trgt_user_no, dclr_trgt_conts_id,
+		dtl_dclr_rsn_cn, prcs_stts_cd,
+		dclr_trgt_type_cd)
 		VALUES
-		(
-		#{dclrId},
-		#{dclrUserNo},
-		#{dclrRsnCd},
-		#{dclrTrgtUserNo},
-		#{dclrTrgtContsId},
-		#{dtlDclrRsnCn},
-		'RECEIVED',  <!-- 처리 
-			상태는 'RECEIVED'로 고정 -->
-		#{dclrTrgtTypeCd}
-		)
+		(#{dclrId}, #{dclrUserNo}, #{dclrRsnCd},
+		#{dclrTrgtUserNo}, #{dclrTrgtContsId},
+		#{dtlDclrRsnCn}, 'RECEIVED',
+		#{dclrTrgtTypeCd})
 	</insert>
 
 	<!-- 가장 마지막 신고 ID 조회 -->
@@ -55,12 +42,166 @@
 		FROM reports
 	</select>
 
-	<!-- 신고 대상 유형 목록 조회 (중복 제거) -->
+	<!-- 신고 대상 유형 목록 조회 -->
 	<select id="getReportTargetTypeList" resultType="String">
-		SELECT DISTINCT dclr_trgt_type_cd
+		SELECT DISTINCT
+		dclr_trgt_type_cd
 		FROM report_reasons
 		WHERE dclr_trgt_type_cd != 'ALL'
 		AND actvtn_yn = 1
+	</select>
+
+	<!-- 첨부파일 정보 저장 -->
+	<insert id="insertReportAttachment"
+		parameterType="ks55team02.customer.reports.domain.ReportAttachment">
+		INSERT INTO report_attachments
+		(file_id, dclr_id,
+		original_filename, file_path, file_size, upload_dt)
+		VALUES
+		(#{fileId},
+		#{dclrId}, #{originalFilename}, #{filePath}, #{fileSize},
+		NOW())
+	</insert>
+
+	<!-- [최종 업그레이드] 검색 조건(상세 신고 대상 포함)에 맞는 내 신고 내역의 '전체 개수'를 조회 -->
+	<select id="getTotalReportCount" resultType="long">
+		SELECT
+		COUNT(*)
+		FROM
+		reports r
+		LEFT JOIN report_reasons rr ON
+		r.dclr_rsn_cd = rr.dclr_rsn_cd
+		LEFT
+		JOIN users u ON r.dclr_trgt_user_no
+		= u.user_no
+		LEFT JOIN products p ON
+		r.dclr_trgt_conts_id = p.gds_no
+		LEFT
+		JOIN posts pst ON
+		r.dclr_trgt_conts_id = pst.pst_sn
+		LEFT JOIN
+		post_comments cmt ON
+		r.dclr_trgt_conts_id = cmt.pst_cmnt_sn
+		WHERE
+		r.dclr_user_no = #{userNo}
+		<if test="searchKeyword != null and !searchKeyword.equals('')">
+			AND (
+			rr.dclr_rsn_cn LIKE CONCAT('%', #{searchKeyword},
+			'%')
+			OR CONCAT(DATE_FORMAT(r.dclr_rcpt_dt, '%Y%m%d'), '_',
+			SUBSTRING_INDEX(r.dclr_id, '_', -1)) LIKE CONCAT('%',
+			#{searchKeyword}, '%')
+			)
+		</if>
+	</select>
+
+	<!-- 검색 및 페이지네이션 조건에 맞는 '내 신고 내역 목록'(상세 신고 대상 포함)을 조회 -->
+	<select id="getMyReportList" resultType="map">
+		SELECT
+		r.dclr_id AS dclrId,
+		r.dclr_trgt_type_cd AS dclrTrgtTypeCd,
+		CASE
+		r.dclr_trgt_type_cd
+		WHEN 'USER' THEN CONCAT(u.user_lgn_id, ' (',
+		u.user_ncnm, ')')
+		WHEN 'PRODUCT' THEN CONCAT(p.gds_nm, ' (',
+		s.store_conm, ')')
+		WHEN 'POST' THEN pst.pst_ttl
+		WHEN 'COMMENT' THEN
+		cmt.cmnt_cn
+		ELSE COALESCE(r.dclr_trgt_user_no, r.dclr_trgt_conts_id)
+		END AS targetIdentifier,
+		rr.dclr_rsn_cn AS dclrRsnCn,
+		r.dclr_rcpt_dt AS
+		dclrRcptDt,
+		r.prcs_stts_cd AS prcsSttsCd
+		FROM
+		reports r
+		LEFT JOIN
+		report_reasons rr ON r.dclr_rsn_cd = rr.dclr_rsn_cd
+		LEFT
+		JOIN users u ON
+		r.dclr_trgt_user_no = u.user_no
+		LEFT JOIN products p ON
+		r.dclr_trgt_conts_id = p.gds_no
+		LEFT JOIN stores s ON p.store_id =
+		s.store_id
+		LEFT JOIN posts pst ON r.dclr_trgt_conts_id = pst.pst_sn
+		LEFT JOIN post_comments cmt ON r.dclr_trgt_conts_id = cmt.pst_cmnt_sn
+		WHERE
+		r.dclr_user_no = #{userNo}
+		<if test="searchKeyword != null and !searchKeyword.equals('')">
+			AND (
+			rr.dclr_rsn_cn LIKE CONCAT('%', #{searchKeyword},
+			'%')
+			OR CONCAT(DATE_FORMAT(r.dclr_rcpt_dt, '%Y%m%d'), '_',
+			SUBSTRING_INDEX(r.dclr_id, '_', -1)) LIKE CONCAT('%',
+			#{searchKeyword}, '%')
+			)
+		</if>
+		ORDER BY
+		r.dclr_rcpt_dt DESC
+		LIMIT #{pageSize} OFFSET #{offset}
+	</select>
+
+	<!-- 특정 신고 1건의 상세 정보(상세 신고 대상, 관리자 답변 포함)를 조회 -->
+	<select id="getReportDetail" parameterType="String"
+		resultType="map">
+		SELECT
+		r.dclr_id AS dclrId,
+		r.dclr_user_no AS dclrUserNo,
+		r.dclr_trgt_type_cd AS dclrTrgtTypeCd,
+		CASE r.dclr_trgt_type_cd
+		WHEN 'USER' THEN CONCAT(u.user_lgn_id, ' (', u.user_ncnm, ')')
+		WHEN 'PRODUCT' THEN CONCAT(p.gds_nm, ' (', s.store_conm, ')')
+		WHEN 'POST' THEN pst.pst_ttl
+		WHEN 'COMMENT' THEN cmt.cmnt_cn
+		ELSE COALESCE(r.dclr_trgt_user_no, r.dclr_trgt_conts_id)
+		END AS targetIdentifier,
+		rr.dclr_rsn_cn AS dclrRsnCn,
+		r.dtl_dclr_rsn_cn AS dtlDclrRsnCn,
+		r.dclr_rcpt_dt AS dclrRcptDt,
+		r.prcs_stts_cd AS prcsSttsCd,
+		rh.actn_cn AS adminReply,
+		rh.prcs_dt AS processDate
+		FROM
+		reports r
+		LEFT JOIN report_reasons rr ON r.dclr_rsn_cd = rr.dclr_rsn_cd
+		LEFT
+		JOIN report_history rh ON r.dclr_id = rh.dclr_id
+		LEFT JOIN users u ON
+		r.dclr_trgt_user_no = u.user_no
+		LEFT JOIN products p ON
+		r.dclr_trgt_conts_id = p.gds_no
+		LEFT JOIN stores s ON p.store_id =
+		s.store_id
+		LEFT JOIN posts pst ON r.dclr_trgt_conts_id = pst.pst_sn
+		LEFT JOIN post_comments cmt ON r.dclr_trgt_conts_id = cmt.pst_cmnt_sn
+		WHERE
+		r.dclr_id = #{dclrId}
+	</select>
+
+	<!-- 첨부파일 객체 하나를 매핑하기 위한 resultMap -->
+	<resultMap id="attachmentResult"
+		type="ks55team02.customer.reports.domain.ReportAttachment">
+		<id property="fileId" column="file_id" />
+		<result property="originalFilename" column="original_filename" />
+		<result property="filePath" column="file_path" />
+		<result property="fileSize" column="file_size" />
+	</resultMap>
+
+	<!-- 특정 신고의 '첨부파일 목록'만 조회 -->
+	<select id="getAttachmentsByDclrId" parameterType="String"
+		resultMap="attachmentResult">
+		SELECT
+		file_id,
+		original_filename,
+		file_path,
+		file_size
+		FROM
+		report_attachments
+		WHERE
+		dclr_id = #{dclrId}
 	</select>
 
 </mapper>

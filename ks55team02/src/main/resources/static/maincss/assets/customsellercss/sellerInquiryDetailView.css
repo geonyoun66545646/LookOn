@@ -196,3 +196,9 @@ font-size: 14px;
     min-width: 100px; /* '수정 완료' 버튼의 너비에 맞춰 이 값을 조절하세요. */
     text-align: center; /* 텍스트가 이 최소 너비 안에서 가운데 정렬되도록 다시 한번 명시 */
 }
+
+#ans-button {
+    display: flex; /* d-flex가 이미 있지만, 명시적으로 flex 컨테이너임을 강조 */
+    gap: 10px; /* 버튼 사이의 간격 (원하는 값으로 조정 가능) */
+    /* 기존 justify-content-end 및 mt-3는 HTML에 있으므로 여기서 제거 */
+}

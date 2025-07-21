@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class PremiumCheckoutDTO {
+public class SellerPremiumDTO {
 	
 	private String sbscrPlanId;           // 구독 플랜 ID
     private String sbscrPlanNm;           // 구독 플랜 명칭
