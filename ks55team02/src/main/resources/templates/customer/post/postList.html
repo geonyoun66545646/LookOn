@@ -3,155 +3,56 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{customer/layout/layoutMain}">
 
-	<head>
-	    <meta name="description" content="한국스마트정보교육원 ksmybatis" />
-	    <title>게시글 목록</title>
-	    <!-- CSS 파일 링크는 layoutMain에서 제공될 가능성이 높으므로, 여기에 다시 명시하지 않겠습니다. -->
-	    <!-- 만약 layoutMain에서 CSS를 동적으로 추가하지 않는다면, 여기에 추가해야 합니다. -->
-	    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postList.css}">
-	</head>
-	
-	<!-- 추가할 js file -->
-	<th:block layout:fragment="jsFile">
-	    <!-- 필요한 js 파일이 있다면 여기에 추가 -->
-	    <script th:src="@{/maincss/assets/js/customer/postList.js}"></script>
-	</th:block>
-	
-	
-	<!-- 추가할 script -->
-	<th:block layout:fragment="jsScript">
-	
-	</th:block>
-	
-	<!-- 추가할 페이지 contents -->
-	<th:block layout:fragment="contents">
-	    <!-- 사진 2처럼 페이지 타이틀이 나오는 부분을 가정하고 div로 감쌌습니다 -->
-		<div class="container"
-	         th:data-initial-bbsClsfCd="${bbsClsfCd}"
-	         th:data-initial-page="${currentPage}"
-	         th:data-initial-size="${size}"
-	         th:data-initial-keyword="${keyword}">
-	         
-		    <div class="page-title-section">
-		        <h2 th:text="${boardName}" class="page-main-title" id="board-title">게시판 이름</h2>
-		        <h5 class="page-subtitle">게시판의 모든 게시글</h5>
-		    </div>
-		
-			<!-- 카테고리 탭 -->
-			<div class="board-tabs-container"  id="tabsContainer">
-				<ul class="nav nav-tabs">
-					<li class="nav-item">
-						<a	class="nav-link"
-							th:href="@{/customer/post/postList}"
-							th:classappend="${bbsClsfCd == null || bbsClsfCd == '' ? 'active' : ''}">전체</a>
-					</li>
-	
-					<li class="nav-item" th:each="b : ${boardList}">
-						<a	class="nav-link"
-							th:href="@{/customer/post/postList(bbsClsfCd=${b.bbsClsfCd})}"
-							th:text="${b.bbsNm}"
-							th:classappend="${bbsClsfCd == b.bbsClsfCd ? 'active' : ''}">게시판 이름</a>
-					</li>
-				</ul>
-			</div>
-			
-		    <div class="card mb-4">
-		        <!-- card-header end// -->
-		        <div class="card-body">
-		            <div class="table-responsive">
-		                <table class="table table-hover">
-		                    <thead>
-		                        <tr>
-									<th style="width: 15%;">게시글일련번호</th>
-									<th style="width: 40%;">게시글제목</th>
-									<th style="width: 15%;">작성자</th>
-									<th style="width: 8%;">추천수</th>
-									<th style="width: 8%;">조회수</th>
-									<th style="width: 14%;">생성일시</th>
-		                        </tr>
-		                    </thead>
-		                    <tbody id="post-list-body">
-		                    </tbody>
-		                </table>
-		            </div>
-		            <!-- table-responsive //end -->
-		        </div>
-		        <!-- card-body end// -->
-		
-		        <div class="content-footer-action">
-		            <!-- 1. 로그인 되어 있을 때 보여줄 버튼 -->
-					<!-- 세션에 loginUser가 존재할 때만 이 버튼이 화면에 그려집니다. -->
-					<button th:if="${session.loginUser != null}"
-					        type="button" 
-					        class="btn-write-post" 
-					        onclick="location.href='/customer/post/postWrite'">글 작성</button>
-					
-					<!-- 2. 로그인 되어 있지 않을 때 보여줄 버튼 -->
-					<!-- 세션에 loginUser가 존재하지 않을 때만 이 버튼이 화면에 그려집니다. -->
-					<button th:if="${session.loginUser == null}"
-					        type="button" 
-					        class="btn-write-post" 
-					        data-toggle="modal" 
-					        data-target="#signin-modal">글 작성</button>
-		        </div>
-	
-		    </div>
-		    <!-- card end// -->
-		
-		    <!-- 페이지네이션 영역 -->
-		    <div class="pagination-area" id="pagination-container">
+<head>
+    <title>커뮤니티</title>
+    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postList.css}">
+</head>
 
-		    </div>
-			<!-- =================================================================== -->
-			<!-- 임시 검색 및 페이지 크기 조절 컨트롤 (부트스트랩 기반) -->
-			<!-- =================================================================== -->
-			<div class="row-container">
-			    <!-- form 태그로 전체를 감싸서 검색과 페이지 크기 변경이 모두 작동하게 합니다. -->
-			    <form th:action="@{/customer/post/postList}" method="GET" id="tempSearchAndSizeForm">
-			        
-			        <!-- 부트스트랩의 'row'를 사용하여 컨트롤들을 한 줄에 배치합니다. -->
-			        <div class="row justify-content-between align-items-center">
-			
-			            <!-- 1. 검색창 영역 (화면의 약 7칸 차지) -->
-			            <div class="col-md-7">
-			                <!-- 'input-group'은 검색창과 버튼을 예쁘게 묶어주는 부트스트랩 기능입니다. -->
-			                <div class="input-group">
-			                    <input type="text" 
-			                           name="keyword" 
-			                           class="form-control" 
-			                           placeholder="검색어를 입력하세요" 
-			                           th:value="${param.keyword}"
-			                           aria-label="검색어 입력">
-			                    <button class="btn btn-outline-secondary" type="submit">검색</button>
-			                </div>
-			            </div>
-			
-			            <!-- 2. 페이지 사이즈 선택 영역 (화면의 약 4칸 차지) -->
-			            <div class="col-md-4">
-			                <!-- 'd-flex'와 'justify-content-end'로 내용물을 오른쪽 끝으로 정렬합니다. -->
-			                <div class="d-flex justify-content-end align-items-center">
-			                    <label for="tempPageSizeSelect" class="form-label mb-0 me-2">개수:</label>
-			                    <select id="tempPageSizeSelect" 
-			                            name="size" 
-			                            class="form-select form-select-sm" 
-			                            style="width: auto;" 
-			                            onchange="document.getElementById('tempSearchAndSizeForm').submit()">
-			                        <option value="10" th:selected="${size == 10}">10개</option>
-			                        <option value="15" th:selected="${size == 15}">15개</option>
-			                        <option value="20" th:selected="${size == 20}">20개</option>
-			                    </select>
-			                </div>
-			            </div>
-			
-			        </div>
-			    </form>
-			</div>
-			<!-- =================================================================== -->
-			<!-- 임시 컨트롤 끝 -->
-			<!-- =================================================================== -->
-	
-		    
-		</div>
-	</th:block>
+<th:block layout:fragment="jsFile">
+    <script th:src="@{/maincss/assets/js/customer/postList.js}"></script>
+</th:block>
 
+<th:block layout:fragment="contents">
+    <div class="container"
+         th:data-initial-bbsClsfCd="${bbsClsfCd}"
+         th:data-initial-keyword="${keyword}">
+         
+        <div class="page-title-section">
+            <h2 class="page-main-title" id="board-title">커뮤니티</h2>
+        </div>
+    
+        <!-- =================================================================== -->
+        <!-- [핵심 추가] 피드 페이지와 동일한 상단 메인 탭을 여기에 추가합니다. -->
+        <!-- =================================================================== -->
+        <nav class="main-tabs">
+            <ul>
+                <!-- '발견'과 '팔로잉'은 피드 페이지로 가는 링크입니다. -->
+                <li><a th:href="@{/customer/feed/feedList}">발견</a></li>
+                <li><a th:href="@{/customer/feed/feedList}">팔로잉</a></li>
+                <!-- '커뮤니티'는 현재 페이지이므로 active 상태입니다. -->
+                <li class="active"><a href="#">커뮤니티</a></li>
+            </ul>
+        </nav>
+
+        <!-- =================================================================== -->
+        <!-- [구조 변경] 하위 카테고리 탭과 글쓰기 버튼을 한 줄에 묶습니다. -->
+        <!-- =================================================================== -->
+        <div class="sub-controls-area">
+            <div class="board-tabs-container" id="tabsContainer">
+                 <ul class="nav nav-tabs">
+                    <li class="nav-item"><a class="nav-link active" href="#" data-bbsclsfcd="">전체</a></li>
+                    <li class="nav-item" th:each="b : ${boardList}"><a class="nav-link" href="#" th:data-bbsclsfcd="${b.bbsClsfCd}" th:text="${b.bbsNm}"></a></li>
+                </ul>
+            </div>
+            <div class="write-button-area">
+                <button th:if="${session.loginUser != null}" type="button" class="btn-write" onclick="location.href='/customer/post/postWrite'">+</button>
+                <button th:if="${session.loginUser == null}" type="button" class="btn-write" data-toggle="modal" data-target="#signin-modal">+</button>
+            </div>
+        </div>
+        
+        <!-- 게시글 리스트 컨테이너와 로딩 인디케이터는 그대로 둡니다. -->
+        <div class="post-list-container" id="post-list-container"></div>
+        <div id="loading-indicator" style="display: none;"><p>Loading...</p></div>
+    </div>
+</th:block>
 </html>

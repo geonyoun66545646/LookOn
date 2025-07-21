@@ -1,43 +1,38 @@
 package ks55team02.customer.post.service;
 
 import java.util.List;
-
-import org.springframework.stereotype.Service;
-
-import ks55team02.customer.post.domain.PostComment;
+import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
+import ks55team02.customer.post.domain.Board;
 import ks55team02.customer.post.domain.Post;
-import ks55team02.customer.post.domain.PostInteraction;
+import ks55team02.customer.post.domain.PostComment;
 
-@Service
 public interface PostService {
-	
-	// 추천수 증가
-	void insertInterCount(PostInteraction interaction);
 
-	// 게시판 글 목록 조회
-	List<Post> selectPostListByBoardCd(String bbsClsfCd, int offset, int size);
-
-	// 특정 게시판 게시글 갯수 조회
-	int selectPostListNumByBoardCd(String bbsClsfCd);
-
-	// 특정 게시글 상세 조회
-	Post selectPostDetailByPostSn(String pstSn);
-	
-	// 게시글 등록
-	void insertPost(Post post);
-	
-	// 댓글 등록 
-	void insertComment(PostComment comment);
-
-	// 게시글 수정
-	void updatePost(Post post);
-	
-	// 게시글 삭제
-	void deletePost(String pstSn);
-	
-	// 댓글 수정
-	void updateComment(PostComment comment);
-
-	// 댓글 삭제
-	void deleteComment(String pstCmntSn);
+    List<Board> selectBoardName();
+    
+    Post selectPostDetailByPostSn(String pstSn, String loginUserNo);
+    
+    void increaseViewCount(String pstSn);
+    
+    List<Post> selectPostListByBoardCd(String bbsClsfCd, int offset, int size);
+    
+    int selectPostListNumByBoardCd(String bbsClsfCd);
+    
+    // =======================================================
+    // [수정] 게시글 생성/수정/삭제 메소드 시그니처 변경
+    // =======================================================
+    void insertPost(Post post, List<MultipartFile> imageFiles);
+    
+    boolean updatePost(Post post, List<MultipartFile> newImageFiles, List<String> deleteImageSns, String loginUserNo);
+    
+    void deletePost(String pstSn);
+    
+    void insertComment(PostComment comment);
+    
+    void updateComment(PostComment comment);
+    
+    void deleteComment(String pstCmntSn);
+    
+    Map<String, Object> togglePostLike(String pstSn, String loginUserNo);
 }

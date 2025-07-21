@@ -1,83 +1,70 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{customer/layout/layoutMain}">
-	
-	<head>
-		<meta name="description" content="한국스마트정보교육원 ksmybatis" />
-		<title>글 작성</title>
-		<!-- postWrite.css 파일 로드 -->
-		<link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postWrite.css}">
-	</head>
-	
-	<!-- 추가할 js file -->
-	<th:block layout:fragment="jsFile">
-        <!-- jQuery 라이브러리가 layoutMain에서 로드되지 않았다면 여기에 추가해야 합니다. -->
-        <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
-        <script th:src="@{/maincss/assets/js/customer/postWrite.js}"></script>
-	</th:block>
-	
-	<!-- 추가할 script -->
-	<th:block layout:fragment="jsScript">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{customer/layout/layoutMain}">
+<head>
+    <title th:text="${post.pstSn != null ? '글 수정' : '글 작성'}"></title>
+    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postWrite.css}">
+    <!-- [신규] 이미지 미리보기 스타일 -->
+    <style>
+        .image-preview-container { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px; }
+        .image-preview-item { position: relative; width: 100px; height: 100px; border: 1px solid #ddd; padding: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        .image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .image-preview-item .delete-btn { position: absolute; top: -5px; right: -5px; background: rgba(217, 30, 24, 0.8); color: white; border: none; cursor: pointer; width: 22px; height: 22px; line-height: 22px; text-align: center; font-size: 14px; border-radius: 50%; font-weight: bold; }
+    </style>
+</head>
 
-	</th:block>
+<th:block layout:fragment="jsFile">
+    <script th:src="@{/maincss/assets/js/customer/postWrite.js}"></script>
+</th:block>
 
-	<th:block layout:fragment="contents"> <!-- 1. "이것이 사진입니다" 라는 라벨 (절대 지우면 안 됨) -->
-	
-	    <!-- 2. 그 '안에' 변수를 만드는 투명 스티커를 붙입니다. -->
-	    <th:block th:with="updateUrl=@{/customer/post/postUpdate}, writeUrl=@{/customer/post/postWrite}">
-	
-	        <div class="write-form-container ">
-	        
-	            <div class="page-title-section ">
-	                <h2 class="page-main-title" th:text="${post.pstSn != null ? '글 수정' : '글 작성'}"></h2>
-	            </div>
-	            
-	            <!-- 3. 이제 폼에서는 미리 만든 변수를 안전하게 사용합니다. -->
-	            <form id="postForm"
-	                  th:action="${post.pstSn != null ? updateUrl : writeUrl}"
-	                  method="post" 
-	                  th:object="${post}">
-	
-	                <!-- 게시글 번호 (수정 시에만 필요) -->
-	                <input type="hidden" id="pstSn" th:field="*{pstSn}">
-	                
-	                <!-- 작성자 번호 -->
-	                <input type="hidden" name="wrtrUserNo" th:value="${session.loginUser.userNo}" />
-	
-	                <!-- 제목 -->
-	                <div class="form-group">
-	                    <label for="postTitle">제목</label>
-	                    <input type="text" id="postTitle" class="form-control" placeholder="제목을 입력하세요" th:field="*{pstTtl}" required>
-	                </div>
-	
-	                <!-- 내용 -->
-	                <div class="form-group">
-	                    <label for="postContent">내용</label>
-	                    <textarea id="postContent" class="form-control" placeholder="내용을 입력하세요" rows="10" required th:field="*{pstCn}"></textarea>
-	                </div>
-	
-	                <!-- 카테고리 선택 -->
-	                <div class="form-group">
-	                    <label for="postCategory">카테고리</label>
-	                    <select id="postCategory" name="bbsClsfCd" class="form-control" required th:field="*{bbsClsfCd}">
-	                    	<option value="">---게시판 선택---</option>
-	 						<option th:each="b : ${boardList}"
-	 								th:value="${b.bbsClsfCd}"
-	 								th:text="${b.bbsNm}"></option>
-	                    </select>
-	                </div>
-	
-	                <!-- 버튼 영역 -->
-	                <div class="form-actions">
-	                    <button type="submit" class="btn btn-primary" th:text="${post.pstSn != null ? '글 수정' : '글 작성'}"></button>
-	                    <button type="button" class="btn btn-secondary" onclick="history.back()">취소</button>
-	                </div>
-	
-	            </form>
-	        </div>
-	        
-	    </th:block> <!-- th:with 블록 끝 -->
-	
-	</th:block> <!-- layout:fragment="contents" 블록 끝 -->
+<th:block layout:fragment="contents">
+    <div class="write-form-container">
+        <div class="page-title-section">
+            <h2 class="page-main-title" th:text="${post.pstSn != null ? '글 수정' : '글 작성'}"></h2>
+        </div>
+
+        <!-- [수정] action 속성 제거, enctype 추가 -->
+        <form id="postForm" method="post" enctype="multipart/form-data" th:object="${post}">
+            <input type="hidden" id="pstSn" name="pstSn" th:field="*{pstSn}">
+
+            <div class="form-group">
+                <label for="postCategory">카테고리</label>
+                <select id="postCategory" name="bbsClsfCd" class="form-control" required th:field="*{bbsClsfCd}">
+                    <option value="">---게시판 선택---</option>
+                    <option th:each="b : ${boardList}" th:value="${b.bbsClsfCd}" th:text="${b.bbsNm}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="postTitle">제목</label>
+                <input type="text" id="postTitle" name="pstTtl" class="form-control" placeholder="제목을 입력하세요" th:field="*{pstTtl}" required>
+            </div>
+            <div class="form-group">
+                <label for="postContent">내용</label>
+                <textarea id="postContent" name="pstCn" class="form-control" placeholder="내용을 입력하세요" rows="10" required th:field="*{pstCn}"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="newImageFiles">이미지 첨부</label>
+                <!-- [수정] input name을 newImageFiles로 변경 -->
+                <input type="file" id="newImageFiles" name="newImageFiles" class="form-control" multiple accept="image/*">
+            </div>
+
+            <!-- [신규/수정] 기존 이미지 및 새 이미지 미리보기 영역 -->
+            <div id="image-preview-container" class="image-preview-container">
+                <!-- 수정 모드일 때, 기존 이미지를 여기에 렌더링 -->
+                <th:block th:if="${post.pstSn != null and post.imageList != null}">
+                    <div class="image-preview-item" th:each="image : ${post.imageList}" th:data-image-sn="${image.pstImgSn}">
+                        <img th:src="@{${image.imgFilePathNm}}" alt="기존 이미지">
+                        <button type="button" class="delete-btn existing-image-delete-btn">X</button>
+                    </div>
+                </th:block>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" th:text="${post.pstSn != null ? '수정 완료' : '작성 완료'}"></button>
+                <button type="button" class="btn btn-secondary" onclick="history.back()">취소</button>
+            </div>
+        </form>
+    </div>
+</th:block>
 </html>
