@@ -146,7 +146,7 @@
                             <th scope="col">최종가격</th>
                             <th scope="col">등록일자</th>
                             <th scope="col">승인상태</th>
-                            <th scope="col">활성상태</th>
+                            <th scope="col">미리보기</th>
                             <th scope="col">수정/삭제</th>
                         </tr>
                         </thead>
@@ -167,7 +167,13 @@
                             <td th:text="${#temporals.format(p.regDt, 'yyyy-MM-dd')}"></td>
                             <td><span class="badge" th:text="${p.latestApprovalStatus}"
                                       th:classappend="${p.latestApprovalStatus == '승인' ? 'bg-success' : (p.latestApprovalStatus == '반려' ? 'bg-danger' : 'bg-warning')}"></span></td>
-                            <td th:text="${p.actvtnYn ? '활성' : '비활성'}"></td>
+                                      
+                            <td>
+							    <a th:href="@{/seller/products/preview/{gdsNo}(gdsNo=${p.gdsNo})}" 
+							       class="btn btn-info font-sm text-white" 
+							       target="_blank">미리보기</a>
+							</td>
+                            
                             <td class="text-center action-buttons">
                                 <a th:href="@{/seller/products/update/{gdsNo}(gdsNo=${p.gdsNo})}" class="btn btn-warning font-sm text-white">수정</a>
                                 <form th:action="@{/seller/products/deactivate}" method="post" style="display: inline;">

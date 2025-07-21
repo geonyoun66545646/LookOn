@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{customer/layout/layoutProductDetail}">
+
+<head>
+<title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE"
+	th:text="${product?.gdsNm ?: 'Molla 상품 상세'}"></title>
+<meta name="description" th:content="${product?.gdsExpln ?: '상품 상세 정보'}">
+
+<th:block layout:fragment="cssFile">
+	<link rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+		integrity="sha512-..." crossorigin="anonymous"
+		referrerpolicy="no-referrer" />
+	<link rel="stylesheet"
+		th:href="@{/maincss/assets/css/plugins/nouislider/nouislider.css}">
+	<link rel="stylesheet"
+		th:href="@{/maincss/assets/mainHeader/mainHeader.css}">
+	<link rel="stylesheet"
+		th:href="@{/maincss/assets/categoryFilterModal/categoryFilterModal.css}">
+	<link rel="stylesheet"
+		th:href="@{/maincss/assets/productDetail/productDetail.css}">
+	<link rel="stylesheet"
+		th:href="@{/maincss/assets/mainSlide/mainSlide.css}" />
+</th:block>
+</head>
+
+<body>
+	<th:block layout:fragment="contents">
+		<div class="page-content">
+			<div class="container">
+				<div class="alert alert-info text-center" role="alert" th:if="${isPreview}">
+                    <strong>[미리보기 모드]</strong> 이 페이지는 판매자님께만 보이며, 고객에게는 노출되지 않습니다.
+                </div>
+				<div class="product-details-top">
+					<div class="row">
+
+						<div class="col-md-6">
+							<div class="product-gallery product-gallery-vertical">
+								<div class="row">
+									<figure class="product-main-image">
+										<img id="product-zoom" th:if="${thumbnailImage != null}"
+											th:src="@{${thumbnailImage.imgFilePathNm}}"
+											th:data-zoom-image="@{${thumbnailImage.imgFilePathNm}}"
+											alt="product image">
+										<img id="product-zoom" th:unless="${thumbnailImage != null}"
+											th:src="@{/maincss/assets/images/no_image.jpg}"
+											th:data-zoom-image="@{/maincss/assets/images/no_image.jpg}"
+											alt="No product image">
+									</figure>
+
+									<div id="product-zoom-gallery"
+										class="product-image-gallery owl-carousel owl-full-width">
+
+										<th:block th:if="${!#lists.isEmpty(mainGalleryImages)}">
+											<a th:each="img : ${mainGalleryImages}"
+												class="product-gallery-item" href="#"
+												th:classappend="${imgStat.first ? 'active' : ''}"
+												th:data-image="@{${img.imgFilePathNm}}"
+												th:data-zoom-image="@{${img.imgFilePathNm}}"> <img
+												th:src="@{${img.imgFilePathNm}}"
+												alt="product cross-thumbnail">
+											</a>
+										</th:block>
+
+										<div
+											th:if="${thumbnailImage == null and #lists.isEmpty(mainGalleryImages)}">
+											<img th:src="@{/maincss/assets/images/no_image_small.jpg}"
+												alt="No images available">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="product-details">
+								<a th:if="${product.store != null}"
+									th:href="@{/customer/products/brand/{brandId}(brandId=${product.store.storeId})}"
+									style="text-decoration: none; color: inherit;">
+									<div class="product-brand-info">
+										<div class="product-brand-icon"
+											th:if="${product.store.storeLogoImg != null}">
+											<img th:src="@{${product.store.storeLogoImg}}" alt="브랜드 로고"
+												style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+										</div>
+										<div class="product-brand-icon"
+											th:unless="${product.store.storeLogoImg != null}">
+											<span
+												th:text="${#strings.substring(product.store.storeConm, 0, 1)}"></span>
+										</div>
+
+										<div class="product-brand-name"
+											th:text="${product.store.storeConm}">MOLLA BRAND</div>
+									</div>
+								</a>
+								<div th:unless="${product.store != null}">
+									<span>브랜드 정보 없음</span>
+								</div>
+
+								<div class="product-details-top">
+									<div class="product-cat">
+										<a
+											th:href="@{/products/category/{categoryId}(categoryId=${product.productCategory.categoryId})}"
+											th:text="${product?.productCategory?.categoryName ?: '카테고리	없음'}">카테고리
+										</a>
+									</div>
+								</div>
+
+								<h1 class="product-title"
+									th:text="${product?.gdsNm ?: '상품명 없음'}"></h1>
+
+								<div class="ratings-container">
+									<div class="ratings">
+										<div class="ratings-val" style="width: 80%;"></div>
+									</div>
+									<a class="ratings-text" href="#product-review-link"
+										id="review-link"
+										th:text="'(' + (${reviews != null ? reviews.size() : 0}) + ' 개의 리뷰)'">(
+										2 리뷰 )</a>
+								</div>
+
+								<div class="product-price-section">
+									<div class="original-price-wrapper"
+										th:if="${product.dscntRt != null and product.dscntRt > 0}">
+										<span class="original-price"
+											th:text="${#numbers.formatDecimal(product.basPrc, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+									</div>
+
+									<div class="final-price-wrapper">
+										<span class="discount-rate"
+											th:if="${product.dscntRt != null and product.dscntRt > 0}"
+											th:text="${#numbers.formatInteger(product.dscntRt, 0)} + '%'"></span>
+
+										<span class="final-price"
+											th:text="${#numbers.formatDecimal(product.lastSelPrc, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+									</div>
+								</div>
+
+								<div class="product-content">
+									<p th:text="${product?.gdsExpln ?: '상품 설명이 없습니다.'}"></p>
+								</div>
+
+								<div
+									th:if="${product.productOptions != null and !#lists.isEmpty(product.productOptions)}">
+									<div th:each="option : ${product.productOptions}">
+										<div th:if="${option.actvtnYn and option.optNm != '성별'}"
+											class="details-filter-row"
+											th:classappend="${option.optNm == '색상' ? 'details-row-color' : (option.optNm == '사이즈' ? 'details-row-size' : '')}">
+
+											<label th:for="${'option-select-' + option.optNo}"
+												th:text="${option.optNm} + ':'"></label>
+											<div class="select-custom">
+												<select th:name="${option.optNm}"
+													th:id="${'option-select-' + option.optNo}"
+													class="form-control product-option-select">
+													<option value="" selected disabled
+														th:text="${option.optNm + ' 선택'}"></option>
+													<option th:each="optionValue : ${option.optionValues}"
+														th:if="${optionValue.actvtnYn}"
+														th:value="${optionValue.optVlNo}"
+														th:text="${optionValue.vlNm}"></option>
+												</select>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="product-selection-summary" id="selectionSummary"
+									style="display: none;">
+									<div class="product-option-price-preview">
+										<span>선택된 옵션 가격</span>
+									</div>
+
+									<div class="selected-options-container"
+										id="selectedOptionsContainer"></div>
+
+									<div class="summary-divider"></div>
+									<div class="summary-total-price-area">
+										<div class="total-price-label">
+											<h5 class="total-price-heading">총 상품금액</h5>
+										</div>
+										<div class="total-price-display">
+											<span class="final-total-price" id="totalPrice">0원</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="product-details-action">
+									<div class="product-main-buttons">
+										<a href="#" class="btn-product btn-cart" id="addToCartBtn"><span>장바구니</span></a>
+										<a href="#" class="btn-product btn-buy-now"><span>구매하기</span></a>
+										<button class="btn-product btn-share" data-toggle="modal"
+											data-target="#shareModal" title="공유하기">
+											<i class="icon-share-alt"></i> <span>공유</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="product-details-tab product-details-extended">
+					<div class="container">
+						<ul class="nav nav-pills justify-content-center" role="tablist">
+							<li class="nav-item"><a class="nav-link active"
+								id="product-desc-link" data-toggle="tab"
+								href="#product-desc-tab" role="tab"
+								aria-controls="product-desc-tab" aria-selected="true">상품상세</a></li>
+							<li class="nav-item"><a class="nav-link"
+								id="product-info-link" data-toggle="tab"
+								href="#product-info-tab" role="tab"
+								aria-controls="product-info-tab" aria-selected="false">상품정보</a>
+							</li>
+							<li class="nav-item"><a class="nav-link"
+								id="product-review-link" data-toggle="tab"
+								href="#product-review-tab" role="tab"
+								aria-controls="product-review-tab" aria-selected="false"> 리뷰
+									(<span th:text="${reviews != null ? reviews.size() : 0}">0</span>)
+							</a></li>
+						</ul>
+					</div>
+
+					<div class="tab-content">
+						<div class="tab-pane fade show active" id="product-desc-tab"
+							role="tabpanel">
+							<div class="product-desc-content">
+								<div th:each="img : ${detailImages}"
+									class="product-detail-image-wrapper">
+									<img th:src="@{${img.imgFilePathNm}}" alt="상세 이미지">
+								</div>
+								<p th:if="${#lists.isEmpty(detailImages)}" class="text-center">상세
+									이미지가 없습니다.</p>
+							</div>
+						</div>
+
+						<div class="tab-pane fade" id="product-info-tab" role="tabpanel">
+							<div class="product-desc-content">
+								<div class="container">
+									<h3>상품 정보</h3>
+									<p th:text="${product.gdsExpln}">상품 설명</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="tab-pane fade" id="product-review-tab" role="tabpanel">
+
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="modal fade" id="shareModal" tabindex="-1" role="dialog"
+			aria-labelledby="shareModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="shareModalLabel">공유하기</h5>
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">×</span>
+						</button>
+					</div>
+					<div class="modal-body text-center">
+						<div
+							class="social-share-buttons d-flex justify-content-around mb-4">
+							<a href="#"
+								class="share-icon-btn d-flex flex-column align-items-center">
+								<span class="share-icon circle instagram-bg"><i
+									class="icon-instagram"></i></span> <span class="share-text mt-2">인스타그램</span>
+							</a> <a href="#"
+								class="share-icon-btn d-flex flex-column align-items-center">
+								<span class="share-icon circle kakao-bg"><img src="#"
+									alt="KakaoTalk" style="width: 24px; height: 24px;"></span> <span
+								class="share-text mt-2">카카오톡</span>
+							</a> <a href="#"
+								class="share-icon-btn d-flex flex-column align-items-center">
+								<span class="share-icon circle facebook-bg"><i
+									class="icon-facebook"></i></span> <span class="share-text mt-2">페이스북</span>
+							</a> <a href="#"
+								class="share-icon-btn d-flex flex-column align-items-center"
+								onclick="copyShareLink(); return false;"> <span
+								class="share-icon circle url-bg"><i class="icon-link"></i></span>
+								<span class="share-text mt-2">URL 복사하기</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</th:block>
+
+
+	<th:block layout:fragment="jsFile">
+		<script
+			src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+		<script th:src="@{/maincss/assets/js/jquery.elevateZoom.min.js}"></script>
+		<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
+	</th:block>
+
+</body>
+</html>
