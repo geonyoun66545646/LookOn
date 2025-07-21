@@ -93,14 +93,24 @@
 
 /* '팔로우' 링크 스타일 */
 .follow-link {
-    color: #0095f6; /* 인스타그램의 파란색과 유사 */
+    color: deepskyblue; /* 인스타그램의 파란색과 유사 */
 }
 
 /* '팔로잉' 링크 스타일 */
 .following-link {
-    color: #262626; /* 기본 텍스트 색상 */
+    color: deepskyblue; /* 기본 텍스트 색상 */
+}
+/* 1. '팔로잉' 버튼에 마우스를 올렸을 때 변화 없애기 */
+.following-link:hover {
+    color: deepskyblue; /* 원래 색상과 동일하게 설정 */
+    text-decoration: none; /* 밑줄 등 장식 제거 */
 }
 
+/* 2. '팔로우' 버튼에 마우스를 올렸을 때 변화 없애기 */
+.follow-link:hover {
+    color: deepskyblue; /* 원래 색상과 동일하게 설정 */
+    text-decoration: none; /* 밑줄 등 장식 제거 */
+}
 /* 언팔로우 모달 관련 스타일 */
 .unfollow-modal-content {
     border-radius: 12px;
