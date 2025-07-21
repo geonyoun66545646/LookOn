@@ -1,7 +1,9 @@
 package ks55team02.admin.adminpage.productadmin.admincategorymanagement.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -163,14 +165,19 @@ public class AdminCategoryManagementController {
     @GetMapping("/adminCategoryManagement")
     public String productadminCategoryController(
             @ModelAttribute SearchCriteria searchCriteria,
+            @RequestParam(value = "levels", required = false) String[] levels,
             Model model) {
         
-        boolean isSearch = searchCriteria.getLevels() != null || searchCriteria.getStartDate() != null ||
-                           searchCriteria.getEndDate() != null || StringUtils.hasText(searchCriteria.getSearchValue());
-
-        if (!isSearch) {
-            searchCriteria.setLevels(List.of(1, 2)); 
+        // ⭐ 이 부분이 수정되었습니다: 빈 문자열을 필터링하는 로직 추가
+        if (levels != null) {
+            List<Integer> intLevels = Arrays.stream(levels)
+                                            .filter(s -> !s.isBlank()) // <--- ⭐ 이 한 줄을 추가하세요
+                                            .map(Integer::parseInt)
+                                            .collect(Collectors.toList());
+            searchCriteria.setLevels(intLevels);
         }
+
+        
         
         Map<String, Object> resultMap = productCategoryService.getCategoryList(searchCriteria);
         
