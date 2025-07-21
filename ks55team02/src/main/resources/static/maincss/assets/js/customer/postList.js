@@ -1,206 +1,157 @@
-$(document).ready(function() {
+/**
+ * postList.js v2.3 (대표 이미지 DTO 필드명 변경 반영)
+ * - 썸네일 이미지 경로를 post.representativeImage.imgFilePathNm에서 참조하도록 수정
+ */
+$(() => {
 
-    // --- 1. 상태 관리 및 초기화 ---
-    const initialState = {
-        bbsClsfCd: $('[data-initial-bbsClsfCd]').data('initial-bbsClsfCd') || null,
-        page: $('[data-initial-page]').data('initial-page') || 1,
-        size: $('[data-initial-size]').data('initial-size') || 10,
-        keyword: $('[data-initial-keyword]').data('initial-keyword') || null
+    const state = {
+        currentPage: 1,
+        isLoading: false,
+        hasNext: true,
+        bbsClsfCd: $('.container').data('initial-bbsclsfcd') || ''
     };
-    
-    // 이 코드를 위해 postList.html의 메인 컨테이너에 data-* 속성 추가가 필요합니다.
-    // 예: <div class="container" th:data-initial-bbsClsfCd="${bbsClsfCd}" ... >
 
-    // --- 2. 이벤트 핸들러 바인딩 ---
-	
-	/* ============================================================
-	    카테고리 탭 드래그-스크롤 기능 구현
-	   ============================================================ */
-	const slider = document.querySelector('#tabsContainer');
-	let isDown = false; // 마우스 클릭 여부
-	let startX;         // 클릭 시점의 X 좌표
-	let scrollLeft;     // 클릭 시점의 스크롤 위치
+    const $container = $('#post-list-container');
+    const $tabsParentContainer = $('.board-tabs-container');
+    const $navTabsScroller = $tabsParentContainer.find('.nav-tabs');
+    const $loadingIndicator = $('#loading-indicator');
 
-	if (slider) { // #tabsContainer 요소가 존재할 때만 스크립트 실행
-	    
-	    // 1. 마우스를 누를 때 (드래그 시작)
-	    slider.addEventListener('mousedown', (e) => {
-	        isDown = true;
-	        slider.classList.add('active-drag'); // (선택사항) 드래그 중임을 나타내는 클래스 추가
-	        startX = e.pageX - slider.offsetLeft;
-	        scrollLeft = slider.scrollLeft;
-	        slider.style.cursor = 'grabbing'; // 커서를 잡는 모양으로 변경
+    const slider = $navTabsScroller[0];
+    if (slider) {
+        let isDown = false, startX, scrollLeft;
+        const dragStart = (e) => {
+            if (e.target.tagName === 'A' || $(e.target).closest('a').length) {
+                e.preventDefault();
+            }
+            isDown = true;
+            $tabsParentContainer.addClass('active-drag');
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        };
+        const dragEnd = () => { isDown = false; $tabsParentContainer.removeClass('active-drag'); };
+        const dragMove = (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2;
+            slider.scrollLeft = scrollLeft - walk;
+        };
+        $tabsParentContainer.on('mousedown', dragStart);
+        $tabsParentContainer.on('mouseleave', dragEnd);
+        $tabsParentContainer.on('mouseup', dragEnd);
+        $tabsParentContainer.on('mousemove', dragMove);
+    }
+
+    $navTabsScroller.on('click', '.nav-link', function(e) {
+        e.preventDefault();
+        const selectedBbsClsfCd = $(this).data('bbsclsfcd');
+        if ($(this).hasClass('active')) return;
+
+        $navTabsScroller.find('.nav-link').removeClass('active');
+        $(this).addClass('active');
+
+        state.bbsClsfCd = selectedBbsClsfCd;
+        state.currentPage = 1;
+        state.hasNext = true;
+        $container.empty();
+        loadNextPage();
+    });
+
+    $(window).on('scroll', () => {
+        if (state.isLoading || !state.hasNext) return;
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 300) {
+            loadNextPage();
+        }
+    });
+
+    function loadNextPage() {
+        state.isLoading = true;
+        $loadingIndicator.show();
+
+        $.ajax({
+            url: '/customer/api/post/list',
+            type: 'GET',
+            data: {
+                page: state.currentPage,
+                size: 15,
+                bbsClsfCd: state.bbsClsfCd
+            },
+            dataType: 'json'
+        })
+        .done(response => {
+            if (response && response.postList && response.postList.length > 0) {
+                renderPostList(response.postList);
+                state.hasNext = response.hasNext;
+                state.currentPage++;
+            } else {
+                state.hasNext = false;
+                if (state.currentPage === 1) {
+                    $container.html('<div class="no-posts-message">게시글이 없습니다.</div>');
+                }
+            }
+        })
+        .fail(err => {
+            console.error("게시글 로딩 중 오류:", err);
+            state.hasNext = false;
+        })
+        .always(() => {
+            state.isLoading = false;
+            $loadingIndicator.hide();
+        });
+    }
+
+	function renderPostList(postList) {
+	    function formatRelativeTime(dateString) {
+	        if (!dateString) return '';
+	        const now = new Date();
+	        const postDate = new Date(dateString);
+	        const diffInSeconds = Math.floor((now - postDate) / 1000);
+	        const MINUTE = 60, HOUR = 3600, DAY = 86400, WEEK = 604800;
+	        if (diffInSeconds < MINUTE) return '방금 전';
+	        if (diffInSeconds < HOUR) return `${Math.floor(diffInSeconds / MINUTE)}분 전`;
+	        if (diffInSeconds < DAY) return `${Math.floor(diffInSeconds / HOUR)}시간 전`;
+	        if (diffInSeconds < WEEK) return `${Math.floor(diffInSeconds / DAY)}일 전`;
+	        return dateString.split('T')[0].replace(/-/g, '.');
+	    }
+
+	    const eyeIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16"><path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/></svg>`;
+	    const commentIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-fill" viewBox="0 0 16 16"><path d="M2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/></svg>`;
+
+	    postList.forEach(post => {
+	        // [핵심 수정] 썸네일 이미지 경로 생성 로직
+	        let thumbnailHtml = '';
+	        if (post.representativeImage && post.representativeImage.imgFilePathNm) {
+	            const thumbnailUrl = post.representativeImage.imgFilePathNm;
+	            thumbnailHtml = `
+	                <div class="post-item-thumbnail">
+	                    <img src="${thumbnailUrl}" alt="${post.pstTtl || '게시글 썸네일'}">
+	                </div>`;
+	        }
+	        
+	        const formattedDate = formatRelativeTime(post.crtDt);
+	        const detailLink = `/customer/post/postView?pstSn=${post.pstSn}`;
+	        
+	        const postItemHtml = `
+	            <div class="post-item">
+	                <a href="${detailLink}">
+	                    <div class="post-item-content">
+	                        <h3 class="title">${post.pstTtl || '제목 없음'}</h3>
+	                        <div class="author-info">
+	                            <span class="nickname">${post.writerInfo?.userNcnm || '작성자 없음'}</span>
+	                            <span class="separator">·</span>
+	                            <span class="date">${formattedDate}</span>
+	                        </div>
+	                        <div class="post-stats">
+	                            <span class="views">${eyeIconSvg} <span>${post.viewCnt || 0}</span></span>
+	                            <span class="comments">${commentIconSvg} <span>${post.cmntCnt || 0}</span></span>
+	                        </div>
+	                    </div>
+	                    ${thumbnailHtml}
+	                </a>
+	            </div>`;
+	        $container.append(postItemHtml);
 	    });
-
-	    // 2. 마우스가 요소 밖으로 나갔을 때
-	    slider.addEventListener('mouseleave', () => {
-	        isDown = false;
-	        slider.classList.remove('active-drag');
-	        slider.style.cursor = 'grab'; // 커서 모양 복원
-	    });
-
-	    // 3. 마우스를 뗄 때 (드래그 종료)
-	    slider.addEventListener('mouseup', () => {
-	        isDown = false;
-	        slider.classList.remove('active-drag');
-	        slider.style.cursor = 'grab'; // 커서 모양 복원
-	    });
-
-	    // 4. 마우스를 움직일 때 (실제 스크롤 발생)
-	    slider.addEventListener('mousemove', (e) => {
-	        if (!isDown) return; // 마우스가 눌리지 않았으면 아무것도 하지 않음
-	        e.preventDefault();
-	        const x = e.pageX - slider.offsetLeft;
-	        const walk = (x - startX) * 2; // 이동 거리 계산 (곱하는 숫자로 스크롤 속도 조절 가능)
-	        slider.scrollLeft = scrollLeft - walk;
-	    });
-
 	}
 
-    // 게시판 탭(카테고리) 클릭 이벤트
-    $('.board-tabs-container').on('click', '.nav-link', function(e) {
-        e.preventDefault();
-        const url = new URL($(this).attr('href'), window.location.origin);
-        initialState.bbsClsfCd = url.searchParams.get('bbsClsfCd');
-        initialState.page = 1; // 카테고리 변경 시 1페이지로 리셋
-        fetchAndRenderPosts(initialState);
-    });
-
-    // 페이지네이션 링크 클릭 이벤트
-    $('#pagination-container').on('click', '.page-link', function(e) {
-        e.preventDefault();
-        const url = new URL($(this).attr('href'), window.location.origin);
-        initialState.page = url.searchParams.get('page');
-        fetchAndRenderPosts(initialState);
-    });
-
-    // 검색 폼 제출 이벤트
-    $('#tempSearchAndSizeForm').on('submit', function(e) {
-        e.preventDefault();
-        initialState.keyword = $(this).find('input[name="keyword"]').val();
-        initialState.page = 1; // 검색 시 1페이지로 리셋
-        fetchAndRenderPosts(initialState);
-    });
-
-    // 페이지 크기 변경 이벤트
-    $('#tempPageSizeSelect').on('change', function() {
-        initialState.size = $(this).val();
-        initialState.page = 1; // 크기 변경 시 1페이지로 리셋
-        fetchAndRenderPosts(initialState);
-    });
-
-
-    // --- 3. 핵심 함수: 데이터 요청 및 렌더링 ---
-    function fetchAndRenderPosts(params) {
-        $.ajax({
-            url: '/customer/post/list-data',
-            type: 'GET',
-            data: params,
-            dataType: 'json',
-            success: function(response) {
-                renderTable(response.postList, params);
-                renderPagination(response);
-                // 필요 시 제목 업데이트: $('#board-title').text(response.boardName);
-            },
-            error: function(err) {
-                console.error("데이터를 불러오는 데 실패했습니다.", err);
-                $('#post-list-body').html('<tr><td colspan="6">게시글을 불러오는 중 오류가 발생했습니다.</td></tr>');
-            }
-        });
-    }
-
-    // --- 4. 렌더링 헬퍼 함수 ---
-
-    // 테이블 본문 렌더링 함수
-    function renderTable(postList, params) {
-        const $tbody = $('#post-list-body');
-        $tbody.empty(); // 기존 내용 비우기
-
-        if (!postList || postList.length === 0) {
-            $tbody.html('<tr><td colspan="6">게시글이 존재하지 않습니다.</td></tr>');
-            return;
-        }
-
-        postList.forEach(function(p) {
-            const commentCount = p.cmntCnt > 0 ? `<span>[<span>${p.cmntCnt}</span>]</span>` : '';
-            const postLink = `/customer/post/postView?pstSn=${p.pstSn}&bbsClsfCd=${params.bbsClsfCd || ''}&page=${params.page}&size=${params.size}`;
-            
-            const rowHtml = `
-                <tr>
-                    <td>${p.pstSn}</td>
-                    <td class="post-title-cell">
-                        <a href="${postLink}" class="post-title-link">${p.pstTtl}</a>
-                        ${commentCount}
-                    </td>
-                    <td>${p.userInfo ? p.userInfo.userNcnm : '알 수 없음'}</td>
-                    <td>${p.interCnt}</td>
-                    <td>${p.viewCnt}</td>
-                    <td>${formatDate(p.crtDt)}</td>
-                </tr>
-            `;
-            $tbody.append(rowHtml);
-        });
-    }
-
-    // 페이지네이션 렌더링 함수
-    function renderPagination(data) {
-        const $paginationContainer = $('#pagination-container');
-        $paginationContainer.empty();
-        
-        if (!data.totalPage || data.totalPage <= 1) return;
-
-        let paginationHtml = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
-
-        // '이전' 버튼
-        if (data.currentPage > 1) {
-            paginationHtml += `<li class="page-item"><a class="page-link" href="/customer/post/postList?page=${data.currentPage - 1}&size=${data.size}&bbsClsfCd=${data.bbsClsfCd || ''}">이전</a></li>`;
-        }
-
-        // 페이지 번호
-        for (let i = data.startPageNum; i <= data.endPageNum; i++) {
-            const activeClass = (i === data.currentPage) ? 'active' : '';
-            paginationHtml += `<li class="page-item ${activeClass}"><a class="page-link" href="/customer/post/postList?page=${i}&size=${data.size}&bbsClsfCd=${data.bbsClsfCd || ''}">${i}</a></li>`;
-        }
-
-        // '다음' 버튼
-        if (data.currentPage < data.totalPage) {
-            paginationHtml += `<li class="page-item"><a class="page-link" href="/customer/post/postList?page=${data.currentPage + 1}&size=${data.size}&bbsClsfCd=${data.bbsClsfCd || ''}">다음</a></li>`;
-        }
-        
-        paginationHtml += '</ul></nav>';
-        $paginationContainer.html(paginationHtml);
-    }
-
-    // 날짜 포맷팅 함수 (기존 Thymeleaf 로직과 유사하게 구현)
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        const today = new Date();
-        
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-
-        if (date.getFullYear() === today.getFullYear() &&
-            date.getMonth() === today.getMonth() &&
-            date.getDate() === today.getDate()) {
-            return `${hours}:${minutes}`; // 오늘 날짜면 HH:mm
-        } else {
-            return `${month}-${day}`; // 다른 날짜면 MM-dd
-        }
-    }
-    
-    // --- 5. 최초 데이터 로드 ---
-    // 이 JS파일 상단에 있던 initialState를 사용하기 위해 아래와 같이 수정
-    // (이 코드가 제대로 동작하려면 postList.html 수정이 필요합니다.)
-    const $container = $('.container'); // postList.html의 메인 컨테이너
-    const initialParams = {
-        bbsClsfCd: $container.data('initial-bbsclsfcd'),
-        page: $container.data('initial-page'),
-        size: $container.data('initial-size'),
-        keyword: $container.data('initial-keyword')
-    };
-    fetchAndRenderPosts(initialParams);
-
+    loadNextPage();
 });
