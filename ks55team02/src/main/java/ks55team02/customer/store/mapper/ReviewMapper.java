@@ -7,8 +7,9 @@ import org.apache.ibatis.annotations.Param;
 
 import ks55team02.common.domain.store.ProductReview;
 import ks55team02.common.domain.store.ReviewImage;
+import ks55team02.common.domain.store.StoreImage;
 import ks55team02.orderproduct.domain.OrderDTO;
-import ks55team02.seller.common.domain.Order;
+
 
 @Mapper
 public interface ReviewMapper {
@@ -56,7 +57,19 @@ public interface ReviewMapper {
 		 						@Param("gdsNo") String gdsNo);
 					 
  
- 
+ /**
+  * 여러 StoreImage 정보를 DB에 배치 저장합니다.
+  * @param storeImages 저장할 StoreImage 객체 리스트
+  * @return INSERT된 행의 수
+  */
+ int addStoreImages(List<StoreImage> storeImages); // 배치 삽입 메서드 추가
+
+ /**
+  * 여러 ReviewImage 정보를 DB에 배치 저장합니다. (리뷰와 이미지 매핑)
+  * @param reviewImages 저장할 ReviewImage 객체 리스트
+  * @return INSERT된 행의 수
+  */
+ int addReviewImages(List<ReviewImage> reviewImages); // 배치 삽입 메서드 추가
  
 }
 

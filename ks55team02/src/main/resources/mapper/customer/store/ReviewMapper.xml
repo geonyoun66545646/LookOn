@@ -182,4 +182,46 @@
 	LIMIT 1;
 </select>
 
+<!-- StoreImage 배치 삽입 -->
+<insert id="addStoreImages" parameterType="java.util.List">
+    INSERT INTO store_images (
+        img_id,
+        img_file_nm,
+        img_addr,
+        img_file_sz,
+        img_type_cd,
+        reg_ymd,
+        del_yn
+    ) VALUES
+    <foreach collection="list" item="storeImage" separator=",">
+    (
+        #{storeImage.imgId},
+        #{storeImage.imgFileNm},
+        #{storeImage.imgAddr},
+        #{storeImage.imgFileSz},
+        #{storeImage.imgTypeCd},
+        #{storeImage.regYmd},
+        #{storeImage.delYn}
+    )
+    </foreach>
+</insert>
+
+<!-- ReviewImage 배치 삽입 -->
+<insert id="addReviewImages" parameterType="java.util.List">
+    INSERT INTO review_images (
+        review_img_id,
+        review_id,
+        img_id,
+        ord
+    ) VALUES
+    <foreach collection="list" item="reviewImage" separator=",">
+    (
+        #{reviewImage.reviewImgId},
+        #{reviewImage.reviewId},
+        #{reviewImage.imgId},
+        #{reviewImage.ord}
+    )
+    </foreach>
+</insert>
+
 </mapper>

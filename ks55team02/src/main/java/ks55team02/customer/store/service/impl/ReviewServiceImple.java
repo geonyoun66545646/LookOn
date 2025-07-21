@@ -1,19 +1,24 @@
 package ks55team02.customer.store.service.impl;
 
-import java.io.IOException; // 파일 처리 시 필요할 수 있으므로 추가
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile; // MultipartFile import 추가
 
 import ks55team02.common.domain.store.ProductReview;
-// import ks55team02.common.domain.store.ReviewImage; // 지금 당장 사용하지 않음
+import ks55team02.common.domain.store.ReviewImage;
+import ks55team02.common.domain.store.StoreImage;
 import ks55team02.customer.store.domain.ReviewAddDto; // DTO 클래스명 확인
 import ks55team02.customer.store.mapper.ReviewMapper;
 import ks55team02.customer.store.service.ReviewService;
 import ks55team02.orderproduct.domain.OrderDTO;
-// import ks55team02.seller.common.domain.Order; // 사용하지 않으므로 제거 또는 주석 처리
+import ks55team02.util.FileDetail;
+import ks55team02.util.FilesUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j; // 로그 사용을 위해 추가
 
@@ -24,6 +29,7 @@ import lombok.extern.slf4j.Slf4j; // 로그 사용을 위해 추가
 public class ReviewServiceImple implements ReviewService { // 클래스명 관례에 맞게 수정 (ReviewServiceImple -> ReviewServiceImpl)
 
     private final ReviewMapper reviewMapper;
+    private final FilesUtils filesUtils;
     
     // TODO: 파일 처리 로직을 담당할 FileService를 나중에 주입해야 합니다.
     // private final FileService fileService;
@@ -82,25 +88,59 @@ public class ReviewServiceImple implements ReviewService { // 클래스명 관�
         log.info("리뷰 기본 정보 저장 성공. reviewId: {}", newReviewId);
 
         // 7. 첨부된 파일 처리 로직
+        // ⭐⭐⭐ 7. 첨부된 파일 처리 로직 구현 시작 (참조 코드 기반) ⭐⭐⭐
         List<MultipartFile> reviewImages = reviewAddDto.getReviewImages();
-        if (reviewImages != null && !reviewImages.isEmpty()) {
-            log.info("{}개의 이미지 파일 처리를 시작합니다.", reviewImages.size());
-            // TODO: 여기에 실제 파일 처리 로직을 구현해야 합니다.
-            // 1. 파일을 서버 특정 위치에 저장 (ex: FileService.saveFile())
-            // 2. 저장된 파일 정보를 `store_images` 테이블에 INSERT
-            // 3. 생성된 reviewId와 imageId를 `review_images` 테이블에 INSERT (매핑)
-            // 이 로직은 반복문 안에서 처리되어야 합니다.
-            // try-catch로 감싸서 파일 처리 중 예외가 발생해도 롤백되도록 해야 합니다.
-        }
-        
-    } // addReview 메서드 끝
+        if (reviewImages != null && !reviewImages.isEmpty() && !reviewImages.get(0).isEmpty()) { // 파일이 실제로 있는지 확인
+            List<StoreImage> storeImagesToInsert = new ArrayList<>();
+            List<ReviewImage> reviewImagesToInsert = new ArrayList<>();
+            int order = 0;
 
-    /**
-     * 특정 사용자가 특정 상품에 대해 리뷰를 작성할 수 있는지 확인하고,
-     * 가능하다면 대상 주문 정보를 반환합니다.
-     */
+            // FilesUtils를 사용하여 파일 저장 및 FileDetail 리스트 얻기
+            // "review_images"는 FilesUtils 내부에서 사용할 서브 경로 (예: /upload/review_images/)
+            List<FileDetail> fileDetails = filesUtils.saveFiles(reviewImages.toArray(new MultipartFile[0]), "review_images");
+
+            for (FileDetail fileDetail : fileDetails) {
+                // 7-1. StoreImage 객체 생성 및 리스트에 추가 (store_images 테이블용)
+                String imgId = "img_" + LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(FilesUtils.FILEIDX_DATE_FORMATTER)
+                                     + UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+                StoreImage storeImage = StoreImage.builder()
+                        .imgId(imgId)
+                        .imgFileNm(fileDetail.getOriginalFileName()) // 원본 파일명
+                        .imgAddr(fileDetail.getSavedPath()) // 저장된 경로 (예: /upload/review_images/UUID.확장자)
+                        .imgFileSz(fileDetail.getFileSize())
+                        .imgTypeCd(fileDetail.getFileExtension()) // 파일 확장자
+                        .regYmd(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                        .delYn(false)
+                        .build();
+                storeImagesToInsert.add(storeImage);
+
+                // 7-2. ReviewImage 객체 생성 및 리스트에 추가 (review_images 테이블용)
+                String reviewImgId = "review_img_" + LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(FilesUtils.FILEIDX_DATE_FORMATTER)
+                                          + UUID.randomUUID().toString().replace("-", "").substring(0, 16);
+                ReviewImage reviewImage = ReviewImage.builder()
+                        .reviewImgId(reviewImgId)
+                        .reviewId(newReviewId) // 새로 생성된 리뷰 ID
+                        .imgId(imgId) // 위에서 생성한 StoreImage의 imgId
+                        .ord(order++) // 이미지 순서
+                        .build();
+                reviewImagesToInsert.add(reviewImage);
+            }
+
+            // 7-3. StoreImage 데이터 저장 (배치 삽입)
+            if (!storeImagesToInsert.isEmpty()) {
+                reviewMapper.addStoreImages(storeImagesToInsert);
+                log.info("{}개의 StoreImage 정보 저장 성공.", storeImagesToInsert.size());
+            }
+
+            // 7-4. ReviewImage 데이터 저장 (배치 삽입)
+            if (!reviewImagesToInsert.isEmpty()) {
+                reviewMapper.addReviewImages(reviewImagesToInsert);
+                log.info("{}개의 ReviewImage 정보 저장 성공.", reviewImagesToInsert.size());
+            }
+        } // <--- addReview 메서드 내 이미지 처리 if 블록의 닫는 중괄호
+    } // <--- addReview 메서드의 닫는 중괄호
     @Override
     public OrderDTO findReviewableOrder(String userNo, String gdsNo) {
         return reviewMapper.findReviewableOrder(userNo, gdsNo);
     }
-} // ReviewServiceImpl 클래스 끝
+}
