@@ -63,6 +63,7 @@ public class FeedController {
     	UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
     	model.addAttribute("userInfo", userInfo);
     	model.addAttribute("showFab", true);
+    	model.addAttribute("loginUserNo", userNo);
     	return "customer/feed/feedListByUserNo";
     }
     
