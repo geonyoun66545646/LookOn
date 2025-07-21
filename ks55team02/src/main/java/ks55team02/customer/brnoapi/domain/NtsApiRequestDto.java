@@ -1,4 +1,4 @@
-package ks55team02.customer.brnoApi.domain;
+package ks55team02.customer.brnoapi.domain;
 
 import java.util.List;
 

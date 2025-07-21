@@ -1,12 +1,12 @@
-package ks55team02.customer.brnoApi.controller;
+package ks55team02.customer.brnoapi.controller;
 
 import org.springframework.web.bind.annotation.GetMapping; // GET 요청 매핑을 위한 어노테이션
 import org.springframework.web.bind.annotation.RequestMapping; // 요청 경로 매핑을 위한 어노테이션
 import org.springframework.web.bind.annotation.RequestParam; // 쿼리 파라미터 바인딩을 위한 어노테이션
 import org.springframework.web.bind.annotation.RestController; // REST 컨트롤러임을 명시하는 어노테이션
 
-import ks55team02.customer.brnoApi.domain.NtsApiResponseDto; // NtsApiResponseDto 임포트
-import ks55team02.customer.brnoApi.service.NtsApiService; // NtsApiService 임포트
+import ks55team02.customer.brnoapi.domain.NtsApiResponseDto;
+import ks55team02.customer.brnoapi.service.NtsApiService;
 import reactor.core.publisher.Mono; // 비동기 처리를 위한 Mono 임포트
 
 @RestController // 이 클래스가 RESTful 웹 서비스를 제공하는 컨트롤러임을 명시합니다.
