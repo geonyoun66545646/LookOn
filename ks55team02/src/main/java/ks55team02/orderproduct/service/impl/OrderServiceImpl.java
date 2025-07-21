@@ -34,23 +34,36 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Map<String, Object> getLatestOrderDetailsForUser(String userNo) {
-        String latestOrderId = orderMapper.findLatestOrderIdByUserNo(userNo);
-        if (latestOrderId == null || latestOrderId.isEmpty()) {
-            return null;
+
+        // 1. Mapper를 호출하여 사용자의 가장 최근 주문 번호(ordrNo)를 가져옵니다.
+        String latestOrderNo = orderMapper.findLatestOrderIdByUserNo(userNo);
+
+        // 2. 만약 사용자의 주문 기록이 없다면, null을 반환하여 데이터가 없음을 알립니다.
+        if (latestOrderNo == null) {
+            System.out.println("서비스: " + userNo + " 님의 주문 내역이 없습니다.");
+            return null; // 컨트롤러에서 null 체크를 통해 후속 처리를 합니다.
         }
 
-        // OrderDTO로 직접 매핑
-        OrderDTO orderDTO = orderMapper.getCombinedOrderDetailsByOrderId(latestOrderId);
-        
-        // 상품 목록 조회
-        List<Map<String, Object>> orderedProducts = orderMapper.getOrderedProductsByOrderId(latestOrderId);
+        // 3. 조회된 주문 번호를 사용하여 주문의 기본/결제/배송 정보를 가져옵니다.
+        OrderDTO orderInfo = orderMapper.getCombinedOrderDetailsByOrderId(latestOrderNo);
 
-        // 결과 맵 구성
-        Map<String, Object> result = new HashMap<>();
-        result.put("orderInfo", orderDTO);
-        result.put("orderedProducts", orderedProducts);
-        
-        return result;
+        // 4. 동일한 주문 번호로 주문된 상품 목록을 가져옵니다.
+        List<Map<String, Object>> orderedProducts = orderMapper.getOrderedProductsByOrderId(latestOrderNo);
+
+        // [디버깅 로그] 각 단계에서 데이터가 제대로 조회되었는지 확인하는 것이 매우 중요합니다.
+        System.out.println("--- OrderServiceImpl 데이터 확인 ---");
+        System.out.println("사용자 최근 주문 번호: " + latestOrderNo);
+        System.out.println("조회된 주문 기본 정보 (orderInfo): " + orderInfo);
+        System.out.println("조회된 주문 상품 목록 (orderedProducts): " + orderedProducts);
+        System.out.println("----------------------------------");
+
+        // 5. 조회된 두 종류의 데이터를 컨트롤러에서 사용하기 좋게 하나의 Map으로 묶습니다.
+        Map<String, Object> resultData = new HashMap<>();
+        resultData.put("orderInfo", orderInfo);
+        resultData.put("orderedProducts", orderedProducts);
+
+        // 6. 데이터가 담긴 Map을 컨트롤러로 반환합니다.
+        return resultData;
     }
 
     @Override
