@@ -79,6 +79,8 @@
         <result column="issue_condition_type" 	property="issueConditionType"/>
     </resultMap>
     
+    
+    
     <!-- <<<<<<<<< [위치변경 및 추가] ID 생성 쿼리 섹션 >>>>>>>>> -->
     <select id="selectNextOrderId" resultType="String">
 	    SELECT CONCAT(
@@ -163,7 +165,8 @@
             oi.ordr_tm_untprc,
             oi.ordr_dtl_artcl_dcsn_cd,
             p.gds_nm AS product_name,          -- 상품 이름
-            po.opt_nm AS option_name           -- 옵션 이름
+            po.opt_nm AS option_name,          -- 옵션 이름
+            oi.ordr_qntty AS ordr_qntty
         FROM
             order_items oi
         JOIN
@@ -299,6 +302,31 @@
             user_cpn_id = #{userCpnId}
             AND use_yn = 1 -- 아직 사용하지 않은 상태일 때만 업데이트
     </update>
+    
+    <select id="findUserCouponsByUserId" resultMap="UserCouponDetailsMap">
+        SELECT
+	        uc.user_cpn_id AS userCpnId,
+	        c.cpn_nm AS couponName,
+	        c.dscnt_vl AS discountValue,
+	        c.min_ordr_amt AS minOrderAmount,  -- checkOut.html에서 minOrderAmount 필요할 수 있어 일단 유지
+	        c.max_dscnt_amt AS maxDiscountAmount, -- checkOut.html에서 maxDiscountAmount 필요할 수 있어 일단 유지
+	        uc.use_yn AS useYn,               -- useYn이 0/1이므로 프론트엔드에 전달
+	        uc.indiv_expry_dt AS indivExpryDt, -- 만료일 정보도 일단 전달 (프론트엔드에서 체크)
+	        CASE
+	            -- dscnt_vl이 정수가 아니면 'PERCENT', 정수이면 'FIXED'
+	            WHEN c.dscnt_vl != TRUNCATE(c.dscnt_vl, 0) THEN 'PERCENT'
+	            ELSE 'FIXED'
+	        END AS discountType
+	    FROM
+	        user_coupons uc
+	    JOIN
+	        coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+	    WHERE
+	        uc.user_no = #{userNo};
+	        -- 모든 유효성 조건 (uc.use_yn = TRUE, indiv_expry_dt > NOW(), vld_end_dt > NOW(), actvtn_yn = TRUE) 제거
+	        -- 이렇게 하면 user_no_208에 연결된 모든 쿠폰이 조회됩니다.
+    </select>
+    
     <!-- <<<<<<<<< [위치변경 및 추가] 쿠폰 관련 쿼리 섹션 끝 >>>>>>>>> -->
 
     <!-- <<<<<<<<< [기존] getUserOrderPaymentHistory는 기존 위치에 유지 >>>>>>>>> -->
