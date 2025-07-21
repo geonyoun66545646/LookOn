@@ -52,8 +52,9 @@ public interface ReviewMapper {
  Integer findMaxReviewIdNumber();
  
  // 리뷰 가능 주문 조회
- OrderDTO findReviewableOrder(@Param("userNo") String userNo, @Param("gdsNo") String gdsNo);
- 
+ OrderDTO findReviewableOrder(@Param("userNo") String userNo, 
+		 						@Param("gdsNo") String gdsNo);
+					 
  
  
  

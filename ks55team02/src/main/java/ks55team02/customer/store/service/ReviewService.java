@@ -8,6 +8,7 @@ import ks55team02.common.domain.store.ReviewImage;
 import ks55team02.customer.store.domain.ReviewAddDto;
 import ks55team02.orderproduct.domain.OrderDTO;
 import ks55team02.seller.common.domain.Order;
+import ks55team02.tossapi.domain.PayOrderItemsDTO;
 
 public interface ReviewService {
 
@@ -29,7 +30,7 @@ public interface ReviewService {
  // ProductReview가 아닌 ReviewFormDTO를 받는 것이 더 명확합니다.
  
  // 리뷰 가능 주문내역 조회
- OrderDTO findReviewableOrder(String userNo, String gdsNo);
+ OrderDTO findReviewableOrder(String ordrNo, String userNo);
 }
 
  // TODO: 리뷰 작성, 수정, 삭제, 좋아요/취소 등의 메서드를 여기에 추가할 수 있습니다.

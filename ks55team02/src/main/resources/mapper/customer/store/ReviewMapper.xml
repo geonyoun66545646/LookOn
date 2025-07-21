@@ -98,21 +98,21 @@
 	
 	<!--    리뷰 인서트     -->
 	<select id="findReviewableOrderItem" resultType="String">
-	    SELECT
-	        oi.ordr_dtl_artcl_no
-	    FROM
-	        orders o
-	    JOIN
-	        order_items oi ON o.ordr_no = oi.ordr_no
-	    WHERE
-	        o.user_no = #{userNo}
-	      AND
-	        o.ordr_no = #{ordrNo}
-	      AND
-	        oi.gds_no = #{gdsNo}
-	      AND
-	        oi.ordr_dtl_artcl_dcsn_cd = 'ORDERED' -- 상태 체크 조건 추가!
-	    LIMIT 1
+    SELECT
+        oi.ordr_dtl_artcl_no
+    FROM
+        orders o
+    JOIN
+        order_items oi ON o.ordr_no = oi.ordr_no
+    WHERE
+        o.user_no = #{userNo}
+      AND
+        o.ordr_no = #{ordrNo}
+      AND
+        oi.gds_no = #{gdsNo}
+      AND
+        oi.ordr_dtl_artcl_dcsn_cd = 'ORDERED' -- 상태 체크 조건 추가!
+    LIMIT 1
 	</select>
 <!-- [2] 중복 리뷰 검사를 위한 쿼리 -->
 <select id="countReviewByOrderItem" resultType="int">

@@ -2,7 +2,9 @@ package ks55team02.orderproduct.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import ks55team02.tossapi.domain.PayOrderItemsDTO;
 import lombok.Data;
 
 @Data
@@ -26,4 +28,7 @@ public class OrderDTO {
     private String userName;
     private String emlAddr;
     private String gdsNm;
+    
+    /*tossapi의 orderItems 객체를 리스트로 가져와서 사용*/
+    private List<PayOrderItemsDTO> payOrderItemsDTO;
 }

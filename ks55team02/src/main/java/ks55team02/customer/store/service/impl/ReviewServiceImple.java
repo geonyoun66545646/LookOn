@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j; // 로그 사용을 위해 추가
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class ReviewServiceImpl implements ReviewService { // 클래스명 관례에 맞게 수정 (ReviewServiceImple -> ReviewServiceImpl)
+public class ReviewServiceImple implements ReviewService { // 클래스명 관례에 맞게 수정 (ReviewServiceImple -> ReviewServiceImpl)
 
     private final ReviewMapper reviewMapper;
     
