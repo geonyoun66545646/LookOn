@@ -1,7 +1,6 @@
 package ks55team02.admin.adminpage.inquiryadmin.reports.domain;
 
-import java.util.List; // 1:N 관계를 위해 List import
-
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,24 +11,28 @@ import lombok.ToString;
 public class AdminReportDetail {
 
     // reports 테이블 정보
-    private String dclrId;          // 신고 아이디 (dclr_id)
-    private String dclrUserNo;      // 신고자 회원 번호 (dclr_user_no)
-    private String dclrUserNcnm;    // 신고자 닉네임 (users.user_ncnm)
-    private String dclrTrgtUserNo;  // 신고대상 회원 번호 (dclr_trgt_user_no)
-    private String dclrTrgtUserNcnm;// 신고대상 닉네임 (users.user_ncnm)
-    private String dclrRsnCd;       // 신고 사유 코드 (dclr_rsn_cd)
-    private String dclrRsnCn;       // 신고 사유 내용 (report_reasons.dclr_rsn_cn)
-    private String dclrCn;          // 신고 상세 내용 (dclr_cn)
-    private String dclrDt;          // 신고 일자 (dclr_dt)
-    private String prcsSttsCd;      // 처리 상태 코드 (prcs_stts_cd)
-    private String prcsPicMngrNo;     // 처리 담당 관리자 ID
-    private String dclrPrcsRsltCn;    // 최종 처리 결과 내용
+    private String dclrId;
+    private String dclrUserNo;
+    private String dclrUserNcnm;
+    private String dclrTrgtUserNo;
+    private String dclrTrgtUserNcnm;
+    private String dclrRsnCd;
+    private String dclrRsnCn;
+    private String dclrCn;
+    private String dclrDt;
+    private String prcsSttsCd;
     
-    // report_attachments 테이블 정보 (우선 파일 개수만)
-    private int attachmentCount;    // 첨부파일 개수
+    // report_attachments 테이블 정보
+    private int attachmentCount;
 
-    // 1:N 관계: 하나의 신고 상세 정보는 여러 처리 이력을 가질 수 있습니다.
+    // 1:N 관계
     private List<AdminReportHistory> historyList; 
+
+    // 처리 완료 후 정보
+    private String prcsPicMngrNo;
+    private String dclrPrcsRsltCn;
     
-    
+    // [수정 3] 유효성 검사에 필요한 필드들을 추가합니다.
+    private String dclrTrgtTypeCd; // 신고 대상 타입
+    private String dclrTrgtContsId; // 신고 대상 콘텐츠 ID
 }
