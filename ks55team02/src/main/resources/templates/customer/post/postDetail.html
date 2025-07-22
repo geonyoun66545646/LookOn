@@ -4,10 +4,10 @@
       layout:decorate="~{customer/layout/layoutMain}">
 <head>
     <title th:text="${postDetail != null ? postDetail.pstTtl : '게시글 상세'}"></title>
-    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postView.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postDetail.css}">
 </head>
 <th:block layout:fragment="jsFile">
-    <script th:src="@{/maincss/assets/js/customer/postView.js}"></script>
+    <script th:src="@{/js/customerjs/postDetail.js}"></script>
 </th:block>
 <th:block layout:fragment="contents">
     <!-- [수정] 최상위 컨테이너에 login-user-no 속성 추가 -->
@@ -105,7 +105,7 @@
                     <button id="comment-submit-btn" type="submit" disabled>등록</button>
                 </form>
                 <div class="comment-login-prompt" th:if="${session.loginUser == null}">
-                    <a th:href="@{/login}">로그인</a> 후 댓글을 작성할 수 있습니다.
+                    <a href="#" role="button" data-toggle="modal" data-target="#signin-modal">로그인</a> 후 댓글을 작성할 수 있습니다.
                 </div>
             </div>
         </div>

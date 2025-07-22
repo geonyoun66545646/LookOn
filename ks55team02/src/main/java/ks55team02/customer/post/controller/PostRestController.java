@@ -1,21 +1,20 @@
 package ks55team02.customer.post.controller;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.customer.post.domain.Post;
 import ks55team02.customer.post.domain.PostComment;
 import ks55team02.customer.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpSession;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/customer/api/post")
@@ -46,12 +45,8 @@ public class PostRestController {
         }
     }
 
-    // =======================================================
-    // [신규] 게시글 작성 API (파일 업로드 포함)
-    // =======================================================
     @PostMapping(value = "/write", consumes = {"multipart/form-data"})
     public ResponseEntity<Map<String, Object>> writePost(
-            // Post DTO 필드를 개별 @RequestParam으로 받습니다.
             @RequestParam("bbsClsfCd") String bbsClsfCd,
             @RequestParam("pstTtl") String pstTtl,
             @RequestParam("pstCn") String pstCn,
@@ -60,11 +55,10 @@ public class PostRestController {
         
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         if (loginUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("result", "fail", "message", "로그인이 필요합니다."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         try {
-            // Post 객체를 생성하고 값 설정
             Post post = new Post();
             post.setBbsClsfCd(bbsClsfCd);
             post.setPstTtl(pstTtl);
@@ -80,9 +74,6 @@ public class PostRestController {
         }
     }
 
-    // =======================================================
-    // [신규] 게시글 수정 API (파일 업로드 포함)
-    // =======================================================
     @PostMapping(value = "/update/{pstSn}", consumes = {"multipart/form-data"})
     public ResponseEntity<Map<String, Object>> updatePost(
             @PathVariable("pstSn") String pstSn,
@@ -95,7 +86,7 @@ public class PostRestController {
 
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         if (loginUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("result", "fail", "message", "로그인이 필요합니다."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         try {
@@ -104,7 +95,7 @@ public class PostRestController {
             post.setBbsClsfCd(bbsClsfCd);
             post.setPstTtl(pstTtl);
             post.setPstCn(pstCn);
-            post.setWrtrUserNo(loginUser.getUserNo()); // 권한 확인용
+            post.setWrtrUserNo(loginUser.getUserNo());
 
             boolean isSuccess = postService.updatePost(post, newImageFiles, deleteImageSns, loginUser.getUserNo());
 
@@ -119,9 +110,13 @@ public class PostRestController {
         }
     }
 
-
     @DeleteMapping("/delete/{pstSn}")
-    public ResponseEntity<Map<String, Object>> deletePost(@PathVariable String pstSn) {
+    public ResponseEntity<Map<String, Object>> deletePost(@PathVariable String pstSn, HttpSession session) {
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
         Map<String, Object> response = new HashMap<>();
         try {
             postService.deletePost(pstSn);
@@ -137,15 +132,24 @@ public class PostRestController {
     public ResponseEntity<Map<String, Object>> toggleLike(@RequestBody Map<String, String> payload, HttpSession session) {
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         if (loginUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "로그인이 필요합니다."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         
         String pstSn = payload.get("pstSn");
         String loginUserNo = loginUser.getUserNo();
 
         try {
-            Map<String, Object> result = postService.togglePostLike(pstSn, loginUserNo);
-            return ResponseEntity.ok(result);
+            boolean success = postService.addPostLike(pstSn, loginUserNo);
+
+            if (success) {
+                int currentLikeCount = postService.countInteractionsByPost(pstSn);
+                Map<String, Object> response = new HashMap<>();
+                response.put("isLiked", true);
+                response.put("likeCount", currentLikeCount);
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
         } catch (Exception e) {
             log.error("Error toggling like for postSn={}: {}", pstSn, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "처리 중 오류가 발생했습니다."));
@@ -153,7 +157,13 @@ public class PostRestController {
     }
 
     @PostMapping("/comments")
-    public ResponseEntity<Map<String, Object>> writeComment(@RequestBody PostComment comment) {
+    public ResponseEntity<Map<String, Object>> writeComment(@RequestBody PostComment comment, HttpSession session) {
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        comment.setWrtrUserNo(loginUser.getUserNo());
+        
         Map<String, Object> response = new HashMap<>();
         try {
             postService.insertComment(comment);
@@ -166,7 +176,12 @@ public class PostRestController {
     }
 
     @PutMapping("/comments/{pstCmntSn}")
-    public ResponseEntity<Map<String, Object>> updateComment(@PathVariable String pstCmntSn, @RequestBody PostComment comment) {
+    public ResponseEntity<Map<String, Object>> updateComment(@PathVariable String pstCmntSn, @RequestBody PostComment comment, HttpSession session) {
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
         Map<String, Object> response = new HashMap<>();
         try {
             comment.setPstCmntSn(pstCmntSn);
@@ -180,7 +195,12 @@ public class PostRestController {
     }
 
     @DeleteMapping("/comments/{pstCmntSn}")
-    public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable String pstCmntSn) {
+    public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable String pstCmntSn, HttpSession session) {
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
         Map<String, Object> response = new HashMap<>();
         try {
             postService.deleteComment(pstCmntSn);

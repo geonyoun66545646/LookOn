@@ -163,6 +163,21 @@
     cursor: pointer;
 }
 
+#create-feed-btn-login-prompt.fab-button {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
 /* 3. 기존 '#scroll-top' 버튼 스타일 덮어쓰기 (흰색 원형) */
 #scroll-top {
     /* 위치 및 크기 재설정 */
