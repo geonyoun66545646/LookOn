@@ -14,9 +14,9 @@
         <nav>
             <ul class="menu-aside">
                 <li class="menu-item" th:classappend="${activeMenu == 'adminpage'} ? 'active' : ''">
-                    <a class="menu-link" href="/adminpage">
+                    <a class="menu-link" th:href="@{/adminpage/dashboard}">
                         <i class="icon material-icons md-home"></i>
-                        <span class="text">홈으로 이동</span>
+                        <span class="text">대시보드로 이동</span>
                     </a>
                 </li>
                 <li class="menu-item has-submenu" th:classappend="${activeMenu == 'user'} ? 'active' : ''">
