@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpSession;
 import ks55team02.common.domain.store.ProductReview;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.customer.store.service.ReviewService;
+import ks55team02.orderproduct.domain.OrderDTO;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.domain.ProductImage;
 import ks55team02.seller.products.domain.ProductImageType;
@@ -29,8 +30,11 @@ import ks55team02.seller.products.service.ProductCategoryService;
 import ks55team02.seller.products.service.ProductSearchService;
 import ks55team02.seller.products.service.ProductsService;
 import ks55team02.seller.stores.domain.Stores;
+import ks55team02.util.CustomerPagination;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Controller
 @RequiredArgsConstructor
 public class CustomerProductController {
@@ -298,7 +302,7 @@ public class CustomerProductController {
 	}
 
 	@GetMapping("/products/detail/{productCode}")
-	public String getProductDetailForCustomer(@PathVariable String productCode, Model model) {
+	public String getProductDetailForCustomer(@PathVariable String productCode, Model model, HttpSession session) {
 		Products product = productsService.getProductDetailWithImages(productCode);
 
 		if (product == null || !Boolean.TRUE.equals(product.getExpsrYn())
@@ -317,9 +321,6 @@ public class CustomerProductController {
 		List<ProductImage> detailImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.DETAIL)
 				.sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
 
-		// 리뷰 추가(ljs)
-		List<ProductReview> reviews = reviewService.getReviewsByProductCode(productCode); // productCode로 리뷰 조회
-
 		if (product.getCtgryNo() != null) {
 			List<Products> similarProducts = productSearchService.getSimilarProducts(product.getCtgryNo(),
 					product.getGdsNo());
@@ -330,13 +331,69 @@ public class CustomerProductController {
 		List<Map<String, Object>> productStatusData = productsService.getProductStatusOptions(productCode);
 		model.addAttribute("productStatusData", productStatusData);
 		
-		// 리뷰 추가(ljs)
-		model.addAttribute("reviews", reviews);
-
 		model.addAttribute("thumbnailImage", thumbnailImage);
 		model.addAttribute("mainGalleryImages", mainGalleryImages);
 		model.addAttribute("detailImages", detailImages);
+		
+		
+		  // ==================== [ 리뷰 관련 로직] ====================
+		
+        // [리뷰 로직 1: 첫 페이지 리뷰 목록 및 페이지네이션 정보 조회]
+		 LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+	        String currentUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
 
-		return "customer/productDetail";
+	        int currentPage = 1;
+	        int pageSize = 5;
+	        int blockSize = 10;
+	        
+	        // 상품의 전체 리뷰 개수를 조회합니다.
+	        long totalReviewCount = reviewService.getReviewCountByGdsNo(productCode);
+	        // Service에서 평균 평점 가져오기
+	        double averageRating = reviewService.getAverageRating(productCode);
+	        
+	        // ✅ [핵심 수정] 첫 페이지 리뷰 목록을 조회할 때, 'currentUserNo'를 함께 전달합니다.
+	        // 이를 통해 각 리뷰에 대한 현재 사용자의 '좋아요' 여부를 함께 가져옵니다.
+	        List<ProductReview> firstPageReviews = reviewService.getReviewListPageByGdsNo(
+	            productCode, 
+	            currentPage, 
+	            pageSize, 
+	            currentUserNo
+	        );
+
+	        // JavaScript에서 사용할 페이지네이션 객체를 생성합니다.
+	        CustomerPagination<ProductReview> reviewPaginationData = new CustomerPagination<>(
+	            firstPageReviews, totalReviewCount, currentPage, pageSize, blockSize
+	        );
+	        
+	        // 모델에 페이지네이션 객체와 상품 ID를 추가하여 Thymeleaf/JavaScript에서 사용할 수 있도록 합니다.
+	        model.addAttribute("reviewPaginationData", reviewPaginationData);
+	        model.addAttribute("productId", productCode);
+	        model.addAttribute("averageRating", averageRating); // ✅ [추가] Model에 평균 평점 추가
+	        
+	        // [2] 리뷰 작성 가능 여부 확인
+	        // -------------------------------------------------------------------
+	        boolean canWriteReview = false;
+	        OrderDTO reviewableOrder = null;
+
+	        // 로그인한 상태일 때만 리뷰 작성 가능 여부를 확인합니다.
+	        if (currentUserNo != null) {
+	            log.info(">>>>> 리뷰 작성 가능 여부 확인 - 사용자 번호: {}", currentUserNo);
+	            reviewableOrder = reviewService.findReviewableOrder(currentUserNo, productCode);
+
+	            if (reviewableOrder != null) {
+	                canWriteReview = true;
+	            }
+	        }
+	        
+	        // 모델에 리뷰 작성 관련 정보를 추가합니다.
+	        model.addAttribute("canWriteReview", canWriteReview);
+	        if (canWriteReview) {
+	            model.addAttribute("reviewableOrder", reviewableOrder);
+	        }
+        /*  리뷰 끝  */
+        
+	    return "customer/productDetail";
 	}
 }
+
+	

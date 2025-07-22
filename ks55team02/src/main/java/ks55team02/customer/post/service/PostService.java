@@ -1,8 +1,9 @@
 package ks55team02.customer.post.service;
 
 import java.util.List;
-import java.util.Map;
+
 import org.springframework.web.multipart.MultipartFile;
+
 import ks55team02.customer.post.domain.Board;
 import ks55team02.customer.post.domain.Post;
 import ks55team02.customer.post.domain.PostComment;
@@ -19,9 +20,6 @@ public interface PostService {
     
     int selectPostListNumByBoardCd(String bbsClsfCd);
     
-    // =======================================================
-    // [수정] 게시글 생성/수정/삭제 메소드 시그니처 변경
-    // =======================================================
     void insertPost(Post post, List<MultipartFile> imageFiles);
     
     boolean updatePost(Post post, List<MultipartFile> newImageFiles, List<String> deleteImageSns, String loginUserNo);
@@ -34,5 +32,7 @@ public interface PostService {
     
     void deleteComment(String pstCmntSn);
     
-    Map<String, Object> togglePostLike(String pstSn, String loginUserNo);
+    boolean addPostLike(String pstSn, String loginUserNo);
+    
+    int countInteractionsByPost(String pstSn);
 }

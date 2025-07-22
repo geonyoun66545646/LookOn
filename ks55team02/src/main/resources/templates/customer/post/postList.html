@@ -9,7 +9,13 @@
 </head>
 
 <th:block layout:fragment="jsFile">
-    <script th:src="@{/maincss/assets/js/customer/postList.js}"></script>
+    <script th:src="@{/js/customerjs/postList.js}"></script>
+</th:block>
+
+<th:block layout:fragment="jsScript">
+    <script th:inline="javascript">
+        window.loginUser = /*[[${session.loginUser}]]*/ null;
+    </script>
 </th:block>
 
 <th:block layout:fragment="contents">
@@ -21,22 +27,18 @@
             <h2 class="page-main-title" id="board-title">커뮤니티</h2>
         </div>
     
-        <!-- =================================================================== -->
-        <!-- [핵심 추가] 피드 페이지와 동일한 상단 메인 탭을 여기에 추가합니다. -->
-        <!-- =================================================================== -->
         <nav class="main-tabs">
             <ul>
-                <!-- '발견'과 '팔로잉'은 피드 페이지로 가는 링크입니다. -->
                 <li><a th:href="@{/customer/feed/feedList}">발견</a></li>
-                <li><a th:href="@{/customer/feed/feedList}">팔로잉</a></li>
-                <!-- '커뮤니티'는 현재 페이지이므로 active 상태입니다. -->
+                
+                <!-- ▼▼▼ [핵심 수정] th:data-href에 'tab=following' 파라미터 추가 ▼▼▼ -->
+                <li><a href="#" id="following-tab-link" th:data-href="@{/customer/feed/feedList(tab='following')}">팔로잉</a></li>
+                <!-- ▲▲▲ [핵심 수정] ▲▲▲ -->
+                
                 <li class="active"><a href="#">커뮤니티</a></li>
             </ul>
         </nav>
 
-        <!-- =================================================================== -->
-        <!-- [구조 변경] 하위 카테고리 탭과 글쓰기 버튼을 한 줄에 묶습니다. -->
-        <!-- =================================================================== -->
         <div class="sub-controls-area">
             <div class="board-tabs-container" id="tabsContainer">
                  <ul class="nav nav-tabs">
@@ -50,7 +52,6 @@
             </div>
         </div>
         
-        <!-- 게시글 리스트 컨테이너와 로딩 인디케이터는 그대로 둡니다. -->
         <div class="post-list-container" id="post-list-container"></div>
         <div id="loading-indicator" style="display: none;"><p>Loading...</p></div>
     </div>

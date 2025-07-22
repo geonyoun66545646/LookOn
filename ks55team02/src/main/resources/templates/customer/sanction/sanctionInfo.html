@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>계정 이용 제한 안내</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; /* 글꼴 설정 */
+            display: flex; /* 화면 중앙 정렬을 위해 사용 */
+            justify-content: center; /* 가로 중앙 정렬 */
+            align-items: center; /* 세로 중앙 정렬 */
+            min-height: 100vh; /* 화면 전체 높이 사용 */
+            background-color: #f0f2f5; /* 배경색 */
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px; /* 모서리 둥글게 */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+            text-align: center;
+            max-width: 550px; /* 최대 너비 */
+            width: 90%;
+            border-top: 5px solid #dc3545; /* 상단에 빨간색 강조선 */
+        }
+        h1 {
+            color: #dc3545; /* 경고를 나타내는 빨간색 */
+            margin-bottom: 25px;
+            font-size: 2.2em; /* 제목 크기 */
+        }
+        p {
+            font-size: 1.15em;
+            line-height: 1.7;
+            color: #495057;
+            margin-bottom: 18px;
+        }
+        strong {
+            color: #007bff; /* 중요한 정보를 강조하는 파란색 */
+            font-weight: bold;
+        }
+        .logout-btn {
+            background-color: #6c757d; /* 회색 버튼 */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none; /* 밑줄 제거 */
+            display: inline-block;
+            margin-top: 30px;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease; /* 부드러운 호버 효과 */
+        }
+        .logout-btn:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 계정 이용이 제한되었습니다. 🚨</h1>
+        <p>회원님의 계정은 **<span th:text="${sanctionType}"></span>** 조치로 인해</p>
+        <p><strong><span th:text="${sanctionEndDt}"></span></strong>까지 이용이 제한되었습니다.</p>
+        <p><strong>사유:</strong> <span th:text="${sanctionReason}"></span></p>
+        <p>더 자세한 정보가 필요하시면 고객센터로 문의해주세요.</p>
+        <a th:href="@{/customer/logout}" class="logout-btn">로그아웃</a>
+    </div>
+</body>
+</html>

@@ -1,5 +1,8 @@
 package ks55team02.customer.feed.controller;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,15 +27,48 @@ public class FeedController {
 
     private final FeedService feedService;
     private final UserInfoService userInfoService;
+    private static final int PAGE_SIZE = 12; // JS와 동일한 페이지 사이즈
 
+    // ▼▼▼ [핵심 수정] ▼▼▼
     @GetMapping("/feedList")
     public String selectFeedList(
+            @RequestParam(name = "tab", defaultValue = "discover") String tab, // 1. 'tab' 파라미터 받기 (기본값 'discover')
             @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
             Model model) {
+        
+        int currentPage = 1;
+        Map<String, Object> feedData;
+
+        // 2. 'tab' 값에 따라 분기 처리
+        if ("following".equals(tab)) {
+            // 팔로잉 탭을 보려면 로그인이 필수
+            if (loginUser == null) {
+                // 비로그인 시, 빈 데이터를 모델에 담고 로그인 페이지로 유도
+                model.addAttribute("feedList", Collections.emptyList());
+                model.addAttribute("hasNext", false);
+                model.addAttribute("totalCount", 0);
+                model.addAttribute("needsLogin", true); // JS나 HTML에서 로그인 유도에 사용할 수 있는 플래그
+            } else {
+                // 로그인 시, 팔로잉 피드 목록의 첫 페이지 조회
+                String followerUserNo = loginUser.getUserNo();
+                feedData = feedService.getFollowingFeedList(followerUserNo, currentPage, PAGE_SIZE);
+                model.addAllAttributes(feedData); // 조회된 데이터를 모델에 한번에 추가
+            }
+        } else {
+            // '발견' 탭 (기본)
+            feedData = feedService.selectFeedList(null, currentPage, PAGE_SIZE);
+            model.addAllAttributes(feedData);
+        }
+
+        // 3. 공통 모델 속성 추가
         model.addAttribute("loginUser", loginUser);
         model.addAttribute("showFab", true);
+        model.addAttribute("activeTab", tab); // 현재 활성화된 탭 정보 전달
+        model.addAttribute("currentPage", currentPage); // 현재 페이지 번호(1) 전달
+
         return "customer/feed/feedList";
     }
+    // ▲▲▲ [핵심 수정] ▲▲▲
      
 	 @GetMapping("/feedDetail/{feedSn}")
 	 public String selectFeedDetail(@PathVariable String feedSn, 
@@ -42,7 +78,6 @@ public class FeedController {
 			 			Model model) {
 		 
 	     Feed feed = feedService.selectFeedDetail(feedSn);
-         // [수정] 피드가 없거나 삭제된 경우 목록으로 리다이렉트
          if (feed == null) {
              return "redirect:/customer/feed/feedList";
          }
@@ -98,9 +133,6 @@ public class FeedController {
         return "customer/feed/feedWrite";
     }
     
-    // =======================================================
-    // [신규] 피드 수정 페이지 이동 컨트롤러
-    // =======================================================
     @GetMapping("/edit/{feedSn}")
     public String feedEditPage(@PathVariable("feedSn") String feedSn,
                                @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
@@ -111,7 +143,6 @@ public class FeedController {
 
         Feed feed = feedService.selectFeedDetail(feedSn);
 
-        // 피드가 존재하지 않거나, 현재 로그인한 사용자가 작성자가 아닌 경우 접근 차단
         if (feed == null || !feed.getWrtrUserNo().equals(loginUser.getUserNo())) {
             log.warn("잘못된 수정 접근: feedSn={}, accessor={}", feedSn, loginUser.getUserNo());
             return "redirect:/customer/feed/feedList";
@@ -120,6 +151,6 @@ public class FeedController {
         model.addAttribute("userInfo", userInfo);
         model.addAttribute("feed", feed);
         model.addAttribute("loginUser", loginUser);
-        return "customer/feed/feedWrite"; // 작성 페이지(feedWrite.html) 재사용
+        return "customer/feed/feedWrite";
     }
 }

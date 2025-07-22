@@ -148,38 +148,28 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Map<String, Object> togglePostLike(String pstSn, String loginUserNo) {
-        PostInteraction existingLike = postMapper.findInteractionByUserAndPost(pstSn, loginUserNo);
-        boolean isLiked;
-
-        if (existingLike == null) {
-            Integer maxNum = postMapper.selectMaxInterNumber();
-            int nextNum = (maxNum == null) ? 1 : maxNum + 1;
-            String newSn = "pst_itrct_" + nextNum;
-            
-            PostInteraction newLike = new PostInteraction();
-            newLike.setPstIntractSn(newSn);
-            newLike.setPstSn(pstSn);
-            newLike.setUserNo(loginUserNo);
-            
-            postMapper.insertInteraction(newLike);
-            isLiked = true;
-
-        } else {
-            if (existingLike.getRtrcnDt() != null) {
-                postMapper.revertLike(existingLike.getPstIntractSn());
-                isLiked = true;
-            } else {
-                postMapper.cancelLike(existingLike.getPstIntractSn());
-                isLiked = false;
-            }
+    public boolean addPostLike(String pstSn, String loginUserNo) {
+        if (postMapper.checkLikeExists(pstSn, loginUserNo) > 0) {
+            log.info("중복 추천 시도: userNo={}, pstSn={}", loginUserNo, pstSn);
+            return false;
         }
 
-        int currentLikeCount = postMapper.countInteractionsByPost(pstSn);
+        Integer maxNum = postMapper.selectMaxInterNumber();
+        int nextNum = (maxNum == null) ? 1 : maxNum + 1;
+        String newSn = "pst_itrct_" + nextNum;
+        
+        PostInteraction newLike = new PostInteraction();
+        newLike.setPstIntractSn(newSn);
+        newLike.setPstSn(pstSn);
+        newLike.setUserNo(loginUserNo);
+        
+        postMapper.insertInteraction(newLike);
+        
+        return true;
+    }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("isLiked", isLiked);
-        result.put("likeCount", currentLikeCount);
-        return result;
+    @Override
+    public int countInteractionsByPost(String pstSn) {
+        return postMapper.countInteractionsByPost(pstSn);
     }
 }

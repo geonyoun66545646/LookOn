@@ -1408,3 +1408,103 @@
         margin: 0 8px; /* 구분자 좌우 여백 살짝 줄이기 */
     }
 }
+
+
+/*  리뷰 입력 폼  */
+/* 리뷰 섹션 컨테이너 */
+.add-review {
+    background-color: #ffffff;
+    border-radius: 12px;
+}
+
+/* 폼 라벨 */
+.form-label {
+    font-weight: 600;
+    color: #343a40; /* Dark gray */
+}
+
+/* 별점 섹션 */
+.rating-stars {
+    font-size: 2.2rem; /* 별 아이콘 크기 */
+    cursor: pointer;
+    color: #ccc; /* 기본 별 색상 */
+}
+
+.rating-stars .star-icon {
+    transition: color 0.2s ease-in-out, transform 0.1s ease-in-out;
+    margin: 0 3px;
+}
+
+.rating-stars .star-icon.fas { /* 채워진 별 */
+    color: #ffc107; /* Gold color */
+}
+
+.rating-stars .star-icon:hover {
+    transform: scale(1.1);
+}
+
+.rating-stars .star-icon.fas:hover {
+    transform: scale(1.1);
+}
+
+/* 파일 선택 input 숨기고 label 스타일링 */
+.custom-file-label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* 이미지 미리보기 컨테이너 */
+#imagePreview {
+    gap: 10px; /* 미리보기 이미지 사이 간격 */
+}
+
+#imagePreview .image-item {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa;
+}
+
+#imagePreview .image-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+#imagePreview .image-item .remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#imagePreview .image-item .remove-image:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* 제출 버튼 애니메이션 */
+.animate-hover-shadow {
+    transition: all 0.3s ease-in-out;
+}
+
+.animate-hover-shadow:hover {
+    box-shadow: 0 8px 16px rgba(0, 123, 255, 0.2); /* Primary color shadow */
+    transform: translateY(-2px);
+}

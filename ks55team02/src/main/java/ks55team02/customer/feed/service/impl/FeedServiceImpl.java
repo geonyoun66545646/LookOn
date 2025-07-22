@@ -49,6 +49,20 @@ public class FeedServiceImpl implements FeedService {
     }
 	
     @Override
+    public Map<String, Object> getFollowingFeedList(String followerUserNo, int page, int size) {
+        int offset = (page - 1) * size;
+        List<Feed> feedList = feedMapper.selectFollowingFeedList(followerUserNo, size, offset);
+        int totalCount = feedMapper.countFollowingFeeds(followerUserNo);
+        boolean hasNext = (offset + feedList.size()) < totalCount;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("feedList", feedList);
+        result.put("hasNext", hasNext);
+        result.put("totalCount", totalCount);
+        return result;
+    }
+    
+    @Override
     public Feed selectFeedDetail(String feedSn) {
         return feedMapper.selectFeedDetail(feedSn);
     }
@@ -61,7 +75,6 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
 	public void insertFeed(String feedCn, String hashtags, List<MultipartFile> imageFiles, LoginUser loginUser) {
-		// 1. 피드 본문 저장
 		String lastFeedSn = feedMapper.selectLastFeedSn();
 		int newFeedNum = (lastFeedSn == null) ? 1 : Integer.parseInt(lastFeedSn.replace("feed_", "")) + 1;
 		String newFeedSn = "feed_" + String.format("%03d", newFeedNum);
@@ -71,38 +84,31 @@ public class FeedServiceImpl implements FeedService {
 		newFeed.setWrtrUserNo(loginUser.getUserNo());
 		feedMapper.insertFeed(newFeed);
 		
-		// 2. 이미지 저장
 		saveImages(newFeedSn, imageFiles);
 		
-		// 3. 해시태그 처리
 		processHashtags(newFeedSn, hashtags, loginUser);
 	}
 	
 	@Override
 	@Transactional
 	public boolean updateFeed(String feedSn, String feedCn, String hashtags, List<String> deleteImageSns, List<MultipartFile> newImageFiles, LoginUser loginUser) {
-	    // 1. 피드 존재 여부 및 소유권 확인
 	    Feed existingFeed = feedMapper.selectFeedDetail(feedSn);
 	    if (existingFeed == null || !existingFeed.getWrtrUserNo().equals(loginUser.getUserNo())) {
 	        log.warn("피드 수정 권한 없음: feedSn={}, userNo={}", feedSn, loginUser.getUserNo());
 	        return false;
 	    }
 
-	    // 2. 피드 내용 업데이트
 	    Feed feedToUpdate = new Feed();
 	    feedToUpdate.setFeedSn(feedSn);
 	    feedToUpdate.setFeedCn(feedCn);
 	    feedMapper.updateFeed(feedToUpdate);
 
-	    // 3. 기존 이미지 삭제
 	    if (deleteImageSns != null && !deleteImageSns.isEmpty()) {
 	        feedMapper.deleteFeedImagesBySn(deleteImageSns, loginUser.getUserNo());
 	    }
 	    
-	    // 4. 새 이미지 추가
 	    saveImages(feedSn, newImageFiles);
 	    
-	    // 5. 해시태그 업데이트 (기존 태그 삭제 후 새로 추가)
 	    feedMapper.deleteTagsByFeedSn(feedSn);
 	    processHashtags(feedSn, hashtags, loginUser);
 
@@ -112,28 +118,19 @@ public class FeedServiceImpl implements FeedService {
 	@Override
 	@Transactional
 	public boolean deleteFeed(String feedSn, String userNo) {
-	    // 1. 피드 존재 여부 및 소유권 확인
 	    Feed feed = feedMapper.selectFeedDetail(feedSn);
 	    if (feed == null || !feed.getWrtrUserNo().equals(userNo)) {
-	        return false; // 권한 없음
+	        return false;
 	    }
-	    // 2. 피드 논리적 삭제
 	    feedMapper.deleteFeedLogically(feedSn, userNo);
-	    // (연관된 좋아요, 댓글, 이미지 등은 FK 제약조건이나 추가적인 비즈니스 로직으로 처리 필요. 현재는 피드만 논리삭제)
 	    return true;
 	}
 
 	private void saveImages(String feedSn, List<MultipartFile> imageFiles) {
-	    // [핵심 수정] 스트림 대신 for 반복문을 사용하여 문법 오류 해결
 	    if (imageFiles != null && !imageFiles.isEmpty()) {
-	        // DB에 저장할 이미지 객체 리스트
 	        List<FeedImage> imageListForDb = new ArrayList<>();
-	        
-	        // 마지막 이미지 번호를 가져와서 1 증가시킨 값을 시작점으로 사용
 	        String lastFeedImgSn = feedMapper.selectLastFeedImageSn();
 	        int newFeedImgNum = (lastFeedImgSn == null) ? 1 : Integer.parseInt(lastFeedImgSn.replace("feed_img_", "")) + 1;
-
-	        // 정렬 순서를 위한 카운터
 	        int sortOrder = 0;
 
 	        for (MultipartFile file : imageFiles) {
@@ -145,7 +142,6 @@ public class FeedServiceImpl implements FeedService {
 	                    feedImage.setFeedImgSn(newImgSn);
 	                    feedImage.setFeedSn(feedSn);
 	                    feedImage.setImgFilePathNm(fileDetail.getSavedPath());
-	                    // 정렬 순서를 0부터 차례대로 부여
 	                    feedImage.setFeedImgSortSn(String.valueOf(sortOrder++)); 
 	                    imageListForDb.add(feedImage);
 	                }
@@ -171,7 +167,6 @@ public class FeedServiceImpl implements FeedService {
 	        return;
 	    }
 	    
-	    // [핵심 수정] 이제 쿼리가 순수 숫자 문자열을 반환하므로, .replace() 로직을 제거합니다.
 	    String lastTagNumStr = feedMapper.selectLastTagSn();
 	    AtomicInteger lastTagSnNum = new AtomicInteger(lastTagNumStr == null ? 1 : Integer.parseInt(lastTagNumStr) + 1);
 	    
@@ -184,7 +179,6 @@ public class FeedServiceImpl implements FeedService {
 	        FeedTag tag = feedMapper.findTagByName(tagName);
 	        if (tag == null) {
 	            tag = new FeedTag();
-	            // DB에 저장할 실제 식별자는 접두사를 붙여서 생성합니다.
 	            String newTagSn = "tag_sn_" + String.format("%03d", lastTagSnNum.getAndIncrement());
 	            tag.setTagSn(newTagSn);
 	            tag.setTagNm(tagName);
@@ -193,7 +187,6 @@ public class FeedServiceImpl implements FeedService {
 	        }
 	        
 	        FeedTag feedTag = new FeedTag();
-	        // DB에 저장할 실제 식별자는 접두사를 붙여서 생성합니다.
 	        String newFeedTagSn = "feed_tag_sn_" + String.format("%03d", lastFeedTagSnNum.getAndIncrement());
 	        feedTag.setFeedTagSn(newFeedTagSn);
 	        feedTag.setFeedSn(feedSn);

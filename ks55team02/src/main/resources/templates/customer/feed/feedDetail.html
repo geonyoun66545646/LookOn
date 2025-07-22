@@ -9,16 +9,18 @@
 </head>
 
 <th:block layout:fragment="jsFile">
-	<script th:src="@{/js/customerjs/follow.js}"></script>
-	<script th:src="@{/js/customerjs/feedDetail.js}"></script> <!--// [신규 추가]-->
-	<script th:src="@{/js/customerjs/feedOptionModal.js}"></script> <!--// [신규 추가]-->
+    <!-- [중요] 반드시 이 순서로 로드되어야 합니다. -->
+    <script th:src="@{/js/customerjs/follow.js}"></script>
+    <script th:src="@{/js/customerjs/feedOptionModal.js}"></script>
+    <script th:src="@{/js/customerjs/feedDetail.js}"></script>
 </th:block>
 
 <th:block layout:fragment="contents">
     <div class="feed-detail-container" id="feed-container" 
     	 th:data-context="${context}" th:data-user-no="${userNo}" 
     	 th:data-login-user-no="${session.loginUser?.userNo ?: ''}">
-        <div class="feed-post-wrapper" th:object="${feed}" 
+         
+        <div class="feed-post-wrapper" th:if="${feed != null}" th:object="${feed}" 
              th:attr="data-crt-dt=*{crtDt}, data-wrtr-user-no=*{wrtrUserNo}, data-feed-sn=*{feedSn}">
             <section class="post-media-section">
                 <div class="feed-post-content">
@@ -37,15 +39,12 @@
 	                        <div class="user-info">
 	                        	<span class="username" th:text="*{writerInfo?.userNcnm}">유저닉네임</span>
 	                        </div>
-	                         <!-- ▼▼▼ [신규 추가] follow.js가 사용할 팔로우 버튼 영역 ▼▼▼ -->
 					        <div class="follow-action-area"
 					             th:if="${session.loginUser != null and session.loginUser.userNo != feed.wrtrUserNo}">
-					            <!-- 이 안의 내용은 follow.js가 채울 것입니다. -->
+					            <!-- 이 공간은 feedDetail.js가 동적으로 채웁니다. -->
 					        </div>
-					        <!-- ▲▲▲ [신규 추가] ▲▲▲ -->
                         </div>
                         <div class="post-actions">
-	                        <!-- ▼▼▼ [수정] '수정/삭제' 버튼 대신 항상 '...' 버튼이 보이도록 변경합니다. ▼▼▼ -->
 							<button class="options-menu-btn" aria-label="옵션 더 보기">
 					            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
 					                <circle cx="12" cy="12" r="1.5"></circle>
@@ -53,11 +52,9 @@
 					                <circle cx="18" cy="12" r="1.5"></circle>
 					            </svg>
 					        </button>
-							<!-- ▲▲▲ [수정] ▲▲▲ -->
                         </div>
                     </header>
                     <div class="post-scrollable-content">
-                        <!-- [핵심 수정] 피드 본문과 해시태그를 ul 태그 밖으로 이동 -->
                         <div class="feed-content-wrapper">
                             <div class="feed-content-body" th:if="*{feedCn != null and !feedCn.isEmpty()}">
                                 <a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=*{writerInfo.userNo})}">
@@ -76,12 +73,12 @@
                         </div>
                         <ul class="comment-list">
                             <li class="comment-item" th:each="comment, iterStat : *{commentList}" 
-                            						 th:attr="data-comment-sn=${comment.feedCmntSn}, data-writer-user-no=${comment.wrtrUserNo}" 
-                            						 th:classappend="${iterStat.index >= 5} ? 'hidden-comment' : ''">
+                            	th:attr="data-comment-sn=${comment.feedCmntSn}, data-writer-user-no=${comment.wrtrUserNo}" 
+                            	th:classappend="${iterStat.index >= 5} ? 'hidden-comment' : ''">
                                 <div class="comment-writer-profile">
-                                <a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=${comment.writerInfo.userNo})}">
-                                	<img th:src="${comment.writerInfo?.prflImg ?: '/uploads/profiles/defaultprofile.jpg'}" alt="프로필 사진">
-                                </a>
+                                    <a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=${comment.writerInfo.userNo})}">
+                                	    <img th:src="${comment.writerInfo?.prflImg ?: '/uploads/profiles/defaultprofile.jpg'}" alt="프로필 사진">
+                                    </a>
                                 </div>
                                 <div class="comment-content">
                                     <div class="comment-view-mode">
@@ -121,9 +118,9 @@
 							    </svg>
 							</button>
 							<button aria-label="공유">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-						        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"></path>
-						    </svg>
+							    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+						            <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"></path>
+						        </svg>
 						    </button>
 						</div>
                         <p class="like-count" th:text="|좋아요 *{likeCount}개|">좋아요 개수</p>
@@ -135,7 +132,7 @@
         </div>
         <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;"><p>Loading...</p></div>
     </div>
-    <!-- ▼▼▼ [신규 추가] 언팔로우 확인 모달 ▼▼▼ -->
+
 	<div class="modal fade" id="unfollow-confirm-modal" tabindex="-1" role="dialog" aria-hidden="true">
 	    <div class="modal-dialog modal-dialog-centered" role="document">
 	        <div class="modal-content unfollow-modal-content">
@@ -152,18 +149,13 @@
 	        </div>
 	    </div>
 	</div>
-	<!-- ▲▲▲ [신규 추가] ▲▲▲ -->
-	<!-- ▼▼▼ [신규 추가] 게시물 옵션 모달 ▼▼▼ -->
 	<div class="modal fade" id="feed-options-modal" tabindex="-1" role="dialog" aria-hidden="true">
 	    <div class="modal-dialog modal-dialog-centered" role="document">
 	        <div class="modal-content options-modal-content">
-	            <!-- 자바스크립트가 이 안에 메뉴 목록을 동적으로 생성합니다. -->
 	            <ul class="list-group list-group-flush" id="feed-options-list">
-	                <!-- 예: <li class="list-group-item text-danger"><b>삭제</b></li> -->
 	            </ul>
 	        </div>
 	    </div>
 	</div>
-	<!-- ▲▲▲ [신규 추가] ▲▲▲ -->
 </th:block>
 </html>
