@@ -32,7 +32,9 @@ import ks55team02.seller.products.service.ProductsService;
 import ks55team02.seller.stores.domain.Stores;
 import ks55team02.util.CustomerPagination;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Controller
 @RequiredArgsConstructor
 public class CustomerProductController {
@@ -333,43 +335,58 @@ public class CustomerProductController {
 		model.addAttribute("mainGalleryImages", mainGalleryImages);
 		model.addAttribute("detailImages", detailImages);
 		
+		
 		  // ==================== [ 리뷰 관련 로직] ====================
 
         // [리뷰 로직 1: 첫 페이지 리뷰 목록 및 페이지네이션 정보 조회]
-        int currentPage = 1;
-        int pageSize = 5;
-        int blockSize = 10;
+		 LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+	        String currentUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
 
-        // @PathVariable로 받은 productCode를 gdsNo로 사용합니다.
-        long totalReviewCount = reviewService.getReviewCountByGdsNo(productCode);
-        List<ProductReview> firstPageReviews = reviewService.getReviewListPageByGdsNo(productCode, currentPage, pageSize);
+	        int currentPage = 1;
+	        int pageSize = 5;
+	        int blockSize = 10;
+	        
+	        // 상품의 전체 리뷰 개수를 조회합니다.
+	        long totalReviewCount = reviewService.getReviewCountByGdsNo(productCode);
+	        
+	        // ✅ [핵심 수정] 첫 페이지 리뷰 목록을 조회할 때, 'currentUserNo'를 함께 전달합니다.
+	        // 이를 통해 각 리뷰에 대한 현재 사용자의 '좋아요' 여부를 함께 가져옵니다.
+	        List<ProductReview> firstPageReviews = reviewService.getReviewListPageByGdsNo(
+	            productCode, 
+	            currentPage, 
+	            pageSize, 
+	            currentUserNo
+	        );
 
-        CustomerPagination<ProductReview> reviewPagination = new CustomerPagination<>(
-            firstPageReviews, totalReviewCount, currentPage, pageSize, blockSize
-        );
-        // JS와 연동을 위해 "reviewPagination" 이름으로 모델에 추가합니다.
-        model.addAttribute("reviewPagination", reviewPagination);
+	        // JavaScript에서 사용할 페이지네이션 객체를 생성합니다.
+	        CustomerPagination<ProductReview> reviewPaginationData = new CustomerPagination<>(
+	            firstPageReviews, totalReviewCount, currentPage, pageSize, blockSize
+	        );
+	        
+	        // 모델에 페이지네이션 객체와 상품 ID를 추가하여 Thymeleaf/JavaScript에서 사용할 수 있도록 합니다.
+	        model.addAttribute("reviewPaginationData", reviewPaginationData);
+	        model.addAttribute("productId", productCode);
 
-        
-        // [리뷰 로직 2: 리뷰 작성 가능 여부 확인]
-        boolean canWriteReview = false;
-        OrderDTO reviewableOrder = null;
+	        // [2] 리뷰 작성 가능 여부 확인
+	        // -------------------------------------------------------------------
+	        boolean canWriteReview = false;
+	        OrderDTO reviewableOrder = null;
 
-        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
-        if (loginUser != null) {
-            System.out.println(">>>>> 현재 로그인된 사용자 번호: " + loginUser.getUserNo());
-            // 위에서 조회한 product 객체의 상품 번호를 사용합니다.
-            reviewableOrder = reviewService.findReviewableOrder(loginUser.getUserNo(), product.getGdsNo());
+	        // 로그인한 상태일 때만 리뷰 작성 가능 여부를 확인합니다.
+	        if (currentUserNo != null) {
+	            log.info(">>>>> 리뷰 작성 가능 여부 확인 - 사용자 번호: {}", currentUserNo);
+	            reviewableOrder = reviewService.findReviewableOrder(currentUserNo, productCode);
 
-            if (reviewableOrder != null) {
-                canWriteReview = true;
-            }
-        }
-        
-        model.addAttribute("canWriteReview", canWriteReview);
-        if (canWriteReview) {
-            model.addAttribute("reviewableOrder", reviewableOrder);
-        }
+	            if (reviewableOrder != null) {
+	                canWriteReview = true;
+	            }
+	        }
+	        
+	        // 모델에 리뷰 작성 관련 정보를 추가합니다.
+	        model.addAttribute("canWriteReview", canWriteReview);
+	        if (canWriteReview) {
+	            model.addAttribute("reviewableOrder", reviewableOrder);
+	        }
         /*  리뷰 끝  */
         
 	    return "customer/productDetail";

@@ -28,6 +28,9 @@ public class ProductReview {
 	private UserProfile 	userProfile;		// 유저 프로필 테이블
 	
 	
+	private Boolean isLiked;   // 현재 사용자의 '좋아요' 여부를 담을 필
+	
+	
 	private List<ReviewImage> reviewImages; // 리뷰 이미지 목록
 
 }

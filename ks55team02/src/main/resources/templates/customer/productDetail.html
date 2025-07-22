@@ -110,7 +110,7 @@
 										<div class="ratings-val" style="width: 80%;"></div>
 									</div>
 									 <a class="ratings-text" href="#product-review-link" id="review-link">
-      									 (<span th:text="${reviewPagination.totalCount+' 개의 리뷰'}">0</span>)</a>
+      									 (<span th:text="${reviewPaginationData.totalCount+' 개의 리뷰'}">0</span>)</a>
 								</div>
 
 								<div class="product-price-section">
@@ -210,7 +210,7 @@
 								id="product-review-link" data-toggle="tab"
 								href="#product-review-tab" role="tab"
 								aria-controls="product-review-tab" aria-selected="false"> 리뷰
-									(<span th:text="${reviewPagination.totalCount}">0</span>)
+									(<span th:text="${reviewPaginationData.totalCount}">0</span>)
 							</a></li>
 						</ul>
 					</div>
@@ -365,7 +365,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // 1. 컨트롤러에서 넘겨준 상품 ID와 '첫 페이지 리뷰 데이터'를 가져옵니다.
             const productId = /*[[${product.gdsNo}]]*/ null;
-            const initialPaginationData = /*[[${reviewPagination}]]*/ null;
+            const initialPaginationData = /*[[${reviewPaginationData}]]*/ null;
 
             // 2. productReview.js 파일에 정의된 초기화 함수(initReviewSection)를 호출합니다.
             if (typeof window.initReviewSection === 'function') {
