@@ -23,6 +23,10 @@ public interface FeedMapper {
 	List<FeedTag> selectTagsByFeedSn(String feedSn);
 	List<FeedComment> selectCommentsByFeedSn(String feedSn);
 
+	// 팔로잉 피드 관련
+	List<Feed> selectFollowingFeedList(@Param("followerUserNo") String followerUserNo, @Param("limit") int limit, @Param("offset") int offset);
+	int countFollowingFeeds(@Param("followerUserNo") String followerUserNo);
+
 	// 피드 작성 관련
 	String selectLastFeedSn();
 	int insertFeed(Feed feed);
@@ -44,20 +48,12 @@ public interface FeedMapper {
 	int deleteComment(@Param("feedCmntSn") String feedCmntSn, @Param("delUserNo") String delUserNo);
 	int updateComment(@Param("feedCmntSn") String feedCmntSn, @Param("commentText") String commentText);
 
-    // =======================================================
-    // [신규/수정] 피드 수정 및 삭제 관련 메소드
-    // =======================================================
-    
-    // 피드 내용(텍스트, 수정일자) 업데이트
+    // 피드 수정 및 삭제 관련
     int updateFeed(Feed feed);
-
-    // 기존 이미지 여러 개를 논리적으로 삭제 (수정 시 사용)
     int deleteFeedImagesBySn(@Param("imageSnList") List<String> imageSnList, @Param("delUserNo") String delUserNo);
-    
-    // 피드를 논리적으로 삭제
     int deleteFeedLogically(@Param("feedSn") String feedSn, @Param("delUserNo") String delUserNo);
     
-    // [신규] 태그 관련
+    // 태그 관련
     String selectLastTagSn();
     void insertTag(FeedTag tag);
     FeedTag findTagByName(String tagName);

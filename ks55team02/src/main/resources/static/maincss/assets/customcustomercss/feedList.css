@@ -24,3 +24,15 @@
 .feed-item:hover img { transform: scale(1.05); }
 .feed-item .item-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); color: white; padding: 20px 10px 10px 10px; opacity: 0; transition: opacity 0.3s; font-weight: bold; }
 .feed-item:hover .item-overlay { opacity: 1; }
+
+.feed-grid .no-feeds {
+    grid-column: 1 / -1;
+    padding: 60px 20px;
+    text-align: center;
+    color: #868e96;
+    font-size: 1rem;
+}
+
+.feed-grid .no-feeds p {
+    margin: 0;
+}

@@ -3,16 +3,17 @@
 
 	<head>
 		<meta charset="utf-8" />
-        <title th:text="${title}">Nest Dashboard</title>
+        <title th:text="${title}"></title>
         <meta http-equiv="x-ua-compatible" content="ie=edge" />
         <meta name="description" content="" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" th:href="@{/admincss/assets/imgs/theme/favicon.svg}" />
+        <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicons/lookonfavicon1.png}" />
         <!-- Template CSS -->
-        <link th:href="@{/admincss/assets/css/main.css?v=1.1}" rel="stylesheet" type="text/css" />
-        
+        <link th:href="@{/admincss/assets/css/main.css?v=1.1}" rel="stylesheet" type="text/css" />      
          <th:block layout:fragment="customCss"></th:block>
+         
+		<link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/adminFragments.css}" />	  
         
 	</head>
 	<body>

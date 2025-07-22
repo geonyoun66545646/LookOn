@@ -15,7 +15,8 @@ public class WebMvcConfig implements WebMvcConfigurer{
 	                
 	                // 인터셉터를 적용할 URL 패턴을 지정합니다. (로그인이 필요한 모든 경로)
 	                .addPathPatterns(
-	                    "/customer/mypage/**"  	// 마이페이지 및 그 하위 모든 경로
+	                    "/customer/mypage/**",  	// 마이페이지 및 그 하위 모든 경로
+	                    "/aditinfo/**"
 	                    // 여기에 로그인이 필요한 다른 URL 패턴들을 계속 추가하면 됩니다.
 	                	,"/cart/**"	// - 2025.07.11 gy -
 	                );

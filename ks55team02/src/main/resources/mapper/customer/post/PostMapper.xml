@@ -199,35 +199,20 @@
 	<update id="deleteComment" parameterType="String">
 		UPDATE post_comments SET del_dt = NOW() WHERE pst_cmnt_sn = TRIM(#{pstCmntSn});
 	</update>
-
-    <!-- ======================================================= -->
-    <!-- [수정] 추천(좋아요) 관련 쿼리 전면 수정 -->
-    <!-- ======================================================= -->
+    
     <select id="selectMaxInterNumber" resultType="Integer">
 	    SELECT MAX(CAST(SUBSTRING_INDEX(pst_intract_sn, '_', -1) AS UNSIGNED)) FROM post_interactions WHERE pst_intract_sn REGEXP '^pst_itrct_[0-9]+$';
 	</select>
     
-    <select id="findInteractionByUserAndPost" resultType="ks55team02.customer.post.domain.PostInteraction">
-        SELECT * FROM post_interactions 
-        WHERE pst_sn = #{pstSn} AND user_no = #{userNo} AND intract_type_cd = 'LIKE';
+    <select id="checkLikeExists" resultType="int">
+        SELECT COUNT(*) FROM post_interactions 
+        WHERE pst_sn = #{pstSn} AND user_no = #{userNo} AND intract_type_cd = 'LIKE' AND rtrcn_dt IS NULL;
     </select>
 
     <insert id="insertInteraction" parameterType="ks55team02.customer.post.domain.PostInteraction">
         INSERT INTO post_interactions (pst_intract_sn, pst_sn, user_no, intract_type_cd, crt_dt) 
         VALUES (#{pstIntractSn}, #{pstSn}, #{userNo}, 'LIKE', NOW());
     </insert>
-
-    <update id="cancelLike">
-        UPDATE post_interactions
-        SET rtrcn_dt = NOW()
-        WHERE pst_intract_sn = #{pstIntractSn};
-    </update>
-
-    <update id="revertLike">
-        UPDATE post_interactions
-        SET rtrcn_dt = NULL
-        WHERE pst_intract_sn = #{pstIntractSn};
-    </update>
 
     <select id="countInteractionsByPost" resultType="int">
         SELECT COUNT(*) FROM post_interactions 
