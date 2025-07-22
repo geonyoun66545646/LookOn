@@ -1,0 +1,43 @@
+@charset "UTF-8";
+.login-history-table {
+    table-layout: fixed; /* 테이블 레이아웃을 고정하여 너비가 깨지지 않게 함 */
+    width: 100%;
+}
+
+.login-history-table th,
+.login-history-table td {
+    vertical-align: middle;
+    text-align: center;
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee;
+    word-break: break-all; /* 단어 단위로 줄바꿈 (필요시) */
+}
+
+.login-history-table th {
+    background-color: #f8f9fa; /* 헤더 배경색 */
+    font-weight: 600;      /* 헤더 텍스트 굵게 */
+}
+
+/* 긴 텍스트를 '...'으로 처리하는 클래스 */
+.ellipsis {
+    white-space: nowrap;      /* 줄 바꿈 방지 */
+    overflow: hidden;         /* 영역 밖 내용 숨김 */
+    text-overflow: ellipsis;  /* ...으로 표시 */
+}
+
+/* 컬럼별 너비 지정 */
+.login-history-table .col-id        { width: 25%; }
+.login-history-table .col-ip        { width: 25%; }
+.login-history-table .col-logintime { width: 30%; }
+.login-history-table .col-status    { width: 20%; }
+
+/* 성공/실패 배지 스타일 */
+.badge {
+    padding: 0.5em 0.9em;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    min-width: 60px;
+    text-align: center;
+    border-radius: 10px;
+}
