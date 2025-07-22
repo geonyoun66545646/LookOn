@@ -9,14 +9,12 @@
         SET
             user_status = '탈퇴',
             whdwl_dt = NOW(),
-            user_lgn_id = NULL,
             user_nm = NULL,
             user_pswd_encpt_val = NULL,
             eml_addr = NULL,
             telno = NULL,
             addr = NULL,
-            daddr = NULL,
-            user_ncnm = NULL
+            daddr = NULL 
         WHERE
             user_no = #{userNo}
     </update>
