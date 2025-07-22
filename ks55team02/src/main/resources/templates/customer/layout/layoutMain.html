@@ -52,22 +52,14 @@
 
 	<div class="screen-overlay"></div>
 
-	<th:block th:if="${showFab != null and showFab}">
 
-		<!-- === 신규 플로팅 버튼 컨테이너 === -->
-		<div class="fab-container">
-			<button type="button" id="create-feed-btn" class="fab-button"
-				th:onclick="|location.href='@{/customer/feed/feedWrite}'|">
-				<i class="bi bi-plus-lg"></i>
-			</button>
-		</div>
 
 		<!-- 기존 'Top 이동' 버튼 (우리 CSS로 덮어쓰기 위해 여기에 위치) -->
 		<button id="scroll-top" title="Back to Top" class="show">
 			<i class="icon-arrow-up"></i>
 		</button>
 
-	</th:block>
+
 
 	<div class="page-wrapper">
 		<main class="main-wrap">
@@ -141,7 +133,20 @@
 		/*]]>*/
 	</script>
 
-
+	<th:block layout:fragment="global-js">
+	    <script>
+	        $(document).ajaxError(function(event, jqxhr, settings, thrownError) {
+	            if (jqxhr.status === 401) {
+	                const loginModal = $('#signin-modal');
+	                if (loginModal.length) {
+	                    loginModal.modal('show');
+	                } else {
+	                    alert('로그인이 필요한 서비스입니다.');
+	                }
+	            }
+	        });
+	    </script>
+	</th:block>
 
 	<th:block layout:fragment="jsScript"></th:block>
 </body>

@@ -88,4 +88,63 @@ public interface AdminReportsMapper {
 	 * @return UserSanction 객체 (가장 최신 기록) 또는 기록이 없을 경우 null
 	 */
 	UserSanction getLatestSanctionByUserNo(String userNo); // [새로 추가]
+
+	/**
+	 * user_sanctions 테이블의 새로운 PK (sanction_id)를 생성하기 위한 메소드
+	 *
+	 * @return 생성된 새로운 제재 ID (예: SANCT_00001)
+	 */
+	String getNextSanctionId(); // 이 부분을 추가하세요.
+
+	// [새로 추가] 게시글/댓글/상품 소유자 조회 메소드
+	/**
+	 * 특정 게시글의 작성자 userNo를 조회합니다.
+	 * 
+	 * @param postSn 게시글 순번
+	 * @return 작성자 userNo
+	 */
+	String getPostOwnerUserNo(String postSn);
+
+	/**
+	 * 특정 댓글의 작성자 userNo를 조회합니다.
+	 * 
+	 * @param commentSn 댓글 순번
+	 * @return 작성자 userNo
+	 */
+	String getCommentOwnerUserNo(String commentSn);
+
+	/**
+	 * 특정 상품의 판매자 userNo를 조회합니다. (store_id를 통해 user_no 조회)
+	 * 
+	 * @param gdsNo 상품 번호
+	 * @return 판매자 userNo
+	 */
+	String getProductOwnerUserNo(String gdsNo);
+
+	// [새로 추가] 게시글/댓글/상품 상태 변경/삭제 메소드
+	/**
+	 * 게시글의 상태를 변경합니다 (삭제 조치, 숨김 등).
+	 * 
+	 * @param postSn 게시글 순번
+	 * @param status 변경할 상태 코드 (예: 'DELETED', 'HIDDEN')
+	 * @return 영향받은 행의 수
+	 */
+	int updatePostStatus(@Param("postSn") String postSn, @Param("status") String status);
+
+	/**
+	 * 댓글을 삭제합니다.
+	 * 
+	 * @param commentSn 댓글 순번
+	 * @return 영향받은 행의 수
+	 */
+	int deleteComment(Map<String, Object> paramMap);
+
+	/**
+	 * 상품의 노출 여부를 변경합니다 (삭제 조치).
+	 * 
+	 * @param gdsNo      상품 번호
+	 * @param exposureYn 노출 여부 (false: 노출 안함, true: 노출)
+	 * @return 영향받은 행의 수
+	 */
+	int updateProductExposureYn(@Param("gdsNo") String gdsNo, @Param("exposureYn") boolean exposureYn);
 }

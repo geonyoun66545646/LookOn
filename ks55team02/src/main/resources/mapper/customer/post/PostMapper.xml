@@ -108,6 +108,8 @@
         ORDER BY pc.crt_dt ASC;
 	</select>
     
+    
+    
     <select id="selectBoardName" resultMap="boardResultMap">
 		SELECT bbs_clsf_cd, bbs_nm FROM boards WHERE del_dt IS NULL
 		ORDER BY CASE WHEN bbs_clsf_cd = 'notice' THEN 1 WHEN bbs_clsf_cd = 'freeBoard' THEN 2 WHEN bbs_clsf_cd = 'event_board' THEN 3 ELSE 4 END, bbs_nm ASC;
@@ -118,17 +120,18 @@
 	</update>
 	
 	<select id="selectPostListByBoardCd" resultMap="postListResultMap">
-		SELECT
-			p.pst_sn, p.bbs_clsf_cd, p.wrtr_user_no, p.pst_ttl, p.pst_cn, p.view_cnt, p.crt_dt,
-			b.bbs_nm, u.user_ncnm,
-            (SELECT COUNT(*) FROM post_comments pc WHERE pc.pst_sn = p.pst_sn AND pc.del_dt IS NULL) AS cmnt_cnt,
-            (SELECT COUNT(*) FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS inter_cnt
-        FROM posts p
-        JOIN boards b ON p.bbs_clsf_cd = b.bbs_clsf_cd
-        LEFT JOIN users u ON p.wrtr_user_no = u.user_no
-        WHERE p.del_dt IS NULL AND b.del_dt IS NULL
-        <if test="bbsClsfCd != null and bbsClsfCd != ''"> AND p.bbs_clsf_cd = #{bbsClsfCd} </if>
-        ORDER BY p.crt_dt DESC LIMIT #{limit} OFFSET #{offset};
+	    SELECT
+	        p.pst_sn, p.bbs_clsf_cd, p.wrtr_user_no, p.pst_ttl, p.pst_cn, p.view_cnt, p.ntc_pst_yn, p.crt_dt,
+	        b.bbs_nm, u.user_ncnm,
+	        (SELECT COUNT(*) FROM post_comments pc WHERE pc.pst_sn = p.pst_sn AND pc.del_dt IS NULL) AS cmnt_cnt,
+	        (SELECT COUNT(*) FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS inter_cnt
+	    FROM posts p
+	    JOIN boards b ON p.bbs_clsf_cd = b.bbs_clsf_cd
+	    LEFT JOIN users u ON p.wrtr_user_no = u.user_no
+	    WHERE p.del_dt IS NULL AND b.del_dt IS NULL
+	    <if test="bbsClsfCd != null and bbsClsfCd != ''"> AND p.bbs_clsf_cd = #{bbsClsfCd} </if>
+	    ORDER BY p.ntc_pst_yn DESC, p.crt_dt DESC
+	    LIMIT #{limit} OFFSET #{offset};
 	</select>
 	
 	<select id="selectPostListNumByBoardCd" resultType="int">
@@ -199,17 +202,14 @@
 	<update id="deleteComment" parameterType="String">
 		UPDATE post_comments SET del_dt = NOW() WHERE pst_cmnt_sn = TRIM(#{pstCmntSn});
 	</update>
-
-    <!-- ======================================================= -->
-    <!-- [수정] 추천(좋아요) 관련 쿼리 전면 수정 -->
-    <!-- ======================================================= -->
+    
     <select id="selectMaxInterNumber" resultType="Integer">
 	    SELECT MAX(CAST(SUBSTRING_INDEX(pst_intract_sn, '_', -1) AS UNSIGNED)) FROM post_interactions WHERE pst_intract_sn REGEXP '^pst_itrct_[0-9]+$';
 	</select>
     
-    <select id="findInteractionByUserAndPost" resultType="ks55team02.customer.post.domain.PostInteraction">
-        SELECT * FROM post_interactions 
-        WHERE pst_sn = #{pstSn} AND user_no = #{userNo} AND intract_type_cd = 'LIKE';
+    <select id="checkLikeExists" resultType="int">
+        SELECT COUNT(*) FROM post_interactions 
+        WHERE pst_sn = #{pstSn} AND user_no = #{userNo} AND intract_type_cd = 'LIKE' AND rtrcn_dt IS NULL;
     </select>
 
     <insert id="insertInteraction" parameterType="ks55team02.customer.post.domain.PostInteraction">
@@ -217,21 +217,11 @@
         VALUES (#{pstIntractSn}, #{pstSn}, #{userNo}, 'LIKE', NOW());
     </insert>
 
-    <update id="cancelLike">
-        UPDATE post_interactions
-        SET rtrcn_dt = NOW()
-        WHERE pst_intract_sn = #{pstIntractSn};
-    </update>
-
-    <update id="revertLike">
-        UPDATE post_interactions
-        SET rtrcn_dt = NULL
-        WHERE pst_intract_sn = #{pstIntractSn};
-    </update>
-
     <select id="countInteractionsByPost" resultType="int">
         SELECT COUNT(*) FROM post_interactions 
         WHERE pst_sn = #{pstSn} AND intract_type_cd = 'LIKE' AND rtrcn_dt IS NULL;
     </select>
+
+
 
 </mapper>

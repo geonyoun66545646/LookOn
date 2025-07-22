@@ -1,21 +1,28 @@
 /**
- * postList.js v2.3 (대표 이미지 DTO 필드명 변경 반영)
- * - 썸네일 이미지 경로를 post.representativeImage.imgFilePathNm에서 참조하도록 수정
+ * postList.js v2.4
+ * - [추가] 팔로잉 탭에 대한 로그인 체크 로직 추가
+ * - [수정] 대표 이미지 DTO 필드명 변경 반영 (기존)
  */
 $(() => {
-
+    // --- 1. 상태 관리 변수 ---
     const state = {
         currentPage: 1,
         isLoading: false,
         hasNext: true,
         bbsClsfCd: $('.container').data('initial-bbsclsfcd') || ''
     };
-
+    
+    // --- 2. 주요 DOM 요소 캐싱 ---
     const $container = $('#post-list-container');
     const $tabsParentContainer = $('.board-tabs-container');
     const $navTabsScroller = $tabsParentContainer.find('.nav-tabs');
     const $loadingIndicator = $('#loading-indicator');
+    
+    // --- 3. 전역 변수 (로그인 정보) ---
+    // HTML의 <script> 블록에서 설정한 window.loginUser 값을 가져옵니다.
+    const loginUser = window.loginUser || null;
 
+    // --- 4. UI/UX 관련 로직 (카테고리 탭 드래그 스크롤) ---
     const slider = $navTabsScroller[0];
     if (slider) {
         let isDown = false, startX, scrollLeft;
@@ -41,7 +48,10 @@ $(() => {
         $tabsParentContainer.on('mouseup', dragEnd);
         $tabsParentContainer.on('mousemove', dragMove);
     }
+    
+    // --- 5. 이벤트 핸들러 ---
 
+    // 하위 카테고리 탭(전체, 자유게시판 등) 클릭 이벤트
     $navTabsScroller.on('click', '.nav-link', function(e) {
         e.preventDefault();
         const selectedBbsClsfCd = $(this).data('bbsclsfcd');
@@ -56,14 +66,36 @@ $(() => {
         $container.empty();
         loadNextPage();
     });
+    
+    // [핵심 추가] 상단 메인 탭의 '팔로잉' 링크 클릭 이벤트
+    $('#following-tab-link').on('click', function(e) {
+        e.preventDefault(); // a 태그의 기본 동작(링크 이동)을 막습니다.
+        
+        // 1. 비로그인 상태인지 확인합니다.
+        if (!loginUser) {
+            // 비로그인 상태이면, 로그인 모달을 띄웁니다.
+            $('#signin-modal').modal('show');
+            return; // 여기서 함수 실행을 중단합니다.
+        }
+        
+        // 2. 로그인 상태라면, HTML의 data-href 속성에 저장해둔 피드 페이지 URL로 이동시킵니다.
+        const targetUrl = $(this).data('href');
+        if (targetUrl) {
+            window.location.href = targetUrl;
+        }
+    });
 
+    // 무한 스크롤 이벤트
     $(window).on('scroll', () => {
         if (state.isLoading || !state.hasNext) return;
         if ($(window).scrollTop() + $(window).height() >= $(document).height() - 300) {
             loadNextPage();
         }
     });
+    
+    // --- 6. 데이터 처리 및 렌더링 함수 ---
 
+    // 다음 페이지 데이터를 불러오는 함수
     function loadNextPage() {
         state.isLoading = true;
         $loadingIndicator.show();
@@ -100,6 +132,7 @@ $(() => {
         });
     }
 
+    // 게시글 목록 HTML을 생성하고 렌더링하는 함수
 	function renderPostList(postList) {
 	    function formatRelativeTime(dateString) {
 	        if (!dateString) return '';
@@ -118,7 +151,6 @@ $(() => {
 	    const commentIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-square-fill" viewBox="0 0 16 16"><path d="M2 0a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2.5a1 1 0 0 1 .8.4l1.9 2.533a1 1 0 0 0 1.6 0l1.9-2.533a1 1 0 0 1 .8-.4H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/></svg>`;
 
 	    postList.forEach(post => {
-	        // [핵심 수정] 썸네일 이미지 경로 생성 로직
 	        let thumbnailHtml = '';
 	        if (post.representativeImage && post.representativeImage.imgFilePathNm) {
 	            const thumbnailUrl = post.representativeImage.imgFilePathNm;
@@ -129,29 +161,32 @@ $(() => {
 	        }
 	        
 	        const formattedDate = formatRelativeTime(post.crtDt);
-	        const detailLink = `/customer/post/postView?pstSn=${post.pstSn}`;
+	        const detailLink = `/customer/post/postDetail?pstSn=${post.pstSn}`;
 	        
-	        const postItemHtml = `
-	            <div class="post-item">
-	                <a href="${detailLink}">
-	                    <div class="post-item-content">
-	                        <h3 class="title">${post.pstTtl || '제목 없음'}</h3>
-	                        <div class="author-info">
-	                            <span class="nickname">${post.writerInfo?.userNcnm || '작성자 없음'}</span>
-	                            <span class="separator">·</span>
-	                            <span class="date">${formattedDate}</span>
-	                        </div>
-	                        <div class="post-stats">
-	                            <span class="views">${eyeIconSvg} <span>${post.viewCnt || 0}</span></span>
-	                            <span class="comments">${commentIconSvg} <span>${post.cmntCnt || 0}</span></span>
-	                        </div>
-	                    </div>
-	                    ${thumbnailHtml}
-	                </a>
-	            </div>`;
-	        $container.append(postItemHtml);
+			const isNoticeClass = post.bbsClsfCd === 'notice' ? ' is-notice' : '';
+
+			const postItemHtml = `
+			    <div class="post-item${isNoticeClass}">
+			        <a href="${detailLink}">
+			            <div class="post-item-content">
+			                <h3 class="title">${post.pstTtl || '제목 없음'}</h3>
+			                <div class="author-info">
+			                    <span class="nickname">${post.writerInfo?.userNcnm || '작성자 없음'}</span>
+			                    <span class="separator">·</span>
+			                    <span class="date">${formattedDate}</span>
+			                </div>
+			                <div class="post-stats">
+			                    <span class="views">${eyeIconSvg} <span>${post.viewCnt || 0}</span></span>
+			                    <span class="comments">${commentIconSvg} <span>${post.cmntCnt || 0}</span></span>
+			                </div>
+			            </div>
+			            ${thumbnailHtml}
+			        </a>
+			    </div>`;
+			$container.append(postItemHtml);
 	    });
 	}
-
+    
+    // --- 7. 초기 실행 ---
     loadNextPage();
 });

@@ -105,23 +105,7 @@
     border-bottom: 2px solid #000;
 }
 
-.write-button-area {
-    padding-left: 20px;
-}
 
-.btn-write {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #fff;
-    cursor: pointer;
-    font-size: 24px;
-    color: #333;
-}
 
 /* --- 게시글 리스트 --- */
 .post-list-container {
@@ -224,4 +208,9 @@
     /* SVG의 크기는 JS에서 width/height 속성으로 제어하고 있으나, 
        세부 조정이 필요하면 여기서 수정할 수 있습니다. */
     vertical-align: middle; /* 텍스트와의 수직 정렬을 미세 조정 */
+}
+
+.post-item.is-notice .title {
+    color: #007bff; /* Bootstrap의 기본 파란색 계열입니다. */
+    font-weight: 600;  /* 파란색이 흰 배경에서 잘 보이도록 기본(500)보다 약간 굵게 조정했습니다. */
 }

@@ -126,4 +126,15 @@ public class CartServiceImpl implements CartService {
         cartMapper.deleteCartItemsByIds(cartItemIds, userNo);
         log.info("서비스: 사용자 '{}'의 장바구니 항목들 삭제 성공", userNo);
     }
+    
+    /**
+     * CartService 인터페이스에 선언된 getCartItemCount 메소드를 구현합니다.
+     * CartMapper를 호출하여 실제 데이터베이스 조회를 수행합니다.
+     */
+    @Override
+    public int getCartItemCount(String userNo) {
+    	
+        log.info("서비스: 사용자 '{}'의 장바구니 수량 조회를 위해 Mapper를 호출합니다.", userNo);
+        return cartMapper.getCartItemCount(userNo);
+    }
 }

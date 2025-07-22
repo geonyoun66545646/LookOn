@@ -1,3 +1,6 @@
+// 파일 경로: /js/customerjs/feedWrite.js
+// 아래 코드로 파일 전체를 교체해주세요.
+
 $(() => {
     // --- 1. 요소 및 상태 변수 초기화 ---
     const feedForm = $('#feed-form');
@@ -9,7 +12,6 @@ $(() => {
     const cancelBtn = $('#cancel-btn');
     const submitBtn = $('#submit-btn');
 
-    // [수정 1] 폼의 data-feed-sn 속성으로 작성/수정 모드 감지
     const feedSn = feedForm.data('feed-sn');
     const isEditMode = !!feedSn;
 
@@ -22,7 +24,6 @@ $(() => {
         const files = event.target.files;
         if (files && files.length > 0) {
             uploadPlaceholder.hide();
-            // FileList를 배열로 변환하여 DataTransfer 객체에 저장 (삭제 기능 구현 위함)
             const dataTransfer = new DataTransfer();
             Array.from(files).forEach(file => dataTransfer.items.add(file));
             imageInput[0].files = dataTransfer.files;
@@ -51,7 +52,6 @@ $(() => {
         const wrapperToRemove = $(this).closest('.preview-image-wrapper');
         const fileIndexToRemove = parseInt(wrapperToRemove.data('file-index'), 10);
         
-        // DataTransfer API를 사용해 input의 파일 목록에서 해당 파일 제거
         const dataTransfer = new DataTransfer();
         const originalFiles = imageInput[0].files;
         
@@ -60,11 +60,10 @@ $(() => {
                 dataTransfer.items.add(originalFiles[i]);
             }
         }
-        imageInput[0].files = dataTransfer.files; // 수정된 파일 목록으로 교체
+        imageInput[0].files = dataTransfer.files;
 
-        wrapperToRemove.remove(); // 화면에서 미리보기 제거
+        wrapperToRemove.remove();
 
-        // 남은 미리보기들의 index를 재정렬
         newPreviewContainer.find('.preview-image-wrapper').each(function(newIndex) {
             $(this).attr('data-file-index', newIndex);
         });
@@ -76,7 +75,7 @@ $(() => {
         }
     });
     
-    // [신규 2] '기존 이미지'의 'X' 삭제 버튼 클릭 시 (수정 모드 전용)
+    // '기존 이미지'의 'X' 삭제 버튼 클릭 시 (수정 모드 전용)
     existingPreviewContainer.on('click', '.delete-existing-image-btn', function() {
         const imageWrapper = $(this).closest('.preview-image-wrapper');
         const imageSnToDelete = imageWrapper.data('image-sn');
@@ -102,14 +101,13 @@ $(() => {
         }
     });
 
-    // [수정 3] 폼 제출(Submit) 처리 로직 통합
+    // 폼 제출(Submit) 처리 로직 통합
     feedForm.on('submit', function(event) {
         event.preventDefault(); 
         submitBtn.prop('disabled', true).text('처리 중...');
 
-        const formData = new FormData(this); // form 요소의 모든 input을 FormData로 만듦
+        const formData = new FormData(this);
 
-        // 유효성 검사
         const hasContent = !!formData.get('feedCn')?.trim();
         const hasNewImages = imageInput[0].files.length > 0;
         const hasExistingImages = isEditMode && existingPreviewContainer.find('.preview-image-wrapper:visible').length > 0;
@@ -120,7 +118,6 @@ $(() => {
             return;
         }
 
-        // 해시태그에서 # 제거하여 전송
         let hashtags = formData.get('hashtags');
         if (hashtags) {
             formData.set('hashtags', hashtags.replace(/#/g, ''));
@@ -136,16 +133,15 @@ $(() => {
             redirectUrl: isEditMode ? `/customer/feed/feedDetail/${feedSn}` : '/customer/feed/feedList'
         };
 
-        // [수정 4] Ajax 요청 실행
         $.ajax(ajaxSettings)
         .done(() => {
             alert(ajaxSettings.successMessage);
             window.location.href = ajaxSettings.redirectUrl;
         })
         .fail((jqXHR) => {
+            // [핵심 수정] 401 에러 시, 강제 페이지 이동 대신 로그인 모달을 띄웁니다.
             if (jqXHR.status === 401) {
-                alert('로그인이 필요합니다.');
-                window.location.href = '/customer/login/login';
+                $('#signin-modal').modal('show'); // 로그인 모달 띄우기
             } else if (jqXHR.status === 403) {
                 alert('수정할 권한이 없습니다.');
             } else {
@@ -166,7 +162,6 @@ $(() => {
         } else {
             uploadPlaceholder.hide();
         }
-        // 수정 모드 시 해시태그 앞에 # 붙이기 (화면 표시용)
         const hashtagInput = $('#feed-hashtags');
         let tags = hashtagInput.val().trim();
         if (tags && !tags.startsWith('#')) {

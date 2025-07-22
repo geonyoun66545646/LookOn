@@ -38,7 +38,7 @@ public class AdminLoginController {
         if (loginAdmin != null) {
             // [핵심 수정] 세션에 저장하는 키 값을 "loginAdmin"에서 "loginUser"로 변경합니다.
             session.setAttribute("loginUser", loginAdmin); 
-            return "redirect:/adminpage";
+            return "redirect:/adminpage/dashboard";
         }
         
         redirectAttributes.addFlashAttribute("errorMessage", "아이디 또는 비밀번호가 일치하지 않습니다.");

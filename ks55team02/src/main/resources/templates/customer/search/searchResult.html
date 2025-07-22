@@ -103,7 +103,7 @@
 										th:each="post, iterStat : ${searchResult.posts}"
 										th:if="${iterStat.index < 5}">
 										<h6 class="mb-1 text-truncate">
-											<a th:href="@{/customer/post/postView(pstSn=${post.pstSn})}"
+											<a th:href="@{/customer/post/postDetail(pstSn=${post.pstSn})}"
 												th:text="${post.pstTtl}"></a>
 										</h6>
 										<small class="text-muted"
@@ -376,7 +376,7 @@
     	            const formattedDate = post.crtDt ? new Date(post.crtDt).toISOString().split('T')[0] : '';
     	            itemsHtml += `
     	                <div class="post-item">
-    	                    <h6 class="mb-1 text-truncate"><a href="/customer/post/postView?pstSn=${post.pstSn}">${post.pstTtl}</a></h6>
+    	                    <h6 class="mb-1 text-truncate"><a href="/customer/post/postDetail?pstSn=${post.pstSn}">${post.pstTtl}</a></h6>
     	                    <small class="text-muted">${post.userNcnm} | ${formattedDate}</small>
     	                    <p class="text-truncate-2">${post.pstCn}</p>
     	                </div>`;

@@ -33,4 +33,6 @@ public interface CartMapper {
 	String getMaxCartItemId();
 
 	void deleteCartItemsByIds(@Param("cartItemIds") List<String> cartItemIds, @Param("userNo") String userNo);
+	
+	int getCartItemCount(@Param("userNo") String userNo);
 }
