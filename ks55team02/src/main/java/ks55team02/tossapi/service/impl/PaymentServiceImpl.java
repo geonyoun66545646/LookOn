@@ -65,12 +65,9 @@ public class PaymentServiceImpl implements PaymentService {
             payorderDTO.setOrdrNo(orderId);
             payorderDTO.setUserNo((String) orderData.get("userNo"));
             payorderDTO.setOrdrDt(LocalDateTime.now());
-            
-            // [수정] Null-safe 하게 BigDecimal로 변환하는 로직으로 변경
             payorderDTO.setGdsTotAmt(getBigDecimalFromMap(orderData, "totalAmount"));
             payorderDTO.setApldCpnDscntAmt(getBigDecimalFromMap(orderData, "discountAmount"));
             payorderDTO.setLastStlmAmt(getBigDecimalFromMap(orderData, "finalAmount"));
-
             payorderDTO.setDlvyFeeAmt(BigDecimal.ZERO);
             payorderDTO.setUserCpnId((String) orderData.get("couponId"));
             payorderDTO.setOrdrSttsCd("CREATED");
@@ -88,6 +85,9 @@ public class PaymentServiceImpl implements PaymentService {
             paymentMapper.insertOrder(payorderDTO); 
             log.info("orders 테이블 저장 완료. 주문 번호: {}", orderId);
 
+            // =========================================================================
+            // ★★★ 여기가 최종 수정된 부분입니다. ★★★
+            // =========================================================================
             // 2. 주문 상품 정보 저장 (order_items 테이블)
             List<Map<String, Object>> products = (List<Map<String, Object>>) orderData.get("products");
             if (products != null && !products.isEmpty()) {
@@ -96,10 +96,13 @@ public class PaymentServiceImpl implements PaymentService {
                     itemData.put("ordrDtlArtclNo", paymentMapper.selectNextOrderItemId());
                     itemData.put("ordrNo", orderId);
                     itemData.put("gdsNo", product.get("gdsNo"));
-                    itemData.put("store_id", product.get("store_id")); // store_id 추가
                     itemData.put("ordrQntty", product.get("quantity"));
                     itemData.put("ordrTmUntprc", product.get("price"));
                     itemData.put("ordrDtlArtclDcsnCd", "ORDERED");
+                    
+                    // ★★★ 키 이름을 'store_id'에서 'storeId'로 변경하여 XML과 일치시킵니다. ★★★
+                    itemData.put("storeId", product.get("store_id")); 
+                    
                     paymentMapper.insertOrderItem(itemData);
                 }
             }
@@ -116,7 +119,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentDTO.setStlmDmndDt(LocalDateTime.now());
             paymentMapper.insertPayment(paymentDTO); 
 
-            return orderId; // 생성된 주문 ID를 반환
+            return orderId;
 
         } catch (Exception e) {
             log.error("saveOrder 서비스 처리 중 심각한 오류 발생: {}", e.getMessage(), e);
@@ -141,7 +144,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Map<String, Object> confirmTossPayment(String paymentKey, String orderId, Long amount) throws Exception {
         
-        // 1. 토스페이먼츠 API에 결제 승인을 요청합니다. (기존과 동일)
+        // 1. 토스페이먼츠 API에 결제 승인을 요청합니다.
         String tossPaymentsUrl = "https://api.tosspayments.com/v1/payments/confirm";
         
         HttpHeaders headers = new HttpHeaders();
@@ -170,36 +173,50 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             // 2-1. 방금 결제된 주문의 모든 상품 항목을 DB에서 가져옵니다.
             List<Map<String, Object>> orderedItems = paymentMapper.getOrderedProductsByOrderId(orderId);
+            // ★★★ 로그 1: DB에서 가져온 데이터 전체 확인
+            log.info(">>>> [DEBUG] Ordered Items from DB: {}", orderedItems);
 
-            // =========================================================================
-            // ★★★ [수정/추가] 상점별 매출을 집계하고 누적 업데이트하는 로직입니다. ★★★
-            // =========================================================================
             // 2-2. 상점별 매출을 집계할 Map 생성
             Map<String, BigDecimal> salesByStore = new HashMap<>();
             for (Map<String, Object> item : orderedItems) {
                 String storeId = (String) item.get("store_id");
                 Object unitPriceObj = item.get("ordr_tm_untprc");
                 Object quantityObj = item.get("ordr_qntty");
+                
+                // ★★★ 로그 2: 반복문 내부의 각 아이템과 클래스 타입 확인 (매우 중요!)
+                log.info(">>>> [DEBUG] Processing Item - storeId: {}, unitPrice: {}, quantity: {}", storeId, unitPriceObj, quantityObj);
+                if(unitPriceObj != null) log.info(">>>> [DEBUG] Price Type: " + unitPriceObj.getClass().getName());
+                if(quantityObj != null) log.info(">>>> [DEBUG] Quantity Type: " + quantityObj.getClass().getName());
 
                 // storeId가 있고, 가격과 수량이 정상적인 타입일 때만 계산
                 if (storeId != null && !storeId.isEmpty() && unitPriceObj instanceof BigDecimal && quantityObj instanceof Integer) {
+                    // ★★★ 로그 3: 조건문 통과 확인
+                    log.info(">>>> [DEBUG] Condition PASSED for storeId: {}", storeId);
                     BigDecimal salesAmount = ((BigDecimal) unitPriceObj).multiply(new BigDecimal((Integer) quantityObj));
-                    // getOrDefault를 사용하여 기존 금액에 새로운 금액을 더함
                     salesByStore.put(storeId, salesByStore.getOrDefault(storeId, BigDecimal.ZERO).add(salesAmount));
+                } else {
+                    // ★★★ 로그 4: 조건문 실패 원인 확인
+                    log.warn(">>>> [DEBUG] Condition FAILED for item. Check storeId, price type, or quantity type.");
                 }
             }
 
+            // ★★★ 로그 5: 최종 집계된 상점별 매출 확인
+            log.info(">>>> [DEBUG] Final Sales By Store Map: {}", salesByStore);
+            
             // 2-3. 집계된 금액으로 각 상점의 총 판매 금액(tot_sel_amt)을 업데이트
             if (!salesByStore.isEmpty()) {
                 log.info("상점별 매출 누적 업데이트 시작: {}", salesByStore);
                 for (Map.Entry<String, BigDecimal> entry : salesByStore.entrySet()) {
+                    // ★★★ 로그 6: 실제 DB 업데이트 직전 데이터 확인
+                    log.info(">>>> [DEBUG] Updating DB for Store ID: {}, Amount: {}", entry.getKey(), entry.getValue());
                     paymentMapper.updateTotalSalesAmount(entry.getKey(), entry.getValue());
-                    log.info(" - 상점 ID: {}, 추가 매출: {}", entry.getKey(), entry.getValue());
                 }
                 log.info("상점별 매출 누적 업데이트 완료.");
+            } else {
+                log.warn(">>>> [DEBUG] salesByStore Map is empty. No updates will be made.");
             }
 
-            // 2-4. 주문 및 결제 상태를 업데이트합니다. (기존 로직)
+            // 2-4. 주문 및 결제 상태를 업데이트합니다.
             PayOrderDTO orderDetails = paymentMapper.getOrderDetailsByOrderId(orderId);
             
             Map<String, Object> orderStatusParams = Map.of("ordrNo", orderId, "status", "PAID");
@@ -216,13 +233,13 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentMapper.insertPaymentHistory(historyDTO);
             }
 
-            // 2-5. 사용된 쿠폰 상태를 '사용됨'으로 업데이트합니다. (기존 로직)
+            // 2-5. 사용된 쿠폰 상태를 '사용됨'으로 업데이트합니다.
             if (orderDetails != null && orderDetails.getUserCpnId() != null && !orderDetails.getUserCpnId().isEmpty()) {
                 paymentMapper.updateUserCouponToUsed(orderDetails.getUserCpnId()); 
                 log.info("사용자 쿠폰 ({}) 상태가 '사용됨'으로 업데이트되었습니다.", orderDetails.getUserCpnId());
             }
             
-            // 2-6. 장바구니에서 결제 완료된 상품을 삭제합니다. (기존 로직)
+            // 2-6. 장바구니에서 결제 완료된 상품을 삭제합니다.
             String userNo = (orderDetails != null) ? orderDetails.getUserNo() : null;
             if (userNo != null && !orderedItems.isEmpty()) {
                 List<Map<String, Object>> itemsToDelete = new ArrayList<>();

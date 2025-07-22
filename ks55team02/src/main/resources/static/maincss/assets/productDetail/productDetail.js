@@ -206,95 +206,55 @@ $(document).ready(function() {
     /**
      * ⭐ 최종 수정된 장바구니 버튼 클릭 이벤트
      * 이제 optNo 대신 gdsSttsNo를 전송합니다.
+	 * 2025.07.22 gy
      */
-    $('.btn-cart').on('click', function(e) {
-        e.preventDefault();
+	$('.btn-cart').on('click', function(e) {
+	        e.preventDefault();
+	        if (selectedOptions.length === 0) { alert('최소 하나 이상의 옵션을 추가해주세요.'); return; }
 
-        if (selectedOptions.length === 0) {
-            alert('최소 하나 이상의 옵션을 추가해주세요.');
-            return;
-        }
+	        const payload = {
+			    gdsNo: currentProductGdsNo,
+			    storeId: currentProductStoreId,
+			    selectedOptions: selectedOptions.map(opt => ({ gdsSttsNo: opt.gdsSttsNo, quantity: opt.quantity }))
+			};
 
-        const gdsNo = currentProductGdsNo;
-        const storeId = currentProductStoreId;
+	        $.ajax({
+	            url: '/api/cart/add', type: 'POST', contentType: 'application/json', data: JSON.stringify(payload),
+	            success: function(response) {
+	                if (confirm('장바구니에 상품이 추가되었습니다. 장바구니로 이동하시겠습니까?')) window.location.href = '/cart';
+	            },
+	            error: function(xhr) { alert('장바구니 추가 중 오류가 발생했습니다.'); },
+	            complete: function() { selectedOptions = []; updateOptionsDisplay(); }
+	        });
+	    });
 
-		const payload = {
-		    gdsNo: gdsNo,
-		    storeId: storeId,
-		    selectedOptions: selectedOptions.map(option => ({
-		        // ⭐⭐ 키 이름을 gdsSttsNo로 변경
-		        gdsSttsNo: option.gdsSttsNo, 
-		        quantity: option.quantity
-		    }))
-		};
+    /* ========================== 구매하기 버튼 2025.07.22 gy ========================== */
+	$('.btn-buy-now').on('click', function(e) {
+	        e.preventDefault();
+	        
+	        if (selectedOptions.length === 0) {
+	            alert('구매하시려면 최소 하나 이상의 옵션을 선택해주세요.');
+	            return;
+	        }
 
-        console.log("전송할 페이로드:", JSON.stringify(payload, null, 2));
+	        const productName = $('.product-details .product-title').text().trim();
+	        const basePrice = getBaseProductPrice();
+	        
+	        const buyNowData = selectedOptions.map(option => ({
+	            gdsNo: currentProductGdsNo,
+	            name: `${productName} (${option.color} / ${option.size})`,
+	            price: basePrice,
+	            quantity: option.quantity,
+	            store_id: currentProductStoreId // ★★★ store_id를 여기서 포함시킵니다. ★★★
+	        }));
+	        
+	        console.log("Checkout 페이지로 전달할 데이터:", JSON.stringify(buyNowData, null, 2));
 
-        $.ajax({
-            url: '/api/cart/add',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(payload),
-            success: function(response) {
-                if (confirm('장바구니에 상품이 추가되었습니다. 장바구니로 이동하시겠습니까?')) {
-                    window.location.href = '/cart';
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("장바구니 추가 중 오류 발생:", error);
-                let errorMessage = '장바구니 추가 중 오류가 발생했습니다.';
-                if (xhr.status === 401) {
-                    errorMessage = '로그인이 필요합니다.';
-                } else if (xhr.responseText) {
-                    try {
-                        const errorResponse = JSON.parse(xhr.responseText);
-                        errorMessage = errorResponse.message || errorMessage;
-                    } catch (e) {
-                        errorMessage = xhr.responseText;
-                    }
-                }
-                alert(errorMessage);
-            },
-            complete: function() {
-                selectedOptions = [];
-                updateOptionsDisplay();
-            }
-        });
-    });
-
-    /* ========================== 구매하기 버튼 2025.07.11 gy ========================== */
-    $('.btn-buy-now').on('click', function(e) {
-        e.preventDefault();
-        const productName = $('.product-details .product-title').text().trim();
-        const productImageSrc = $('.product-main-image img').attr('src');
-        const productGdsNo = typeof currentProductGdsNo !== 'undefined' ? currentProductGdsNo : null;
-        if (selectedOptions.length === 0) {
-            alert('구매하시려면 최소 하나 이상의 옵션을 선택해주세요.');
-            return;
-        }
-        if (confirm('선택하신 상품을 바로 구매하시겠습니까?')) {
-            let buyNowData = [];
-            selectedOptions.forEach(option => {
-                const uniqueItemId = `${productName}_${option.color}_${option.size}`;
-                const basePrice = getBaseProductPrice();
-                buyNowData.push({
-                    id: uniqueItemId,
-                    gdsNo: productGdsNo,
-                    name: `${productName} ${option.color} ${option.size}`,
-                    price: basePrice,
-                    quantity: option.quantity,
-                    image: productImageSrc,
-                    color: option.color,
-                    size: option.size
-                });
-            });
-            sessionStorage.setItem('buy_now_data', JSON.stringify(buyNowData));
-            window.location.href = '/checkout';
-        } else {
-            console.log("구매하기 취소됨.");
-        }
-    });
-
+	        if (confirm('선택하신 상품을 바로 구매하시겠습니까?')) {
+	            sessionStorage.setItem('buy_now_data', JSON.stringify(buyNowData));
+	            window.location.href = '/checkout';
+	        }
+	    });
     /* =================================================================== */
     /* ⭐ [새로 추가] 비슷한 상품 슬라이더 초기화 ⭐ */
     /* =================================================================== */

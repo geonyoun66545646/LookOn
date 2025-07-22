@@ -93,25 +93,47 @@
 	    INSERT INTO orders (ordr_no, user_no, ordr_dt, gds_tot_amt, dlvy_fee_amt, pblcn_cpn_id, user_cpn_id, apld_cpn_dscnt_amt, last_stlm_amt, ordr_stts_cd, rcvr_nm, rcvr_telno, dlvy_addr, dlvy_daddr, zip, dlvy_memo_cn, user_name)
 	    VALUES (#{ordrNo}, #{userNo}, #{ordrDt}, #{gdsTotAmt}, #{dlvyFeeAmt}, #{pblcnCpnId}, #{userCpnId}, #{apldCpnDscntAmt}, #{lastStlmAmt}, #{ordrSttsCd}, #{rcvrNm}, #{rcvrTelno}, #{dlvyAddr}, #{dlvyDaddr}, #{zip}, #{dlvyMemoCn}, #{userName})
 	</insert>
+	
     <insert id="insertOrderItem" parameterType="map">
         INSERT INTO order_items (ordr_dtl_artcl_no, ordr_no, opt_no, gds_no, store_id, ordr_qntty, ordr_tm_untprc, ordr_dtl_artcl_dcsn_cd)
         VALUES (#{ordrDtlArtclNo}, #{ordrNo}, #{optNo}, #{gdsNo}, #{storeId}, #{ordrQntty}, #{ordrTmUntprc}, #{ordrDtlArtclDcsnCd})
     </insert>
+    
     <update id="updateOrderStatus" parameterType="map">
         UPDATE orders SET ordr_stts_cd = #{status} WHERE ordr_no = #{ordrNo}
     </update>
+    
     <select id="getOrderDetailsByOrderId" parameterType="String" resultMap="payorderResultMap">
         SELECT o.*, (SELECT user_nm FROM users WHERE user_no = o.user_no) AS user_name FROM orders o WHERE ordr_no = #{ordrNo}
     </select>
+    
     <select id="getOrderedProductsByOrderId" parameterType="String" resultType="java.util.Map">
-        SELECT oi.*, p.gds_nm AS product_name, po.opt_nm AS option_name FROM order_items oi
-        JOIN products p ON oi.gds_no = p.gds_no
-        LEFT JOIN product_options po ON oi.opt_no = po.opt_no
-        WHERE oi.ordr_no = #{ordrNo} ORDER BY oi.ordr_dtl_artcl_no ASC
+        SELECT 
+            oi.ordr_dtl_artcl_no,
+            oi.ordr_no,
+            oi.gds_no,
+            oi.store_id,  -- store_id를 명시적으로 SELECT
+            oi.ordr_qntty,
+            oi.ordr_tm_untprc,
+            oi.ordr_dtl_artcl_dcsn_cd,
+            p.gds_nm AS product_name,
+            po.opt_nm AS option_name
+        FROM 
+            order_items oi
+        JOIN 
+            products p ON oi.gds_no = p.gds_no
+        LEFT JOIN 
+            product_options po ON oi.opt_no = po.opt_no
+        WHERE 
+            oi.ordr_no = #{ordrNo} 
+        ORDER BY 
+            oi.ordr_dtl_artcl_no ASC
     </select>
+    
     <select id="findLatestOrderIdByUserNo" parameterType="String" resultType="String">
 	    SELECT ordr_no FROM orders WHERE user_no = #{userNo} ORDER BY ordr_dt DESC LIMIT 1
 	</select>
+	
 	<select id="getUserOrderPaymentHistory" parameterType="String" resultType="Map">
         SELECT o.ordr_no, o.ordr_dt, o.last_stlm_amt, o.ordr_stts_cd, p.stlm_mthd_cd,
             (SELECT gds_nm FROM products WHERE gds_no = (SELECT gds_no FROM order_items WHERE ordr_no = o.ordr_no LIMIT 1)) AS first_product_name,
@@ -125,13 +147,16 @@
         INSERT INTO payments (stlm_id, ordr_no, user_no, stlm_mthd_cd, stlm_amt, stlm_stts_cd, pg_dlng_id, pg_co_info, stlm_cmptn_dt, stlm_dmnd_dt)
         VALUES (#{stlmId}, #{ordrNo}, #{userNo}, #{stlmMthdCd}, #{stlmAmt}, #{stlmSttsCd}, #{pgDlngId}, #{pgCoInfo}, NOW(), #{stlmDmndDt})
     </insert>
+    
     <insert id="insertPaymentHistory" parameterType="ks55team02.tossapi.domain.PaymentHistoryDTO">
         INSERT INTO payments_history (stlm_hstry_id, stlm_id, hstry_crt_dt, hstry_mdfcn_dt)
         VALUES (#{stlmHstryId}, #{stlmId}, NOW(), NOW())
     </insert>
+    
     <select id="getPaymentIdByPgDlngId" parameterType="String" resultType="String">
         SELECT stlm_id FROM payments WHERE pg_dlng_id = #{pgDlngId}
     </select>
+    
     <update id="updatePaymentStatusAndCompletionDate" parameterType="map">
         UPDATE payments SET stlm_stts_cd = #{stlmSttsCd}, stlm_cmptn_dt = NOW() WHERE pg_dlng_id = #{pgDlngId} AND ordr_no = #{ordrNo}
     </update>

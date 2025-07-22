@@ -377,7 +377,8 @@
 	        // =================================================================
 	        // 4. 결제 버튼 기능 (독립적으로 실행 및 로직 복원)
 	        // =================================================================
-            (function setupPaymentButton() {
+            (
+            	function setupPaymentButton() {
                 const paymentButton = document.getElementById("payment-button");
                 if (!paymentButton) { return; }
 
@@ -421,7 +422,25 @@
                         finalAmount: finalAmount,
                         purchaseRoute: purchaseRoute
                     };
+                    
+                    console.log("========================================");
+                    console.log("결제 버튼 클릭! 서버로 전송될 최종 데이터를 확인합니다.");
+                    console.log("전체 orderData 객체:", JSON.stringify(orderData, null, 2));
 
+                    console.log("--- 각 상품별 store_id 확인 ---");
+                    
+                    if (orderData.products && orderData.products.length > 0) {
+                        orderData.products.forEach((product, index) => {
+                            console.log(`상품 ${index + 1} ('${product.name}')의 store_id는 [${product.store_id}] 입니다.`);
+                            if (product.store_id === null || product.store_id === undefined) {
+                                 console.error(`--> 경고: 상품 ${index + 1}의 store_id가 null 또는 undefined 입니다! 이전 페이지(장바구니/상품상세)의 sessionStorage 저장 로직을 확인하세요.`);
+                            }
+                        });
+                    } else {
+                        console.warn("전송할 상품이 없습니다.");
+                    }
+                    console.log("========================================");
+                    
                     try {
                         paymentButton.disabled = true;
                         paymentButton.textContent = "주문 처리 중...";

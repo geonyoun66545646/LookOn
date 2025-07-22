@@ -302,25 +302,24 @@ public class CustomerProductController {
 	}
 
 	@GetMapping("/products/detail/{productCode}")
-    public String getProductDetailForCustomer(@PathVariable String productCode, Model model, HttpSession session) {
-        Products product = productsService.getProductDetailWithImages(productCode);
+	public String getProductDetailForCustomer(@PathVariable String productCode, Model model, HttpSession session) {
+		Products product = productsService.getProductDetailWithImages(productCode);
 
-        if (product == null || !Boolean.TRUE.equals(product.getExpsrYn())
-                || !Boolean.TRUE.equals(product.getActvtnYn())) {
-            return "redirect:/error/404";
-        }
-        model.addAttribute("product", product);
+		if (product == null || !Boolean.TRUE.equals(product.getExpsrYn())
+				|| !Boolean.TRUE.equals(product.getActvtnYn())) {
+			return "redirect:/error/404";
+		}
+		model.addAttribute("product", product);
 
-        List<ProductImage> allImages = product.getProductImages();
-        ProductImage thumbnailImage = allImages.stream().filter(img -> img.getImgType() == ProductImageType.THUMBNAIL)
-                .findFirst().orElse(allImages.stream().filter(img -> img.getImgType() == ProductImageType.MAIN)
-                        .findFirst().orElse(null));
-        List<ProductImage> mainGalleryImages = allImages.stream()
-                .filter(img -> img.getImgType() == ProductImageType.MAIN)
-                .sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
-        List<ProductImage> detailImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.DETAIL)
-                .sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
-
+		List<ProductImage> allImages = product.getProductImages();
+		ProductImage thumbnailImage = allImages.stream().filter(img -> img.getImgType() == ProductImageType.THUMBNAIL)
+				.findFirst().orElse(allImages.stream().filter(img -> img.getImgType() == ProductImageType.MAIN)
+						.findFirst().orElse(null));
+		List<ProductImage> mainGalleryImages = allImages.stream()
+				.filter(img -> img.getImgType() == ProductImageType.MAIN)
+				.sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
+		List<ProductImage> detailImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.DETAIL)
+				.sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
 
 		if (product.getCtgryNo() != null) {
 			List<Products> similarProducts = productSearchService.getSimilarProducts(product.getCtgryNo(),
@@ -343,7 +342,6 @@ public class CustomerProductController {
 		 LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
 	        String currentUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
 
-
 	        int currentPage = 1;
 	        int pageSize = 5;
 	        int blockSize = 10;
@@ -362,7 +360,6 @@ public class CustomerProductController {
 	            currentUserNo
 	        );
 
-
 	        // JavaScript에서 사용할 페이지네이션 객체를 생성합니다.
 	        CustomerPagination<ProductReview> reviewPaginationData = new CustomerPagination<>(
 	            firstPageReviews, totalReviewCount, currentPage, pageSize, blockSize
@@ -377,8 +374,6 @@ public class CustomerProductController {
 	        // -------------------------------------------------------------------
 	        boolean canWriteReview = false;
 	        OrderDTO reviewableOrder = null;
-
-
 
 	        // 로그인한 상태일 때만 리뷰 작성 가능 여부를 확인합니다.
 	        if (currentUserNo != null) {
@@ -399,7 +394,6 @@ public class CustomerProductController {
         
 	    return "customer/productDetail";
 	}
-
 }
 
 	
