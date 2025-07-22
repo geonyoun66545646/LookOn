@@ -3,6 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <title>Molla - 통합 헤더</title>
+<script>
+    /**
+     * 헤더의 장바구니 아이콘 뱃지를 최신 수량으로 업데이트하는 전역 함수.
+     * 이 함수는 다른 페이지의 스크립트에서도 호출할 수 있습니다. (예: 상품 상세 페이지)
+     */
+	function updateCartBadge() {
+	    fetch('/api/cart/count')
+	        .then(response => {
+	            // 로그인하지 않은 상태(401 Unauthorized 등)에서는 조용히 실패하도록 처리
+	            if (!response.ok) {
+	                if(response.status === 401) return null;
+	                throw new Error('장바구니 수량 조회 실패');
+	            }
+	            return response.json();
+	        })
+	        .then(data => {
+                // data가 null일 경우 (비로그인 등)를 처리합니다.
+                if (data === null || data.count === undefined) {
+                    const badge = document.querySelector('a[href="/cart"].lookon-action-link .lookon-badge');
+                    if (badge) {
+                        badge.style.display = 'none'; // 비로그인 시 뱃지 숨김
+                    }
+                    return;
+                }
+
+	            const badge = document.querySelector('a[href="/cart"].lookon-action-link .lookon-badge');
+	            const cartLink = document.querySelector('a[href="/cart"].lookon-action-link');
+	            const count = data.count;
+
+	            if (count > 0) {
+	                if (badge) {
+	                    badge.textContent = count;
+	                    badge.style.display = 'flex'; // 숨겨져 있었다면 다시 보이게
+	                } else {
+	                    // 뱃지가 아예 없는 경우를 대비해 새로 만듭니다.
+	                    const newBadge = document.createElement('span');
+	                    newBadge.className = 'lookon-badge';
+	                    newBadge.textContent = count;
+	                    if (cartLink) {
+	                        cartLink.appendChild(newBadge);
+                        }
+	                }
+	            } else {
+	                // 수량이 0이면 뱃지를 숨깁니다.
+	                if (badge) {
+	                    badge.style.display = 'none';
+	                }
+	            }
+	        })
+	        .catch(error => {
+                console.error('장바구니 뱃지 업데이트 중 에러:', error);
+                const badge = document.querySelector('a[href="/cart"].lookon-action-link .lookon-badge');
+                if(badge) badge.style.display = 'none'; // 에러 발생 시에도 뱃지를 숨김
+            });
+	}
+	
+	/**
+	 * DOM이 모두 로드되었을 때, 함수를 "최초 1회 실행"하는 코드.
+	 * 이 코드가 있기 때문에 어떤 페이지를 열든 항상 장바구니 수량을 체크하게 됩니다.
+	 */
+	document.addEventListener('DOMContentLoaded', function() {
+	    updateCartBadge();
+	});
+</script>
 </head>
 <body>
 	<header class="lookon-main-header" th:fragment="mainHeaderFragment">
@@ -45,9 +109,12 @@
 					<a href="#" class="lookon-action-link" data-toggle="modal" data-target="#signin-modal"> 
 						<i class="fas fa-sign-in-alt" style="font-size:20px;"></i> 
 					</a>
+					<!-- 2025.07.22 gy -->
 					<a href="/cart" class="lookon-action-link">
 						<i class="fas fa-shopping-bag" style="font-size:19px;"></i>
-						<span class="lookon-badge">2</span>
+						
+						<!-- [최종 수정] Thymeleaf를 완전히 제거하고, 초기에는 보이지 않도록 style을 추가합니다. -->
+						<span class="lookon-badge" style="display: none;"></span>
 					</a>
 				</div>
 			</div>

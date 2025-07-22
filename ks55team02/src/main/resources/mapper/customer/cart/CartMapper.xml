@@ -8,7 +8,8 @@
         <result column="user_no"        property="userNo"/>
         <result column="gds_no"         property="gdsNo"/>
         <result column="store_id"       property="storeId"/>
-        <result column="gds_stts_no"    property="gdsSttsNo"/> <result column="quantity"       property="quantity"/>
+        <result column="gds_stts_no"    property="gdsSttsNo"/> 
+        <result column="quantity"       property="quantity"/>
         <result column="added_at"       property="addedAt"/>
         <result column="updated_at"     property="updatedAt"/>
         <result column="is_chc_ord"     property="isChcOrd"/>
@@ -113,4 +114,13 @@
         WHERE
             user_no = #{userNo}
     </delete>
+    
+    <select id="getCartItemCount" resultType="int">
+        SELECT
+        	COUNT(*) 
+        FROM 
+        	cart_items 
+        WHERE 
+        	user_no = #{userNo}
+    </select>
 </mapper>
