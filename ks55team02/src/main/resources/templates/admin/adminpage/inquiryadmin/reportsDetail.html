@@ -142,6 +142,20 @@
 									value="DCLR_20230710_001">
 
 								<div class="mb-4 form-group">
+									<label for="sanctionType" class="form-label">사용자 제재 조치</label>
+									<select class="form-select" id="sanctionType"
+										name="sanctionType">
+										<option value="NONE" selected>제재 없음</option>
+										<option value="3일 이용 정지">3일 이용 정지</option>
+										<option value="7일 이용 정지">7일 이용 정지</option>
+										<option value="14일 이용 정지">14일 이용 정지</option>
+										<option value="30일 이용 정지">30일 이용 정지</option>
+										<option value="영구 이용 정지">영구 이용 정지</option>
+									</select> <small class="form-text text-muted">신고 대상 사용자에 대한 제재를
+										선택합니다. '제재 없음'은 경고 조치만 할 경우 선택합니다.</small>
+								</div>
+
+								<div class="mb-4 form-group">
 									<label for="actnCn" class="form-label">조치 내용</label>
 									<textarea class="form-control" id="actnCn" name="actnCn"
 										rows="3"
@@ -180,7 +194,6 @@
 							</form>
 						</div>
 
-						<!-- ==================== 처리 이력 목록 탭 (데이터 연동) ==================== -->
 						<!-- ==================== 처리 이력 목록 탭 (최종 수정) ==================== -->
 						<div class="tab-pane fade" id="reportHistory" role="tabpanel"
 							aria-labelledby="history-tab">
@@ -236,7 +249,6 @@
 
 <th:block layout:fragment="jsFile">
 </th:block>
-
 <th:block layout:fragment="jsScript">
 	<script th:inline="javascript">
     /*<![CDATA[*/
@@ -244,27 +256,42 @@
     // reportDetail 객체가 존재하는 경우에만 스크립트를 실행합니다. (오류 방지)
     const reportDetail = /*[[${reportDetail}]]*/ null;
 
-if (reportDetail) {
+    if (reportDetail) {
         
+        console.log("1. 스크립트 시작: reportDetail 객체 확인 완료", reportDetail);
+
+        // 신고 처리에 필요한 HTML 요소들을 정확한 ID로 찾아옵니다.
         const processForm = document.getElementById('reportProcessingAndHistoryForm');
         const statusSelect = document.getElementById('prcsSttsCd');
         const resultContentTextarea = document.getElementById('dclrPrcsRsltCn');
         const actionContentTextarea = document.getElementById('actnCn');
         const memoContentTextarea = document.getElementById('prcsDsctnMemoCn');
+        const sanctionTypeSelect = document.getElementById('sanctionType'); // 제재 선택 드롭다운
         const submitButton = processForm.querySelector('button[type="submit"]');
 
-        function processReport(dclrId, status, resultContent, actionContent, memoContent) {
+        console.log("2. HTML 요소 확인: submitButton =", submitButton);
+        
+        /**
+         * 신고 처리 API를 호출하는 함수 (제재 정보 포함)
+         */
+        function processReport(dclrId, status, resultContent, actionContent, memoContent, sanctionType) {
+            console.log("5. processReport 함수 실행됨! 서버로 데이터를 보냅니다.");
             
             const requestData = {
                 newStatus: status,
                 dclrPrcsRsltCn: resultContent,
                 prcsCn: actionContent,
-                prcsDsctnMemoCn: memoContent
+                prcsDsctnMemoCn: memoContent,
+                sanctionType: sanctionType
             };
 
             fetch(`/api/admin/reports/${dclrId}/process`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    // CSRF 토큰 헤더가 필요하다면 여기에 추가됩니다.
+                    // [document.querySelector('meta[name="_csrf_header"]').getAttribute('content')]: document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                },
                 body: JSON.stringify(requestData),
             })
             .then(response => {
@@ -274,8 +301,8 @@ if (reportDetail) {
                 return response.json();
             })
             .then(data => {
-                alert(data.message); // 성공 메시지 표시
-                window.location.reload(); // 페이지 새로고침
+                alert(data.message);
+                window.location.reload();
             })
             .catch(error => {
                 console.error('신고 처리 중 오류 발생:', error);
@@ -285,19 +312,26 @@ if (reportDetail) {
         
         // 현재 신고의 처리 상태를 가져옵니다.
         const currentStatus = reportDetail.prcsSttsCd;
+        console.log("3. 현재 신고 상태 확인:", currentStatus);
         
         // 현재 상태가 'RECEIVED'(처리 대기)인 경우에만 처리 관련 기능을 활성화합니다.
-               if (currentStatus === 'RECEIVED') {
+        if (currentStatus === 'RECEIVED') {
+            console.log("4. 처리 대기 상태이므로, 버튼에 이벤트 리스너를 추가합니다.");
+            
             submitButton.disabled = false;
             submitButton.textContent = '처리 내용 저장';
             
             submitButton.addEventListener('click', function(event) {
+                console.log("--> 버튼 클릭 이벤트 발생!");
                 event.preventDefault();
 
                 const selectedStatus = statusSelect.value;
                 const resultContent = resultContentTextarea.value.trim();
                 const actionContent = actionContentTextarea.value.trim();
                 const memoContent = memoContentTextarea.value.trim();
+                const sanctionType = sanctionTypeSelect.value;
+                
+                console.log("--> 수집된 데이터:", {selectedStatus, resultContent, actionContent, memoContent, sanctionType});
                 
                 if (actionContent === '') {
                     alert('조치 내용을 입력해주세요.');
@@ -305,17 +339,20 @@ if (reportDetail) {
                     return;
                 }
 
-                processReport(reportDetail.dclrId, selectedStatus, resultContent, actionContent, memoContent);
+                processReport(reportDetail.dclrId, selectedStatus, resultContent, actionContent, memoContent, sanctionType);
             });
             
         } else {
+            console.log("4. 이미 처리된 신고이므로, 폼을 비활성화합니다.");
 
             // 이미 처리된 신고일 경우, 폼을 비활성화합니다.
             statusSelect.disabled = true;
-            contentTextarea.disabled = true;
+            resultContentTextarea.readOnly = true;
+            actionContentTextarea.readOnly = true;
+            memoContentTextarea.readOnly = true;
+            sanctionTypeSelect.disabled = true;
             submitButton.textContent = '처리 완료됨';
             
-            // 페이지 상단의 '처리 완료' 버튼도 텍스트를 변경합니다.
             const headerSubmitButton = document.querySelector('.content-header button[type="submit"]');
             if(headerSubmitButton) {
                 headerSubmitButton.textContent = '처리 완료됨';
