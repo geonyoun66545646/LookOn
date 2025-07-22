@@ -105,13 +105,18 @@
 								<h1 class="product-title"
 									th:text="${product?.gdsNm ?: '상품명 없음'}"></h1>
 
-								<div class="ratings-container">
-									<div class="ratings">
-										<div class="ratings-val" style="width: 80%;"></div>
-									</div>
-									 <a class="ratings-text" href="#product-review-link" id="review-link"
-      									 th:text="'(' + (${reviews != null ? reviews.size() : 0}) + ' 개의 리뷰)'">( 2 리뷰 )</a>
-								</div>
+								<div class="ratings-container" th:if="${reviewPaginationData.totalCount > 0}">
+								    <div class="ratings">
+								        <div class="ratings-val" th:style="'width: ' + ${averageRating * 20} + '%;'"></div>
+								    </div>
+								    <a href="#product-review-link" class="ratings-text" id="review-link">
+								        <span th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">4.5</span>
+								        <span>([[${reviewPaginationData.totalCount}]]개의 리뷰)</span>
+								    </a>
+								</div>							
+								<div class="ratings-container" th:if="${reviewPaginationData.totalCount == 0}">
+								    <span class="text-muted">아직 등록된 리뷰가 없습니다.</span>
+								</div>															
 
 								<div class="product-price-section">
 									<div class="original-price-wrapper"
@@ -133,7 +138,32 @@
 								<div class="product-content">
 									<p th:text="${product?.gdsExpln ?: '상품 설명이 없습니다.'}"></p>
 								</div>
-
+								
+								
+								<div class="coupon-wrapper">
+									<a th:href="@{/customer/coupons}" class="coupon-link">
+										<div class="coupon-container">
+											<div class="coupon-left-section">
+												<span class="coupon-brand-text">LookOn</span>
+											</div>
+											<div class="coupon-right-section">
+												<div class="coupon-info-row">
+													<div class="coupon-discount-main">
+														<span class="main-percentage">최대</span> <span
+															class="main-percentage-value">~100%</span> <span
+															class="main-discount-text">할인</span>
+													</div>
+													<span class="separator"> | </span>
+													<div class="coupon-condition-inline">
+														<span class="condition-text">5만원 이상 구매 시 적용</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</a>
+								</div>
+								
+								
 								<div
 									th:if="${product.productOptions != null and !#lists.isEmpty(product.productOptions)}">
 									<div th:each="option : ${product.productOptions}">
@@ -210,7 +240,7 @@
 								id="product-review-link" data-toggle="tab"
 								href="#product-review-tab" role="tab"
 								aria-controls="product-review-tab" aria-selected="false"> 리뷰
-									(<span th:text="${reviews != null ? reviews.size() : 0}">0</span>)
+									(<span th:text="${reviewPaginationData.totalCount}">0</span>)
 							</a></li>
 						</ul>
 					</div>
@@ -247,7 +277,7 @@
 							        </div>
 							        <hr class="mt-4 mb-4">
 							    </div>																		   
-							    <div th:include="~{customer/fragments/productReviewFragment :: productReviewFragment(${product.gdsNo})}">							  							
+							    <div id="review-section-content">							  							
 							</div>
 						</div>
 					</div>
@@ -330,6 +360,7 @@
 		<script th:src="@{/maincss/assets/productDetail/productDetail.js}"></script>
 		 <script th:src="@{/js/customerjs/productReview.js}"></script>
 		<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
+		<script th:src="@{/js/customerjs/insertReviewForm.js}"></script>
 	</th:block>
 
 	<th:block layout:fragment="jsScript">
@@ -361,21 +392,22 @@
 		
 		<!-- ljs 리뷰목록  -->
 		<script th:inline="javascript">
-				/*<![CDATA[*/
-					// 페이지 로딩이 완료되면 실행
-					document.addEventListener('DOMContentLoaded', function() {
-						// Thymeleaf 모델에서 전체 리뷰 목록을 가져옵니다.
-						const reviewData = /*[[${reviews}]]*/ [];
-						
-						// review.js 파일에 정의된 초기화 함수를 호출하며 데이터를 전달합니다.
-						if (typeof initReviewSection === 'function') {
-							initReviewSection(reviewData);
-						} else {
-							console.error('initReviewSection 함수를 찾을 수 없습니다. review.js 파일이 올바르게 로드되었는지 확인하세요.');
-						}
-					});
-				/*]]>*/
-				</script>
+    /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. 컨트롤러에서 넘겨준 상품 ID와 '첫 페이지 리뷰 데이터'를 가져옵니다.
+            const productId = /*[[${product.gdsNo}]]*/ null;
+            const initialPaginationData = /*[[${reviewPaginationData}]]*/ null;
+
+            // 2. productReview.js 파일에 정의된 초기화 함수(initReviewSection)를 호출합니다.
+            if (typeof window.initReviewSection === 'function') {
+                window.initReviewSection(productId, initialPaginationData);
+            } else {
+                console.error('initReviewSection 함수를 찾을 수 없습니다. productReview.js 파일이 올바르게 로드되었는지 확인하세요.');
+            }
+        });
+    /*]]>*/
+    </script>
+				
 
 
 		<script>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.systems.batch.SanctionBatchMapper">
+
+    <select id="findUsersWithExpiredSanctions" resultType="String">
+        SELECT
+            DISTINCT s.user_no
+        FROM
+            user_sanctions s
+        JOIN
+            users u ON s.user_no = u.user_no
+        WHERE
+            s.sanction_end_dt &lt;= NOW()
+            AND u.user_status = '제한'
+    </select>
+    
+    <update id="updateUsersStatusToActive" parameterType="java.util.List">
+        UPDATE users
+        SET
+            user_status = '활동'
+        WHERE
+            user_no IN
+            <foreach item="userNo" collection="list" open="(" separator="," close=")">
+                #{userNo}
+            </foreach>
+    </update>
+    
+</mapper>
