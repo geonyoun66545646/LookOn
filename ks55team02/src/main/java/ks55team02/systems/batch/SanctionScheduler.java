@@ -19,7 +19,7 @@ public class SanctionScheduler {
 	/**
 	 * 매일 0시 0분 0초에 실행되는 스케줄러 cron = "[초] [분] [시] [일] [월] [요일]" (fixedRate = 10000)
 	 */
-	@Scheduled(fixedRate = 10000)
+	@Scheduled(cron = "0 0 0 * * *")
 	@Transactional
 	public void releaseExpiredSanctions() {
 		log.info("▶▶▶▶▶ 제재 만료 사용자 복구 스케줄러 시작 ◀◀◀◀◀");
