@@ -1036,6 +1036,7 @@
 @media screen and (min-width: 992px) {
 	.product-gallery-vertical .product-image-gallery {
 		/* ... 데스크탑 갤러리 스크롤 스타일 ... */
+		display: flex;
 		flex: 0 0 20%;
 		max-width: 20%;
 		max-height: 620px;
@@ -1044,6 +1045,8 @@
 		scrollbar-width: none;
 		-ms-overflow-style: none;
 		gap: 5px;
+		/* align-items: flex-start; */
+		align-content: flex-start;
 	}
 	.product-gallery-vertical .product-image-gallery::-webkit-scrollbar {
 		display: none;
@@ -1079,6 +1082,7 @@
 		padding-left: 0;
 		padding-right: 0;
 		margin-bottom: 0rem;
+		height: 21%;
 	}
 	.product-gallery-item {
 		position: relative;
@@ -1111,53 +1115,52 @@
 
 /* 1. 이미지 슬라이더의 전체 컨테이너 (뷰포트 역할) */
 .review-image-slider {
-    position: relative;
-    width: 100%;
-    overflow-x: scroll; /* 스크롤 기능은 유지하되, 스크롤바는 아래에서 숨깁니다. */
-    cursor: grab;       /* 마우스를 올렸을 때 잡는 모양의 커서 */
-    user-select: none;  /* 드래그 시 텍스트가 선택되는 것을 방지 */
-    
-    /* 핵심: 스크롤바를 숨깁니다 */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE, Edge */
+	position: relative;
+	width: 100%;
+	overflow-x: scroll; /* 스크롤 기능은 유지하되, 스크롤바는 아래에서 숨깁니다. */
+	cursor: grab; /* 마우스를 올렸을 때 잡는 모양의 커서 */
+	user-select: none; /* 드래그 시 텍스트가 선택되는 것을 방지 */
+	/* 핵심: 스크롤바를 숨깁니다 */
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE, Edge */
 }
 
 /* 스크롤바 숨기기 - Webkit (Chrome, Safari) */
 .review-image-slider::-webkit-scrollbar {
-    display: none;
+	display: none;
 }
 
 /* 드래그가 활성화되었을 때 (마우스를 누르고 있을 때)의 스타일 */
 .review-image-slider.active {
-    cursor: grabbing; /* 잡고 끄는 모양의 커서 */
-    cursor: -webkit-grabbing;
+	cursor: grabbing; /* 잡고 끄는 모양의 커서 */
+	cursor: -webkit-grabbing;
 }
 
 /* 2. 실제 이미지들을 담고 있는 가로 트랙 (변경 없음) */
 .review-image-track {
-    display: flex;
-    gap: 10px;
-    padding-bottom: 5px; /* 공간을 약간만 둠 */
+	display: flex;
+	gap: 10px;
+	padding-bottom: 5px; /* 공간을 약간만 둠 */
 }
 
 /* 3. 각 이미지를 감싸는 아이템 */
 .review-image-item {
-    flex-shrink: 0;
-    /* 기존 80% 크기의 70%인 56%로 변경 */
-    width: 56%; 
-    max-width: 320px;
-    aspect-ratio: 4 / 3;
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: #f0f0f0;
+	flex-shrink: 0;
+	/* 기존 80% 크기의 70%인 56%로 변경 */
+	width: 56%;
+	max-width: 320px;
+	aspect-ratio: 4/3;
+	border-radius: 8px;
+	overflow: hidden;
+	background-color: #f0f0f0;
 }
 
 /* 4. 아이템 안의 실제 이미지 태그 (변경 없음) */
 .review-image-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none; /* 드래그 중 이미지가 클릭되는 현상 방지 */
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	pointer-events: none; /* 드래그 중 이미지가 클릭되는 현상 방지 */
 }
 
 /* ================================================== */
@@ -1166,56 +1169,56 @@
 
 /* 프로필 이미지를 감싸는 컨테이너 */
 .profile-image-wrapper {
-    /* 기존 크기의 50%로 설정 (예: 기본 40px -> 30px) */
-    width: 30px; 
-    height: 30px;
-    flex-shrink: 0; /* 컨테이너 크기가 줄어들지 않도록 함 */
+	/* 기존 크기의 50%로 설정 (예: 기본 40px -> 30px) */
+	width: 30px;
+	height: 30px;
+	flex-shrink: 0; /* 컨테이너 크기가 줄어들지 않도록 함 */
 }
 
 /* 프로필 이미지 자체 */
 .profile-image-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 
 /* 닉네임, 별점 등이 있는 메타 정보 영역 */
 .review-meta-info {
-    width: 100%;
+	width: 100%;
 }
 
 .review .review-header {
-    align-items: flex-start !important; /* 자식 요소들을 컨테이너의 위쪽으로 정렬 */
+	align-items: flex-start !important; /* 자식 요소들을 컨테이너의 위쪽으로 정렬 */
 }
 
 .review .ratings-container {
-    margin-top: 0;
-    padding-top: 0;
+	margin-top: 0;
+	padding-top: 0;
 }
 
-.btn-helpful{
+.btn-helpful {
 	display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 0.85rem 1.5rem;
-    font-weight: 400;
-    font-size: 1.2rem;
-    line-height: 1;
-    letter-spacing: -.01em;
-    min-width: 92px;
-    border-radius: 0;
-    white-space: normal;
-    transition: all 0.3s;
-    box-shadow: none;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 0.85rem 1.5rem;
+	font-weight: 400;
+	font-size: 1.2rem;
+	line-height: 1;
+	letter-spacing: -.01em;
+	min-width: 92px;
+	border-radius: 0;
+	white-space: normal;
+	transition: all 0.3s;
+	box-shadow: none;
 }
 
 /* 프리뷰 */
 .alert-info {
-    color: #fff;
-    background-color: #c96;
-    max-width: 1200px;
-    margin: 10px 5px 0px 10px;
-    border-radius: 10px;
-    /* box-sizing: border-box; */
+	color: #fff;
+	background-color: #c96;
+	max-width: 1200px;
+	margin: 10px 5px 0px 10px;
+	border-radius: 10px;
+	/* box-sizing: border-box; */
 }
