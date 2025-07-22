@@ -16,49 +16,56 @@
 
 		<div class="card mb-4">
 			<div class="card-body">
-				<form id="reportSearchForm" action="#" method="get">
-					<div class="row gx-3 align-items-end">
+				<form id="reportSearchForm"
+					th:action="@{/adminpage/inquiryadmin/reportsList}" method="get">
+					  <div class="row gx-3 align-items-end justify-content-center">
 
-						<div class="col-lg-4 mb-3">
-							<label class="form-label">접수 기간</label>
-							<div class="d-flex">
-								<input type="date" class="form-control" name="startDate"
-									value="2023-01-01"> <span
-									class="mx-2 d-flex align-items-center">~</span> <input
-									type="date" class="form-control" name="endDate"
-									value="2023-12-31">
-							</div>
-						</div>
+
 
 						<div class="col-lg-4 mb-3">
 							<label class="form-label">검색 키워드</label>
 							<div class="input-group">
 								<select class="form-select" name="searchKey"
 									style="max-width: 150px;">
-									<option value="all" selected>전체</option>
-									<option value="dclrId">신고 ID</option>
-									<option value="dclrUserNo">신고자 ID</option>
-									<option value="dclrTrgtUserNo">대상 사용자 ID</option>
-									<option value="dclrTrgtContsId">대상 콘텐츠 ID</option>
+
+									<option value="dclrId"
+										th:selected="${param.searchKey == 'dclrId' or param.searchKey == null}">신고
+										ID</option>
+
+									<option value="dclrUserLoginId"
+										th:selected="${param.searchKey == 'dclrUserLoginId'}">신고자
+										ID</option>
+									<option value="dclrTrgtTypeCd"
+										th:selected="${param.searchKey == 'dclrTrgtTypeCd'}">신고
+										대상 타입</option>
+									<option value="dclrReasonContent"
+										th:selected="${param.searchKey == 'dclrReasonContent'}">신고
+										사유</option>
 								</select> <input type="text" class="form-control" name="searchValue"
-									value="" placeholder="신고 ID, 사용자 ID, 콘텐츠 ID">
+									th:value="${adminReportSearch.searchValue}"
+									placeholder="신고 ID, 사용자 ID, 콘텐츠 ID">
 							</div>
 						</div>
 
 						<div class="col-lg-2 mb-3">
 							<label for="prcsSttsCd" class="form-label">처리 상태</label> <select
 								class="form-select" id="prcsSttsCd" name="prcsSttsCd">
-								<option value="">-- 전체 --</option>
-								<option value="PENDING" selected>처리 대기</option>
-								<option value="IN_PROGRESS">처리 중</option>
-								<option value="COMPLETED">처리 완료</option>
-								<option value="REJECTED">반려</option>
+								<option value=""
+									th:selected="${param.prcsSttsCd == '' or param.prcsSttsCd == null}">--
+									전체 --</option>
+								<option value="RECEIVED"
+									th:selected="${param.prcsSttsCd == 'RECEIVED'}">처리 대기</option>
+								<option value="COMPLETED"
+									th:selected="${param.prcsSttsCd == 'COMPLETED'}">처리 완료</option>
+								<option value="REJECTED"
+									th:selected="${param.prcsSttsCd == 'REJECTED'}">반려</option>
 							</select>
 						</div>
 
 						<div class="col-lg-2 mb-3 d-flex align-items-end">
 							<a href="#" class="btn btn-primary btn-block me-2" id="searchBtn">검색</a>
-							<button class="btn btn-light btn-block" type="reset">초기화</button>
+							<a th:href="@{/adminpage/inquiryadmin/reportsList}"
+								class="btn btn-light btn-block">초기화</a>
 						</div>
 					</div>
 				</form>
@@ -70,7 +77,8 @@
 				<div class="d-flex justify-content-between align-items-center mb-3">
 					<div>
 						<span class="font-weight-bold">[ 전체 신고 <span
-							class="text-primary">0</span>건 ]
+							class="text-primary" th:text="${pagination.totalRecordCount}">0</span>건
+							]
 						</span>
 					</div>
 					<div></div>
@@ -89,99 +97,180 @@
 							<th>대상 타입</th>
 							<th>대상 ID</th>
 							<th>신고 사유</th>
-							<th>상세 사유 요약</th>
 							<th>처리 상태</th>
 							<th>관리</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										value="DCLR_001">
-								</div></td>
-							<td>DCLR_20230710_001</td>
-							<td>2023-07-10 10:30</td>
-							<td>user_honggildong</td>
-							<td>USER</td>
-							<td>user_badguy</td>
-							<td>욕설/비방</td>
-							<td>게시글에 반복적인 욕설 사용...</td>
-							<td><span class="badge bg-warning">처리 대기</span></td>
-							<td><a
-								th:href="@{/adminpage/inquiryadmin/reportsDetail}"
-								class="btn btn-sm btn-primary" style="min-width: 90px;">처리</a></td>
-						</tr>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										value="DCLR_002">
-								</div></td>
-							<td>DCLR_20230709_002</td>
-							<td>2023-07-09 15:45</td>
-							<td>user_kimchulsu</td>
-							<td>CONTENT</td>
-							<td>CONTS_POST_456</td>
-							<td>음란물/선정성</td>
-							<td>사진에 부적절한 내용 포함...</td>
-							<td><span class="badge bg-info">처리 중</span></td>
-							<td><a
-								th:href="@{/adminpage/inquiryadmin/reportsDetail}"
-								class="btn btn-sm btn-primary" style="min-width: 90px;">처리</a></td>
-						</tr>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										value="DCLR_003">
-								</div></td>
-							<td>DCLR_20230708_003</td>
-							<td>2023-07-08 09:00</td>
-							<td>user_parkyounghee</td>
-							<td>USER</td>
-							<td>user_spam_bot</td>
-							<td>도배/스팸</td>
-							<td>댓글로 광고 도배 지속...</td>
-							<td><span class="badge bg-success">처리 완료</span></td>
-							<td><a
-								th:href="@{/adminpage/inquiryadmin/reportsDetail}"
-								class="btn btn-sm btn-primary" style="min-width: 90px;">상세</a></td>
-						</tr>
-						<tr>
-							<td><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										value="DCLR_004">
-								</div></td>
-							<td>DCLR_20230707_004</td>
-							<td>2023-07-07 11:20</td>
-							<td>user_leeyoungmi</td>
-							<td>CONTENT</td>
-							<td>CONTS_COMMENT_789</td>
-							<td>기타</td>
-							<td>불쾌감을 주는 댓글 작성...</td>
-							<td><span class="badge bg-danger">반려</span></td>
-							<td><a
-								th:href="@{/adminpage/inquiryadmin/reportsDetail}"
-								class="btn btn-sm btn-primary" style="min-width: 90px;">상세</a></td>
-						</tr>
 					</tbody>
 				</table>
 
 				<nav class="d-flex justify-content-center mt-4"
-					aria-label="Page navigation">
-					<ul class="pagination">
-						<li class="page-item disabled"><a class="page-link" href="#">이전</a></li>
-						<li class="page-item active"><a class="page-link" href="#">1</a></li>
-						<li class="page-item"><a class="page-link" href="#">2</a></li>
-						<li class="page-item"><a class="page-link" href="#">3</a></li>
-						<li class="page-item"><a class="page-link" href="#">다음</a></li>
-					</ul>
-				</nav>
+					aria-label="Page navigation"></nav>
 			</div>
 		</div>
 	</main>
 </th:block>
 
 <th:block layout:fragment="jsScript">
+	<script>
+    // 검색 폼과 테이블, 페이지네이션 요소를 미리 찾아둡니다.
+    const searchForm = document.getElementById('reportSearchForm');
+    const tableBody = document.querySelector('.table tbody');
+    const paginationContainer = document.querySelector('nav[aria-label="Page navigation"]');
+    const totalCountSpan = document.querySelector('.text-primary');
 
+    /**
+     * 검색 조건에 따라 신고 목록 데이터를 비동기(AJAX)로 조회하고 화면을 다시 그리는 함수
+     */
+    function fetchAndRenderReports(page = 1) {
+        // 현재 검색 폼의 모든 데이터를 가져옵니다.
+        const formData = new FormData(searchForm);
+        // 페이지 번호 파라미터를 추가합니다.
+        formData.set('currentPage', page);
+        
+        const params = new URLSearchParams(formData);
+
+        // 1. API 호출
+        fetch(`/api/admin/reports?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                // 2. 받아온 데이터로 화면을 다시 그립니다.
+                renderTable(data.reportList);
+                renderPagination(data.pagination);
+                totalCountSpan.textContent = data.pagination.totalRecordCount;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    /**
+     * 신고 목록 데이터로 테이블의 tbody를 다시 그리는 함수
+     */
+    function renderTable(reportList) {
+        tableBody.innerHTML = ''; // 기존 내용을 모두 지웁니다.
+
+        if (!reportList || reportList.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-5">조회된 신고 내역이 없습니다.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        reportList.forEach(report => {
+            // 날짜 포맷팅 (YYYY-MM-DD HH:mm)
+            const dclrRcptDt = new Date(report.dclrRcptDt).toLocaleString('sv-SE').slice(0, 16);
+            
+            // 처리 상태 뱃지 클래스 결정
+            let badgeClass = 'bg-info'; // 기본값: 처리 중
+            if (report.prcsSttsCd === 'RECEIVED') badgeClass = 'bg-warning';
+            if (report.prcsSttsCd === 'COMPLETED') badgeClass = 'bg-success';
+            if (report.prcsSttsCd === 'REJECTED') badgeClass = 'bg-danger';
+
+            // 처리 상태 텍스트 결정
+            let statusText = '처리 중';
+            if (report.prcsSttsCd === 'RECEIVED') statusText = '처리 대기';
+            if (report.prcsSttsCd === 'COMPLETED') statusText = '처리 완료';
+            if (report.prcsSttsCd === 'REJECTED') statusText = '반려';
+
+            // 관리 버튼 텍스트 결정
+            const buttonText = (report.prcsSttsCd === 'COMPLETED' || report.prcsSttsCd === 'REJECTED') ? '상세' : '처리';
+            
+            html += `
+                <tr>
+                    <td><div class="form-check"><input class="form-check-input" type="checkbox" value="${report.dclrId}"></div></td>
+                    <td>${report.dclrId}</td>
+                    <td>${dclrRcptDt}</td>
+                    <td>${report.dclrUserLoginId}</td>
+                    <td>${report.dclrTrgtTypeCd}</td>
+                    <td>${report.intelligentTargetInfo}</td>
+                    <td>${report.dclrReasonContent}</td>
+                    <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                    <td><a href="/adminpage/inquiryadmin/reports/${report.dclrId}" class="btn btn-sm btn-primary" style="min-width: 90px;">${buttonText}</a></td>
+                </tr>
+            `;
+        });
+        tableBody.innerHTML = html;
+    }
+
+    /**
+     * 페이지네이션 데이터로 페이지 번호 부분을 다시 그리는 함수 (수정 완료)
+     */
+    function renderPagination(pagination) {
+        paginationContainer.innerHTML = ''; // 기존 내용을 모두 지웁니다.
+
+        if (!pagination || pagination.totalRecordCount === 0) {
+            return;
+        }
+
+        let html = '<ul class="pagination">';
+        
+        // [수정] '이전' 버튼: currentPage - 1 로 이동, 1페이지일 때 비활성화
+        html += `<li class="page-item ${pagination.currentPage <= 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${pagination.currentPage - 1}">이전</a>
+                 </li>`;
+        
+        // 페이지 번호 (이 부분은 동일)
+        for (let i = pagination.startPage; i <= pagination.endPage; i++) {
+            html += `<li class="page-item ${i === pagination.currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                     </li>`;
+        }
+
+        // [수정] '다음' 버튼: currentPage + 1 로 이동, 마지막 페이지일 때 비활성화
+        html += `<li class="page-item ${pagination.currentPage >= pagination.totalPageCount ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${pagination.currentPage + 1}">다음</a>
+                 </li>`;
+        
+        html += '</ul>';
+        paginationContainer.innerHTML = html;
+    }
+
+    // --- 이벤트 리스너 설정 ---
+
+    // '검색' 버튼 클릭 시
+    document.getElementById('searchBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        fetchAndRenderReports(1); // 검색 시에는 항상 1페이지부터 조회
+    });
+
+    // ================= [여기에 새로운 코드를 추가해주세요] ==================
+    // '검색 키워드' 입력창에서 엔터 키를 눌렀을 때
+    const searchInput = document.querySelector('input[name="searchValue"]');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', function(event) {
+            // 1. 만약 누른 키가 'Enter'가 아니면, 아무것도 안 함
+            if (event.key !== 'Enter') {
+                return;
+            }
+
+            // 2. 'Enter' 키의 기본 동작(폼 제출)을 막음 (가장 중요!)
+            event.preventDefault();
+
+            // 3. '검색' 버튼을 코드로 대신 클릭해 줌
+            document.getElementById('searchBtn').click();
+        });
+    }
+
+    // 페이지 번호 클릭 시 (이벤트 위임)
+    paginationContainer.addEventListener('click', function(e) {
+        // 클릭된 요소가 a 태그가 아니면 아무것도 안 함
+        if (e.target.tagName !== 'A') {
+            return;
+        }
+
+        e.preventDefault(); // a 태그의 기본 동작 막기
+
+        // 부모 li 요소에 disabled 클래스가 있으면 아무것도 안 함
+        if (e.target.parentElement.classList.contains('disabled')) {
+            return;
+        }
+
+        const page = parseInt(e.target.dataset.page, 10);
+        fetchAndRenderReports(page);
+    });
+    
+ // [추가] 페이지가 처음 로드되었을 때 1페이지 데이터를 바로 불러옵니다.
+    fetchAndRenderReports(1);
+
+</script>
 </th:block>
 </html>
