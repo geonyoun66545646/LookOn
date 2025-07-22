@@ -22,22 +22,93 @@
     object-fit: cover;
     border: 1px solid #ddd;
 }
-.profile-info-wrapper { flex-grow: 1; }
-.profile-nickname { font-size: 24px; font-weight: bold; margin: 0 0 10px; }
-.profile-bio { color: #888; margin-bottom: 20px; }
-.profile-stats ul { display: flex; list-style: none; padding: 0; margin: 0 0 20px; gap: 40px; }
-.profile-stats li { text-align: center; }
-.profile-stats .stat-count { display: block; font-size: 20px; font-weight: bold; }
-.profile-stats .stat-label { font-size: 14px; color: #555; }
-.profile-actions { display: flex; gap: 10px; }
-.btn-profile-edit { display: inline-block; padding: 10px 20px; border: 1px solid #ccc; background-color: #fff; color: #333; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; }
-.btn-profile-edit:hover { background-color: #f5f5f5; }
+.profile-info-wrapper { 
+	flex-grow: 1; 
+}
+.profile-nickname { 
+	display: inline-block; /* h2 태그를 글자(인라인)처럼 취급하되, 크기는 유지합니다. */
+    vertical-align: middle;   /* 세로 정렬을 보기 좋게 맞춥니다. */
+    margin-right: 15px;    /* 닉네임과 팔로우 버튼 사이의 간격을 만듭니다. */ 
+}
+.profile-bio { 
+	color: #888; margin-bottom: 20px; 
+}
+.profile-stats ul { 
+	display: flex; 
+	list-style: none; 
+	padding: 0; 
+	margin: 0 0 20px; 
+	gap: 40px; 
+}
+.profile-stats li { 
+	text-align: center; 
+}
+.profile-stats .stat-count { 
+	display: block; 
+	font-size: 20px; 
+	font-weight: bold; 
+}
+.profile-stats .stat-label { 
+	font-size: 14px; 
+	color: #555; 
+}
+.btn-profile-edit { 
+	display: inline-block; 
+	padding: 10px 20px; 
+	border: 1px solid #ccc; 
+	background-color: #fff; 
+	color: #333; 
+	text-decoration: none; 
+	border-radius: 5px; 
+	font-weight: bold; 
+	text-align: center; 
+}
+.btn-profile-edit:hover { 
+	background-color: #f5f5f5; 
+}
 /* 콘텐츠 탭 영역 */
-.content-tabs { border-bottom: 1px solid #ddd; margin-bottom: 30px; }
-.content-tabs ul { display: flex; list-style: none; padding: 0; margin: 0; }
-.content-tabs li a { display: inline-block; padding: 15px 20px; color: #888; text-decoration: none; font-weight: bold; position: relative; bottom: -1px; }
-.content-tabs li.active a { color: #000; border-bottom: 2px solid #000; }
+.content-tabs { 
+	border-bottom: 1px solid #ddd; 
+	margin-bottom: 30px; 
+}
+.content-tabs ul { 
+	display: flex; 
+	list-style: none; 
+	padding: 0; 
+	margin: 0; 
+}
+.content-tabs li a { 
+	display: inline-block; 
+	padding: 15px 20px; 
+	color: #888; 
+	text-decoration: none; 
+	font-weight: bold; 
+	position: relative; 
+	bottom: -1px; 
+}
+.content-tabs li.active a { 
+	color: #000; 
+	border-bottom: 2px solid #000; 
+}
 
+
+/* 팔로우 버튼과 '...' 버튼을 함께 담고 있는 컨테이너 */
+.other-user-actions {
+    /* 이 컨테이너는 이제 '...' 버튼의 위치에 영향을 주지 않습니다. */
+    /* 자바스크립트가 팔로우 버튼을 넣기 쉽도록 기본 상태로 둡니다. */
+}
+
+/* '...' 버튼을 부모 영역(.profile-actions)의 오른쪽 상단에 고정시킵니다. */
+.options-menu-btn {
+    position: relative; /* 매우 중요! */
+    padding-right: 50px;
+}
+
+
+.follow-action-area {
+    display: inline-block; /* 닉네임과 한 줄에 오도록 설정 */
+    vertical-align: middle; /* 세로 중앙 정렬 */
+}
 /* 본인 게시물 그리드 영역 - 기존 feedList의 CSS를 재사용 */
 /* 이 부분의 스타일은 이미 feedList 작업 시 추가되었을 것입니다. */
 .feed-grid {
@@ -92,16 +163,29 @@
     margin-left: 8px; /* 닉네임과의 간격 */
     text-decoration: none;
     cursor: pointer;
+    color: deepskyblue;
 }
 
 /* '팔로우' 링크 스타일 */
 .follow-link {
-    color: #0095f6; /* 인스타그램의 파란색과 유사 */
+	color: deepskyblue; /* 인스타그램의 파란색과 유사 */
 }
 
 /* '팔로잉' 링크 스타일 */
 .following-link {
-    color: #262626; /* 기본 텍스트 색상 */
+    color: deepskyblue; /* 기본 텍스트 색상 */
+}
+
+/* 1. '팔로잉' 버튼에 마우스를 올렸을 때 변화 없애기 */
+.following-link:hover {
+    color: deepskyblue; /* 원래 색상과 동일하게 설정 */
+    text-decoration: none; /* 밑줄 등 장식 제거 */
+}
+
+/* 2. '팔로우' 버튼에 마우스를 올렸을 때 변화 없애기 */
+.follow-link:hover {
+    color: deepskyblue; /* 원래 색상과 동일하게 설정 */
+    text-decoration: none; /* 밑줄 등 장식 제거 */
 }
 
 /* 언팔로우 모달 관련 스타일 */
@@ -162,6 +246,63 @@
     border-radius: 12px;
     border: none;
 }
+/* profile-details: 전체 프로필 상세 정보를 감싸는 컨테이너 */
+.profile-details {
+    /* display: flex; 이전에 인라인으로 있던 것을 여기로 옮깁니다. */
+    /* 필요에 따라 flex-direction: column; 등을 설정할 수 있습니다. */
+    /* 현재는 profile-actions-top과 profile-bio가 세로로 쌓이도록 합니다. */
+    width: 100%; /* 부모 요소에 맞춤 */
+    position: relative; /* 만약 내부 요소가 absolute를 쓴다면 기준점 */
+}
+
+
+
+/* 닉네임 스타일 */
+.profile-nickname {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0; /* 기본 마진 제거 */
+    margin-right: 10px; /* 닉네임과 팔로우 버튼 사이 간격 */
+}
+
+/* follow-action-area: 팔로우 버튼이 들어올 영역 */
+.follow-action-area {
+    /* 이 안에 실제 팔로우 버튼(follow-link 등)이 삽입됩니다. */
+    /* 필요에 따라 여기에도 flex 속성을 줄 수 있습니다. */
+    display: flex;
+    align-items: center;
+    position: absolute;
+}
+
+
+/* 프로필 수정 버튼 */
+.btn-profile-edit {
+    display: inline-block;
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+}
+
+
+/* 자기소개 스타일 */
+.profile-bio {
+    color: #888;
+    margin-top: 5px; /* 닉네임 라인과의 간격 */
+    margin-bottom: 20px; /* 아래 다른 요소와의 간격 */
+}
+
+/* 2. '...' 버튼만 콕 집어서 오른쪽 상단으로 옮깁니다. */
+.other-user-actions .options-menu-btn {
+    position: absolute;
+    top: 5px; /* 닉네임과 높이를 맞추기 위해 살짝 내립니다. */
+    right: 0;
+}
+
 
 /* 모달 메뉴 목록(ul)의 기본 스타일 초기화 */
 #feed-options-list {
@@ -196,4 +337,68 @@
 #feed-options-list li.text-danger b {
     color: #ed4956; /* 빨간색 텍스트 */
     font-weight: 700; /* 굵은 글씨 */
+}
+/* 1. 전체 영역을 위치 기준점으로 설정 */
+.profile-actions {
+    position: relative;
+    padding-right: 40px; /* '...' 버튼이 들어갈 공간 확보 */
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+/* 2. '...' 버튼만 오른쪽 상단으로 분리해서 고정 */
+.other-user-actions .options-menu-btn {
+    position: absolute;
+    top: 5px;
+    right: 0;
+}
+
+/* 3. 닉네임은 글자처럼 옆으로 흐르도록 설정 */
+.profile-nickname {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 15px; /* 팔로우 버튼과의 간격 */
+}
+
+/* 4. 팔로우 버튼 영역도 닉네임 옆에 글자처럼 붙도록 설정 */
+.follow-action-area {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* =================================================== */
+/*    [디버깅용 최종 테스트] CSS 강제 적용 코드         */
+/* =================================================== */
+
+/* 1. 전체 영역을 위치 기준점으로 강제 설정 */
+.profile-actions {
+    position: relative !important;
+    padding-right: 50px !important; /* 공간 확보 */
+}
+
+/* 2. '...' 버튼을 오른쪽 상단으로 강제 이동 */
+.other-user-actions .options-menu-btn {
+    position: absolute !important;
+    top: 5px !important;
+    right: 0 !important;
+    /* 다른 display 속성과의 충돌을 막기 위해 기본값으로 초기화 */
+    display: block !important;
+}
+
+/* 3. 닉네임과 팔로우 버튼을 옆으로 붙도록 강제 설정 */
+.profile-nickname {
+    display: inline-block !important;
+    vertical-align: middle !important;
+    margin-right: 15px !important;
+}
+
+.follow-action-area {
+    display: inline-block !important;
+    vertical-align: middle !important;
+    /* 이전 스크린샷에서 보였던 모든 위치 관련 속성을 강제로 덮어쓰기 위해 초기화 */
+    position: static !important; /* absolute 해제 */
+    left: auto !important;
+    top: auto !important;
 }

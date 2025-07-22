@@ -35,7 +35,7 @@
 	color: #fff;
 	background-color: #c96;
 	/* [수정] 이제 사용하지 않으므로 주석 처리 또는 삭제 */
-    display: none;
+	display: none;
 }
 
 .product-label {
@@ -60,10 +60,10 @@
 	transition: box-shadow .35s ease;
 	background-color: #fff;
 	/* ⭐⭐⭐ [추가] 시작 ⭐⭐⭐ */
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* 부모 요소의 높이를 꽉 채우도록 설정 */
-    /* ⭐⭐⭐ [추가] 끝 ⭐⭐⭐ */
+	display: flex;
+	flex-direction: column;
+	height: 100%; /* 부모 요소의 높이를 꽉 채우도록 설정 */
+	/* ⭐⭐⭐ [추가] 끝 ⭐⭐⭐ */
 }
 
 .product-body {
@@ -72,7 +72,7 @@
 	transition: all .35s ease;
 	background-color: #fff; /* 배경색을 흰색으로 변경 */
 	min-height: 120px;
-    flex-grow: 1;
+	flex-grow: 1;
 }
 
 /* 1. 카테고리 스타일 */
@@ -87,69 +87,71 @@
 
 /* 2. 상점명 (브랜드명) 스타일 */
 .product-brand {
-    font-size: 1.3rem;
-    font-weight: 500;
-    color: #666;
-    margin-bottom: 0.4rem;
-    /* 너비 초과 시 ... 처리 */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+	font-size: 1.3rem;
+	font-weight: 500;
+	color: #666;
+	margin-bottom: 0.4rem;
+	/* 너비 초과 시 ... 처리 */
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
+
 .product-brand a {
-    color: inherit;
-    text-decoration: none;
+	color: inherit;
+	text-decoration: none;
 }
+
 .product-brand a:hover {
-    color: #c96;
+	color: #c96;
 }
 
 /* 3. 제품명 (.product-title) 스타일 수정 */
 .product.product-7 .product-title {
-    font-size: 1.6rem;
-    font-weight: 400; /* 일반 두께로 */
-    color: #666;
-    letter-spacing: 0;
-    margin-bottom: 0.8rem;
-    /* 너비 초과 시 ... 처리 */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+	font-size: 1.6rem;
+	font-weight: 400; /* 일반 두께로 */
+	color: #666;
+	letter-spacing: 0;
+	margin-bottom: 0.8rem;
+	/* 너비 초과 시 ... 처리 */
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
+
 .product.product-7 .product-title a {
-    color: inherit;
-    text-decoration: none;
+	color: inherit;
+	text-decoration: none;
 }
 
 /* 4. 가격 영역 (.product-price) 전체 스타일 수정 */
 .product.product-7 .product-price {
-    display: flex;
-    align-items: baseline; /* 할인율과 가격의 세로 정렬 기준선 */
-    font-size: 19px;
-    font-weight: 600; /* 굵게 */
-    margin-top: auto; /* 항상 카드 하단에 위치하도록 함 */
-    margin-bottom: 0px;
+	display: flex;
+	align-items: baseline; /* 할인율과 가격의 세로 정렬 기준선 */
+	font-size: 19px;
+	font-weight: 600; /* 굵게 */
+	margin-top: auto; /* 항상 카드 하단에 위치하도록 함 */
+	margin-bottom: 0px;
 }
 
 /* 할인율 스타일 */
 .product-price .discount-rate {
-    color: #c96; /* 할인율 텍스트 색상 */
-    font-size: 1.5rem;
-    margin-right: 8px; /* 가격과의 간격 */
+	color: #c96; /* 할인율 텍스트 색상 */
+	font-size: 1.5rem;
+	margin-right: 8px; /* 가격과의 간격 */
 }
 
 /* 최종 가격 스타일 (할인 여부와 무관하게 공통 적용) */
 .product-price .final-price {
-    color: #333;
+	color: #333;
 }
 
 /* 할인된 가격에만 특별히 적용할 스타일 (필요하다면) */
 .product-price .final-price.discounted {
-    color: #333;
+	color: #333;
 }
 
 /* ⭐⭐⭐ [추가] 끝 ⭐⭐⭐ */
-
 .product.text-center {
 	text-align: left !important;
 }
@@ -179,7 +181,6 @@
 	align-content: stretch;
 	box-sizing: border-box; /* 이미 되어 있지만, 중요합니다. */
 	/* 각 col- 요소에 기본적으로 background-color를 흰색으로 줘서 gap 배경색을 덮도록 합니다. */
-	background-color: #fff;
 }
 
 /* 1. 기본 스타일 (모바일 우선): 2개씩 표시 */
@@ -363,7 +364,7 @@
 /* ================== 반응형 스타일 (832px 이하) ================== */
 @media ( max-width : 832px) {
 	/* '상품 필터'와 '신상품'을 제외한 나머지 필터 버튼 숨기기 */
-	.filter-button, .filter-dropdown {
+	.filter-dropdown {
 		display: none;
 	}
 
@@ -373,7 +374,6 @@
       코드가 더 깔끔해집니다.
     */
 }
-
 
 /* ================== 필터 모달 스타일 ================== */
 
@@ -407,17 +407,17 @@ body.app-modal-open {
 /* 2. 모달 본문 (Content) */
 .app-filter-modal-content {
 	background-color: #fff;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 420px; /* 이미지와 유사한 너비 */
-    height: 80vh; /* 화면 높이의 80% */
-    max-height: 600px; /* 최대 높이 제한 */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
+	border-radius: 12px;
+	width: 90%;
+	max-width: 420px; /* 이미지와 유사한 너비 */
+	height: 80vh; /* 화면 높이의 80% */
+	max-height: 600px; /* 최대 높이 제한 */
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+	transform: translateY(20px);
+	transition: transform 0.3s ease;
 }
 
 .app-filter-modal-overlay.show .app-filter-modal-content {
@@ -425,18 +425,19 @@ body.app-modal-open {
 }
 
 /* 2-1. 모달 헤더 */
-.app-modal-header-top{
+.app-modal-header-top {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	padding: 16px 17px 0;
 }
+
 .app-modal-header {
 	display: flex;
-    flex-direction: column;
-    padding: 0 0 0 0; /* 패딩 조정 */
-    flex-shrink: 0;
-    border-bottom: 1px solid #eee; /* 하단 경계선 두께 조정 */
+	flex-direction: column;
+	padding: 0 0 0 0; /* 패딩 조정 */
+	flex-shrink: 0;
+	border-bottom: 1px solid #eee; /* 하단 경계선 두께 조정 */
 }
 
 .app-modal-title {
@@ -472,21 +473,21 @@ body.app-modal-open {
 	top: 0;
 	background-color: #fff;
 	z-index: 10;
-    border-bottom: 1px solid #eee;
+	border-bottom: 1px solid #eee;
 }
 
 .app-modal-tab-button {
 	padding: 12px 5px; /* 패딩 조정 */
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: #888;
-    font-size: 1em; /* 16px */
-    font-weight: 500;
-    text-align: center;
-    white-space: nowrap;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
+	border: none;
+	background: none;
+	cursor: pointer;
+	color: #888;
+	font-size: 1em; /* 16px */
+	font-weight: 500;
+	text-align: center;
+	white-space: nowrap;
+	border-bottom: 2px solid transparent;
+	transition: color 0.2s, border-color 0.2s;
 	flex-grow: 1; /* 모든 버튼이 공간을 나눠가짐 */
 }
 
@@ -515,18 +516,19 @@ body.app-modal-open {
 }
 
 .app-filter-options-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px 10px;
-    margin-bottom: 25px;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 15px 10px;
+	margin-bottom: 25px;
 }
 
 label {
-    color: #666;
-    font-weight: 300;
-    font-size: 1.4rem;
-    margin: 0;
+	color: #666;
+	font-weight: 300;
+	font-size: 1.4rem;
+	margin: 0;
 }
+
 .app-filter-option {
 	display: flex;
 	align-items: center;
@@ -534,20 +536,20 @@ label {
 	cursor: pointer;
 }
 
-.app-filter-option input[type="checkbox"],
-.app-filter-option input[type="radio"] {
+.app-filter-option input[type="checkbox"], .app-filter-option input[type="radio"]
+	{
 	margin-right: 8px;
 	width: 18px; /* 크기 키움 */
 	height: 18px; /* 크기 키움 */
 	cursor: pointer;
-    accent-color: #000; /* 체크/선택 시 색상 */
+	accent-color: #000; /* 체크/선택 시 색상 */
 }
-
 
 /* --- 컬러 탭 스타일 --- */
 .app-color-options {
 	gap: 15px 10px;
 }
+
 .app-color-option {
 	cursor: pointer;
 	display: flex;
@@ -555,6 +557,7 @@ label {
 	gap: 8px;
 	font-size: 0.95em;
 }
+
 .color-swatch {
 	width: 22px;
 	height: 22px;
@@ -562,138 +565,135 @@ label {
 	display: inline-block;
 	transition: transform 0.2s ease;
 }
-.app-color-option input:checked + .color-swatch {
+
+.app-color-option input:checked+.color-swatch {
 	transform: scale(1.05);
 	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000;
 }
 
 /* --- 가격 탭 스타일 --- */
 .modal-content-body { /* 이 클래스명은 실제 모달 구조에 맞게 변경해주세요 */
-    max-height: calc(100vh - Xpx); /* 모달 헤더, 푸터 등을 제외한 높이 계산 */
-    overflow-y: auto;
-    padding-bottom: 20px; /* 푸터와 겹치지 않도록 여유 공간 */
+	max-height: calc(100vh - Xpx); /* 모달 헤더, 푸터 등을 제외한 높이 계산 */
+	overflow-y: auto;
+	padding-bottom: 20px; /* 푸터와 겹치지 않도록 여유 공간 */
 }
 
-
 .app-brand-search-wrapper {
-    position: sticky; /* 스크롤 시 상단에 고정 */
-    z-index: 10; /* 다른 요소 위에 오도록 z-index 설정 */
-    background-color: #fff; /* 스크롤 시 뒤 내용이 비치지 않도록 배경색 지정 */
-    padding-bottom: 20px; /* 기존 margin-bottom 유지 */
-    margin-bottom: 0; /* 원래 margin-bottom은 sticky 요소에는 적합하지 않으므로 0으로 */
+	position: sticky; /* 스크롤 시 상단에 고정 */
+	z-index: 10; /* 다른 요소 위에 오도록 z-index 설정 */
+	background-color: #fff; /* 스크롤 시 뒤 내용이 비치지 않도록 배경색 지정 */
+	padding-bottom: 20px; /* 기존 margin-bottom 유지 */
+	margin-bottom: 0; /* 원래 margin-bottom은 sticky 요소에는 적합하지 않으므로 0으로 */
 }
 
 .app-brand-search-input {
-    width: 100%;
-    padding: 12px 40px 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1em;
-    box-sizing: border-box;
+	width: 100%;
+	padding: 12px 40px 12px 15px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	font-size: 1em;
+	box-sizing: border-box;
 }
 
 .app-brand-search-button {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-80%);
-    background: none;
-    border: none;
-    padding: 5px;
-    cursor: pointer;
+	position: absolute;
+	right: 10px;
+	top: 50%;
+	transform: translateY(-80%);
+	background: none;
+	border: none;
+	padding: 5px;
+	cursor: pointer;
 }
 
 .brand-name {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.3;
+	display: flex;
+	flex-direction: column;
+	line-height: 1.3;
 }
 
 .brand-name small {
-    font-size: 0.85em;
-    color: #888;
-    margin-top: 2px;
+	font-size: 0.85em;
+	color: #888;
+	margin-top: 2px;
 }
 
 .app-brand-options {
-    /* max-height: 300px; 제거 */
-    /* overflow-y: auto; 제거 */
-    padding-top: 20px; /* 브랜드 목록 상단에 여백 추가 */
-    border-top: 1px solid #eee; /* 브랜드 목록 상단 구분선 */
+	/* max-height: 300px; 제거 */
+	/* overflow-y: auto; 제거 */
+	padding-top: 20px; /* 브랜드 목록 상단에 여백 추가 */
+	border-top: 1px solid #eee; /* 브랜드 목록 상단 구분선 */
 }
 
 .app-filter-options-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px 10px;
-    margin-bottom: 25px;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 15px 10px;
+	margin-bottom: 25px;
 }
-
-
-
 
 /* 2-3. 모달 푸터 */
 .app-modal-footer {
-    display: flex;
-    flex-direction: column; /* 세로 방향 정렬 (이전과 동일) */
-    padding: 15px 20px;
-    background-color: #fff;
-    border-top: 1px solid #eee;
-    gap: 15px; /* 푸터 내부 요소들 (버튼 그룹과 상품보기 버튼) 사이의 간격 */
+	display: flex;
+	flex-direction: column; /* 세로 방향 정렬 (이전과 동일) */
+	padding: 15px 20px;
+	background-color: #fff;
+	border-top: 1px solid #eee;
+	gap: 15px; /* 푸터 내부 요소들 (버튼 그룹과 상품보기 버튼) 사이의 간격 */
 }
 
 /* 새로 추가된 filter-options-and-reset 컨테이너에 flexbox 적용 */
 .filter-options-and-reset {
-    display: flex;
-    justify-content: space-between; /* 양 끝 정렬 (태그는 왼쪽, 초기화 버튼은 오른쪽) */
-    align-items: center; /* 수직 중앙 정렬 */
-    width: 100%; /* 부모(footer)의 전체 너비 사용 */
-    flex-wrap: wrap; /* 내용이 많아지면 다음 줄로 넘어가도록 허용 */
-    gap: 10px; /* 내부 요소 간 간격 */
+	display: flex;
+	justify-content: space-between; /* 양 끝 정렬 (태그는 왼쪽, 초기화 버튼은 오른쪽) */
+	align-items: center; /* 수직 중앙 정렬 */
+	width: 100%; /* 부모(footer)의 전체 너비 사용 */
+	flex-wrap: wrap; /* 내용이 많아지면 다음 줄로 넘어가도록 허용 */
+	gap: 10px; /* 내부 요소 간 간격 */
 }
 
 /* selected-filters-container는 그대로 flex-wrap 유지 */
 .selected-filters-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px; /* 태그들 사이의 간격 */
-    /* flex-grow를 1로 주어 가능한 공간을 채우게 할 수 있습니다. */
-    flex-grow: 1;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px; /* 태그들 사이의 간격 */
+	/* flex-grow를 1로 주어 가능한 공간을 채우게 할 수 있습니다. */
+	flex-grow: 1;
 }
 
 /* 필터 초기화 버튼 스타일은 이전과 동일하게 유지 */
 .app-reset-filters-button {
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 1em;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
-    flex-shrink: 0; /* 필터 태그가 많아져도 이 버튼이 줄어들지 않도록 */
+	background: none;
+	border: none;
+	color: #888;
+	font-size: 1em;
+	cursor: pointer;
+	padding: 8px 12px;
+	border-radius: 4px;
+	transition: background-color 0.2s, color 0.2s;
+	flex-shrink: 0; /* 필터 태그가 많아져도 이 버튼이 줄어들지 않도록 */
 }
 
 .app-reset-filters-button:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    color: #000;
+	background-color: rgba(0, 0, 0, 0.05);
+	color: #000;
 }
 
 /* 상품보기 버튼 스타일도 이전과 동일하게 유지 */
 .app-view-products-button {
-    width: 100%;
-    padding: 12px 20px;
-    background-color: #000;
-    color: #fff;
-    border: none;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    text-align: center;
+	width: 100%;
+	padding: 12px 20px;
+	background-color: #000;
+	color: #fff;
+	border: none;
+	font-size: 1.1em;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	text-align: center;
 }
 
 .app-view-products-button:hover {
-    background-color: #333;
+	background-color: #333;
 }
 /* 정렬 드롭다운 메뉴 컨테이너 */
 .sort-dropdown-container {
@@ -739,92 +739,108 @@ label {
 /* 모달 js 스타일 */
 /* footer 내부 버튼 그룹을 위한 스타일 */
 .footer-buttons-group {
-    display: flex;
-    justify-content: space-between; /* 양 끝 정렬 */
-    align-items: center; /* 수직 중앙 정렬 */
-    width: 100%; /* 전체 너비 사용 */
-    gap: 10px; /* 버튼 사이 간격 */
+	display: flex;
+	justify-content: space-between; /* 양 끝 정렬 */
+	align-items: center; /* 수직 중앙 정렬 */
+	width: 100%; /* 전체 너비 사용 */
+	gap: 10px; /* 버튼 사이 간격 */
 }
 
 /* 필터 초기화 버튼 스타일 (모달 X 버튼과 유사하게) */
 .app-reset-filters-button {
-    background: none; /* 배경 투명 */
-    border: none; /* 테두리 없음 */
-    color: #888; /* 옅은 회색 텍스트 */
-    font-size: 1em; /* 기본 폰트 크기 */
-    cursor: pointer;
-    padding: 8px 12px; /* 패딩 */
-    border-radius: 4px; /* 둥근 모서리 */
-    transition: background-color 0.2s, color 0.2s; /* 호버 효과 */
-    flex-shrink: 0; /* flex item에서 공간이 부족해도 줄어들지 않도록 */
+	background: none; /* 배경 투명 */
+	border: none; /* 테두리 없음 */
+	color: #888; /* 옅은 회색 텍스트 */
+	font-size: 1em; /* 기본 폰트 크기 */
+	cursor: pointer;
+	padding: 8px 12px; /* 패딩 */
+	border-radius: 4px; /* 둥근 모서리 */
+	transition: background-color 0.2s, color 0.2s; /* 호버 효과 */
+	flex-shrink: 0; /* flex item에서 공간이 부족해도 줄어들지 않도록 */
 }
 
 .app-reset-filters-button:hover {
-    background-color: rgba(0, 0, 0, 0.05); /* 호버 시 약간 어두운 배경 */
-    color: #000; /* 호버 시 텍스트 색상 진하게 */
+	background-color: rgba(0, 0, 0, 0.05); /* 호버 시 약간 어두운 배경 */
+	color: #000; /* 호버 시 텍스트 색상 진하게 */
 }
 
 /* 개별 필터 태그 내 'x' 버튼 스타일 (remove-filter-btn) */
 .remove-filter-btn {
-    background: none;
-    border: none;
-    color: #999; /* X 버튼 색상 */
-    font-size: 1.2em; /* 크기 조정 */
-    margin-left: 5px; /* 텍스트와의 간격 */
-    cursor: pointer;
-    padding: 0 3px;
-    line-height: 1; /* 라인 높이 조절 */
-    transition: color 0.2s;
+	background: none;
+	border: none;
+	color: #999; /* X 버튼 색상 */
+	font-size: 1.2em; /* 크기 조정 */
+	margin-left: 5px; /* 텍스트와의 간격 */
+	cursor: pointer;
+	padding: 0 3px;
+	line-height: 1; /* 라인 높이 조절 */
+	transition: color 0.2s;
 }
 
 .remove-filter-btn:hover {
-    color: #333; /* 호버 시 진한 색상 */
+	color: #333; /* 호버 시 진한 색상 */
 }
 
 /* selected-filter-tag 자체의 디자인을 모달스럽게 조정 (필요하다면) */
 .selected-filter-tag {
 	font-weight: 400;
-    display: inline-flex;
-    align-items: center;
-    background-color: #f0f0f0; /* 밝은 배경색 */
-    border: 1px solid #ddd; /* 옅은 테두리 */
-    border-radius: 4px;
-    padding: 5px 10px;
-    font-size: 0.9em;
-    color: #555;
+	display: inline-flex;
+	align-items: center;
+	background-color: #f0f0f0; /* 밝은 배경색 */
+	border: 1px solid #ddd; /* 옅은 테두리 */
+	border-radius: 4px;
+	padding: 5px 10px;
+	font-size: 0.9em;
+	color: #555;
 }
 
-
 .app-view-products-button:hover {
-    background-color: #333;
+	background-color: #333;
 }
 
 /* 상품정렬  */
 /* filter-button의 스타일 (예시) */
 .filter-button {
-    background-color: #fff;
-    border: 1px solid #dcdcdc;
-    padding: 3px 12px;
-    border-radius: 8px;
-    font-size: 0.9em;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-    white-space: nowrap;
+	background-color: #fff;
+	border: 1px solid #dcdcdc;
+	padding: 3px 12px;
+	border-radius: 8px;
+	font-size: 0.9em;
+	cursor: pointer;
+	transition: background-color 0.2s, border-color 0.2s;
+	white-space: nowrap;
 }
 /* sort-control에 삼각형 추가 (이 부분은 이전과 동일) */
 .sort-control::after {
-    content: '';
-    display: inline-block;
-    width: 0;
-    height: 7px;
-    margin-left: 5px;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 6px solid #333;
+	content: '';
+	display: inline-block;
+	width: 0;
+	height: 7px;
+	margin-left: 5px;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-top: 6px solid #333;
 }
+
 .sort-dropdown-button {
-    margin: 0;
-    border: none;
-    padding: 0;
-    background-color: white;
+	margin: 0;
+	border: none;
+	padding: 0;
+	background-color: white;
+}
+
+/* 등록된 상품이 없을 때 */
+.products-none.col-12.text-center.mt-4 {
+	margin: 0px !important;
+	height: 427px;
+	align-items: center;
+}
+
+.products-none.col-12.text-center.mt-4 p {
+    margin-bottom: 0;
+    font-size: 1.4rem;
+    font-weight: 500;
+    font-family: 'Poppins';
+    letter-spacing: 0;
+    color: #777;
 }

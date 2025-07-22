@@ -1,8 +1,14 @@
 package ks55team02.common.domain.store;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ReviewImage {
 
     private String reviewImgId; // 리뷰 이미지 ID (review_img_id)

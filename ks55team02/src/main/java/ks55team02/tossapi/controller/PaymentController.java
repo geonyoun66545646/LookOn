@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpSession;
+import ks55team02.customer.coupons.domain.Coupons;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.tossapi.service.PaymentService;
 
@@ -50,10 +51,6 @@ public class PaymentController {
         Map<String, Object> latestOrderDetails = paymentService.getLatestOrderDetailsForUser(userNo);
         model.addAttribute("orderDetails", latestOrderDetails);
         model.addAttribute("tossClientKey", tossClientKey);
-        
-        // 사용 가능한 쿠폰 목록 조회
-        List<Map<String, Object>> userCoupons = paymentService.getUserCoupons(userNo);
-        model.addAttribute("userCoupons", userCoupons);
 
         return "customer/fragments/checkout"; // Thymeleaf/JSP 뷰 파일 경로
     }
@@ -204,11 +201,20 @@ public class PaymentController {
         return ResponseEntity.ok(latestOrder);
     }
 
-    @GetMapping("/api/coupons/{userNo}")
+    @GetMapping("/api/user/coupons") // userNo를 PathVariable에서 제외
     @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getUserCoupons(@PathVariable String userNo) {
-        log.info("API 호출: /api/coupons/{} (사용자 쿠폰 조회)", userNo);
-        List<Map<String, Object>> coupons = paymentService.getUserCoupons(userNo);
+    public ResponseEntity<List<Coupons>> getUserCoupons(HttpSession session) {
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            log.error("사용자 쿠폰 조회 실패: 세션에 로그인 정보가 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 Unauthorized 반환
+        }
+        String userNo = loginUser.getUserNo(); // 로그인된 사용자의 userNo를 세션에서 가져옴
+        log.info("API 호출: /api/user/coupons (사용자 쿠폰 조회) - 사용자 번호: {}", userNo);
+
+        // PaymentService가 아닌 별도의 CouponService를 사용하는 것이 더 적절할 수 있습니다.
+        // 현재는 PaymentService에 있다고 가정하고 진행합니다.
+        List<Coupons> coupons = paymentService.getUserCouponsDTO(userNo); // DTO를 반환하는 새 메서드 호출
         return ResponseEntity.ok(coupons);
     }
 

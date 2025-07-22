@@ -4,7 +4,7 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ks55team02.customer.post.mapper.PostMapper">
 
-	<resultMap id="postResultMap" type="Post">
+	<resultMap id="postResultMap" type="ks55team02.customer.post.domain.Post">
 	    <id     column="pst_sn"         property="pstSn"/>
 	    <result column="bbs_clsf_cd"    property="bbsClsfCd"/>
 	    <result column="wrtr_user_no"   property="wrtrUserNo"/>
@@ -15,300 +15,223 @@
 	    <result column="crt_dt"         property="crtDt"/>
 	    <result column="mdfcn_dt"       property="mdfcnDt"/>
 	    <result column="del_dt"         property="delDt"/>
+        <result column="bbs_nm"         property="bbsNm"/>
 	    <result column="cmnt_cnt" 		property="cmntCnt"/>
 	    <result column="inter_cnt" 		property="interCnt"/>
 	</resultMap>
-	
-	<resultMap id="userResultMap" type="UserList">
-	    <id     column="user_no"            property="userNo"/>
-	    <result column="mbr_grd_cd"         property="mbrGrdCd"/>
-	    <result column="user_lgn_id"        property="userLgnId"/>
-	    <result column="user_nm"            property="userNm"/>
-	    <result column="gender_se_cd"       property="genderSeCd"/>
-	    <result column="eml_addr"           property="emlAddr"/>
-	    <result column="telno"              property="telno"/>
-	    <result column="user_brdt"          property="userBrdt"/>
-	    <result column="zip_cd"             property="zipCd"/>
-	    <result column="addr"               property="addr"/>
-	    <result column="daddr"              property="daddr"/>
-	    <result column="user_ncnm"          property="userNcnm"/>
-	    <result column="user_status"        property="userStatus"/>
-	    <result column="join_dt"            property="joinDt"/>
-	    <result column="whdwl_dt"           property="whdwlDt"/>
-	    <result column="last_info_mdfcn_dt" property="lastInfoMdfcnDt"/>
-	    <result column="last_login_dt"      property="lastLoginDt"/>
-	</resultMap>
-	
-	<resultMap id="postCommentResultMap" type="PostComment">
+
+    <resultMap id="userInfoResultMap" type="ks55team02.customer.login.domain.UserInfoResponse">
+        <id     column="user_no"    property="userNo" />
+        <result column="user_ncnm"  property="userNcnm" />
+        <result column="prfl_img"   property="prflImg" />
+    </resultMap>
+
+    <resultMap id="postImageResultMap" type="ks55team02.customer.post.domain.PostImage">
+        <id     column="pst_img_sn"         property="pstImgSn" />
+        <result column="pst_sn"             property="pstSn" />
+        <result column="img_file_path_nm"   property="imgFilePathNm" />
+        <result column="pst_img_sort_sn"    property="pstImgSortSn"/>
+    </resultMap>
+    
+	<resultMap id="postCommentResultMap" type="ks55team02.customer.post.domain.PostComment">
 	    <id     column="pst_cmnt_sn"    property="pstCmntSn"/>
 	    <result column="pst_sn"         property="pstSn"/>
 	    <result column="wrtr_user_no"   property="wrtrUserNo"/>
-	    <result column="prnt_cmnt_sn"   property="prntCmntSn"/>
 	    <result column="cmnt_cn"        property="cmntCn"/>
 	    <result column="crt_dt"         property="crtDt"/>
-	    <result column="mdfcn_dt"       property="mdfcnDt"/>
-	    <result column="del_dt"         property="delDt"/>
-	    <result column="del_user_no"    property="delUserNo"/>
-	    <result column="user_ncnm"      property="userNcnm"/>
+        <association property="writerInfo" resultMap="userInfoResultMap" />
 	</resultMap>
-	
-	<resultMap id="postInteractionResultMap" type="PostInteraction">
-		<id 	column="pst_intract_sn" 	property="pstIntractSn"></id>
-		<result column="pst_sn" 			property="pstSn"></result>
-		<result column="user_no" 			property="userNo"></result>
-		<result column="intract_type_cd" 	property="intractTypeCd"></result>
-		<result column="crt_dt" 			property="crtDt"></result>
-		<result column="rtrcn_dt" 			property="rtrcnDt"></result>
-	</resultMap>
-	
-	<resultMap id="postListResultMap" type="Post" extends="postResultMap">
-	    <association property="userInfo" javaType="UserList">
+
+    <resultMap id="postDetailResultMap" type="ks55team02.customer.post.domain.Post" extends="postResultMap">
+        <result column="liked_by_current_user" property="likedByCurrentUser" />
+        <association property="writerInfo" resultMap="userInfoResultMap" />
+        <collection property="imageList"   javaType="java.util.List" ofType="ks55team02.customer.post.domain.PostImage"   column="pst_sn" select="selectPostImagesByPstSn" />
+        <collection property="commentList" javaType="java.util.List" ofType="ks55team02.customer.post.domain.PostComment" column="pst_sn" select="selectCommentListByPstSn" />
+    </resultMap>
+    
+    <resultMap id="postListResultMap" type="ks55team02.customer.post.domain.Post" extends="postResultMap">
+	    <association property="writerInfo" javaType="ks55team02.customer.login.domain.UserInfoResponse">
 	        <result column="user_ncnm" property="userNcnm"/>
 	    </association>
+        <association property="representativeImage" column="pst_sn" select="selectFirstPostImageByPstSn"
+                     javaType="ks55team02.customer.post.domain.PostImage" />
 	</resultMap>
 	
-	<resultMap id="postDetailResultMap" type="Post" extends="postResultMap">
-	    <association property="userInfo" resultMap="userResultMap"/>
+	<resultMap type="ks55team02.customer.post.domain.Board" id="boardResultMap">
+		<id column="bbs_clsf_cd" property="bbsClsfCd"></id>
+		<result column="bbs_nm" property="bbsNm"></result>
 	</resultMap>
-	
-	<resultMap id="postCommentListResultMap" type="PostComment" extends="postCommentResultMap">
-		<association property="userInfo" javaType="UserList">
-			<result column="user_ncnm"  property="userNcnm"/>
-		</association>
-	</resultMap>
-	
-	<select id="selectMaxInterNumber" resultType="Integer">
-		/* 추천 일련번호 생성 */
-	    SELECT 
-	    	MAX(CAST(SUBSTRING_INDEX(pst_intract_sn, '_', -1) AS UNSIGNED))
-	    FROM 
-	    	post_interactions pi
-	    WHERE 
-	    	pi.pst_intract_sn REGEXP '^pst_itrct_[0-9]+$';
-	</select>
-	
-	<insert id="insertInterCount" parameterType="PostInteraction">
-		/* 추천수 증가 */
-		INSERT INTO post_interactions
-			(pst_intract_sn, 
-			pst_sn, 
-			user_no, 
-			intract_type_cd, 
-			crt_dt, 
-			rtrcn_dt)
-		VALUES
-			(#{pstIntractSn}, 
-			#{pstSn}, 
-			#{userNo}, 
-			'like', 
-			Now(), 
-			null);
-	</insert>
-	
-	<update id="updateViewCount" parameterType="String">
-		/* 게시글 조회수 증가 */
-		UPDATE
-			posts p
-		SET
-			p.view_cnt = p.view_cnt + 1 
-		WHERE
-			p.pst_sn = #{pstSn};
-	</update>
-	
-	<select id="selectPostListByBoardCd" parameterType="Post" resultMap="postListResultMap">
-		/* 게시판 글 목록 조회 */
-        SELECT
-            p.pst_sn,
-            p.bbs_clsf_cd,
-            p.pst_ttl,
-            p.pst_cn,
-            p.view_cnt,
-            p.ntc_pst_yn,
-            p.crt_dt,
-            p.mdfcn_dt,
-            p.del_dt,
-            b.bbs_nm,
-            u.user_ncnm,
-            (SELECT COUNT(pc.pst_cmnt_sn) FROM post_comments pc WHERE pc.pst_sn = p.pst_sn And pc.del_dt IS null) AS cmnt_cnt,
-            (SELECT COUNT(pi.pst_intract_sn) FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS inter_cnt
-        FROM 
-        	posts p
-        	JOIN boards b ON p.bbs_clsf_cd = b.bbs_clsf_cd
-        	LEFT JOIN users u ON p.wrtr_user_no = u.user_no
-        WHERE 
-        	p.del_dt IS NULL
-        	AND b.del_dt IS NULL
-        	<if test="bbsClsfCd != null and bbsClsfCd != ''">
-        		AND p.bbs_clsf_cd = #{bbsClsfCd}
-        	</if>
-        ORDER BY p.crt_dt DESC
-        LIMIT #{limit} OFFSET #{offset};
+
+	<select id="selectPostImagesByPstSn" resultMap="postImageResultMap">
+		SELECT pst_img_sn, pst_sn, img_file_path_nm, pst_img_sort_sn
+		FROM post_images
+		WHERE pst_sn = #{pstSn} AND del_dt IS NULL
+		ORDER BY pst_img_sort_sn ASC
 	</select>
 
-	<select id="selectPostListNumByBoardCd" resultType="int">
-		/* 특정 게시판 게시글 갯수 조회 */
-		SELECT
-			COUNT(p.pst_sn)
-		FROM
-			posts p
-		WHERE
-			p.del_dt is null
-			<if test="bbsClsfCd != null and bbsClsfCd != ''">
-				AND p.bbs_clsf_cd = #{bbsClsfCd}
-			</if>;
+	<select id="selectFirstPostImageByPstSn" resultMap="postImageResultMap">
+		SELECT pst_img_sn, pst_sn, img_file_path_nm, pst_img_sort_sn
+		FROM post_images
+		WHERE pst_sn = #{pstSn} AND del_dt IS NULL
+		ORDER BY pst_img_sort_sn ASC
+		LIMIT 1
 	</select>
-	
-	<select id="selectPostDetailByPstSn" parameterType="String" resultMap="postDetailResultMap">
-		/* 특정 게시글 상세 조회 */
+
+	<select id="selectPostDetailByPstSn" resultMap="postDetailResultMap">
 		SELECT
-			p.pst_sn,
-			p.bbs_clsf_cd,
-			p.wrtr_user_no,
-			u.user_ncnm,
-			p.pst_ttl,
-			p.pst_cn,
-			p.view_cnt,
-			p.ntc_pst_yn,
-			p.crt_dt,
-			p.mdfcn_dt,
-			p.del_dt,
-			(SELECT COUNT(pc.pst_cmnt_sn) FROM post_comments pc WHERE pc.pst_sn = p.pst_sn And pc.del_dt IS null) AS cmnt_cnt,
-			(SELECT COUNT(pi.pst_intract_sn) FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS inter_cnt
+			p.pst_sn, p.bbs_clsf_cd, p.wrtr_user_no, p.pst_ttl, p.pst_cn, p.view_cnt, p.crt_dt,
+			b.bbs_nm, u.user_no, u.user_ncnm, up.prfl_img,
+			(SELECT COUNT(*) FROM post_comments pc WHERE pc.pst_sn = p.pst_sn AND pc.del_dt IS NULL) AS cmnt_cnt,
+			(SELECT COUNT(*) FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS inter_cnt,
+			<if test="loginUserNo != null and loginUserNo != ''">
+				EXISTS(SELECT 1 FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.user_no = #{loginUserNo} AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS liked_by_current_user
+			</if>
+			<if test="loginUserNo == null or loginUserNo == ''">
+				0 AS liked_by_current_user
+			</if>
 		FROM
 			posts p
 			LEFT JOIN users u ON p.wrtr_user_no = u.user_no
+			LEFT JOIN user_profiles up ON u.user_no = up.user_no
+			LEFT JOIN boards b ON p.bbs_clsf_cd = b.bbs_clsf_cd
 		WHERE
-			p.pst_sn = #{pstSn};
+			p.pst_sn = #{pstSn} AND p.del_dt IS NULL;
 	</select>
 	
-	<select id="selectCommentListByPstSn" parameterType="String" resultMap="postCommentListResultMap">
-		/* 특정 게시글의 댓글 목록 조회 */
+	<select id="selectCommentListByPstSn" parameterType="String" resultMap="postCommentResultMap">
+		SELECT pc.pst_cmnt_sn, pc.pst_sn, pc.wrtr_user_no, pc.cmnt_cn, pc.crt_dt,
+            u.user_no, u.user_ncnm, up.prfl_img
+		FROM post_comments pc
+		LEFT JOIN users u ON pc.wrtr_user_no = u.user_no
+        LEFT JOIN user_profiles up ON u.user_no = up.user_no
+		WHERE pc.pst_sn = #{pstSn} AND pc.del_dt IS NULL
+        ORDER BY pc.crt_dt ASC;
+	</select>
+    
+    <select id="selectBoardName" resultMap="boardResultMap">
+		SELECT bbs_clsf_cd, bbs_nm FROM boards WHERE del_dt IS NULL
+		ORDER BY CASE WHEN bbs_clsf_cd = 'notice' THEN 1 WHEN bbs_clsf_cd = 'freeBoard' THEN 2 WHEN bbs_clsf_cd = 'event_board' THEN 3 ELSE 4 END, bbs_nm ASC;
+	</select>
+	
+	<update id="updateViewCount" parameterType="String">
+		UPDATE posts SET view_cnt = view_cnt + 1 WHERE pst_sn = #{pstSn};
+	</update>
+	
+	<select id="selectPostListByBoardCd" resultMap="postListResultMap">
 		SELECT
-			pc.pst_cmnt_sn,
-			pc.pst_sn,
-			pc.wrtr_user_no,
-			u.user_ncnm,
-			pc.cmnt_cn,
-			pc.crt_dt
-		FROM
-			post_comments pc
-			LEFT JOIN users u ON pc.wrtr_user_no = u.user_no
-		WHERE
-			pc.pst_sn = #{pstSn}
-			AND pc.del_dt IS null;
+			p.pst_sn, p.bbs_clsf_cd, p.wrtr_user_no, p.pst_ttl, p.pst_cn, p.view_cnt, p.crt_dt,
+			b.bbs_nm, u.user_ncnm,
+            (SELECT COUNT(*) FROM post_comments pc WHERE pc.pst_sn = p.pst_sn AND pc.del_dt IS NULL) AS cmnt_cnt,
+            (SELECT COUNT(*) FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS inter_cnt
+        FROM posts p
+        JOIN boards b ON p.bbs_clsf_cd = b.bbs_clsf_cd
+        LEFT JOIN users u ON p.wrtr_user_no = u.user_no
+        WHERE p.del_dt IS NULL AND b.del_dt IS NULL
+        <if test="bbsClsfCd != null and bbsClsfCd != ''"> AND p.bbs_clsf_cd = #{bbsClsfCd} </if>
+        ORDER BY p.crt_dt DESC LIMIT #{limit} OFFSET #{offset};
 	</select>
 	
+	<select id="selectPostListNumByBoardCd" resultType="int">
+		SELECT COUNT(p.pst_sn) FROM posts p WHERE p.del_dt IS NULL
+		<if test="bbsClsfCd != null and bbsClsfCd != ''"> AND p.bbs_clsf_cd = #{bbsClsfCd} </if>
+	</select>
+	
+    <update id="deletePostImagesBySn">
+        UPDATE post_images
+        SET
+            del_dt = NOW(),
+            del_user_no = #{delUserNo}
+        WHERE
+            pst_img_sn IN
+            <foreach collection="imageSnList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+    </update>
+
 	<select id="selectMaxPostNumber" resultType="Integer">
-		/* 게시글 일련번호 생성 */
-	    SELECT 
-	    	MAX(CAST(SUBSTRING_INDEX(pst_sn, '_', -1) AS UNSIGNED))
-	    FROM 
-	    	posts p
-	    WHERE 
-	    	p.pst_sn REGEXP '^post_[0-9]+$';
+	    SELECT MAX(CAST(SUBSTRING_INDEX(pst_sn, '_', -1) AS UNSIGNED)) FROM posts WHERE pst_sn REGEXP '^post_[0-9]+$';
 	</select>
 	
-	<insert id="insertPost" parameterType="Post">
-		/* 게시글 등록 */
-		INSERT INTO posts
-		(pst_sn,
-		bbs_clsf_cd,
-		wrtr_user_no,
-		pst_ttl,
-		pst_cn,
-		view_cnt,
-		ntc_pst_yn,
-		crt_dt,
-		mdfcn_dt,
-		del_dt)
-		VALUES
-		(#{pstSn},
-		#{bbsClsfCd},
-		#{wrtrUserNo},
-		#{pstTtl},
-		#{pstCn},
-		0,
-		0,
-		Now(),
-		null,
-		null);
+	<insert id="insertPost" parameterType="ks55team02.customer.post.domain.Post">
+		INSERT INTO posts (pst_sn, bbs_clsf_cd, wrtr_user_no, pst_ttl, pst_cn, view_cnt, ntc_pst_yn, crt_dt)
+		VALUES (#{pstSn}, #{bbsClsfCd}, #{wrtrUserNo}, #{pstTtl}, #{pstCn}, 0, 0, NOW());
 	</insert>
 	
+    <select id="selectMaxPostImageNumber" resultType="Integer">
+        SELECT MAX(CAST(SUBSTRING_INDEX(pst_img_sn, '_', -1) AS UNSIGNED)) FROM post_images WHERE pst_img_sn REGEXP '^post_img_[0-9]+$';
+    </select>
+    
+    <insert id="insertPostImages" parameterType="list">
+        INSERT INTO post_images (pst_img_sn, pst_sn, img_file_path_nm, pst_img_sort_sn, crt_dt)
+        VALUES
+        <foreach collection="imageList" item="image" separator=",">
+            (#{image.pstImgSn}, #{image.pstSn}, #{image.imgFilePathNm}, #{image.pstImgSortSn}, NOW())
+        </foreach>
+    </insert>
+
 	<select id="selectMaxCommentNumber" resultType="Integer">
-		/* 댓글 일련번호 생성 */
-	    SELECT 
-	    	MAX(CAST(SUBSTRING_INDEX(pst_cmnt_sn, '_', -1) AS UNSIGNED))
-	    FROM 
-	    	post_comments pc
-	    WHERE 
-	    	pc.pst_cmnt_sn REGEXP '^cmnt_[0-9]+$';
+	    SELECT MAX(CAST(SUBSTRING_INDEX(pst_cmnt_sn, '_', -1) AS UNSIGNED)) FROM post_comments WHERE pst_cmnt_sn REGEXP '^cmnt_[0-9]+$';
 	</select>
 	
-	<insert id="insertComment" parameterType="PostComment">
-		/* 댓글 등록 */
-		INSERT INTO post_comments
-		(pst_cmnt_sn,
-		pst_sn,
-		wrtr_user_no,
-		prnt_cmnt_sn,
-		cmnt_cn,
-		crt_dt,
-		mdfcn_dt,
-		del_dt,
-		del_user_no)
-		VALUES
-		(#{pstCmntSn},
-		#{pstSn},
-		#{wrtrUserNo},
-		null,
-		#{cmntCn},
-		Now(),
-		null,
-		null,
-		null);
+	<insert id="insertComment" parameterType="ks55team02.customer.post.domain.PostComment">
+		INSERT INTO post_comments (pst_cmnt_sn, pst_sn, wrtr_user_no, cmnt_cn, crt_dt)
+		VALUES (#{pstCmntSn}, #{pstSn}, #{wrtrUserNo}, #{cmntCn}, NOW());
 	</insert>
 	
-	<update id="updatePost" parameterType="Post">
-		/* 게시글 수정 */
-		UPDATE
-			posts p
-		SET
-			p.bbs_clsf_cd = #{bbsClsfCd},
-			p.pst_ttl = #{pstTtl},
-			p.pst_cn = #{pstCn},
-			p.mdfcn_dt = Now()
-		WHERE
-			p.pst_sn = #{pstSn};
+	<update id="updatePost" parameterType="ks55team02.customer.post.domain.Post">
+		UPDATE posts 
+		SET 
+			bbs_clsf_cd = #{bbsClsfCd}, 
+			pst_ttl = #{pstTtl}, 
+			pst_cn = #{pstCn}, 
+			mdfcn_dt = NOW() 
+		WHERE pst_sn = #{pstSn};
 	</update>
 	
 	<update id="deletePost" parameterType="String">
-		/* 특정 게시글 삭제 */
-		UPDATE
-			posts p
-		SET
-			p.del_dt = Now()
-		WHERE
-			p.pst_sn = TRIM(#{pstSn});
+		UPDATE posts SET del_dt = NOW() WHERE pst_sn = TRIM(#{pstSn});
 	</update>
 	
-	<update id="updateComment" parameterType="PostComment">
-		/* 댓글 수정 */
-		UPDATE
-			post_comments pc
-		SET
-			pc.cmnt_cn = #{cmntCn},
-			pc.mdfcn_dt = Now()
-		WHERE
-			pc.pst_cmnt_sn = #{pstCmntSn};
+	<update id="updateComment" parameterType="ks55team02.customer.post.domain.PostComment">
+		UPDATE post_comments SET cmnt_cn = #{cmntCn}, mdfcn_dt = NOW() WHERE pst_cmnt_sn = #{pstCmntSn};
 	</update>
 	
 	<update id="deleteComment" parameterType="String">
-		/* 특정 댓글 삭제 */
-		UPDATE
-			post_comments pc
-		SET
-			pc.del_dt = Now()
-		WHERE
-			pc.pst_cmnt_sn = TRIM(#{pstCmntSn});
+		UPDATE post_comments SET del_dt = NOW() WHERE pst_cmnt_sn = TRIM(#{pstCmntSn});
 	</update>
+
+    <!-- ======================================================= -->
+    <!-- [수정] 추천(좋아요) 관련 쿼리 전면 수정 -->
+    <!-- ======================================================= -->
+    <select id="selectMaxInterNumber" resultType="Integer">
+	    SELECT MAX(CAST(SUBSTRING_INDEX(pst_intract_sn, '_', -1) AS UNSIGNED)) FROM post_interactions WHERE pst_intract_sn REGEXP '^pst_itrct_[0-9]+$';
+	</select>
+    
+    <select id="findInteractionByUserAndPost" resultType="ks55team02.customer.post.domain.PostInteraction">
+        SELECT * FROM post_interactions 
+        WHERE pst_sn = #{pstSn} AND user_no = #{userNo} AND intract_type_cd = 'LIKE';
+    </select>
+
+    <insert id="insertInteraction" parameterType="ks55team02.customer.post.domain.PostInteraction">
+        INSERT INTO post_interactions (pst_intract_sn, pst_sn, user_no, intract_type_cd, crt_dt) 
+        VALUES (#{pstIntractSn}, #{pstSn}, #{userNo}, 'LIKE', NOW());
+    </insert>
+
+    <update id="cancelLike">
+        UPDATE post_interactions
+        SET rtrcn_dt = NOW()
+        WHERE pst_intract_sn = #{pstIntractSn};
+    </update>
+
+    <update id="revertLike">
+        UPDATE post_interactions
+        SET rtrcn_dt = NULL
+        WHERE pst_intract_sn = #{pstIntractSn};
+    </update>
+
+    <select id="countInteractionsByPost" resultType="int">
+        SELECT COUNT(*) FROM post_interactions 
+        WHERE pst_sn = #{pstSn} AND intract_type_cd = 'LIKE' AND rtrcn_dt IS NULL;
+    </select>
+
 </mapper>

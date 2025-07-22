@@ -92,23 +92,23 @@
 	</insert>
 
 	<sql id="categorySearchCondition">
-		<where>
-			<if test="searchKey != null and searchValue != null and searchValue != ''">
-				<choose>
-					<when test="searchKey == 'categoryName'"> AND ctgry_nm LIKE CONCAT('%', #{searchValue}, '%') </when>
-					<when test="searchKey == 'categoryId'"> AND ctgry_no LIKE CONCAT('%', #{searchValue}, '%') </when>
-					<when test="searchKey == 'all'"> AND (ctgry_nm LIKE CONCAT('%', #{searchValue}, '%') OR ctgry_no LIKE CONCAT('%', #{searchValue}, '%')) </when>
-				</choose>
-			</if>
-			<if test="startDate != null"> AND reg_dt >= #{startDate} </if>
-			<if test="endDate != null"> AND reg_dt &gt; DATE_ADD(#{endDate}, INTERVAL 1 DAY) </if>
-			<if test="levels != null and levels.size() > 0">
-				AND ctgry_dpth IN
-				<foreach item="level" collection="levels" open="(" separator="," close=")">
-					#{level}
-				</foreach>
-			</if>
-		</where>
+	    <where>
+	        <if test="searchKey != null and searchValue != null and searchValue != ''">
+	            <choose>
+	                <when test="searchKey == 'categoryName'"> AND ctgry_nm LIKE CONCAT('%', #{searchValue}, '%') </when>
+	                <when test="searchKey == 'categoryId'"> AND ctgry_no LIKE CONCAT('%', #{searchValue}, '%') </when>
+	                <when test="searchKey == 'all'"> AND (ctgry_nm LIKE CONCAT('%', #{searchValue}, '%') OR ctgry_no LIKE CONCAT('%', #{searchValue}, '%')) </when>
+	            </choose>
+	        </if>
+	        <if test="startDate != null"> AND reg_dt >= #{startDate} </if>
+	        <if test="endDate != null"> AND reg_dt <![CDATA[<=]]> #{endDate} </if>
+	        <if test="levels != null and levels.size() > 0">
+	            AND ctgry_dpth IN
+	            <foreach item="level" collection="levels" open="(" separator="," close=")">
+	                #{level}
+	            </foreach>
+	        </if>
+	    </where>
 	</sql>
 
 	<select id="getCategoryById" parameterType="String"

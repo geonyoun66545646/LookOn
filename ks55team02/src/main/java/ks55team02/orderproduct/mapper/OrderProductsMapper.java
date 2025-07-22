@@ -18,6 +18,7 @@ public interface OrderProductsMapper {
      * @return 주문 상세 정보를 담은 Map 객체
      */
 	OrderDTO getCombinedOrderDetailsByOrderId(String ordrNo);
+
     /**
      * XML ID: getOrderedProductsByOrderId
      * 주문 ID로 해당 주문에 포함된 상품 목록을 조회합니다. (JOIN 활용)
