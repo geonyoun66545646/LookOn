@@ -21,7 +21,6 @@ import ks55team02.common.domain.store.ProductReview;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.customer.store.service.ReviewService;
 import ks55team02.orderproduct.domain.OrderDTO;
-import ks55team02.seller.common.domain.Order;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.domain.ProductImage;
 import ks55team02.seller.products.domain.ProductImageType;
@@ -31,6 +30,7 @@ import ks55team02.seller.products.service.ProductCategoryService;
 import ks55team02.seller.products.service.ProductSearchService;
 import ks55team02.seller.products.service.ProductsService;
 import ks55team02.seller.stores.domain.Stores;
+import ks55team02.util.CustomerPagination;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -319,9 +319,6 @@ public class CustomerProductController {
 		List<ProductImage> detailImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.DETAIL)
 				.sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
 
-		// 리뷰 추가(ljs)
-		List<ProductReview> reviews = reviewService.getReviewsByProductCode(productCode); // productCode로 리뷰 조회
-
 		if (product.getCtgryNo() != null) {
 			List<Products> similarProducts = productSearchService.getSimilarProducts(product.getCtgryNo(),
 					product.getGdsNo());
@@ -332,42 +329,49 @@ public class CustomerProductController {
 		List<Map<String, Object>> productStatusData = productsService.getProductStatusOptions(productCode);
 		model.addAttribute("productStatusData", productStatusData);
 		
-		
-		model.addAttribute("reviews", reviews);// 리뷰 추가(ljs)
 		model.addAttribute("thumbnailImage", thumbnailImage);
 		model.addAttribute("mainGalleryImages", mainGalleryImages);
 		model.addAttribute("detailImages", detailImages);
 		
-		// ⭐⭐ [리뷰 작성 가능 여부 확인 로직] 시작 ⭐⭐
+		  // ==================== [ 리뷰 관련 로직] ====================
 
-		// 1. 기본값을 false로 설정
-	    boolean canWriteReview = false;
-	    OrderDTO reviewableOrder = null; // 리뷰 가능한 주문 정보를 담을 객체
+        // [리뷰 로직 1: 첫 페이지 리뷰 목록 및 페이지네이션 정보 조회]
+        int currentPage = 1;
+        int pageSize = 5;
+        int blockSize = 10;
 
-	    // 2. 로그인 상태 확인
-	    LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
-	    System.out.println(">>>>> 현재 로그인된 사용자 번호: " + loginUser.getUserNo()); 
-	    if (loginUser != null) {
-	        // 3. 서비스에 리뷰 작성 가능 여부 및 대상 주문 조회를 위임
-	        // 이전에 함께 만들었던 findReviewableOrder 메서드를 사용합니다.
-	        reviewableOrder = reviewService.findReviewableOrder(loginUser.getUserNo(), product.getGdsNo());
+        // @PathVariable로 받은 productCode를 gdsNo로 사용합니다.
+        long totalReviewCount = reviewService.getReviewCountByGdsNo(productCode);
+        List<ProductReview> firstPageReviews = reviewService.getReviewListPageByGdsNo(productCode, currentPage, pageSize);
 
-	        // 4. 서비스 조회 결과가 있다면, 작성 가능 상태로 변경
-	        if (reviewableOrder != null) {
-	            canWriteReview = true;
-	        }
-	    }
+        CustomerPagination<ProductReview> reviewPagination = new CustomerPagination<>(
+            firstPageReviews, totalReviewCount, currentPage, pageSize, blockSize
+        );
+        // JS와 연동을 위해 "reviewPagination" 이름으로 모델에 추가합니다.
+        model.addAttribute("reviewPagination", reviewPagination);
 
-	    // 5. 계산된 최종 결과를 Model에 추가하여 뷰(HTML)로 전달
-	    model.addAttribute("canWriteReview", canWriteReview);
-	    if (canWriteReview) {
-	        // canWriteReview가 true일 때만 reviewableOrder를 전달해야
-	        // th:if 블록 안에서 NullPointerException을 피할 수 있습니다.
-	        model.addAttribute("reviewableOrder", reviewableOrder);
-	    }
-	    
-	    // ⭐⭐⭐ 로직 끝 ⭐⭐⭐
+        
+        // [리뷰 로직 2: 리뷰 작성 가능 여부 확인]
+        boolean canWriteReview = false;
+        OrderDTO reviewableOrder = null;
 
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser != null) {
+            System.out.println(">>>>> 현재 로그인된 사용자 번호: " + loginUser.getUserNo());
+            // 위에서 조회한 product 객체의 상품 번호를 사용합니다.
+            reviewableOrder = reviewService.findReviewableOrder(loginUser.getUserNo(), product.getGdsNo());
+
+            if (reviewableOrder != null) {
+                canWriteReview = true;
+            }
+        }
+        
+        model.addAttribute("canWriteReview", canWriteReview);
+        if (canWriteReview) {
+            model.addAttribute("reviewableOrder", reviewableOrder);
+        }
+        /*  리뷰 끝  */
+        
 	    return "customer/productDetail";
 	}
 }

@@ -1,6 +1,7 @@
 package ks55team02.customer.store.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,15 +14,31 @@ import ks55team02.orderproduct.domain.OrderDTO;
 
 @Mapper
 public interface ReviewMapper {
+	
+	/**
+     * [1단계] 페이지에 해당하는 리뷰의 고유 ID 목록을 조회합니다.
+     * @param gdsNo 상품 번호
+     * @param pageSize 페이지 당 리뷰 수
+     * @param offset 시작 위치 ( (currentPage - 1) * pageSize )
+     * @return 리뷰 ID 문자열 리스트
+     */
+    List<String> findReviewIdsByGdsNo(@Param("gdsNo") String gdsNo,
+                                      @Param("pageSize") int pageSize,
+                                      @Param("offset") int offset);
 
- /**
-  * 특정 상품 코드에 해당하는 리뷰 목록을 조회합니다.
-  *
-  * @param gdsNo 상품 ID (productCode에 해당)
-  * @return ProductReview 목록
-  */
- List<ProductReview> selectReviewsByProductCode(String gdsNo);
- 
+    /**
+     * [2단계] 리뷰 ID 목록을 기반으로 리뷰 상세 정보(이미지 포함)를 조회합니다.
+     * @param reviewIds 1단계에서 조회한 리뷰 ID 리스트
+     * @return ProductReview 객체 리스트 (이미지 포함)
+     */
+    List<ProductReview> findReviewsByIds(@Param("list") List<String> reviewIds);
+	
+	/**
+     * [신규] 특정 상품의 게시된 리뷰 총 개수를 조회합니다. (페이지네이션용)
+     * @param gdsNo 상품 번호
+     * @return 리뷰 개수
+     */
+    long getReviewCountByGdsNo(String gdsNo);
  
  /**
   * 사용자가 특정 주문에서 특정 상품을 구매했는지 확인하고,
@@ -55,8 +72,7 @@ public interface ReviewMapper {
  // 리뷰 가능 주문 조회
  OrderDTO findReviewableOrder(@Param("userNo") String userNo, 
 		 						@Param("gdsNo") String gdsNo);
-					 
- 
+					  
  /**
   * 여러 StoreImage 정보를 DB에 배치 저장합니다.
   * @param storeImages 저장할 StoreImage 객체 리스트
