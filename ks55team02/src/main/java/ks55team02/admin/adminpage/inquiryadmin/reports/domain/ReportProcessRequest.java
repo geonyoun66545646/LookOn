@@ -17,4 +17,7 @@ public class ReportProcessRequest {
     private String dclrPrcsRsltCn;
     private String prcsDsctnMemoCn;
     
+ // [추가] 제재 종류를 담을 필드 (예: "7일 이용 정지")
+    private String sanctionType;
+    
 }

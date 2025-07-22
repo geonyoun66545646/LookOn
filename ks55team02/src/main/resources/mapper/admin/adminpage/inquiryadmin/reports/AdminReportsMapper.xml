@@ -32,6 +32,8 @@
 		<result property="attachmentCount" column="attachment_count" />
 		<result property="prcsPicMngrNo" column="prcs_pic_mngr_no" />
 		<result property="dclrPrcsRsltCn" column="dclr_prcs_rslt_cn" />
+		<result property="dclrTrgtTypeCd" column="dclr_trgt_type_cd" />
+		<result property="dclrTrgtContsId" column="dclr_trgt_conts_id" />
 	</resultMap>
 
 	<resultMap id="adminReportHistoryResultMap"
@@ -45,6 +47,19 @@
 		<result property="crntSttsCd" column="crnt_stts_cd" />
 		<result property="prcsDt" column="prcs_dt" />
 		<result property="prcsDsctnMemoCn" column="prcs_dsctn_memo_cn" />
+	</resultMap>
+
+	<resultMap id="userSanctionResultMap"
+		type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.UserSanction">
+		<id property="sanctionId" column="sanction_id" />
+		<result property="userNo" column="user_no" />
+		<result property="dclrId" column="dclr_id" />
+		<result property="sanctionType" column="sanction_type" />
+		<result property="sanctionReason" column="sanction_reason" />
+		<result property="sanctionStartDt" column="sanction_start_dt" />
+		<result property="sanctionEndDt" column="sanction_end_dt" />
+		<result property="prcsDt" column="prcs_dt" />
+		<result property="prcsAdminNo" column="prcs_admin_no" />
 	</resultMap>
 
 	<select id="getAdminTotalReportCount"
@@ -169,24 +184,26 @@
 		rr.dclr_rsn_cn,
 		r.dtl_dclr_rsn_cn AS
 		dclr_cn,
-		DATE_FORMAT(r.dclr_rcpt_dt, '%Y-%-m-%d %H:%i') AS dclr_dt,
+		DATE_FORMAT(r.dclr_rcpt_dt, '%Y-%m-%d %H:%i') AS dclr_dt,
 		r.prcs_stts_cd,
 		(SELECT COUNT(*) FROM report_attachments WHERE dclr_id
 		= r.dclr_id) AS
 		attachment_count,
 		r.prcs_pic_mngr_no,
-		r.dclr_prcs_rslt_cn
+		r.dclr_prcs_rslt_cn,
+		r.dclr_trgt_type_cd,
+		r.dclr_trgt_conts_id
 		FROM
 		reports AS r
 		LEFT JOIN
-		users AS dclr_user ON
-		r.dclr_user_no = dclr_user.user_no
+		users AS dclr_user ON r.dclr_user_no =
+		dclr_user.user_no
 		LEFT JOIN
-		users AS trgt_user ON
-		r.dclr_trgt_user_no = trgt_user.user_no
+		users AS trgt_user ON r.dclr_trgt_user_no =
+		trgt_user.user_no
 		LEFT JOIN
-		report_reasons AS rr
-		ON r.dclr_rsn_cd = rr.dclr_rsn_cd
+		report_reasons AS rr ON r.dclr_rsn_cd =
+		rr.dclr_rsn_cd
 		WHERE
 		r.dclr_id = #{dclrId};
 	</select>
@@ -215,7 +232,6 @@
 		h.prcs_dt DESC;
 	</select>
 
-	<!-- 1. 신고 처리 상태 업데이트 (UPDATE) -->
 	<update id="updateReportStatus"
 		parameterType="ks55team02.admin.adminpage.inquiryadmin.reports.domain.ReportProcessRequest">
 		UPDATE reports
@@ -228,7 +244,6 @@
 		dclr_id = #{dclrId};
 	</update>
 
-	<!-- 2. 신고 처리 이력 추가 (INSERT) -->
 	<insert id="insertReportHistory"
 		parameterType="ks55team02.admin.adminpage.inquiryadmin.reports.domain.ReportProcessRequest">
 		INSERT INTO report_history
@@ -248,7 +263,6 @@
 		);
 	</insert>
 
-	<!-- 기존 코드 아래, </mapper> 태그 바로 위에 추가 -->
 	<select id="getNextReportHistoryId" resultType="String">
 		SELECT
 		CONCAT('HSTRY_', LPAD(IFNULL(MAX(CAST(SUBSTRING(hstry_id, 7) AS
@@ -256,5 +270,63 @@
 		FROM
 		report_history
 	</select>
+
+	<select id="getTargetUserNoByReportId" parameterType="String"
+		resultType="String">
+		SELECT
+		dclr_trgt_user_no
+		FROM
+		reports
+		WHERE
+		dclr_id = #{dclrId};
+	</select>
+
+	<update id="updateUserStatus">
+		UPDATE users
+		SET
+		user_status = #{status}
+		WHERE
+		user_no =
+		#{userNo};
+	</update>
+
+	<insert id="insertSanction"
+		parameterType="ks55team02.admin.adminpage.inquiryadmin.reports.domain.UserSanction">
+		INSERT INTO user_sanctions
+		(sanction_id, user_no,
+		dclr_id, sanction_type, sanction_reason, sanction_start_dt,
+		sanction_end_dt, prcs_admin_no)
+		VALUES
+		(
+		#{sanctionId},
+		#{userNo},
+		#{dclrId},
+		#{sanctionType},
+		#{sanctionReason},
+		#{sanctionStartDt},
+		#{sanctionEndDt},
+		#{prcsAdminNo}
+		);
+	</insert>
+	
+	<select id="getLatestSanctionByUserNo" parameterType="String" resultMap="userSanctionResultMap">
+        SELECT
+            sanction_id,
+            user_no,
+            dclr_id,
+            sanction_type,
+            sanction_reason,
+            sanction_start_dt,
+            sanction_end_dt,
+            prcs_dt,
+            prcs_admin_no
+        FROM
+            user_sanctions
+        WHERE
+            user_no = #{userNo}
+        ORDER BY
+            prcs_dt DESC
+        LIMIT 1
+    </select>
 
 </mapper>
