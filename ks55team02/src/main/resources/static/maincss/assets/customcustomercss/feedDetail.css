@@ -204,3 +204,54 @@
     color: #ed4956; /* 빨간색 텍스트 */
     font-weight: 700; /* 굵은 글씨 */
 }
+
+/* ======================================================= */
+/* 6. Mobile Responsive Styles (max-width: 991px)      */
+/* ======================================================= */
+@media (max-width: 991px) {
+    /*
+     * [핵심 수정 1]
+     * 모바일 화면에서는 사진과 정보/댓글 영역을 세로로 쌓습니다.
+     * flex-direction: column;
+     */
+    .feed-post-wrapper {
+        flex-direction: column;
+        /* [핵심 수정 2] 세로로 길어질 수 있도록 최대 높이 제한을 해제합니다. */
+        max-height: none;
+        border: none; /* 모바일에서는 카드 테두리 제거로 더 넓어보이게 함 */
+        border-radius: 0;
+    }
+
+    /* [핵심 수정 3] 미디어 섹션이 화면 너비에 꽉 차도록 합니다. */
+    .post-media-section {
+        flex-basis: auto; /* flex-basis 초기화 */
+    }
+
+    /*
+     * [핵심 수정 4]
+     * 정보/댓글 영역의 최소 너비 제한을 풀어 화면 너비에 맞게 조절되도록 합니다.
+     */
+    .post-info-section {
+        flex-basis: auto; /* flex-basis 초기화 */
+        min-width: unset; /* 최소 너비 제한 해제 */
+    }
+
+    /* [핵심 수정 5] 전체 컨테이너의 좌우 패딩을 제거하여 꽉 찬 화면을 만듭니다. */
+    .feed-detail-container {
+        padding: 0;
+    }
+
+    /* 정보/댓글 영역의 헤더와 푸터에 다시 패딩을 주어 좌우 여백을 확보합니다. */
+    .post-info-section .feed-post-header,
+    .post-info-section .post-scrollable-content,
+    .post-info-section .feed-post-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    /* [핵심 수정 6] 스크롤 영역이 불필요하므로 초기화합니다. */
+    .post-info-section .post-scrollable-content {
+        overflow-y: visible;
+        flex-grow: 0; /* 불필요한 공간 차지 방지 */
+    }
+}
