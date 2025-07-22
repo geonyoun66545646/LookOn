@@ -46,12 +46,26 @@
                     <li class="nav-item" th:each="b : ${boardList}"><a class="nav-link" href="#" th:data-bbsclsfcd="${b.bbsClsfCd}" th:text="${b.bbsNm}"></a></li>
                 </ul>
             </div>
-            <div class="write-button-area">
-                <button th:if="${session.loginUser != null}" type="button" class="btn-write" onclick="location.href='/customer/post/postWrite'">+</button>
-                <button th:if="${session.loginUser == null}" type="button" class="btn-write" data-toggle="modal" data-target="#signin-modal">+</button>
-            </div>
         </div>
-        
+                <div class="fab-container">
+            <button th:if="${session.loginUser != null}"
+                    type="button"
+                    class="fab-button"
+                    aria-label="새 게시글 작성"
+                    title="새 게시글 작성"
+                    th:onclick="|location.href='@{/customer/post/postWrite}'|">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+            <button th:if="${session.loginUser == null}"
+                    type="button"
+                    class="fab-button"
+                    aria-label="새 게시글 작성 (로그인 필요)"
+                    title="새 게시글 작성 (로그인 필요)"
+                    data-toggle="modal"
+                    data-target="#signin-modal">
+                <i class="bi bi-plus-lg"></i>
+            </button>
+        </div>
         <div class="post-list-container" id="post-list-container"></div>
         <div id="loading-indicator" style="display: none;"><p>Loading...</p></div>
     </div>

@@ -52,37 +52,14 @@
 
 	<div class="screen-overlay"></div>
 
-	<th:block th:if="${showFab != null and showFab}">
 
-		<!-- === 신규 플로팅 버튼 컨테이너 === -->
-		<div class="fab-container" th:if="${showFab == true}">
-		    <button th:if="${session.loginUser != null}"
-		            type="button" 
-		            id="create-feed-btn" 
-		            class="fab-button"
-		            aria-label="새 피드 작성"
-		            title="새 피드 작성"
-		            th:onclick="|location.href='@{/customer/feed/feedWrite}'|">
-		        <i class="bi bi-plus-lg"></i>
-		    </button>
-		    <button th:if="${session.loginUser == null}"
-		            type="button" 
-		            id="create-feed-btn-login-prompt"
-		            class="fab-button"
-		            aria-label="새 피드 작성 (로그인 필요)"
-		            title="새 피드 작성 (로그인 필요)"
-		            data-toggle="modal" 
-		            data-target="#signin-modal">
-		        <i class="bi bi-plus-lg"></i>
-		    </button>
-		</div>
 
 		<!-- 기존 'Top 이동' 버튼 (우리 CSS로 덮어쓰기 위해 여기에 위치) -->
 		<button id="scroll-top" title="Back to Top" class="show">
 			<i class="icon-arrow-up"></i>
 		</button>
 
-	</th:block>
+
 
 	<div class="page-wrapper">
 		<main class="main-wrap">

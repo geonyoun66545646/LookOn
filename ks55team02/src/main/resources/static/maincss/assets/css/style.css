@@ -13544,9 +13544,9 @@ button:focus {
         margin-top: 1.5rem
     }
 
-    .product-details-action .btn-cart {
+/*     .product-details-action .btn-cart {
         min-width: 198px
-    }
+    } */
 
     .product-details-tab .nav.nav-pills .nav-item+.nav-item {
         margin-left: 1rem
@@ -13618,10 +13618,10 @@ button:focus {
         margin-right: 1.5rem
     }
 
-    .product-details-action .btn-cart,
+/*     .product-details-action .btn-cart,
     .product-details-centered .product-details-action .btn-cart {
         min-width: 198px
-    }
+    } */
 
     .product-details-sidebar .details-action-col .btn-product {
         min-width: 168px

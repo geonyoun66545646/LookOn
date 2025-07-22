@@ -138,7 +138,32 @@
 								<div class="product-content">
 									<p th:text="${product?.gdsExpln ?: '상품 설명이 없습니다.'}"></p>
 								</div>
-
+								
+								
+								<div class="coupon-wrapper">
+									<a th:href="@{/customer/coupons}" class="coupon-link">
+										<div class="coupon-container">
+											<div class="coupon-left-section">
+												<span class="coupon-brand-text">LookOn</span>
+											</div>
+											<div class="coupon-right-section">
+												<div class="coupon-info-row">
+													<div class="coupon-discount-main">
+														<span class="main-percentage">최대</span> <span
+															class="main-percentage-value">~100%</span> <span
+															class="main-discount-text">할인</span>
+													</div>
+													<span class="separator"> | </span>
+													<div class="coupon-condition-inline">
+														<span class="condition-text">5만원 이상 구매 시 적용</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</a>
+								</div>
+								
+								
 								<div
 									th:if="${product.productOptions != null and !#lists.isEmpty(product.productOptions)}">
 									<div th:each="option : ${product.productOptions}">
