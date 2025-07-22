@@ -62,7 +62,7 @@ public class FeedController {
 
         // 3. 공통 모델 속성 추가
         model.addAttribute("loginUser", loginUser);
-        model.addAttribute("showFab", true);
+
         model.addAttribute("activeTab", tab); // 현재 활성화된 탭 정보 전달
         model.addAttribute("currentPage", currentPage); // 현재 페이지 번호(1) 전달
 
@@ -85,7 +85,7 @@ public class FeedController {
 	     model.addAttribute("context", context);
 	     model.addAttribute("userNo", userNo);
          model.addAttribute("loginUser", loginUser);
-	     model.addAttribute("showFab", true);
+
 
 	     return "customer/feed/feedDetail";
 	 }
@@ -100,7 +100,7 @@ public class FeedController {
     	String userNo = loginUser.getUserNo();
     	UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
     	model.addAttribute("userInfo", userInfo);
-    	model.addAttribute("showFab", true);
+
     	model.addAttribute("loginUserNo", userNo);
     	return "customer/feed/feedListByUserNo";
     }
@@ -111,7 +111,7 @@ public class FeedController {
     					Model model) {
         UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
         model.addAttribute("userInfo", userInfo);
-        model.addAttribute("showFab", true);
+
         if (loginUser != null) {
             model.addAttribute("loginUserNo", loginUser.getUserNo());
         } else {

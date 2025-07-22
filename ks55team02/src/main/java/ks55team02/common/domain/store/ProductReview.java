@@ -1,14 +1,24 @@
 package ks55team02.common.domain.store;
 
 import java.time.LocalDateTime;
+
 import java.util.List;
 
+import ks55team02.admin.common.domain.SearchCriteria;
 import ks55team02.common.domain.inquiry.InquiryUser;
 import ks55team02.customer.register.domain.UserProfile;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Data
-public class ProductReview {
+@EqualsAndHashCode (callSuper = true)
+public class ProductReview extends SearchCriteria{
 	private String 			reviewId;            // 리뷰 ID (review_id)
 	private String 			ordrDtlArtclNo;      // 주문 상세 항목 ID (ordr_dtl_artcl_no)
 	private String 			prchsrUserNo;        // 구매자 ID (prchsr_user_no)
@@ -25,12 +35,13 @@ public class ProductReview {
 
 	private InquiryUser 	user;				// 유저 테이블
 	private UserProfile 	userProfile;		// 유저 프로필 테이블
-	
-	
 	private Boolean isLiked;   // 현재 사용자의 '좋아요' 여부를 담을 필
-	
-	
 	private List<ReviewImage> reviewImages; // 리뷰 이미지 목록
+	
+	 private String prchsrUserNm; // 구매자 이름
+	 private String delPrcrUserNm; // 삭제 처리자 이름
+	 private String gdsNm; // 상품명
+
 
 }
 

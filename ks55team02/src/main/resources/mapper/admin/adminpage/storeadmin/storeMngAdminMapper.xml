@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.admin.adminpage.storeadmin.storemngadmin.mapper.StoreMngAdminMapper">
+
+    <resultMap id="storeResultMap" type="ks55team02.common.domain.store.Store">
+        <id property="storeId" column="store_id"/>
+        <result property="aplyId" column="aply_id"/>
+        <result property="sellerUserNo" column="seller_user_no"/>
+        <result property="storeConm" column="store_conm"/>
+        <result property="storeIntroCn" column="store_intro_cn"/>
+        <result property="storeLogoImg" column="store_logo_img"/>
+        <result property="storeStts" column="store_stts"/>
+        <result property="infoMdfcnDt" column="info_mdfcn_dt"/>
+        <result property="sellerUserNm" column="seller_user_nm"/>
+        <result property="delPrcrYn" column="del_prcr_yn"/>
+    </resultMap>
+
+    <select id="getStoreCount" parameterType="ks55team02.common.domain.store.Store" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            stores s
+        INNER JOIN
+            users u ON s.seller_user_no = u.user_no
+        <where>
+            <if test="searchKey != null and searchKey != '' and searchValue != null and searchValue != ''">
+                <choose>
+                    <when test="searchKey == 'storeId'">
+                        s.store_id LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchKey == 'storeConm'">
+                        s.store_conm LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchKey == 'sellerUserNo'">
+                        s.seller_user_no LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchKey == 'sellerUserNm'">
+                        u.user_nm LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                </choose>
+            </if>
+            <if test="(searchKey == null or searchKey == '') and searchValue != null and searchValue != ''">
+                AND (
+                    s.store_id LIKE CONCAT('%', #{searchValue}, '%')
+                    OR s.store_conm LIKE CONCAT('%', #{searchValue}, '%')
+                    OR s.store_intro_cn LIKE CONCAT('%', #{searchValue}, '%')
+                    OR u.user_nm LIKE CONCAT('%', #{searchValue}, '%')
+                )
+            </if>
+            <if test="filterConditions != null and filterConditions.size > 0">
+                AND s.store_stts IN
+                <foreach item="condition" collection="filterConditions" open="(" separator="," close=")">
+                    #{condition}
+                </foreach>
+            </if>
+            <if test="startDate != null">
+                AND s.info_mdfcn_dt &gt;= #{startDate, jdbcType=DATE}
+            </if>
+            <if test="endDate != null">
+                AND s.info_mdfcn_dt &lt; DATE_ADD(#{endDate, jdbcType=DATE}, INTERVAL 1 DAY)
+            </if>
+        </where>
+    </select>
+
+    <select id="getStoreList" parameterType="map" resultMap="storeResultMap">
+        SELECT
+            s.store_id,
+            s.aply_id,
+            s.seller_user_no,
+            s.store_conm,
+            s.store_intro_cn,
+            s.store_logo_img,
+            s.store_stts,
+            s.info_mdfcn_dt,
+            u.user_nm AS seller_user_nm,
+            s.del_prcr_yn
+        FROM
+            stores s
+        INNER JOIN
+            users u ON s.seller_user_no = u.user_no
+        <where>
+            <if test="store.searchKey != null and store.searchKey != '' and store.searchValue != null and store.searchValue != ''">
+                <choose>
+                    <when test="store.searchKey == 'storeId'">
+                        s.store_id LIKE CONCAT('%', #{store.searchValue}, '%')
+                    </when>
+                    <when test="store.searchKey == 'storeConm'">
+                        s.store_conm LIKE CONCAT('%', #{store.searchValue}, '%')
+                    </when>
+                    <when test="store.searchKey == 'sellerUserNo'">
+                        s.seller_user_no LIKE CONCAT('%', #{store.searchValue}, '%')
+                    </when>
+                    <when test="store.searchKey == 'sellerUserNm'">
+                        u.user_nm LIKE CONCAT('%', #{store.searchValue}, '%')
+                    </when>
+                </choose>
+            </if>
+            <if test="(store.searchKey == null or store.searchKey == '') and store.searchValue != null and store.searchValue != ''">
+                AND (
+                    s.store_id LIKE CONCAT('%', #{store.searchValue}, '%')
+                    OR s.store_conm LIKE CONCAT('%', #{store.searchValue}, '%')
+                    OR s.store_intro_cn LIKE CONCAT('%', #{store.searchValue}, '%')
+                    OR u.user_nm LIKE CONCAT('%', #{store.searchValue}, '%')
+                )
+            </if>
+            <if test="store.filterConditions != null and store.filterConditions.size > 0">
+                AND s.store_stts IN
+                <foreach item="condition" collection="store.filterConditions" open="(" separator="," close=")">
+                    #{condition}
+                </foreach>
+            </if>
+            <if test="store.startDate != null">
+                AND s.info_mdfcn_dt &gt;= #{store.startDate, jdbcType=DATE}
+            </if>
+            <if test="store.endDate != null">
+                AND s.info_mdfcn_dt &lt; DATE_ADD(#{store.endDate, jdbcType=DATE}, INTERVAL 1 DAY)
+            </if>
+        </where>
+        <if test="store.sortKey != null and store.sortOrder != null">
+            ORDER BY
+            <choose>
+                <when test="store.sortKey == 'storeId'">
+                    CAST(SUBSTRING_INDEX(s.store_id, '_', -1) AS UNSIGNED)
+                </when>
+                <when test="store.sortKey == 'storeConm'">
+                    s.store_conm
+                </when>
+                <when test="store.sortKey == 'infoMdfcnDt'">
+                    s.info_mdfcn_dt
+                </when>
+                <otherwise>
+                    CAST(SUBSTRING_INDEX(s.store_id, '_', -1) AS UNSIGNED)
+                </otherwise>
+            </choose>
+            <if test="store.sortOrder == 'ASC'">ASC</if><if test="store.sortOrder == 'DESC'">DESC</if>
+        </if>
+        LIMIT #{limitStart}, #{pageSize}
+    </select>
+
+    <update id="updateStoreStatus">
+        UPDATE stores
+        SET
+            store_stts = #{newStatus},
+            info_mdfcn_dt = #{infoMdfcnDt},
+            del_prcr_yn = #{delPrcrYn}
+        WHERE
+            store_id = #{storeId}
+    </update>
+
+</mapper>
