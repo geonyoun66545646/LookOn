@@ -50,13 +50,11 @@ public interface PostMapper {
 	
 	int deleteComment(@Param("pstCmntSn") String pstCmntSn);
 	
-    // =======================================================
-    // [수정] 추천(좋아요) 토글 기능을 위한 쿼리들
-    // =======================================================
     Integer selectMaxInterNumber();
-    PostInteraction findInteractionByUserAndPost(@Param("pstSn") String pstSn, @Param("userNo") String userNo);
+
+    int checkLikeExists(@Param("pstSn") String pstSn, @Param("userNo") String userNo);
+
     void insertInteraction(PostInteraction interaction);
-    void cancelLike(@Param("pstIntractSn") String pstIntractSn);
-    void revertLike(@Param("pstIntractSn") String pstIntractSn);
+
     int countInteractionsByPost(@Param("pstSn") String pstSn);
 }
