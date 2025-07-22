@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.annotation.PostConstruct;
+import ks55team02.customer.coupons.domain.Coupons;
 import ks55team02.tossapi.domain.PayOrderDTO;
 import ks55team02.tossapi.domain.PaymentDTO;
 import ks55team02.tossapi.domain.PaymentHistoryDTO;
@@ -68,8 +69,8 @@ public class PaymentServiceImpl implements PaymentService {
             // 1. orders 테이블에 주문 정보 저장 (OrderDTO 사용)
             // ===========================================
             PayOrderDTO payorderDTO = new PayOrderDTO();
-            String ordrNo = paymentMapper.selectNextOrderId(); 
-            payorderDTO.setOrdrNo(ordrNo);
+            String orderId = paymentMapper.selectNextOrderId(); 
+            payorderDTO.setOrdrNo(orderId);
             
             // userNo는 세션 등에서 받아오거나 orderData에 추가되어야 합니다.
             // 현재 로그에는 userNo가 보이지 않으므로, 임시로 null 처리되거나,
@@ -116,7 +117,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             log.info("orders 테이블에 주문 정보 INSERT 시도: {}", payorderDTO);
             paymentMapper.insertOrder(payorderDTO); 
-            log.info("orders 테이블에 주문 정보 삽입 완료. 주문 번호: {}", ordrNo);
+            log.info("orders 테이블에 주문 정보 삽입 완료. 주문 번호: {}", orderId);
 
             // ===========================================
             // 2. order_items 테이블에 주문 상품 상세 정보 저장 (Map 사용)
@@ -124,7 +125,7 @@ public class PaymentServiceImpl implements PaymentService {
             List<Map<String, Object>> products = (List<Map<String, Object>>) orderData.get("products");
             if (products != null && !products.isEmpty()) {
                 for (Map<String, Object> product : products) {
-                    product.put("ordrNo", ordrNo);
+                    product.put("orderId", orderId);
                     product.put("ordrDtlArtclNo", paymentMapper.selectNextOrderItemId());
 
                     // 각 필드에 대해 null 체크 및 적절한 형변환 (예: 숫자 필드)
@@ -159,7 +160,7 @@ public class PaymentServiceImpl implements PaymentService {
             PaymentDTO paymentDTO = new PaymentDTO();
             String stlmId = paymentMapper.selectNextPaymentId();
             paymentDTO.setStlmId(stlmId);
-            paymentDTO.setOrdrNo(ordrNo);
+            paymentDTO.setOrdrNo(orderId);
             paymentDTO.setUserNo(payorderDTO.getUserNo()); // orderDTO에서 userNo 가져오기
             
             // stlmMthdCd는 프론트엔드에서 어떤 방식으로 넘어오는지 확인 후 매핑 필요.
@@ -169,7 +170,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentDTO.setStlmSttsCd("READY");
             
             // pgDlngId는 백엔드에서 생성한 주문번호 (orderNo)로 설정
-            paymentDTO.setPgDlngId(ordrNo); // orderId 대신 백엔드 생성 주문번호 사용
+            paymentDTO.setPgDlngId(orderId); // orderId 대신 백엔드 생성 주문번호 사용
             
             paymentDTO.setPgCoInfo("Toss Payments");
             paymentDTO.setStlmDmndDt(LocalDateTime.now());
@@ -191,7 +192,7 @@ public class PaymentServiceImpl implements PaymentService {
             paymentMapper.insertPaymentHistory(historyDTO); 
             log.info("payment_history 테이블에 결제 이력 삽입 완료. 이력 ID: {}", historyDTO.getStlmHstryId());
 
-            orderData.put("generatedOrdrNo", ordrNo);
+            orderData.put("generatedOrdrNo", orderId);
             orderData.put("generatedStlmId", stlmId);
 
         } catch (Exception e) {
@@ -265,7 +266,7 @@ public class PaymentServiceImpl implements PaymentService {
             Map<String, Object> paymentUpdateParams = new HashMap<>();
             // paymentKey가 아닌 pgDlngId를 사용해야 함.
             paymentUpdateParams.put("pgDlngId", paymentKey); // paymentKey가 토스의 pgDlngId에 해당
-            paymentUpdateParams.put("ordrNo", orderId); // 주문번호 (필요하다면)
+            paymentUpdateParams.put("orderId", orderId); // 주문번호 (필요하다면)
             paymentUpdateParams.put("stlmSttsCd", "DONE");
 
             log.info("payments 테이블 결제 상태 및 완료 일시 업데이트 시도: paymentKey - {}, orderId - {}, 상태 - {}", paymentKey, orderId, "DONE");
@@ -401,4 +402,10 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("주문 상품 목록 조회 서비스 호출. 주문 번호: {}", orderId);
         return paymentMapper.getOrderedProductsByOrderId(orderId);
     }
+    
+    @Override
+    public List<Coupons> getUserCouponsDTO(String userNo) {
+        return paymentMapper.findUserCouponsByUserId(userNo); // Mapper 메서드 호출
+    }
+
 }

@@ -40,8 +40,29 @@ public interface FeedMapper {
 	int insertComment(FeedComment comment);
 	FeedComment selectCommentBySn(String feedCmntSn);
 	
-	// [신규] 댓글 삭제 (논리적)
+	// 댓글 삭제/수정
 	int deleteComment(@Param("feedCmntSn") String feedCmntSn, @Param("delUserNo") String delUserNo);
-	// [신규] 댓글 수정
 	int updateComment(@Param("feedCmntSn") String feedCmntSn, @Param("commentText") String commentText);
+
+    // =======================================================
+    // [신규/수정] 피드 수정 및 삭제 관련 메소드
+    // =======================================================
+    
+    // 피드 내용(텍스트, 수정일자) 업데이트
+    int updateFeed(Feed feed);
+
+    // 기존 이미지 여러 개를 논리적으로 삭제 (수정 시 사용)
+    int deleteFeedImagesBySn(@Param("imageSnList") List<String> imageSnList, @Param("delUserNo") String delUserNo);
+    
+    // 피드를 논리적으로 삭제
+    int deleteFeedLogically(@Param("feedSn") String feedSn, @Param("delUserNo") String delUserNo);
+    
+    // [신규] 태그 관련
+    String selectLastTagSn();
+    void insertTag(FeedTag tag);
+    FeedTag findTagByName(String tagName);
+    String selectLastFeedTagSn();
+    void insertFeedTags(@Param("feedTagList") List<FeedTag> feedTagList);
+    void deleteTagsByFeedSn(String feedSn);
+
 }

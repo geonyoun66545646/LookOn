@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.seller.settlements.mapper.SettlementMapper">
+
+	<resultMap id="settlementResultMap" type="ks55team02.seller.settlements.domain.SettlementDTO">
+        <id 	property="storeClclnId" column="store_clcln_id"/>
+        <result property="storeId" 		column="store_id"/>
+        <result property="storeConm" 	column="store_conm"/>
+        <result property="totSelAmt" 	column="tot_sel_amt"/>
+        <result property="selFeeRt" 	column="sel_fee_rt"/>
+        <result property="clclnAmt" 	column="clcln_amt"/>
+        <result property="clclnPrcsYmd" column="clcln_prcs_ymd"/>
+        <result property="clclnSttsCd" 	column="clcln_stts_cd"/>
+    </resultMap>
+    
+    <sql id="whereConditions">
+        WHERE ss.store_id = #{storeId}
+        <if test="startDate != null and endDate != null">
+            AND ss.clcln_prcs_ymd BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="filterConditions != null and filterConditions.size > 0">
+            AND ss.clcln_stts_cd IN
+            <foreach collection="filterConditions" item="condition" open="(" separator="," close=")">
+                #{condition}
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="selectMySettlementList" resultMap="settlementResultMap">
+        SELECT
+            ss.store_clcln_id,
+            ss.store_id,
+            s.store_conm,
+            ss.tot_sel_amt,
+            ss.sel_fee_rt,
+            ss.clcln_amt,
+            ss.clcln_prcs_ymd,
+            ss.clcln_stts_cd
+        FROM
+            store_settlements ss
+        JOIN
+            stores s ON ss.store_id = s.store_id
+        <include refid="whereConditions"/>
+        ORDER BY
+            ss.clcln_prcs_ymd DESC, ss.store_clcln_id DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countMySettlementList" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            store_settlements ss
+        JOIN
+            stores s ON ss.store_id = s.store_id
+        <include refid="whereConditions"/>
+    </select>
+    
+    <select id="selectStoreIdByUserNo" resultType="String">
+        SELECT
+            store_id
+        FROM
+            stores
+        WHERE
+            seller_user_no = #{userNo}
+        LIMIT 1
+    </select>
+    
+</mapper>

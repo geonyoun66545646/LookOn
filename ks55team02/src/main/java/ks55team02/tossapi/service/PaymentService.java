@@ -5,6 +5,8 @@ package ks55team02.tossapi.service;
 import java.util.List;
 import java.util.Map;
 
+import ks55team02.customer.coupons.domain.Coupons;
+
 public interface PaymentService {
 
     /**
@@ -75,4 +77,6 @@ public interface PaymentService {
      * @return 주문된 상품 정보 목록
      */
     List<Map<String, Object>> getOrderedProductsByOrderId(String orderId);
+    
+    List<Coupons> getUserCouponsDTO(String userNo);
 }

@@ -59,9 +59,9 @@
                     </tbody>
                 </table>
                 
-                <div class="ordered-products-section" th:if="${orderedItems != null and !orderedItems.isEmpty()}">
+                <!-- <div class="ordered-products-section" th:if="${orderedItems != null and !orderedItems.isEmpty()}">
                     <h3>주문 상품 목록</h3>
-                    <!-- 
+                    
                     <div th:each="item : ${orderedItems}" class="ordered-product-item">
                         <div class="ordered-product-details">
                             <div class="ordered-product-name" th:text="${item.product_name}">상품명</div>
@@ -72,8 +72,8 @@
                         </div>
                         <div class="ordered-product-price" th:text="${#numbers.formatInteger(item.ordr_tm_untprc * item.ordr_qntty, 0, 'COMMA') + '원'}">가격</div>
                     </div> 
-                    -->
-                </div>
+                   
+                </div> -->
                 
                 <div class="action-buttons">
 				    <!-- <a th:href="@{/paymentHistory(userNo=${session.loginUser.userNo})}" class="btn btn-primary">주문 내역 확인</a> -->

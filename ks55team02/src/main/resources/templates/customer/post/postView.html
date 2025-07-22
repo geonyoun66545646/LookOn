@@ -2,163 +2,119 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{customer/layout/layoutMain}">
+<head>
+    <title th:text="${postDetail != null ? postDetail.pstTtl : '게시글 상세'}"></title>
+    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postView.css}">
+</head>
+<th:block layout:fragment="jsFile">
+    <script th:src="@{/maincss/assets/js/customer/postView.js}"></script>
+</th:block>
+<th:block layout:fragment="contents">
+    <!-- [수정] 최상위 컨테이너에 login-user-no 속성 추가 -->
+    <div class="post-view-container" th:data-login-user-no="${session.loginUser?.userNo ?: ''}">
+        <div class="post-card" th:if="${postDetail != null and postDetail.delDt == null}">
+            <div class="post-header">
+                <div class="author-info">
+                    <div class="profile-image-wrapper">
+                        <img th:src="${postDetail.writerInfo?.prflImg ?: '/maincss/assets/images/default_profile.png'}" alt="프로필 이미지">
+                    </div>
+                    <div class="author-details">
+                        <span class="author-nickname" th:text="${postDetail.writerInfo?.userNcnm ?: '작성자'}"></span>
+                        <div class="post-meta">
+                            <span class="relative-time" th:attr="data-datetime=${postDetail.crtDt}"></span>
+                            <span>·</span>
+                            <span>조회 <span th:text="${postDetail.viewCnt}">0</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-actions-menu">
+                    <button type="button" class="btn-more">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                    </button>
+                    <div class="more-menu" style="display: none;">
+                        <th:block th:if="${loginUser != null and loginUser.userNo == postDetail.writerInfo.userNo}">
+                            <a th:href="@{/customer/post/postUpdate/{pstSn}(pstSn=${postDetail.pstSn})}">수정하기</a>
+                            <button type="button" id="delete-post-btn" th:data-post-delete-url="@{/customer/api/post/delete/{pstSn}(pstSn=${postDetail.pstSn})}">삭제하기</button>
+                        </th:block>
+                        <th:block th:unless="${loginUser != null and loginUser.userNo == postDetail.writerInfo.userNo}">
+                            <button type="button" class="report-btn">신고하기</button>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
 
-	<head>
-	    <meta name="description" content="한국스마트정보교육원 ksmybatis" />
-	    <!-- postDetailView.css 파일을 로드해야 합니다. -->
-	    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postView.css}">
-	    <title>게시글 상세</title>
-	</head>
+            <div class="post-body">
+                <h2 class="post-title" th:text="${postDetail.pstTtl}"></h2>
+                <div class="post-images-area" th:if="${postDetail.imageList != null and not #lists.isEmpty(postDetail.imageList)}">
+                    <img th:each="image : ${postDetail.imageList}" th:src="@{${image.imgFilePathNm}}" alt="게시글 이미지" class="post-image-item">
+                </div>
+                <p class="post-content-text" th:utext="${#strings.replace(postDetail.pstCn, '\n', '<br>')}"></p>
+            </div>
 
-	<!-- 추가할 js file -->
-	<th:block layout:fragment="jsFile">
-	    <!-- 댓글 관련 JavaScript 파일이 있다면 여기에 추가 -->
-	    <script th:src="@{/maincss/assets/js/customer/postView.js}"></script>
-	</th:block>
+            <div class="post-interaction-bar">
+                <button type="button" class="interaction-btn" id="post-like-btn" th:classappend="${postDetail.likedByCurrentUser} ? 'liked' : ''" th:data-post-sn="${postDetail.pstSn}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                    <span>추천</span>
+                    <span class="like-count" th:text="${postDetail.interCnt}">0</span>
+                </button>
+                <button type="button" class="interaction-btn" id="post-share-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    <span>공유</span>
+                </button>
+            </div>
+        </div>
 
-	<!-- 추가할 script -->
-	<th:block layout:fragment="jsScript">
+        <div class="comments-section" th:if="${postDetail != null and postDetail.delDt == null}">
+            <div class="comments-header">
+                <h3>댓글 <span th:text="${#lists.size(postDetail.commentList)}">0</span></h3>
+            </div>
+            <div class="comment-list">
+                <div class="comment-item" th:each="comment : ${postDetail.commentList}" th:data-comment-sn="${comment.pstCmntSn}">
+                    <div class="comment-author-profile">
+                        <img th:src="${comment.writerInfo?.prflImg ?: '/maincss/assets/images/default_profile.png'}" alt="프로필">
+                    </div>
+                    <div class="comment-main">
+                        <div class="comment-header">
+                            <span class="comment-author-name" th:text="${comment.writerInfo?.userNcnm ?: '익명'}"></span>
+                            <span class="comment-date" th:text="${#temporals.format(comment.crtDt, 'yyyy.MM.dd HH:mm')}"></span>
+                        </div>
+                        <div class="comment-body">
+                            <p th:text="${comment.cmntCn}"></p>
+                        </div>
+                        <div class="comment-update-form" style="display:none;">
+                            <textarea class="comment-update-input" th:text="${comment.cmntCn}"></textarea>
+                        </div>
+                        <div class="comment-actions" th:if="${session.loginUser != null and session.loginUser.userNo == comment.wrtrUserNo}">
+                            <button type="button" class="update-comment-btn">수정</button>
+                            <button type="button" class="delete-comment-btn" th:data-comment-delete-url="@{/customer/api/post/comments/{cmntSn}(cmntSn=${comment.pstCmntSn})}">삭제</button>
+                            <button type="button" class="save-comment-btn" style="display:none;" th:data-comment-update-url="@{/customer/api/post/comments/{cmntSn}(cmntSn=${comment.pstCmntSn})}">저장</button>
+                            <button type="button" class="cancel-comment-btn" style="display:none;">취소</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="no-comment" th:if="${#lists.isEmpty(postDetail.commentList)}">
+                    <p>아직 댓글이 없습니다.</p>
+                </div>
+            </div>
 
-	</th:block>
+            <div class="comment-form-wrapper">
+                <form id="commentForm" th:if="${session.loginUser != null}">
+                    <input type="hidden" name="pstSn" th:value="${postDetail.pstSn}">
+                    <input type="hidden" name="wrtrUserNo" th:value="${session.loginUser.userNo}">
+                    <textarea id="comment-textarea" name="cmntCn" placeholder="댓글을 남겨보세요" required></textarea>
+                    <button id="comment-submit-btn" type="submit" disabled>등록</button>
+                </form>
+                <div class="comment-login-prompt" th:if="${session.loginUser == null}">
+                    <a th:href="@{/login}">로그인</a> 후 댓글을 작성할 수 있습니다.
+                </div>
+            </div>
+        </div>
 
-	<th:block layout:fragment="contents">
-	
-	    <!-- 게시글 상세 정보 영역 -->
-	    <div class="post-detail-area"
-	    	 th:unless="${postDetail.delDt != null}">
-	        <!-- 게시글 제목, 작성자, 날짜 등 헤더 정보 -->
-	        <div class="post-detail-header">
-	            <!-- 게시글 제목 -->
-	            <h2	th:text="${postDetail.pstTtl}">게시글 제목</h2>      
-	
-	            <!-- 게시글 정보 (작성자, 날짜, 조회수 등) -->
-	            <div class="post-detail-info">
-	                <span th:if="${postDetail.userInfo.userNcnm != null}" th:text="${postDetail.userInfo.userNcnm}">작성자</span>
-	                <span th:text="${#temporals.format(postDetail.crtDt, 'yyyy.MM.dd HH:mm:ss')}">작성일</span>
-	                <span>조회수: <span th:text="${postDetail.viewCnt}">0</span></span>
-	                <span>추천수: <span th:text="${postDetail.interCnt}">0</span></span>
-	                <span>댓글수: <span th:text="${postDetail.cmntCnt}">0</span></span>
-	            </div>
-	        </div>
-	
-	        <!-- 게시글 본문 내용 -->
-	        <div class="post-content">
-	            <p th:utext="${postDetail.pstCn}">게시글 내용</p>
-	        </div>
-	        
-	        <div class="post-interaction">
-			    <!-- 1. 로그인 상태일 때만 보여줄 버튼 -->
-			    <!-- 여기에는 세션 정보에 접근하는 코드가 들어가도 안전합니다. -->
-			    <button th:if="${session.loginUser != null}"
-			            type="button" 
-			            id="post_interaction_btn" 
-			            class="btn btn-info" 
-			            th:data-interaction-pstsn="${postDetail.pstSn}"
-			            th:data-interaction-userno="${session.loginUser.userNo}"
-			            th:data-post-interaction-insert-url="@{/customer/post/interactionInsert}">추천</button>
-			    
-			    <!-- 2. 비로그인 상태일 때만 보여줄 버튼 -->
-			    <!-- 여기에는 세션 정보에 접근하는 코드가 전혀 없으므로 100% 안전합니다. -->
-			    <button th:unless="${session.loginUser != null}" 
-			            type="button" 
-			            id="post_interaction_btn"
-			            class="btn btn-info" 
-			            data-toggle="modal" 
-			            data-target="#signin-modal">추천</button>
-	        </div>
-	
-	        <!-- 게시글 관련 액션 버튼 (수정, 삭제, 목록) -->
-	        <div class="post-actions">
+        <div class="deleted-post-placeholder" th:if="${postDetail == null or postDetail.delDt != null}">
+            <h2>존재하지 않거나 삭제된 게시글입니다.</h2>
+            <a th:href="@{/customer/post/postList}" class="btn-back-to-list">목록으로 돌아가기</a>
+        </div>
+    </div>
+</th:block>
 
-	        	<button type="button" id="select-postlist-btn" class="btn btn-secondary" onclick="history.back()">목록</button>
-	        	<a class="btn btn-primary" 
-	        		id="update-post-btn" 
-	        		th:href="@{/customer/post/postUpdate/{pstSn}(pstSn=${postDetail.pstSn})}"
-	        		th:if="${session.loginUser != null and session.loginUser.userNo == postDetail.wrtrUserNo}">수정</a>
-
-	            <button type="button" 
-	            		id="delete-post-btn" 
-	            		class="btn btn-danger"
-	       				th:data-post-delete-url="@{/customer/post/postDelete/{pstSn}(pstSn=${postDetail.pstSn})}"
-	       				th:if="${session.loginUser != null and session.loginUser.userNo == postDetail.wrtrUserNo}">삭제</button>
-					        
-										       
-	        
-	        </div>
-	    </div>
-	    
-		<div class="post-detail-area"
-			th:if="${postDetail.delDt != null}">
-			
-			<div class="post-detail-header">
-				<h2>오류</h2>
-			</div>
-			
-		</div>
-	
-	    <!-- 댓글 영역 -->
-	    <div class="comments-section"
-	    	th:unless="${postDetail.delDt != null}">
-	        <h3>댓글</h3>
-	
-	        <!-- 댓글 작성 폼 -->
-	        <form 	id="commentForm" 
-	        		method="post" 
-	        		class="comment-form"
-	        		th:action="@{/customer/post/insertComment}">
-	            <!-- 사용자 정보 (로그인 사용자 ID 등)를 숨김 필드로 전달할 수 있습니다. -->
-	            <!-- <input type="hidden" name="pstSn" th:value="${postDetail.pstSn}"> -->
-	            <!-- <input type="hidden" name="userId" th:value="${session.loginUser.userId}"> -->
-	            <textarea name="cmntCn" placeholder="댓글을 입력해주세요."></textarea>
-	            <input type="hidden" name="pstSn" th:value="${postDetail.pstSn}" />
-			    <th:block th:if="${session.loginUser != null}">
-			        <input type="hidden" name="wrtrUserNo" th:value="${session.loginUser.userNo}" />
-			    </th:block>
-	            <button th:if="${session.loginUser != null}"
-	            		type="submit" class="btn btn-primary insert-comment-btn">등록</button>
-	            <button th:unless="${session.loginUser != null}"
-	                    data-toggle="modal" 
-        				data-target="#signin-modal"
-	            		type="button" class="btn btn-primary insert-comment-btn">등록</button>
-	        </form>
-	
-	        <!-- 댓글 목록 -->
-	        <div class="comment-list">
-	            <th:block th:if="${!#lists.isEmpty(postDetail.comment)}">
-	                <div class="comment-item" 
-	                	th:each="c : ${postDetail.comment}">
-	                    <div class="comment-header">
-	                        <span class="comment-author" th:text="${c.userNcnm}">작성자</span>
-	                        <span class="comment-date" th:text="${#temporals.format(c.crtDt, 'yyyy-MM-dd HH:mm:ss')}">작성일</span>
-	                    </div>
-						<div class="comment-body">
-						    <p class="comment-content-display" th:text="${c.cmntCn}">댓글 내용</p>
-						    <!-- 수정 1: textarea에 각 댓글을 식별할 수 있도록 data-comment-sn 속성을 추가합니다. -->
-						    <textarea class="comment-update-input form-control" style="display:none;"
-						              th:data-comment-sn="${c.pstCmntSn}"
-						              th:text="${c.cmntCn}"></textarea>
-						</div>
-						<div class="comment-actions">
-						    <button type="button" class="btn btn-primary update-comment-btn"
-						    		th:if="${session.loginUser != null and session.loginUser.userNo == c.wrtrUserNo}">수정</button>
-						    <!-- 수정 2: '저장' 버튼에도 수정할 댓글의 고유 번호(pstCmntSn)를 data 속성으로 추가합니다. -->
-						    <button type="button" class="btn btn-success save-comment-btn" style="display:none;"
-						            th:data-comment-sn="${c.pstCmntSn}"
-						            th:data-comment-update-url="@{/customer/post/updateComment}">저장</button>
-						    <button type="button" class="btn btn-secondary cancel-comment-btn" style="display:none;">취소</button>
-	                        
-	                        <button type="button" class="btn btn-danger delete-comment-btn"
-	                                th:data-comment-delete-url="@{/customer/post/commentDelete/{pstCmntSn}(pstCmntSn=${c.pstCmntSn})}"
-	                                th:if="${session.loginUser != null and session.loginUser.userNo == c.wrtrUserNo}">삭제</button>
-	                    
-															                
-	                    
-	                    </div>
-	                </div>
-	            </th:block>
-	            <p th:unless="${!#lists.isEmpty(postDetail.comment)}">아직 작성된 댓글이 없습니다.</p>
-	        </div>
-	    </div>
-	
-	</th:block>
 </html>
