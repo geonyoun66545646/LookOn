@@ -1,50 +1,57 @@
-<!--
-  [수정 사항]
-  1. 파라미터로 상품 번호(gdsNo)와 주문 번호(ordNo)를 모두 받도록 변경.
-  2. 프래그먼트는 실제 form을 감싸는 div 부터 시작하도록 구조 단순화.
--->
 <th:block th:fragment="insertReviewFragment(gdsNo, ordrNo)">
 
-    <!-- 리뷰 작성 섹션 -->
-    <div class="add-review">
-        <h3>리뷰 작성</h3>
+    <div class="add-review card p-4 shadow-sm mb-5">
+        <h3 class="card-title text-center mb-4 font-weight-bold">상품 리뷰 작성</h3>
 
-        <!--
-          [수정 사항]
-          1. 파일 업로드를 위해 enctype="multipart/form-data" 추가 (필수!)
-        -->
-        <form th:action="@{/api/reviews/add}" method="post" enctype="multipart/form-data">
+        <form th:action="@{/api/reviews/add}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
             
-            <!--
-              [수정 사항]
-              1. 어떤 상품(gdsNo)과 어떤 주문(ordNo)에 대한 리뷰인지 서버에 전송
-            -->
             <input type="hidden" name="gdsNo" th:value="${gdsNo}" />
             <input type="hidden" name="ordrNo" th:value="${ordrNo}" />
 
-            <div class="form-group">
-                <label for="rating">평점 <span class="required">*</span></label>
-                <select name="evlScr" id="rating" class="form-control" required>
-                    <option value="" disabled selected>평점을 선택하세요</option>
-                    <option value="5">★★★★★ (5점)</option>
-                    <option value="4">★★★★☆ (4점)</option>
-                    <option value="3">★★★☆☆ (3점)</option>
-                    <option value="2">★★☆☆☆ (2점)</option>
-                    <option value="1">★☆☆☆☆ (1점)</option>
-                </select>
+            <div class="form-group mb-4">
+                <label for="rating" class="form-label d-block mb-2">
+                </label>
+                <div class="rating-stars d-flex justify-content-center align-items-center" data-selected-rating="0">
+                    <i class="star-icon far fa-star" data-value="1"></i>
+                    <i class="star-icon far fa-star" data-value="2"></i>
+                    <i class="star-icon far fa-star" data-value="3"></i>
+                    <i class="star-icon far fa-star" data-value="4"></i>
+                    <i class="star-icon far fa-star" data-value="5"></i>
+                    <input type="hidden" name="evlScr" id="rating" required aria-label="Rating selection">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="review_cn">리뷰 내용 <span class="required">*</span></label>
-                <textarea id="review_cn" name="reviewCn" cols="30" rows="6" class="form-control" required></textarea>
+
+            <div class="form-group mb-4">
+                <label for="review_cn" class="form-label">
+                    리뷰 내용 <span class="text-danger">*</span>
+                </label>
+                <textarea id="review_cn" name="reviewCn" rows="6" class="form-control" placeholder="상품에 대한 솔직한 리뷰를 남겨주세요." required aria-describedby="reviewContentHelp"></textarea>
+                <div class="invalid-feedback">리뷰 내용을 입력해주세요.</div>
             </div>
-            <div class="form-group">
-                <label for="review_images">리뷰 이미지 (선택 사항)</label>
-                <input type="file" id="review_images" name="reviewImages" multiple class="form-control-file" accept="image/*">
+
+            <div class="form-group mb-5">
+                <label for="review_images" class="form-label">
+                    리뷰 이미지
+                </label>
+                <div class="custom-file">
+                    <input type="file" id="review_images" name="reviewImages" multiple class="custom-file-input" accept="image/*" aria-label="Review image upload">
+                    <label class="custom-file-label" for="review_images">
+                        파일 선택...
+                    </label>
+                </div>
+                <div id="imagePreview" class="d-flex flex-wrap mt-3">
+                    </div>
+                <small class="form-text text-muted mt-2">
+                    최대 5개의 이미지를 첨부할 수 있습니다. (각 이미지 최대 5MB)
+                </small>
             </div>
-            <button type="submit" class="btn btn-outline-primary-2">
-                <span>리뷰 제출</span> <i class="icon-long-arrow-right"></i>
-            </button>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg w-100 animate-hover-shadow">
+                    <i class="fas fa-paper-plane mr-2"></i> 리뷰 제출하기
+                </button>
+            </div>
         </form>
-    </div><!-- End .add-review -->
+    </div>
 
 </th:block>
