@@ -165,8 +165,9 @@
                 </div>
                 <nav class="mt-4" aria-label="Page navigation" th:if="${pagination.totalRecordCount > 0}">
                     <ul class="pagination justify-content-center">
-                        <li class="page-item" th:if="${pagination.existPrevBlock}">
-                            <a class="page-link page-num" href="#" th:data-page="${pagination.startPage - 1}">이전</a>
+                        <!-- 이전 페이지 버튼: 현재 페이지가 1보다 클 때만 표시 -->
+                        <li class="page-item" th:if="${pagination.currentPage > 1}">
+                            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage - 1}">이전</a>
                         </li>
 
                         <li class="page-item" th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
@@ -174,8 +175,9 @@
                             <a class="page-link page-num" href="#" th:text="${page}" th:data-page="${page}"></a>
                         </li>
 
-                        <li class="page-item" th:if="${pagination.existNextBlock}">
-                            <a class="page-link page-num" href="#" th:data-page="${pagination.endPage + 1}">다음</a>
+                        <!-- 다음 페이지 버튼: 현재 페이지가 전체 페이지 수보다 작을 때만 표시 -->
+                        <li class="page-item" th:if="${pagination.currentPage < pagination.totalPageCount}">
+                            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage + 1}">다음</a>
                         </li>
                     </ul>
                 </nav>
