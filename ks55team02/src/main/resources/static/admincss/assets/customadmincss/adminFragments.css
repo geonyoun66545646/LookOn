@@ -1,0 +1,33 @@
+@charset "UTF-8";
+/* 사이드바 메뉴 구분선 스타일 */
+.menu-aside .menu-divider {
+    margin-top: 1rem; /* 위쪽 여백 */
+    margin-bottom: 1rem; /* 아래쪽 여백 */
+    border-bottom: 1px solid #e0e0e0; /* 연한 회색의 1px 실선 */
+}
+/* 로고 */
+.navbar-aside .aside-top {
+	padding: 12px 10px;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-box-pack: justify;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+	border-bottom: 1px solid #eee;
+	min-height: 72px;
+}
+
+.navbar-aside .aside-top .brand-wrap {
+    padding: 0 15px;
+    display: inline-block;
+}
+
+.aside-top .brand-wrap .lookon-logo{
+	font-size: 27px;
+    font-weight: 900;
+    color: #333;
+}

@@ -1,3 +1,6 @@
+// 파일 경로: /js/customerjs/postDetail.js
+// 아래 코드로 파일 전체를 교체해주세요.
+
 $(document).ready(function() {
     function formatRelativeTime(dateString) {
         if (!dateString) return '';
@@ -30,6 +33,9 @@ $(document).ready(function() {
         $('.more-menu').hide();
     });
 
+    const $container = $('.post-view-container');
+    const loginUserNo = $container.data('login-user-no');
+
     $('#delete-post-btn').on('click', function(e) {
         if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
         const deleteUrl = $(e.currentTarget).data('post-delete-url');
@@ -40,22 +46,27 @@ $(document).ready(function() {
         }).done(response => {
             alert(response.message || '게시글이 삭제되었습니다.');
             location.href = '/customer/post/postList';
-        }).fail(err => {
-            alert(err.responseJSON?.message || '삭제 중 오류가 발생했습니다.');
+        // [수정] .fail() 로직 표준화
+        }).fail(jqXHR => {
+            if (jqXHR.status === 401) {
+                $('#signin-modal').modal('show');
+            } else {
+                alert(jqXHR.responseJSON?.message || '삭제 중 오류가 발생했습니다.');
+            }
         });
     });
 
-    // [수정] 추천(좋아요) 토글 기능 -> 이벤트 위임 방식으로 변경
-    $('.post-view-container').on('click', '#post-like-btn', function() {
+    $container.on('click', '#post-like-btn', function() {
         const $btn = $(this);
         const pstSn = $btn.data('post-sn');
-        const $container = $('.post-view-container');
-        const loginUserNo = $container.data('login-user-no');
-
+        
         if (!loginUserNo) {
-            alert('로그인이 필요합니다.');
-            const loginUrl = '/customer/login/login?redirectUrl=' + window.location.pathname + window.location.search;
-            window.location.href = loginUrl;
+            $('#signin-modal').modal('show');
+            return;
+        }
+
+        if ($btn.hasClass('liked')) {
+            alert("이미 추천했습니다.");
             return;
         }
 
@@ -68,10 +79,18 @@ $(document).ready(function() {
             data: JSON.stringify({ pstSn: pstSn }),
             dataType: 'json'
         }).done(response => {
-            $btn.toggleClass('liked', response.isLiked);
+            $btn.addClass('liked');
             $btn.find('.like-count').text(response.likeCount);
-        }).fail(err => {
-            alert(err.responseJSON?.message || '오류가 발생했습니다.');
+        // [수정] .fail() 로직 표준화
+        }).fail(jqXHR => {
+            if (jqXHR.status === 401) {
+                $('#signin-modal').modal('show');
+            } else if (jqXHR.status === 409) {
+                alert("이미 추천했습니다.");
+                $btn.addClass('liked');
+            } else {
+                alert(jqXHR.responseJSON?.message || '오류가 발생했습니다.');
+            }
         }).always(() => {
             $btn.prop('disabled', false);
         });
@@ -81,11 +100,7 @@ $(document).ready(function() {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(window.location.href).then(() => {
                 alert('게시글 주소가 클립보드에 복사되었습니다.');
-            }).catch(err => {
-                alert('주소 복사에 실패했습니다. 다시 시도해주세요.');
             });
-        } else {
-            alert('이 브라우저에서는 자동 복사를 지원하지 않습니다.');
         }
     });
 
@@ -103,8 +118,15 @@ $(document).ready(function() {
 
     $('#commentForm').on('submit', function(e) {
         e.preventDefault();
+        
+        if (!loginUserNo) {
+            $('#signin-modal').modal('show');
+            return;
+        }
+        
         const formData = new FormData(this);
         const formObject = Object.fromEntries(formData.entries());
+        
         $.ajax({
             url: '/customer/api/post/comments',
             method: 'POST',
@@ -114,11 +136,14 @@ $(document).ready(function() {
         }).done(response => {
             if (response.result === 'success') {
                 window.location.reload();
-            } else {
-                alert(response.message || '댓글 등록에 실패했습니다.');
             }
-        }).fail(err => {
-            alert(err.responseJSON?.message || '댓글 작성 중 오류가 발생했습니다.');
+        // [수정] .fail() 로직 표준화
+        }).fail(jqXHR => {
+            if (jqXHR.status === 401) {
+                $('#signin-modal').modal('show');
+            } else {
+                alert(jqXHR.responseJSON?.message || '댓글 작성 중 오류가 발생했습니다.');
+            }
         });
     });
 
@@ -151,8 +176,13 @@ $(document).ready(function() {
             dataType: 'json'
         }).done(response => {
             window.location.reload();
-        }).fail(err => {
-            alert(err.responseJSON?.message || '댓글 수정 중 오류가 발생했습니다.');
+        // [수정] .fail() 로직 표준화
+        }).fail(jqXHR => {
+            if (jqXHR.status === 401) {
+                $('#signin-modal').modal('show');
+            } else {
+                alert(jqXHR.responseJSON?.message || '댓글 수정 중 오류가 발생했습니다.');
+            }
         });
     });
 
@@ -165,8 +195,13 @@ $(document).ready(function() {
             dataType: 'json'
         }).done(response => {
             window.location.reload();
-        }).fail(err => {
-            alert(err.responseJSON?.message || '댓글 삭제 중 오류가 발생했습니다.');
+        // [수정] .fail() 로직 표준화
+        }).fail(jqXHR => {
+            if (jqXHR.status === 401) {
+                $('#signin-modal').modal('show');
+            } else {
+                alert(jqXHR.responseJSON?.message || '댓글 삭제 중 오류가 발생했습니다.');
+            }
         });
     });
 });

@@ -55,11 +55,26 @@
 	<th:block th:if="${showFab != null and showFab}">
 
 		<!-- === 신규 플로팅 버튼 컨테이너 === -->
-		<div class="fab-container">
-			<button type="button" id="create-feed-btn" class="fab-button"
-				th:onclick="|location.href='@{/customer/feed/feedWrite}'|">
-				<i class="bi bi-plus-lg"></i>
-			</button>
+		<div class="fab-container" th:if="${showFab == true}">
+		    <button th:if="${session.loginUser != null}"
+		            type="button" 
+		            id="create-feed-btn" 
+		            class="fab-button"
+		            aria-label="새 피드 작성"
+		            title="새 피드 작성"
+		            th:onclick="|location.href='@{/customer/feed/feedWrite}'|">
+		        <i class="bi bi-plus-lg"></i>
+		    </button>
+		    <button th:if="${session.loginUser == null}"
+		            type="button" 
+		            id="create-feed-btn-login-prompt"
+		            class="fab-button"
+		            aria-label="새 피드 작성 (로그인 필요)"
+		            title="새 피드 작성 (로그인 필요)"
+		            data-toggle="modal" 
+		            data-target="#signin-modal">
+		        <i class="bi bi-plus-lg"></i>
+		    </button>
 		</div>
 
 		<!-- 기존 'Top 이동' 버튼 (우리 CSS로 덮어쓰기 위해 여기에 위치) -->
@@ -141,7 +156,20 @@
 		/*]]>*/
 	</script>
 
-
+	<th:block layout:fragment="global-js">
+	    <script>
+	        $(document).ajaxError(function(event, jqxhr, settings, thrownError) {
+	            if (jqxhr.status === 401) {
+	                const loginModal = $('#signin-modal');
+	                if (loginModal.length) {
+	                    loginModal.modal('show');
+	                } else {
+	                    alert('로그인이 필요한 서비스입니다.');
+	                }
+	            }
+	        });
+	    </script>
+	</th:block>
 
 	<th:block layout:fragment="jsScript"></th:block>
 </body>

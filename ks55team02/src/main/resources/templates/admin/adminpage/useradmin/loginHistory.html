@@ -6,6 +6,7 @@
      <head>
         <title th:text="${title}">로그인 기록 조회</title>
         <!-- 필요하다면 이 페이지 전용 CSS를 연결할 수 있습니다. -->
+        <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/loginHistory.css}">
      </head>
      
      <!-- 추가할 페이지 contents -->
@@ -23,7 +24,7 @@
                         <div class="col-lg-4">
                             <label class="form-label">기간</label>
                             <div class="d-flex">
-                                <input type="date" class="form-control" name="startDate">
+                                <input type="date" class="form-control" name="startDate" value="2025-01-01">
                                 <span class="mx-2 d-flex align-items-center">-</span>
                                 <input type="date" class="form-control" name="endDate" th:value="${#dates.format(#dates.createToday(), 'yyyy-MM-dd')}">
                             </div>
@@ -75,30 +76,32 @@
         
                     <!-- 테이블 -->
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr class="text-center">
-                                    <th scope="col">회원 ID</th>
-                                    <th scope="col">접속 IP</th>
-                                    <th scope="col">로그인 일시</th>
-                                    <th scope="col">성공 여부</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-center">
-                                <tr th:if="${#lists.isEmpty(loginHistoryList)}">
-                                    <td colspan="4" class="text-center py-5">조회된 기록이 없습니다.</td>
-                                </tr>
-                                <tr th:unless="${#lists.isEmpty(loginHistoryList)}" th:each="log, iter : ${loginHistoryList}">
-                                    <td th:text="${log.userLgnId}"></td>
-                                    <td th:text="${log.lgnIpAddr}"></td>
-                                    <td th:text="${#temporals.format(log.lgnDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-                                    <td>
-                                        <span class="badge" th:text="${log.lgnFailNmtm == 0 ? '성공' : '실패'}"
-                                              th:classappend="${log.lgnFailNmtm == 0 ? 'bg-success' : 'bg-danger'}"></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <table class="table table-hover login-history-table">
+					        <thead>
+					            <tr class="text-center">
+					                <!-- 2. th 태그에 컬럼 너비 클래스 추가 -->
+					                <th scope="col" class="col-id">회원 ID</th>
+					                <th scope="col" class="col-ip">접속 IP</th>
+					                <th scope="col" class="col-logintime">로그인 일시</th>
+					                <th scope="col" class="col-status">성공 여부</th>
+					            </tr>
+					        </thead>
+					        <tbody class="text-center">
+					            <tr th:if="${#lists.isEmpty(loginHistoryList)}">
+					                <td colspan="4" class="text-center py-5">조회된 기록이 없습니다.</td>
+					            </tr>
+					            <tr th:unless="${#lists.isEmpty(loginHistoryList)}" th:each="log : ${loginHistoryList}">
+					                <!-- 3. 내용이 길어질 수 있는 td에 ellipsis 클래스 추가 -->
+					                <td class="ellipsis" th:text="${log.userLgnId}" th:title="${log.userLgnId}"></td>
+					                <td class="ellipsis" th:text="${log.lgnIpAddr}" th:title="${log.lgnIpAddr}"></td>
+					                <td th:text="${#temporals.format(log.lgnDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+					                <td>
+					                    <span class="badge" th:text="${log.lgnFailNmtm == 0 ? '성공' : '실패'}"
+					                          th:classappend="${log.lgnFailNmtm == 0 ? 'bg-success' : 'bg-danger'}"></span>
+					                </td>
+					            </tr>
+					        </tbody>
+					    </table>
                     </div>
                     
                     <!-- 페이지네이션 -->

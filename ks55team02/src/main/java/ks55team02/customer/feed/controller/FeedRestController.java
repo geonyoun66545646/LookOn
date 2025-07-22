@@ -1,4 +1,3 @@
-// [전체 코드] ks55team02/customer/feed/controller/FeedRestController.java
 package ks55team02.customer.feed.controller;
 
 import java.util.List;
@@ -38,6 +37,19 @@ public class FeedRestController {
         return ResponseEntity.ok(result);
     }
     
+    @GetMapping("/following")
+    public ResponseEntity<Map<String, Object>> selectFollowingFeeds(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
+
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String followerUserNo = loginUser.getUserNo();
+        Map<String, Object> result = feedService.getFollowingFeedList(followerUserNo, page, PAGE_SIZE);
+        return ResponseEntity.ok(result);
+    }
+    
     @GetMapping("/next")
     public ResponseEntity<List<ks55team02.customer.feed.domain.Feed>> selectNextFeeds(@RequestParam("currentFeedCrtDt") String currentFeedCrtDt, @RequestParam(value = "limit", defaultValue = "3") int limit, @RequestParam(name = "context", defaultValue = "all") String context, @RequestParam(name = "userNo", required = false) String userNo) {
         List<ks55team02.customer.feed.domain.Feed> nextFeedList = feedService.selectNextFeedList(currentFeedCrtDt, limit, context, userNo);
@@ -49,7 +61,7 @@ public class FeedRestController {
     
     @GetMapping("/my-feed")
     public ResponseEntity<Map<String, Object>> selectMyFeeds(@RequestParam(name = "page", defaultValue = "1") int page, @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
-        if (loginUser == null) return ResponseEntity.status(401).build();
+        if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         String userNo = loginUser.getUserNo();
         Map<String, Object> result = feedService.selectFeedList(userNo, page, PAGE_SIZE);
         return ResponseEntity.ok(result);
@@ -61,7 +73,6 @@ public class FeedRestController {
         return ResponseEntity.ok(result);
     }
     
-    // [수정] 해시태그 파라미터 추가 및 파일 파라미터명 변경
     @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<Void> insertFeed(
             @RequestParam(value = "feedCn", required = false) String feedCn,
@@ -84,9 +95,6 @@ public class FeedRestController {
         }
     }
 
-    // =======================================================
-    // [신규] 피드 수정 API
-    // =======================================================
     @PostMapping(value = "/edit/{feedSn}", consumes = {"multipart/form-data"})
     public ResponseEntity<Void> updateFeed(
             @PathVariable("feedSn") String feedSn,
@@ -101,9 +109,9 @@ public class FeedRestController {
         try {
             boolean isSuccess = feedService.updateFeed(feedSn, feedCn, hashtags, deleteImageSns, newImageFiles, loginUser);
             if (isSuccess) {
-                return ResponseEntity.ok().build(); // 수정 성공
+                return ResponseEntity.ok().build();
             } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 권한 없음
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         } catch (Exception e) {
             log.error("피드 수정 중 오류 발생: {}", e.getMessage(), e);
@@ -111,9 +119,6 @@ public class FeedRestController {
         }
     }
     
-    // =======================================================
-    // [신규] 피드 삭제 API
-    // =======================================================
     @DeleteMapping("/{feedSn}")
     public ResponseEntity<Void> deleteFeed(
             @PathVariable("feedSn") String feedSn,
@@ -123,16 +128,16 @@ public class FeedRestController {
 
         boolean isSuccess = feedService.deleteFeed(feedSn, loginUser.getUserNo());
         if (isSuccess) {
-            return ResponseEntity.noContent().build(); // 삭제 성공 (204 No Content)
+            return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 권한 없음
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
-    // 이하 댓글, 좋아요 관련 API는 기존과 동일
     @PostMapping("/{feedSn}/like")
     public ResponseEntity<Map<String, Object>> addLike(@PathVariable String feedSn, @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
         if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        
         try {
             Map<String, Object> result = feedService.addLike(feedSn, loginUser.getUserNo());
             return ResponseEntity.ok(result);
@@ -145,7 +150,9 @@ public class FeedRestController {
     @PostMapping("/{feedSn}/comments")
     public ResponseEntity<?> addComment(@PathVariable String feedSn, @RequestParam("commentText") String commentText, @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
         if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        
         if (commentText == null || commentText.trim().isEmpty()) return ResponseEntity.badRequest().body("댓글 내용이 없습니다.");
+        
         try {
             FeedComment newComment = feedService.addComment(feedSn, commentText, loginUser.getUserNo());
             return ResponseEntity.status(HttpStatus.CREATED).body(newComment);
@@ -158,6 +165,7 @@ public class FeedRestController {
     @DeleteMapping("/comments/{commentSn}")
     public ResponseEntity<Void> deleteComment(@PathVariable String commentSn, @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
         if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        
         boolean isDeleted = feedService.deleteComment(commentSn, loginUser.getUserNo());
         if (isDeleted) {
             return ResponseEntity.noContent().build();
@@ -169,7 +177,9 @@ public class FeedRestController {
     @PatchMapping("/comments/{commentSn}")
     public ResponseEntity<?> updateComment(@PathVariable String commentSn, @RequestParam("commentText") String commentText, @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
         if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        
         if (commentText == null || commentText.trim().isEmpty()) return ResponseEntity.badRequest().body("댓글 내용이 없습니다.");
+        
         try {
             FeedComment updatedComment = feedService.updateComment(commentSn, commentText, loginUser.getUserNo());
             if (updatedComment != null) {

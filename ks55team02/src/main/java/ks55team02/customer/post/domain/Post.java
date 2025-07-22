@@ -30,9 +30,9 @@ public class Post {
     private UserInfoResponse writerInfo; 
     private List<PostImage> imageList;
     private List<PostComment> commentList;
-    private PostImage representativeImage; // [신규] 목록 썸네일용 대표 이미지
+    private PostImage representativeImage;
 
     // --- 폼 제출용 필드 (DB와 무관) ---
-    private List<MultipartFile> newImageFiles; // [수정] 필드명 명확화
+    private List<MultipartFile> newImageFiles;
     private List<String> deleteImageSns;
 }

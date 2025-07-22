@@ -1,7 +1,7 @@
 @charset "UTF-8";
 		/* W컨셉 스타일과 유사한 회원정보 관리 페이지 전용 CSS */
 		.profile-management-page {
-		    font-family: '돋움', Dotum, sans-serif;
+		    font-family: 'Poppins';
 		    color: #555;
 		    background-color: #fff;
 		}

@@ -40,7 +40,7 @@ public class PostController {
         return "customer/post/postList";
     }
 
-    @GetMapping("/postView")
+    @GetMapping("/postDetail")
     public String selectPostDetail(@RequestParam String pstSn, Model model, HttpSession session) {
         // [수정] 세션에서 실제 타입인 LoginUser로 객체를 가져옵니다.
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
@@ -55,7 +55,7 @@ public class PostController {
         model.addAttribute("postDetail", postDetail);
         // [수정] LoginUser 객체 전체를 뷰로 전달합니다.
         model.addAttribute("loginUser", loginUser);
-        return "customer/post/postView";
+        return "customer/post/postDetail";
     }
 
     @GetMapping("/postWrite")
