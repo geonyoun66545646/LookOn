@@ -163,25 +163,27 @@ $(() => {
 	        const formattedDate = formatRelativeTime(post.crtDt);
 	        const detailLink = `/customer/post/postDetail?pstSn=${post.pstSn}`;
 	        
-	        const postItemHtml = `
-	            <div class="post-item">
-	                <a href="${detailLink}">
-	                    <div class="post-item-content">
-	                        <h3 class="title">${post.pstTtl || '제목 없음'}</h3>
-	                        <div class="author-info">
-	                            <span class="nickname">${post.writerInfo?.userNcnm || '작성자 없음'}</span>
-	                            <span class="separator">·</span>
-	                            <span class="date">${formattedDate}</span>
-	                        </div>
-	                        <div class="post-stats">
-	                            <span class="views">${eyeIconSvg} <span>${post.viewCnt || 0}</span></span>
-	                            <span class="comments">${commentIconSvg} <span>${post.cmntCnt || 0}</span></span>
-	                        </div>
-	                    </div>
-	                    ${thumbnailHtml}
-	                </a>
-	            </div>`;
-	        $container.append(postItemHtml);
+			const isNoticeClass = post.bbsClsfCd === 'notice' ? ' is-notice' : '';
+
+			const postItemHtml = `
+			    <div class="post-item${isNoticeClass}">
+			        <a href="${detailLink}">
+			            <div class="post-item-content">
+			                <h3 class="title">${post.pstTtl || '제목 없음'}</h3>
+			                <div class="author-info">
+			                    <span class="nickname">${post.writerInfo?.userNcnm || '작성자 없음'}</span>
+			                    <span class="separator">·</span>
+			                    <span class="date">${formattedDate}</span>
+			                </div>
+			                <div class="post-stats">
+			                    <span class="views">${eyeIconSvg} <span>${post.viewCnt || 0}</span></span>
+			                    <span class="comments">${commentIconSvg} <span>${post.cmntCnt || 0}</span></span>
+			                </div>
+			            </div>
+			            ${thumbnailHtml}
+			        </a>
+			    </div>`;
+			$container.append(postItemHtml);
 	    });
 	}
     
