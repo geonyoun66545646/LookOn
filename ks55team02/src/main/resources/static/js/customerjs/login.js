@@ -81,8 +81,15 @@ $('#login-btn').on('click', (e) => {
 					    if (response.status === 'success') {
 					        alert(response.message);
 					        window.location.href = response.redirectUrl || '/main';
+							
+							// 25-07-22 염가은 추가
+							// 2. 계정 제한(Sanctioned) 상태일 경우
+			            } else if (response.status === 'sanctioned') {
+			                alert(response.message); // "계정이 이용 제한되었습니다." 메시지
+			                // 서버에서 보낸 redirectUrl (sanctionInfo 페이지)로 이동
+			                window.location.href = response.redirectUrl; 
 					    
-					    // 2. 로그인 실패 시 (비밀번호 불일치, 관리자 로그인 시도 등 모든 실패 케이스)
+					    // 3. 로그인 실패 시 (비밀번호 불일치, 관리자 로그인 시도 등 모든 실패 케이스)
 			            } else if (response.status === 'fail') {
 			                alert(response.message);
 			                // 아이디와 비밀번호를 모두 지웁니다.
@@ -90,7 +97,7 @@ $('#login-btn').on('click', (e) => {
 			                $('#login-pw').val('');
 			                $('#login-id').focus();
 
-					    // 3. 그 외 모든 케이스 (계정 잠금, 비활성 등)
+					    // 4. 그 외 모든 케이스 (계정 잠금, 비활성 등)
 					    } else {
 					        alert(response.message);
 					    }
