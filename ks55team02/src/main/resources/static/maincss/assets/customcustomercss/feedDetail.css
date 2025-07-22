@@ -169,6 +169,9 @@
     border-radius: 12px;
     border: none;
 }
+.options-modal-content:hover {
+    border-radius: 12px !important; /* 호버 시에도 둥근 모서리 유지 */
+}
 
 /* 모달 메뉴 목록(ul)의 기본 스타일 초기화 */
 #feed-options-list {
@@ -176,6 +179,7 @@
     padding: 0;
     margin: 0;
     width: 100%;
+    overflow: hidden;
 }
 
 /* 모달 메뉴 항목(li) 각각의 스타일 */
@@ -192,11 +196,18 @@
 /* 첫 번째 메뉴는 위쪽 구분선 제거 */
 #feed-options-list li:first-child {
     border-top: none;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
 
 /* 마우스를 올렸을 때 약간의 배경색 변경 */
 #feed-options-list li:hover {
     background-color: #f9f9f9;
+}
+/* [핵심 추가] 마지막 li의 하단 모서리를 둥글게 */
+#feed-options-list li:last-child {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 
 /* '삭제', '신고', '팔로우 취소' 등 위험/중요 메뉴 스타일 */

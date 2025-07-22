@@ -5,7 +5,7 @@
 		
 	 <head>
 	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />	
-	 	<link rel="stylesheet" th:href="@{/admincss/assets/css/customadminpagecss/userList.css}">
+	 	<link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/userList.css}">
 	 </head>
 	 
 	 <!-- 추가할 페이지 contents -->
@@ -32,11 +32,7 @@
 		                                	   name="statusList" value="휴면" checked>
 		                                <label class="form-check-label">휴면 계정</label>
 		                            </div>
-		                            <div class="form-check me-4">
-		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="statusList" value="탈퇴" checked>
-		                                <label class="form-check-label">탈퇴 계정</label>
-		                            </div>
+
 		                            <div class="form-check me-4">
 		                            <input class="form-check-input" type="checkbox"
 		                            	   id="filterCheckAll" checked>
@@ -93,7 +89,6 @@
 							    <div class="dropdown-menu dropdown-menu-end">
 							        <a class="dropdown-item status-badge-item change-status-btn status-active" href="#" data-status="활동">활동</a>
 							        <a class="dropdown-item status-badge-item change-status-btn status-dormant" href="#" data-status="휴면">휴면</a>
-							        <a class="dropdown-item status-badge-item change-status-btn status-withdrawal" href="#" data-status="탈퇴">탈퇴</a>
 							    </div>
 							</div>
 		                    <!-- 회원 조회 분류 키워드 -->
@@ -136,12 +131,13 @@
 				                <td>
 				                	<input class="form-check-input member-check" type="checkbox" th:value="${user.userNo}">
 				                </td>
-				                <td class="ellipsis text-left" th:text="${user.userLgnId}" th:title="${user.userLgnId}"></td>
-				                <td class="text-left" th:text="${user.userNm}"></td>
+				                <td class="ellipsis" th:text="${user.userLgnId}" th:title="${user.userLgnId}"></td>
+				                <td th:text="${user.userNm != null ? user.userNm : '-(탈퇴회원)-'}"></td>
 				                <td th:text="${user.getGenderText()}"></td>
-				                <td class="ellipsis text-left" th:text="${user.emlAddr}" th:title="${user.emlAddr}"></td>
-				                <td th:text="${user.telno}"></td>
-				                <td class="ellipsis text-left" th:text="${user.getFullAddress()}" th:title="${user.getFullAddress()}"></td>
+				                <td class="ellipsis" th:text="${user.emlAddr != null ? user.emlAddr : '-(정보없음)-'}" th:title="${user.emlAddr != null ? user.emlAddr : ''}"></td>
+				                <td th:text="${user.telno != null ? user.telno : '-(정보없음)-'}"></td>
+				                <td class="ellipsis" th:text="${user.addr != null ? user.addr + (user.daddr != null ? ' ' + user.daddr : '') : '-(정보없음)-'}" 
+				                					 th:title="${user.addr != null ? user.addr + (user.daddr != null ? ' ' + user.daddr : '') : ''}"></td>
 				                <td>
 				                    <span class="badge custom-badge"
 				                          th:text="${user.userStatus}"
