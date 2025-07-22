@@ -1,5 +1,6 @@
 package ks55team02.tossapi.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
 import ks55team02.customer.coupons.domain.Coupons;
+import ks55team02.customer.coupons.domain.UserCoupons;
 import ks55team02.tossapi.domain.PayOrderDTO;
 import ks55team02.tossapi.domain.PaymentDTO;
 import ks55team02.tossapi.domain.PaymentHistoryDTO;
@@ -97,5 +99,23 @@ public interface PaymentMapper {
      */
     void insertPayment(PaymentDTO paymentDTO);
     
-    List<Coupons> findUserCouponsByUserId(@Param("userNo") String userNo);
+    /**
+     * 특정 사용자가 사용 가능한 모든 쿠폰 정보를 상세 정보(Coupon)와 함께 조회합니다.
+     * 이 메소드는 PaymentMapper.xml의 findUserCouponsByUserId 쿼리와 직접 연결됩니다.
+     * 
+     * @param userNo 사용자 식별자
+     * @return 사용 가능한 쿠폰 목록 (UserCoupons 객체 리스트, 각 객체는 Coupon 상세 정보를 포함)
+     */
+    List<UserCoupons> findUserCouponsByUserId(@Param("userNo") String userNo);
+    
+    void deletePurchasedItemsFromCart(Map<String, Object> params);
+    
+    /**
+     * 상점별 매출 금액을 누적 업데이트합니다.
+     * @param storeId 상점 ID
+     * @param salesAmount 추가할 매출 금액
+     */
+    void updateTotalSalesAmount(@Param("storeId") String storeId, @Param("salesAmount") BigDecimal salesAmount);
+   
+    
 }

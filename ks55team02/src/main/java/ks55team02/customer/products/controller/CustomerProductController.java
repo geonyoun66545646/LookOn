@@ -300,76 +300,81 @@ public class CustomerProductController {
 	}
 
 	@GetMapping("/products/detail/{productCode}")
-	public String getProductDetailForCustomer(@PathVariable String productCode, Model model, HttpSession session) {
-		Products product = productsService.getProductDetailWithImages(productCode);
+    public String getProductDetailForCustomer(@PathVariable String productCode, Model model, HttpSession session) {
+        Products product = productsService.getProductDetailWithImages(productCode);
 
-		if (product == null || !Boolean.TRUE.equals(product.getExpsrYn())
-				|| !Boolean.TRUE.equals(product.getActvtnYn())) {
-			return "redirect:/error/404";
-		}
-		model.addAttribute("product", product);
+        if (product == null || !Boolean.TRUE.equals(product.getExpsrYn())
+                || !Boolean.TRUE.equals(product.getActvtnYn())) {
+            return "redirect:/error/404";
+        }
+        model.addAttribute("product", product);
 
-		List<ProductImage> allImages = product.getProductImages();
-		ProductImage thumbnailImage = allImages.stream().filter(img -> img.getImgType() == ProductImageType.THUMBNAIL)
-				.findFirst().orElse(allImages.stream().filter(img -> img.getImgType() == ProductImageType.MAIN)
-						.findFirst().orElse(null));
-		List<ProductImage> mainGalleryImages = allImages.stream()
-				.filter(img -> img.getImgType() == ProductImageType.MAIN)
-				.sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
-		List<ProductImage> detailImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.DETAIL)
-				.sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
+        List<ProductImage> allImages = product.getProductImages();
+        ProductImage thumbnailImage = allImages.stream().filter(img -> img.getImgType() == ProductImageType.THUMBNAIL)
+                .findFirst().orElse(allImages.stream().filter(img -> img.getImgType() == ProductImageType.MAIN)
+                        .findFirst().orElse(null));
+        List<ProductImage> mainGalleryImages = allImages.stream()
+                .filter(img -> img.getImgType() == ProductImageType.MAIN)
+                .sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
+        List<ProductImage> detailImages = allImages.stream().filter(img -> img.getImgType() == ProductImageType.DETAIL)
+                .sorted(Comparator.comparing(ProductImage::getImgIndctSn)).collect(Collectors.toList());
 
-		// 리뷰 추가(ljs)
-		List<ProductReview> reviews = reviewService.getReviewsByProductCode(productCode); // productCode로 리뷰 조회
+        // 리뷰 추가(ljs)
+        List<ProductReview> reviews = reviewService.getReviewsByProductCode(productCode); // productCode로 리뷰 조회
 
-		if (product.getCtgryNo() != null) {
-			List<Products> similarProducts = productSearchService.getSimilarProducts(product.getCtgryNo(),
-					product.getGdsNo());
-			model.addAttribute("similarProducts", similarProducts);
-		}
-		
-		// ⭐⭐ [추가] 상품 옵션 조합 데이터를 모델에 추가
-		List<Map<String, Object>> productStatusData = productsService.getProductStatusOptions(productCode);
-		model.addAttribute("productStatusData", productStatusData);
-		
-		
-		model.addAttribute("reviews", reviews);// 리뷰 추가(ljs)
-		model.addAttribute("thumbnailImage", thumbnailImage);
-		model.addAttribute("mainGalleryImages", mainGalleryImages);
-		model.addAttribute("detailImages", detailImages);
-		
-		// ⭐⭐ [리뷰 작성 가능 여부 확인 로직] 시작 ⭐⭐
+        if (product.getCtgryNo() != null) {
+            List<Products> similarProducts = productSearchService.getSimilarProducts(product.getCtgryNo(),
+                    product.getGdsNo());
+            model.addAttribute("similarProducts", similarProducts);
+        }
 
-		// 1. 기본값을 false로 설정
-	    boolean canWriteReview = false;
-	    OrderDTO reviewableOrder = null; // 리뷰 가능한 주문 정보를 담을 객체
+        // ⭐⭐ [추가] 상품 옵션 조합 데이터를 모델에 추가
+        List<Map<String, Object>> productStatusData = productsService.getProductStatusOptions(productCode);
+        model.addAttribute("productStatusData", productStatusData);
 
-	    // 2. 로그인 상태 확인
-	    LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
-	    System.out.println(">>>>> 현재 로그인된 사용자 번호: " + loginUser.getUserNo()); 
-	    if (loginUser != null) {
-	        // 3. 서비스에 리뷰 작성 가능 여부 및 대상 주문 조회를 위임
-	        // 이전에 함께 만들었던 findReviewableOrder 메서드를 사용합니다.
-	        reviewableOrder = reviewService.findReviewableOrder(loginUser.getUserNo(), product.getGdsNo());
 
-	        // 4. 서비스 조회 결과가 있다면, 작성 가능 상태로 변경
-	        if (reviewableOrder != null) {
-	            canWriteReview = true;
-	        }
-	    }
+        model.addAttribute("reviews", reviews);// 리뷰 추가(ljs)
+        model.addAttribute("thumbnailImage", thumbnailImage);
+        model.addAttribute("mainGalleryImages", mainGalleryImages);
+        model.addAttribute("detailImages", detailImages);
 
-	    // 5. 계산된 최종 결과를 Model에 추가하여 뷰(HTML)로 전달
-	    model.addAttribute("canWriteReview", canWriteReview);
-	    if (canWriteReview) {
-	        // canWriteReview가 true일 때만 reviewableOrder를 전달해야
-	        // th:if 블록 안에서 NullPointerException을 피할 수 있습니다.
-	        model.addAttribute("reviewableOrder", reviewableOrder);
-	    }
-	    
-	    // ⭐⭐⭐ 로직 끝 ⭐⭐⭐
+        // ⭐⭐ [리뷰 작성 가능 여부 확인 로직] 시작 ⭐⭐
 
-	    return "customer/productDetail";
-	}
+        // 1. 기본값을 false로 설정
+        boolean canWriteReview = false;
+        OrderDTO reviewableOrder = null; // 리뷰 가능한 주문 정보를 담을 객체
+
+        // 2. 로그인 상태 확인 (loginUser가 null이 아닌 경우에만 사용자 관련 로직 실행)
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+
+        // 이 부분에서 loginUser가 null인지 먼저 확인해야 합니다.
+        if (loginUser != null) {
+            // 로그인된 사용자인 경우에만 getUserNo()를 호출하고 리뷰 가능 여부를 확인합니다.
+            System.out.println(">>>>> 현재 로그인된 사용자 번호: " + loginUser.getUserNo());
+            // 3. 서비스에 리뷰 작성 가능 여부 및 대상 주문 조회를 위임
+            reviewableOrder = reviewService.findReviewableOrder(loginUser.getUserNo(), product.getGdsNo());
+
+            // 4. 서비스 조회 결과가 있다면, 작성 가능 상태로 변경
+            if (reviewableOrder != null) {
+                canWriteReview = true;
+            }
+        } else {
+            // 로그인하지 않은 경우, canWriteReview는 기본값인 false를 유지합니다.
+            System.out.println(">>>>> 현재 로그인된 사용자가 없습니다.");
+        }
+
+        // 5. 계산된 최종 결과를 Model에 추가하여 뷰(HTML)로 전달
+        model.addAttribute("canWriteReview", canWriteReview);
+        if (canWriteReview) {
+            // canWriteReview가 true일 때만 reviewableOrder를 전달해야
+            // th:if 블록 안에서 NullPointerException을 피할 수 있습니다.
+            model.addAttribute("reviewableOrder", reviewableOrder);
+        }
+
+        // ⭐⭐⭐ 로직 끝 ⭐⭐⭐
+
+        return "customer/productDetail";
+    }
 }
 
 	
