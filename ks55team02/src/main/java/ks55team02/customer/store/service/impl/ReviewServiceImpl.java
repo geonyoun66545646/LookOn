@@ -202,4 +202,17 @@ public class ReviewServiceImpl implements ReviewService {
     public OrderDTO findReviewableOrder(String userNo, String gdsNo) {
         return reviewMapper.findReviewableOrder(userNo, gdsNo);
     }
+    
+    /**
+     * ✅ [추가] 특정 상품의 평균 평점을 조회하는 로직 구현
+     */
+    @Override
+    public double getAverageRating(String gdsNo) {
+        Double average = reviewMapper.getAverageRatingByGdsNo(gdsNo);
+        // 리뷰가 하나도 없어서 평균 계산 결과가 null인 경우 0.0을 반환
+        if (average == null) {
+            return 0.0;
+        }
+        return average;
+    }
 }

@@ -135,4 +135,11 @@ public interface ReviewMapper {
      * @return INSERT된 행의 수
      */
     int addReviewImages(List<ReviewImage> reviewImages);
+    
+    /**
+     * ✅ [추가] 특정 상품의 평균 평점을 조회합니다.
+     * @param gdsNo 상품 번호
+     * @return 평균 평점 (리뷰가 없으면 null)
+     */
+    Double getAverageRatingByGdsNo(String gdsNo);
 }

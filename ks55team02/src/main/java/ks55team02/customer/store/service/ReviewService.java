@@ -69,5 +69,12 @@ public interface ReviewService {
      * @return OrderDTO 객체
      */
     OrderDTO findReviewableOrder(String userNo, String gdsNo);
+    
+    /**
+     * ✅ [추가] 특정 상품의 평균 평점을 조회합니다.
+     * @param gdsNo 상품 번호
+     * @return 평균 평점
+     */
+    double getAverageRating(String gdsNo);
 
 }

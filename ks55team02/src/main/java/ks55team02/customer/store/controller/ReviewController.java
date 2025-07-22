@@ -34,7 +34,7 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/api/reviews") // API 경로를 명확하게 분리
 @RequiredArgsConstructor
 public class ReviewController {
-
+		
     private final ReviewService reviewService;
 
     /**

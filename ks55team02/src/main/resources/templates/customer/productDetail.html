@@ -105,13 +105,18 @@
 								<h1 class="product-title"
 									th:text="${product?.gdsNm ?: '상품명 없음'}"></h1>
 
-								<div class="ratings-container">
-									<div class="ratings">
-										<div class="ratings-val" style="width: 80%;"></div>
-									</div>
-									 <a class="ratings-text" href="#product-review-link" id="review-link">
-      									 (<span th:text="${reviewPaginationData.totalCount+' 개의 리뷰'}">0</span>)</a>
-								</div>
+								<div class="ratings-container" th:if="${reviewPaginationData.totalCount > 0}">
+								    <div class="ratings">
+								        <div class="ratings-val" th:style="'width: ' + ${averageRating * 20} + '%;'"></div>
+								    </div>
+								    <a href="#product-review-link" class="ratings-text" id="review-link">
+								        <span th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">4.5</span>
+								        <span>([[${reviewPaginationData.totalCount}]]개의 리뷰)</span>
+								    </a>
+								</div>							
+								<div class="ratings-container" th:if="${reviewPaginationData.totalCount == 0}">
+								    <span class="text-muted">아직 등록된 리뷰가 없습니다.</span>
+								</div>															
 
 								<div class="product-price-section">
 									<div class="original-price-wrapper"

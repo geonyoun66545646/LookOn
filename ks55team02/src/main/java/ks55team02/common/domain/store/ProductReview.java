@@ -22,7 +22,6 @@ public class ProductReview {
 	private LocalDateTime	delDt;       		 // 삭제(숨김) 일시 (del_dt) - datetime으로 변경
 	private String 			delPrcrNo;           // 삭제(숨김) 처리자 번호 (del_prcr_no)
 	private Integer 		helpdCnt;           // 도움돼요 수 (helpd_cnt) - int로 변경 (DEFAULT '0')
-	private String 			starRating;          // star_rating
 
 	private InquiryUser 	user;				// 유저 테이블
 	private UserProfile 	userProfile;		// 유저 프로필 테이블

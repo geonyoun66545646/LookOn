@@ -337,7 +337,7 @@ public class CustomerProductController {
 		
 		
 		  // ==================== [ 리뷰 관련 로직] ====================
-
+		
         // [리뷰 로직 1: 첫 페이지 리뷰 목록 및 페이지네이션 정보 조회]
 		 LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
 	        String currentUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
@@ -348,6 +348,8 @@ public class CustomerProductController {
 	        
 	        // 상품의 전체 리뷰 개수를 조회합니다.
 	        long totalReviewCount = reviewService.getReviewCountByGdsNo(productCode);
+	        // Service에서 평균 평점 가져오기
+	        double averageRating = reviewService.getAverageRating(productCode);
 	        
 	        // ✅ [핵심 수정] 첫 페이지 리뷰 목록을 조회할 때, 'currentUserNo'를 함께 전달합니다.
 	        // 이를 통해 각 리뷰에 대한 현재 사용자의 '좋아요' 여부를 함께 가져옵니다.
@@ -366,7 +368,8 @@ public class CustomerProductController {
 	        // 모델에 페이지네이션 객체와 상품 ID를 추가하여 Thymeleaf/JavaScript에서 사용할 수 있도록 합니다.
 	        model.addAttribute("reviewPaginationData", reviewPaginationData);
 	        model.addAttribute("productId", productCode);
-
+	        model.addAttribute("averageRating", averageRating); // ✅ [추가] Model에 평균 평점 추가
+	        
 	        // [2] 리뷰 작성 가능 여부 확인
 	        // -------------------------------------------------------------------
 	        boolean canWriteReview = false;

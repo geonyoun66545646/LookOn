@@ -164,6 +164,16 @@
             #{evlScr}, #{reviewCn}, '1', NOW(), 0
         )
     </insert>
+    <!-- 평점 평균 -->
+    <select id="getAverageRatingByGdsNo" parameterType="String" resultType="double">
+    SELECT 
+        AVG(evl_scr) 
+    FROM 
+        product_reviews
+    WHERE 
+        gds_no = #{gdsNo} AND review_stts = 1
+</select>
+    
 
     <select id="findMaxReviewIdNumber" resultType="Integer">
         SELECT MAX(CAST(SUBSTRING_INDEX(review_id, '_', -1) AS UNSIGNED))
