@@ -53,15 +53,21 @@
 			</a>
 				<div class="submenu">
 					<!-- [추가] 전체 상품관리 메뉴 -->
-					<a th:href="@{/adminpage/productadmin/allProducts}">전체 상품관리</a>
+					<a th:href="@{/adminpage/productadmin/allProducts}">전체 상품 관리</a>
 
 					<!-- [기존] 상품관리 (승인/반려용) -->
 					<a th:href="@{/adminpage/productadmin/adminProductManagement}">상품
 						승인 관리</a>
 
+					<!-- [추가] 승인/반려 기록 메뉴 -->
+					<a th:href="@{/adminpage/productadmin/approvalHistory}">승인/반려
+						기록</a>
+
 					<!-- [기존] 카테고리 관리 -->
 					<a th:href="@{/adminpage/productadmin/adminCategoryManagement}">카테고리
 						관리</a>
+
+
 				</div></li>
 			<li class="menu-item has-submenu"
 				th:classappend="${activeMenu == 'board'} ? 'active' : ''"><a

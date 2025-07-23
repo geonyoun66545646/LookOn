@@ -5,10 +5,14 @@ import java.util.List;
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.AdminProductSearchCriteria;
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.AdminProductView;
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ApprovalCriteria;
+import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory;
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductRejectRequest;
 import ks55team02.util.CustomerPagination;
 
 public interface AdminProductManagementService {
+	
+	// [추가] 승인/반려 기록 목록 조회 (페이지네이션 적용)
+    CustomerPagination<ProductApprovalHistory> getApprovalHistoryList(AdminProductSearchCriteria searchCriteria, int currentPage);
 
 	// [추가] 전체 상품 목록 조회 (페이지네이션 적용)
 	CustomerPagination<AdminProductView> findAllProducts(AdminProductSearchCriteria searchCriteria, int currentPage);

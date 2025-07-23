@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpSession;
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.AdminProductSearchCriteria;
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.AdminProductView;
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ApprovalCriteria;
+import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductApprovalHistory;
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.domain.ProductRejectRequest;
 import ks55team02.admin.adminpage.productadmin.adminproductsmanagement.service.AdminProductManagementService;
 import ks55team02.util.CustomerPagination;
@@ -33,7 +34,26 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminProductManagementController {
 
     private final AdminProductManagementService adminProductManagementService;
-
+    
+    // [추가] '승인/반려 기록' 페이지 조회 로직
+	 // [수정] '승인/반려 기록' 페이지 조회 로직
+	    @GetMapping("/approvalHistory")
+	    public String getApprovalHistory(
+	            @ModelAttribute("searchCriteria") AdminProductSearchCriteria searchCriteria,
+	            @RequestParam(value = "currentPage", defaultValue = "1") int currentPage,
+	            Model model) {
+	
+	        // 서비스 호출하여 페이지네이션 객체 받아오기
+	        CustomerPagination<ProductApprovalHistory> pagination = adminProductManagementService.getApprovalHistoryList(searchCriteria, currentPage);
+	
+	        model.addAttribute("title", "승인/반려 기록");
+	        model.addAttribute("pagination", pagination); // 페이지네이션 객체 전달
+	        model.addAttribute("historyList", pagination.getList()); // 목록 전달
+	        model.addAttribute("activeMenu", "product");
+	
+	        return "admin/adminpage/productadmin/approvalHistory";
+	    }
+    
     // [최종 버전] '전체 상품 관리' 페이지 조회 로직 (검색/페이지네이션 포함)
     @GetMapping("/allProducts")
     public String allProductsPage(
@@ -42,6 +62,10 @@ public class AdminProductManagementController {
             Model model) {
 
         CustomerPagination<AdminProductView> pagination = adminProductManagementService.findAllProducts(searchCriteria, currentPage);
+
+        // ================== 이 부분을 추가해주세요 ==================
+        model.addAttribute("title", "전체 상품 관리");
+        // ========================================================
 
         model.addAttribute("pagination", pagination);
         model.addAttribute("activeMenu", "product");
