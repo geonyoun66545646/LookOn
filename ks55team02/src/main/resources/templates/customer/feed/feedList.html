@@ -56,7 +56,10 @@
         <div class="feed-info-bar">
             <!-- ▼▼▼ [핵심 수정 3] totalCount를 서버에서 직접 받아 표시 ▼▼▼ -->
             <span class="content-count" th:text="|총 ${#numbers.formatInteger(totalCount, 0, 'COMMA')}개|">총 0개</span>
-            <select name="sort" class="sort-dropdown"><option value="latest">최신순</option><option value="popular">인기순</option></select>
+            <select name="sort" id="sort-dropdown" class="sort-dropdown">
+    <option value="latest" th:selected="${currentSort == 'latest'}">최신순</option>
+    <option value="popular" th:selected="${currentSort == 'popular'}">인기순</option>
+</select>
         </div>
 
         <!-- ▼▼▼ [핵심 수정 4] 서버에서 받은 첫 페이지 데이터를 th:each로 렌더링 ▼▼▼ -->

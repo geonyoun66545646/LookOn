@@ -43,18 +43,24 @@ $(() => {
     };
     
     // --- 3. 렌더링 및 데이터 로딩 ---
-    const renderFeeds = (feeds) => {
-        const gridContainer = $('#feed-grid-container');
-        if (currentPage === 1 && feeds.length === 0) {
-            let message = isMyFeed ? '작성한 피드가 없습니다.' : '이 사용자가 작성한 피드가 없습니다.';
-            gridContainer.html(`<div class="no-feeds" style="text-align:center; padding: 20px;"><p>${message}</p></div>`);
-            hasNext = false;
-            return;
-        }
-        feeds.forEach(feed => {
-            gridContainer.append(createFeedItemHtml(feed));
-        });
-    };
+	const renderFeeds = (feeds) => {
+	    const gridContainer = $('#feed-grid-container');
+	    if (currentPage === 1 && feeds.length === 0) {
+	        let message = isMyFeed ? '작성한 피드가 없습니다.' : '이 사용자가 작성한 피드가 없습니다.';
+	        // [수정] 그리드 전체 너비를 차지하고 중앙 정렬되는 HTML 구조로 변경
+	        const noFeedHtml = `
+	            <div class="no-feeds-container">
+	                <p>${message}</p>
+	            </div>
+	        `;
+	        gridContainer.html(noFeedHtml);
+	        hasNext = false;
+	        return;
+	    }
+	    feeds.forEach(feed => {
+	        gridContainer.append(createFeedItemHtml(feed));
+	    });
+	};
 
     const loadNextPage = () => {
         if (isLoading || !hasNext) return;

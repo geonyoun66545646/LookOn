@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout/layoutMain}">
+
+<head>
+<title th:text="${title}"></title>
+<!-- userList.css를 재사용하거나, 필요시 feedList.css를 만들어 연결합니다. -->
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/customadmincss/userList.css}">
+</head>
+
+<th:block layout:fragment="contents">
+	<main class="main-content">
+		<section class="content-header">
+			<h2 class="content-title">피드 관리</h2>
+		</section>
+
+		<!-- 1. 검색 필터 카드 -->
+		<div class="card mb-4">
+			<div class="card-body">
+				<!-- 분류: 정상/숨김 -->
+				<div class="row gx-3">
+					<div class="col-lg-12">
+						<label class="form-label">분류</label>
+						<div class="d-flex align-items-center">
+							<div class="form-check me-4">
+								<input class="form-check-input filter-check" type="checkbox"
+									name="filterConditions" value="normal" checked> <label
+									class="form-check-label">정상 피드</label>
+							</div>
+							<div class="form-check me-4">
+								<input class="form-check-input filter-check" type="checkbox"
+									name="filterConditions" value="hidden"> <label
+									class="form-check-label">숨김 처리된 피드</label>
+							</div>
+							<div class="form-check me-4">
+								<input class="form-check-input" type="checkbox"
+									id="filterCheckAll"> <label class="form-check-label">전체선택</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr>
+				<!-- 기간 및 검색 -->
+				<div class="row gx-3 align-items-end">
+					<div class="col-lg-4">
+						<label class="form-label">작성 기간</label>
+						<div class="d-flex">
+							<input type="date" class="form-control" name="startDate"
+								th:value="${searchCriteria.startDate}"> <span
+								class="mx-2 d-flex align-items-center">-</span> <input
+								type="date" class="form-control" name="endDate"
+								th:value="${searchCriteria.endDate}">
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<label class="form-label">검색 키워드</label>
+						<div class="input-group">
+							<select class="form-select" name="searchKey"
+								style="max-width: 150px; background-color: #fff;">
+								<option value="all"
+									th:selected="${searchCriteria.searchKey == 'all'}">전체</option>
+								<option value="userNcnm"
+									th:selected="${searchCriteria.searchKey == 'userNcnm'}">작성자
+									닉네임</option>
+								<option value="feedCn"
+									th:selected="${searchCriteria.searchKey == 'feedCn'}">피드
+									내용</option>
+							</select> <input type="text" class="form-control" name="searchValue"
+								placeholder="검색어를 입력하세요"
+								th:value="${searchCriteria.searchValue}">
+						</div>
+					</div>
+					<div class="col-lg-2">
+						<button class="btn btn-primary btn-block" type="button"
+							id="searchBtn">검색</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 2. 피드 목록 테이블 카드 (Fragment 영역) -->
+		<div class="card" id="feedListContainer"
+			th:fragment="feedListFragment">
+			<div class="card-body">
+				<div class="row gx-3 align-items-center mb-4">
+					<div class="col-md-6">
+						<div class="search-result-info">
+							총 <b class="text-brand" th:text="${totalCount}">0</b> 건의 피드가
+							검색되었습니다.
+						</div>
+					</div>
+					<div class="col-md-6 text-md-end">
+						<div class="btn-group me-2">
+							<button type="button"
+								class="btn btn-sm btn-outline-secondary dropdown-toggle"
+								data-bs-toggle="dropdown">선택한 피드 처리</button>
+							<div class="dropdown-menu dropdown-menu-end">
+								<a class="dropdown-item change-status-btn" href="#"
+									data-action="hide">숨김 처리</a> <a
+									class="dropdown-item change-status-btn" href="#"
+									data-action="restore">숨김 해제 (복구)</a>
+							</div>
+						</div>
+						<div class="d-inline-block">
+							<select class="form-select d-inline-block" id="sortOrder"
+								name="sortOrder" style="width: auto;">
+								<option value="crtDtDesc"
+									th:selected="${searchCriteria.sortOrder == 'crtDtDesc'}">최신
+									작성일순</option>
+								<option value="likeCountDesc"
+									th:selected="${searchCriteria.sortOrder == 'likeCountDesc'}">좋아요
+									많은 순</option>
+							</select> <select class="form-select d-inline-block" id="pageSize"
+								name="psize" style="width: auto;">
+								<option value="10"
+									th:selected="${searchCriteria.psize == '10' or searchCriteria.psize == null}">10개씩
+									보기</option>
+								<option value="30" th:selected="${searchCriteria.psize == '30'}">30개씩
+									보기</option>
+								<option value="50" th:selected="${searchCriteria.psize == '50'}">50개씩
+									보기</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="table-responsive">
+					<table class="table table-hover member-table">
+						<thead>
+							<tr class="text-center">
+								<th style="width: 5%;"><input class="form-check-input"
+									type="checkbox" id="checkAll"></th>
+								<th style="width: 10%;">대표 이미지</th>
+								<th style="width: auto;">내용</th>
+								<th style="width: 10%;">작성자</th>
+								<th style="width: 8%;">좋아요</th>
+								<th style="width: 8%;">댓글</th>
+								<th style="width: 8%;">상태</th>
+								<th style="width: 10%;">작성일</th>
+								<th style="width: 8%;">관리</th>
+								<!-- [신규] 관리 컬럼 추가 -->
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:if="${#lists.isEmpty(feedList)}">
+								<td colspan="9" class="text-center py-5">조회된 피드가 없습니다.</td>
+								<!-- [수정] colspan="9" -->
+							</tr>
+							<tr th:unless="${#lists.isEmpty(feedList)}"
+								th:each="feed : ${feedList}">
+								<td><input class="form-check-input feed-check"
+									type="checkbox" th:value="${feed.feedSn}"></td>
+								<td><img th:if="${feed.representativeImg != null}"
+									th:src="@{${feed.representativeImg}}" alt="피드 이미지"
+									style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+									<span th:unless="${feed.representativeImg != null}">-</span></td>
+								<td class="text-start ellipsis" th:text="${feed.feedCn}"
+									th:title="${feed.feedCn}"></td>
+								<td th:text="${feed.userNcnm}"></td>
+								<td th:text="${feed.likeCount}"></td>
+								<td th:text="${feed.commentCount}"></td>
+								<td><span class="badge custom-badge"
+									th:text="${feed.delDt == null ? '정상' : '숨김'}"
+									th:classappend="${feed.delDt == null ? 'bg-success' : 'bg-secondary'}">
+								</span></td>
+								<td th:text="${#temporals.format(feed.crtDt, 'yyyy-MM-dd')}"></td>
+								<!-- [신규] 개별 처리 버튼 추가 -->
+								<td>
+									<button th:if="${feed.delDt == null}" type="button"
+										class="btn btn-sm btn-outline-warning individual-action-btn"
+										th:data-feed-sn="${feed.feedSn}" data-action="hide">숨김</button>
+									<button th:if="${feed.delDt != null}" type="button"
+										class="btn btn-sm btn-outline-info individual-action-btn"
+										th:data-feed-sn="${feed.feedSn}" data-action="restore">복구</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<!-- 페이지네이션 (userList와 동일) -->
+				<nav class="mt-4" aria-label="Page navigation"
+					th:if="${totalCount > 0}" th:with="p = ${pagination}">
+					<ul class="pagination justify-content-center">
+						<li class="page-item" th:if="${p.currentPage > 1}"><a
+							class="page-link page-num" href="#"
+							th:data-page="${p.currentPage - 1}">이전</a></li>
+						<li class="page-item"
+							th:each="page : ${#numbers.sequence(p.startPage, p.endPage)}"
+							th:classappend="${page == p.currentPage} ? 'active' : ''"><a
+							class="page-link page-num" href="#" th:text="${page}"
+							th:data-page="${page}"></a></li>
+						<li class="page-item" th:if="${p.currentPage < p.totalPageCount}"><a
+							class="page-link page-num" href="#"
+							th:data-page="${p.currentPage + 1}">다음</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</main>
+</th:block>
+
+<th:block layout:fragment="jsScript">
+	<script th:src="@{/js/admin/adminfeedList.js}"></script>
+</th:block>
+</html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html xmlns:th="http://www.thymeleaf.org/"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorate="~{admin/layout/layoutMain}">
 
@@ -18,37 +18,32 @@
 		<div class="card mb-4">
 			<div class="card-body">
 				<form id="categorySearchForm">
-				
+					<!-- 기존 폼 내용은 그대로 유지 -->
 					<div class="row gx-3">
-					    <div class="col-lg-12">
-					        <label class="form-label font-weight-bold">분류</label>
-					        <div class="d-flex align-items-center">
-					
-					            <input type="hidden" name="levels" value="">
-					
-					            <div class="form-check form-check-inline">
-    <input class="form-check-input level-check" type="checkbox"
-        name="levels" value="1" id="level1"
-        th:checked="${searchCriteria.levels != null and #lists.contains(searchCriteria.levels, 1)}">
-    <label class="form-check-label" for="level1">1차 카테고리</label>
-</div>
-<div class="form-check form-check-inline">
-    <input class="form-check-input level-check" type="checkbox"
-        name="levels" value="2" id="level2"
-        th:checked="${searchCriteria.levels != null and #lists.contains(searchCriteria.levels, 2)}">
-    <label class="form-check-label" for="level2">2차 카테고리</label>
-</div>
-					            <div class="form-check me-4">
-					                <input class="form-check-input" type="checkbox"
-					                    id="checkAllLevels">
-					                <label class="form-check-label"
-					                    for="checkAllLevels">전체선택</label>
-					            </div>
-					
-					        </div>
-					    </div>
+						<div class="col-lg-12">
+							<label class="form-label font-weight-bold">분류</label>
+							<div class="d-flex align-items-center">
+								<input type="hidden" name="levels" value="">
+								<div class="form-check form-check-inline">
+									<input class="form-check-input level-check" type="checkbox"
+										name="levels" value="1" id="level1"
+										th:checked="${searchCriteria.levels != null and #lists.contains(searchCriteria.levels, 1)}">
+									<label class="form-check-label" for="level1">1차 카테고리</label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input level-check" type="checkbox"
+										name="levels" value="2" id="level2"
+										th:checked="${searchCriteria.levels != null and #lists.contains(searchCriteria.levels, 2)}">
+									<label class="form-check-label" for="level2">2차 카테고리</label>
+								</div>
+								<div class="form-check me-4">
+									<input class="form-check-input" type="checkbox"
+										id="checkAllLevels"> <label class="form-check-label"
+										for="checkAllLevels">전체선택</label>
+								</div>
+							</div>
+						</div>
 					</div>
-					
 					<hr>
 					<div class="row gx-3 align-items-end">
 						<div class="col-lg-4">
@@ -101,6 +96,7 @@
 				</div>
 
 				<table class="table table-hover text-center">
+					<!-- 기존 테이블 내용은 그대로 유지 -->
 					<thead class="thead-light">
 						<tr>
 							<th><div class="form-check">
@@ -133,25 +129,25 @@
 							</span></td>
 							<td
 								th:text="${#temporals.format(category.regDate, 'yyyy-MM-dd')}"></td>
-							<td>
-								<a
+							<td><a
 								th:href="@{/adminpage/productadmin/updateCategory/{categoryId}(categoryId=${category.categoryId})}"
-								class="btn btn-sm btn-outline-dark">수정</a> <form th:if="${category.activationYn}"
+								class="btn btn-sm btn-outline-dark">수정</a>
+								<form th:if="${category.activationYn}"
 									th:action="@{/adminpage/productadmin/deactivateCategory}"
 									method="post" style="display: inline;">
 									<input type="hidden" name="categoryId"
 										th:value="${category.categoryId}" />
 									<button type="submit" class="btn btn-sm btn-outline-danger"
 										onclick="return confirm('이 카테고리를 비활성화 하시겠습니까? 관련된 모든 상품이 사용자에게 노출되지 않습니다.');">비활성</button>
-								</form> <form th:unless="${category.activationYn}"
+								</form>
+								<form th:unless="${category.activationYn}"
 									th:action="@{/adminpage/productadmin/activateCategory}"
 									method="post" style="display: inline;">
 									<input type="hidden" name="categoryId"
 										th:value="${category.categoryId}" />
 									<button type="submit" class="btn btn-sm btn-success"
 										onclick="return confirm('이 카테고리를 다시 활성화 하시겠습니까?');">활성</button>
-								</form>
-							</td>
+								</form></td>
 						</tr>
 						<tr th:if="${#lists.isEmpty(categoryList)}">
 							<td colspan="8" class="text-center">등록된 카테고리가 없습니다.</td>
@@ -159,60 +155,67 @@
 					</tbody>
 				</table>
 
+				<!-- [페이지네이션 HTML] 기존 구조는 그대로 유지 -->
 				<nav th:if="${pagination.totalRecordCount > 0}"
 					class="d-flex justify-content-center mt-4"
 					aria-label="Page navigation">
 					<ul class="pagination">
-						<li class="page-item"
-							th:classappend="${!pagination.existPrevBlock ? 'disabled' : ''}">
-							<a
+						<!-- '이전' 버튼: existPrevBlock 사용 -->
+						<li class="page-item" th:if="${pagination.existPrevBlock}"><a
 							class="page-link page-num" href="#"
-							th:data-page="${pagination.startPage - 1}">이전</a>
-						</li>
+							th:data-page="${pagination.startPage - 1}">이전</a></li>
+
+						<!-- 페이지 번호 (변경 없음) -->
 						<li class="page-item"
 							th:each="pageNum : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
 							th:classappend="${pageNum == pagination.currentPage ? 'active' : ''}">
 							<a class="page-link page-num" href="#" th:data-page="${pageNum}"
 							th:text="${pageNum}"></a>
 						</li>
-						<li class="page-item"
-							th:classappend="${!pagination.existNextBlock ? 'disabled' : ''}">
-							<a class="page-link page-num" href="#"
-							th:data-page="${pagination.endPage + 1}">다음</a>
-						</li>
+
+						<!-- '다음' 버튼: existNextBlock 사용 -->
+						<li class="page-item" th:if="${pagination.existNextBlock}"><a
+							class="page-link page-num" href="#"
+							th:data-page="${pagination.endPage + 1}">다음</a></li>
 					</ul>
 				</nav>
 			</div>
 		</div>
 	</main>
 </th:block>
+
 <th:block layout:fragment="jsScript">
+	<!-- [수정] jQuery 기반으로 페이지네이션 로직만 수정 -->
 	<script>
 		$(document)
 				.ready(
 						function() {
 
+							// 검색 및 페이지 이동 함수
 							function submitSearch(page) {
+								// jQuery의 .serialize()를 사용하여 폼 데이터 수집
 								const formData = $('#categorySearchForm')
 										.serialize();
-								// 페이지 번호를 URL에 포함시킴
+								// URL 생성 및 이동
 								window.location.href = `[[@{/adminpage/productadmin/adminCategoryManagement}]]?currentPage=${page}&${formData}`;
 							}
 
 							// 검색 버튼 클릭 이벤트
 							$('#searchBtn').on('click', function() {
-								submitSearch(1); // 검색 버튼을 누르면 항상 1페이지부터 조회
+								submitSearch(1);
 							});
 
-							// 페이지 번호 링크 클릭 이벤트
-							$('.pagination').on('click', '.page-num',
+							// [수정] 페이지네이션 클릭 이벤트를 이벤트 위임 방식으로 변경
+							$(document).on('click', '.pagination .page-num',
 									function(e) {
 										e.preventDefault();
 										const page = $(this).data('page');
-										submitSearch(page);
+										if (page) {
+											submitSearch(page);
+										}
 									});
 
-							// --- 분류 체크박스 로직 (기존과 동일) ---
+							// --- 기존 분류 체크박스 로직 (jQuery 기반으로 그대로 유지) ---
 							$('#checkAllLevels').on(
 									'click',
 									function() {

@@ -12,6 +12,8 @@ public interface PostService {
 
     List<Board> selectBoardName();
     
+    List<Board> selectBoardListForWrite();
+    
     Post selectPostDetailByPostSn(String pstSn, String loginUserNo);
     
     void increaseViewCount(String pstSn);

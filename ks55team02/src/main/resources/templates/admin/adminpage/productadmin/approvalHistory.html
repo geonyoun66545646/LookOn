@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}">
+
+<head>
+    <style>
+    	.pagination .page-item .page-link { display: block; position: relative; }
+    </style>
+</head>
+
+<th:block layout:fragment="customTitle">
+    <title>승인/반려 기록</title>
+</th:block>
+
+<th:block layout:fragment="contents">
+    <main class="main-content">
+        <section class="content-header">
+            <h2 class="content-title">승인/반려 기록</h2>
+        </section>
+
+        <!-- 1. 검색/필터 카드 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form id="searchForm" th:action="@{/adminpage/productadmin/approvalHistory}" method="get" th:object="${searchCriteria}">
+                    <div class="row gx-3 align-items-end">
+                        <div class="col-lg-4 mb-2">
+                            <label class="form-label">검색 분류</label>
+                            <select class="form-select" name="searchKey">
+                                <option value="gdsNm" th:selected="*{searchKey == 'gdsNm'}">상품명</option>
+                                <option value="gdsNo" th:selected="*{searchKey == 'gdsNo'}">상품번호</option>
+                                <option value="selUserNo" th:selected="*{searchKey == 'selUserNo'}">판매자ID</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-4 mb-2">
+                            <label class="form-label">검색 키워드</label>
+                            <input type="text" class="form-control" name="searchValue" th:value="*{searchValue}" placeholder="검색어를 입력하세요">
+                        </div>
+                        <div class="col-lg-2 mb-2">
+                            <label class="form-label">상태</label>
+                            <select class="form-select" name="statusFilter">
+                                <option value="">전체</option>
+                                <option value="승인" th:selected="*{statusFilter == '승인'}">승인</option>
+                                <option value="반려" th:selected="*{statusFilter == '반려'}">반려</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 mb-2">
+                            <button type="button" class="btn btn-primary btn-block" id="searchBtn">검색</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 2. 기록 목록 카드 -->
+        <div class="card mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">승인/반려 기록 목록</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <span class="font-weight-bold">[ 전체 <span class="text-primary" th:text="${pagination.totalCount}">0</span>건 ]</span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center" id="dataTable" width="100%" cellspacing="0">
+                        <thead class="thead-light">
+                        <tr>
+                            <th>처리일시</th>
+                            <th>상품번호</th>
+                            <th>상품명</th>
+                            <th>처리 관리자</th>
+                            <th>상태</th>
+                            <th>반려 사유</th>
+                            <th>관리자 코멘트</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(historyList)}">
+                            <td colspan="7" class="text-center">조회된 기록이 없습니다.</td>
+                        </tr>
+                        <tr th:each="history : ${historyList}">
+                            <td th:text="${#temporals.format(history.prcsDt, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td th:text="${history.gdsNo}"></td>
+                            <td th:text="${history.gdsNm}"></td>
+                            <td th:text="${history.prcsMngrId}"></td>
+                            <td>
+                                <span class="badge"
+                                      th:text="${history.aprvSttsCd}"
+                                      th:classappend="${history.aprvSttsCd == '승인' ? 'bg-success' : 'bg-danger'}">
+                                </span>
+                            </td>
+                            <td th:text="${history.rjctRsn ?: '-'}"></td>
+                            <td th:text="${history.mngrCmntCn ?: '-'}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav class="mt-4" aria-label="Page navigation" th:if="${pagination.totalCount > 0}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:if="${pagination.hasPreviousBlock}">
+                            <a class="page-link page-num" href="#" th:data-page="${pagination.startPage - 1}">«</a>
+                        </li>
+                        <li class="page-item" th:each="pageNumber : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+                            th:classappend="${pageNumber == pagination.currentPage} ? 'active' : ''">
+                            <a class="page-link page-num" href="#" th:data-page="${pageNumber}" th:text="${pageNumber}"></a>
+                        </li>
+                        <li class="page-item" th:if="${pagination.hasNextBlock}">
+                            <a class="page-link page-num" href="#" th:data-page="${pagination.endPage + 1}">»</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+</th:block>
+
+<th:block layout:fragment="jsScript">
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchForm = document.getElementById('searchForm');
+            const paginationEl = document.querySelector('.pagination');
+
+            function submitSearch(page = 1) {
+                const formData = new FormData(searchForm);
+                const params = new URLSearchParams(formData);
+                params.set('currentPage', page);
+                const baseUrl = /*[[@{/adminpage/productadmin/approvalHistory}]]*/ '/adminpage/productadmin/approvalHistory';
+                window.location.href = `${baseUrl}?${params.toString()}`;
+            }
+
+            document.getElementById('searchBtn').addEventListener('click', () => submitSearch(1));
+
+            if (paginationEl) {
+                paginationEl.addEventListener('click', (e) => {
+                    const target = e.target.closest('.page-num');
+                    if (target) {
+                        e.preventDefault();
+                        const page = target.dataset.page;
+                        if (page) { submitSearch(page); }
+                    }
+                });
+            }
+        });
+    </script>
+</th:block>
+</html>

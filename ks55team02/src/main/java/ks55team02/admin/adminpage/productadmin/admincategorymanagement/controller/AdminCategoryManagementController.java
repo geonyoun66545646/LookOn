@@ -74,7 +74,7 @@ public class AdminCategoryManagementController {
         LoginUser loginAdmin = (LoginUser) session.getAttribute("loginUser"); // ⭐ "loginAdmin" -> "loginUser"
         if (loginAdmin == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "세션이 만료되었거나 로그인이 필요합니다.");
-            return "redirect:/adminpage/login"; // ⭐ "/admin/login" -> "/adminpage/login"
+            return "redirect:/adminpage/login";
         }
         
         try {

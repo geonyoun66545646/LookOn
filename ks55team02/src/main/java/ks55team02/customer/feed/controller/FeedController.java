@@ -27,48 +27,45 @@ public class FeedController {
 
     private final FeedService feedService;
     private final UserInfoService userInfoService;
-    private static final int PAGE_SIZE = 12; // JS와 동일한 페이지 사이즈
+    private static final int PAGE_SIZE = 12;
 
-    // ▼▼▼ [핵심 수정] ▼▼▼
     @GetMapping("/feedList")
     public String selectFeedList(
-            @RequestParam(name = "tab", defaultValue = "discover") String tab, // 1. 'tab' 파라미터 받기 (기본값 'discover')
+            @RequestParam(name = "tab", defaultValue = "discover") String tab,
+            // [수정] sort 파라미터 추가
+            @RequestParam(name = "sort", defaultValue = "latest") String sort,
             @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
             Model model) {
         
         int currentPage = 1;
         Map<String, Object> feedData;
 
-        // 2. 'tab' 값에 따라 분기 처리
         if ("following".equals(tab)) {
-            // 팔로잉 탭을 보려면 로그인이 필수
             if (loginUser == null) {
-                // 비로그인 시, 빈 데이터를 모델에 담고 로그인 페이지로 유도
                 model.addAttribute("feedList", Collections.emptyList());
                 model.addAttribute("hasNext", false);
                 model.addAttribute("totalCount", 0);
-                model.addAttribute("needsLogin", true); // JS나 HTML에서 로그인 유도에 사용할 수 있는 플래그
+                model.addAttribute("needsLogin", true);
             } else {
-                // 로그인 시, 팔로잉 피드 목록의 첫 페이지 조회
                 String followerUserNo = loginUser.getUserNo();
+                // [참고] 팔로잉 목록은 정렬 기능이 없으므로 그대로 둡니다.
                 feedData = feedService.getFollowingFeedList(followerUserNo, currentPage, PAGE_SIZE);
-                model.addAllAttributes(feedData); // 조회된 데이터를 모델에 한번에 추가
+                model.addAllAttributes(feedData);
             }
         } else {
-            // '발견' 탭 (기본)
-            feedData = feedService.selectFeedList(null, currentPage, PAGE_SIZE);
+            // [수정] 서비스 호출 시 sort 파라미터 전달
+            feedData = feedService.selectFeedList(null, currentPage, PAGE_SIZE, sort);
             model.addAllAttributes(feedData);
         }
 
-        // 3. 공통 모델 속성 추가
         model.addAttribute("loginUser", loginUser);
-
-        model.addAttribute("activeTab", tab); // 현재 활성화된 탭 정보 전달
-        model.addAttribute("currentPage", currentPage); // 현재 페이지 번호(1) 전달
+        model.addAttribute("activeTab", tab);
+        model.addAttribute("currentPage", currentPage);
+        // [수정] 현재 정렬 상태를 프론트엔드로 전달
+        model.addAttribute("currentSort", sort);
 
         return "customer/feed/feedList";
     }
-    // ▲▲▲ [핵심 수정] ▲▲▲
      
 	 @GetMapping("/feedDetail/{feedSn}")
 	 public String selectFeedDetail(@PathVariable String feedSn, 
@@ -86,7 +83,6 @@ public class FeedController {
 	     model.addAttribute("userNo", userNo);
          model.addAttribute("loginUser", loginUser);
 
-
 	     return "customer/feed/feedDetail";
 	 }
 	    
@@ -94,14 +90,16 @@ public class FeedController {
     public String selectFeedListByUserNo(
             @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, 
             Model model) {
-    	if(loginUser == null) {
-    		return "redirect:/customer/login/login?redirectUrl=/customer/feed/feedListByUserNo";
-    	}
-    	String userNo = loginUser.getUserNo();
-    	UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
-    	model.addAttribute("userInfo", userInfo);
+    	
+        // [수정] 리다이렉션 로직 제거. 로그인 여부와 관계없이 항상 템플릿을 반환합니다.
+        // 비로그인 시 loginUser와 userInfo는 null로 전달되며, 프론트엔드(JS)에서 이를 처리합니다.
+    	if(loginUser != null) {
+    	    String userNo = loginUser.getUserNo();
+    	    UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
+    	    model.addAttribute("userInfo", userInfo);
+    	    model.addAttribute("loginUserNo", userNo);
+        }
 
-    	model.addAttribute("loginUserNo", userNo);
     	return "customer/feed/feedListByUserNo";
     }
     
@@ -124,11 +122,12 @@ public class FeedController {
     public String feedWritePage(
             @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
             Model model) {
-        if (loginUser == null) {
-            return "redirect:/customer/login/login?redirectUrl=/customer/feed/feedWrite";
+        
+        // [수정] 리다이렉션 로직 제거.
+        if (loginUser != null) {
+            UserInfoResponse userInfo = userInfoService.getUserInfo(loginUser.getUserNo());
+            model.addAttribute("userInfo", userInfo); 
         }
-        UserInfoResponse userInfo = userInfoService.getUserInfo(loginUser.getUserNo());
-        model.addAttribute("userInfo", userInfo); 
         model.addAttribute("loginUser", loginUser);
         return "customer/feed/feedWrite";
     }
@@ -137,19 +136,20 @@ public class FeedController {
     public String feedEditPage(@PathVariable("feedSn") String feedSn,
                                @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
                                Model model) {
-        if (loginUser == null) {
-            return "redirect:/customer/login/login?redirectUrl=/customer/feed/edit/" + feedSn;
-        }
+        
+        // [수정] 리다이렉션 로직 제거.
+        if (loginUser != null) {
+            Feed feed = feedService.selectFeedDetail(feedSn);
 
-        Feed feed = feedService.selectFeedDetail(feedSn);
-
-        if (feed == null || !feed.getWrtrUserNo().equals(loginUser.getUserNo())) {
-            log.warn("잘못된 수정 접근: feedSn={}, accessor={}", feedSn, loginUser.getUserNo());
-            return "redirect:/customer/feed/feedList";
+            if (feed == null || !feed.getWrtrUserNo().equals(loginUser.getUserNo())) {
+                log.warn("잘못된 수정 접근: feedSn={}, accessor={}", feedSn, loginUser.getUserNo());
+                return "redirect:/customer/feed/feedList";
+            }
+            UserInfoResponse userInfo = userInfoService.getUserInfo(loginUser.getUserNo());
+            model.addAttribute("userInfo", userInfo);
+            model.addAttribute("feed", feed);
         }
-        UserInfoResponse userInfo = userInfoService.getUserInfo(loginUser.getUserNo());
-        model.addAttribute("userInfo", userInfo);
-        model.addAttribute("feed", feed);
+        
         model.addAttribute("loginUser", loginUser);
         return "customer/feed/feedWrite";
     }

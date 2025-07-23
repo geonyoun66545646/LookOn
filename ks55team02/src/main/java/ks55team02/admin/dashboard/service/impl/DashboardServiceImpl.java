@@ -31,16 +31,16 @@ public class DashboardServiceImpl implements DashboardService {
         int pendingProducts = dashboardMapper.countPendingProducts();
         int pendingSettlements = dashboardMapper.countPendingSettlements();
         int pendingReports = dashboardMapper.countPendingReports();
-        // int pendingInquiries = dashboardMapper.countPendingInquiries(); // 문의는 담당자 확인 후 주석 해제
+        int pendingInquiries = dashboardMapper.countPendingInquiry(); // 문의는 담당자 확인 후 주석 해제
         
         dashboard.setPendingStoreCount(pendingStores);
         dashboard.setPendingProductCount(pendingProducts);
         dashboard.setPendingSettlementCount(pendingSettlements);
         dashboard.setPendingReportCount(pendingReports);
-        // dashboard.setPendingInquiryCount(pendingInquiries);
+        dashboard.setPendingInquiryCount(pendingInquiries);
 
         // 3. '처리할 업무' 총합 계산 및 DTO에 설정
-        int totalTasks = pendingStores + pendingProducts + pendingSettlements + pendingReports;
+        int totalTasks = pendingStores + pendingProducts + pendingSettlements + pendingReports + pendingInquiries;
         dashboard.setTotalPendingTasks(totalTasks);
         
         // 4. 월별 매출 차트 데이터 조회 및 가공

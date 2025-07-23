@@ -1,20 +1,22 @@
 package ks55team02.customer.post.controller;
 
-import ks55team02.customer.login.domain.LoginUser; // [수정] LoginUser 임포트
-import ks55team02.customer.post.domain.Board;
-import ks55team02.customer.post.domain.Post;
-import ks55team02.customer.post.service.PostService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import jakarta.servlet.http.HttpSession;
 
-import java.util.List;
+import jakarta.servlet.http.HttpSession;
+import ks55team02.customer.login.domain.LoginUser; // [수정] LoginUser 임포트
+import ks55team02.customer.post.domain.Board;
+import ks55team02.customer.post.domain.Post;
+import ks55team02.customer.post.service.PostService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequestMapping("/customer/post")
@@ -42,25 +44,38 @@ public class PostController {
 
     @GetMapping("/postDetail")
     public String selectPostDetail(@RequestParam String pstSn, Model model, HttpSession session) {
-        // [수정] 세션에서 실제 타입인 LoginUser로 객체를 가져옵니다.
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         String loginUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
+        String loginUserGrade = (loginUser != null) ? loginUser.getMbrGrdCd() : null;
 
         Post postDetail = postService.selectPostDetailByPostSn(pstSn, loginUserNo);
         
         if (postDetail != null) {
             postService.increaseViewCount(pstSn);
+
+            // 댓글 작성 가능 여부 판단 로직 추가
+            boolean isAdmin = "grd_cd_0".equals(loginUserGrade) || "grd_cd_1".equals(loginUserGrade);
+            boolean canComment = loginUser != null && (isAdmin || !"admin_only".equals(postDetail.getCmntWrtAuthrtLvlVal()));
+            model.addAttribute("canComment", canComment);
         }
 
         model.addAttribute("postDetail", postDetail);
-        // [수정] LoginUser 객체 전체를 뷰로 전달합니다.
         model.addAttribute("loginUser", loginUser);
         return "customer/post/postDetail";
     }
 
     @GetMapping("/postWrite")
-    public String postWriteForm(Model model) {
-        List<Board> boardList = postService.selectBoardName();
+    public String postWriteForm(Model model, HttpSession session) {
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        List<Board> boardList = postService.selectBoardListForWrite();
+
+        // 관리자가 아닌 경우 'admin_only' 게시판 필터링
+        if (loginUser == null || (!"grd_cd_0".equals(loginUser.getMbrGrdCd()) && !"grd_cd_1".equals(loginUser.getMbrGrdCd()))) {
+            boardList = boardList.stream()
+                                 .filter(b -> !"admin_only".equals(b.getWrtAuthrtLvlVal()))
+                                 .collect(Collectors.toList());
+        }
+
         model.addAttribute("boardList", boardList);
         model.addAttribute("post", new Post());
         return "customer/post/postWrite";
@@ -68,12 +83,18 @@ public class PostController {
 
     @GetMapping("/postUpdate/{pstSn}")
     public String postUpdateForm(@PathVariable String pstSn, Model model, HttpSession session) {
-        // [수정] 세션 처리 로직을 selectPostDetail과 동일하게 맞춥니다.
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         String loginUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
 
         Post postToUpdate = postService.selectPostDetailByPostSn(pstSn, loginUserNo);
-        List<Board> boardList = postService.selectBoardName();
+        List<Board> boardList = postService.selectBoardListForWrite();
+
+        // 관리자가 아닌 경우 'admin_only' 게시판 필터링
+        if (loginUser == null || (!"grd_cd_0".equals(loginUser.getMbrGrdCd()) && !"grd_cd_1".equals(loginUser.getMbrGrdCd()))) {
+            boardList = boardList.stream()
+                                 .filter(b -> !"admin_only".equals(b.getWrtAuthrtLvlVal()))
+                                 .collect(Collectors.toList());
+        }
         
         model.addAttribute("boardList", boardList);
         model.addAttribute("post", postToUpdate);
