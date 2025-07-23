@@ -41,12 +41,6 @@
 		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '접수')}">
 		                                <label class="form-check-label">접수</label>
 		                            </div>
-		                            <!-- <div class="form-check me-4">
-		                                <input class="form-check-input status-check" type="checkbox"
-		                                	   name="appAStoreList" value="PENDING"
-		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '보류')}">
-		                                <label class="form-check-label">보류</label>
-		                            </div> -->
 		                            <div class="form-check me-4">
 		                                <input class="form-check-input status-check" type="checkbox"
 		                                	   name="appAStoreList" value="APPROVED"
@@ -109,12 +103,6 @@
 		                            선택한 회원 상태 변경
 		                        </button>
 		                        <div class="dropdown-menu status">
-		                            <!-- <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="접수">
-		                            	<span class="badge-dot bg-primary"></span>접수
-		                            </a> -->
-		                           <!--  <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="보류">
-		                            	<span class="badge-dot bg-warning"></span>보류
-		                            </a> -->
 		                            <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="승인">
 		                            	<span class="badge-dot bg-success"></span>승인
 		                            </a>
@@ -144,10 +132,10 @@
 				                <th scope="col" class="col-checkbox">
 				                	<input class="form-check-input" type="checkbox" id="checkAll">
 				                </th>
-				                <th scope="col">신청 아이디</th>
+				                <th scope="col">신청 ID</th>
 				                <th scope="col">상점명</th>
 				                <th scope="col">신청자 이름</th>
-				                <th scope="col">신청 유저 아이디</th>
+				                <th scope="col">신청 유저 ID</th>
 				                <th scope="col">수수료 비율</th>
 				                <th scope="col">계약 신청일</th>
 				                <th scope="col">상태</th>
@@ -164,7 +152,7 @@
 				                	<a class="text" th:href="@{/adminpage/storeadmin/appDetail(aplyId=${appStore.aplyId})}" th:text="${appStore.storeNm}"></a>
 				                </td>
 				                <td th:text="${appStore.user.userNm}"></td>
-				                <td th:text="${appStore.user.userNo}"></td>
+				                <td th:text="${appStore.user.userLgnId}"></td>
 				                <td class="ellipsis text" th:text="${appStore.plcyId}"></td>
 				                <td th:text="${#temporals.format(appStore.ctrtAplyYmd, 'yyyy-MM-dd')}"></td>
 				                <td>
@@ -315,11 +303,6 @@
                  return false; // 일치하는 것을 찾았으니 루프 종료
              }
          });
-
-         // Hidden input에도 초기값을 설정 (필요한 경우)
-         // searchCriteria에 sortKey와 sortOrder가 이미 설정되어 있으므로 별도 설정 필요 없음
-         // sortKeyInput.val(initialSortKey);
-         // sortOrderInput.val(initialSortOrder);
      });
 
 	 /*]]>*/

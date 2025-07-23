@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.seller.common.domain.Store;
 import ks55team02.seller.common.domain.TopSellingProduct;
-import ks55team02.seller.common.service.impl.StoreMngService;
+import ks55team02.seller.common.service.StoreMngService;
 import ks55team02.seller.inquiry.service.SellerInquiryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

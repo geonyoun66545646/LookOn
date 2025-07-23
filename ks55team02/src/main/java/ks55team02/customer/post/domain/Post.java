@@ -35,4 +35,7 @@ public class Post {
     // --- 폼 제출용 필드 (DB와 무관) ---
     private List<MultipartFile> newImageFiles;
     private List<String> deleteImageSns;
+    
+    // 댓글작성제한
+    private String cmntWrtAuthrtLvlVal;
 }

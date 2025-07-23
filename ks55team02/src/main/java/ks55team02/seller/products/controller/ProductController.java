@@ -23,7 +23,7 @@ import ks55team02.admin.common.domain.SearchCriteria;
 import ks55team02.common.domain.store.ProductReview;
 import ks55team02.customer.login.domain.LoginUser; // LoginUser import
 import ks55team02.customer.store.service.ReviewService;
-import ks55team02.seller.common.service.impl.StoreMngService;
+import ks55team02.seller.common.service.StoreMngService;
 import ks55team02.seller.products.domain.ProductCategory;
 import ks55team02.seller.products.domain.ProductImage;
 import ks55team02.seller.products.domain.ProductImageType;

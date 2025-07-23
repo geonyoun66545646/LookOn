@@ -11,7 +11,7 @@ import ks55team02.customer.login.domain.LoginUser;
 
 public interface FeedService {
 
-	Map<String, Object> selectFeedList(String userNo, int page, int size);
+	Map<String, Object> selectFeedList(String userNo, int page, int size, String sortOrder);
 	Feed selectFeedDetail(String feedSn);
 	List<Feed> selectNextFeedList(String currentFeedCrtDt, int limit, String context, String userNo);
 	

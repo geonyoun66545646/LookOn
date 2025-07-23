@@ -1,6 +1,7 @@
 package ks55team02.customer.feed.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,7 +16,7 @@ import ks55team02.customer.feed.domain.FeedTag;
 public interface FeedMapper {
 
 	// 피드 목록/상세 관련
-	List<Feed> selectFeedList(@Param("userNo") String userNo, @Param("limit") int limit, @Param("offset") int offset);
+	List<Feed> selectFeedList(Map<String, Object> params);
 	int selectFeedCount(@Param("userNo") String userNo);
 	Feed selectFeedDetail(String feedSn);
 	List<Feed> selectNextFeedList(@Param("currentFeedCrtDt") String currentFeedCrtDt, @Param("limit") int limit, @Param("context") String context, @Param("userNo") String userNo);

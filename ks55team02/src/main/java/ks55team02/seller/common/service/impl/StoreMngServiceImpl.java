@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ks55team02.seller.common.domain.Store;
 import ks55team02.seller.common.domain.TopSellingProduct;
 import ks55team02.seller.common.mapper.StoreMngMapper;
+import ks55team02.seller.common.service.StoreMngService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
