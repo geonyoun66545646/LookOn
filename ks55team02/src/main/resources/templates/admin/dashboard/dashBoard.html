@@ -36,7 +36,7 @@
 		    <!-- [신규] 오늘의 방문자수 카드 -->
 		    <div class="col-lg-3">
 		        <div class="card card-body mb-4">
-		            <a class="text-decoration-none" th:href="@{/adminpage/useradmin/userList}">
+		            <a class="text-decoration-none" th:href="@{/adminpage/useradmin/loginHistory}">
 		                <article class="d-flex align-items-start">
 		                    <div class="icon-part me-3">
 		                        <!-- 아이콘과 색상 변경 -->
@@ -145,6 +145,15 @@
 			                    <span>신규 신고 접수</span>
 			                </div>
 			                <span class="badge rounded-pill bg-warning" th:text="${dashboard.pendingReportCount}">0</span>
+			            </a>
+			            
+			            <!-- 신규 신고 접수 -->
+			            <a th:href="@{/admin/inquiry/adminInquiryList}" class="task-item">
+			                <div class="item-info">
+			                    <i class="icon material-icons text-warning md-report_problem"></i>
+			                    <span>신규 문의 접수</span>
+			                </div>
+			                <span class="badge rounded-pill bg-warning" th:text="${dashboard.pendingInquiryCount}">0</span>
 			            </a>
 			
 			            <!-- 처리할 항목이 하나도 없을 때 표시될 메시지 -->
