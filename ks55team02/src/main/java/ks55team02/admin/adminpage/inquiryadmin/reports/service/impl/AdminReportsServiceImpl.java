@@ -150,8 +150,17 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 		String targetGdsNo = report.getDclrTrgtContsId();
 
 		if ("CONTENT_DELETION".equals(actionType)) {
-			adminReportsMapper.updateProductExposureYn(targetGdsNo, false);
-			log.info("상품 {} 삭제 조치 완료.", targetGdsNo);
+			// 1. 쿼리에 전달할 파라미터를 담을 Map을 만듭니다.
+			Map<String, Object> params = new HashMap<>();
+
+			// 2. Map에 상품번호(gdsNo)와 관리자 ID(adminId)를 넣습니다.
+			params.put("gdsNo", targetGdsNo);
+			params.put("adminId", request.getAdminId()); // request 객체에서 관리자 ID 가져오기
+
+			// 3. Map을 파라미터로 넘겨 수정된 매퍼 메소드를 호출합니다.
+			adminReportsMapper.updateProductExposureYn(params);
+
+			log.info("상품 {} 비활성화(삭제) 조치 완료. 처리자: {}", targetGdsNo, request.getAdminId());
 		} else {
 			log.info("상품 {}에 대해 '제재 없음' 또는 정의되지 않은 조치({}) 선택.", targetGdsNo, actionType);
 		}
@@ -214,7 +223,6 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 		adminReportsMapper.insertSanction(sanction);
 		log.info("콘텐츠 소유자 {} 계정 제한 기록 (sanctionId: {}) user_sanctions에 저장 완료.", userNo, nextSanctionId);
 	}
-
 
 	// =================================================================================
 	// 아래는 기존 목록/상세 조회 메소드 (수정 없음)

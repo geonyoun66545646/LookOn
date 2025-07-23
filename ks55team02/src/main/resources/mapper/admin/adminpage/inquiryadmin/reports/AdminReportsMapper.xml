@@ -234,7 +234,8 @@
 		rh.actn_cn,
 		rh.prcs_dsctn_memo_cn,
 		rh.action_type,
-		DATE_FORMAT(rh.prcs_dt, '%Y-%m-%d %H:%i') AS prcs_dt,
+		DATE_FORMAT(rh.prcs_dt, '%Y-%m-%d
+		%H:%i') AS prcs_dt,
 		u.user_ncnm AS prcsUserNcnm
 		FROM
 		report_history rh
@@ -242,7 +243,8 @@
 		users u ON rh.user_no = u.user_no
 		WHERE
 		rh.dclr_id = #{dclrId}
-		ORDER BY
+		ORDER
+		BY
 		rh.prcs_dt DESC
 	</select>
 
@@ -391,10 +393,12 @@
 		#{commentSn};
 	</update>
 
-	<update id="updateProductExposureYn">
+	<update id="updateProductExposureYn" parameterType="map">
 		UPDATE products
 		SET
-		expsr_yn = #{exposureYn}
+		expsr_yn = 0,
+		actvtn_yn = 0,
+		inactvtn_dt = NOW()
 		WHERE
 		gds_no = #{gdsNo};
 	</update>
