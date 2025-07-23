@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.admin.dashboard.mapper.DashboardMapper">
+
+    <!-- 오늘의 매출 조회 -->
+    <select id="getTodayRevenue" resultType="long">
+        SELECT
+            COALESCE(SUM(last_stlm_amt), 0)
+        FROM
+            orders
+        WHERE
+            DATE(ordr_dt) = CURDATE()
+            AND ordr_stts_cd = 'PAID'
+    </select>
+
+    <!-- 오늘 방문자 수 조회 -->
+    <select id="getTodayVisitors" resultType="int">
+        SELECT
+		    COUNT(DISTINCT user_no) AS todayVisitors
+		FROM
+		    login_history
+		WHERE
+		    DATE(lgn_dt) = CURDATE()
+		    AND lgn_fail_nmtm = 0;
+    </select>
+
+    <!-- 신규 가입자 수 조회 -->
+    <select id="getNewUserCount" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            users
+        WHERE
+            DATE(join_dt) = CURDATE()
+    </select>
+
+    <!-- [처리할 업무] - 상점 신청 건수 조회 -->
+    <select id="countPendingStores" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            store_application
+        WHERE
+            aply_stts = 'APPLY'
+    </select>
+
+    <!-- [처리할 업무] - 상품 승인 건수 조회 -->
+    <select id="countPendingProducts" resultType="int">
+        SELECT
+            COUNT(p.gds_no)
+        FROM
+            products AS p
+        JOIN
+            stores AS s ON p.store_id = s.store_id
+        JOIN
+            product_approval_history AS pah ON p.gds_no = pah.gds_no
+        WHERE
+            pah.aprv_rjct_hstry_cd = (
+                SELECT aprv_rjct_hstry_cd
+                FROM product_approval_history
+                WHERE gds_no = p.gds_no
+                ORDER BY prcs_dt DESC, aprv_rjct_cycl DESC
+                LIMIT 1
+            )
+            AND pah.aprv_stts_cd = '대기'
+    </select>
+    
+    <!-- [처리할 업무] - 신고 접수 건수 조회 -->
+    <select id="countPendingReports" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            reports
+        WHERE
+            prcs_stts_cd = 'RECEIVED'
+    </select>
+
+    <!-- [처리할 업무] - 정산 대기 건수 조회 -->
+    <select id="countPendingSettlements" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            store_settlements
+        WHERE
+            clcln_stts_cd = '판매정산대기'
+    </select>
+
+    <!-- 월별 통계 데이터 조회 (수수료 수익) -->
+    <select id="getMonthlyRevenue" resultType="map">
+	    SELECT
+	        DATE_FORMAT(clcln_prcs_ymd, '%Y-%m') AS `month`,
+	        SUM(tot_sel_amt) AS `totalSales`,  -- 총 판매액 추가
+	        SUM(tot_sel_amt - clcln_amt) AS `revenue` -- 수수료 수익
+	    FROM
+	        store_settlements
+	    WHERE
+	        clcln_stts_cd = '판매정산완료'
+	        AND clcln_prcs_ymd IS NOT NULL
+	        AND clcln_prcs_ymd >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+	    GROUP BY `month`
+	    ORDER BY `month` ASC
+	</select>
+
+</mapper>

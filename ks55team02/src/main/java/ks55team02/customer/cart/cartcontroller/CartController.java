@@ -160,4 +160,32 @@ public class CartController {
             return new ResponseEntity<>("선택된 장바구니 항목 삭제 중 서버 오류 발생", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+   
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Integer>> getCartCount(HttpSession session) {
+        
+        // --- 🕵️‍♂️ 탐정용 로그 추가 ---
+        log.info("========================================");
+        log.info("🕵️‍♂️ [/api/cart/count] API가 호출되었습니다.");
+        
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        int count = 0;
+        
+        if (loginUser != null) {
+            log.info("🕵️‍♂️ 세션에서 로그인 정보를 찾았습니다. userNo: {}", loginUser.getUserNo());
+            count = cartService.getCartItemCount(loginUser.getUserNo());
+            log.info("🕵️‍♂️ DB에서 조회한 장바구니 개수: {}", count);
+        } else {
+            log.warn("🕵️‍♂️ 세션에서 'loginUser' 정보를 찾지 못했습니다. 비로그인 상태로 간주합니다.");
+        }
+        
+        Map<String, Integer> response = new HashMap<>();
+        response.put("count", count);
+        
+        log.info("🕵️‍♂️ 프론트엔드로 최종 반환하는 JSON: {}", response);
+        log.info("========================================");
+        
+        return ResponseEntity.ok(response);
+    }
+
 }
