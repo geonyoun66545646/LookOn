@@ -18,6 +18,8 @@
     <resultMap id="inquiryUserResultMap" type="ks55team02.common.domain.inquiry.InquiryUser">
         <id property="userNo"       column="user_no"/>
         <result property="userNcnm" column="user_ncnm"/>
+		<result property="userLgnId" column="user_lgn_id"/>
+		<result property="userNm" 		column="user_nm"/>
     </resultMap>
 
     <resultMap id="inquiryImageResultMap" type="ks55team02.common.domain.inquiry.InquiryImage">
@@ -62,7 +64,8 @@
 
         <association property="writerInfo" resultMap="inquiryUserResultMap"/>
         <association property="storeInfo" resultMap="storeResultMap"/>
-        <association property="answer" resultMap="answerResultMap"/> <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage" resultMap="inquiryImageResultMap"/>
+        <association property="answer" resultMap="answerResultMap"/> 
+        <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage" resultMap="inquiryImageResultMap"/>
     </resultMap>
     
     <select id="getMaxAnsIdNumber" resultType="java.lang.Integer">
@@ -164,6 +167,8 @@
             s.del_prcr_yn,
             u.user_no,
             u.user_ncnm,
+            u.user_lgn_id,
+            u.user_nm,
             iim.inqry_img_id,
             iim.img_id,
             iim.inqry_id AS inquiry_image_inqry_id,
@@ -291,6 +296,7 @@
             s.del_prcr_yn,
             u.user_no,
             u.user_ncnm,
+            u.user_lgn_id,
             iim.inqry_img_id,
             iim.img_id,
             iim.inqry_id AS inquiry_image_inqry_id,

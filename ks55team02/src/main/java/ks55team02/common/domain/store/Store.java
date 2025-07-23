@@ -29,6 +29,7 @@ public class Store extends SearchCriteria {
     private String sellerUserNo; 
     
     private String sellerUserNm;
+    private String sellerUserLoginId;
     
     
     
