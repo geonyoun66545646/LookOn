@@ -10,19 +10,19 @@ import lombok.ToString;
 @ToString
 public class AdminReportHistory {
 
-	private String hstryId; // hstry_id
-	private String dclrId; // dclr_id
-	private String userNo; // user_no (처리 사용자 번호)
+	private String hstryId;
+	private String dclrId;
+	private String userNo;
+	private String prcsUserNcnm;
+	private String actnCn;
+	private String bfrSttsCd;
+	private String crntSttsCd;
+	private String prcsDt;
+	private String prcsDsctnMemoCn;
 
-	// 이 필드는 user 테이블과 조인해서 가져와야 하므로 그대로 둡니다.
-	private String prcsUserNcnm; // 처리자 닉네임 (조인 결과)
-
-	private String actnCn; // actn_cn (조치 내용)
-	private String bfrSttsCd; // bfr_stts_cd
-	private String crntSttsCd; // crnt_stts_cd
-	private String prcsDt; // prcs_dt
-	private String prcsDsctnMemoCn; // prcs_dsctn_memo_cn
-
-	// user_sanctions 테이블에서 조인으로 가져올 필드
+	// 이 필드는 더 이상 user_sanctions와 조인하지 않으므로, 아래 actionType으로 통합하는 것이 좋습니다.
 	private String sanctionType;
+
+	// [수정] 보이지 않는 특수 문자를 제거한 라인입니다.
+	private String actionType;
 }
