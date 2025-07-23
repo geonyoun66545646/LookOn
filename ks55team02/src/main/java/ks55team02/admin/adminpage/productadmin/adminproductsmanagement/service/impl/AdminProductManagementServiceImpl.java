@@ -33,7 +33,71 @@ public class AdminProductManagementServiceImpl implements AdminProductManagement
     private final ProductsMapper productsMapper; // ⭐ ProductsMapper 주입
     private static final int PAGE_SIZE = 10; // 한 페이지에 보여줄 아이템 수
     private static final int BLOCK_SIZE = 5;  // 페이지네이션 블록 크기
+    
+    // [추가] 승인/반려 기록 목록 조회 로직 구현
+    @Override
+    public CustomerPagination<ProductApprovalHistory> getApprovalHistoryList(AdminProductSearchCriteria searchCriteria, int currentPage) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("searchCriteria", searchCriteria);
 
+        // (주의: Mapper에 countApprovalHistory 메소드 추가 필요)
+        int totalCount = adminProductManagementMapper.countApprovalHistory(params);
+        log.info(">>>>>> [Service] '승인/반려 기록' 조회된 기록 수: {}", totalCount);
+
+        if (totalCount == 0) {
+            return new CustomerPagination<>(Collections.emptyList(), 0, currentPage, PAGE_SIZE, BLOCK_SIZE);
+        }
+
+        int offset = (currentPage - 1) * PAGE_SIZE;
+        params.put("limit", PAGE_SIZE);
+        params.put("offset", offset);
+        
+        // (주의: Mapper에 findApprovalHistoryList 메소드 추가 필요)
+        List<ProductApprovalHistory> historyList = adminProductManagementMapper.findApprovalHistoryList(params);
+        
+        return new CustomerPagination<>(historyList, totalCount, currentPage, PAGE_SIZE, BLOCK_SIZE);
+    }
+    
+    // [추가] 전체 상품 목록 조회 로직
+    @Override
+    public CustomerPagination<AdminProductView> findAllProducts(AdminProductSearchCriteria searchCriteria, int currentPage) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("searchCriteria", searchCriteria);
+
+        // [수정] countAdminProducts 대신 countAllProducts를 호출하도록 변경
+        int totalCount = adminProductManagementMapper.countAllProducts(params);
+        log.info(">>>>>> [Service] '전체 상품 관리' 조회된 상품 수: {}", totalCount);
+
+        if (totalCount == 0) {
+            return new CustomerPagination<>(Collections.emptyList(), 0, currentPage, PAGE_SIZE, BLOCK_SIZE);
+        }
+
+        int offset = (currentPage - 1) * PAGE_SIZE;
+        params.put("limit", PAGE_SIZE);
+        params.put("offset", offset);
+
+        // 목록 조회 쿼리는 이미 올바르게 findAllProductsList를 호출하고 있습니다.
+        List<AdminProductView> productList = adminProductManagementMapper.findAllProductsList(params);
+        
+        return new CustomerPagination<>(productList, totalCount, currentPage, PAGE_SIZE, BLOCK_SIZE);
+    }
+    
+    // [추가] 상품 상태 변경 로직
+    @Override
+    @Transactional
+    public void updateProductStatus(String gdsNo, String status, String managerId) {
+        boolean isExposure = "ACTIVE".equalsIgnoreCase(status);
+        
+        Map<String, Object> params = new HashMap<>();
+        params.put("gdsNo", gdsNo);
+        params.put("exposure", isExposure);
+        params.put("managerId", managerId);
+        
+        // (주의: Mapper의 updateProductExposure 메소드가 이 파라미터들을 처리해야 함)
+        adminProductManagementMapper.updateProductExposure(params);
+        log.info(">>>>>> [Service] 상품 상태 변경: gdsNo={}, exposure={}, managerId={}", gdsNo, isExposure, managerId);
+    }
+    
     @Override
     public CustomerPagination<AdminProductView> getAdminProductList(AdminProductSearchCriteria searchCriteria, int currentPage) {
         

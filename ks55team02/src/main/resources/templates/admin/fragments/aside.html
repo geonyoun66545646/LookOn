@@ -1,92 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <aside class="navbar-aside" id="offcanvas_aside" th:fragment="asideFragments">
-        <div class="aside-top">
-            <a th:href="@{/}" class="brand-wrap">
-                <span class="lookon-logo">LookOn</span>
-            </a>
-           <div>
-                <button class="btn btn-icon btn-aside-minimize">
-                	<i class="text-muted material-icons md-menu_open"></i>
-                </button>
-            </div>
-        </div>
-        <nav>
-            <ul class="menu-aside">
-                <li class="menu-item" th:classappend="${activeMenu == 'adminpage'} ? 'active' : ''">
-                    <a class="menu-link" th:href="@{/adminpage/dashboard}">
-                        <i class="icon material-icons md-home"></i>
-                        <span class="text">대시보드로 이동</span>
-                    </a>
-                </li>
-                <li class="menu-item has-submenu" th:classappend="${activeMenu == 'user'} ? 'active' : ''">
-                    <a class="menu-link" href="#">
-                        <i class="icon material-icons md-person"></i>
-                        <span class="text">회원관리</span>
-                    </a>
-                    <div class="submenu">
-                        <a th:href="@{/adminpage/useradmin/userList}">회원목록조회</a>
-                        <a th:href="@{/adminpage/useradmin/loginHistory}">로그인기록조회</a>
-                        <a th:href="@{/adminpage/useradmin/search}">검색 기록 조회</a>
-                        <a th:href="@{/adminpage/useradmin/chatLog}">채팅 로그 조회</a>
-                        <a th:href="@{/adminpage/useradmin/memberCoupons}">회원 쿠폰 조회</a>
-                        <a th:href="@{/adminpage/useradmin/couponsList}">쿠폰 목록 조회</a>
-                        <a th:href="@{/adminpage/useradmin/createCoupons}">쿠폰 생성</a>
-                    </div>
-                </li>
-                <li class="menu-item has-submenu" th:classappend="${activeMenu == 'store'} ? 'active' : ''">
-                    <a class="menu-link" href="#">
-                        <i class="icon material-icons md-shopping_bag"></i>
-                        <span class="text">상점관리</span>
-                    </a>
-                    <div class="submenu">
-                        <a th:href="@{/adminpage/storeadmin/appAdmin}">상점 신청 관리</a>
-                        <a th:href="@{/adminpage/storeadmin/storeMngAdmin}">상점 관리</a>
-                        <a th:href="@{/adminpage/storeadmin/reviewAdmin}">상품 리뷰 관리</a>
-                        <a th:href="@{/adminpage/storeadmin/settlementDetailByStore}">상점별 정산 내역 조회</a>
-                        <a th:href="@{/adminpage/storeadmin/premiumAdd}">구독권 추가</a>
-                    </div>
-                </li>
-                <li class="menu-item has-submenu" th:classappend="${activeMenu == 'product'} ? 'active' : ''">
-                    <a class="menu-link" href="#">
-                        <i class="icon material-icons md-shopping_bag"></i>
-                        <span class="text">상품관리</span>
-                    </a>
-                    <div class="submenu">
-                        <a th:href="@{/adminpage/productadmin/adminProductManagement}">상품관리</a>
-                        <a th:href="@{/adminpage/productadmin/adminCategoryManagement}">카테고리 관리</a>
-                    </div>
-                </li>
-                <li class="menu-item has-submenu" th:classappend="${activeMenu == 'board'} ? 'active' : ''">
-                    <a class="menu-link" href="#">
-                        <i class="icon material-icons md-comment"></i>
-                        <span class="text">게시판관리</span>
-                    </a>
-                    <div class="submenu">
-                        <a th:href="@{/adminpage/boardadmin/boardManagement}">게시판 관리</a>
-                        <a th:href="@{/adminpage/boardadmin/commentManagement}">댓글 관리</a>
-                    </div>
-                </li>
-                <li class="menu-item has-submenu" th:classappend="${activeMenu == 'inquiry'} ? 'active' : ''">
-                    <a class="menu-link" href="#">
-                        <i class="icon material-icons md-comment"></i>
-                        <span class="text">문의 및 신고관리</span>
-                    </a>
-                    <div class="submenu">
-                        <a th:href="@{/admin/inquiry/adminInquiryList}">문의 목록 조회</a>
-                        <a th:href="@{/adminpage/inquiryadmin/reportsList}">신고 목록 관리</a>
-                    </div>
-                </li>
-                <li class="menu-divider"></li>
+<aside class="navbar-aside" id="offcanvas_aside"
+	th:fragment="asideFragments">
+	<div class="aside-top">
+		<a th:href="@{/}" class="brand-wrap"> <span class="lookon-logo">LookOn</span>
+		</a>
+		<div>
+			<button class="btn btn-icon btn-aside-minimize">
+				<i class="text-muted material-icons md-menu_open"></i>
+			</button>
+		</div>
+	</div>
+	<nav>
+		<ul class="menu-aside">
+			<li class="menu-item"
+				th:classappend="${activeMenu == 'adminpage'} ? 'active' : ''">
+				<a class="menu-link" th:href="@{/adminpage/dashboard}"> <i
+					class="icon material-icons md-home"></i> <span class="text">대시보드로
+						이동</span>
+			</a>
+			</li>
+			<li class="menu-item has-submenu"
+				th:classappend="${activeMenu == 'user'} ? 'active' : ''"><a
+				class="menu-link" href="#"> <i
+					class="icon material-icons md-person"></i> <span class="text">회원관리</span>
+			</a>
+				<div class="submenu">
+					<a th:href="@{/adminpage/useradmin/userList}">회원목록조회</a> <a
+						th:href="@{/adminpage/useradmin/loginHistory}">로그인기록조회</a> <a
+						th:href="@{/adminpage/useradmin/search}">검색 기록 조회</a> <a
+						th:href="@{/adminpage/useradmin/chatLog}">채팅 로그 조회</a> <a
+						th:href="@{/adminpage/useradmin/memberCoupons}">회원 쿠폰 조회</a> <a
+						th:href="@{/adminpage/useradmin/couponsList}">쿠폰 목록 조회</a> <a
+						th:href="@{/adminpage/useradmin/createCoupons}">쿠폰 생성</a>
+				</div></li>
+			<li class="menu-item has-submenu"
+				th:classappend="${activeMenu == 'store'} ? 'active' : ''"><a
+				class="menu-link" href="#"> <i
+					class="icon material-icons md-shopping_bag"></i> <span class="text">상점관리</span>
+			</a>
+				<div class="submenu">
+					<a th:href="@{/adminpage/storeadmin/appAdmin}">상점 신청 관리</a> <a
+						th:href="@{/adminpage/storeadmin/storeMngAdmin}">상점 관리</a> <a
+						th:href="@{/adminpage/storeadmin/reviewAdmin}">상품 리뷰 관리</a> <a
+						th:href="@{/adminpage/storeadmin/settlementDetailByStore}">상점별
+						정산 내역 조회</a> <a th:href="@{/adminpage/storeadmin/premiumAdd}">구독권
+						추가</a>
+				</div></li>
+			<li class="menu-item has-submenu"
+				th:classappend="${activeMenu == 'product'} ? 'active' : ''"><a
+				class="menu-link" href="#"> <i
+					class="icon material-icons md-shopping_bag"></i> <span class="text">상품관리</span>
+			</a>
+				<div class="submenu">
+					<a th:href="@{/adminpage/productadmin/allProducts}">전체 상품 관리</a>
+					<a th:href="@{/adminpage/productadmin/adminProductManagement}">상품 승인 관리</a>
+					<a th:href="@{/adminpage/productadmin/approvalHistory}">승인/반려 기록</a>
+					<a th:href="@{/adminpage/productadmin/adminCategoryManagement}">카테고리 관리</a>
+				</div></li>
+			<li class="menu-item has-submenu"
+				th:classappend="${activeMenu == 'board'} ? 'active' : ''"><a
+				class="menu-link" href="#"> <i
+					class="icon material-icons md-comment"></i> <span class="text">게시판관리</span>
+			</a>
+				<div class="submenu">
+					<a th:href="@{/adminpage/boardadmin/boardManagement}">게시판 관리</a> <a
+						th:href="@{/adminpage/boardadmin/commentManagement}">댓글 관리</a>
+				</div></li>
+			<li class="menu-item has-submenu"
+				th:classappend="${activeMenu == 'inquiry'} ? 'active' : ''"><a
+				class="menu-link" href="#"> <i
+					class="icon material-icons md-comment"></i> <span class="text">문의
+						및 신고관리</span>
+			</a>
+				<div class="submenu">
+					<a th:href="@{/admin/inquiry/adminInquiryList}">문의 목록 조회</a> <a
+						th:href="@{/adminpage/inquiryadmin/reportsList}">신고 목록 관리</a>
+				</div></li>
+			<li class="menu-divider"></li>
 
-                <!-- 2. 로그아웃 메뉴 구조를 다른 메뉴와 동일하게 수정 -->
-                <li class="menu-item">
-                    <a class="menu-link" th:href="@{/adminpage/logout}">
-                        <i class="icon material-icons md-logout"></i>
-                        <span class="text">로그아웃</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
+			<li class="menu-item"><a class="menu-link"
+				th:href="@{/adminpage/logout}"> <i
+					class="icon material-icons md-logout"></i> <span class="text">로그아웃</span>
+			</a></li>
+		</ul>
+	</nav>
+</aside>
 </html>
