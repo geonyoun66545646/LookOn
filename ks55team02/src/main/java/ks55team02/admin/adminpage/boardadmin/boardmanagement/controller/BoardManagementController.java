@@ -14,4 +14,11 @@ public class BoardManagementController {
 		
 		return "admin/adminpage/boardadmin/boardManagement";
 	}
+	
+	// 피드 관리
+	@GetMapping("/feedManagement")
+	public String feedAdminController() {
+		
+		return "admin/adminpage/boardadmin/feedManagement";
+	}
 }
