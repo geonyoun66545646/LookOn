@@ -1,4 +1,4 @@
-package ks55team02.admin.adminpage.storeadmin.appAdmin.controller;
+package ks55team02.admin.adminpage.storeadmin.appadmin.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import ks55team02.admin.adminpage.storeadmin.appAdmin.service.AppAdminService;
+import ks55team02.admin.adminpage.storeadmin.appadmin.service.AppAdminService;
 import ks55team02.admin.common.domain.Pagination;
 import ks55team02.common.domain.store.AppStore;
 import ks55team02.common.enums.ApplyStatus;

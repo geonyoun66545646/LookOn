@@ -1,4 +1,4 @@
-package ks55team02.seller.common.service.impl;
+package ks55team02.seller.common.service;
 
 import java.util.List;
 import java.util.Map;

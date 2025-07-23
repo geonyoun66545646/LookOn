@@ -4,9 +4,15 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
     <property name="LOG_DIR" value="/home/teamproject/logs" />
 
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){cyan} [%-5level] %logger{20} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
     <appender name="QSTDOUT_CUSTOM" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){cyan}  %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} %n    %msg%n</pattern>
+            <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss}){cyan}  %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} %n    %msg%n</pattern>
         </encoder>
     </appender>
 

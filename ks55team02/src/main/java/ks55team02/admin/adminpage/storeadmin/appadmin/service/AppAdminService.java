@@ -1,8 +1,8 @@
-package ks55team02.admin.adminpage.storeadmin.appAdmin.service;
+package ks55team02.admin.adminpage.storeadmin.appadmin.service;
 
 import java.util.List;
 
-import ks55team02.admin.adminpage.storeadmin.appAdmin.domain.AppAdmin;
+import ks55team02.admin.adminpage.storeadmin.appadmin.domain.AppAdmin;
 import ks55team02.common.domain.store.AppStore;
 
 public interface AppAdminService {

@@ -141,8 +141,7 @@
                                     <th scope="col">문의 유형</th>
                                     <th scope="col">문의 대상</th>
                                     <th scope="col">제목</th>
-                                    <th scope="col">작성자 (ID)</th>
-                                    <th scope="col">등록일</th>
+                                    <th scope="col">작성자 이름</th> <th scope="col">작성자 ID</th> <th scope="col">등록일</th>
                                     <th scope="col">처리 상태</th>
                                     <th scope="col">상세 보기</th>
                                     
@@ -155,8 +154,7 @@
                                     <td th:text="${inquiry.inqryTypeCd}"></td>
                                     <td th:text="${inquiry.inqryTrgtTypeCd}"></td>
                                     <td><a class="text" th:href="@{/admin/inquiry/adminInquiryDetail(inqryId=${inquiry.inqryId})}" th:text="${inquiry.inqryTtl}"></a></td>
-                                    <td th:text="${inquiry.writerInfo.userNcnm} + ' (' + ${inquiry.wrtrId} + ')'"></td>
-                                    <td th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></td>
+                                    <td><span th:text="${inquiry.writerInfo.userNm}"></span></td> <td><span th:text="${inquiry.writerInfo.userLgnId}"></span></td> <td th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></td>
                                     <td>
                                         <span class="badge custom-badge"
                                               th:text="${inquiry.prcsStts}"
