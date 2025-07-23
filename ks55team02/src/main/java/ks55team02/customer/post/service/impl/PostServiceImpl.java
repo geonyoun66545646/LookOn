@@ -34,6 +34,11 @@ public class PostServiceImpl implements PostService {
     public List<Board> selectBoardName() {
         return postMapper.selectBoardName();
     }
+    
+    @Override
+    public List<Board> selectBoardListForWrite() {
+        return postMapper.selectBoardListForWrite();
+    }
 
     @Override
     @Transactional(readOnly = true)
