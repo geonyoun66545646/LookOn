@@ -3,13 +3,15 @@ $(() => {
     const $feedContainer = $('.feed-container');
     const $container = $('#feed-list-grid-container');
     const $loadingIndicator = $('#loading-indicator');
+    const $sortDropdown = $('#sort-dropdown'); // [신규] 정렬 드롭다운 요소 캐싱
 
     // HTML의 data 속성에서 초기 상태를 읽어옴
     const state = {
         currentPage: parseInt($feedContainer.data('current-page'), 10) || 1,
         isLoading: false,
         hasNext: $feedContainer.data('has-next'),
-        activeTab: $feedContainer.data('active-tab') || 'discover'
+        activeTab: $feedContainer.data('active-tab') || 'discover',
+        sortOrder: $sortDropdown.val() || 'latest' // [신규] 현재 정렬 상태 초기화
     };
     
     // 비로그인 상태에서 팔로잉 탭으로 접근했을 경우 로그인 모달 띄우기
@@ -60,7 +62,10 @@ $(() => {
         $.ajax({
             url: apiUrl,
             type: 'GET',
-            data: { page: nextPage },
+            data: { 
+                page: nextPage,
+                sort: state.sortOrder // [수정] data 객체에 sort 파라미터 추가
+            },
             dataType: 'json'
         })
         .done(response => {
@@ -90,9 +95,9 @@ $(() => {
     };
 
     // --- 4. 이벤트 핸들러 ---
+    
     // 무한 스크롤
     $(window).on('scroll', () => {
-        // 첫 페이지 데이터가 적어 스크롤이 생기지 않을 수도 있으므로, hasNext가 true일 때만 이벤트 리스너를 활성화
         if (state.hasNext) {
              if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
                 loadNextPage();
@@ -119,6 +124,20 @@ $(() => {
         }
     });
 
+    // [신규] 정렬 순서 변경 이벤트 핸들러
+    $sortDropdown.on('change', function() {
+        const selectedSort = $(this).val();
+        
+        // 현재 URL에서 쿼리 파라미터를 가져와 객체로 변환
+        const currentParams = new URLSearchParams(window.location.search);
+        
+        // sort 파라미터 값을 새로 선택된 값으로 설정
+        currentParams.set('sort', selectedSort);
+        
+        // 새로운 쿼리 스트링을 포함하여 페이지를 리로드
+        window.location.href = window.location.pathname + '?' + currentParams.toString();
+    });
+
     // --- 5. 초기 실행 ---
-    // 이제 JS는 초기 로딩을 하지 않으므로 이 섹션은 비워둡니다.
+    // JS는 초기 로딩을 하지 않으므로 이 섹션은 비워둡니다.
 });

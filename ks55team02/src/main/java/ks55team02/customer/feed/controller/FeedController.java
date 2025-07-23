@@ -32,6 +32,8 @@ public class FeedController {
     @GetMapping("/feedList")
     public String selectFeedList(
             @RequestParam(name = "tab", defaultValue = "discover") String tab,
+            // [수정] sort 파라미터 추가
+            @RequestParam(name = "sort", defaultValue = "latest") String sort,
             @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
             Model model) {
         
@@ -46,17 +48,21 @@ public class FeedController {
                 model.addAttribute("needsLogin", true);
             } else {
                 String followerUserNo = loginUser.getUserNo();
+                // [참고] 팔로잉 목록은 정렬 기능이 없으므로 그대로 둡니다.
                 feedData = feedService.getFollowingFeedList(followerUserNo, currentPage, PAGE_SIZE);
                 model.addAllAttributes(feedData);
             }
         } else {
-            feedData = feedService.selectFeedList(null, currentPage, PAGE_SIZE);
+            // [수정] 서비스 호출 시 sort 파라미터 전달
+            feedData = feedService.selectFeedList(null, currentPage, PAGE_SIZE, sort);
             model.addAllAttributes(feedData);
         }
 
         model.addAttribute("loginUser", loginUser);
         model.addAttribute("activeTab", tab);
         model.addAttribute("currentPage", currentPage);
+        // [수정] 현재 정렬 상태를 프론트엔드로 전달
+        model.addAttribute("currentSort", sort);
 
         return "customer/feed/feedList";
     }

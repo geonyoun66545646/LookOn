@@ -117,9 +117,16 @@ $(() => {
                 state.currentPage++;
             } else {
                 state.hasNext = false;
-                if (state.currentPage === 1) {
-                    $container.html('<div class="no-posts-message">게시글이 없습니다.</div>');
-                }
+				if (state.currentPage === 1) {
+				    const noPostHtml = `
+				        <div class="post-item">
+				            <div class="post-item-content" style="text-align: center; width: 100%;">
+				                <h3 class="title" style="margin: 3rem 0;">게시글이 없습니다.</h3>
+				            </div>
+				        </div>
+				    `;
+				    $container.html(noPostHtml);
+				}
             }
         })
         .fail(err => {
