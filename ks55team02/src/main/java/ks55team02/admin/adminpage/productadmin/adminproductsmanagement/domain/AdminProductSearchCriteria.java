@@ -19,4 +19,7 @@ public class AdminProductSearchCriteria {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate; // 검색 종료일
+    
+    // [추가] '전체 상품 관리' 페이지의 상태 필터링을 위한 필드
+    private String statusFilter; 
 }

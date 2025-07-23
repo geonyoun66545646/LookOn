@@ -29,6 +29,9 @@ public interface DashboardMapper {
     // [처리할 업무] - 정산 대기 건수 조회
     int countPendingSettlements();
 
+    // [처리할 업무] - 문의 접수 건수 조회
+    int countPendingInquiry();
+
     // 월별 통계 데이터 조회 (수수료 수익)
     // MyBatis는 여러 컬럼을 반환할 때 Map<String, Object> 리스트로 받는 것이 편리합니다.
     List<Map<String, Object>> getMonthlyRevenue();

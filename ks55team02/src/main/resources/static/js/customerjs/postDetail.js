@@ -2,6 +2,9 @@
 // 아래 코드로 파일 전체를 교체해주세요.
 
 $(document).ready(function() {
+    // ... formatRelativeTime, .relative-time, .btn-more, document click ... (기존과 동일)
+    
+    // [기존 코드 시작] - 기존에 있던 모든 로직은 그대로 둡니다.
     function formatRelativeTime(dateString) {
         if (!dateString) return '';
         const now = new Date();
@@ -46,7 +49,6 @@ $(document).ready(function() {
         }).done(response => {
             alert(response.message || '게시글이 삭제되었습니다.');
             location.href = '/customer/post/postList';
-        // [수정] .fail() 로직 표준화
         }).fail(jqXHR => {
             if (jqXHR.status === 401) {
                 $('#signin-modal').modal('show');
@@ -81,7 +83,6 @@ $(document).ready(function() {
         }).done(response => {
             $btn.addClass('liked');
             $btn.find('.like-count').text(response.likeCount);
-        // [수정] .fail() 로직 표준화
         }).fail(jqXHR => {
             if (jqXHR.status === 401) {
                 $('#signin-modal').modal('show');
@@ -110,13 +111,27 @@ $(document).ready(function() {
     
     const $commentTextarea = $('#comment-textarea');
     const $commentSubmitBtn = $('#comment-submit-btn');
+    const $commentForm = $('#commentForm');
+
     if ($commentTextarea.length) {
         $commentTextarea.on('input', function() {
             $commentSubmitBtn.prop('disabled', $(this).val().trim() === '');
         });
+
+        // [신규] 'Enter' 키로 댓글 등록 기능
+        $commentTextarea.on('keydown', function(e) {
+            // Enter 키가 눌렸고, Shift 키가 눌리지 않았을 때
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // 기본 동작(줄바꿈) 방지
+                // 등록 버튼이 활성화 상태일 때만 submit 이벤트 트리거
+                if (!$commentSubmitBtn.is(':disabled')) {
+                    $commentForm.trigger('submit');
+                }
+            }
+        });
     }
 
-    $('#commentForm').on('submit', function(e) {
+    $commentForm.on('submit', function(e) {
         e.preventDefault();
         
         if (!loginUserNo) {
@@ -127,6 +142,8 @@ $(document).ready(function() {
         const formData = new FormData(this);
         const formObject = Object.fromEntries(formData.entries());
         
+        $commentSubmitBtn.prop('disabled', true); // 중복 제출 방지
+
         $.ajax({
             url: '/customer/api/post/comments',
             method: 'POST',
@@ -137,13 +154,13 @@ $(document).ready(function() {
             if (response.result === 'success') {
                 window.location.reload();
             }
-        // [수정] .fail() 로직 표준화
         }).fail(jqXHR => {
             if (jqXHR.status === 401) {
                 $('#signin-modal').modal('show');
             } else {
                 alert(jqXHR.responseJSON?.message || '댓글 작성 중 오류가 발생했습니다.');
             }
+            $commentSubmitBtn.prop('disabled', false); // 실패 시 버튼 다시 활성화
         });
     });
 
@@ -176,7 +193,6 @@ $(document).ready(function() {
             dataType: 'json'
         }).done(response => {
             window.location.reload();
-        // [수정] .fail() 로직 표준화
         }).fail(jqXHR => {
             if (jqXHR.status === 401) {
                 $('#signin-modal').modal('show');
@@ -195,7 +211,6 @@ $(document).ready(function() {
             dataType: 'json'
         }).done(response => {
             window.location.reload();
-        // [수정] .fail() 로직 표준화
         }).fail(jqXHR => {
             if (jqXHR.status === 401) {
                 $('#signin-modal').modal('show');
@@ -204,4 +219,5 @@ $(document).ready(function() {
             }
         });
     });
+    // [기존 코드 끝]
 });

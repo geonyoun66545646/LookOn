@@ -60,11 +60,12 @@
                 <li class="menu-item has-submenu" th:classappend="${activeMenu == 'board'} ? 'active' : ''">
                     <a class="menu-link" href="#">
                         <i class="icon material-icons md-comment"></i>
-                        <span class="text">게시판관리</span>
+                        <span class="text">피드 및 커뮤니티 관리</span>
                     </a>
                     <div class="submenu">
+                        <a th:href="@{/adminpage/boardadmin/feedManagement}">피드 관리</a>
+                        <a th:href="@{/adminpage/boardadmin/postManagement}">게시글 관리</a>
                         <a th:href="@{/adminpage/boardadmin/boardManagement}">게시판 관리</a>
-                        <a th:href="@{/adminpage/boardadmin/commentManagement}">댓글 관리</a>
                     </div>
                 </li>
                 <li class="menu-item has-submenu" th:classappend="${activeMenu == 'inquiry'} ? 'active' : ''">
@@ -78,15 +79,11 @@
                     </div>
                 </li>
                 <li class="menu-divider"></li>
-
-                <!-- 2. 로그아웃 메뉴 구조를 다른 메뉴와 동일하게 수정 -->
-                <li class="menu-item">
-                    <a class="menu-link" th:href="@{/adminpage/logout}">
-                        <i class="icon material-icons md-logout"></i>
-                        <span class="text">로그아웃</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
+			<li class="menu-item"><a class="menu-link"
+				th:href="@{/adminpage/logout}"> <i
+					class="icon material-icons md-logout"></i> <span class="text">로그아웃</span>
+			</a></li>
+		</ul>
+	</nav>
+</aside>
 </html>

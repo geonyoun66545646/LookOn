@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ks55team02.admin.adminpage.boardadmin.boardmanagement.mapper.BoardManagementMapper">
+
+	<resultMap id="boardResultMap"
+		type="ks55team02.customer.post.domain.Board">
+		<id column="bbs_clsf_cd" property="bbsClsfCd" />
+		<result column="bbs_creatr_user_no" property="bbsCreatrUserNo" />
+		<result column="bbs_nm" property="bbsNm" />
+		<result column="bbs_prps_cn" property="bbsPrpsCn" />
+		<result column="wrt_authrt_lvl_val" property="wrtAuthrtLvlVal" />
+		<result column="cmnt_wrt_authrt_lvl_val"
+			property="cmntWrtAuthrtLvlVal" />
+		<result column="crt_dt" property="crtDt" />
+		<result column="del_dt" property="delDt" />
+	</resultMap>
+
+	<select id="getBoardList" resultMap="boardResultMap">
+		SELECT bbs_clsf_cd, bbs_nm, wrt_authrt_lvl_val, cmnt_wrt_authrt_lvl_val,
+		crt_dt, del_dt
+		FROM boards
+		ORDER BY crt_dt DESC;
+	</select>
+
+	<select id="getBoardByCode" parameterType="string"
+		resultMap="boardResultMap">
+		SELECT bbs_clsf_cd, bbs_nm, bbs_prps_cn, wrt_authrt_lvl_val,
+		cmnt_wrt_authrt_lvl_val
+		FROM boards
+		WHERE bbs_clsf_cd = #{boardCode};
+	</select>
+
+	<insert id="addBoard"
+		parameterType="ks55team02.customer.post.domain.Board">
+		INSERT INTO boards
+		(bbs_clsf_cd, bbs_nm, bbs_prps_cn, wrt_authrt_lvl_val, cmnt_wrt_authrt_lvl_val,
+		bbs_creatr_user_no, crt_dt)
+		VALUES
+		(#{bbsClsfCd}, #{bbsNm}, #{bbsPrpsCn}, #{wrtAuthrtLvlVal}, #{cmntWrtAuthrtLvlVal},
+		#{bbsCreatrUserNo}, NOW());
+	</insert>
+
+	<update id="updateBoard"
+		parameterType="ks55team02.customer.post.domain.Board">
+		UPDATE boards
+		SET
+		bbs_nm = #{bbsNm},
+		bbs_prps_cn = #{bbsPrpsCn},
+		wrt_authrt_lvl_val = #{wrtAuthrtLvlVal},
+		cmnt_wrt_authrt_lvl_val = #{cmntWrtAuthrtLvlVal},
+		mdfcn_dt = NOW()
+		WHERE
+		bbs_clsf_cd = #{bbsClsfCd};
+	</update> <!-- [최종 수정] 오타 수정: </doupdate> -> </update> -->
+
+	<update id="deleteBoard" parameterType="string">
+		UPDATE boards
+		SET del_dt = NOW()
+		WHERE bbs_clsf_cd = #{boardCode};
+	</update>
+
+	<update id="restoreBoard" parameterType="string">
+		UPDATE boards
+		SET del_dt = NULL
+		WHERE bbs_clsf_cd = #{boardCode};
+	</update>
+</mapper>

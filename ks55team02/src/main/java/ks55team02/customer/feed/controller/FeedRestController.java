@@ -32,8 +32,11 @@ public class FeedRestController {
     private static final int PAGE_SIZE = 12;
 
     @GetMapping("/list")
-    public ResponseEntity<Map<String, Object>> selectFeedsForScroll(@RequestParam(value = "page", defaultValue = "1") int page) {
-        Map<String, Object> result = feedService.selectFeedList(null, page, PAGE_SIZE);
+    public ResponseEntity<Map<String, Object>> selectFeedsForScroll(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "sort", defaultValue = "latest") String sort) {
+        // [수정] sort 파라미터를 서비스 호출에 추가
+        Map<String, Object> result = feedService.selectFeedList(null, page, PAGE_SIZE, sort);
         return ResponseEntity.ok(result);
     }
     
@@ -60,16 +63,27 @@ public class FeedRestController {
     }
     
     @GetMapping("/my-feed")
-    public ResponseEntity<Map<String, Object>> selectMyFeeds(@RequestParam(name = "page", defaultValue = "1") int page, @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
+    public ResponseEntity<Map<String, Object>> selectMyFeeds(
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(value = "sort", defaultValue = "latest") String sort, // [수정] sort 파라미터 추가
+            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
+        
         if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         String userNo = loginUser.getUserNo();
-        Map<String, Object> result = feedService.selectFeedList(userNo, page, PAGE_SIZE);
+        
+        // [수정] sort 파라미터를 서비스 호출에 추가하여 4개 인자로 호출
+        Map<String, Object> result = feedService.selectFeedList(userNo, page, PAGE_SIZE, sort);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/user-feed/{userNo}")
-    public ResponseEntity<Map<String, Object>> selectUserFeeds(@PathVariable("userNo") String userNo, @RequestParam(name = "page", defaultValue = "1") int page) {
-        Map<String, Object> result = feedService.selectFeedList(userNo, page, PAGE_SIZE);
+    public ResponseEntity<Map<String, Object>> selectUserFeeds(
+            @PathVariable("userNo") String userNo,
+            @RequestParam(name = "page", defaultValue = "1") int page,
+            @RequestParam(value = "sort", defaultValue = "latest") String sort) { // [수정] sort 파라미터 추가
+        
+        // [수정] sort 파라미터를 서비스 호출에 추가하여 4개 인자로 호출
+        Map<String, Object> result = feedService.selectFeedList(userNo, page, PAGE_SIZE, sort);
         return ResponseEntity.ok(result);
     }
     
