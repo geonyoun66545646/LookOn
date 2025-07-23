@@ -1,4 +1,4 @@
-package ks55team02.admin.adminpage.storeadmin.appAdmin.mapper;
+package ks55team02.admin.adminpage.storeadmin.appadmin.mapper;
 
 import java.util.List;
 

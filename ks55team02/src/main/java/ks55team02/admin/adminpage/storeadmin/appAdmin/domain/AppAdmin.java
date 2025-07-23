@@ -1,4 +1,4 @@
-package ks55team02.admin.adminpage.storeadmin.appAdmin.domain;
+package ks55team02.admin.adminpage.storeadmin.appadmin.domain;
 
 import java.time.LocalDateTime;
 
