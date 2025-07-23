@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}">
+<head>
+    <title th:text="${title}"></title>
+    <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/userList.css}">
+</head>
+<th:block layout:fragment="contents">
+    <main class="main-content">
+        <section class="content-header">
+            <h2 class="content-title">게시판 관리</h2>
+        </section>
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-end mb-4">
+                    <button type="button" class="btn btn-primary" id="add-board-btn">
+                        + 새 게시판 생성
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover member-table">
+                        <thead>
+                            <tr class="text-center">
+                                <th>게시판 코드</th>
+                                <th>게시판 이름</th>
+                                <th>글쓰기 권한</th>
+                                <th>댓글쓰기 권한</th>
+                                <th>상태</th> <!-- [신규] 상태 컬럼 추가 -->
+                                <th>생성일</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="board-table-body">
+                            <tr th:each="board : ${boardList}">
+                                <td th:text="${board.bbsClsfCd}"></td>
+                                <td th:text="${board.bbsNm}"></td>
+                                <td th:text="${board.wrtAuthrtLvlVal}"></td>
+                                <td th:text="${board.cmntWrtAuthrtLvlVal}"></td>
+                                <!-- [신규] 상태 표시 로직 -->
+                                <td>
+                                    <span class="badge" th:text="${board.delDt == null ? '정상' : '삭제됨'}"
+                                          th:classappend="${board.delDt == null ? 'bg-success' : 'bg-secondary'}"></span>
+                                </td>
+                                <td th:text="${board.crtDt != null ? #strings.substring(board.crtDt, 0, 10) : '-'}"></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary edit-btn" th:data-board-code="${board.bbsClsfCd}">수정</button>
+                                    <!-- [수정] 삭제/복구 버튼 조건부 렌더링 -->
+                                    <button th:if="${board.delDt == null}" type="button" class="btn btn-sm btn-outline-danger delete-btn" th:data-board-code="${board.bbsClsfCd}">삭제</button>
+                                    <button th:if="${board.delDt != null}" type="button" class="btn btn-sm btn-outline-info restore-btn" th:data-board-code="${board.bbsClsfCd}">복구</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 게시판 생성/수정 모달 -->
+    <div class="modal fade" id="board-modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-title">새 게시판 생성</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="board-form">
+                        <input type="hidden" id="board-mode">
+                        <div class="mb-3">
+                            <label for="bbsClsfCd" class="form-label">게시판 코드 (영문)</label>
+                            <input type="text" class="form-control" id="bbsClsfCd" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bbsNm" class="form-label">게시판 이름</label>
+                            <input type="text" class="form-control" id="bbsNm" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bbsPrpsCn" class="form-label">게시판 설명</label>
+                            <textarea class="form-control" id="bbsPrpsCn" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="wrtAuthrtLvlVal" class="form-label">글쓰기 권한</label>
+                            <select class="form-select" id="wrtAuthrtLvlVal">
+                                <option value="public">public</option>
+                                <option value="admin_only">admin_only</option>
+                                <option value="seller_only">seller_only</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cmntWrtAuthrtLvlVal" class="form-label">댓글쓰기 권한</label>
+                            <select class="form-select" id="cmntWrtAuthrtLvlVal">
+                                <option value="public">public</option>
+                                <option value="admin_only">admin_only</option>
+                                <option value="seller_only">seller_only</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="save-board-btn">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+<th:block layout:fragment="jsScript">
+    <script th:src="@{/js/admin/adminBoardList.js}"></script>
+</th:block>
+</html>

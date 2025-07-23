@@ -112,13 +112,14 @@
 								<option value="likeCountDesc"
 									th:selected="${searchCriteria.sortOrder == 'likeCountDesc'}">좋아요
 									많은 순</option>
-							</select> <select class="form-select d-inline-block" id="psize"
+							</select> <select class="form-select d-inline-block" id="pageSize"
 								name="psize" style="width: auto;">
-								<option value="10" th:selected="${searchCriteria.psize == 10}">10개씩
+								<option value="10"
+									th:selected="${searchCriteria.psize == '10' or searchCriteria.psize == null}">10개씩
 									보기</option>
-								<option value="30" th:selected="${searchCriteria.psize == 30}">30개씩
+								<option value="30" th:selected="${searchCriteria.psize == '30'}">30개씩
 									보기</option>
-								<option value="50" th:selected="${searchCriteria.psize == 50}">50개씩
+								<option value="50" th:selected="${searchCriteria.psize == '50'}">50개씩
 									보기</option>
 							</select>
 						</div>
