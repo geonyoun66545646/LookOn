@@ -19,6 +19,7 @@ public class WebMvcConfig implements WebMvcConfigurer{
 	                    "/aditinfo/**"
 	                    // 여기에 로그인이 필요한 다른 URL 패턴들을 계속 추가하면 됩니다.
 	                	,"/cart/**"	// - 2025.07.11 gy -
+	                	,"/checkout/**"	// - 2025.07.22 gy -
 	                );
 	                
 	                // 인터셉터를 적용하지 않을 URL 패턴 (예외 처리)

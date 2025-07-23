@@ -1,6 +1,8 @@
 package ks55team02.admin.adminpage.inquiryadmin.reports.domain;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -35,4 +37,7 @@ public class AdminReportDetail {
     // [수정 3] 유효성 검사에 필요한 필드들을 추가합니다.
     private String dclrTrgtTypeCd; // 신고 대상 타입
     private String dclrTrgtContsId; // 신고 대상 콘텐츠 ID
+    
+    private String prcsCmptnDt; // 처리 완료 일시
+
 }

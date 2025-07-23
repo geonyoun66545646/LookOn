@@ -90,5 +90,24 @@
 
         <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;"><p>Loading...</p></div>
     </main>
+    <div class="fab-container">
+        <button th:if="${session.loginUser != null}"
+                type="button"
+                class="fab-button"
+                aria-label="새 피드 작성"
+                title="새 피드 작성"
+                th:onclick="|location.href='@{/customer/feed/feedWrite}'|">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+        <button th:if="${session.loginUser == null}"
+                type="button"
+                class="fab-button"
+                aria-label="새 피드 작성 (로그인 필요)"
+                title="새 피드 작성 (로그인 필요)"
+                data-toggle="modal"
+                data-target="#signin-modal">
+            <i class="bi bi-plus-lg"></i>
+        </button>
+    </div>
 </th:block>
 </html>

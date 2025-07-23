@@ -34,20 +34,23 @@
 		<result property="dclrPrcsRsltCn" column="dclr_prcs_rslt_cn" />
 		<result property="dclrTrgtTypeCd" column="dclr_trgt_type_cd" />
 		<result property="dclrTrgtContsId" column="dclr_trgt_conts_id" />
+		<result property="prcsCmptnDt" column="prcs_cmptn_dt" />
 	</resultMap>
 
 	<resultMap id="adminReportHistoryResultMap"
 		type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportHistory">
 		<id property="hstryId" column="hstry_id" />
 		<result property="dclrId" column="dclr_id" />
-		<result property="prcsUserNo" column="user_no" />
-		<result property="prcsUserNcnm" column="prcs_user_ncnm" />
-		<result property="prcsCn" column="prcs_cn" />
+		<result property="userNo" column="user_no" /> <!-- DTO 필드명: userNo -->
+		<result property="actnCn" column="actn_cn" /> <!-- DTO 필드명: actnCn -->
+		<result property="prcsUserNcnm" column="prcsUserNcnm" /> <!-- 쿼리 별칭과 동일하게 -->
 		<result property="bfrSttsCd" column="bfr_stts_cd" />
 		<result property="crntSttsCd" column="crnt_stts_cd" />
 		<result property="prcsDt" column="prcs_dt" />
 		<result property="prcsDsctnMemoCn" column="prcs_dsctn_memo_cn" />
+		<result property="sanctionType" column="sanction_type" /> <!-- sanctionType 추가 -->
 	</resultMap>
+
 
 	<resultMap id="userSanctionResultMap"
 		type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.UserSanction">
@@ -154,11 +157,11 @@
 					</when>
 					<when test="searchCriteria.searchKey == 'dclrTrgtTypeCd'">
 						AND R.dclr_trgt_type_cd LIKE CONCAT('%',
-						#{searchCriteria.searchValue}, '%')
+						#{searchValue}, '%')
 					</when>
 					<when test="searchCriteria.searchKey == 'dclrReasonContent'">
 						AND RR.dclr_rsn_cn LIKE CONCAT('%',
-						#{searchCriteria.searchValue},
+						#{searchValue},
 						'%')
 					</when>
 				</choose>
@@ -192,44 +195,56 @@
 		r.prcs_pic_mngr_no,
 		r.dclr_prcs_rslt_cn,
 		r.dclr_trgt_type_cd,
-		r.dclr_trgt_conts_id
+		r.dclr_trgt_conts_id,
+		DATE_FORMAT(COALESCE(r.prcs_cmptn_dt, us.prcs_dt), '%Y-%m-%d %H:%i')
+		AS prcs_cmptn_dt
 		FROM
 		reports AS r
 		LEFT JOIN
-		users AS dclr_user ON r.dclr_user_no =
-		dclr_user.user_no
+		users AS dclr_user ON
+		r.dclr_user_no = dclr_user.user_no
 		LEFT JOIN
-		users AS trgt_user ON r.dclr_trgt_user_no =
-		trgt_user.user_no
+		users AS trgt_user ON
+		r.dclr_trgt_user_no = trgt_user.user_no
 		LEFT JOIN
-		report_reasons AS rr ON r.dclr_rsn_cd =
-		rr.dclr_rsn_cd
+		report_reasons AS rr
+		ON r.dclr_rsn_cd = rr.dclr_rsn_cd
+		LEFT JOIN
+		user_sanctions AS us ON
+		r.dclr_id = us.dclr_id
 		WHERE
 		r.dclr_id = #{dclrId};
 	</select>
 
+	<!-- AdminReportsMapper.xml -->
+
+	<!-- [수정] id가 "getAdminReportHistoryListById" 인 select 쿼리 -->
+	<!-- AdminReportsMapper.xml -->
+
+	<!-- [수정] id가 "getAdminReportHistoryListById" 인 select 쿼리 -->
 	<select id="getAdminReportHistoryListById"
-		parameterType="String" resultMap="adminReportHistoryResultMap">
+		resultMap="adminReportHistoryResultMap" parameterType="String">
 		SELECT
-		h.hstry_id,
-		h.dclr_id,
-		h.user_no,
-		u.user_ncnm AS prcs_user_ncnm,
-		h.actn_cn AS prcs_cn,
-		h.bfr_stts_cd,
-		h.crnt_stts_cd,
-		DATE_FORMAT(h.prcs_dt, '%Y-%m-%d %H:%i')
-		AS prcs_dt,
-		h.prcs_dsctn_memo_cn
+		rh.hstry_id,
+		rh.dclr_id,
+		rh.user_no,
+		rh.actn_cn,
+		rh.bfr_stts_cd,
+		rh.crnt_stts_cd,
+		DATE_FORMAT(rh.prcs_dt, '%Y-%m-%d %H:%i') AS prcs_dt,
+		rh.prcs_dsctn_memo_cn,
+		u.user_ncnm AS prcsUserNcnm,
+		us.sanction_type
 		FROM
-		report_history AS h
-		INNER JOIN
-		users
-		AS u ON h.user_no = u.user_no
+		report_history rh
+		JOIN
+		users u ON rh.user_no = u.user_no
+		LEFT JOIN
+		user_sanctions us ON rh.dclr_id = us.dclr_id
 		WHERE
-		h.dclr_id = #{dclrId}
+		rh.dclr_id = #{dclrId}
 		ORDER BY
-		h.prcs_dt DESC;
+		rh.prcs_dt DESC;
 	</select>
 
 	<update id="updateReportStatus"
@@ -255,7 +270,8 @@
 		#{hstryId},
 		#{dclrId},
 		#{adminId},
-		#{prcsCn},
+		#{actionContent}, -- [수정] DTO 필드명에 맞게
+		(ReportProcessRequest에 actionContent 필드 추가 필요)
 		#{prcsDsctnMemoCn},
 		'RECEIVED',
 		#{newStatus},
@@ -308,25 +324,76 @@
 		#{prcsAdminNo}
 		);
 	</insert>
-	
-	<select id="getLatestSanctionByUserNo" parameterType="String" resultMap="userSanctionResultMap">
-        SELECT
-            sanction_id,
-            user_no,
-            dclr_id,
-            sanction_type,
-            sanction_reason,
-            sanction_start_dt,
-            sanction_end_dt,
-            prcs_dt,
-            prcs_admin_no
-        FROM
-            user_sanctions
-        WHERE
-            user_no = #{userNo}
-        ORDER BY
-            prcs_dt DESC
-        LIMIT 1
-    </select>
+
+	<select id="getLatestSanctionByUserNo" parameterType="String"
+		resultMap="userSanctionResultMap">
+		SELECT
+		sanction_id,
+		user_no,
+		dclr_id,
+		sanction_type,
+		sanction_reason,
+		sanction_start_dt,
+		sanction_end_dt,
+		prcs_dt,
+		prcs_admin_no
+		FROM
+		user_sanctions
+		WHERE
+		user_no = #{userNo}
+		ORDER BY
+		prcs_dt DESC
+		LIMIT 1
+	</select>
+
+	<select id="getNextSanctionId" resultType="String">
+		SELECT
+		CONCAT('SANCT_', LPAD(IFNULL(MAX(CAST(SUBSTRING(sanction_id, 7) AS
+		UNSIGNED)), 0) + 1,
+		5, '0'))
+		FROM
+		user_sanctions
+	</select>
+
+	<select id="getPostOwnerUserNo" parameterType="String"
+		resultType="String">
+		SELECT wrtr_user_no FROM posts WHERE pst_sn = #{postSn};
+	</select>
+
+	<select id="getCommentOwnerUserNo" parameterType="String"
+		resultType="String">
+		SELECT wrtr_user_no FROM post_comments WHERE pst_cmnt_sn =
+		#{commentSn};
+	</select>
+
+	<select id="getProductOwnerUserNo" parameterType="String"
+		resultType="String">
+		SELECT s.seller_user_no FROM products p
+		JOIN stores s ON
+		p.store_id = s.store_id
+		WHERE p.gds_no = #{gdsNo};
+	</select>
+
+	<update id="updatePostStatus" parameterType="java.util.Map"> UPDATE posts
+		SET
+		del_dt = NOW() WHERE
+		pst_sn = #{postSn};
+	</update>
+
+	<update id="deleteComment" parameterType="java.util.Map"> UPDATE post_comments
+		SET
+		del_dt = NOW(), del_user_no = #{adminId} WHERE
+		pst_cmnt_sn =
+		#{commentSn};
+	</update>
+
+	<update id="updateProductExposureYn">
+		UPDATE products
+		SET
+		expsr_yn = #{exposureYn}
+		WHERE
+		gds_no = #{gdsNo};
+	</update>
+
 
 </mapper>

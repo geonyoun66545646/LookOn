@@ -13,14 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpSession;
-import ks55team02.customer.coupons.domain.Coupons;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.tossapi.service.PaymentService;
 
@@ -56,9 +54,10 @@ public class PaymentController {
     }
 
     // 2. 결제 준비 (주문 정보 DB 저장)
+    // 2. 결제 준비 (주문 정보 DB 저장)
     @PostMapping("/api/orders")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody Map<String, Object> orderData, HttpSession session) { // Map<String, Object>로 변경
+    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody Map<String, Object> orderData, HttpSession session) {
         log.info("API 호출: /api/orders (주문 생성) - orderData: {}", orderData);
         
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
@@ -69,36 +68,38 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorBody);
         }
         
-     // 로그인한 사용자의 userNo를 orderData에 추가합니다.
-        String userNo = loginUser.getUserNo(); // LoginUser 객체에서 사용자 번호를 가져오는 실제 메서드를 사용하세요.
-                                                // 예: loginUser.getMemberId(), loginUser.getUserNo() 등
+        String userNo = loginUser.getUserNo();
         orderData.put("userNo", userNo);
         log.info("orderData에 userNo 추가됨: {}", userNo);
         
         try {
-            String orderId = paymentService.createOrder(orderData); // 주문 정보 저장 및 ID 생성
+            String orderId = paymentService.createOrder(orderData);
             log.info("주문이 성공적으로 생성되었습니다. 주문 ID: {}", orderId);
             
-            // 토스페이먼츠 위젯에 필요한 정보들을 Map에 담아 반환합니다.
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("orderId", orderId);
             
-            // `amount` (totalAmount)는 Long 타입으로 변환하여 전달
-            Object totalAmountObj = orderData.get("totalAmount");
-            if (totalAmountObj instanceof Integer) { // Integer로 넘어올 경우 Long으로 변환
-                responseBody.put("amount", ((Integer) totalAmountObj).longValue());
-            } else if (totalAmountObj instanceof String) { // String으로 넘어올 경우 Long으로 파싱
-                responseBody.put("amount", Long.parseLong((String) totalAmountObj));
-            } else if (totalAmountObj instanceof Long) { // 이미 Long인 경우 그대로 사용
-                responseBody.put("amount", (Long) totalAmountObj);
-            } else { // 그 외의 경우 (예: BigDecimal), 적절히 처리하거나 기본값 설정
-                log.warn("totalAmount의 예상치 못한 타입: {}", totalAmountObj.getClass().getName());
-                responseBody.put("amount", 0L); // 안전을 위해 0으로 설정하거나 예외 발생
+            // =========================================================================
+            // [수정] 바로 이 부분입니다!
+            // 토스페이먼츠에 전달할 결제 금액(amount)을 할인 전 금액(totalAmount)이 아닌,
+            // 최종 결제 금액(finalAmount)으로 변경합니다.
+            // =========================================================================
+            Object finalAmountObj = orderData.get("finalAmount"); // totalAmount -> finalAmount로 변경
+            if (finalAmountObj instanceof Integer) {
+                responseBody.put("amount", ((Integer) finalAmountObj).longValue());
+            } else if (finalAmountObj instanceof String) {
+                responseBody.put("amount", Long.parseLong((String) finalAmountObj));
+            } else if (finalAmountObj instanceof Long) {
+                responseBody.put("amount", (Long) finalAmountObj);
+            } else if (finalAmountObj instanceof Double) { // Double 타입으로 넘어올 경우를 대비
+                responseBody.put("amount", ((Double) finalAmountObj).longValue());
+            } else {
+                log.warn("finalAmount의 예상치 못한 타입: {}", finalAmountObj.getClass().getName());
+                responseBody.put("amount", 0L);
             }
 
-            // `orderName` (주문명)은 상품 목록에서 첫 번째 상품 이름 또는 "상품 외 N개"
             List<Map<String, Object>> products = (List<Map<String, Object>>) orderData.get("products");
-            String orderName = "주문 상품"; // 기본 주문명
+            String orderName = "주문 상품";
             if (products != null && !products.isEmpty()) {
                 String firstProductName = (String) products.get(0).get("name");
                 if (products.size() > 1) {
@@ -108,19 +109,12 @@ public class PaymentController {
                 }
             }
             responseBody.put("orderName", orderName);
-
-            // `customerName` (고객명)
             responseBody.put("customerName", orderData.get("customerName"));
             
-            // 필요하다면 `customerEmail`과 `customerMobilePhone`도 추가 (프론트에서 넘겨준다면)
-            // responseBody.put("customerEmail", orderData.get("customerEmail"));
-            // responseBody.put("customerMobilePhone", ((Map<String, Object>)orderData.get("shippingAddress")).get("phone"));
-
-
             return ResponseEntity.ok(responseBody);
         } catch (Exception e) {
             log.error("주문 생성 실패: {}", e.getMessage(), e);
-            Map<String, Object> errorBody = new HashMap<>(); // Map<String, Object>로 변경
+            Map<String, Object> errorBody = new HashMap<>();
             errorBody.put("error", "주문 생성에 실패했습니다: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorBody);
         }
@@ -184,48 +178,34 @@ public class PaymentController {
         return "customer/fragments/paymentFail";
     }
 
-    // 기타 API 엔드포인트
-    @GetMapping("/api/orders/history/{userNo}")
-    @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getOrderPaymentHistory(@PathVariable String userNo) {
-        log.info("API 호출: /api/orders/history/{} (주문 결제 이력 조회)", userNo);
-        List<Map<String, Object>> history = paymentService.getOrderPaymentHistoryByUser(userNo);
-        return ResponseEntity.ok(history);
-    }
 
-    @GetMapping("/api/orders/latest/{userNo}")
+    @GetMapping("/api/user/coupons")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getLatestOrderDetails(@PathVariable String userNo) {
-        log.info("API 호출: /api/orders/latest/{} (최신 주문 상세 조회)", userNo);
-        Map<String, Object> latestOrder = paymentService.getLatestOrderDetailsForUser(userNo);
-        return ResponseEntity.ok(latestOrder);
-    }
-
-    @GetMapping("/api/user/coupons") // userNo를 PathVariable에서 제외
-    @ResponseBody
-    public ResponseEntity<List<Coupons>> getUserCoupons(HttpSession session) {
+    public ResponseEntity<List<ks55team02.customer.coupons.domain.UserCoupons>> getUserCoupons(HttpSession session) { // 반환 타입 변경 (1)
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         if (loginUser == null) {
             log.error("사용자 쿠폰 조회 실패: 세션에 로그인 정보가 없습니다.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 Unauthorized 반환
+            // 401 에러를 JSON 형태로 반환하여 프론트에서 처리할 수 있도록 개선
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Unauthorized");
+            error.put("message", "로그인이 필요합니다.");
+            return new ResponseEntity(error, HttpStatus.UNAUTHORIZED);
         }
-        String userNo = loginUser.getUserNo(); // 로그인된 사용자의 userNo를 세션에서 가져옴
+        String userNo = loginUser.getUserNo();
         log.info("API 호출: /api/user/coupons (사용자 쿠폰 조회) - 사용자 번호: {}", userNo);
 
-        // PaymentService가 아닌 별도의 CouponService를 사용하는 것이 더 적절할 수 있습니다.
-        // 현재는 PaymentService에 있다고 가정하고 진행합니다.
-        List<Coupons> coupons = paymentService.getUserCouponsDTO(userNo); // DTO를 반환하는 새 메서드 호출
-        return ResponseEntity.ok(coupons);
+        try {
+            // PaymentService에서 UserCoupons 리스트를 반환하는 메소드를 호출해야 합니다.
+            List<ks55team02.customer.coupons.domain.UserCoupons> userCoupons = paymentService.getActiveUserCoupons(userNo); // 서비스 메소드명 변경 제안 (2)
+            return ResponseEntity.ok(userCoupons);
+        } catch (Exception e) {
+            log.error("쿠폰 정보를 가져오는 중 서버 에러 발생", e);
+            // 500 에러도 JSON 형태로 반환
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Internal Server Error");
+            error.put("message", "쿠폰 정보를 가져오는 데 실패했습니다.");
+            return new ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @PostMapping("/api/calculate-discount")
-    @ResponseBody
-    public ResponseEntity<Long> calculateDiscountedAmount(
-            @RequestParam Long originalAmount,
-            @RequestParam String couponCode,
-            @RequestParam String userNo) {
-        log.info("API 호출: /api/calculate-discount (할인 금액 계산)");
-        Long discountedAmount = paymentService.calculateDiscountedAmount(originalAmount, couponCode, userNo);
-        return ResponseEntity.ok(discountedAmount);
-    }
 }

@@ -14,6 +14,8 @@ public interface PostMapper {
 	
 	List<Board> selectBoardName();
 	
+	List<Board> selectBoardListForWrite();
+	
 	Post selectPostDetailByPstSn(@Param("pstSn") String pstSn, @Param("loginUserNo") String loginUserNo);
 	
 	int updateViewCount(String pstSn);

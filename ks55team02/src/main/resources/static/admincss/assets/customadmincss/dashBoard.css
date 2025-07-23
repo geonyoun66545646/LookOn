@@ -1,0 +1,66 @@
+@charset "UTF-8";
+/* 카드 안의 값을 강조하는 스타일 */
+.card-value {
+    font-size: 2rem; /* 숫자 크기 */
+    font-weight: 600; /* 숫자 굵기 */
+    margin-bottom: 0.25rem;
+    color: #333;
+}
+
+/* 카드 아이콘을 감싸는 동그라미 스타일 */
+.icon-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%; /* 완벽한 원으로 만듦 */
+}
+
+/* 동그라미 아이콘 내부의 아이콘 크기 */
+.icon-circle .material-icons {
+    font-size: 28px;
+}
+
+/* 색상별 연한 배경색 (부트스트랩 색상 변수 활용) */
+.bg-primary-light { background-color: rgba(13, 110, 253, 0.1); }
+.bg-success-light { background-color: rgba(25, 135, 84, 0.1); }
+.bg-warning-light { background-color: rgba(255, 193, 7, 0.15); }
+.bg-danger-light  { background-color: rgba(220, 53, 69, 0.1); }
+
+/* 링크 밑줄 제거 */
+.text-decoration-none {
+    text-decoration: none !important;
+}
+
+/* dashBoard.css 파일에 추가 */
+
+.task-list .task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 0.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.task-list .task-item:last-child {
+    border-bottom: none;
+}
+
+.task-list .task-item:hover {
+    background-color: #f8f9fa;
+}
+
+.task-list .task-item .item-info {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+
+.task-list .task-item .item-info .material-icons {
+    margin-right: 12px; /* 아이콘과 텍스트 사이 간격 */
+    font-size: 22px;
+}

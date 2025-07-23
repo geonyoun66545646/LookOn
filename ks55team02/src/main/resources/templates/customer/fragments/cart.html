@@ -120,7 +120,8 @@
             type: 'GET',
             dataType: 'json',
             success: function(cartItems) {
-                console.log("장바구니 데이터 조회 성공:", cartItems);
+                // ★★★ 중요: 서버 응답에 store_id가 포함되어 있는지 로그로 확인
+                console.log("서버로부터 받은 장바구니 데이터:", cartItems); 
                 globalCartItems = cartItems;
                 renderCartItems(globalCartItems);
             },
@@ -187,35 +188,32 @@
         $('#cartTotalPayment').text(`${subtotal.toLocaleString()}원`);
     }
 
-    // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ [ 여기가 수정된 부분입니다 ] ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
-    // 4. 수량 변경 및 삭제 AJAX 함수들의 내용을 실제로 채워 넣습니다.
+    // 4. 수량 변경 및 삭제 AJAX 함수들
     function updateCartItemQuantity(cartItemId, quantity) {
         $.ajax({
-            url: `/api/cart/updateQuantity`, // CartController와 일치하는 주소
+            url: `/api/cart/updateQuantity`,
             type: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify({ cartItemId: cartItemId, quantity: quantity }),
             success: function(response) {
                 console.log("수량 변경 성공:", response);
-                fetchCartDataFromServer(); // 성공 시 장바구니 전체 새로고침
+                fetchCartDataFromServer();
             },
             error: function(xhr) {
                 console.error("수량 변경 실패:", xhr.responseText);
-                // 오류 메시지를 좀 더 친절하게 표시
                 const errorMsg = xhr.responseJSON ? xhr.responseJSON.message : '서버 오류';
                 alert('수량 변경에 실패했습니다: ' + errorMsg);
-                fetchCartDataFromServer(); // 실패 시에도 원래 상태로 되돌리기 위해 새로고침
+                fetchCartDataFromServer();
             }
         });
     }
 
     function removeCartItem(cartItemId) {
         $.ajax({
-            url: `/api/cart/remove/${cartItemId}`, // CartController와 일치하는 주소
+            url: `/api/cart/remove/${cartItemId}`,
             type: 'DELETE',
             success: function(response) {
                 console.log("항목 삭제 성공:", response);
-                // 삭제 애니메이션 효과 후 전체 새로고침
                 $(`tr[data-cart-item-id="${cartItemId}"]`).fadeOut(300, function() {
                     fetchCartDataFromServer();
                 });
@@ -227,7 +225,6 @@
             }
         });
     }
-    // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ [ 여기가 수정된 부분입니다 ] ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
     // 5. 페이지가 완전히 로드된 후 실행될 코드
     $(document).ready(function() {
@@ -243,7 +240,6 @@
             if (newQuantity && newQuantity > 0) {
                 updateCartItemQuantity(cartItemId, newQuantity);
             } else {
-                // 유효하지 않은 값이 입력되면, API 호출 전 원래 값으로 되돌리기
                 alert('수량은 1 이상이어야 합니다.');
                 fetchCartDataFromServer();
             }
@@ -267,8 +263,10 @@
                 }
             });
         });
-
-        // "결제 진행" 버튼 클릭 이벤트
+        
+        // =========================================================================
+        // ★★★ 여기가 최종 수정된 부분입니다. ★★★
+        // =========================================================================
         $('.checkout-btn').on('click', function(e) {
             e.preventDefault();
             
@@ -276,19 +274,31 @@
                 alert('결제할 상품이 없습니다.');
                 return;
             }
-            const checkoutData = globalCartItems.map(item => ({
-                id: item.cartItemId,
-                gdsNo: item.gdsNo,
-                name: `${item.gdsNm || '상품명'} ${item.optNm ? '('+item.optNm+')' : ''}`,
-                price: item.gdsPrc,
-                quantity: item.quantity,
-                // image 필드는 제거된 상태 유지
-            }));
             
-            sessionStorage.setItem('buy_now_data', JSON.stringify(checkoutData));
+            const checkoutData = globalCartItems.map(item => {
+                // 'storeId' (대문자 I)로 값을 가져오도록 수정
+                const storeIdValue = item.storeId; 
+
+                // 디버깅: 가져온 값이 유효한지 확인
+                if(!storeIdValue) {
+                    console.error("치명적 오류: item 객체에서 storeId 값을 찾을 수 없습니다!", item);
+                }
+                
+                return {
+                    gdsNo: item.gdsNo,
+                    name: `${item.gdsNm || '상품명'} ${item.optNm ? '('+item.optNm+')' : ''}`,
+                    price: item.gdsPrc,
+                    quantity: item.quantity,
+                    // checkout.html에서 사용하는 'store_id'(언더바) 키 이름으로 값을 할당
+                    store_id: storeIdValue 
+                }
+            });
+            
+            console.log("Checkout으로 보낼 최종 데이터:", checkoutData);
+            
+            sessionStorage.setItem('cart_checkout_data', JSON.stringify(checkoutData));
             window.location.href = '/checkout';
         });
-        
         
     });
 </script>

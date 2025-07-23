@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
+<html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{admin/layout/layoutMain}">
-		
+
 	 <head>
 	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />
 	 	<th:block layout:fragment="customCss">
         <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/appAdminView.css}">
     </th:block>
 	 </head>
-	 
+
 	 <th:block layout:fragment="jsFile">
 	 </th:block>
-	 
-	 <th:block layout:fragment="jsScript">	 
+
+	 <th:block layout:fragment="jsScript">
 	 </th:block>
-	 
+
 	 <th:block layout:fragment="contents">
 		<main class="main-content">
 		    <section class="content-header">
 		        <h2 class="content-title">상점 신청 내용</h2>
-		    </section>	
-		    
+		    </section>
+
 		    <div class="card mb-4">
 		        <div class="card-body">
 		            <form id="searchForm" th:action="@{/adminpage/storeadmin/appAdmin}" method="get">
@@ -36,26 +36,26 @@
 		                    	<label class="form-label">분류</label>
 		                        <div class="d-flex align-items-center">
 		                            <div class="form-check me-4">
-		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAStoreList" value="APPLY" 
+		                                <input class="form-check-input status-check" type="checkbox"
+		                                	   name="appAStoreList" value="APPLY"
 		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '접수')}">
 		                                <label class="form-check-label">접수</label>
 		                            </div>
 		                            <!-- <div class="form-check me-4">
-		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAStoreList" value="PENDING" 
+		                                <input class="form-check-input status-check" type="checkbox"
+		                                	   name="appAStoreList" value="PENDING"
 		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '보류')}">
 		                                <label class="form-check-label">보류</label>
 		                            </div> -->
 		                            <div class="form-check me-4">
-		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAStoreList" value="APPROVED" 
+		                                <input class="form-check-input status-check" type="checkbox"
+		                                	   name="appAStoreList" value="APPROVED"
 		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '승인')}">
 		                                <label class="form-check-label">승인</label>
 		                            </div>
 		                             <div class="form-check me-4">
-		                                <input class="form-check-input status-check" type="checkbox" 
-		                                	   name="appAStoreList" value="REJECTED" 
+		                                <input class="form-check-input status-check" type="checkbox"
+		                                	   name="appAStoreList" value="REJECTED"
 		                                	   th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '반려')}">
 		                                <label class="form-check-label">반려</label>
 		                            </div>
@@ -164,7 +164,7 @@
 				                	<a class="text" th:href="@{/adminpage/storeadmin/appDetail(aplyId=${appStore.aplyId})}" th:text="${appStore.storeNm}"></a>
 				                </td>
 				                <td th:text="${appStore.user.userNm}"></td>
-				                <td th:text="${appStore.user.userNo}"></td>				                
+				                <td th:text="${appStore.user.userNo}"></td>
 				                <td class="ellipsis text" th:text="${appStore.plcyId}"></td>
 				                <td th:text="${#temporals.format(appStore.ctrtAplyYmd, 'yyyy-MM-dd')}"></td>
 				                <td>
@@ -181,24 +181,26 @@
 				</div>
 		            <nav class="mt-4" aria-label="Page navigation" th:if="${pagination.totalRecordCount > 0}">
 					    <ul class="pagination justify-content-center">
-					        <li class="page-item" th:if="${pagination.existPrevBlock}">
-					            <a class="page-link page-num" href="#" th:data-page="${pagination.startPage - 1}">이전</a>
+					        <!-- 이전 페이지 버튼: 현재 페이지가 1보다 클 때만 표시 -->
+					        <li class="page-item" th:if="${pagination.currentPage > 1}">
+					            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage - 1}">이전</a>
 					        </li>
-					        
+
 					        <li class="page-item" th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
 					            th:classappend="${page == pagination.currentPage} ? 'active' : ''">
 					            <a class="page-link page-num" href="#" th:text="${page}" th:data-page="${page}"></a>
 					        </li>
-					        
-					        <li class="page-item" th:if="${pagination.existNextBlock}">
-					            <a class="page-link page-num" href="#" th:data-page="${pagination.endPage + 1}">다음</a>
+
+					        <!-- 다음 페이지 버튼: 현재 페이지가 전체 페이지 수보다 작을 때만 표시 -->
+					        <li class="page-item" th:if="${pagination.currentPage < pagination.totalPageCount}">
+					            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage + 1}">다음</a>
 					        </li>
 					    </ul>
 					</nav>
 		        </div> </div> </main>
 	 </th:block>
 	 <th:block layout:fragment="jsFile">
-	 </th:block>	
+	 </th:block>
 	 <th:block layout:fragment="jsScript">
 	 <script th:inline="javascript">
 	 /*<![CDATA[*/
@@ -222,10 +224,10 @@
              }
          });
          filterConditionsInput.val(selectedStatuses.join(',')); // 콤마로 구분된 문자열로 저장
-         
+
 	 	searchForm.submit();
 	 }
-	 
+
 	 // [테이블] 헤더 체크박스로 전체 선택/해제
 	 mainContent.on('click', '#checkAll', function() {
 	     $('.member-check').prop('checked', $(this).is(':checked'));
@@ -288,7 +290,7 @@
                  if (conditionsArray.includes($(this).val())) {
                      $(this).prop('checked', true);
                  } else {
-                     $(this).prop('checked', false);
+                     $(this).val() === 'APPLY' ? $(this).prop('checked', false) : $(this).prop('checked', false);
                  }
              });
              // 초기 로드 시 전체선택 상태도 맞춰줌
@@ -299,7 +301,7 @@
              statusCheckboxes.prop('checked', true);
              filterCheckAll.prop('checked', true);
          }
-         
+
          // 페이지 로드 시 정렬 select box 초기 선택값 설정
          const initialSortKey = /*[[${searchCriteria.sortKey}]]*/ ''; // Thymeleaf 값 가져오기
          const initialSortOrder = /*[[${searchCriteria.sortOrder}]]*/ ''; // Thymeleaf 값 가져오기
@@ -313,14 +315,14 @@
                  return false; // 일치하는 것을 찾았으니 루프 종료
              }
          });
-         
+
          // Hidden input에도 초기값을 설정 (필요한 경우)
          // searchCriteria에 sortKey와 sortOrder가 이미 설정되어 있으므로 별도 설정 필요 없음
-         // sortKeyInput.val(initialSortKey); 
+         // sortKeyInput.val(initialSortKey);
          // sortOrderInput.val(initialSortOrder);
      });
 
 	 /*]]>*/
-	 </script>	
-   </th:block>	
+	 </script>
+   </th:block>
 </html>

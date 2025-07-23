@@ -15,8 +15,8 @@
 		<ul class="menu-aside">
 			<li class="menu-item"
 				th:classappend="${activeMenu == 'adminpage'} ? 'active' : ''">
-				<a class="menu-link" href="/adminpage"> <i
-					class="icon material-icons md-home"></i> <span class="text">홈으로
+				<a class="menu-link" th:href="@{/adminpage/dashboard}"> <i
+					class="icon material-icons md-home"></i> <span class="text">대시보드로
 						이동</span>
 			</a>
 			</li>
@@ -41,7 +41,8 @@
 			</a>
 				<div class="submenu">
 					<a th:href="@{/adminpage/storeadmin/appAdmin}">상점 신청 관리</a> <a
-						href="#">상점 관리</a> <a
+						th:href="@{/adminpage/storeadmin/storeMngAdmin}">상점 관리</a> <a
+						th:href="@{/adminpage/storeadmin/reviewAdmin}">상품 리뷰 관리</a> <a
 						th:href="@{/adminpage/storeadmin/settlementDetailByStore}">상점별
 						정산 내역 조회</a> <a th:href="@{/adminpage/storeadmin/premiumAdd}">구독권
 						추가</a>
@@ -52,22 +53,10 @@
 					class="icon material-icons md-shopping_bag"></i> <span class="text">상품관리</span>
 			</a>
 				<div class="submenu">
-					<!-- [추가] 전체 상품관리 메뉴 -->
 					<a th:href="@{/adminpage/productadmin/allProducts}">전체 상품 관리</a>
-
-					<!-- [기존] 상품관리 (승인/반려용) -->
-					<a th:href="@{/adminpage/productadmin/adminProductManagement}">상품
-						승인 관리</a>
-
-					<!-- [추가] 승인/반려 기록 메뉴 -->
-					<a th:href="@{/adminpage/productadmin/approvalHistory}">승인/반려
-						기록</a>
-
-					<!-- [기존] 카테고리 관리 -->
-					<a th:href="@{/adminpage/productadmin/adminCategoryManagement}">카테고리
-						관리</a>
-
-
+					<a th:href="@{/adminpage/productadmin/adminProductManagement}">상품 승인 관리</a>
+					<a th:href="@{/adminpage/productadmin/approvalHistory}">승인/반려 기록</a>
+					<a th:href="@{/adminpage/productadmin/adminCategoryManagement}">카테고리 관리</a>
 				</div></li>
 			<li class="menu-item has-submenu"
 				th:classappend="${activeMenu == 'board'} ? 'active' : ''"><a
@@ -90,7 +79,6 @@
 				</div></li>
 			<li class="menu-divider"></li>
 
-			<!-- 2. 로그아웃 메뉴 구조를 다른 메뉴와 동일하게 수정 -->
 			<li class="menu-item"><a class="menu-link"
 				th:href="@{/adminpage/logout}"> <i
 					class="icon material-icons md-logout"></i> <span class="text">로그아웃</span>

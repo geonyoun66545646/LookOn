@@ -14,7 +14,6 @@
         <result property="storeLogoImg" 		column="store_logo_img"/> 	<!-- 상점 로고 이미지 파일 -->
         <result property="storeStts" 			column="store_stts"/> 		<!-- 상점 상태 -->
         <result property="infoMdfcnDt" 			column="info_mdfcn_dt"/> 	<!-- 정보 수정일시 -->
-        <result property="inactvtnDt" 			column="inactvtn_dt"/> 		<!-- 비활성화 일시 -->
         <result property="delPrcrYn" 			column="del_prcr_yn"/> 		<!-- 폐쇄 여부 -->
     </resultMap>
     
@@ -153,7 +152,6 @@
             store_logo_img,
             store_stts,
             info_mdfcn_dt,
-            inactvtn_dt,
             del_prcr_yn
         FROM
             stores
@@ -172,7 +170,6 @@
             store_logo_img,
             store_stts,
             info_mdfcn_dt,
-            inactvtn_dt,
             del_prcr_yn
         FROM
             stores
@@ -253,7 +250,6 @@
 	        p.last_sel_prc,     -- 최종 판매가
 	        p.reg_dt,           -- 등록일시
 	        p.mdfcn_dt,         -- 수정일시
-	        p.inactvtn_dt,      -- 비활성 일시
 	        p.expsr_yn,         -- 노출 여부
 	        p.actvtn_yn,        -- 활성화 여부
 	        p.min_purchase_qty, -- 최소 구매 수량

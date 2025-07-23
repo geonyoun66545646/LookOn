@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{admin/layout/layoutMain}">	
+	 <head>
+	 	<link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/dashBoard.css}">
+	 </head>
+	 <!-- 추가할 페이지 contents -->
+	 <th:block layout:fragment="contents">
+    <main class="main-content">
+        <!-- 1. 페이지 제목 -->
+        <section class="content-header">
+            <h2 class="content-title">대시보드</h2>
+        </section>
+        <!-- 2. 핵심 현황 대시보드 카드 영역 -->
+        <div class="row">
+		    <!-- 오늘의 매출 카드 -->
+		    <div class="col-lg-3">
+		        <div class="card card-body mb-4">
+		            <a class="text-decoration-none" href="#">
+		                <article class="d-flex align-items-start">
+		                    <div class="icon-part me-3">
+		                        <span class="icon-circle bg-success-light">
+		                            <i class="icon material-icons text-success md-monetization_on"></i>
+		                        </span>
+		                    </div>
+		                    <div class="info-part">
+		                        <h3 class="card-value" th:text="${#numbers.formatInteger(dashboard.todayRevenue ?: 0, 0, 'COMMA')} + '원'">0원</h3>
+		                        <h6 class="text-muted">오늘의 매출</h6>
+		                    </div>
+		                </article>
+		            </a>
+		        </div>
+		    </div>
+		
+		    <!-- [신규] 오늘의 방문자수 카드 -->
+		    <div class="col-lg-3">
+		        <div class="card card-body mb-4">
+		            <a class="text-decoration-none" th:href="@{/adminpage/useradmin/loginHistory}">
+		                <article class="d-flex align-items-start">
+		                    <div class="icon-part me-3">
+		                        <!-- 아이콘과 색상 변경 -->
+		                        <span class="icon-circle bg-info-light">
+		                            <i class="icon material-icons text-info md-visibility"></i>
+		                        </span>
+		                    </div>
+		                    <div class="info-part">
+		                        <!-- 변수명과 단위 변경 -->
+		                        <h3 class="card-value" th:text="${dashboard.todayVisitors} + '명'">0명</h3>
+		                        <h6 class="text-muted">오늘 방문자수</h6>
+		                    </div>
+		                </article>
+		            </a>
+		        </div>
+		    </div>
+		
+		    <!-- 신규 가입 카드 -->
+		    <div class="col-lg-3">
+		        <div class="card card-body mb-4">
+		            <a class="text-decoration-none" th:href="@{/adminpage/useradmin/userList}">
+		                <article class="d-flex align-items-start">
+		                    <div class="icon-part me-3">
+		                        <span class="icon-circle bg-primary-light">
+		                            <i class="icon material-icons text-primary md-person_add"></i>
+		                        </span>
+		                    </div>
+		                    <div class="info-part">
+		                        <h3 class="card-value" th:text="${dashboard.newUserCount} + '명'">0명</h3>
+		                        <h6 class="text-muted">신규 가입</h6>
+		                    </div>
+		                </article>
+		            </a>
+		        </div>
+		    </div>
+		    
+		    <!-- [통합] 처리할 업무 카드 -->
+		    <div class="col-lg-3">
+		        <div class="card card-body mb-4">
+		            <a class="text-decoration-none" href="#taskList"> <!-- 페이지 내 '확인 필요 항목'으로 이동 -->
+		                <article class="d-flex align-items-start">
+		                    <div class="icon-part me-3">
+		                        <span class="icon-circle bg-danger-light">
+		                            <i class="icon material-icons text-danger md-playlist_add_check"></i>
+		                        </span>
+		                    </div>
+		                    <div class="info-part">
+		                        <!-- 문의+신고+상점승인+상품승인 등 모든 대기 건수의 합 -->
+		                        <h3 class="card-value" th:text="${dashboard.totalPendingTasks} + '건'">0건</h3>
+		                        <h6 class="text-muted">처리할 업무</h6>
+		                    </div>
+		                </article>
+		            </a>
+		        </div>
+		    </div>
+		</div> <!-- row end// -->
+
+        <!-- ================== [새로 추가된 영역] ================== -->
+        <div class="row">
+            <!-- 3. [수정] 월별 매출 통계 차트 -->
+            <div class="col-lg-8">
+			    <div class="card card-body mb-4">
+			        <div class="chart-container" style="position: relative; height:35vh; width:100%">
+			            <canvas id="salesChart"></canvas>
+			        </div>
+			        <!-- ▲▲▲ 여기까지 수정 ▲▲▲ -->
+			    </div>
+			</div>
+            
+            <!-- 4. 확인 필요 항목 -->
+            <div class="col-lg-4">
+			    <div class="card card-body mb-4">
+			        <h5 class="card-title">확인 필요 항목</h5>
+			        <div class="task-list">
+			            <!-- 상점 승인 요청 -->
+			            <a th:href="@{/adminpage/storeadmin/appAdmin}" class="task-item">
+			                <div class="item-info">
+			                    <i class="icon material-icons text-danger md-storefront"></i>
+			                    <span>상점 승인 요청</span>
+			                </div>
+			                <span class="badge rounded-pill bg-danger" th:text="${dashboard.pendingStoreCount}">0</span>
+			            </a>
+			
+			            <!-- 상품 승인 요청 -->
+			            <a th:href="@{/adminpage/productadmin/adminProductManagement}" class="task-item">
+			                <div class="item-info">
+			                    <i class="icon material-icons text-danger md-fact_check"></i>
+			                    <span>상품 승인 요청</span>
+			                </div>
+			                <span class="badge rounded-pill bg-danger" th:text="${dashboard.pendingProductCount}">0</span>
+			            </a>
+			            
+			            <!-- 정산 대기 항목 -->
+			            <a th:href="@{/adminpage/storeadmin/settlementDetailByStore}" class="task-item">
+			                <div class="item-info">
+			                    <i class="icon material-icons text-warning md-request_quote"></i>
+			                    <span>정산 대기</span>
+			                </div>
+			                <span class="badge rounded-pill bg-warning" th:text="${dashboard.pendingSettlementCount}">0</span>
+			            </a>
+			
+			            <!-- 신규 신고 접수 -->
+			            <a th:href="@{/adminpage/inquiryadmin/reportsList}" class="task-item">
+			                <div class="item-info">
+			                    <i class="icon material-icons text-warning md-report_problem"></i>
+			                    <span>신규 신고 접수</span>
+			                </div>
+			                <span class="badge rounded-pill bg-warning" th:text="${dashboard.pendingReportCount}">0</span>
+			            </a>
+			            
+			            <!-- 신규 신고 접수 -->
+			            <a th:href="@{/admin/inquiry/adminInquiryList}" class="task-item">
+			                <div class="item-info">
+			                    <i class="icon material-icons text-warning md-report_problem"></i>
+			                    <span>신규 문의 접수</span>
+			                </div>
+			                <span class="badge rounded-pill bg-warning" th:text="${dashboard.pendingInquiryCount}">0</span>
+			            </a>
+			
+			            <!-- 처리할 항목이 하나도 없을 때 표시될 메시지 -->
+			            <div class="text-center text-muted py-4" 
+			                 th:if="${dashboard.totalPendingTasks == 0}">
+			                <p class="mb-0">👍 처리할 항목이 없습니다.</p>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+        </div>
+    </main>
+</th:block>
+
+<!--/* 개발시 추가할 jsfile 영역 정의 */-->
+<th:block layout:fragment="jsFile">
+    <!-- Chart.js 라이브러리 CDN 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</th:block>
+
+<!--/* 개발시 추가할 스크립트 */-->
+<th:block layout:fragment="jsScript">
+
+	<script th:inline="javascript">
+        /*<![CDATA[*/
+        // 서버에서 받아온 데이터를 전역 변수에 할당
+        window.monthlyLabels = /*[[${dashboard.monthlyLabels}]]*/ [];
+        window.revenueData = /*[[${dashboard.monthlyRevenueData}]]*/ [];
+        window.totalSalesData = /*[[${dashboard.monthlyTotalSalesData}]]*/ [];
+        window.monthlyAverageRevenueData = /*[[${dashboard.monthlyAverageRevenueData}]]*/ [];
+        window.monthlyAverageTotalSalesData = /*[[${dashboard.monthlyAverageTotalSalesData}]]*/ [];
+        /*]]>*/
+    </script>
+
+    <!-- 2. 새로 만든 dashboard.js 파일 로드 -->
+    <!-- 위에서 선언한 전역 변수들이 로드된 후에 와야 합니다. -->
+    <script th:src="@{/js/admin/dashboard.js}"></script>
+</th:block>
+</html>

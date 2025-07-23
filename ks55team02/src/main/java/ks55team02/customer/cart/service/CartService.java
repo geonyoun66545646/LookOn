@@ -25,4 +25,13 @@ public interface CartService {
 	
 	void removeCartItemsByIds(String userNo, List<String> cartItemIds);
 	
+	/**
+     * 특정 사용자의 장바구니에 담긴 상품의 총 개수를 조회합니다.
+     * 헤더의 장바구니 아이콘 뱃지에 숫자를 표시하기 위해 사용됩니다.
+     * 
+     * @param userNo 조회할 사용자의 고유 번호
+     * @return 장바구니에 담긴 상품의 총 개수
+     */
+	int getCartItemCount(String userNo);
+	
 }
