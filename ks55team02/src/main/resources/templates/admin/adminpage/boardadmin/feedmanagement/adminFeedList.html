@@ -44,20 +44,20 @@
                         <div class="col-lg-4">
                             <label class="form-label">작성 기간</label>
                             <div class="d-flex">
-                                <input type="date" class="form-control" name="startDate">
+                                <input type="date" class="form-control" name="startDate" th:value="${searchCriteria.startDate}">
                                 <span class="mx-2 d-flex align-items-center">-</span>
-                                <input type="date" class="form-control" name="endDate">
+                                <input type="date" class="form-control" name="endDate" th:value="${searchCriteria.endDate}">
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <label class="form-label">검색 키워드</label>
                             <div class="input-group">
                                 <select class="form-select" name="searchKey" style="max-width: 150px; background-color: #fff;">
-                                    <option value="all" selected>전체</option>
-                                    <option value="userNcnm">작성자 닉네임</option>
-                                    <option value="feedCn">피드 내용</option>
+                                    <option value="all" th:selected="${searchCriteria.searchKey == 'all'}">전체</option>
+                                    <option value="userNcnm" th:selected="${searchCriteria.searchKey == 'userNcnm'}">작성자 닉네임</option>
+                                    <option value="feedCn" th:selected="${searchCriteria.searchKey == 'feedCn'}">피드 내용</option>
                                 </select>
-                                <input type="text" class="form-control" name="searchValue" placeholder="검색어를 입력하세요">
+                                <input type="text" class="form-control" name="searchValue" placeholder="검색어를 입력하세요" th:value="${searchCriteria.searchValue}">
                             </div>
                         </div>
                         <div class="col-lg-2">
@@ -91,10 +91,10 @@
                                     <option value="crtDtDesc" th:selected="${searchCriteria.sortOrder == 'crtDtDesc'}">최신 작성일순</option>
                                     <option value="likeCountDesc" th:selected="${searchCriteria.sortOrder == 'likeCountDesc'}">좋아요 많은 순</option>
                                 </select>
-                                <select class="form-select d-inline-block" id="pageSize" name="pageSize" style="width: auto;">
-                                    <option value="10" th:selected="${searchCriteria.pageSize == 10}">10개씩 보기</option>
-                                    <option value="30" th:selected="${searchCriteria.pageSize == 30}">30개씩 보기</option>
-                                    <option value="50" th:selected="${searchCriteria.pageSize == 50}">50개씩 보기</option>
+                                <select class="form-select d-inline-block" id="psize" name="psize" style="width: auto;">
+                                    <option value="10" th:selected="${searchCriteria.psize == 10}">10개씩 보기</option>
+                                    <option value="30" th:selected="${searchCriteria.psize == 30}">30개씩 보기</option>
+                                    <option value="50" th:selected="${searchCriteria.psize == 50}">50개씩 보기</option>
                                 </select>
                             </div>
                         </div>

@@ -1,25 +1,19 @@
 package ks55team02.admin.adminpage.boardadmin.feedmanagement.controller;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttribute;
-
 import ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed;
-import ks55team02.admin.adminpage.boardadmin.feedmanagement.service.FeedManagementService; // Service 임포트
+import ks55team02.admin.adminpage.boardadmin.feedmanagement.service.FeedManagementService;
 import ks55team02.admin.common.domain.Pagination;
 import ks55team02.admin.login.domain.AdminInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/adminpage/boardadmin/feedmanagement")
@@ -27,12 +21,27 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FeedManagementController {
 
-    private final FeedManagementService feedManagementService; // final 필드로 Service 주입
+    private final FeedManagementService feedManagementService;
 
+    /**
+     * 피드 관리 페이지 최초 로딩 핸들러
+     */
     @GetMapping("/feedList")
     public String feedList(@ModelAttribute AdminFeed searchCriteria, Model model) {
         
-        // [수정] 실제 Service를 호출하여 데이터 조회
+        // 첫 로딩 시 기본 필터 조건 설정
+        if (searchCriteria.getFilterConditions() == null || searchCriteria.getFilterConditions().isEmpty()) {
+            searchCriteria.setFilterConditions(Arrays.asList("normal"));
+        }
+        // 첫 로딩 시 기본 정렬 조건 설정
+        if (searchCriteria.getSortOrder() == null || searchCriteria.getSortOrder().isEmpty()) {
+            searchCriteria.setSortOrder("crtDtDesc");
+        }
+
+        // [수정] DTO의 편의 메소드를 사용하여 int 값을 가져와서 부모의 pageSize에 설정
+        int intPageSize = searchCriteria.getPsizeAsInt();
+        searchCriteria.setPageSize(intPageSize);
+        
         int totalCount = feedManagementService.getFeedCount(searchCriteria);
         Pagination pagination = new Pagination(totalCount, searchCriteria);
         searchCriteria.setOffset(pagination.getLimitStart());
@@ -48,10 +57,16 @@ public class FeedManagementController {
         return "admin/adminpage/boardadmin/feedmanagement/adminFeedList";
     }
 
+    /**
+     * 피드 목록 비동기 검색 핸들러 (Fragment 반환)
+     */
     @GetMapping("/feedSearch")
     public String searchFeedList(@ModelAttribute AdminFeed searchCriteria, Model model) {
         
-        // [수정] 실제 Service를 호출하여 데이터 조회
+        // [수정] DTO의 편의 메소드를 사용하여 int 값을 가져와서 부모의 pageSize에 설정
+        int intPageSize = searchCriteria.getPsizeAsInt();
+        searchCriteria.setPageSize(intPageSize);
+
         int totalCount = feedManagementService.getFeedCount(searchCriteria);
         Pagination pagination = new Pagination(totalCount, searchCriteria);
         searchCriteria.setOffset(pagination.getLimitStart());
@@ -66,16 +81,18 @@ public class FeedManagementController {
         return "admin/adminpage/boardadmin/feedmanagement/adminFeedList :: feedListFragment"; 
     }
 
+    /**
+     * 피드 상태 일괄 변경 API (숨김/복구)
+     */
     @PostMapping("/updateStatus")
     @ResponseBody
     public ResponseEntity<?> updateFeedsStatus(@RequestBody Map<String, Object> payload,
-                                               @SessionAttribute(name="loginAdminInfo", required = false) AdminInfo loginAdmin) { // [수정] 세션 이름과 타입을 실제 DTO에 맞게 변경 (세션 이름은 확인 필요)
+                                               @SessionAttribute(name="loginAdminInfo", required = false) AdminInfo loginAdmin) {
         
         if (loginAdmin == null) {
             return ResponseEntity.status(401).body(Map.of("result", "fail", "message", "관리자 로그인이 필요합니다."));
         }
         
-        // [수정] AdminInfo DTO에 정의된 getUserNo() 메소드를 사용하여 관리자 번호 획득
         String adminUserNo = loginAdmin.getUserNo(); 
         
         List<String> feedSns = (List<String>) payload.get("feedSns");

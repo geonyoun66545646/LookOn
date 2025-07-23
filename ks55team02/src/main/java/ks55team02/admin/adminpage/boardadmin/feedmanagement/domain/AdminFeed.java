@@ -1,9 +1,10 @@
 package ks55team02.admin.adminpage.boardadmin.feedmanagement.domain;
 
+import java.time.LocalDateTime;
+
 import ks55team02.admin.common.domain.SearchCriteria;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -26,4 +27,18 @@ public class AdminFeed extends SearchCriteria {
     
     // 편의 필드
     private String feedStatus;
+    
+    private String psize;
+
+    public int getPsizeAsInt() {
+        if (this.psize == null || this.psize.trim().isEmpty()) {
+            return 10; // 기본값
+        }
+        try {
+            return Integer.parseInt(this.psize);
+        } catch (NumberFormatException e) {
+            return 10; // 숫자로 변환할 수 없는 경우에도 기본값 반환
+        }
+    }
+    
 }

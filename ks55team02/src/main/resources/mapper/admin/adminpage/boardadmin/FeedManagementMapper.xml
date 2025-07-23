@@ -14,14 +14,9 @@
         <result column="comment_count"      property="commentCount"/>
     </resultMap>
 
-    <!-- 피드 목록 조회 (페이징, 정렬, 검색 포함) -->
-    <select id="getFeedList" parameterType="AdminFeed" resultMap="adminFeedResultMap">
+    <select id="getFeedList" parameterType="ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed" resultMap="adminFeedResultMap">
         SELECT
-            f.feed_sn,
-            f.wrtr_user_no,
-            f.feed_cn,
-            f.crt_dt,
-            f.del_dt,
+            f.feed_sn, f.wrtr_user_no, f.feed_cn, f.crt_dt, f.del_dt,
             u.user_ncnm,
             (SELECT COUNT(*) FROM feed_interactions fi WHERE fi.feed_sn = f.feed_sn AND fi.rtrcn_dt IS NULL) AS like_count,
             (SELECT COUNT(*) FROM feed_comments fc WHERE fc.feed_sn = f.feed_sn AND fc.del_dt IS NULL) AS comment_count,
@@ -45,28 +40,26 @@
         </if>
     </select>
 
-    <!-- 검색 조건에 맞는 전체 피드 수 조회 -->
-    <select id="getFeedCount" parameterType="AdminFeed" resultType="int">
+    <select id="getFeedCount" parameterType="ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed" resultType="int">
         SELECT COUNT(*)
         FROM feeds f
-        LEFT JOIN users u ON f.wrtr_user_no = u.user_no
+        LEFT JOIN
+            users u ON f.wrtr_user_no = u.user_no
         <include refid="commonSearchCondition" />
     </select>
     
-    <!-- 공통 검색 조건 Fragment -->
     <sql id="commonSearchCondition">
-        <trim prefix="WHERE" prefixOverrides="AND |OR ">
-            <!-- 1. 상태(분류) 조건 -->
+        <where>
             <if test="filterConditions != null and !filterConditions.isEmpty()">
-                <foreach item="status" collection="filterConditions" open="AND (" close=")" separator="OR">
+                <foreach item="status" collection="filterConditions" open="AND (" close=")" separator=" OR ">
                     <if test="'normal'.equals(status)">f.del_dt IS NULL</if>
                     <if test="'hidden'.equals(status)">f.del_dt IS NOT NULL</if>
                 </foreach>
             </if>
-            <!-- 2. 작성일 기간 조건 -->
+            <!-- [최종 수정] != '' 조건 제거 -->
             <if test="startDate != null">AND f.crt_dt >= #{startDate}</if>
+            <!-- [최종 수정] < 를 < 로 변경하고 != '' 조건 제거 -->
             <if test="endDate != null">AND f.crt_dt &gt; DATE_ADD(#{endDate}, INTERVAL 1 DAY)</if>
-            <!-- 3. 검색 키워드 조건 -->
             <if test="searchKey != null and searchValue != null and searchValue != ''">
                 AND
                 <choose>
@@ -75,10 +68,9 @@
                     <otherwise>(u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%') OR f.feed_cn LIKE CONCAT('%', #{searchValue}, '%'))</otherwise>
                 </choose>
             </if>
-        </trim>
+        </where>
     </sql>
 
-    <!-- 선택한 피드 숨김 처리 (논리적 삭제) -->
     <update id="hideFeeds" parameterType="map">
         UPDATE feeds
         SET
@@ -91,7 +83,6 @@
             </foreach>
     </update>
     
-    <!-- 선택한 피드 숨김 해제 (복구) -->
     <update id="restoreFeeds" parameterType="list">
         UPDATE feeds
         SET
