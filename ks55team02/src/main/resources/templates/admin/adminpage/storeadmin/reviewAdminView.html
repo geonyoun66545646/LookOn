@@ -5,15 +5,10 @@
 <head>
     <meta name="description" content="한국스마트정보교육원 ksmybatis" />
     <th:block layout:fragment="customCss">
+        <!-- 기존 CSS를 그대로 사용하거나 필요시 수정합니다. -->
         <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/reviewAdminView.css}">
-        </th:block>
+    </th:block>
 </head>
-
-<th:block layout:fragment="jsFile">
-</th:block>
-
-<th:block layout:fragment="jsScript">
-</th:block>
 
 <th:block layout:fragment="contents">
     <main class="main-content">
@@ -24,33 +19,41 @@
         <div class="card mb-4">
             <div class="card-body">
                 <form id="searchForm" th:action="@{/adminpage/storeadmin/reviewAdmin}" method="get">
+                    <!-- Hidden Inputs for pagination and sorting -->
                     <input type="hidden" name="currentPage" th:value="${pagination.currentPage}" id="currentPageInput"/>
                     <input type="hidden" name="pageSize" th:value="${pagination.recordSize}" id="pageSizeInput"/>
                     <input type="hidden" name="sortKey" th:value="${searchCriteria.sortKey}" id="sortKeyInput"/>
                     <input type="hidden" name="sortOrder" th:value="${searchCriteria.sortOrder}" id="sortOrderInput"/>
+
+                    <!-- [수정] 리뷰 상태 필터 체크박스 (활성, 숨김, 삭제) -->
                     <div class="row gx-3">
                         <div class="col-lg-12">
                             <label class="form-label">리뷰 상태</label>
                             <div class="d-flex align-items-center">
                                 <div class="form-check me-4">
-                                    <input class="form-check-input status-check" type="checkbox"
-                                           name="filterConditions" value="1" th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '1')}">
+                                    <input class="form-check-input status-check" type="checkbox" name="filterConditions" value="ACTIVE"
+                                           th:checked="${searchCriteria.filterConditions == null or #lists.contains(searchCriteria.filterConditions, 'ACTIVE')}">
                                     <label class="form-check-label">활성</label>
                                 </div>
                                 <div class="form-check me-4">
-                                    <input class="form-check-input status-check" type="checkbox"
-                                           name="filterConditions" value="0" th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, '0')}">
-                                    <label class="form-check-label">삭제/숨김</label>
+                                    <input class="form-check-input status-check" type="checkbox" name="filterConditions" value="HIDDEN"
+                                           th:checked="${searchCriteria.filterConditions == null or #lists.contains(searchCriteria.filterConditions, 'HIDDEN')}">
+                                    <label class="form-check-label">숨김</label>
                                 </div>
                                 <div class="form-check me-4">
-                                    <input class="form-check-input" type="checkbox"
-                                           id="filterCheckAll">
+                                    <input class="form-check-input status-check" type="checkbox" name="filterConditions" value="DELETED"
+                                           th:checked="${searchCriteria.filterConditions == null or #lists.contains(searchCriteria.filterConditions, 'DELETED')}">
+                                    <label class="form-check-label">삭제</label>
+                                </div>
+                                <div class="form-check me-4">
+                                    <input class="form-check-input" type="checkbox" id="filterCheckAll">
                                     <label class="form-check-label">전체선택</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <hr>
+                    <!-- 검색 조건 (기존과 동일) -->
                     <div class="row gx-3 align-items-end">
                         <div class="col-lg-4">
                             <label class="form-label">작성일 기간</label>
@@ -80,7 +83,8 @@
                 </form>
             </div>
         </div>
-        <div class="card" id="reviewListContainer" th:fragment="reviewListFragment">
+
+        <div class="card" id="reviewListContainer">
             <div class="card-body">
                 <div class="row gx-3 align-items-center mb-4">
                     <div class="col-md-6">
@@ -89,17 +93,18 @@
                         </div>
                     </div>
                     <div class="col-md-6 text-md-end">
+                        <!-- [수정] 상태 변경 드롭다운 (활성, 숨김, 삭제) -->
                         <div class="btn-group me-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
                                 선택한 리뷰 상태 변경
                             </button>
                             <div class="dropdown-menu status">
-                                <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="1"> <span class="badge-dot bg-success"></span>활성
-                                </a>
-                                <a class="dropdown-item status-badge-item change-status-btn" href="#" data-status="0"> <span class="badge-dot bg-danger"></span>삭제/숨김
-                                </a>
+                                <a class="dropdown-item change-status-btn" href="#" data-status="ACTIVE">활성</a>
+                                <a class="dropdown-item change-status-btn" href="#" data-status="HIDDEN">숨김</a>
+                                <a class="dropdown-item change-status-btn" href="#" data-status="DELETED">삭제</a>
                             </div>
                         </div>
+                        <!-- 정렬 및 보기 개수 (기존과 동일) -->
                         <div class="d-inline-block">
                             <select class="form-select d-inline-block" id="sortOrderSelect" style="width: auto;">
                                 <option value="" data-sort-key="wrtYmd" data-sort-order="DESC" th:selected="${searchCriteria.sortKey == 'wrtYmd' and searchCriteria.sortOrder == 'DESC'}">최신 작성일순</option>
@@ -121,56 +126,55 @@
                     <table class="table table-hover member-table">
                         <thead>
                             <tr class="text-center">
-                                <th scope="col">
-                                    <input class="form-check-input" type="checkbox" id="checkAll">
-                                </th>
-                                <th scope="col">리뷰 ID</th>
-                                <th scope="col">상품명</th>
-                                <th scope="col">구매자 이름</th>
-                                <th scope="col">평점</th>
-                                <th scope="col">리뷰 내용</th>
-                                <th scope="col">작성일</th>
-                                <th scope="col">리뷰 상태</th>
-                                <th scope="col">최종 수정일시</th>
-                                <th scope="col">처리자</th>
+                                <th><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                                <th>리뷰 ID</th>
+                                <th>상품명</th>
+                                <th>구매자 이름</th>
+                                <th>평점</th>
+                                <th>리뷰 내용</th>
+                                <th>작성일</th>
+                                <th>리뷰 상태</th>
+                                <th>최종 수정일시</th>
+                                <th>처리자</th>
                             </tr>
                         </thead>
                         <tbody class="text-center">
                             <tr th:if="${#lists.isEmpty(reviewList)}">
-                                <td colspan="10" class="text-center py-5">조회된 리뷰가 없습니다.</td> </tr>
+                                <td colspan="10" class="text-center py-5">조회된 리뷰가 없습니다.</td>
+                            </tr>
                             <tr th:unless="${#lists.isEmpty(reviewList)}" th:each="review: ${reviewList}">
-                                <td>
-                                    <input class="form-check-input member-check" type="checkbox" th:value="${review.reviewId}">
-                                </td>
+                                <td><input class="form-check-input member-check" type="checkbox" th:value="${review.reviewId}"></td>
                                 <td th:text="${review.reviewId}"></td>
                                 <td th:text="${review.gdsNm}"></td>
                                 <td th:text="${review.prchsrUserNm}"></td>
                                 <td th:text="${review.evlScr}"></td>
                                 <td th:text="${review.reviewCn}"></td>
                                 <td th:text="${#temporals.format(review.wrtYmd, 'yyyy-MM-dd HH:mm:ss')}"></td>
-                               <td>
-								    <span class="badge custom-badge"
-								          th:text="${review.reviewStts == true ? '활성' : '삭제'}"
-								          th:classappend="${review.reviewStts == true} ? 'bg-success' : 'bg-danger'">
-								    </span>
-								</td>
+                                <!-- [수정] 리뷰 상태를 3가지(활성, 숨김, 삭제)로 표시 -->
+                                <td>
+                                    <th:block th:switch="${review.reviewStts}">
+                                        <span th:case="'ACTIVE'" class="badge custom-badge bg-success">활성</span>
+                                        <span th:case="'HIDDEN'" class="badge custom-badge bg-warning">숨김</span>
+                                        <span th:case="'DELETED'" class="badge custom-badge bg-danger">삭제</span>
+                                        <span th:case="*" class="badge custom-badge bg-secondary" th:text="${review.reviewStts}">기타</span>
+                                    </th:block>
+                                </td>
                                 <td th:text="${review.lastMdfcnDt != null ? #temporals.format(review.lastMdfcnDt, 'yyyy-MM-dd HH:mm:ss') : 'N/A'}"></td>
                                 <td th:text="${review.delPrcrUserNm != null ? review.delPrcrUserNm : 'N/A'}"></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                <!-- Pagination (기존과 동일) -->
                 <nav class="mt-4" aria-label="Page navigation" th:if="${pagination.totalRecordCount > 0}">
                     <ul class="pagination justify-content-center">
                         <li class="page-item" th:if="${pagination.currentPage > 1}">
                             <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage - 1}">이전</a>
                         </li>
-
                         <li class="page-item" th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
                             th:classappend="${page == pagination.currentPage} ? 'active' : ''">
                             <a class="page-link page-num" href="#" th:text="${page}" th:data-page="${page}"></a>
                         </li>
-
                         <li class="page-item" th:if="${pagination.currentPage < pagination.totalPageCount}">
                             <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage + 1}">다음</a>
                         </li>
@@ -180,160 +184,130 @@
         </div>
     </main>
 </th:block>
-<th:block layout:fragment="jsFile">
-</th:block>
+
 <th:block layout:fragment="jsScript">
     <script th:inline="javascript">
         /*<![CDATA[*/
-        const mainContent = $('main.main-content');
-        const searchForm = $('#searchForm');
-        const currentPageInput = $('#currentPageInput');
-        const pageSizeInput = $('#pageSizeInput');
-        const sortKeyInput = $('#sortKeyInput');
-        const sortOrderInput = $('#sortOrderInput');
-        const statusCheckboxes = $('.status-check');
-        const filterCheckAll = $('#filterCheckAll');
-
-        // 검색 폼 제출 함수
-        function submitSearchForm() {
-            searchForm.submit();
-        }
-
-        // [테이블] 헤더 체크박스로 전체 선택/해제
-        mainContent.on('click', '#checkAll', function() {
-            $('.member-check').prop('checked', $(this).is(':checked'));
-        });
-
-        // [테이블] 개별 체크박스 선택 시, 헤더 체크박스 상태 동기화
-        mainContent.on('click', '.member-check', () => {
-            const totalChecks = $('.member-check').length;
-            const checkedChecks = $('.member-check:checked').length;
-            $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
-        });
-
-        // 페이지 번호 클릭 시
-        mainContent.on('click', '.page-num', function(e) {
-            e.preventDefault(); // 기본 링크 동작 방지
-            currentPageInput.val($(this).data('page'));
-            submitSearchForm();
-        });
-
-        // 페이지 크기 변경 시
-        $('#pageSizeSelect').on('change', function() {
-            pageSizeInput.val($(this).val());
-            currentPageInput.val(1); // 페이지 크기 변경 시 1페이지로 이동
-            submitSearchForm();
-        });
-
-        // 정렬 순서 변경 시
-        $('#sortOrderSelect').on('change', function() {
-            const selectedOption = $(this).find('option:selected');
-            sortKeyInput.val(selectedOption.data('sort-key'));
-            sortOrderInput.val(selectedOption.data('sort-order'));
-            currentPageInput.val(1); // 정렬 변경 시 1페이지로 이동
-            submitSearchForm();
-        });
-
-     // 분류 체크박스 상태 변경 시 (개별 체크박스)
-        statusCheckboxes.on('change', function() {
-            const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
-            filterCheckAll.prop('checked', allChecked);
-        });
-
-        // '전체선택' 체크박스 클릭 시
-        filterCheckAll.on('change', function() {
-            statusCheckboxes.prop('checked', $(this).is(':checked'));
-        });
-
-        // 페이지 로드 시 '전체선택' 체크박스 상태 초기화
         $(document).ready(function() {
-            const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
-            filterCheckAll.prop('checked', allChecked);
+            const mainContent = $('main.main-content');
+            const searchForm = $('#searchForm');
+            const currentPageInput = $('#currentPageInput');
+            const pageSizeInput = $('#pageSizeInput');
+            const sortKeyInput = $('#sortKeyInput');
+            const sortOrderInput = $('#sortOrderInput');
+            const statusCheckboxes = $('.status-check');
+            const filterCheckAll = $('#filterCheckAll');
 
-            const initialFilterConditions = /*[[${searchCriteria.filterConditions}]]*/ [];
-            if (initialFilterConditions && initialFilterConditions.length > 0) {
-                statusCheckboxes.each(function() {
-                    if (initialFilterConditions.includes($(this).val())) {
-                        $(this).prop('checked', true);
-                    } else {
-                        $(this).prop('checked', false);
-                    }
-                });
-            } else {
-                // filterConditions가 없거나 비어있으면 (즉, 초기 로드 시 모든 필터가 해제된 경우)
-                // 모든 체크박스를 선택된 상태로 시작하도록 (기본값 활성)
-                statusCheckboxes.filter('[value="1"]').prop('checked', true);
-                statusCheckboxes.filter('[value="0"]').prop('checked', false);
+            // 검색 폼 제출 함수
+            function submitSearchForm() {
+                searchForm.submit();
             }
-            const currentAllChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
-            filterCheckAll.prop('checked', currentAllChecked);
 
-            // 페이지 로드 시 정렬 select box 초기 선택값 설정
-            const initialSortKey = /*[[${searchCriteria.sortKey}]]*/ '';
-            const initialSortOrder = /*[[${searchCriteria.sortOrder}]]*/ '';
+            // [테이블] 헤더 체크박스로 전체 선택/해제
+            mainContent.on('click', '#checkAll', function() {
+                $('.member-check').prop('checked', $(this).is(':checked'));
+            });
 
-            $('#sortOrderSelect option').each(function() {
-                const optionSortKey = $(this).data('sort-key');
-                const optionSortOrder = $(this).data('sort-order');
+            // [테이블] 개별 체크박스 선택 시, 헤더 체크박스 상태 동기화
+            mainContent.on('click', '.member-check', () => {
+                const totalChecks = $('.member-check').length;
+                const checkedChecks = $('.member-check:checked').length;
+                $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
+            });
 
-                if (optionSortKey === initialSortKey && optionSortOrder === initialSortOrder) {
-                    $(this).prop('selected', true);
-                    return false;
+            // 페이지 번호, 페이지 크기, 정렬 순서 변경 시 자동 제출
+            mainContent.on('click', '.page-num', function(e) {
+                e.preventDefault();
+                currentPageInput.val($(this).data('page'));
+                submitSearchForm();
+            });
+            $('#pageSizeSelect, #sortOrderSelect').on('change', function() {
+                if ($(this).is('#pageSizeSelect')) {
+                    pageSizeInput.val($(this).val());
+                } else {
+                    const selectedOption = $(this).find('option:selected');
+                    sortKeyInput.val(selectedOption.data('sort-key'));
+                    sortOrderInput.val(selectedOption.data('sort-order'));
+                }
+                currentPageInput.val(1);
+                submitSearchForm();
+            });
+
+            // 필터 체크박스 관련 로직
+            statusCheckboxes.on('change', function() {
+                const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+                filterCheckAll.prop('checked', allChecked);
+            });
+            filterCheckAll.on('change', function() {
+                statusCheckboxes.prop('checked', $(this).is(':checked'));
+            });
+            // 페이지 로드 시 '전체선택' 체크박스 상태 초기화
+            (function initCheckboxes() {
+                // filterConditions 파라미터가 없으면 (최초 접속 등) 모든 체크박스를 체크한 상태로 시작
+                const initialFilters = /*[[${searchCriteria.filterConditions}]]*/ null;
+                if (initialFilters === null) {
+                    statusCheckboxes.prop('checked', true);
+                }
+                const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+                filterCheckAll.prop('checked', allChecked);
+            })();
+            
+            // ====================================================================
+            // [수정] 리뷰 상태 변경 기능 (활성, 숨김, 삭제)
+            // ====================================================================
+            mainContent.on('click', '.change-status-btn', function(e) {
+                e.preventDefault();
+
+                const newStatus = $(this).data('status'); // 'ACTIVE', 'HIDDEN', 'DELETED'
+                const selectedReviewIds = [];
+                $('.member-check:checked').each(function() {
+                    selectedReviewIds.push($(this).val());
+                });
+
+                if (selectedReviewIds.length === 0) {
+                    alert('상태를 변경할 리뷰를 선택해주세요.');
+                    return;
+                }
+
+                let confirmMessage = '';
+                switch (newStatus) {
+                    case 'ACTIVE':
+                        confirmMessage = `선택된 ${selectedReviewIds.length}개 리뷰를 '활성' 상태로 변경하시겠습니까?`;
+                        break;
+                    case 'HIDDEN':
+                        confirmMessage = `선택된 ${selectedReviewIds.length}개 리뷰를 '숨김' 상태로 변경하시겠습니까?`;
+                        break;
+                    case 'DELETED':
+                        confirmMessage = `선택된 ${selectedReviewIds.length}개 리뷰를 '삭제' 상태로 변경하시겠습니까? 이 작업은 되돌릴 수 없습니다.`;
+                        break;
+                    default:
+                        return; // 알 수 없는 상태는 무시
+                }
+
+                if (confirm(confirmMessage)) {
+                    $.ajax({
+                        url: '/adminpage/storeadmin/updateReviewStatus',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            reviewIds: selectedReviewIds,
+                            newStatus: newStatus // 이제 문자열 상태('ACTIVE' 등)를 전송
+                        }),
+                        success: function(response) {
+                            if (response.success) {
+                                alert(response.message);
+                                submitSearchForm(); 
+                            } else {
+                                alert('상태 변경 실패: ' + response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('상태 변경 중 오류가 발생했습니다: ' + xhr.responseText);
+                        }
+                    });
                 }
             });
         });
-
-        // ====================================================================
-        // 리뷰 상태 변경 기능
-        // ====================================================================
-        mainContent.on('click', '.change-status-btn', function(e) {
-            e.preventDefault(); // 기본 링크 동작 방지
-
-            const newStatus = parseInt($(this).data('status')); // 변경할 상태 (0: 삭제/숨김, 1: 활성)
-            const selectedReviewIds = [];
-            $('.member-check:checked').each(function() {
-                selectedReviewIds.push($(this).val());
-            });
-
-            if (selectedReviewIds.length === 0) {
-                alert('상태를 변경할 리뷰를 선택해주세요.');
-                return;
-            }
-
-            let confirmMessage = '';
-            if (newStatus === 0) {
-                confirmMessage = `선택된 ${selectedReviewIds.length}개 리뷰를 '삭제/숨김' 상태로 변경하시겠습니까?`;
-            } else if (newStatus === 1) {
-                confirmMessage = `선택된 ${selectedReviewIds.length}개 리뷰를 '활성' 상태로 변경하시겠습니까?`;
-            } else {
-                confirmMessage = `선택된 ${selectedReviewIds.length}개 리뷰의 상태를 변경하시겠습니까?`;
-            }
-
-            if (confirm(confirmMessage)) {
-                $.ajax({
-                    url: '/adminpage/storeadmin/updateReviewStatus',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        reviewIds: selectedReviewIds,
-                        newStatus: newStatus
-                    }),
-                    success: function(response) {
-                        if (response.success) {
-                            alert(response.message);
-                            submitSearchForm(); 
-                        } else {
-                            alert('상태 변경 실패: ' + response.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('상태 변경 중 오류가 발생했습니다: ' + xhr.responseText);
-                        console.error('AJAX Error:', status, error, xhr.responseText);
-                    }
-                });
-            }
-        });
-
         /*]]>*/
     </script>
 </th:block>

@@ -1,7 +1,9 @@
 package ks55team02.admin.inquiry.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,12 +14,12 @@ import ks55team02.common.domain.inquiry.Answer;
 import ks55team02.common.domain.inquiry.Inquiry;
 import ks55team02.common.domain.inquiry.InquiryAnswerHistory;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 public class AdminInquiryServiceImpl implements AdminInquiryService {
 
     private final AdminInquiryMapper adminInquiryMapper;
@@ -42,95 +44,72 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
 
     @Override
     public Answer registerAnswer(String inqryId, String ansCn, String answrUserNo) {
-        log.info("서비스: 신규 답변 등록 요청 - inqryId: {}, ansCn: {}, answrUserNo: {}", inqryId, ansCn, answrUserNo);
-
-        // 1. 새로운 답변 ID 생성
+        log.info("서비스: 신규 답변 등록 요청 - inqryId: {}, answrUserNo: {}", inqryId, answrUserNo);
         Integer maxAnsIdNum = adminInquiryMapper.getMaxAnsIdNumber();
         int nextAnsIdNum = (maxAnsIdNum != null) ? maxAnsIdNum + 1 : 1;
         String ansId = "ans_" + nextAnsIdNum;
 
-        // 2. Answer 객체 생성 및 데이터 설정
         Answer answer = new Answer();
         answer.setAnsId(ansId);
         answer.setInqryId(inqryId);
-        answer.setAnswrUserNo(answrUserNo); // 답변 작성자 (닉네임 또는 ID)
+        answer.setAnswrUserNo(answrUserNo);
         answer.setAnsCn(ansCn);
-        answer.setAnsTm(LocalDateTime.now()); // 답변 시간
-        answer.setAnswrTypeCd("관리자 답변"); // 기본값 설정 (필요에 따라 변경)
-        answer.setRlsYn(true); // 공개 여부 (기본값 설정)
-        answer.setActvtnYn(true); // 활성화 여부 (기본값 설정)
-        // lastMdfcnDt는 처음 등록 시에는 null이거나 ansTm과 동일하게 설정될 수 있음
-        answer.setLastMdfcnDt(null); // 초기 등록이므로 수정 시간은 null 또는 ansTm
+        answer.setAnsTm(LocalDateTime.now());
+        answer.setAnswrTypeCd("관리자 답변");
+        answer.setRlsYn(true);
+        answer.setActvtnYn(true);
 
-        // 3. 답변 저장
         int result = adminInquiryMapper.insertAnswer(answer);
-
         if (result > 0) {
             log.info("서비스: 답변 등록 성공 - 답변 ID: {}", ansId);
-            // 4. 문의 처리 상태 '완료'로 업데이트
-            updateInquiryProcessStatus(inqryId, "완료");
-
-            // 5. 답변 이력 기록 (등록 이력)
-            // InquiryAnswerHistory history = new InquiryAnswerHistory(...);
-            // insertInquiryAnswerHistory(history); // 이력 기록 로직 필요 시 추가
-
+            // 답변 등록 시, 상태를 '완료(COMPLETED)'로 자동 변경
+            updateInquiryStatus(List.of(inqryId), "COMPLETED", answrUserNo);
             return answer;
-        } else {
-            log.error("서비스: 답변 등록 실패 - 문의 ID: {}", inqryId);
-            return null;
         }
+        return null;
     }
-
+    
+    // [참고] updateAnswer 메소드가 없어서 추가합니다. 만약 이미 있다면 이 부분은 무시하세요.
     @Override
     public Answer updateAnswer(String ansId, String inqryId, String ansCn, String answrUserNo) {
-        log.info("서비스: 답변 수정 요청 - ansId: {}, inqryId: {}, ansCn: {}, answrUserNo (로그인된 관리자 닉네임/ID): {}", ansId, inqryId, ansCn, answrUserNo);
-
-        // 1. 기존 답변 정보 조회
+        log.info("서비스: 답변 수정 요청 - ansId: {}, inqryId: {}, answrUserNo: {}", ansId, inqryId, answrUserNo);
         Answer existingAnswer = adminInquiryMapper.getAnswerById(ansId);
-        if (existingAnswer == null) {
-            log.warn("서비스: 수정할 답변을 찾을 수 없습니다 - 답변 ID: {}", ansId);
-            return null;
-        }
-
-        // 2. 답변 내용 및 수정 시간 업데이트
+        if (existingAnswer == null) return null;
+        
         existingAnswer.setAnsCn(ansCn);
-        // 기존 작성자 (answrUserNo)는 유지하고, 마지막 수정자 정보만 업데이트
-        // 이 로직이 작동하려면 Answer 도메인에 lastMdfcnUserNo 또는 lastMdfcnUserNcnm 필드가 추가되어야 합니다.
-        // 예를 들어: existingAnswer.setLastMdfcnUserNo(answrUserNo);
-        // 만약 기존 answrUserNo 필드를 원작성자로 간주하고 변경하지 않으려면 아래 라인을 제거하거나 주석 처리합니다.
-        // existingAnswer.setAnswrUserNo(answrUserNo); // 이 라인을 제거하여 원작성자를 유지합니다.
-        existingAnswer.setLastMdfcnDt(LocalDateTime.now()); // 마지막 수정 일시
-
-        // 3. 답변 업데이트 저장
+        existingAnswer.setLastMdfcnDt(LocalDateTime.now());
+        
         int result = adminInquiryMapper.updateAnswer(existingAnswer);
-
         if (result > 0) {
-            // 4. 문의 처리 상태 '완료'로 업데이트 (이미 완료 상태여도 다시 업데이트)
-            updateInquiryProcessStatus(inqryId, "완료");
-            
-            // 5. 답변 이력 기록 (수정 이력)
-            // InquiryAnswerHistory history = new InquiryAnswerHistory(...);
-            // insertInquiryAnswerHistory(history); // 이력 기록 로직 필요 시 추가
-
-            // 업데이트된 정보를 다시 조회하여 반환 (필요한 경우)
-            // 또는 existingAnswer 객체를 그대로 반환해도 무방합니다.
-            return adminInquiryMapper.getAnswerById(ansId); // 업데이트된 최신 정보를 가져와 반환
-        } else {
-            log.error("서비스: 답변 수정 실패 - 답변 ID: {}", ansId);
-            return null;
+            // 답변 수정 시에도 상태를 '완료(COMPLETED)'로 변경
+            updateInquiryStatus(List.of(inqryId), "COMPLETED", answrUserNo);
+            return adminInquiryMapper.getAnswerById(ansId);
         }
+        return null;
     }
 
-    // 문의 처리 상태 업데이트
     @Override
-    public void updateInquiryProcessStatus(String inqryId, String prcsStts) {
-        log.info("서비스: 문의 처리 상태 업데이트 - 문의 ID: {}, 상태: {}", inqryId, prcsStts);
-        adminInquiryMapper.updateInquiryProcessStatus(inqryId, prcsStts);
+    public void insertInquiryAnswerHistory(InquiryAnswerHistory history) {
+        // TODO: 구현 필요
     }
 
-	@Override
-	public void insertInquiryAnswerHistory(InquiryAnswerHistory history) {
-		// TODO Auto-generated method stub
-		
-	}
+    // [핵심 수정] 중복된 메소드를 제거하고, 올바른 버전 하나만 남깁니다.
+    @Override
+    public void updateInquiryStatus(List<String> inquiryIds, String newStatus, String adminUserNo) {
+        if (inquiryIds == null || inquiryIds.isEmpty() || newStatus == null || newStatus.isEmpty()) {
+            log.warn("상태 변경 요청 파라미터가 유효하지 않습니다.");
+            return;
+        }
+        log.info("서비스: 문의 상태 일괄 변경 요청 - IDs: {}, 변경 상태: {}, 처리자: {}", inquiryIds, newStatus, adminUserNo);
+
+        // View에서 영문 코드(DELETED, COMPLETED 등)를 직접 보내므로, 한/영 변환 로직(switch)이 필요 없습니다.
+        
+        Map<String, Object> params = new HashMap<>();
+        params.put("inquiryIds", inquiryIds);
+        params.put("newStatus", newStatus); // 변환 없이 그대로 사용
+        params.put("adminUserNo", adminUserNo);
+        
+        adminInquiryMapper.updateInquiryStatus(params); 
+        log.info("서비스: 문의 상태 변경 DB 업데이트 완료");
+    }
 }

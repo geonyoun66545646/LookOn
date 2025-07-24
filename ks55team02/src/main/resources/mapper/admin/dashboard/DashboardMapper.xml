@@ -91,7 +91,7 @@
 		FROM
 		    inquiries
 		WHERE
-		    prcs_stts = '접수';
+		    prcs_stts = 'RECEPTION';
     </select>
     
     
