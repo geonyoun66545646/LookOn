@@ -48,7 +48,7 @@ public class PostServiceImpl implements PostService {
     
     @Override
     @Transactional
-    public void increaseViewCount(String pstSn) {
+    public void updatePostViewCount(String pstSn) {
         postMapper.updateViewCount(pstSn);
     }
     

@@ -6,6 +6,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import ks55team02.systems.interceptor.AdminCheckInterceptor;
+import ks55team02.systems.interceptor.LogInterceptor;
 import ks55team02.systems.interceptor.LoginAndAdminIsolateInterceptor;
 import ks55team02.systems.interceptor.NoCacheInterceptor;
 import ks55team02.systems.interceptor.SellerCheckInterceptor;
@@ -17,6 +18,7 @@ public class InterceptorConfig implements WebMvcConfigurer{
     private final LoginAndAdminIsolateInterceptor loginAndAdminIsolateInterceptor; // 1. 필드 선언
     private final NoCacheInterceptor noCacheInterceptor;
     private final SellerCheckInterceptor sellerCheckInterceptor;
+    private final LogInterceptor logInterceptor;
     
     @Value("${project.interceptors.enabled}")
     private boolean interceptorsEnabled;
@@ -25,15 +27,28 @@ public class InterceptorConfig implements WebMvcConfigurer{
     public InterceptorConfig(AdminCheckInterceptor adminCheckInterceptor, 
                              LoginAndAdminIsolateInterceptor loginAndAdminIsolateInterceptor,
                              NoCacheInterceptor noCacheInterceptor,
-                             SellerCheckInterceptor sellerCheckInterceptor) {
+                             SellerCheckInterceptor sellerCheckInterceptor,
+                             LogInterceptor logInterceptor) {
         this.adminCheckInterceptor = adminCheckInterceptor;
         this.loginAndAdminIsolateInterceptor = loginAndAdminIsolateInterceptor;
         this.noCacheInterceptor = noCacheInterceptor;
         this.sellerCheckInterceptor = sellerCheckInterceptor;
+        this.logInterceptor = logInterceptor;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+    	
+    	// access 이력 조회
+    	registry.addInterceptor(logInterceptor)
+    			.addPathPatterns("/**")
+    			.excludePathPatterns("/admincss/**")
+    			.excludePathPatterns("/favicons/**")
+    			.excludePathPatterns("/git/**")
+    			.excludePathPatterns("/js/**")
+    			.excludePathPatterns("/attachment/**")
+    			.excludePathPatterns("/maincss/**")
+    			.excludePathPatterns("/uploads/**");
     	
     	if (interceptorsEnabled) {
     	

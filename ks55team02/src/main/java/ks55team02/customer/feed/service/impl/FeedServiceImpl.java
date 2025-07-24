@@ -35,21 +35,29 @@ public class FeedServiceImpl implements FeedService {
 	private final FilesUtils filesUtils;
 
 	@Override
-    public Map<String, Object> selectFeedList(String userNo, int page, int size) {
-        int offset = (page - 1) * size;
-        List<Feed> feedList = feedMapper.selectFeedList(userNo, size, offset);
-        int totalCount = feedMapper.selectFeedCount(userNo);
-        boolean hasNext = (offset + feedList.size()) < totalCount;
+	public Map<String, Object> selectFeedList(String userNo, int page, int size, String sortOrder) {
+	    int offset = (page - 1) * size;
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("feedList", feedList);
-        result.put("hasNext", hasNext);
-        result.put("totalCount", totalCount);
-        return result;
-    }
+	    // [수정] Mapper에 전달할 파라미터를 Map으로 구성
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("userNo", userNo);
+	    params.put("limit", size);
+	    params.put("offset", offset);
+	    params.put("sortOrder", sortOrder);
+	    
+	    List<Feed> feedList = feedMapper.selectFeedList(params);
+	    int totalCount = feedMapper.selectFeedCount(userNo);
+	    boolean hasNext = (offset + feedList.size()) < totalCount;
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("feedList", feedList);
+	    result.put("hasNext", hasNext);
+	    result.put("totalCount", totalCount);
+	    return result;
+	}
 	
     @Override
-    public Map<String, Object> getFollowingFeedList(String followerUserNo, int page, int size) {
+    public Map<String, Object> selectFollowingFeedList(String followerUserNo, int page, int size) {
         int offset = (page - 1) * size;
         List<Feed> feedList = feedMapper.selectFollowingFeedList(followerUserNo, size, offset);
         int totalCount = feedMapper.countFollowingFeeds(followerUserNo);

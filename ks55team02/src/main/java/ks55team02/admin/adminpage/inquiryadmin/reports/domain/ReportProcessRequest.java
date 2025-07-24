@@ -28,6 +28,10 @@ public class ReportProcessRequest {
     // ★★★★★★★★★★ 이 필드를 추가하세요 ★★★★★★★★★★
     private LocalDateTime prcsCmptnDt; // 처리 완료 일시
     // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    private String actionContent; 
+    private String actnCn;
+    
+    
 
     // Lombok의 @Getter, @Setter 어노테이션이 있으므로
     // 별도로 getPrcsCmptnDt() 와 setPrcsCmptnDt() 메소드를 만들 필요가 없습니다.

@@ -27,8 +27,9 @@ public class Store extends SearchCriteria {
     private LocalDateTime infoMdfcnDt; // 정보 수정일시
     private Boolean delPrcrYn; // 폐쇄 여부 (true: 폐쇄, false: 미폐쇄)
     private String sellerUserNo; 
-    
+    private String inactvtnDt; 
     private String sellerUserNm;
+    private String sellerUserLoginId;
     
     
     

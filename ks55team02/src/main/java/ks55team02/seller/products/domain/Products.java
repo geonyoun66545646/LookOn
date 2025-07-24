@@ -48,6 +48,9 @@ public class Products {
     private List<ProductOption> productOptions;
     
    
+    private String rejectionReason;  // 반려 사유 요약
+    private String managerComment;   // 관리자 코멘트
+    
     public Boolean getExpsrYn() {
         return this.expsrYn;
     }

@@ -17,13 +17,13 @@
     <div class="card">
         <div class="page-content">
             <div class="container">
-                <div th:replace="~{/common/fragments/inquiryDetailFragment :: inquiryDetailFragment(inquiryData=${inquiryDetail})}"></div>
+                <div th:replace="~{common/fragments/inquiryDetailFragment :: inquiryDetailFragment(inquiryData=${inquiryDetail})}"></div>
 
                 <th:block th:if="${inquiryDetail.answer == null}">
-                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false, answerApiUrl=@{/admin/inquiry/answerProcess})}"></div>
+                    <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false, answerApiUrl=@{/admin/inquiry/answerProcess})}"></div>
                 </th:block>
                 <th:block th:if="${inquiryDetail.answer != null}">
-                    <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true, answerApiUrl=@{/admin/inquiry/answerProcess})}"></div>
+                    <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true, answerApiUrl=@{/admin/inquiry/answerProcess})}"></div>
                 </th:block>
             </div>
         </div>

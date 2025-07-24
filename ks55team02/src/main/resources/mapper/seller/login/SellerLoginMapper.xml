@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ks55team02.seller.login.mapper.SellerLoginMapper">
 
+	<!-- 판매자 아이디로 조회 -->
     <select id="getSellerInfoById" parameterType="String" resultType="ks55team02.seller.login.domain.SellerInfo">
         SELECT
             user_no             AS userNo,
