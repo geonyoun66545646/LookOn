@@ -14,25 +14,45 @@
 
 		<div class="card mb-4">
 			<div class="card-body">
-				<!-- ✅ [HTML 수정] 검색창을 form 태그로 감싸고, '검색어'와 '기간'만 남겨 단순화합니다. -->
 				<form id="searchForm">
-					<div class="row gx-3 align-items-end">
-						<div class="col-lg-5 mb-3">
-							<label class="form-label">검색 기간</label>
-							<div class="d-flex">
-								<input type="date" class="form-control" name="searchStartDate">
-								<span class="mx-2 d-flex align-items-center">-</span> <input
-									type="date" class="form-control" name="searchEndDate">
+					<div class="row gx-3">
+						<div class="col-lg-12">
+							<label class="form-label">분류</label>
+							<div class="d-flex align-items-center">
+								<div class="form-check me-4">
+									<input class="form-check-input" type="checkbox" disabled>
+									<label class="form-check-label text-muted">활동 계정</label>
+								</div>
+								<div class="form-check me-4">
+									<input class="form-check-input" type="checkbox" disabled>
+									<label class="form-check-label text-muted">휴면 계정</label>
+								</div>
 							</div>
 						</div>
-						<div class="col-lg-5 mb-3">
-							<label class="form-label">검색어</label> <input type="text"
-								class="form-control" name="searchValue"
-								placeholder="검색할 키워드를 입력하세요.">
+					</div>
+
+					<hr>
+
+					<div class="row gx-3 align-items-end">
+						<div class="col-lg-4">
+							<label class="form-label">기간</label>
+							<div class="d-flex">
+								<input type="date" class="form-control" id="searchStartDate"
+									name="startDate"> <span
+									class="mx-2 d-flex align-items-center">-</span> <input
+									type="date" class="form-control" id="searchEndDate"
+									name="endDate">
+							</div>
 						</div>
-						<div class="col-lg-2 mb-3 d-flex align-items-end">
-							<button type="submit" class="btn btn-primary btn-block me-2">검색</button>
-							<button class="btn btn-light btn-block" type="reset">초기화</button>
+						<div class="col-lg-4">
+							<label class="form-label">검색 키워드</label>
+							<div class="input-group">
+								<input type="text" class="form-control" id="searchValue"
+									name="searchValue" placeholder="검색 키워드를 입력하세요">
+							</div>
+						</div>
+						<div class="col-lg-2">
+							<button class="btn btn-primary btn-block" type="submit">검색</button>
 						</div>
 					</div>
 				</form>
@@ -180,12 +200,16 @@
             }
 
             async function loadData() {
-                const formData = new FormData(searchForm);
-                const params = new URLSearchParams(formData);
-                params.append('page', currentPage);
-                
-                // ✅ [수정] 불필요하고 오류를 유발했던 if문을 완전히 삭제합니다.
-                // 이제 폼에 있는 'searchValue'가 그대로 백엔드에 전달됩니다.
+            	 const startDate = document.getElementById('searchStartDate').value;
+            	    const endDate = document.getElementById('searchEndDate').value;
+            	    const searchValue = document.getElementById('searchValue').value;
+
+            	    const params = new URLSearchParams({
+            	        searchStartDate: startDate,
+            	        searchEndDate: endDate,
+            	        searchValue: searchValue,
+            	        page: currentPage
+            	    });
 
                 const endpoint = (currentView === 'stats') ? '/api/admin/search/stats' : '/api/admin/search/logs';
                 
@@ -236,29 +260,36 @@
                 });
             }
 
-         // 이 함수만 아래 내용으로 통째로 바꿔주세요.
+         // coupons.html의 <script> 블록 내부
+
             function renderPagination(container, pagination, listSize) {
                 container.innerHTML = '';
-                // ✅ [수정] pagination 객체가 없거나, 목록 사이즈가 0이면 페이지네이션을 그리지 않습니다.
-                if (!pagination || listSize === 0) return;
+                // pagination 객체가 없거나, 전체 페이지가 1 이하면 페이지네이션을 그리지 않습니다.
+                if (!pagination || listSize === 0 || pagination.lastPage <= 1) return;
                 
-                // 이전 페이지 버튼
-                // ✅ [수정] 현재 페이지(currentPage)를 기준으로 계산합니다.
-                const prevPage = pagination.currentPage - 1;
-                const prevDisabled = !pagination.existPrevBlock && pagination.currentPage === 1 ? 'disabled' : '';
-                container.innerHTML += `<li class="page-item ${prevDisabled}"><a class="page-link" href="#" data-page="${prevPage}">이전</a></li>`;
+                const currentPage = pagination.currentPage;
+                const lastPage = pagination.lastPage;
 
-                // 페이지 번호
-                for (let i = pagination.startPage; i <= pagination.endPage; i++) {
-                    const activeClass = (i === pagination.currentPage) ? 'active' : '';
-                    container.innerHTML += `<li class="page-item ${activeClass}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                let html = ''; // HTML 문자열을 먼저 조립합니다.
+
+                // [수정] '이전' 버튼: 1페이지가 아닐 때만 버튼을 생성합니다.
+                if (currentPage > 1) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 1}">이전</a></li>`;
                 }
 
-                // 다음 페이지 버튼
-                // ✅ [수정] 현재 페이지(currentPage)를 기준으로 계산합니다.
-                const nextPage = pagination.currentPage + 1;
-                const nextDisabled = !pagination.existNextBlock && pagination.currentPage === pagination.lastPage ? 'disabled' : '';
-                container.innerHTML += `<li class="page-item ${nextDisabled}"><a class="page-link" href="#" data-page="${nextPage}">다음</a></li>`;
+                // 페이지 번호 (기존과 동일)
+                for (let i = pagination.startPage; i <= pagination.endPage; i++) {
+                    const activeClass = (i === currentPage) ? 'active' : '';
+                    html += `<li class="page-item ${activeClass}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                }
+
+                // [수정] '다음' 버튼: 마지막 페이지가 아닐 때만 버튼을 생성합니다.
+                if (currentPage < lastPage) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 1}">다음</a></li>`;
+                }
+
+                // 최종적으로 조립된 HTML을 컨테이너에 한 번만 삽입합니다.
+                container.innerHTML = `<ul class="pagination justify-content-center">${html}</ul>`;
             }
 
             // ===== 5. 페이지 최초 로딩 =====
