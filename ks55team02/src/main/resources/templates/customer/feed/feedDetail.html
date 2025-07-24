@@ -9,7 +9,6 @@
 </head>
 
 <th:block layout:fragment="jsFile">
-    <!-- [중요] 반드시 이 순서로 로드되어야 합니다. -->
     <script th:src="@{/js/customerjs/follow.js}"></script>
     <script th:src="@{/js/customerjs/feedOptionModal.js}"></script>
     <script th:src="@{/js/customerjs/feedDetail.js}"></script>
@@ -41,7 +40,6 @@
 	                        </div>
 					        <div class="follow-action-area"
 					             th:if="${session.loginUser != null and session.loginUser.userNo != feed.wrtrUserNo}">
-					            <!-- 이 공간은 feedDetail.js가 동적으로 채웁니다. -->
 					        </div>
                         </div>
                         <div class="post-actions">

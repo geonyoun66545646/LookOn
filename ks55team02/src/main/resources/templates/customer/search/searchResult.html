@@ -14,7 +14,7 @@
 	<th:block layout:fragment="contents">
 		<div class="integrated-search-container">
 
-		
+
 			<h2 class="text-center mb-5 fw-bold">통합 검색</h2>
 
 			<div class="card shadow-sm mb-5">
@@ -64,9 +64,7 @@
 									th:each="product : ${searchResult.products}">
 									<a
 										th:href="@{/products/detail/{gdsNo}(gdsNo=${product.gdsNo})}">
-										<img th:src="${product.imgFilePathNm}" class="card-img-top"
-										th:alt="${product.gdsNm}"
-										onerror="this.onerror=null; this.src='/maincss/assets/images/sellerUploads/default_product.png';">
+										<img th:src="${product.imgFilePathNm}" class="card-img-top">
 									</a>
 									<div class="card-body">
 										<h6 class="card-title text-truncate">
@@ -103,7 +101,8 @@
 										th:each="post, iterStat : ${searchResult.posts}"
 										th:if="${iterStat.index < 5}">
 										<h6 class="mb-1 text-truncate">
-											<a th:href="@{/customer/post/postDetail(pstSn=${post.pstSn})}"
+											<a
+												th:href="@{/customer/post/postDetail(pstSn=${post.pstSn})}"
 												th:text="${post.pstTtl}"></a>
 										</h6>
 										<small class="text-muted"
@@ -137,13 +136,9 @@
 									<a
 										th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=${user.userNo})}">
 
-										<img
-										th:src="${user.prflImg != null and !#strings.isEmpty(user.prflImg) ? user.prflImg : '/maincss/assets/images/default_user.png'}"
-										th:alt="${user.prflImg != null and !#strings.isEmpty(user.prflImg) ? user.prflImg : '없음'}"
-										th:attr="data-original=${user.prflImg != null and !#strings.isEmpty(user.prflImg) ? user.prflImg : '없음'}"
+										<img th:src="${user.prflImg}" th:alt="${user.userNcnm}"
 										class="rounded-circle mx-auto mt-3 search-profile-img"
-										style="width: 80px; height: 80px; object-fit: cover;"
-										onerror="this.onerror=null; this.src='/maincss/assets/images/default_user.png'; this.alt=this.getAttribute('data-original');">
+										style="width: 80px; height: 80px; object-fit: cover;">
 
 									</a>
 									<div class="card-body text-center">
@@ -152,8 +147,8 @@
 												th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=${user.userNo})}"
 												th:text="${user.userNcnm}"></a>
 										</h6>
-										<p class="text-muted search-result-userid" th:text="${user.userLgnId}">
-										</p>
+										<p class="text-muted search-result-userid"
+											th:text="${user.userLgnId}"></p>
 									</div>
 								</div>
 							</th:block>
@@ -176,7 +171,7 @@
 
 
 
-			</div>	
+			</div>
 		</div>
 	</th:block>
 	<th:block layout:fragment="jsFile"></th:block>
@@ -337,8 +332,7 @@
                 itemsHtml += `
                     <div class="card h-100 product-card">
                 	 <a href="/products/detail/${product.gdsNo}">
-                            <img src="${product.imgFilePathNm}" class="card-img-top" alt="${product.gdsNm}"
-                                 onerror="this.onerror=null; this.src='/maincss/assets/images/sellerUploads/default_product.png';">
+                	 <img src="${product.imgFilePathNm}" class="card-img-top">
                         </a>
                         <div class="card-body">
                             <h6 class="card-title text-truncate">
@@ -410,8 +404,7 @@
     	            itemsHtml += `
     	                <div class="card h-100 search-result-user-card">
     	                    <a href="/customer/feed/feedListByUserNo/${user.userNo}">
-    	                       <img src="${profileImagePath}" class="rounded-circle mx-auto mt-3 search-profile-img" alt="프로필" style="width: 80px; height: 80px; object-fit: cover;"
-    	                            onerror="this.onerror=null; this.src='/maincss/assets/images/default_user.png';">
+    	                    <img src="${profileImagePath}" class="rounded-circle mx-auto mt-3 search-profile-img" alt="프로필" style="width: 80px; height: 80px; object-fit: cover;">
     	                    </a>
     	                    <div class="card-body text-center">
     	                        <h6 class="card-title mb-0 text-truncate">

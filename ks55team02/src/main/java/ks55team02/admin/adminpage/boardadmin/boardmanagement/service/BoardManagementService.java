@@ -5,11 +5,11 @@ import java.util.List;
 
 public interface BoardManagementService {
     
-     List<Board> getBoardList();
+     List<Board> selectBoardList();
     
-     Board getBoardByCode(String boardCode);
+     Board selectBoardByCode(String boardCode);
     
-     void addBoard(Board board, String adminUserNo);
+     void insertBoard(Board board, String adminUserNo);
     
      boolean updateBoard(Board board);
 

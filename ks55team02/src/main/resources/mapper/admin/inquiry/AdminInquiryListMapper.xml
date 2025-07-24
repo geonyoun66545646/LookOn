@@ -76,50 +76,56 @@
 </select>
 
     <select id="getAdminInquiryCnt" parameterType="ks55team02.common.domain.inquiry.Inquiry" resultType="int">
-        SELECT
-            COUNT(i.inqry_id)
-        FROM
-            inquiries i
-        LEFT JOIN
-            stores s ON s.store_id = i.inqry_store_id
-        LEFT JOIN
-            users u ON u.user_no = i.wrtr_id
-        WHERE 1=1
-        <if test="searchValue != null and searchValue != ''">
-            <choose>
-                <when test="searchKey != null and searchKey != ''">
-                    <choose>
-                        <when test="searchKey == 'inquiryTitle'">
-                            AND i.inqry_ttl LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
-                        <when test="searchKey == 'inquiryContent'">
-                            AND i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
-                        <when test="searchKey == 'writerName'">
-                            AND u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
-                        <when test="searchKey == 'inqryId'">
-                            AND i.inqry_id LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
-                        <when test="searchKey == 'prcsStts'">
-                            AND i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
-                        <when test="searchKey == 'inqryStoreConm'">
-                            AND s.store_conm LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
-                    </choose>
-                </when>
-                <otherwise>
-                    AND (
-                        i.inqry_ttl LIKE CONCAT('%', #{searchValue}, '%') OR
-                        i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%') OR
-                        u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%') OR
-                        i.inqry_id LIKE CONCAT('%', #{searchValue}, '%') OR
-                        i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%') OR
-                        s.store_conm LIKE CONCAT('%', #{searchValue}, '%') )
-                </otherwise>
-            </choose>
-        </if>
+    SELECT
+        COUNT(i.inqry_id)
+    FROM
+        inquiries i
+    LEFT JOIN
+        stores s ON s.store_id = i.inqry_store_id
+    LEFT JOIN
+        users u ON u.user_no = i.wrtr_id
+    WHERE 1=1
+    <if test="searchValue != null and searchValue != ''">
+        <choose>
+            <when test="searchKey != null and searchKey != ''">
+                <choose>
+                    <when test="searchKey == 'inquiryTitle'">
+                        AND i.inqry_ttl LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchKey == 'inquiryContent'">
+                        AND i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <!-- [수정] 키 이름을 writerNickname으로 변경하고 user_ncnm (닉네임) 검색 -->
+                    <when test="searchKey == 'writerNickname'">
+                        AND u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <!-- [추가] user_nm (실제 이름) 검색 기능 추가 -->
+                    <when test="searchKey == 'writerRealName'">
+                        AND u.user_nm LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchKey == 'inqryId'">
+                        AND i.inqry_id LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchKey == 'prcsStts'">
+                        AND i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchKey == 'inqryStoreConm'">
+                        AND s.store_conm LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                </choose>
+            </when>
+            <otherwise>
+                AND (
+                    i.inqry_ttl LIKE CONCAT('%', #{searchValue}, '%') OR
+                    i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%') OR
+                    u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%') OR
+                    u.user_nm LIKE CONCAT('%', #{searchValue}, '%') OR /* [추가] 전체 검색에 실제 이름 포함 */
+                    i.inqry_id LIKE CONCAT('%', #{searchValue}, '%') OR
+                    i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%') OR
+                    s.store_conm LIKE CONCAT('%', #{searchValue}, '%') )
+            </otherwise>
+        </choose>
+    </if>
 
         <if test="filterConditions != null and filterConditions.size() > 0">
             AND i.prcs_stts IN
@@ -163,7 +169,6 @@
             s.store_logo_img,
             s.store_stts,
             s.info_mdfcn_dt,
-            s.inactvtn_dt,
             s.del_prcr_yn,
             u.user_no,
             u.user_ncnm,
@@ -195,42 +200,47 @@
         LEFT JOIN
             answer a ON a.inqry_id = i.inqry_id
         WHERE 1=1
-        <if test="param1.searchValue != null and param1.searchValue != ''">
-            <choose>
-                <when test="param1.searchKey != null and param1.searchKey != ''">
-                    <choose>
-                        <when test="param1.searchKey == 'inquiryTitle'">
-                            AND i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                        <when test="param1.searchKey == 'inquiryContent'">
-                            AND i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                        <when test="param1.searchKey == 'writerName'">
-                            AND u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                        <when test="param1.searchKey == 'inqryId'">
-                            AND i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                        <when test="param1.searchKey == 'prcsStts'">
-                            AND i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                         <when test="param1.searchKey == 'inqryStoreConm'">
-                            AND s.store_conm LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                    </choose>
-                </when>
-                <otherwise>
-                    AND (
-                        i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                        i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                        u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                        i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                        i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                        s.store_conm LIKE CONCAT('%', #{param1.searchValue}, '%') )
-                </otherwise>
-            </choose>
-        </if>
-
+    <if test="param1.searchValue != null and param1.searchValue != ''">
+        <choose>
+            <when test="param1.searchKey != null and param1.searchKey != ''">
+                <choose>
+                    <when test="param1.searchKey == 'inquiryTitle'">
+                        AND i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%')
+                    </when>
+                    <when test="param1.searchKey == 'inquiryContent'">
+                        AND i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%')
+                    </when>
+                    <!-- [수정] 키 이름을 writerNickname으로 변경하고 user_ncnm (닉네임) 검색 -->
+                    <when test="param1.searchKey == 'writerNickname'">
+                        AND u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%')
+                    </when>
+                    <!-- [추가] user_nm (실제 이름) 검색 기능 추가 -->
+                    <when test="param1.searchKey == 'writerRealName'">
+                        AND u.user_nm LIKE CONCAT('%', #{param1.searchValue}, '%')
+                    </when>
+                    <when test="param1.searchKey == 'inqryId'">
+                        AND i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%')
+                    </when>
+                    <when test="param1.searchKey == 'prcsStts'">
+                        AND i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
+                    </when>
+                     <when test="param1.searchKey == 'inqryStoreConm'">
+                        AND s.store_conm LIKE CONCAT('%', #{param1.searchValue}, '%')
+                    </when>
+                </choose>
+            </when>
+            <otherwise>
+                AND (
+                    i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%') OR
+                    i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%') OR
+                    u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%') OR
+                    u.user_nm LIKE CONCAT('%', #{param1.searchValue}, '%') OR /* [추가] 전체 검색에 실제 이름 포함 */
+                    i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%') OR
+                    i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%') OR
+                    s.store_conm LIKE CONCAT('%', #{param1.searchValue}, '%') )
+            </otherwise>
+        </choose>
+    </if>
         <if test="param1.filterConditions != null and param1.filterConditions.size() > 0">
             AND i.prcs_stts IN
             <foreach collection="param1.filterConditions" item="status" open="(" separator="," close=")">
@@ -292,7 +302,6 @@
             s.store_logo_img,
             s.store_stts,
             s.info_mdfcn_dt,
-            s.inactvtn_dt,
             s.del_prcr_yn,
             u.user_no,
             u.user_ncnm,

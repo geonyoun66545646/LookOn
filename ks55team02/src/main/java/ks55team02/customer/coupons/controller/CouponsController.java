@@ -28,7 +28,7 @@ public class CouponsController {
 		return "customer/coupons/coupons";
 	}
     
-    
+}
     /* 2025.07.11 gy / CouponsController
 >>>>>>> refs/heads/develop
     // 새로운 API 엔드포인트 추가
@@ -59,4 +59,3 @@ public class CouponsController {
     */
 
     
-}

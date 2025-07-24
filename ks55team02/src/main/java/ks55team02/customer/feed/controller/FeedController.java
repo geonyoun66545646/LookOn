@@ -25,132 +25,117 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FeedController {
 
-    private final FeedService feedService;
-    private final UserInfoService userInfoService;
-    private static final int PAGE_SIZE = 12;
+	private final FeedService feedService;
+	private final UserInfoService userInfoService;
+	private static final int PAGE_SIZE = 12;
 
-    @GetMapping("/feedList")
-    public String selectFeedList(
-            @RequestParam(name = "tab", defaultValue = "discover") String tab,
-            // [수정] sort 파라미터 추가
-            @RequestParam(name = "sort", defaultValue = "latest") String sort,
-            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
-            Model model) {
-        
-        int currentPage = 1;
-        Map<String, Object> feedData;
+	@GetMapping("/feedList")
+	public String selectFeedList(@RequestParam(name = "tab", defaultValue = "discover") String tab,
+			@RequestParam(name = "sort", defaultValue = "latest") String sort,
+			@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, Model model) {
 
-        if ("following".equals(tab)) {
-            if (loginUser == null) {
-                model.addAttribute("feedList", Collections.emptyList());
-                model.addAttribute("hasNext", false);
-                model.addAttribute("totalCount", 0);
-                model.addAttribute("needsLogin", true);
-            } else {
-                String followerUserNo = loginUser.getUserNo();
-                // [참고] 팔로잉 목록은 정렬 기능이 없으므로 그대로 둡니다.
-                feedData = feedService.getFollowingFeedList(followerUserNo, currentPage, PAGE_SIZE);
-                model.addAllAttributes(feedData);
-            }
-        } else {
-            // [수정] 서비스 호출 시 sort 파라미터 전달
-            feedData = feedService.selectFeedList(null, currentPage, PAGE_SIZE, sort);
-            model.addAllAttributes(feedData);
-        }
+		int currentPage = 1;
+		Map<String, Object> feedData;
 
-        model.addAttribute("loginUser", loginUser);
-        model.addAttribute("activeTab", tab);
-        model.addAttribute("currentPage", currentPage);
-        // [수정] 현재 정렬 상태를 프론트엔드로 전달
-        model.addAttribute("currentSort", sort);
+		if ("following".equals(tab)) {
+			if (loginUser == null) {
+				model.addAttribute("feedList", Collections.emptyList());
+				model.addAttribute("hasNext", false);
+				model.addAttribute("totalCount", 0);
+				model.addAttribute("needsLogin", true);
+			} else {
+				String followerUserNo = loginUser.getUserNo();
+				feedData = feedService.selectFollowingFeedList(followerUserNo, currentPage, PAGE_SIZE);
+				model.addAllAttributes(feedData);
+			}
+		} else {
+			feedData = feedService.selectFeedList(null, currentPage, PAGE_SIZE, sort);
+			model.addAllAttributes(feedData);
+		}
 
-        return "customer/feed/feedList";
-    }
-     
-	 @GetMapping("/feedDetail/{feedSn}")
-	 public String selectFeedDetail(@PathVariable String feedSn, 
-			 			@RequestParam(name = "context", defaultValue = "all") String context,
-			 			@RequestParam(name = "userNo", required = false) String userNo,
-                        @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
-			 			Model model) {
-		 
-	     Feed feed = feedService.selectFeedDetail(feedSn);
-         if (feed == null) {
-             return "redirect:/customer/feed/feedList";
-         }
-	     model.addAttribute("feed", feed);
-	     model.addAttribute("context", context);
-	     model.addAttribute("userNo", userNo);
-         model.addAttribute("loginUser", loginUser);
+		model.addAttribute("loginUser", loginUser);
+		model.addAttribute("activeTab", tab);
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("currentSort", sort);
 
-	     return "customer/feed/feedDetail";
-	 }
-	    
-    @GetMapping("/feedListByUserNo")
-    public String selectFeedListByUserNo(
-            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, 
-            Model model) {
-    	
-        // [수정] 리다이렉션 로직 제거. 로그인 여부와 관계없이 항상 템플릿을 반환합니다.
-        // 비로그인 시 loginUser와 userInfo는 null로 전달되며, 프론트엔드(JS)에서 이를 처리합니다.
-    	if(loginUser != null) {
-    	    String userNo = loginUser.getUserNo();
-    	    UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
-    	    model.addAttribute("userInfo", userInfo);
-    	    model.addAttribute("loginUserNo", userNo);
-        }
+		return "customer/feed/feedList";
+	}
 
-    	return "customer/feed/feedListByUserNo";
-    }
-    
-    @GetMapping("/feedListByUserNo/{userNo}")
-    public String userFeedPage(@PathVariable("userNo") String userNo,
-    					@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, 
-    					Model model) {
-        UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
-        model.addAttribute("userInfo", userInfo);
+	@GetMapping("/feedDetail/{feedSn}")
+	public String selectFeedDetail(@PathVariable String feedSn,
+			@RequestParam(name = "context", defaultValue = "all") String context,
+			@RequestParam(name = "userNo", required = false) String userNo,
+			@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, Model model) {
 
-        if (loginUser != null) {
-            model.addAttribute("loginUserNo", loginUser.getUserNo());
-        } else {
-            model.addAttribute("loginUserNo", "");
-        }
-        return "customer/feed/feedListByUserNo";
-    }
-    
-    @GetMapping("/feedWrite")
-    public String feedWritePage(
-            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
-            Model model) {
-        
-        // [수정] 리다이렉션 로직 제거.
-        if (loginUser != null) {
-            UserInfoResponse userInfo = userInfoService.getUserInfo(loginUser.getUserNo());
-            model.addAttribute("userInfo", userInfo); 
-        }
-        model.addAttribute("loginUser", loginUser);
-        return "customer/feed/feedWrite";
-    }
-    
-    @GetMapping("/edit/{feedSn}")
-    public String feedEditPage(@PathVariable("feedSn") String feedSn,
-                               @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
-                               Model model) {
-        
-        // [수정] 리다이렉션 로직 제거.
-        if (loginUser != null) {
-            Feed feed = feedService.selectFeedDetail(feedSn);
+		Feed feed = feedService.selectFeedDetail(feedSn);
+		if (feed == null) {
+			return "redirect:/customer/feed/feedList";
+		}
+		model.addAttribute("feed", feed);
+		model.addAttribute("context", context);
+		model.addAttribute("userNo", userNo);
+		model.addAttribute("loginUser", loginUser);
 
-            if (feed == null || !feed.getWrtrUserNo().equals(loginUser.getUserNo())) {
-                log.warn("잘못된 수정 접근: feedSn={}, accessor={}", feedSn, loginUser.getUserNo());
-                return "redirect:/customer/feed/feedList";
-            }
-            UserInfoResponse userInfo = userInfoService.getUserInfo(loginUser.getUserNo());
-            model.addAttribute("userInfo", userInfo);
-            model.addAttribute("feed", feed);
-        }
-        
-        model.addAttribute("loginUser", loginUser);
-        return "customer/feed/feedWrite";
-    }
+		return "customer/feed/feedDetail";
+	}
+
+	@GetMapping("/feedListByUserNo")
+	public String selectFeedListByUserNo(@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
+			Model model) {
+
+		if (loginUser != null) {
+			String userNo = loginUser.getUserNo();
+			UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
+			model.addAttribute("userInfo", userInfo);
+			model.addAttribute("loginUserNo", userNo);
+		}
+
+		return "customer/feed/feedListByUserNo";
+	}
+
+	@GetMapping("/feedListByUserNo/{userNo}")
+	public String viewUserFeedPage(@PathVariable("userNo") String userNo,
+			@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, Model model) {
+		UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
+		model.addAttribute("userInfo", userInfo);
+
+		if (loginUser != null) {
+			model.addAttribute("loginUserNo", loginUser.getUserNo());
+		} else {
+			model.addAttribute("loginUserNo", "");
+		}
+		return "customer/feed/feedListByUserNo";
+	}
+
+	@GetMapping("/feedWrite")
+	public String getFeedWritePage(@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
+			Model model) {
+
+		if (loginUser != null) {
+			UserInfoResponse userInfo = userInfoService.getUserInfo(loginUser.getUserNo());
+			model.addAttribute("userInfo", userInfo);
+		}
+		model.addAttribute("loginUser", loginUser);
+		return "customer/feed/feedWrite";
+	}
+
+	@GetMapping("/edit/{feedSn}")
+	public String getFeedEditPage(@PathVariable("feedSn") String feedSn,
+			@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, Model model) {
+
+		if (loginUser != null) {
+			Feed feed = feedService.selectFeedDetail(feedSn);
+
+			if (feed == null || !feed.getWrtrUserNo().equals(loginUser.getUserNo())) {
+				log.warn("잘못된 수정 접근: feedSn={}, accessor={}", feedSn, loginUser.getUserNo());
+				return "redirect:/customer/feed/feedList";
+			}
+			UserInfoResponse userInfo = userInfoService.getUserInfo(loginUser.getUserNo());
+			model.addAttribute("userInfo", userInfo);
+			model.addAttribute("feed", feed);
+		}
+
+		model.addAttribute("loginUser", loginUser);
+		return "customer/feed/feedWrite";
+	}
 }
