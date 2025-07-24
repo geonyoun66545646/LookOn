@@ -10,54 +10,40 @@
     -->
     <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/customerMyPage.css}" />
 </head>
-<body>
-    <th:block layout:fragment="contents">
-        <!-- 
-            [핵심] 본문(main) 영역에 새로운 클래스를 부여하여
-            이 페이지만의 특별한 배경과 스타일을 적용합니다.
-        -->
-        <main class="main withdrawal-page-background">
-            
-            <!-- 
-                화면 중앙의 하얀색 카드 UI 입니다.
-                .container가 너비를 잡아주고, .withdrawal-content-box가 디자인을 담당합니다.
-            -->
-            <div class="container">
-                <div class="withdrawal-content-box">
-                    
-                    <h2 class="text-center">회원 탈퇴</h2>
-                    
-                    <!-- 
-                        이미지 시안에 맞춰 폼 내용을 재구성했습니다.
-                        주의사항 문구를 더 간결하게 변경했습니다.
-                    -->
-                    <form th:action="@{/mypage/withdraw}" method="post" class="mt-4" onsubmit="return confirm('정말로 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
-                        
-                        <!-- 에러 메시지 표시 영역 -->
-                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
-                            <p th:text="${errorMessage}" class="mb-0"></p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="password">현재 비밀번호</label>
-                            <input type="password" id="password" name="password" class="form-control"
-                                   placeholder="계정을 삭제하려면 현재 사용중인 비밀번호를 입력하세요." required>
-                        </div>
-
-                        <p class="withdrawal-info-text">
-                            계정 삭제 시, 회원님의 모든 개인정보와 활동 기록은 복구할 수 없는 형태로 파기됩니다.
-                        </p>
-
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="agree" name="agree" required>
-                            <label class="form-check-label" for="agree">위 내용에 동의합니다.</label>
-                        </div>
-
-                        <button type="submit" class="btn btn-withdrawal w-100">탈퇴 하기</button>
-                    </form>
-                </div>
-            </div>
-        </main>
-    </th:block>
-</body>
+	<body>
+	    <th:block layout:fragment="contents">
+	        <main class="main withdrawal-page-background">
+	            <div class="container">
+	                <div class="withdrawal-content-box">
+	                    
+	                    <h2 class="text-center">회원 탈퇴</h2>
+	                    <form th:action="@{/mypage/withdraw}" method="post" class="mt-4" onsubmit="return confirm('정말로 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.');">
+	                        
+	                        <!-- 에러 메시지 표시 영역 -->
+	                        <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+	                            <p th:text="${errorMessage}" class="mb-0"></p>
+	                        </div>
+	                        
+	                        <div class="form-group">
+	                            <label for="password">현재 비밀번호</label>
+	                            <input type="password" id="password" name="password" class="form-control"
+	                                   placeholder="계정을 삭제하려면 현재 사용중인 비밀번호를 입력하세요." required>
+	                        </div>
+	
+	                        <p class="withdrawal-info-text">
+	                            계정 삭제 시, 회원님의 모든 개인정보와 활동 기록은 복구할 수 없는 형태로 파기됩니다.
+	                        </p>
+	
+	                        <div class="form-check">
+	                            <input type="checkbox" class="form-check-input" id="agree" name="agree" required>
+	                            <label class="form-check-label" for="agree">위 내용에 동의합니다.</label>
+	                        </div>
+	
+	                        <button type="submit" class="btn btn-withdrawal w-100">탈퇴 하기</button>
+	                    </form>
+	                </div>
+	            </div>
+	        </main>
+	    </th:block>
+	</body>
 </html>

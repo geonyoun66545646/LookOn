@@ -84,10 +84,7 @@ function loadOrderHistory(page = 1) {
 // =======================================================================
 
 $(document).ready(function() {
-    
-    // ... (기존에 있던 다른 document ready 코드들) ...
 
-    // 마이페이지가 로딩되면, 첫 번째 페이지의 주문 내역을 불러옵니다.
     loadOrderHistory(1);
 
 });
