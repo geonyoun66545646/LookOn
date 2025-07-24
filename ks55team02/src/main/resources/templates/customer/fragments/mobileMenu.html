@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="mobile-menu-container" th:fragment="mobileMenuFragment">
+    <head>
+        <style>
+            /* 여기에 검색바 정렬을 위한 CSS를 추가합니다. */
+            .mobile-search form {
+                display: flex;
+                width: 100%; /* form이 부모(.mobile-search)의 전체 너비를 차지하도록 설정 */
+                align-items: center; /* 입력 필드와 버튼을 수직 중앙 정렬 */
+            }
+
+            .mobile-search .form-control {
+                flex-grow: 1; /* 입력 필드가 남은 공간을 유연하게 채우도록 함 */
+                /* 기존 max-width: calc(100% - 36px);는 flex-grow: 1;과 함께 사용되면 불필요하거나 충돌할 수 있으니 제거하거나 주석 처리하는 것을 고려하세요. */
+                /* max-width: none; */ /* 필요하다면 기존 max-width를 초기화 */
+            }
+
+            .mobile-search .btn {
+                flex-shrink: 0; /* 버튼이 줄어들지 않도록 함 */
+                /* min-width: 3.6rem; */ /* 기존 속성 유지 */
+                /* padding: .8rem .2rem; */ /* 기존 속성 유지 */
+            }
+        </style>
+    </head>
+    
+    <body>
+    <div class="mobile-menu-wrapper">
+        <span class="mobile-menu-close"><i class="icon-close"></i></span>
+
+        <div class="mobile-search">
+            <form action="#" method="get">
+                <label for="mobile-search-form" class="sr-only">Search</label>
+                <input type="search" class="form-control" name="mobile-search" id="mobile-search-form" placeholder="Search product ..." required><button class="btn btn-primary" type="submit"><i class="icon-search"></i></button>
+            </form>
+        </div>
+        
+        <nav class="mobile-nav">
+            <ul class="mobile-menu">
+                <li class="active">
+                    <a th:href="@{/best}">베스트</a>
+                </li>
+                <li>
+                    <a th:href="@{/sale}">세일</a>
+                </li>
+                <li>
+                    <a th:href="@{/new-products}">신상</a>
+                </li>
+                <li>
+                    <a th:href="@{/community}">커뮤니티</a>
+                </li>
+                <li>
+                    <a th:href="@{/feed}">피드</a>
+                </li>
+            </ul>
+        </nav><div class="social-icons">
+            <a th:href="@{#}" class="social-icon" target="_blank" title="Facebook"><i class="icon-facebook-f"></i></a>
+            <a th:href="@{#}" class="social-icon" target="_blank" title="Twitter"><i class="icon-twitter"></i></a>
+            <a th:href="@{#}" class="social-icon" target="_blank" title="Instagram"><i class="icon-instagram"></i></a>
+            <a th:href="@{#}" class="social-icon" target="_blank" title="Youtube"><i class="icon-youtube"></i></a>
+        </div></div></body>
+        </div>
+</html>

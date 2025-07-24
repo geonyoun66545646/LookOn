@@ -1,5 +1,8 @@
+/* =======================================================
+ *  어드민 문의 목록 (adminInquiryList.css) - 최종 수정본
+ * ======================================================= */
 
-/* ... (기존 .search-result-info, .status-badge-item, .custom-badge 등 좋은 스타일은 그대로 유지) ... */
+/* 검색 관련 스타일 (유지) */
 .search-result-info {
     display: inline-block;
     padding: 8px 15px;
@@ -8,12 +11,119 @@
     font-size: 14px;
     font-weight: 500;
     color: #555;
-    margin-bottom: 10px;
 }
 .search-result-info .text-brand {
     color: #0d6efd;
     font-size: 16px;
 }
+
+/* =======================================================
+ *  드롭다운 메뉴 스타일 (수정 없음 - 정상 동작)
+ * ======================================================= */
+
+/* 드롭다운 메뉴 아이템 (<a>) */
+.dropdown-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+    background-color: #f1f1f1;
+    color: #000;
+}
+
+/* 드롭다운 메뉴의 색상 점 스타일 */
+.dropdown-item .badge-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+/* 드롭다운 메뉴 너비 */
+.btn-group .dropdown-menu {
+    width: 100%;
+    min-width: max-content;
+}
+
+
+/* =======================================================
+ *  [핵심 수정] 테이블 레이아웃 복구
+ * ======================================================= */
+
+.member-table {
+    table-layout: fixed; /* [중요] 컬럼 너비를 고정하기 위해 필수 */
+    width: 100%;
+    min-width: 900px;
+}
+
+.member-table th,
+.member-table td {
+    vertical-align: middle;
+    padding: 5px 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.member-table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap; /* 헤더 텍스트 줄바꿈 방지 */
+}
+
+.member-table tbody td {
+    text-align: center;
+}
+
+/* [핵심 복원] 컬럼별 너비 재지정 */
+.member-table .col-check       { width: 4%; }
+.member-table .col-num         { width: 7%; }
+.member-table .col-type        { width: 8%; }
+.member-table .col-target      { width: 8%; }
+.member-table .col-title       { width: auto; } /* [가장 중요] 제목은 남는 공간을 모두 사용 */
+.member-table .col-writer-name { width: 9%; }
+.member-table .col-writer-id   { width: 10%; }
+.member-table .col-date        { width: 13%; }
+.member-table .col-status      { width: 8%; }
+.member-table .col-details     { width: 9%; }
+
+/* [핵심 복원] 제목 컬럼의 '...' 처리를 위한 스타일 */
+.member-table .t-title {
+    text-align: left !important; /* 제목은 왼쪽 정렬 */
+}
+
+/* td 자체에 ellipsis 클래스가 적용될 때의 스타일 */
+.member-table td.ellipsis {
+    max-width: 0; /* 이 트릭은 table-layout:fixed 와 함께 사용될 때 효과적입니다. */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 제목 링크가 셀 너비를 꽉 채우도록 설정 */
+.member-table td.ellipsis a {
+    display: block; /* 너비를 100% 차지하도록 block 요소로 변경 */
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-decoration: none; /* 밑줄 제거 */
+}
+
+.member-table td.ellipsis a:hover {
+    text-decoration: underline; /* 호버 시 밑줄 표시 */
+}
+
+/* 테이블의 처리 상태 배지 (유지) */
 .custom-badge {
     padding: 0.5em 0.9em;
     font-size: 13px;
@@ -22,169 +132,4 @@
     min-width: 60px;
     text-align: center;
     border-radius: 10px;
-}
-
-/* 드롭다운 메뉴 아이템 (.dropdown-item) 스타일 */
-.dropdown-menu .dropdown-item {
-    display: flex; /* Flexbox 사용 */
-    align-items: center; /* 수직 가운데 정렬 */
-    justify-content: center; /* 수평 가운데 정렬 */
-    padding: 10px 15px; /* 패딩 조정 */
-    color: #333;
-    font-size: 15px;
-    white-space: nowrap;
-    cursor: pointer; /* 클릭 가능하도록 커서 변경 */
-}
-
-.dropdown-menu .dropdown-item:hover {
-    background-color: #f0f0f0;
-}
-
-/* 각 항목 앞의 색상 점 (a 태그의 가상 요소로) */
-.dropdown-menu .dropdown-item::before {
-    content: '';
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 8px; /* 점과 텍스트 사이 간격 */
-    flex-shrink: 0; /* 점이 줄어들지 않도록 */
-}
-
-/* 활동 상태 점 (초록색) */
-.dropdown-menu .dropdown-item.status-active::before {
-    background-color: #28a745; /* 초록색 */
-}
-
-/* 휴면 상태 점 (주황색) */
-.dropdown-menu .dropdown-item.status-dormant::before {
-    background-color: #ffc107; /* 주황색 */
-}
-
-/* 탈퇴 상태 점 (빨간색) */
-.dropdown-menu .dropdown-item.status-withdrawal::before {
-    background-color: #dc3545; /* 빨간색 */
-}
-
-
-.content-title {
-    font-weight: 600;
-    margin-bottom: 20px;
-}
-.form-label {
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-}
-.member-table {
-    table-layout: fixed; /* 테이블 레이아웃 고정 (가장 중요) */
-    width: 100%;
-    min-width: 900px;
-}
-
-.member-table th,
-.member-table td {
-    vertical-align: middle;
-    text-align: center;
-    padding: 12px 8px;
-    border-bottom: 1px solid #eee; /* 테두리 선을 좀 더 연하게 */
-	word-break: break-all;    
-}
-
-.member-table th {
-    background-color: #f8f9fa; /* 헤더 배경색 */
-   	font-weight: 600; /* 헤더 텍스트를 약간 더 굵게 */ 
-}
-
-/* [개선!] 긴 텍스트를 '...'으로 처리하는 클래스 */
-.ellipsis {
-    white-space: nowrap;      /* 줄 바꿈 방지 */
-    overflow: hidden;         /* 영역 밖 내용 숨김 */
-    text-overflow: ellipsis;  /* 숨겨진 내용을 ...으로 표시 */
-}
-
-/* 텍스트 정렬용 클래스 */
-.text-center { text-align: center; }
-
-/* 드롭다운 메뉴 너비를 버튼 너비와 일치시키기 */
-.btn-group .dropdown-menu {
-    width: 100%; /* 부모 요소(.btn-group)의 너비를 100% 따라가도록 설정 */
-    min-width: max-content; /* 내용이 너무 길어질 경우를 대비해 최소 너비 설정 */
-}
-
-
-/* 컬럼별 너비 지정 (nth-child 사용은 그대로 유지, 선택자만 단순화) */
-.member-table .col-checkbox { width: 5%; }
-.member-table .col-id       { width: 12%; }
-.member-table .col-name     { width: 8%; }
-.member-table .col-gender   { width: 5%; }
-.member-table .col-email    { width: 18%; }
-.member-table .col-phone    { width: 12%; }
-.member-table .col-address  { width: auto; } /* 주소는 남는 공간 모두 사용 */
-.member-table .col-status   { width: 8%; }
-.member-table .col-joindate { width: 10%; }
-
-
-/* 텍스트 정렬용 클래스 */
-.text-left { text-align: left !important; } /* important를 추가하여 중앙정렬을 덮어씁니다. */
-.text-center { text-align: center !important; }
-.text-right { text-align: right !important; }
-
-
-/* "문의 대상" 라디오 버튼을 체크박스처럼 보이게 하는 스타일 */
-.inquiry-target-radio {
-    border-radius: 0.25em !important; /* 모서리를 네모낳게 만듭니다. */
-}
-
-/* 선택되었을 때, 동그라미 대신 체크 표시가 나오도록 합니다. */
-.inquiry-target-radio:checked {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
-}
-
-/* 포커스 되었을 때의 그림자 효과를 기본 체크박스와 동일하게 설정 */
-.inquiry-target-radio:focus {
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
-
-
-.member-table .col-check       { width: 4%; }
-.member-table .col-num         { width: 5%; }
-.member-table .col-type        { width: 8%; }
-.member-table .col-target      { width: 8%; }
-/* 제목 컬럼은 남는 공간을 최대한 활용하도록 auto 또는 가장 큰 %를 할당합니다. */
-.member-table .col-title       { width: auto; }
-.member-table .col-writer-name { width: 9%; }
-.member-table .col-writer-id   { width: 10%; }
-.member-table .col-date        { width: 13%; }
-.member-table .col-status      { width: 8%; }
-.member-table .col-details     { width: 8%; }
-
-
-/* [개선!] 긴 텍스트를 '...'으로 처리하는 클래스 (이미 존재하므로 확인만 하세요) */
-.ellipsis {
-    white-space: nowrap;      /* 줄 바꿈 방지 */
-    overflow: hidden;         /* 영역 밖 내용 숨김 */
-    text-overflow: ellipsis;  /* 숨겨진 내용을 ...으로 표시 */
-    max-width: 0;             /* 이 속성은 ellipsis가 td에서 잘 동작하게 도와줍니다. */
-}
-
-/* 텍스트 정렬용 클래스 (이미 존재하므로 확인만 하세요) */
-.text-left { text-align: left !important; }
-.text-center { text-align: center !important; }
-
-/* 테이블 셀 스타일 추가 */
-.member-table td, .member-table th {
-    /* 기존 스타일 유지 */
-    vertical-align: middle;
-    padding: 12px 8px;
-    border-bottom: 1px solid #eee;
-    word-break: break-all; /* 이 속성은 ellipsis와 충돌할 수 있으므로, ellipsis 셀에서는 nowrap이 우선 적용됩니다. */
-}
-
-/* 제목 셀의 a 태그가 너비를 꽉 채우도록 설정 (ellipsis 적용 강화) */
-.member-table .ellipsis a {
-    display: inline-block;
-    width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }

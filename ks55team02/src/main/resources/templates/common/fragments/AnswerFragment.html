@@ -92,58 +92,9 @@
                     .then(data => {
                         if (data.status === 'success') {
                             alert(data.message);
-                            // 답변 성공 시 처리 로직
-                            // 예를 들어, 답변 조회 영역을 업데이트
-                            // window.location.reload() 대신 동적 업데이트를 시도할 수 있으나,
-                            // 현재는 단순성을 위해 새로고침을 유지합니다.
-
-                            // 현재 답변 조회 영역을 숨기고 답변 폼을 숨깁니다.
-                            // answerSection.style.display = 'block';
+                            
                             answerFormContainer.style.display = 'none';
-
-                            // 기존 답변 내용을 업데이트하거나 추가
-                            // const existingAnswerContent = document.getElementById('displayAnswerContent');
-                            // const existingAnswerTime = document.getElementById('displayAnswerTime');
-                            // const existingModifiedTime = document.getElementById('displayModifiedTime');
-                            // const noAnswerMessageRow = document.getElementById('noAnswerMessageRow');
-
-                            // if (noAnswerMessageRow) {
-                            //     noAnswerMessageRow.remove();
-                            // }
-
-                            // if (existingAnswerContent) {
-                            //     existingAnswerContent.innerHTML = `<p class="answer-content-text">${data.ansCn.replace(/\n/g, '<br>')}</p>`;
-                            //     existingAnswerTime.textContent = data.ansTm;
-                            //     if (data.lastMdfcnDt) {
-                            //         existingModifiedTime.textContent = data.lastMdfcnDt;
-                            //     }
-                            // } else {
-                            //     // 기존 답변이 없었던 경우 새로운 답변 정보 행을 생성하여 추가
-                            //     const newAnswerHtml = `
-                            //         <tr class="answer-info-row">
-                            //             <td class="answer-sub">
-                            //                 <span>답변자 : </span>
-                            //                 <span>${data.answrUserNo}</span>
-                            //             </td>
-                            //             <td class="answer-sub">
-                            //                 <span>작성 시간 : </span>
-                            //                 <span>${data.ansTm}</span>
-                            //             </td>
-                            //             <td class="answer-sub">
-                            //                 <span>수정 시간 : </span>
-                            //                 <span>${data.lastMdfcnDt ? data.lastMdfcnDt : ''}</span>
-                            //             </td>
-                            //         </tr>
-                            //         <tr class="answer-content-row">
-                            //             <td colspan="3" class="answer-cn">
-                            //                 <div id="displayAnswerContent" class="answer-content-box">
-                            //                     <p class="answer-content-text">${data.ansCn.replace(/\n/g, '<br>')}</p>
-                            //                 </div>
-                            //             </td>
-                            //         </tr>
-                            //     `;
-                            // answerContentBody.insertAdjacentHTML('beforeend', updatedAnswerHtml);
-
+       
                             const answerHeader = document.getElementById('answer-header');
                             if (answerHeader) {
                                 // inqryId는 inquiryData에서 가져와야 함
@@ -168,11 +119,11 @@
 
             if (cancelAnswerBtn) {
                 cancelAnswerBtn.addEventListener('click', function() {
-                    console.log('답변 수정 취소');
-                    answerFormContainer.style.display = 'none';
-                    window.location.reload();
+                    console.log('취소 버튼 클릭: 이전 페이지로 이동');
+                    history.back(); // 브라우저의 뒤로 가기 기능 실행
                 });
             }
+            
         });
         /* ]]> */
     </script>
