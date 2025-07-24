@@ -26,15 +26,15 @@
                 <div class="page-content">
                     <div class="container">
                         <!-- 문의 상세 정보 프래그먼트 재사용 -->
-                        <div th:replace="~{/common/fragments/inquiryDetailFragment :: inquiryDetailFragment(inquiryData=${inquiryDetail})}"></div>
+                        <div th:replace="~{common/fragments/inquiryDetailFragment :: inquiryDetailFragment(inquiryData=${inquiryDetail})}"></div>
 
                         <th:block th:if="${inquiryDetail.answer == null}">
                             <!-- 답변 작성 프래그먼트 호출 (contextPath 전달) -->
-                            <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false, contextPath='/adminpage/inquiryadmin')}"></div>
+                            <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false, contextPath='/adminpage/inquiryadmin')}"></div>
                         </th:block>
                         <th:block th:unless="${inquiryDetail.answer == null}">
                             <!-- 답변 수정 프래그먼트 호출 (contextPath 전달) -->
-                            <div th:replace="~{/common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true, contextPath='/adminpage/inquiryadmin')}"></div>
+                            <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true, contextPath='/adminpage/inquiryadmin')}"></div>
                         </th:block>
                     </div>
                 </div>
