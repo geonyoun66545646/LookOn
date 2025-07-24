@@ -33,86 +33,68 @@ public class SettlementController {
     public String getMySettlementList(
             Model model,
             @ModelAttribute SettlementSearchCriteria criteria,
-            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
-            @RequestParam(name = "filterConditions", required = false) List<String> testFilterConditions
+            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser
     ) {
-    	 System.out.println("전달받은 Criteria: " + criteria.toString());
-    	    if (criteria.getFilterConditions() != null) {
-    	        System.out.println("수신된 filterConditions:");
-    	        criteria.getFilterConditions().forEach(condition -> 
-    	            System.out.println("- " + condition));
-    	    }
-        // --- 디버그 로그 추가 시작 ---
-        System.out.println("--- SettlementController: getMySettlementList 호출 ---");
-        System.out.println("전달받은 Criteria: " + criteria.toString()); // SettlementSearchCriteria에 @ToString이 있다면 유용
-        List<String> receivedFilterConditions = criteria.getFilterConditions();
-        if (receivedFilterConditions != null && !receivedFilterConditions.isEmpty()) {
-            System.out.println("수신된 filterConditions:");
-            for (String condition : receivedFilterConditions) {
-                System.out.println("- " + condition);
-            }
-            criteria.setFilterConditions(testFilterConditions);
-        } else {
-            System.out.println("수신된 filterConditions가 없거나 비어 있습니다.");
+        // --- 1. 로그인 확인 및 상점 ID 조회 (기존 로직과 동일) ---
+        if (loginUser == null || loginUser.getUserNo() == null) {
+            return "redirect:/main"; // 로그인 안 했으면 메인으로
         }
-        System.out.println("--- 디버그 로그 종료 ---");
-        // --- 디버그 로그 추가 종료 ---
-
-        String storeId = null;
-
-        if (loginUser == null || loginUser.getUserNo() == null || loginUser.getUserNo().isEmpty()) {
-            System.err.println("DEBUG: 세션에 로그인 정보(LoginUser)가 없거나 userNo가 비어 있습니다.");
-            return "redirect:/main";
-        }
-
         String userNo = loginUser.getUserNo();
-        System.out.println("DEBUG: 세션에서 가져온 userNo: " + userNo);
-
-        try {
-            storeId = settlementService.getStoreIdByUserNo(userNo);
-            System.out.println("DEBUG: userNo " + userNo + " 에 연결된 storeId: " + storeId);
-        } catch (Exception e) {
-            System.err.println("ERROR: userNo " + userNo + " 에 해당하는 storeId를 찾는 중 오류 발생: " + e.getMessage());
-            return "redirect:/main?error=storeIdFetchFailed";
+        String storeId = settlementService.getStoreIdByUserNo(userNo);
+        if (storeId == null) {
+            return "redirect:/main?error=noStoreFound"; // 상점이 없으면 메인으로
         }
-
-        if (storeId == null || storeId.isEmpty()) {
-            System.err.println("DEBUG: userNo " + userNo + " 에 연결된 storeId가 없습니다. (데이터베이스에 매핑되지 않음)");
-            return "redirect:/main?error=noStoreFound";
-        }
-
         criteria.setStoreId(storeId);
 
-        if (criteria.getPageSize() == 0) {
-            criteria.setPageSize(10);
-        }
-
-        // 여기서 criteria 객체가 filterConditions 값을 제대로 가지고 service로 전달되는지 확인
+        // --- 2. 서비스 호출하여 데이터 가져오기 ---
+        // 서비스가 settlementList와 pagination을 모두 담은 Map을 반환한다고 가정합니다.
         Map<String, Object> data = settlementService.getMySettlementList(criteria);
 
+        // --- 3. Model에 데이터를 담아 HTML로 전달 ---
+        // HTML이 기다리는 이름(${settlementList})과 똑같은 이름으로 데이터를 추가합니다.
+        model.addAttribute("settlementList", data.get("settlementList"));
         model.addAttribute("pagination", data.get("pagination"));
-        model.addAttribute("searchCriteria", data.get("searchCriteria"));
+        model.addAttribute("searchCriteria", criteria); // 검색 조건 유지를 위해 추가
+        model.addAttribute("title", "나의 정산 내역"); // 페이지 제목 추가
 
-        return "seller/fragments/settlementHistory";
+        // --- 4. 보여줄 HTML 파일의 경로를 정확하게 지정 ---
+        return "seller/settlement/settlementHistory"; // 예시 경로입니다. 실제 파일 위치에 맞게 수정하세요.
     }
     
- // ★★★ 1. 이 메소드를 새로 추가해주세요. ★★★
     /**
      * 전체 판매 내역 조회 페이지를 보여주는 메소드
      */
     @GetMapping("/list")
-    public String salesHistoryListPage(Model model) {
+    public String salesHistoryListPage(
+            Model model,
+            // 1. 세션에서 현재 로그인한 사용자 정보를 가져옵니다.
+            @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser
+    ) {
         
-        // 참고: 현재는 모든 판매 내역을 가져오지만, 나중에 검색/페이지네이션을 추가할 수 있습니다.
-        // 여기서는 예시로 store_id 'store_01'의 내역만 가져오겠습니다.
-        // 실제로는 전체 내역을 가져오거나, 검색 기능을 구현해야 합니다.
-        List<SalesSttsDTO> salesHistoryList = settlementService.getSalesHistoryByStoreId("store_01"); // 예시 ID
+        // 2. 로그인 상태를 확인하고, 비로그인 시 메인 페이지로 보냅니다.
+        if (loginUser == null || loginUser.getUserNo() == null) {
+            // 로그인 정보가 없으면 판매 현황을 볼 수 없으므로 리다이렉트
+            return "redirect:/main";
+        }
+
+        // 3. 세션에서 가져온 userNo로 해당 판매자의 store_id를 조회합니다.
+        String userNo = loginUser.getUserNo();
+        String storeId = settlementService.getStoreIdByUserNo(userNo);
+
+        // 4. store_id가 없는 판매자일 경우를 대비한 방어 코드입니다.
+        if (storeId == null) {
+            // 상점이 없는 판매자는 판매 현황을 볼 수 없으므로 리다이렉트
+            return "redirect:/main?error=noStoreFound";
+        }
         
-        model.addAttribute("title", "전체 판매 내역 조회");
+        // 5. ★★★ 하드코딩된 'store_01' 대신, DB에서 조회한 "진짜 storeId"를 사용합니다. ★★★
+        List<SalesSttsDTO> salesHistoryList = settlementService.getSalesHistoryByStoreId(storeId);
+        
+        model.addAttribute("title", "나의 판매 현황");
         model.addAttribute("salesHistoryList", salesHistoryList);
         
-        // 반환하는 경로는 새로 만들 HTML 파일의 위치와 일치해야 합니다.
-        return "seller/fragments/salesStts";
+        // 6. 보여줄 HTML 파일의 정확한 경로를 반환합니다.
+        return "seller/settlement/settlementHistory"; // 실제 파일 위치에 맞게 수정 필요
     }
     
     /**
