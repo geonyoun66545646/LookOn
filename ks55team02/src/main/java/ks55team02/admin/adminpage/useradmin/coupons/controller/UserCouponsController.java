@@ -17,8 +17,4 @@ public class UserCouponsController {
         return "admin/adminpage/useradmin/coupons/userCouponsList";
     }
 
-    // ==========================================================
-    // 여기에 있었을 쿠폰 생성/수정 관련 @GetMapping, @PostMapping 등
-    // 모든 메소드를 삭제합니다.
-    // ==========================================================
 }

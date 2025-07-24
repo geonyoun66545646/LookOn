@@ -79,7 +79,7 @@
 		ORDER BY
 		<choose>
 			<when test="'expiry'.equals(sortOrder)">uc.indiv_expry_dt ASC</when>
-			<when test="'recent'.equals(sortOrder)">uc.cpn_give_dt DESC</when>
+			<when test="'rate'.equals(sortOrder)">c.dscnt_vl DESC</when>
 			<otherwise>uc.indiv_expry_dt ASC</otherwise>
 		</choose>
 		LIMIT #{limit} OFFSET #{offset}
@@ -214,9 +214,7 @@
 		</if>
 		ORDER BY
 		<choose>
-			<when test="'recommended'.equals(sortOrder)">c.vld_end_dt ASC</when>
 			<when test="'expiry'.equals(sortOrder)">c.vld_end_dt ASC</when>
-			<when test="'recent'.equals(sortOrder)">c.vld_bgng_dt DESC</when>
 			<when test="'rate'.equals(sortOrder)">c.dscnt_vl DESC</when>
 			<otherwise>c.vld_end_dt ASC</otherwise>
 		</choose>
@@ -275,14 +273,7 @@
 	</select>
 
 
-	<!-- ================================================================= -->
-	<!-- ====== 아래의 쿼리들은 '재발급/재사용' 정책 폐기로 삭제됨 ======== -->
-	<!-- ================================================================= -->
-	<!-- <select id="countMonthlyIssuedReviewCoupons" ... /> <select id="isBirthdayWeek" 
-		... /> <select id="countIssuedBirthdayCouponThisYear" ... /> <select id="countMonthlyIssuedCoupon" 
-		... /> <select id="countWeeklyIssuedCoupon" ... /> <select id="countYearlyIssuedCoupon" 
-		... /> <select id="countActiveUserCouponByCouponId" ... /> -->
-	<!-- 등등 재발급 관련 쿼리 일괄 삭제 -->
+
 
 </mapper>
 

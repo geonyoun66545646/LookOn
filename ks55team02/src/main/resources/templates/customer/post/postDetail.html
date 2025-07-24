@@ -1,140 +1,210 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{customer/layout/layoutMain}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{customer/layout/layoutMain}">
 <head>
-    <title th:text="${postDetail != null ? postDetail.pstTtl : '게시글 상세'}"></title>
-    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postDetail.css}">
+<title th:text="${postDetail != null ? postDetail.pstTtl : '게시글 상세'}"></title>
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/customcustomercss/postDetail.css}">
 </head>
 <th:block layout:fragment="jsFile">
-    <script th:src="@{/js/customerjs/postDetail.js}"></script>
+	<script th:src="@{/js/customerjs/postDetail.js}"></script>
 </th:block>
 <th:block layout:fragment="contents">
-    <div class="post-view-container" th:data-login-user-no="${session.loginUser?.userNo ?: ''}">
+	<div class="post-view-container"
+		th:data-login-user-no="${session.loginUser?.userNo ?: ''}">
 
-        <div class="post-card" th:if="${postDetail != null and postDetail.delDt == null}">
-            <!-- [수정] '커뮤니티' 제목을 post-card 안으로 이동 -->
-            <div class="page-title-section">
-                <h2 class="page-main-title">커뮤니티</h2>
-            </div>
+		<div class="post-card"
+			th:if="${postDetail != null and postDetail.delDt == null}">
+			<div class="page-title-section">
+				<h2 class="page-main-title">커뮤니티</h2>
+			</div>
 
-            <div class="post-header">
-                <div class="author-info">
-                    <div class="profile-image-wrapper">
-                        <img th:src="${postDetail.writerInfo?.prflImg ?: '/maincss/assets/images/default_profile.png'}" alt="프로필 이미지">
-                    </div>
-                    <div class="author-details">
-                        <span class="author-nickname" th:text="${postDetail.writerInfo?.userNcnm ?: '작성자'}"></span>
-                        <div class="post-meta">
-                            <span class="relative-time" th:attr="data-datetime=${postDetail.crtDt}"></span>
-                            <span>·</span>
-                            <span>조회 <span th:text="${postDetail.viewCnt}">0</span></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="post-actions-menu">
-                    <button type="button" class="btn-more">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                    </button>
-                    <div class="more-menu" style="display: none;">
-                        <th:block th:if="${loginUser != null and loginUser.userNo == postDetail.writerInfo.userNo}">
-                            <a th:href="@{/customer/post/postUpdate/{pstSn}(pstSn=${postDetail.pstSn})}">수정하기</a>
-                            <button type="button" id="delete-post-btn" th:data-post-delete-url="@{/customer/api/post/delete/{pstSn}(pstSn=${postDetail.pstSn})}">삭제하기</button>
-                        </th:block>
-                        <th:block th:unless="${loginUser != null and loginUser.userNo == postDetail.writerInfo.userNo}">
-                            <button type="button" class="report-btn">신고하기</button>
-                        </th:block>
-                    </div>
-                </div>
-            </div>
+			<div class="post-header">
+				<div class="author-info">
+					<div class="profile-image-wrapper">
+						<img
+							th:src="${postDetail.writerInfo?.prflImg ?: '/maincss/assets/images/default_profile.png'}"
+							alt="프로필 이미지">
+					</div>
+					<div class="author-details">
+						<span class="author-nickname"
+							th:text="${postDetail.writerInfo?.userNcnm ?: '작성자'}"></span>
+						<div class="post-meta">
+							<span class="relative-time"
+								th:attr="data-datetime=${postDetail.crtDt}"></span> <span>·</span>
+							<span>조회 <span th:text="${postDetail.viewCnt}">0</span></span>
+						</div>
+					</div>
+				</div>
+				<div class="post-actions-menu">
+					<button type="button" class="btn-more">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+							viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="12" cy="12" r="1"></circle>
+							<circle cx="19" cy="12" r="1"></circle>
+							<circle cx="5" cy="12" r="1"></circle></svg>
+					</button>
+					<div class="more-menu" style="display: none;">
+						<th:block
+							th:if="${loginUser != null and loginUser.userNo == postDetail.writerInfo.userNo}">
+							<a
+								th:href="@{/customer/post/postUpdate/{pstSn}(pstSn=${postDetail.pstSn})}">수정하기</a>
+							<button type="button" id="delete-post-btn"
+								th:data-post-delete-url="@{/customer/api/post/delete/{pstSn}(pstSn=${postDetail.pstSn})}">삭제하기</button>
+						</th:block>
+						<th:block
+							th:unless="${loginUser != null and loginUser.userNo == postDetail.writerInfo.userNo}">
+							<button type="button" class="report-btn">신고하기</button>
+						</th:block>
+					</div>
+				</div>
+			</div>
 
-            <div class="post-body">
-                <h2 class="post-title" th:text="${postDetail.pstTtl}"></h2>
-                <div class="post-images-area" th:if="${postDetail.imageList != null and not #lists.isEmpty(postDetail.imageList)}">
-                    <img th:each="image : ${postDetail.imageList}" th:src="@{${image.imgFilePathNm}}" alt="게시글 이미지" class="post-image-item">
-                </div>
-                <p class="post-content-text" th:utext="${#strings.replace(postDetail.pstCn, '\n', '<br>')}"></p>
-            </div>
+			<div class="post-body">
+				<h2 class="post-title" th:text="${postDetail.pstTtl}"></h2>
+				<div class="post-images-area"
+					th:if="${postDetail.imageList != null and not #lists.isEmpty(postDetail.imageList)}">
+					<img th:each="image : ${postDetail.imageList}"
+						th:src="@{${image.imgFilePathNm}}" alt="게시글 이미지"
+						class="post-image-item">
+				</div>
+				<p class="post-content-text"
+					th:utext="${#strings.replace(postDetail.pstCn, '\n', '<br>')}"></p>
+			</div>
 
-            <div class="post-interaction-bar">
-                <button type="button" class="interaction-btn" id="post-like-btn" th:classappend="${postDetail.likedByCurrentUser} ? 'liked' : ''" th:data-post-sn="${postDetail.pstSn}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-                    <span>추천</span>
-                    <span class="like-count" th:text="${postDetail.interCnt}">0</span>
-                </button>
-                <button type="button" class="interaction-btn" id="post-share-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
-                    <span>공유</span>
-                </button>
-                <!-- [수정] 목록으로 돌아가기 버튼 아이콘화 및 우측 정렬 -->
-                <a th:href="@{/customer/post/postList}" class="interaction-btn" id="back-to-list-btn" style="margin-left: auto;" title="목록으로">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-                    <span class="sr-only">목록</span>
-                </a>
-            </div>
-        </div>
+			<div class="post-interaction-bar">
+				<button type="button" class="interaction-btn" id="post-like-btn"
+					th:classappend="${postDetail.likedByCurrentUser} ? 'liked' : ''"
+					th:data-post-sn="${postDetail.pstSn}">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+						viewBox="0 0 24 24" fill="none" stroke="currentColor"
+						stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path
+							d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+					<span>추천</span> <span class="like-count"
+						th:text="${postDetail.interCnt}">0</span>
+				</button>
+				<button type="button" class="interaction-btn" id="post-share-btn">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+						viewBox="0 0 24 24" fill="none" stroke="currentColor"
+						stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+						<polyline points="16 6 12 2 8 6"></polyline>
+						<line x1="12" y1="2" x2="12" y2="15"></line></svg>
+					<span>공유</span>
+				</button>
+				<a th:href="@{/customer/post/postList}" class="interaction-btn"
+					id="back-to-list-btn" style="margin-left: auto;" title="목록으로">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+						viewBox="0 0 24 24" fill="none" stroke="currentColor"
+						stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<line x1="8" y1="6" x2="21" y2="6"></line>
+						<line x1="8" y1="12" x2="21" y2="12"></line>
+						<line x1="8" y1="18" x2="21" y2="18"></line>
+						<line x1="3" y1="6" x2="3.01" y2="6"></line>
+						<line x1="3" y1="12" x2="3.01" y2="12"></line>
+						<line x1="3" y1="18" x2="3.01" y2="18"></line></svg> <span
+					class="sr-only">목록</span>
+				</a>
+			</div>
+		</div>
 
-        <div class="comments-section" th:if="${postDetail != null and postDetail.delDt == null}">
-            <div class="comments-header">
-                <h3>댓글 <span th:text="${#lists.size(postDetail.commentList)}">0</span></h3>
-            </div>
-            <div class="comment-list">
-                <div class="comment-item" th:each="comment : ${postDetail.commentList}" th:data-comment-sn="${comment.pstCmntSn}">
-                    <div class="comment-author-profile">
-                        <img th:src="${comment.writerInfo?.prflImg ?: '/maincss/assets/images/default_profile.png'}" alt="프로필">
-                    </div>
-                    <div class="comment-main">
-                        <div class="comment-header">
-                            <span class="comment-author-name" th:text="${comment.writerInfo?.userNcnm ?: '익명'}"></span>
-                            <span class="comment-date" th:text="${#temporals.format(comment.crtDt, 'yyyy.MM.dd HH:mm')}"></span>
-                        </div>
-                        <div class="comment-body">
-                            <p th:text="${comment.cmntCn}"></p>
-                        </div>
-                        <div class="comment-update-form" style="display:none;">
-                            <textarea class="comment-update-input" th:text="${comment.cmntCn}"></textarea>
-                        </div>
-                        <div class="comment-actions" th:if="${session.loginUser != null and session.loginUser.userNo == comment.wrtrUserNo}">
-                            <!-- [수정] 댓글 수정 버튼 아이콘화 -->
-                            <button type="button" class="update-comment-btn" title="수정">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                            </button>
-                            <!-- [수정] 댓글 삭제 버튼 아이콘화 -->
-                            <button type="button" class="delete-comment-btn" th:data-comment-delete-url="@{/customer/api/post/comments/{cmntSn}(cmntSn=${comment.pstCmntSn})}" title="삭제">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                            </button>
-                            <button type="button" class="save-comment-btn" style="display:none;" th:data-comment-update-url="@{/customer/api/post/comments/{cmntSn}(cmntSn=${comment.pstCmntSn})}">저장</button>
-                            <button type="button" class="cancel-comment-btn" style="display:none;">취소</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- [수정] '댓글 없음' 안내 문구 노출 조건 변경 -->
-                <div class="no-comment" th:if="${#lists.isEmpty(postDetail.commentList) and canComment}">
-                    <p>아직 댓글이 없습니다.</p>
-                </div>
-            </div>
+		<div class="comments-section"
+			th:if="${postDetail != null and postDetail.delDt == null}">
+			<div class="comments-header">
+				<h3>
+					댓글 <span th:text="${#lists.size(postDetail.commentList)}">0</span>
+				</h3>
+			</div>
+			<div class="comment-list">
+				<div class="comment-item"
+					th:each="comment : ${postDetail.commentList}"
+					th:data-comment-sn="${comment.pstCmntSn}">
+					<div class="comment-author-profile">
+						<img
+							th:src="${comment.writerInfo?.prflImg ?: '/maincss/assets/images/default_profile.png'}"
+							alt="프로필">
+					</div>
+					<div class="comment-main">
+						<div class="comment-header">
+							<span class="comment-author-name"
+								th:text="${comment.writerInfo?.userNcnm ?: '익명'}"></span> <span
+								class="comment-date"
+								th:text="${#temporals.format(comment.crtDt, 'yyyy.MM.dd HH:mm')}"></span>
+						</div>
+						<div class="comment-body">
+							<p th:text="${comment.cmntCn}"></p>
+						</div>
+						<div class="comment-update-form" style="display: none;">
+							<textarea class="comment-update-input"
+								th:text="${comment.cmntCn}"></textarea>
+						</div>
+						<div class="comment-actions"
+							th:if="${session.loginUser != null and session.loginUser.userNo == comment.wrtrUserNo}">
+							<button type="button" class="update-comment-btn" title="수정">
+								<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor"
+									stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path
+										d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+									<path
+										d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+							</button>
+							<button type="button" class="delete-comment-btn"
+								th:data-comment-delete-url="@{/customer/api/post/comments/{cmntSn}(cmntSn=${comment.pstCmntSn})}"
+								title="삭제">
+								<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+									viewBox="0 0 24 24" fill="none" stroke="currentColor"
+									stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<polyline points="3 6 5 6 21 6"></polyline>
+									<path
+										d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+									<line x1="10" y1="11" x2="10" y2="17"></line>
+									<line x1="14" y1="11" x2="14" y2="17"></line></svg>
+							</button>
+							<button type="button" class="save-comment-btn"
+								style="display: none;"
+								th:data-comment-update-url="@{/customer/api/post/comments/{cmntSn}(cmntSn=${comment.pstCmntSn})}">저장</button>
+							<button type="button" class="cancel-comment-btn"
+								style="display: none;">취소</button>
+						</div>
+					</div>
+				</div>
+				<div class="no-comment"
+					th:if="${#lists.isEmpty(postDetail.commentList) and canComment}">
+					<p>아직 댓글이 없습니다.</p>
+				</div>
+			</div>
 
-            <!-- [수정] 댓글 폼, 로그인 프롬프트, 권한 프롬프트 로직 종합 -->
-            <div class="comment-form-wrapper" th:if="${canComment}">
-                <form id="commentForm">
-                    <input type="hidden" name="pstSn" th:value="${postDetail.pstSn}">
-                    <input type="hidden" name="wrtrUserNo" th:value="${session.loginUser.userNo}">
-                    <textarea id="comment-textarea" name="cmntCn" placeholder="댓글을 남겨보세요" required></textarea>
-                    <button id="comment-submit-btn" type="submit" disabled>등록</button>
-                </form>
-            </div>
-            <div class="comment-login-prompt" th:if="${!canComment and session.loginUser == null}">
-                <a href="#" role="button" data-toggle="modal" data-target="#signin-modal">로그인</a> 후 댓글을 작성할 수 있습니다.
-            </div>
-            <div class="comment-auth-prompt" th:if="${!canComment and session.loginUser != null}">
-                <p>이 게시물은 관리자만 댓글을 작성할 수 있습니다.</p>
-            </div>
-        </div>
+			<div class="comment-form-wrapper" th:if="${canComment}">
+				<form id="commentForm">
+					<input type="hidden" name="pstSn" th:value="${postDetail.pstSn}">
+					<input type="hidden" name="wrtrUserNo"
+						th:value="${session.loginUser.userNo}">
+					<textarea id="comment-textarea" name="cmntCn"
+						placeholder="댓글을 남겨보세요" required></textarea>
+					<button id="comment-submit-btn" type="submit" disabled>등록</button>
+				</form>
+			</div>
+			<div class="comment-login-prompt"
+				th:if="${!canComment and session.loginUser == null}">
+				<a href="#" role="button" data-toggle="modal"
+					data-target="#signin-modal">로그인</a> 후 댓글을 작성할 수 있습니다.
+			</div>
+			<div class="comment-auth-prompt"
+				th:if="${!canComment and session.loginUser != null}">
+				<p>이 게시물은 관리자만 댓글을 작성할 수 있습니다.</p>
+			</div>
+		</div>
 
-        <div class="deleted-post-placeholder" th:if="${postDetail == null or postDetail.delDt != null}">
-            <h2>존재하지 않거나 삭제된 게시글입니다.</h2>
-            <a th:href="@{/customer/post/postList}" class="btn-back-to-list">목록으로 돌아가기</a>
-        </div>
-    </div>
+		<div class="deleted-post-placeholder"
+			th:if="${postDetail == null or postDetail.delDt != null}">
+			<h2>존재하지 않거나 삭제된 게시글입니다.</h2>
+			<a th:href="@{/customer/post/postList}" class="btn-back-to-list">목록으로
+				돌아가기</a>
+		</div>
+	</div>
 </th:block>
 </html>

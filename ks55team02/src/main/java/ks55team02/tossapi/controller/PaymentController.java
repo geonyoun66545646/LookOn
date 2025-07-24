@@ -54,7 +54,6 @@ public class PaymentController {
     }
 
     // 2. 결제 준비 (주문 정보 DB 저장)
-    // 2. 결제 준비 (주문 정보 DB 저장)
     @PostMapping("/api/orders")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> createOrder(@RequestBody Map<String, Object> orderData, HttpSession session) {
@@ -142,6 +141,7 @@ public class PaymentController {
             // 3. [수정] Model에 필요한 모든 데이터 추가
             model.addAttribute("paymentResult", paymentResult);
             model.addAttribute("orderId", orderId);
+            model.addAttribute("ordrNo", orderId);
             model.addAttribute("amount", amount);
             model.addAttribute("orderedItems", orderedItems); // 화면에 전달할 상품 목록
 

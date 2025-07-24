@@ -24,80 +24,78 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PostController {
 
-    private final PostService postService;
+	private final PostService postService;
 
-    @GetMapping("/postList")
-    public String selectPostList(
-            @RequestParam(required = false) String bbsClsfCd,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String keyword,
-            Model model) {
-        List<Board> boardList = postService.selectBoardName();
-        model.addAttribute("boardList", boardList);
-        model.addAttribute("bbsClsfCd", bbsClsfCd);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("size", size);
-        model.addAttribute("keyword", keyword);
-        return "customer/post/postList";
-    }
+	@GetMapping("/postList")
+	public String selectPostList(@RequestParam(required = false) String bbsClsfCd,
+			@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size,
+			@RequestParam(required = false) String keyword, Model model) {
+		List<Board> boardList = postService.selectBoardName();
+		model.addAttribute("boardList", boardList);
+		model.addAttribute("bbsClsfCd", bbsClsfCd);
+		model.addAttribute("currentPage", page);
+		model.addAttribute("size", size);
+		model.addAttribute("keyword", keyword);
+		return "customer/post/postList";
+	}
 
-    @GetMapping("/postDetail")
-    public String selectPostDetail(@RequestParam String pstSn, Model model, HttpSession session) {
-        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
-        String loginUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
-        String loginUserGrade = (loginUser != null) ? loginUser.getMbrGrdCd() : null;
+	@GetMapping("/postDetail")
+	public String selectPostDetail(@RequestParam String pstSn, Model model, HttpSession session) {
+		LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+		String loginUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
+		String loginUserGrade = (loginUser != null) ? loginUser.getMbrGrdCd() : null;
 
-        Post postDetail = postService.selectPostDetailByPostSn(pstSn, loginUserNo);
-        
-        if (postDetail != null) {
-            postService.increaseViewCount(pstSn);
+		Post postDetail = postService.selectPostDetailByPostSn(pstSn, loginUserNo);
 
-            // 댓글 작성 가능 여부 판단 로직 추가
-            boolean isAdmin = "grd_cd_0".equals(loginUserGrade) || "grd_cd_1".equals(loginUserGrade);
-            boolean canComment = loginUser != null && (isAdmin || !"admin_only".equals(postDetail.getCmntWrtAuthrtLvlVal()));
-            model.addAttribute("canComment", canComment);
-        }
+		if (postDetail != null) {
+			postService.updatePostViewCount(pstSn);
 
-        model.addAttribute("postDetail", postDetail);
-        model.addAttribute("loginUser", loginUser);
-        return "customer/post/postDetail";
-    }
+			// 댓글 작성 가능 여부 판단 로직 추가
+			boolean isAdmin = "grd_cd_0".equals(loginUserGrade) || "grd_cd_1".equals(loginUserGrade);
+			boolean canComment = loginUser != null
+					&& (isAdmin || !"admin_only".equals(postDetail.getCmntWrtAuthrtLvlVal()));
+			model.addAttribute("canComment", canComment);
+		}
 
-    @GetMapping("/postWrite")
-    public String postWriteForm(Model model, HttpSession session) {
-        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
-        List<Board> boardList = postService.selectBoardListForWrite();
+		model.addAttribute("postDetail", postDetail);
+		model.addAttribute("loginUser", loginUser);
+		return "customer/post/postDetail";
+	}
 
-        // 관리자가 아닌 경우 'admin_only' 게시판 필터링
-        if (loginUser == null || (!"grd_cd_0".equals(loginUser.getMbrGrdCd()) && !"grd_cd_1".equals(loginUser.getMbrGrdCd()))) {
-            boardList = boardList.stream()
-                                 .filter(b -> !"admin_only".equals(b.getWrtAuthrtLvlVal()))
-                                 .collect(Collectors.toList());
-        }
+	@GetMapping("/postWrite")
+	public String getPostWriteForm(Model model, HttpSession session) {
+		LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+		List<Board> boardList = postService.selectBoardListForWrite();
 
-        model.addAttribute("boardList", boardList);
-        model.addAttribute("post", new Post());
-        return "customer/post/postWrite";
-    }
+		// 관리자가 아닌 경우 'admin_only' 게시판 필터링
+		if (loginUser == null
+				|| (!"grd_cd_0".equals(loginUser.getMbrGrdCd()) && !"grd_cd_1".equals(loginUser.getMbrGrdCd()))) {
+			boardList = boardList.stream().filter(b -> !"admin_only".equals(b.getWrtAuthrtLvlVal()))
+					.collect(Collectors.toList());
+		}
 
-    @GetMapping("/postUpdate/{pstSn}")
-    public String postUpdateForm(@PathVariable String pstSn, Model model, HttpSession session) {
-        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
-        String loginUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
+		model.addAttribute("boardList", boardList);
+		model.addAttribute("post", new Post());
+		return "customer/post/postWrite";
+	}
 
-        Post postToUpdate = postService.selectPostDetailByPostSn(pstSn, loginUserNo);
-        List<Board> boardList = postService.selectBoardListForWrite();
+	@GetMapping("/postUpdate/{pstSn}")
+	public String getPostUpdateForm(@PathVariable String pstSn, Model model, HttpSession session) {
+		LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+		String loginUserNo = (loginUser != null) ? loginUser.getUserNo() : null;
 
-        // 관리자가 아닌 경우 'admin_only' 게시판 필터링
-        if (loginUser == null || (!"grd_cd_0".equals(loginUser.getMbrGrdCd()) && !"grd_cd_1".equals(loginUser.getMbrGrdCd()))) {
-            boardList = boardList.stream()
-                                 .filter(b -> !"admin_only".equals(b.getWrtAuthrtLvlVal()))
-                                 .collect(Collectors.toList());
-        }
-        
-        model.addAttribute("boardList", boardList);
-        model.addAttribute("post", postToUpdate);
-        return "customer/post/postWrite";
-    }
+		Post postToUpdate = postService.selectPostDetailByPostSn(pstSn, loginUserNo);
+		List<Board> boardList = postService.selectBoardListForWrite();
+
+		// 관리자가 아닌 경우 'admin_only' 게시판 필터링
+		if (loginUser == null
+				|| (!"grd_cd_0".equals(loginUser.getMbrGrdCd()) && !"grd_cd_1".equals(loginUser.getMbrGrdCd()))) {
+			boardList = boardList.stream().filter(b -> !"admin_only".equals(b.getWrtAuthrtLvlVal()))
+					.collect(Collectors.toList());
+		}
+
+		model.addAttribute("boardList", boardList);
+		model.addAttribute("post", postToUpdate);
+		return "customer/post/postWrite";
+	}
 }

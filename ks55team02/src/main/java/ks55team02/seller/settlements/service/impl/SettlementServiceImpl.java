@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import ks55team02.seller.settlements.domain.SalesSttsDTO;
 import ks55team02.seller.settlements.domain.SettlementDTO;
 import ks55team02.seller.settlements.domain.SettlementSearchCriteria;
 import ks55team02.seller.settlements.mapper.SettlementMapper;
@@ -51,5 +52,18 @@ public class SettlementServiceImpl implements SettlementService{
     public String getStoreIdByUserNo(String userNo) {
         // 매퍼의 메소드를 호출하여 userNo에 해당하는 store_id를 조회합니다.
         return settlementMapper.selectStoreIdByUserNo(userNo);
+    }
+    
+    @Override
+    public List<SalesSttsDTO> getSalesHistoryByStoreId(String storeId) {
+        return settlementMapper.getSalesHistoryByStoreId(storeId);
+    }
+    
+    /**
+     * 모든 상점의 전체 판매 내역을 조회하는 기능을 구현합니다.
+     */
+    @Override
+    public List<SalesSttsDTO> getAllSalesHistory() {
+        return settlementMapper.getAllSalesHistory();
     }
 }

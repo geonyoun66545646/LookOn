@@ -1,98 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ks55team02.admin.adminpage.boardadmin.feedmanagement.mapper.FeedManagementMapper">
+<mapper
+	namespace="ks55team02.admin.adminpage.boardadmin.feedmanagement.mapper.FeedManagementMapper">
 
-    <resultMap id="adminFeedResultMap" type="ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed">
-        <id     column="feed_sn"            property="feedSn"/>
-        <result column="wrtr_user_no"       property="wrtrUserNo"/>
-        <result column="feed_cn"            property="feedCn"/>
-        <result column="crt_dt"             property="crtDt"/>
-        <result column="del_dt"             property="delDt"/>
-        <result column="user_ncnm"          property="userNcnm"/>
-        <result column="representative_img" property="representativeImg"/>
-        <result column="like_count"         property="likeCount"/>
-        <result column="comment_count"      property="commentCount"/>
-    </resultMap>
+	<resultMap id="adminFeedResultMap"
+		type="ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed">
+		<id column="feed_sn" property="feedSn" />
+		<result column="wrtr_user_no" property="wrtrUserNo" />
+		<result column="feed_cn" property="feedCn" />
+		<result column="crt_dt" property="crtDt" />
+		<result column="del_dt" property="delDt" />
+		<result column="user_ncnm" property="userNcnm" />
+		<result column="representative_img"
+			property="representativeImg" />
+		<result column="like_count" property="likeCount" />
+		<result column="comment_count" property="commentCount" />
+	</resultMap>
 
-    <select id="getFeedList" parameterType="ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed" resultMap="adminFeedResultMap">
-        SELECT
-            f.feed_sn, f.wrtr_user_no, f.feed_cn, f.crt_dt, f.del_dt,
-            u.user_ncnm,
-            (SELECT COUNT(*) FROM feed_interactions fi WHERE fi.feed_sn = f.feed_sn AND fi.rtrcn_dt IS NULL) AS like_count,
-            (SELECT COUNT(*) FROM feed_comments fc WHERE fc.feed_sn = f.feed_sn AND fc.del_dt IS NULL) AS comment_count,
-            (SELECT fi.img_file_path_nm FROM feed_images fi WHERE fi.feed_sn = f.feed_sn AND fi.del_dt IS NULL ORDER BY fi.feed_img_sort_sn ASC LIMIT 1) AS representative_img
-        FROM
-            feeds f
-        LEFT JOIN
-            users u ON f.wrtr_user_no = u.user_no
-        <include refid="commonSearchCondition" />
-        ORDER BY
-        <choose>
-            <when test="sortOrder != null and 'likeCountDesc'.equals(sortOrder)">
-                like_count DESC
-            </when>
-            <otherwise>
-                f.crt_dt DESC
-            </otherwise>
-        </choose>
-        <if test="pageSize > 0">
-            LIMIT #{pageSize} OFFSET #{offset}
-        </if>
-    </select>
+	<select id="selectFeedList"
+		parameterType="ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed"
+		resultMap="adminFeedResultMap">
+		SELECT
+		f.feed_sn, f.wrtr_user_no, f.feed_cn, f.crt_dt, f.del_dt,
+		u.user_ncnm,
+		(SELECT COUNT(*) FROM feed_interactions fi WHERE fi.feed_sn = f.feed_sn AND
+		fi.rtrcn_dt IS NULL) AS like_count,
+		(SELECT COUNT(*) FROM feed_comments fc WHERE fc.feed_sn = f.feed_sn AND
+		fc.del_dt IS NULL) AS comment_count,
+		(SELECT fi.img_file_path_nm FROM feed_images fi WHERE fi.feed_sn = f.feed_sn
+		AND fi.del_dt IS NULL ORDER BY fi.feed_img_sort_sn ASC LIMIT 1) AS
+		representative_img
+		FROM
+		feeds f
+		LEFT JOIN
+		users u ON f.wrtr_user_no = u.user_no
+		<include refid="commonSearchCondition" />
+		ORDER BY
+		<choose>
+			<when
+				test="sortOrder != null and 'likeCountDesc'.equals(sortOrder)">
+				like_count DESC
+			</when>
+			<otherwise>
+				f.crt_dt DESC
+			</otherwise>
+		</choose>
+		<if test="pageSize > 0">
+			LIMIT #{pageSize} OFFSET #{offset}
+		</if>
+	</select>
 
-    <select id="getFeedCount" parameterType="ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed" resultType="int">
-        SELECT COUNT(*)
-        FROM feeds f
-        LEFT JOIN
-            users u ON f.wrtr_user_no = u.user_no
-        <include refid="commonSearchCondition" />
-    </select>
-    
-    <sql id="commonSearchCondition">
-        <where>
-            <if test="filterConditions != null and !filterConditions.isEmpty()">
-                <foreach item="status" collection="filterConditions" open="AND (" close=")" separator=" OR ">
-                    <if test="'normal'.equals(status)">f.del_dt IS NULL</if>
-                    <if test="'hidden'.equals(status)">f.del_dt IS NOT NULL</if>
-                </foreach>
-            </if>
-            <!-- [최종 수정] != '' 조건 제거 -->
-            <if test="startDate != null">AND f.crt_dt >= #{startDate}</if>
-            <!-- [최종 수정] < 를 < 로 변경하고 != '' 조건 제거 -->
-            <if test="endDate != null">AND f.crt_dt &gt; DATE_ADD(#{endDate}, INTERVAL 1 DAY)</if>
-            <if test="searchKey != null and searchValue != null and searchValue != ''">
-                AND
-                <choose>
-                    <when test="'userNcnm'.equals(searchKey)">u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')</when>
-                    <when test="'feedCn'.equals(searchKey)">f.feed_cn LIKE CONCAT('%', #{searchValue}, '%')</when>
-                    <otherwise>(u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%') OR f.feed_cn LIKE CONCAT('%', #{searchValue}, '%'))</otherwise>
-                </choose>
-            </if>
-        </where>
-    </sql>
+	<select id="selectFeedCount"
+		parameterType="ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM feeds f
+		LEFT JOIN
+		users u ON f.wrtr_user_no = u.user_no
+		<include refid="commonSearchCondition" />
+	</select>
 
-    <update id="hideFeeds" parameterType="map">
-        UPDATE feeds
-        SET
-            del_dt = NOW(),
-            del_user_no = #{adminUserNo}
-        WHERE
-            feed_sn IN
-            <foreach collection="feedSns" item="feedSn" open="(" separator="," close=")">
-                #{feedSn}
-            </foreach>
-    </update>
-    
-    <update id="restoreFeeds" parameterType="list">
-        UPDATE feeds
-        SET
-            del_dt = NULL,
-            del_user_no = NULL
-        WHERE
-            feed_sn IN
-            <foreach collection="list" item="feedSn" open="(" separator="," close=")">
-                #{feedSn}
-            </foreach>
-    </update>
+	<sql id="commonSearchCondition">
+		<where>
+			<if
+				test="filterConditions != null and !filterConditions.isEmpty()">
+				<foreach item="status" collection="filterConditions"
+					open="AND (" close=")" separator=" OR ">
+					<if test="'normal'.equals(status)">f.del_dt IS NULL</if>
+					<if test="'hidden'.equals(status)">f.del_dt IS NOT NULL</if>
+				</foreach>
+			</if>
+			<if test="startDate != null">AND f.crt_dt >= #{startDate}</if>
+			<if test="endDate != null">AND f.crt_dt &gt; DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+			</if>
+			<if
+				test="searchKey != null and searchValue != null and searchValue != ''">
+				AND
+				<choose>
+					<when test="'userNcnm'.equals(searchKey)">u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<when test="'feedCn'.equals(searchKey)">f.feed_cn LIKE CONCAT('%', #{searchValue}, '%')
+					</when>
+					<otherwise>(u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%') OR
+						f.feed_cn LIKE CONCAT('%', #{searchValue}, '%'))</otherwise>
+				</choose>
+			</if>
+		</where>
+	</sql>
+
+	<update id="updateFeedsToHidden" parameterType="map">
+		UPDATE feeds
+		SET
+		del_dt = NOW(),
+		del_user_no = #{adminUserNo}
+		WHERE
+		feed_sn IN
+		<foreach collection="feedSns" item="feedSn" open="("
+			separator="," close=")">
+			#{feedSn}
+		</foreach>
+	</update>
+
+	<update id="updateFeedsToRestored" parameterType="list">
+		UPDATE feeds
+		SET
+		del_dt = NULL,
+		del_user_no = NULL
+		WHERE
+		feed_sn IN
+		<foreach collection="list" item="feedSn" open="("
+			separator="," close=")">
+			#{feedSn}
+		</foreach>
+	</update>
 
 </mapper>

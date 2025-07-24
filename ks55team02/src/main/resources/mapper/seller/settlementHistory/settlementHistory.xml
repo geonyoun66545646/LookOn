@@ -15,6 +15,17 @@
         <result property="clclnSttsCd" 	column="clcln_stts_cd"/>
     </resultMap>
     
+    <resultMap id="salesHistoryResultMap" type="ks55team02.seller.settlements.domain.SalesSttsDTO">
+        <result property="orderItemId"  column="orderItemId"/>
+        <result property="orderId"      column="orderId"/>
+        <result property="orderDate"    column="orderDate"/>
+        <result property="productId"    column="productId"/>
+        <result property="productName"  column="productName"/>
+        <result property="quantity"     column="quantity"/>
+        <result property="unitPrice"    column="unitPrice"/>
+        <result property="totalAmount"  column="totalAmount"/>
+    </resultMap>
+    
     <sql id="whereConditions">
         WHERE ss.store_id = #{storeId}
         <if test="startDate != null and endDate != null">
@@ -67,5 +78,56 @@
             seller_user_no = #{userNo}
         LIMIT 1
     </select>
+    
+    <!-- 판매현황 -->
+    <select id="getSalesHistoryByStoreId" parameterType="String"
+            resultType="ks55team02.seller.settlements.domain.SalesSttsDTO">
+        SELECT
+            oi.ordr_dtl_artcl_no    AS orderItemId,
+            o.ordr_no               AS orderId,
+            o.ordr_dt               AS orderDate,
+            p.gds_no                AS productId,
+            p.gds_nm                AS productName,
+            oi.ordr_qntty           AS quantity,
+            oi.ordr_tm_untprc       AS unitPrice,
+            (oi.ordr_qntty * oi.ordr_tm_untprc) AS totalAmount
+        FROM
+            order_items AS oi
+        JOIN
+            orders AS o ON oi.ordr_no = o.ordr_no
+        LEFT JOIN
+            products AS p ON oi.gds_no = p.gds_no
+        WHERE
+            oi.store_id = #{storeId}
+        ORDER BY
+            o.ordr_dt DESC
+    </select>
+    
+    <select id="getAllSalesHistory" resultMap="salesHistoryResultMap">
+	    SELECT
+	        oi.ordr_dtl_artcl_no    AS orderItemId,
+	        o.ordr_no               AS orderId,
+	        o.ordr_dt               AS orderDate,
+	        p.gds_no                AS productId,
+	        p.gds_nm                AS productName,
+	        oi.ordr_qntty           AS quantity,
+	        oi.ordr_tm_untprc       AS unitPrice,
+	        (oi.ordr_qntty * oi.ordr_tm_untprc) AS totalAmount,
+	        s.store_conm            AS storeName -- 상점명도 함께 조회
+	    FROM
+	        order_items AS oi
+	    JOIN
+	        orders AS o ON oi.ordr_no = o.ordr_no
+	    LEFT JOIN
+	        products AS p ON oi.gds_no = p.gds_no
+	    LEFT JOIN
+	        stores AS s ON oi.store_id = s.store_id
+	    WHERE
+	        o.ordr_stts_cd IN ('결제완료', '배송준비중', '배송중', '배송완료', '구매확정')
+	    ORDER BY
+	        o.ordr_dt DESC
+	</select>
+    
+    
     
 </mapper>

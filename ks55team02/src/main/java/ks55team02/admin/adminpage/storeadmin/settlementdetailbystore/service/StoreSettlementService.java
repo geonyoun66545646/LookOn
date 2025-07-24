@@ -1,69 +1,35 @@
+// ks55team02/admin/adminpage/storeadmin/settlementdetailbystore/service/StoreSettlementService.java
+
 package ks55team02.admin.adminpage.storeadmin.settlementdetailbystore.service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import ks55team02.admin.adminpage.storeadmin.settlementdetailbystore.domain.StoreAccountDTO;
 import ks55team02.admin.adminpage.storeadmin.settlementdetailbystore.domain.StoreSettlementDTO;
 import ks55team02.admin.adminpage.storeadmin.settlementdetailbystore.domain.StoreSettlementListViewDTO;
-import ks55team02.admin.common.domain.SearchCriteria; // SearchCriteria 임포트
+import ks55team02.admin.common.domain.SearchCriteria;
 
-@Service
+/**
+ * 정산 관련 비즈니스 로직을 위한 서비스 인터페이스 (설계도)
+ * 컨트롤러는 반드시 여기에 선언된 메소드만 호출할 수 있습니다.
+ */
 public interface StoreSettlementService {
-    /**
-     * 모든 상점의 정산 정보 목록을 조회합니다. (리스트 화면용)
-     * 페이지네이션과 검색 조건을 적용합니다.
-     * @param searchCriteria 검색 및 페이지네이션 조건
-     * @return StoreSettlementListViewDTO 목록
-     */
+
+    // --- settlementDetailByStore.html (메인 목록)을 위한 메소드 ---
     List<StoreSettlementListViewDTO> getAllStoreSettlementsForList(SearchCriteria searchCriteria);
+    int getTotalSettlementCount(SearchCriteria searchCriteria);
+
+
+    // --- JavaScript API 호출을 위한 메소드들 ---
 
     /**
-     * 전체 정산 정보의 개수를 조회합니다. (페이지네이션을 위해 필요)
-     * @param searchCriteria 검색 조건 (전체 개수 조회 시 필터링을 위해 필요)
-     * @return 전체 정산 정보 개수
-     */
-    int getTotalSettlementCount(SearchCriteria searchCriteria); // SearchCriteria 파라미터 추가
-
-    /**
-     * 특정 상점의 정산 내역을 조회합니다.
+     * ★★★ 지적해주신, 누락되었던 바로 그 메소드 선언입니다. ★★★
+     * 특정 상점의 정산 전체 내역을 조회합니다. (모달창에 표시용)
      * @param storeId 조회할 상점 ID
-     * @return StoreSettlement 목록
+     * @return 해당 상점의 StoreSettlement 목록
      */
     List<StoreSettlementDTO> getSettlementHistoryByStoreId(String storeId);
-
-    /**
-     * 새로운 정산 대기 항목을 생성합니다.
-     * @param storeId 상점 ID
-     * @param totSelAmt 총 판매 금액
-     * @param selFeeRt 판매 수수료율
-     * @param plcyId 정책 ID
-     * @return 성공 여부
-     */
-    boolean createPendingSettlement(String storeId, BigDecimal totSelAmt, BigDecimal selFeeRt, String plcyId);
-
-    /**
-     * 특정 정산 건의 상태를 '판매정산완료'로 업데이트합니다.
-     * @param storeClclnId 정산할 정산 ID
-     * @return 정산 성공 여부
-     */
-    boolean completeSettlement(String storeClclnId);
-
-    /**
-     * 선택된 여러 정산 건의 상태를 '판매정산완료'로 일괄 업데이트합니다.
-     * @param storeClclnIds 정산할 정산 ID 목록
-     * @return 일괄 정산 성공 여부 (모두 성공 시 true, 하나라도 실패 시 false)
-     */
-    boolean completeBatchSettlements(List<String> storeClclnIds);
-
-    /**
-     * 특정 정산 건에 대한 상세 정보를 조회합니다.
-     * @param storeClclnId 조회할 정산 ID
-     * @return StoreSettlementDTO 객체
-     */
-    StoreSettlementDTO getStoreSettlementById(String storeClclnId);
 
     /**
      * 특정 상점의 주 계좌 정보를 조회합니다.
@@ -71,4 +37,34 @@ public interface StoreSettlementService {
      * @return StoreAccountDTO 객체
      */
     StoreAccountDTO getStoreAccountDetailsByStoreId(String storeId);
+
+    /**
+     * 선택된 여러 정산 건을 일괄 처리합니다.
+     * @param storeClclnIds 정산할 정산 ID 목록
+     * @return 처리 성공 여부
+     */
+    boolean completeBatchSettlements(List<String> storeClclnIds);
+
+
+    // --- 정산 처리 로직을 위한 메소드들 ---
+
+    /**
+     * 특정 정산 건의 상세 정보를 조회합니다.
+     * ServiceImpl 내부에서 다음 정산 건 생성을 위해 사용됩니다.
+     * @param storeClclnId 조회할 정산 ID
+     * @return StoreSettlementDTO 객체
+     */
+    StoreSettlementDTO getStoreSettlementById(String storeClclnId);
+
+    /**
+     * 최종적으로 사용할 '정산 완료 및 다음 건 생성' 핵심 메소드입니다.
+     * @param completedStoreClclnId 완료 처리할 기존 정산 건의 ID
+     * @return 처리 성공 여부
+     */
+    boolean completeAndCreateNewPendingSettlement(String completedStoreClclnId);
+
+
+    // --- 아래는 현재 메인 로직에서는 사용되지 않지만, 다른 곳에서 사용할 수 있는 메소드들 ---
+    boolean createPendingSettlement(String storeId, BigDecimal totSelAmt, BigDecimal selFeeRt, String plcyId);
+    boolean completeSettlement(String storeClclnId);
 }
