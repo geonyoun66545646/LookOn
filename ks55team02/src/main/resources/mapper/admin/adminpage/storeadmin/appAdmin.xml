@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="ks55team02.admin.adminpage.storeadmin.appAdmin.mapper.AppAdminMapper">
+<mapper namespace="ks55team02.admin.adminpage.storeadmin.appadmin.mapper.AppAdminMapper">
 
 	<resultMap id="appAdminResultMap" 		type="ks55team02.common.domain.store.AppStore">
         <id property="aplyId" 					column="aply_id"/>
@@ -35,6 +35,7 @@
            <result property="userNm" column="user_nm"/>
            <result property="emlAddr" column="eml_addr"/>
            <result property="telno" column="telno"/>
+           <result property="userLgnId" column="user_lgn_id"/>
         </association>
 	</resultMap>
 		
@@ -119,7 +120,8 @@
  	    sa.store_logo_img,
  	    sa.store_intro_cn,
         u.user_nm,
-        u.user_no
+        u.user_no,
+        u.user_lgn_id
     FROM
         store_application sa
     INNER JOIN

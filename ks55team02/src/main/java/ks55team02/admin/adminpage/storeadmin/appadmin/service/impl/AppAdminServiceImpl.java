@@ -1,12 +1,12 @@
-package ks55team02.admin.adminpage.storeadmin.appAdmin.service.impl;
+package ks55team02.admin.adminpage.storeadmin.appadmin.service.impl;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ks55team02.admin.adminpage.storeadmin.appAdmin.mapper.AppAdminMapper;
-import ks55team02.admin.adminpage.storeadmin.appAdmin.service.AppAdminService;
+import ks55team02.admin.adminpage.storeadmin.appadmin.mapper.AppAdminMapper;
+import ks55team02.admin.adminpage.storeadmin.appadmin.service.AppAdminService;
 import ks55team02.common.domain.store.AppStore;
 import ks55team02.common.domain.store.Store;
 import ks55team02.common.domain.store.StoreAccount;

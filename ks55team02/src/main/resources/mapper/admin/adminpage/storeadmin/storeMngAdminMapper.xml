@@ -11,8 +11,10 @@
         <result property="storeLogoImg" column="store_logo_img"/>
         <result property="storeStts" column="store_stts"/>
         <result property="infoMdfcnDt" column="info_mdfcn_dt"/>
-        <result property="sellerUserNm" column="seller_user_nm"/>
         <result property="delPrcrYn" column="del_prcr_yn"/>
+        <result property="sellerUserNm" column="seller_user_nm"/>
+        <result property="sellerUserLoginId" column="seller_user_lgn_id"/>
+        
     </resultMap>
 
     <select id="getStoreCount" parameterType="ks55team02.common.domain.store.Store" resultType="int">
@@ -73,6 +75,7 @@
             s.store_stts,
             s.info_mdfcn_dt,
             u.user_nm AS seller_user_nm,
+            u.user_lgn_id AS seller_user_lgn_id,
             s.del_prcr_yn
         FROM
             stores s
@@ -138,13 +141,17 @@
     </select>
 
     <update id="updateStoreStatus">
-        UPDATE stores
-        SET
-            store_stts = #{newStatus},
-            info_mdfcn_dt = #{infoMdfcnDt},
-            del_prcr_yn = #{delPrcrYn}
-        WHERE
-            store_id = #{storeId}
-    </update>
+    UPDATE stores
+    <set>
+        store_stts = #{newStatus},
+        info_mdfcn_dt = #{infoMdfcnDt}, 
+        del_prcr_yn = #{delPrcrYn}  
+        <if test="newStatus == 'CLOSED'">
+            , inactvtn_dt = NOW()
+        </if>
+    </set>
+    WHERE
+        store_id = #{storeId}
+</update>
 
 </mapper>
