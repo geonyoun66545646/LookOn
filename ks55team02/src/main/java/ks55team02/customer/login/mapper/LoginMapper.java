@@ -42,4 +42,7 @@ public interface LoginMapper {
      * @param userId 로그인에 성공한 사용자의 아이디
      */
     void resetLoginFailCount(String userId);
+    
+    // [추가] 로그아웃 시간을 업데이트하는 메소드 선언
+    void updateLogoutTime(long lgnHstryId);
 }
