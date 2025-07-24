@@ -4,6 +4,8 @@
       layout:decorate="~{admin/layout/layoutMain}">
 
 <head>
+    <!-- Bootstrap JS 파일을 헤드에 추가하여 모달이 안정적으로 작동하도록 보장 -->
+    <script th:src="@{/admincss/assets/js/vendors/bootstrap.bundle.min.js}"></script>
     <style>
     	.pagination .page-item .page-link { display: block; position: relative; }
     </style>
@@ -19,7 +21,7 @@
             <h2 class="content-title">승인/반려 기록</h2>
         </section>
 
-        <!-- 1. 검색/필터 카드 -->
+        <!-- 1. 검색/필터 카드 (변경 없음) -->
         <div class="card mb-4">
             <div class="card-body">
                 <form id="searchForm" th:action="@{/adminpage/productadmin/approvalHistory}" method="get" th:object="${searchCriteria}">
@@ -72,13 +74,12 @@
                             <th>상품명</th>
                             <th>처리 관리자</th>
                             <th>상태</th>
-                            <th>반려 사유</th>
-                            <th>관리자 코멘트</th>
+                            <th>상세 보기</th> <!-- [수정] 헤더 변경 -->
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:if="${#lists.isEmpty(historyList)}">
-                            <td colspan="7" class="text-center">조회된 기록이 없습니다.</td>
+                            <td colspan="6" class="text-center">조회된 기록이 없습니다.</td> <!-- [수정] colspan="6" -->
                         </tr>
                         <tr th:each="history : ${historyList}">
                             <td th:text="${#temporals.format(history.prcsDt, 'yyyy-MM-dd HH:mm')}"></td>
@@ -91,8 +92,16 @@
                                       th:classappend="${history.aprvSttsCd == '승인' ? 'bg-success' : 'bg-danger'}">
                                 </span>
                             </td>
-                            <td th:text="${history.rjctRsn ?: '-'}"></td>
-                            <td th:text="${history.mngrCmntCn ?: '-'}"></td>
+                            <td>
+                                <!-- [수정] '반려' 상태일 때만 버튼을 표시하고, 버튼에 데이터를 저장 -->
+                                <button th:if="${history.aprvSttsCd == '반려'}" type="button"
+                                        class="btn btn-sm btn-outline-secondary view-reasons-btn"
+                                        th:data-reason="${history.rjctRsn}"
+                                        th:data-comment="${history.mngrCmntCn}">
+                                    사유 보기
+                                </button>
+                                <span th:if="${history.aprvSttsCd == '승인'}">-</span>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -114,6 +123,27 @@
                 </nav>
             </div>
         </div>
+
+        <!-- 반려 사유 상세 보기 모달 -->
+        <div class="modal fade" id="rejectionReasonModal" tabindex="-1" aria-labelledby="rejectionReasonModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="rejectionReasonModalLabel">반려 사유 상세 정보</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>반려 사유 요약:</h6>
+                        <p id="modal-reason-summary" class="border p-2 bg-light rounded"></p>
+                        <h6 class="mt-3">관리자 추가 코멘트:</h6>
+                        <p id="modal-manager-comment" class="border p-2 bg-light rounded"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </th:block>
 
@@ -122,7 +152,14 @@
         document.addEventListener('DOMContentLoaded', () => {
             const searchForm = document.getElementById('searchForm');
             const paginationEl = document.querySelector('.pagination');
+            const dataTableBody = document.querySelector('#dataTable tbody');
+            
+            const reasonModalElement = document.getElementById('rejectionReasonModal');
+            const reasonModal = new bootstrap.Modal(reasonModalElement);
+            const modalReasonSummary = document.getElementById('modal-reason-summary');
+            const modalManagerComment = document.getElementById('modal-manager-comment');
 
+            // 검색/페이지네이션 함수 (변경 없음)
             function submitSearch(page = 1) {
                 const formData = new FormData(searchForm);
                 const params = new URLSearchParams(formData);
@@ -141,6 +178,25 @@
                         const page = target.dataset.page;
                         if (page) { submitSearch(page); }
                     }
+                });
+            }
+
+            // [수정] '사유 보기' 버튼 클릭 시, API 호출 없이 HTML의 데이터로 모달을 채움
+            if (dataTableBody) {
+                dataTableBody.addEventListener('click', (e) => {
+                    const viewBtn = e.target.closest('.view-reasons-btn');
+                    if (!viewBtn) return;
+
+                    // 버튼의 data-* 속성에서 반려 사유와 코멘트를 직접 가져옴
+                    const reason = viewBtn.dataset.reason;
+                    const comment = viewBtn.dataset.comment;
+                    
+                    // 가져온 데이터로 모달 내용 채우기
+                    modalReasonSummary.textContent = reason || '요약된 반려 사유가 없습니다.';
+                    modalManagerComment.textContent = comment || '작성된 코멘트가 없습니다.';
+                    
+                    // 모달 띄우기
+                    reasonModal.show();
                 });
             }
         });
