@@ -57,7 +57,7 @@ public class FeedServiceImpl implements FeedService {
 	}
 	
     @Override
-    public Map<String, Object> getFollowingFeedList(String followerUserNo, int page, int size) {
+    public Map<String, Object> selectFollowingFeedList(String followerUserNo, int page, int size) {
         int offset = (page - 1) * size;
         List<Feed> feedList = feedMapper.selectFollowingFeedList(followerUserNo, size, offset);
         int totalCount = feedMapper.countFollowingFeeds(followerUserNo);

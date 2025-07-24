@@ -19,20 +19,20 @@ public class BoardManagementServiceImpl implements BoardManagementService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Board> getBoardList() {
-        return boardManagementMapper.getBoardList();
+    public List<Board> selectBoardList() {
+        return boardManagementMapper.selectBoardList();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Board getBoardByCode(String boardCode) {
-        return boardManagementMapper.getBoardByCode(boardCode);
+    public Board selectBoardByCode(String boardCode) {
+        return boardManagementMapper.selectBoardByCode(boardCode);
     }
 
     @Override
-    public void addBoard(Board board, String adminUserNo) {
+    public void insertBoard(Board board, String adminUserNo) {
     	board.setBbsCreatrUserNo(adminUserNo);
-        boardManagementMapper.addBoard(board);
+        boardManagementMapper.insertBoard(board);
     }
 
     @Override

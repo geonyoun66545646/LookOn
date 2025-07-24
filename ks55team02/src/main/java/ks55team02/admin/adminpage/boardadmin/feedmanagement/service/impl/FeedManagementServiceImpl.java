@@ -21,32 +21,32 @@ public class FeedManagementServiceImpl implements FeedManagementService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AdminFeed> getFeedList(AdminFeed searchCriteria) {
-        return feedManagementMapper.getFeedList(searchCriteria);
+    public List<AdminFeed> selectFeedList(AdminFeed searchCriteria) {
+        return feedManagementMapper.selectFeedList(searchCriteria);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public int getFeedCount(AdminFeed searchCriteria) {
-        return feedManagementMapper.getFeedCount(searchCriteria);
+    public int selectFeedCount(AdminFeed searchCriteria) {
+        return feedManagementMapper.selectFeedCount(searchCriteria);
     }
 
     @Override
-    public int hideFeeds(List<String> feedSns, String adminUserNo) {
+    public int updateFeedsToHidden(List<String> feedSns, String adminUserNo) {
         if (feedSns == null || feedSns.isEmpty()) {
             return 0;
         }
         Map<String, Object> params = new HashMap<>();
         params.put("feedSns", feedSns);
         params.put("adminUserNo", adminUserNo);
-        return feedManagementMapper.hideFeeds(params);
+        return feedManagementMapper.updateFeedsToHidden(params);
     }
 
     @Override
-    public int restoreFeeds(List<String> feedSns) {
+    public int updateFeedsToRestored(List<String> feedSns) {
         if (feedSns == null || feedSns.isEmpty()) {
             return 0;
         }
-        return feedManagementMapper.restoreFeeds(feedSns);
+        return feedManagementMapper.updateFeedsToRestored(feedSns);
     }
 }

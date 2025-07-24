@@ -1,223 +1,218 @@
-// 파일 경로: /js/customerjs/postDetail.js
-// 아래 코드로 파일 전체를 교체해주세요.
 
 $(document).ready(function() {
-    // ... formatRelativeTime, .relative-time, .btn-more, document click ... (기존과 동일)
-    
-    // [기존 코드 시작] - 기존에 있던 모든 로직은 그대로 둡니다.
-    function formatRelativeTime(dateString) {
-        if (!dateString) return '';
-        const now = new Date();
-        const postDate = new Date(dateString);
-        const diffInSeconds = Math.floor((now - postDate) / 1000);
-        const MINUTE = 60, HOUR = 3600, DAY = 86400, WEEK = 604800;
-        if (diffInSeconds < MINUTE) return '방금 전';
-        if (diffInSeconds < HOUR) return `${Math.floor(diffInSeconds / MINUTE)}분 전`;
-        if (diffInSeconds < DAY) return `${Math.floor(diffInSeconds / HOUR)}시간 전`;
-        if (diffInSeconds < WEEK) return `${Math.floor(diffInSeconds / DAY)}일 전`;
-        return dateString.split('T')[0].replace(/-/g, '.');
-    }
 
-    $('.relative-time').each(function() {
-        const datetime = $(this).data('datetime');
-        if (datetime) {
-            $(this).text(formatRelativeTime(datetime));
-        }
-    });
+	function formatRelativeTime(dateString) {
+		if (!dateString) return '';
+		const now = new Date();
+		const postDate = new Date(dateString);
+		const diffInSeconds = Math.floor((now - postDate) / 1000);
+		const MINUTE = 60, HOUR = 3600, DAY = 86400, WEEK = 604800;
+		if (diffInSeconds < MINUTE) return '방금 전';
+		if (diffInSeconds < HOUR) return `${Math.floor(diffInSeconds / MINUTE)}분 전`;
+		if (diffInSeconds < DAY) return `${Math.floor(diffInSeconds / HOUR)}시간 전`;
+		if (diffInSeconds < WEEK) return `${Math.floor(diffInSeconds / DAY)}일 전`;
+		return dateString.split('T')[0].replace(/-/g, '.');
+	}
 
-    $('.btn-more').on('click', function(e) {
-        e.stopPropagation();
-        const $menu = $(this).siblings('.more-menu');
-        $('.more-menu').not($menu).hide();
-        $menu.toggle();
-    });
+	$('.relative-time').each(function() {
+		const datetime = $(this).data('datetime');
+		if (datetime) {
+			$(this).text(formatRelativeTime(datetime));
+		}
+	});
 
-    $(document).on('click', function() {
-        $('.more-menu').hide();
-    });
+	$('.btn-more').on('click', function(e) {
+		e.stopPropagation();
+		const $menu = $(this).siblings('.more-menu');
+		$('.more-menu').not($menu).hide();
+		$menu.toggle();
+	});
 
-    const $container = $('.post-view-container');
-    const loginUserNo = $container.data('login-user-no');
+	$(document).on('click', function() {
+		$('.more-menu').hide();
+	});
 
-    $('#delete-post-btn').on('click', function(e) {
-        if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
-        const deleteUrl = $(e.currentTarget).data('post-delete-url');
-        $.ajax({
-            url: deleteUrl,
-            type: 'DELETE',
-            dataType: 'json'
-        }).done(response => {
-            alert(response.message || '게시글이 삭제되었습니다.');
-            location.href = '/customer/post/postList';
-        }).fail(jqXHR => {
-            if (jqXHR.status === 401) {
-                $('#signin-modal').modal('show');
-            } else {
-                alert(jqXHR.responseJSON?.message || '삭제 중 오류가 발생했습니다.');
-            }
-        });
-    });
+	const $container = $('.post-view-container');
+	const loginUserNo = $container.data('login-user-no');
 
-    $container.on('click', '#post-like-btn', function() {
-        const $btn = $(this);
-        const pstSn = $btn.data('post-sn');
-        
-        if (!loginUserNo) {
-            $('#signin-modal').modal('show');
-            return;
-        }
+	$('#delete-post-btn').on('click', function(e) {
+		if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
+		const deleteUrl = $(e.currentTarget).data('post-delete-url');
+		$.ajax({
+			url: deleteUrl,
+			type: 'DELETE',
+			dataType: 'json'
+		}).done(response => {
+			alert(response.message || '게시글이 삭제되었습니다.');
+			location.href = '/customer/post/postList';
+		}).fail(jqXHR => {
+			if (jqXHR.status === 401) {
+				$('#signin-modal').modal('show');
+			} else {
+				alert(jqXHR.responseJSON?.message || '삭제 중 오류가 발생했습니다.');
+			}
+		});
+	});
 
-        if ($btn.hasClass('liked')) {
-            alert("이미 추천했습니다.");
-            return;
-        }
+	$container.on('click', '#post-like-btn', function() {
+		const $btn = $(this);
+		const pstSn = $btn.data('post-sn');
 
-        $btn.prop('disabled', true);
+		if (!loginUserNo) {
+			$('#signin-modal').modal('show');
+			return;
+		}
 
-        $.ajax({
-            url: '/customer/api/post/toggle-like',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ pstSn: pstSn }),
-            dataType: 'json'
-        }).done(response => {
-            $btn.addClass('liked');
-            $btn.find('.like-count').text(response.likeCount);
-        }).fail(jqXHR => {
-            if (jqXHR.status === 401) {
-                $('#signin-modal').modal('show');
-            } else if (jqXHR.status === 409) {
-                alert("이미 추천했습니다.");
-                $btn.addClass('liked');
-            } else {
-                alert(jqXHR.responseJSON?.message || '오류가 발생했습니다.');
-            }
-        }).always(() => {
-            $btn.prop('disabled', false);
-        });
-    });
+		if ($btn.hasClass('liked')) {
+			alert("이미 추천했습니다.");
+			return;
+		}
 
-    $('#post-share-btn').on('click', () => {
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                alert('게시글 주소가 클립보드에 복사되었습니다.');
-            });
-        }
-    });
+		$btn.prop('disabled', true);
 
-    $('.report-btn').on('click', () => {
-        alert('신고 기능은 현재 준비 중입니다.');
-    });
-    
-    const $commentTextarea = $('#comment-textarea');
-    const $commentSubmitBtn = $('#comment-submit-btn');
-    const $commentForm = $('#commentForm');
+		$.ajax({
+			url: '/customer/api/post/toggle-like',
+			type: 'POST',
+			contentType: 'application/json',
+			data: JSON.stringify({ pstSn: pstSn }),
+			dataType: 'json'
+		}).done(response => {
+			$btn.addClass('liked');
+			$btn.find('.like-count').text(response.likeCount);
+		}).fail(jqXHR => {
+			if (jqXHR.status === 401) {
+				$('#signin-modal').modal('show');
+			} else if (jqXHR.status === 409) {
+				alert("이미 추천했습니다.");
+				$btn.addClass('liked');
+			} else {
+				alert(jqXHR.responseJSON?.message || '오류가 발생했습니다.');
+			}
+		}).always(() => {
+			$btn.prop('disabled', false);
+		});
+	});
 
-    if ($commentTextarea.length) {
-        $commentTextarea.on('input', function() {
-            $commentSubmitBtn.prop('disabled', $(this).val().trim() === '');
-        });
+	$('#post-share-btn').on('click', () => {
+		if (navigator.clipboard) {
+			navigator.clipboard.writeText(window.location.href).then(() => {
+				alert('게시글 주소가 클립보드에 복사되었습니다.');
+			});
+		}
+	});
 
-        // [신규] 'Enter' 키로 댓글 등록 기능
-        $commentTextarea.on('keydown', function(e) {
-            // Enter 키가 눌렸고, Shift 키가 눌리지 않았을 때
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); // 기본 동작(줄바꿈) 방지
-                // 등록 버튼이 활성화 상태일 때만 submit 이벤트 트리거
-                if (!$commentSubmitBtn.is(':disabled')) {
-                    $commentForm.trigger('submit');
-                }
-            }
-        });
-    }
+	$('.report-btn').on('click', () => {
+		alert('신고 기능은 현재 준비 중입니다.');
+	});
 
-    $commentForm.on('submit', function(e) {
-        e.preventDefault();
-        
-        if (!loginUserNo) {
-            $('#signin-modal').modal('show');
-            return;
-        }
-        
-        const formData = new FormData(this);
-        const formObject = Object.fromEntries(formData.entries());
-        
-        $commentSubmitBtn.prop('disabled', true); // 중복 제출 방지
+	const $commentTextarea = $('#comment-textarea');
+	const $commentSubmitBtn = $('#comment-submit-btn');
+	const $commentForm = $('#commentForm');
 
-        $.ajax({
-            url: '/customer/api/post/comments',
-            method: 'POST',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(formObject),
-            dataType: 'json'
-        }).done(response => {
-            if (response.result === 'success') {
-                window.location.reload();
-            }
-        }).fail(jqXHR => {
-            if (jqXHR.status === 401) {
-                $('#signin-modal').modal('show');
-            } else {
-                alert(jqXHR.responseJSON?.message || '댓글 작성 중 오류가 발생했습니다.');
-            }
-            $commentSubmitBtn.prop('disabled', false); // 실패 시 버튼 다시 활성화
-        });
-    });
+	if ($commentTextarea.length) {
+		$commentTextarea.on('input', function() {
+			$commentSubmitBtn.prop('disabled', $(this).val().trim() === '');
+		});
 
-    $('.comment-list').on('click', '.update-comment-btn', function() {
-        const $commentItem = $(this).closest('.comment-item');
-        $commentItem.find('.comment-body, .update-comment-btn, .delete-comment-btn').hide();
-        $commentItem.find('.comment-update-form, .save-comment-btn, .cancel-comment-btn').show();
-        $commentItem.find('.comment-update-input').focus();
-    });
+		// 'Enter' 키로 댓글 등록 기능
+		$commentTextarea.on('keydown', function(e) {
+			// Enter 키가 눌렸고, Shift 키가 눌리지 않았을 때
+			if (e.key === 'Enter' && !e.shiftKey) {
+				e.preventDefault(); // 기본 동작(줄바꿈) 방지
+				// 등록 버튼이 활성화 상태일 때만 submit 이벤트 트리거
+				if (!$commentSubmitBtn.is(':disabled')) {
+					$commentForm.trigger('submit');
+				}
+			}
+		});
+	}
 
-    $('.comment-list').on('click', '.cancel-comment-btn', function() {
-        const $commentItem = $(this).closest('.comment-item');
-        $commentItem.find('.comment-update-form, .save-comment-btn, .cancel-comment-btn').hide();
-        $commentItem.find('.comment-body, .update-comment-btn, .delete-comment-btn').show();
-    });
+	$commentForm.on('submit', function(e) {
+		e.preventDefault();
 
-    $('.comment-list').on('click', '.save-comment-btn', function(e) {
-        const $btn = $(e.currentTarget);
-        const updateUrl = $btn.data('comment-update-url');
-        const cmntCn = $btn.closest('.comment-item').find('.comment-update-input').val();
-        if (!cmntCn.trim()) {
-            alert('수정할 내용을 입력해주세요.');
-            return;
-        }
-        $.ajax({
-            url: updateUrl,
-            type: 'PUT',
-            contentType: 'application/json',
-            data: JSON.stringify({ cmntCn: cmntCn }),
-            dataType: 'json'
-        }).done(response => {
-            window.location.reload();
-        }).fail(jqXHR => {
-            if (jqXHR.status === 401) {
-                $('#signin-modal').modal('show');
-            } else {
-                alert(jqXHR.responseJSON?.message || '댓글 수정 중 오류가 발생했습니다.');
-            }
-        });
-    });
+		if (!loginUserNo) {
+			$('#signin-modal').modal('show');
+			return;
+		}
 
-    $('.comment-list').on('click', '.delete-comment-btn', function(e) {
-        if (!confirm('정말로 이 댓글을 삭제하시겠습니까?')) return;
-        const deleteUrl = $(e.currentTarget).data('comment-delete-url');
-        $.ajax({
-            url: deleteUrl,
-            type: 'DELETE',
-            dataType: 'json'
-        }).done(response => {
-            window.location.reload();
-        }).fail(jqXHR => {
-            if (jqXHR.status === 401) {
-                $('#signin-modal').modal('show');
-            } else {
-                alert(jqXHR.responseJSON?.message || '댓글 삭제 중 오류가 발생했습니다.');
-            }
-        });
-    });
-    // [기존 코드 끝]
+		const formData = new FormData(this);
+		const formObject = Object.fromEntries(formData.entries());
+
+		$commentSubmitBtn.prop('disabled', true); // 중복 제출 방지
+
+		$.ajax({
+			url: '/customer/api/post/comments',
+			method: 'POST',
+			contentType: 'application/json; charset=utf-8',
+			data: JSON.stringify(formObject),
+			dataType: 'json'
+		}).done(response => {
+			if (response.result === 'success') {
+				window.location.reload();
+			}
+		}).fail(jqXHR => {
+			if (jqXHR.status === 401) {
+				$('#signin-modal').modal('show');
+			} else {
+				alert(jqXHR.responseJSON?.message || '댓글 작성 중 오류가 발생했습니다.');
+			}
+			$commentSubmitBtn.prop('disabled', false); // 실패 시 버튼 다시 활성화
+		});
+	});
+
+	$('.comment-list').on('click', '.update-comment-btn', function() {
+		const $commentItem = $(this).closest('.comment-item');
+		$commentItem.find('.comment-body, .update-comment-btn, .delete-comment-btn').hide();
+		$commentItem.find('.comment-update-form, .save-comment-btn, .cancel-comment-btn').show();
+		$commentItem.find('.comment-update-input').focus();
+	});
+
+	$('.comment-list').on('click', '.cancel-comment-btn', function() {
+		const $commentItem = $(this).closest('.comment-item');
+		$commentItem.find('.comment-update-form, .save-comment-btn, .cancel-comment-btn').hide();
+		$commentItem.find('.comment-body, .update-comment-btn, .delete-comment-btn').show();
+	});
+
+	$('.comment-list').on('click', '.save-comment-btn', function(e) {
+		const $btn = $(e.currentTarget);
+		const updateUrl = $btn.data('comment-update-url');
+		const cmntCn = $btn.closest('.comment-item').find('.comment-update-input').val();
+		if (!cmntCn.trim()) {
+			alert('수정할 내용을 입력해주세요.');
+			return;
+		}
+		$.ajax({
+			url: updateUrl,
+			type: 'PUT',
+			contentType: 'application/json',
+			data: JSON.stringify({ cmntCn: cmntCn }),
+			dataType: 'json'
+		}).done(response => {
+			window.location.reload();
+		}).fail(jqXHR => {
+			if (jqXHR.status === 401) {
+				$('#signin-modal').modal('show');
+			} else {
+				alert(jqXHR.responseJSON?.message || '댓글 수정 중 오류가 발생했습니다.');
+			}
+		});
+	});
+
+	$('.comment-list').on('click', '.delete-comment-btn', function(e) {
+		if (!confirm('정말로 이 댓글을 삭제하시겠습니까?')) return;
+		const deleteUrl = $(e.currentTarget).data('comment-delete-url');
+		$.ajax({
+			url: deleteUrl,
+			type: 'DELETE',
+			dataType: 'json'
+		}).done(response => {
+			window.location.reload();
+		}).fail(jqXHR => {
+			if (jqXHR.status === 401) {
+				$('#signin-modal').modal('show');
+			} else {
+				alert(jqXHR.responseJSON?.message || '댓글 삭제 중 오류가 발생했습니다.');
+			}
+		});
+	});
 });
