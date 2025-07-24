@@ -20,9 +20,9 @@
 						<div class="col-lg-5 mb-3">
 							<label class="form-label">검색 기간</label>
 							<div class="d-flex">
-								<input type="date" class="form-control" name="searchStartDate">
+								<input type="date" class="form-control" name="searchStartDate" value="2020-01-01">
 								<span class="mx-2 d-flex align-items-center">-</span> <input
-									type="date" class="form-control" name="searchEndDate">
+									type="date" class="form-control" name="searchEndDate" th:value="${#dates.format(#dates.createToday(), 'yyyy-MM-dd')}">
 							</div>
 						</div>
 						<div class="col-lg-5 mb-3">

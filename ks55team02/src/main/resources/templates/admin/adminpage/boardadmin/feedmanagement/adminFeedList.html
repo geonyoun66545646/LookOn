@@ -48,10 +48,10 @@
 						<label class="form-label">작성 기간</label>
 						<div class="d-flex">
 							<input type="date" class="form-control" name="startDate"
-								th:value="${searchCriteria.startDate}"> <span
+								value="2020-01-01"> <span
 								class="mx-2 d-flex align-items-center">-</span> <input
 								type="date" class="form-control" name="endDate"
-								th:value="${searchCriteria.endDate}">
+								th:value="${#dates.format(#dates.createToday(), 'yyyy-MM-dd')}">
 						</div>
 					</div>
 					<div class="col-lg-4">
