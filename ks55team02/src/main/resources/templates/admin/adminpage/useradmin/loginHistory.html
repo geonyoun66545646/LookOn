@@ -25,7 +25,7 @@
                             <label class="form-label">기간</label>
                             <div class="d-flex">
                                 <input type="date" class="form-control" name="startDate" value="2025-01-01">
-                                <span class="mx-2 d-flex align-items-center">-</span>
+                                	<span class="mx-2 d-flex align-items-center">-</span>
                                 <input type="date" class="form-control" name="endDate" th:value="${#dates.format(#dates.createToday(), 'yyyy-MM-dd')}">
                             </div>
                         </div>
@@ -127,8 +127,8 @@
         </main>
      </th:block>
 
-<!--/* 개발시 추가할 스크립트 */-->
-<th:block layout:fragment="jsScript">
-    <script th:src="@{/js/admin/loginHistory.js}"></script>
-</th:block>    
+	<!--/* 개발시 추가할 스크립트 */-->
+	<th:block layout:fragment="jsScript">
+	    <script th:src="@{/js/admin/loginHistory.js}"></script>
+	</th:block>    
 </html>
