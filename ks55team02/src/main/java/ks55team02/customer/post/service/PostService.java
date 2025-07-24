@@ -16,7 +16,7 @@ public interface PostService {
     
     Post selectPostDetailByPostSn(String pstSn, String loginUserNo);
     
-    void increaseViewCount(String pstSn);
+    void updatePostViewCount(String pstSn);
     
     List<Post> selectPostListByBoardCd(String bbsClsfCd, int offset, int size);
     

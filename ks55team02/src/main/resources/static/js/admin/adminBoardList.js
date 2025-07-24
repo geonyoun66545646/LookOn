@@ -80,7 +80,7 @@ $(() => {
 		}
 	});
 
-	// [신규] 복구 버튼 클릭
+	//  복구 버튼 클릭
 	$('#board-table-body').on('click', '.restore-btn', function() {
 		const boardCode = $(this).data('board-code');
 		if (confirm(`'${boardCode}' 게시판을 정말로 복구하시겠습니까?`)) {

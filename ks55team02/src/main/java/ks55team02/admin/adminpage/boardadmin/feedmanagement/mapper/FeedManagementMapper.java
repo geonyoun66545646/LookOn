@@ -9,11 +9,11 @@ import java.util.Map;
 @Mapper
 public interface FeedManagementMapper {
 
-    List<AdminFeed> getFeedList(AdminFeed searchCriteria);
+	List<AdminFeed> selectFeedList(AdminFeed searchCriteria);
 
-    int getFeedCount(AdminFeed searchCriteria);
+	int selectFeedCount(AdminFeed searchCriteria);
 
-    int hideFeeds(Map<String, Object> params);
-    
-    int restoreFeeds(List<String> feedSns);
+	int updateFeedsToHidden(Map<String, Object> params);
+
+	int updateFeedsToRestored(List<String> feedSns);
 }
