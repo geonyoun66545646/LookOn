@@ -35,7 +35,6 @@ public class AdminProductManagementController {
 
     private final AdminProductManagementService adminProductManagementService;
     
-    // [추가] '승인/반려 기록' 페이지 조회 로직
 	 // [수정] '승인/반려 기록' 페이지 조회 로직
 	    @GetMapping("/approvalHistory")
 	    public String getApprovalHistory(
