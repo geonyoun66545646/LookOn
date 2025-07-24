@@ -20,6 +20,10 @@ import ks55team02.admin.common.domain.Pagination;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 관리자 페이지 내 회원 목록 관리 요청을 처리하는 컨트롤러 클래스입니다.
+ * 회원 목록 조회, 검색, 페이징 및 회원 상태 변경 기능을 제공합니다.
+ */
 @Controller
 @RequestMapping("/adminpage/useradmin")
 @RequiredArgsConstructor
@@ -29,10 +33,12 @@ public class UserListController {
 	private final UserListService userListService;
 
 	/**
-	 * 회원 목록 페이지의 최초 로딩을 처리하는 핸들러
-	 * @param searchCriteria 검색 조건
-	 * @param model 뷰에 전달할 데이터를 담는 모델
-	 * @return 회원 목록 페이지 뷰 경로
+	 * 회원 목록 페이지의 최초 로딩을 처리하는 GET 요청 핸들러 메소드입니다.
+	 * 검색 조건에 맞는 전체 회원 수를 조회하고, 페이징 정보를 계산하여 회원 목록을 가져와 뷰에 전달합니다.
+	 *
+	 * @param searchCriteria 검색 조건을 담는 {@link UserList} DTO. `@ModelAttribute`를 통해 HTTP 요청 파라미터가 자동으로 바인딩됩니다.
+	 * @param model          뷰로 데이터를 전달할 Spring UI Model 객체
+	 * @return               회원 목록 페이지의 뷰 경로 (templates/admin/adminpage/useradmin/userList.html)
 	 */
 	@GetMapping("/userList")
 	public String useradminUserListController(@ModelAttribute UserList searchCriteria, Model model) {
@@ -60,11 +66,12 @@ public class UserListController {
 	}
 	
 	/**
-	 * 여러 회원의 상태를 일괄적으로 변경하는 API (AJAX 호출용)
-	 * @param requestData 변경할 회원 번호 목록(userNos)과 상태(status)를 담은 객체
-	 * @return 처리 결과 (성공/실패 메시지)
+	 * 선택된 여러 회원의 상태를 일괄적으로 변경하는 REST API 엔드포인트입니다.
+	 * 이 메소드는 AJAX 요청을 통해 호출됩니다.
+	 *
+	 * @param requestData 변경할 회원 번호 목록(`userNos`)과 변경할 상태 값(`status`)을 담은 JSON 형태의 Map 객체
+	 * @return            처리 성공/실패 여부와 메시지를 담은 {@link ResponseEntity}
 	 */
-	// 회원 상태 변경
 	@PostMapping("/updateUserStatus")
 	@ResponseBody
 	public ResponseEntity<?> updateUserStatus(@RequestBody Map<String, Object> requestData) {
@@ -84,10 +91,12 @@ public class UserListController {
 
 
 	/**
-	 * 검색, 정렬, 페이징 등 조건에 맞는 회원 목록을 비동기(AJAX)로 조회하는 핸들러
-	 * @param searchCriteria 검색 조건
-	 * @param model 뷰에 전달할 데이터를 담는 모델
-	 * @return 갱신될 뷰의 경로
+	 * 검색 조건(검색어, 회원 상태 등), 정렬, 페이징 등의 조건에 따라 회원 목록을 비동기(AJAX)로 조회하는 핸들러 메소드입니다.
+	 * 이 메소드는 Thymeleaf Fragment를 사용하여 페이지의 특정 부분만 업데이트합니다.
+	 *
+	 * @param searchCriteria 검색 조건을 담는 {@link UserList} DTO
+	 * @param model          뷰로 데이터를 전달할 Spring UI Model 객체
+	 * @return               갱신될 뷰의 경로 (admin/adminpage/useradmin/userList :: userListFragment)
 	 */
 	@GetMapping("/userstatussearch")
 	public String searchUserList(@ModelAttribute UserList searchCriteria, Model model) {
@@ -96,9 +105,11 @@ public class UserListController {
 	}
 	
 	/**
-	 * [공통 메서드] 회원 목록 데이터 조회 및 페이징 처리를 위한 중복 로직
-	 * @param searchCriteria 검색 조건
-	 * @param model 뷰에 전달할 데이터를 담는 모델
+	 * [공통 메서드] 회원 목록 데이터를 조회하고 페이징 정보를 계산하여 모델에 추가하는 중복 로직을 캡슐화한 private 메소드입니다.
+	 * 'userList' 및 'userstatussearch' 메소드에서 공통적으로 사용됩니다.
+	 *
+	 * @param searchCriteria 검색 조건을 담는 {@link UserList} DTO
+	 * @param model          뷰에 전달할 데이터를 담는 모델
 	 */
 	private void loadUserListData(UserList searchCriteria, Model model) {
 		// 1. 조건에 맞는 전체 회원 수 조회

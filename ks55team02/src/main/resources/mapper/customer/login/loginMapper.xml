@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ks55team02.customer.login.mapper.LoginMapper">
-
-    <!--
-        로그인 관련 조회 결과를 Login DTO에 매핑하기 위한 resultMap 입니다.
-        users 테이블과 user_security_settings 테이블을 JOIN한 결과를 담습니다.
-    -->
     <resultMap id="loginResultMap" type="ks55team02.customer.login.domain.Login">
         <!-- users 테이블 컬럼 매핑 -->
         <result column="user_no" 			property="userNo"/>
@@ -25,9 +20,7 @@
         <result column="acnt_lock_rmv_tm" 	property="acntLockRmvTm"/>
     </resultMap>
 
-    <!--
-        사용자 아이디로 회원 기본 정보와 보안 설정 정보를 조회하는 쿼리입니다.
-    -->
+    <!-- 사용자 아이디로 회원 기본 정보와 보안 설정 정보를 조회하는 쿼리입니다. -->
     <select id="getLoginUserInfo" parameterType="String" resultMap="loginResultMap">
         SELECT
             u.user_no,

@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpSession;
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportSearch;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.ReportProcessRequest;
 import ks55team02.admin.adminpage.inquiryadmin.reports.service.AdminReportsService;
 import ks55team02.customer.login.domain.LoginUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * 신고 관리 비동기 요청 처리를 위한 API 컨트롤러
- */
+@Slf4j
 @RestController
 @RequestMapping("/api/admin/reports")
 @RequiredArgsConstructor
@@ -55,8 +55,13 @@ public class AdminReportsApiController {
 		// 3. LoginUser 객체의 getUserNo() 메소드를 호출하여 관리자 ID를 가져옵니다.
 		String adminId = loginAdmin.getUserNo();
 		request.setAdminId(adminId);
-
 		request.setDclrId(dclrId);
+
+		// =====================================================================
+		// [핵심 진단 코드] Service를 호출하기 직전에, DTO의 모든 내용을 로그로 출력합니다.
+		// =====================================================================
+		log.info("▶▶▶ Service로 전달될 최종 데이터 확인: {}", request.toString());
+
 		adminReportsService.processReport(request);
 
 		Map<String, Object> response = new HashMap<>();
@@ -75,4 +80,28 @@ public class AdminReportsApiController {
 		// 기존 서비스 로직을 그대로 재사용하여 데이터만 반환합니다.
 		return adminReportsService.getAdminReportList(searchCriteria);
 	}
+
+	// ================== ▼▼▼ 바로 이 메서드를 추가해야 합니다 ▼▼▼ ==================
+	/**
+	 * 특정 신고의 상세 정보를 JSON 형태로 조회하는 API (AJAX 호출용)
+	 * 
+	 * @param dclrId 조회할 신고 ID
+	 * @return AdminReportDetail 객체를 포함한 ResponseEntity
+	 */
+	@GetMapping("/{dclrId}")
+	public ResponseEntity<Object> getReportDetailForAjax(@PathVariable(name = "dclrId") String dclrId) {
+
+		AdminReportDetail reportDetail = adminReportsService.getAdminReportDetail(dclrId);
+
+		if (reportDetail != null) {
+			// 데이터가 있으면 JSON 데이터와 함께 200 OK 응답
+			return ResponseEntity.ok(reportDetail);
+		} else {
+			// 데이터가 없으면 404 Not Found 응답
+			Map<String, Object> response = new HashMap<>();
+			response.put("message", "해당 신고 정보를 찾을 수 없습니다.");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+		}
+	}
+	// ================== ▲▲▲ 여기까지 추가 ▲▲▲ ==================
 }
