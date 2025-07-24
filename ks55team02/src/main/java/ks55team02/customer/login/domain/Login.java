@@ -6,6 +6,8 @@ import lombok.Data;
 
 @Data
 public class Login {
+	
+	private long lgnHstryId;
 
 	// ===== users 테이블 정보 =====
     private String userNo;					// 사용자의 번호
@@ -42,4 +44,5 @@ public class Login {
     private LocalDateTime lgnDt; // 로그인시 사용된 아이디    
     private String ipAddress; // 컨트롤러에서 채워줄 IP 주소 정보
     private String redirectUrl; // 되돌아갈 페이지 url 주소 정보
+    
 }

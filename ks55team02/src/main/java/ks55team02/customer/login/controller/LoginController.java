@@ -111,11 +111,28 @@ public class LoginController {
      */
     @GetMapping("/logout")
     public String logout(HttpSession session) {
+
+    	try {
+            // [추가] 세션 무효화 전에 로그아웃 시간을 기록하기 위해 세션에서 lgnHstryId를 가져옵니다.
+            Object lgnHstryIdAttr = session.getAttribute("lgnHstryId");
+
+            if (lgnHstryIdAttr != null) {
+                long lgnHstryId = (long) lgnHstryIdAttr;
+                // 서비스 계층을 호출하여 DB에 로그아웃 시간을 업데이트합니다.
+                loginService.updateLogoutTime(lgnHstryId);
+            } else {
+                // 세션에 lgnHstryId가 없는 비정상적인 경우를 대비한 로그
+                log.warn("세션에 lgnHstryId가 없어 로그아웃 시간을 기록할 수 없습니다.");
+            }
+        } catch (Exception e) {
+            // DB 업데이트 중 오류가 발생하더라도 로그아웃은 정상적으로 처리되어야 하므로 예외를 잡고 로그만 남깁니다.
+            log.error("로그아웃 시간 기록 중 오류 발생", e);
+        }
+        
     	// 세션을 무효화하여 모든 세션 데이터를 삭제하고, 로그인 상태를 해제합니다.
     	session.invalidate();
-    	
-    	log.info("========== 로그아웃 메소드 실행됨 ==========");
-    	return "redirect:/"; 
+
+    	return "redirect:/";
     }
     
     /**
