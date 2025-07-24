@@ -138,28 +138,30 @@
 						AND user_no LIKE CONCAT('%', #{keyword}, '%')
 					</when>
 					<when test="'issueConditionType'.equals(searchType)">
-						AND issue_condition_type LIKE CONCAT('%',
-						#{keyword}, '%')
+						AND issue_condition_type LIKE CONCAT('%', #{keyword}, '%')
 					</when>
 					<otherwise>
 						AND (
 						cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-						OR
-						pblcn_cpn_id LIKE CONCAT('%', #{keyword}, '%')
-						OR user_no LIKE
-						CONCAT('%', #{keyword}, '%')
-						OR issue_condition_type LIKE
-						CONCAT('%', #{keyword}, '%')
+						OR pblcn_cpn_id LIKE CONCAT('%', #{keyword}, '%')
+						OR user_no LIKE CONCAT('%', #{keyword}, '%')
+						OR issue_condition_type LIKE CONCAT('%', #{keyword}, '%')
 						)
 					</otherwise>
 				</choose>
 			</if>
-			<if test="actvtnYn != null and actvtnYn != ''">
-				AND actvtn_yn = #{actvtnYn}
+
+			<if
+				test="activationStatusList != null and !activationStatusList.isEmpty()">
+				AND actvtn_yn IN
+				<foreach item="status" collection="activationStatusList"
+					open="(" separator="," close=")">
+					#{status}
+				</foreach>
 			</if>
+
 			<if test="vldBgngDt != null and vldEndDt != null">
-				AND (vld_bgng_dt &lt;= #{vldEndDt} AND vld_end_dt &gt;=
-				#{vldBgngDt})
+				AND (vld_bgng_dt &lt;= #{vldEndDt} AND vld_end_dt &gt;= #{vldBgngDt})
 			</if>
 		</where>
 	</sql>

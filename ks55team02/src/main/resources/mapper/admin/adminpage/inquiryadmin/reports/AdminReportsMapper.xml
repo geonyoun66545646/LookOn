@@ -66,48 +66,54 @@
 		<result property="prcsAdminNo" column="prcs_admin_no" />
 	</resultMap>
 
-	<select id="getAdminTotalReportCount"
-		parameterType="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportSearch"
-		resultType="_int">
-		SELECT
-		COUNT(*)
-		FROM
-		reports AS R
+	<sql id="reportSearchWhereCondition">
 		<where>
-			<if test="prcsSttsCd != null and !prcsSttsCd.equals('')">
-				AND R.prcs_stts_cd = #{prcsSttsCd}
+			<if test="statusList != null and !statusList.isEmpty()">
+				AND R.prcs_stts_cd IN
+				<foreach item="status" collection="statusList" open="("
+					separator="," close=")">
+					#{status}
+				</foreach>
 			</if>
-			<if test="startDate != null">
-				AND R.dclr_rcpt_dt >= #{startDate}
+
+			<if test="startDate != null"> AND R.dclr_rcpt_dt >= #{startDate, jdbcType=DATE}
 			</if>
 			<if test="endDate != null">
-				<![CDATA[
-				AND R.dclr_rcpt_dt <= DATE_ADD(#{endDate}, INTERVAL 1 DAY)
-				]]>
+				AND R.dclr_rcpt_dt &lt;= DATE_ADD(#{endDate, jdbcType=DATE},
+				INTERVAL 1 DAY)
+				AND R.dclr_rcpt_dt <![CDATA[<]]>
+				DATE_ADD(#{endDate, jdbcType=DATE}, INTERVAL 1 DAY)
 			</if>
-			<if test="searchValue != null and !searchValue.equals('')">
+			<if test="searchValue != null and searchValue != ''">
 				<choose>
 					<when test="searchKey == 'dclrId'">
 						AND R.dclr_id LIKE CONCAT('%', #{searchValue}, '%')
 					</when>
 					<when test="searchKey == 'dclrUserLoginId'">
-						AND R.dclr_user_no IN (SELECT user_no FROM users
-						WHERE user_lgn_id
-						LIKE CONCAT('%', #{searchValue}, '%'))
+						AND U.user_lgn_id LIKE CONCAT('%', #{searchValue},
+						'%')
 					</when>
 					<when test="searchKey == 'dclrTrgtTypeCd'">
 						AND R.dclr_trgt_type_cd LIKE CONCAT('%',
 						#{searchValue}, '%')
 					</when>
 					<when test="searchKey == 'dclrReasonContent'">
-						AND R.dclr_rsn_cd IN (SELECT dclr_rsn_cd FROM
-						report_reasons WHERE
-						dclr_rsn_cn LIKE CONCAT('%', #{searchValue},
-						'%'))
+						AND RR.dclr_rsn_cn LIKE CONCAT('%', #{searchValue},
+						'%')
 					</when>
 				</choose>
 			</if>
 		</where>
+	</sql>
+
+	<select id="getAdminTotalReportCount" parameterType="map"
+		resultType="_int">
+		SELECT COUNT(*)
+		FROM reports AS R
+		JOIN users AS U ON R.dclr_user_no =
+		U.user_no
+		JOIN report_reasons AS RR ON R.dclr_rsn_cd = RR.dclr_rsn_cd
+		<include refid="reportSearchWhereCondition" />
 	</select>
 
 	<select id="getAdminReportList" parameterType="map"
@@ -121,53 +127,15 @@
 		U.user_lgn_id AS dclrUserLoginId,
 		RR.dclr_rsn_cn AS dclrReasonContent,
 		COALESCE(R.dclr_trgt_user_no,
-		R.dclr_trgt_conts_id) AS
-		intelligentTargetInfo
+		R.dclr_trgt_conts_id) AS intelligentTargetInfo
 		FROM
 		reports AS R
 		JOIN
-		users AS U ON R.dclr_user_no
-		= U.user_no
-		JOIN report_reasons AS RR ON
+		users AS U ON R.dclr_user_no = U.user_no
+		JOIN
+		report_reasons AS RR ON
 		R.dclr_rsn_cd = RR.dclr_rsn_cd
-		<where>
-			<if
-				test="searchCriteria.prcsSttsCd != null and !searchCriteria.prcsSttsCd.equals('')">
-				AND R.prcs_stts_cd = #{searchCriteria.prcsSttsCd}
-			</if>
-			<if test="searchCriteria.startDate != null">
-				AND R.dclr_rcpt_dt >= #{searchCriteria.startDate}
-			</if>
-			<if test="searchCriteria.endDate != null">
-				<![CDATA[
-				AND R.dclr_rcpt_dt <= DATE_ADD(#{searchCriteria.endDate}, INTERVAL 1 DAY)
-				]]>
-			</if>
-			<if
-				test="searchCriteria.searchValue != null and !searchCriteria.searchValue.equals('')">
-				<choose>
-					<when test="searchCriteria.searchKey == 'dclrId'">
-						AND R.dclr_id LIKE CONCAT('%',
-						#{searchCriteria.searchValue}, '%')
-					</when>
-					<when test="searchCriteria.searchKey == 'dclrUserLoginId'">
-						AND R.dclr_user_no IN (SELECT user_no FROM users
-						WHERE user_lgn_id
-						LIKE CONCAT('%', #{searchCriteria.searchValue},
-						'%'))
-					</when>
-					<when test="searchCriteria.searchKey == 'dclrTrgtTypeCd'">
-						AND R.dclr_trgt_type_cd LIKE CONCAT('%',
-						#{searchValue}, '%')
-					</when>
-					<when test="searchCriteria.searchKey == 'dclrReasonContent'">
-						AND RR.dclr_rsn_cn LIKE CONCAT('%',
-						#{searchValue},
-						'%')
-					</when>
-				</choose>
-			</if>
-		</where>
+		<include refid="reportSearchWhereCondition" />
 		ORDER BY
 		R.dclr_rcpt_dt DESC
 		LIMIT #{pagination.recordSize} OFFSET
@@ -394,13 +362,15 @@
 	</update>
 
 	<update id="updateProductExposureYn" parameterType="map">
-		UPDATE products
+		UPDATE
+		products
 		SET
 		expsr_yn = 0,
 		actvtn_yn = 0,
 		inactvtn_dt = NOW()
 		WHERE
-		gds_no = #{gdsNo};
+		gds_no =
+		#{gdsNo};
 	</update>
 
 
