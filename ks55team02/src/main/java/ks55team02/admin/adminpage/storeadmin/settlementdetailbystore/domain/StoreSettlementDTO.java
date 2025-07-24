@@ -8,6 +8,14 @@ import lombok.Data;
 @Data
 public class StoreSettlementDTO {
 	
+	// ====================== 이 필드를 추가해주세요 ======================
+    /**
+     * 데이터베이스의 AUTO_INCREMENT PK 값을 담기 위한 필드.
+     * 시스템 내부에서만 사용하며, ID 생성의 안전성을 보장합니다.
+     */
+    private Long id;
+    // ===============================================================
+	
 	private String storeClclnId; 	// 스토어 정산 아이디 (PK)
     private String storeId;      	// 상점 ID (FK)
     private String plcyId;       	// 정책 ID (FK)

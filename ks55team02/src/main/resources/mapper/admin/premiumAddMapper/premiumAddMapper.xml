@@ -81,10 +81,20 @@
     </delete>
     
     <!-- 구독 플랜 조회 -->
-	<select id="getPlanById" resultType="ks55team02.admin.adminpage.storeadmin.premiumadd.domain.PremiumAddDTO">
-	    SELECT * FROM subscription_plans 
-	    WHERE sbscr_plan_id = #{planId}
-	</select>
+	<select id="getPlanById" parameterType="string" resultMap="premiumAddresultMap">
+        SELECT
+            sbscr_plan_id,
+            sbscr_plan_nm,
+            sbscr_plan_prc,
+            sbscr_plan_term_val,
+            sbscr_plan_expln,
+            sbscr_plan_crt_dt,
+            sbscr_plan_mdfcn_dt
+        FROM
+            subscription_plans
+        WHERE
+            sbscr_plan_id = #{planId}
+    </select>
 	
 	<!-- 구독 플랜 수정 -->
 	<update id="modifySubscriptionPlan" parameterType="ks55team02.admin.adminpage.storeadmin.premiumadd.domain.PremiumAddDTO">
