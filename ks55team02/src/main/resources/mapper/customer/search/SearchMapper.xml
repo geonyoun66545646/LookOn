@@ -25,11 +25,9 @@
 		FROM
 		products p
 		LEFT JOIN
-		product_images img ON p.gds_no = img.gds_no AND
-		img.rprs_img_yn = 'Y'
+		product_images img ON p.gds_no = img.gds_no AND img.img_indct_sn = 1
 		WHERE
 		p.gds_nm LIKE #{pattern}
-		<!-- (핵심 수정) 판매중(expsr_yn = 1)인 상품만 조회하도록 조건을 추가합니다. -->
 		AND p.expsr_yn = 1
 		ORDER BY
 		p.reg_dt DESC
@@ -150,7 +148,8 @@
 	</select>
 
 	<insert id="insertSearchHistory" parameterType="map">
-		INSERT INTO search_logs (
+		INSERT INTO
+		search_logs (
 		srch_log_id,
 		user_no,
 		srch_keyword_nm,
