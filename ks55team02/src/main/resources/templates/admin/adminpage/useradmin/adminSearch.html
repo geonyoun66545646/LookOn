@@ -15,27 +15,10 @@
 		<div class="card mb-4">
 			<div class="card-body">
 				<form id="searchForm">
-					<div class="row gx-3">
-						<div class="col-lg-12">
-							<label class="form-label">분류</label>
-							<div class="d-flex align-items-center">
-								<div class="form-check me-4">
-									<input class="form-check-input" type="checkbox" disabled>
-									<label class="form-check-label text-muted">활동 계정</label>
-								</div>
-								<div class="form-check me-4">
-									<input class="form-check-input" type="checkbox" disabled>
-									<label class="form-check-label text-muted">휴면 계정</label>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<hr>
-
 					<div class="row gx-3 align-items-end">
-						<div class="col-lg-4">
-							<label class="form-label">기간</label>
+
+						<div class="col-lg-5">
+							<label class="form-label">검색 기간</label>
 							<div class="d-flex">
 								<input type="date" class="form-control" id="searchStartDate"
 									name="startDate"> <span
@@ -44,13 +27,13 @@
 									name="endDate">
 							</div>
 						</div>
-						<div class="col-lg-4">
-							<label class="form-label">검색 키워드</label>
-							<div class="input-group">
-								<input type="text" class="form-control" id="searchValue"
-									name="searchValue" placeholder="검색 키워드를 입력하세요">
-							</div>
+
+						<div class="col-lg-5">
+							<label class="form-label">검색 키워드</label> <input type="text"
+								class="form-control" id="searchValue" name="searchValue"
+								placeholder="검색 키워드를 입력하세요">
 						</div>
+
 						<div class="col-lg-2">
 							<button class="btn btn-primary btn-block" type="submit">검색</button>
 						</div>

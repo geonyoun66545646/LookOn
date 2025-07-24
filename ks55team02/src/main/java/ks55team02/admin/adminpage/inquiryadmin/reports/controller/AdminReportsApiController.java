@@ -31,35 +31,24 @@ public class AdminReportsApiController {
 	private final AdminReportsService adminReportsService;
 
 	/**
-	 * 신고 처리 요청을 받아 처리하는 API
-	 * 
-	 * @param dclrId  처리할 신고의 ID
-	 * @param request 처리 내용과 새로운 상태가 담긴 DTO
-	 * @return 처리 결과 (성공/실패 메시지)
+	 * 신고 처리 요청을 받아 처리하는 API (수정 없음)
 	 */
 	@PostMapping("/{dclrId}/process")
 	public ResponseEntity<Map<String, Object>> processReport(@PathVariable(name = "dclrId") String dclrId,
 			@RequestBody ReportProcessRequest request, HttpSession session) {
 
-		// [최종 수정] AdminLoginController에서 확인한 정보와 완벽하게 일치시킵니다.
-		// 1. 세션에서 "loginUser"라는 이름으로 정보를 가져옵니다.
 		LoginUser loginAdmin = (LoginUser) session.getAttribute("loginUser");
 
-		// 2. 만약 로그인 정보가 없으면, 권한 없음(401) 에러를 응답합니다.
 		if (loginAdmin == null) {
 			Map<String, Object> response = new HashMap<>();
 			response.put("message", "관리자 로그인이 필요한 기능입니다.");
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 		}
 
-		// 3. LoginUser 객체의 getUserNo() 메소드를 호출하여 관리자 ID를 가져옵니다.
 		String adminId = loginAdmin.getUserNo();
 		request.setAdminId(adminId);
 		request.setDclrId(dclrId);
 
-		// =====================================================================
-		// [핵심 진단 코드] Service를 호출하기 직전에, DTO의 모든 내용을 로그로 출력합니다.
-		// =====================================================================
 		log.info("▶▶▶ Service로 전달될 최종 데이터 확인: {}", request.toString());
 
 		adminReportsService.processReport(request);
@@ -70,23 +59,20 @@ public class AdminReportsApiController {
 	}
 
 	/**
-	 * 신고 목록 데이터를 JSON 형태로 조회
-	 * 
-	 * @param searchCriteria 검색 및 페이징 조건
-	 * @return Map 형태의 JSON 데이터 (reportList, pagination 포함)
+	 * 신고 목록 데이터를 JSON 형태로 조회 (수정)
 	 */
 	@GetMapping
-	public Map<String, Object> getReportList(@ModelAttribute AdminReportSearch searchCriteria) {
-		// 기존 서비스 로직을 그대로 재사용하여 데이터만 반환합니다.
+	// ▼▼▼ [수정] @ModelAttribute를 제거하고, 디버깅을 위한 로그를 추가했습니다. ▼▼▼
+	public Map<String, Object> getReportList(AdminReportSearch searchCriteria) {
+
+		// [추가] 프론트엔드에서 보낸 검색 조건이 DTO에 잘 담겼는지 확인하는 로그
+		log.info("API 컨트롤러가 받은 검색 조건: {}", searchCriteria);
+
 		return adminReportsService.getAdminReportList(searchCriteria);
 	}
 
-	// ================== ▼▼▼ 바로 이 메서드를 추가해야 합니다 ▼▼▼ ==================
 	/**
-	 * 특정 신고의 상세 정보를 JSON 형태로 조회하는 API (AJAX 호출용)
-	 * 
-	 * @param dclrId 조회할 신고 ID
-	 * @return AdminReportDetail 객체를 포함한 ResponseEntity
+	 * 특정 신고의 상세 정보를 JSON 형태로 조회하는 API (수정 없음)
 	 */
 	@GetMapping("/{dclrId}")
 	public ResponseEntity<Object> getReportDetailForAjax(@PathVariable(name = "dclrId") String dclrId) {
@@ -94,14 +80,11 @@ public class AdminReportsApiController {
 		AdminReportDetail reportDetail = adminReportsService.getAdminReportDetail(dclrId);
 
 		if (reportDetail != null) {
-			// 데이터가 있으면 JSON 데이터와 함께 200 OK 응답
 			return ResponseEntity.ok(reportDetail);
 		} else {
-			// 데이터가 없으면 404 Not Found 응답
 			Map<String, Object> response = new HashMap<>();
 			response.put("message", "해당 신고 정보를 찾을 수 없습니다.");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 		}
 	}
-	// ================== ▲▲▲ 여기까지 추가 ▲▲▲ ==================
 }
