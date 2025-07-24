@@ -1,73 +1,73 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{customer/layout/layoutMain}">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{customer/layout/layoutMain}">
 
 <head>
-    <title>커뮤니티</title>
-    <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/postList.css}">
+<title>커뮤니티</title>
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/customcustomercss/postList.css}">
 </head>
 
 <th:block layout:fragment="jsFile">
-    <script th:src="@{/js/customerjs/postList.js}"></script>
+	<script th:src="@{/js/customerjs/postList.js}"></script>
 </th:block>
 
 <th:block layout:fragment="jsScript">
-    <script th:inline="javascript">
+	<script th:inline="javascript">
         window.loginUser = /*[[${session.loginUser}]]*/ null;
     </script>
 </th:block>
 
 <th:block layout:fragment="contents">
-    <div class="container"
-         th:data-initial-bbsClsfCd="${bbsClsfCd}"
-         th:data-initial-keyword="${keyword}">
-         
-        <div class="page-title-section">
-            <h2 class="page-main-title" id="board-title">커뮤니티</h2>
-        </div>
-    
-        <nav class="main-tabs">
-            <ul>
-                <li><a th:href="@{/customer/feed/feedList}">발견</a></li>
-                
-                <!-- ▼▼▼ [핵심 수정] th:data-href에 'tab=following' 파라미터 추가 ▼▼▼ -->
-                <li><a href="#" id="following-tab-link" th:data-href="@{/customer/feed/feedList(tab='following')}">팔로잉</a></li>
-                <!-- ▲▲▲ [핵심 수정] ▲▲▲ -->
-                
-                <li class="active"><a href="#">커뮤니티</a></li>
-            </ul>
-        </nav>
+	<div class="container" th:data-initial-bbsClsfCd="${bbsClsfCd}"
+		th:data-initial-keyword="${keyword}">
 
-        <div class="sub-controls-area">
-            <div class="board-tabs-container" id="tabsContainer">
-                 <ul class="nav nav-tabs">
-                    <li class="nav-item"><a class="nav-link active" href="#" data-bbsclsfcd="">전체</a></li>
-                    <li class="nav-item" th:each="b : ${boardList}"><a class="nav-link" href="#" th:data-bbsclsfcd="${b.bbsClsfCd}" th:text="${b.bbsNm}"></a></li>
-                </ul>
-            </div>
-        </div>
-                <div class="fab-container">
-            <button th:if="${session.loginUser != null}"
-                    type="button"
-                    class="fab-button"
-                    aria-label="새 게시글 작성"
-                    title="새 게시글 작성"
-                    th:onclick="|location.href='@{/customer/post/postWrite}'|">
-                <i class="bi bi-plus-lg"></i>
-            </button>
-            <button th:if="${session.loginUser == null}"
-                    type="button"
-                    class="fab-button"
-                    aria-label="새 게시글 작성 (로그인 필요)"
-                    title="새 게시글 작성 (로그인 필요)"
-                    data-toggle="modal"
-                    data-target="#signin-modal">
-                <i class="bi bi-plus-lg"></i>
-            </button>
-        </div>
-        <div class="post-list-container" id="post-list-container"></div>
-        <div id="loading-indicator" style="display: none;"><p>Loading...</p></div>
-    </div>
+		<div class="page-title-section">
+			<h2 class="page-main-title" id="board-title">커뮤니티</h2>
+		</div>
+
+		<nav class="main-tabs">
+			<ul>
+				<li><a th:href="@{/customer/feed/feedList}">발견</a></li>
+
+
+				<li><a href="#" id="following-tab-link"
+					th:data-href="@{/customer/feed/feedList(tab='following')}">팔로잉</a></li>
+
+
+				<li class="active"><a href="#">커뮤니티</a></li>
+			</ul>
+		</nav>
+
+		<div class="sub-controls-area">
+			<div class="board-tabs-container" id="tabsContainer">
+				<ul class="nav nav-tabs">
+					<li class="nav-item"><a class="nav-link active" href="#"
+						data-bbsclsfcd="">전체</a></li>
+					<li class="nav-item" th:each="b : ${boardList}"><a
+						class="nav-link" href="#" th:data-bbsclsfcd="${b.bbsClsfCd}"
+						th:text="${b.bbsNm}"></a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="fab-container">
+			<button th:if="${session.loginUser != null}" type="button"
+				class="fab-button" aria-label="새 게시글 작성" title="새 게시글 작성"
+				th:onclick="|location.href='@{/customer/post/postWrite}'|">
+				<i class="bi bi-plus-lg"></i>
+			</button>
+			<button th:if="${session.loginUser == null}" type="button"
+				class="fab-button" aria-label="새 게시글 작성 (로그인 필요)"
+				title="새 게시글 작성 (로그인 필요)" data-toggle="modal"
+				data-target="#signin-modal">
+				<i class="bi bi-plus-lg"></i>
+			</button>
+		</div>
+		<div class="post-list-container" id="post-list-container"></div>
+		<div id="loading-indicator" style="display: none;">
+			<p>Loading...</p>
+		</div>
+	</div>
 </th:block>
 </html>

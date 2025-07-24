@@ -18,29 +18,29 @@ public class PostManagementServiceImpl implements PostManagementService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AdminPost> getPostList(AdminPost searchCriteria) {
-        return postManagementMapper.getPostList(searchCriteria);
+    public List<AdminPost> selectPostList(AdminPost searchCriteria) {
+        return postManagementMapper.selectPostList(searchCriteria);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public int getPostCount(AdminPost searchCriteria) {
-        return postManagementMapper.getPostCount(searchCriteria);
+    public int selectPostCount(AdminPost searchCriteria) {
+        return postManagementMapper.selectPostCount(searchCriteria);
     }
 
     @Override
-    public int hidePosts(List<String> postSns) {
+    public int updatePostsToHidden(List<String> postSns) {
         if (postSns == null || postSns.isEmpty()) {
             return 0;
         }
-        return postManagementMapper.hidePosts(postSns);
+        return postManagementMapper.updatePostsToHidden(postSns);
     }
 
     @Override
-    public int restorePosts(List<String> postSns) {
+    public int updatePostsToRestored(List<String> postSns) {
         if (postSns == null || postSns.isEmpty()) {
             return 0;
         }
-        return postManagementMapper.restorePosts(postSns);
+        return postManagementMapper.updatePostsToRestored(postSns);
     }
 }

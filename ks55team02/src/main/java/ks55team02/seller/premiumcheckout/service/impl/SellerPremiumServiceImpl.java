@@ -12,6 +12,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -107,7 +108,7 @@ public class SellerPremiumServiceImpl implements SellerPremiumService { // 또�
      * 이 로직은 이미 완벽하므로 그대로 유지합니다.
      */
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public SellerPremiumPaymentDTO processPaymentSuccess(String orderId, String paymentKey, BigDecimal amount, String userNo) {
         log.info("결제 성공 처리 시작. 주문 ID: {}", orderId);
 

@@ -16,14 +16,15 @@
 		<result column="del_dt" property="delDt" />
 	</resultMap>
 
-	<select id="getBoardList" resultMap="boardResultMap">
-		SELECT bbs_clsf_cd, bbs_nm, wrt_authrt_lvl_val, cmnt_wrt_authrt_lvl_val,
+	<select id="selectBoardList" resultMap="boardResultMap">
+		SELECT bbs_clsf_cd, bbs_nm,
+		wrt_authrt_lvl_val, cmnt_wrt_authrt_lvl_val,
 		crt_dt, del_dt
 		FROM boards
 		ORDER BY crt_dt DESC;
 	</select>
 
-	<select id="getBoardByCode" parameterType="string"
+	<select id="selectBoardByCode" parameterType="string"
 		resultMap="boardResultMap">
 		SELECT bbs_clsf_cd, bbs_nm, bbs_prps_cn, wrt_authrt_lvl_val,
 		cmnt_wrt_authrt_lvl_val
@@ -31,13 +32,16 @@
 		WHERE bbs_clsf_cd = #{boardCode};
 	</select>
 
-	<insert id="addBoard"
+	<insert id="insertBoard"
 		parameterType="ks55team02.customer.post.domain.Board">
 		INSERT INTO boards
-		(bbs_clsf_cd, bbs_nm, bbs_prps_cn, wrt_authrt_lvl_val, cmnt_wrt_authrt_lvl_val,
-		bbs_creatr_user_no, crt_dt)
+		(bbs_clsf_cd, bbs_nm, bbs_prps_cn,
+		wrt_authrt_lvl_val, cmnt_wrt_authrt_lvl_val,
+		bbs_creatr_user_no,
+		crt_dt)
 		VALUES
-		(#{bbsClsfCd}, #{bbsNm}, #{bbsPrpsCn}, #{wrtAuthrtLvlVal}, #{cmntWrtAuthrtLvlVal},
+		(#{bbsClsfCd}, #{bbsNm}, #{bbsPrpsCn},
+		#{wrtAuthrtLvlVal}, #{cmntWrtAuthrtLvlVal},
 		#{bbsCreatrUserNo}, NOW());
 	</insert>
 
@@ -46,23 +50,26 @@
 		UPDATE boards
 		SET
 		bbs_nm = #{bbsNm},
-		bbs_prps_cn = #{bbsPrpsCn},
+		bbs_prps_cn =
+		#{bbsPrpsCn},
 		wrt_authrt_lvl_val = #{wrtAuthrtLvlVal},
 		cmnt_wrt_authrt_lvl_val = #{cmntWrtAuthrtLvlVal},
 		mdfcn_dt = NOW()
 		WHERE
 		bbs_clsf_cd = #{bbsClsfCd};
-	</update> <!-- [최종 수정] 오타 수정: </doupdate> -> </update> -->
+	</update>
 
 	<update id="deleteBoard" parameterType="string">
 		UPDATE boards
-		SET del_dt = NOW()
+		SET del_dt =
+		NOW()
 		WHERE bbs_clsf_cd = #{boardCode};
 	</update>
 
 	<update id="restoreBoard" parameterType="string">
 		UPDATE boards
-		SET del_dt = NULL
+		SET del_dt
+		= NULL
 		WHERE bbs_clsf_cd = #{boardCode};
 	</update>
 </mapper>

@@ -140,11 +140,11 @@ public interface AdminReportsMapper {
 	int deleteComment(Map<String, Object> paramMap);
 
 	/**
-	 * 상품의 노출 여부를 변경합니다 (삭제 조치).
-	 * 
-	 * @param gdsNo      상품 번호
-	 * @param exposureYn 노출 여부 (false: 노출 안함, true: 노출)
+	 * 신고 처리에 따른 상품 비활성화(삭제) 조치. expsr_yn, actvtn_yn, inactvtn_dt, del_user_no를
+	 * 업데이트합니다.
+	 *
+	 * @param params gdsNo(상품번호), adminId(처리 관리자 ID)를 담은 Map
 	 * @return 영향받은 행의 수
 	 */
-	int updateProductExposureYn(@Param("gdsNo") String gdsNo, @Param("exposureYn") boolean exposureYn);
+	int updateProductExposureYn(Map<String, Object> params);
 }

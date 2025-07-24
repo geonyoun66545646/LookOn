@@ -141,13 +141,17 @@
     </select>
 
     <update id="updateStoreStatus">
-        UPDATE stores
-        SET
-            store_stts = #{newStatus},
-            info_mdfcn_dt = #{infoMdfcnDt},
-            del_prcr_yn = #{delPrcrYn}
-        WHERE
-            store_id = #{storeId}
-    </update>
+    UPDATE stores
+    <set>
+        store_stts = #{newStatus},
+        info_mdfcn_dt = #{infoMdfcnDt}, 
+        del_prcr_yn = #{delPrcrYn}  
+        <if test="newStatus == 'CLOSED'">
+            , inactvtn_dt = NOW()
+        </if>
+    </set>
+    WHERE
+        store_id = #{storeId}
+</update>
 
 </mapper>

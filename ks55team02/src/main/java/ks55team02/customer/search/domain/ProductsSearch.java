@@ -8,4 +8,5 @@ public class ProductsSearch {
     private String gdsNm;
     private int lastSelPrc;
     private String imgFilePathNm;
+    
 }

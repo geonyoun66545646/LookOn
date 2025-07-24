@@ -58,24 +58,22 @@ public class StoreMngAdminServiceImpl implements StoreMngAdminService {
         log.info("서비스: updateStoreStatus 호출 - 상점 ID: {}, 새 상태: {}", storeIds, newStatus);
         LocalDateTime now = LocalDateTime.now();
 
-        // del_prcr_yn 값 초기화
-        String delPrcrYnToUpdate = "0"; // 기본값: 폐쇄 아님
+        String delPrcrYnToUpdate = "0"; // 기본값
 
         switch (newStatus) {
             case "ACTIVE":
-            case "INACTIVE": // INACTIVE도 del_prcr_yn은 '0'
-                // del_prcr_yn은 '0' (기본값)
+                break;
+            case "INACTIVE": 
+                delPrcrYnToUpdate = "1";
                 break;
             case "CLOSED":
                 delPrcrYnToUpdate = "1"; // 폐쇄 컬럼 1로 설정
                 break;
             default:
                 log.warn("알 수 없는 상점 상태: {}", newStatus);
-                return; // 처리하지 않음
+                return; 
         }
-
         for (String storeId : storeIds) {
-            // inactvtnDtToUpdate 파라미터 제거
             storeMngAdminMapper.updateStoreStatus(storeId, newStatus, now, delPrcrYnToUpdate);
             log.info("상점 {} 상태를 {}로 업데이트 완료 (info_mdfcn_dt: {}, del_prcr_yn: {})",
                      storeId, newStatus, now, delPrcrYnToUpdate);

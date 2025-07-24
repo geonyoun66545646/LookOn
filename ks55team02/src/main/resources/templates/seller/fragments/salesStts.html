@@ -1,0 +1,63 @@
+<!-- templates/admin/adminpage/storesaleshistory/salesHistoryList.html -->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org/"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}">
+<head>
+    <title th:text="${title}">판매 현황</title>
+    <!-- 여기에 이 페이지에 필요한 CSS를 추가할 수 있습니다. -->
+    <style>
+        /* 제공해주신 CSS와 유사한 스타일 */
+        .page-container { padding: 2rem; }
+        .page-title { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .page-subtitle { color: #6c757d; margin-bottom: 2rem; }
+        .sales-panel { background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); padding: 1.5rem; }
+        .panel-title { font-size: 1.25rem; font-weight: 500; margin-bottom: 1.5rem; }
+        .sales-table { width: 100%; border-collapse: collapse; }
+        .sales-table th, .sales-table td { padding: 0.75rem 1rem; border-bottom: 1px solid #e9ecef; text-align: left; }
+        .sales-table thead { background-color: #f8f9fa; font-weight: 500; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="contents">
+    <div class="page-container">
+        <h1 class="page-title" th:text="${title}">상점별 판매 현황</h1>
+        <p class="page-subtitle">상점별로 발생한 모든 개별 판매 내역을 확인합니다.</p>
+
+        <div class="sales-panel">
+            <h2 class="panel-title">판매 내역 목록</h2>
+            
+            <div style="overflow-x: auto;">
+                <table class="sales-table">
+                    <thead>
+                        <tr>
+                            <th>주문일시</th>
+                            <th>상점명</th>
+                            <th>상품명</th>
+                            <th class="text-center">수량</th>
+                            <th class="text-right">주문금액</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(salesHistoryList)}">
+                            <td colspan="5" class="text-center" style="padding: 3rem 0;">판매 내역이 없습니다.</td>
+                        </tr>
+                        <tr th:each="sale : ${salesHistoryList}">
+                            <td th:text="${#temporals.format(sale.orderDate, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td th:text="${sale.storeName}"></td>
+                            <td th:text="${sale.productName}"></td>
+                            <td class="text-center" th:text="${sale.quantity}"></td>
+                            <td class="text-right" th:text="${#numbers.formatDecimal(sale.totalAmount, 0, 'COMMA', 0, 'POINT') + '원'}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 여기에 페이지네이션을 추가할 수 있습니다 -->
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
