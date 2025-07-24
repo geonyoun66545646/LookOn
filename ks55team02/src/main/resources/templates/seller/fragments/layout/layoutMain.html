@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Molla - Bootstrap eCommerce Template</title>
+    <meta name="keywords" content="HTML5 Template">
+    <meta name="description" content="Molla - Bootstrap eCommerce Template">
+    <meta name="author" content="p-themes">
+    <link rel="apple-touch-icon" sizes="180x180" th:href="@{/maincss/assets/images/icons/apple-touch-icon.png}">
+    <link rel="icon" type="image/png" sizes="32x32" th:href="@{/maincss/assets/images/icons/favicon-32x32.png}">
+    <link rel="icon" type="image/png" sizes="16x16" th:href="@{/maincss/assets/images/icons/favicon-16x16.png}">
+    <link rel="manifest" th:href="@{/maincss/assets/images/icons/site.html}">
+    <link rel="mask-icon" th:href="@{/maincss/assets/images/icons/safari-pinned-tab.svg}" color="#666666">
+    <link rel="shortcut icon" th:href="@{/maincss/assets/images/icons/favicon.ico}">
+    <meta name="apple-mobile-web-app-title" content="Molla">
+    <meta name="application-name" content="Molla">
+    <meta name="msapplication-TileColor" content="#cc9966">
+    <meta name="msapplication-config" th:content="@{/maincss/assets/images/icons/browserconfig.xml}">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" th:href="@{/maincss/assets/vendor/line-awesome/line-awesome/line-awesome/css/line-awesome.min.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/owl-carousel/owl.carousel.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/magnific-popup/magnific-popup.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/plugins/jquery.countdown.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/skins/skin-demo-6.css}">
+    <link rel="stylesheet" th:href="@{/maincss/assets/css/demos/demo-6.css}">
+</head>
+<body>
+
+    <div class="screen-overlay"></div>
+    
+    <div th:replace="~{customer/fragments/mobileMenu :: mobileMenuFragment}"></div>
+    <button id="scroll-top" title="Back to Top"><i class="icon-arrow-up"></i></button>
+
+    <div class="page-wrapper">
+        <main class="main-wrap"> 
+        <header th:replace="~{customer/fragments/header :: headerFragment}"></header>
+            <section class="content-main">
+                <th:block layout:fragment="contents"></th:block>
+                </section>
+            
+            <footer th:replace="~{customer/fragments/footer :: footerFragment}"></footer>
+            </main>
+            
+            
+            
+            
+    </div> <script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.waypoints.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/superfish.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/owl.carousel.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.plugin.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.magnific-popup.min.js}"></script>
+    <script th:src="@{/maincss/assets/js/jquery.countdown.min.js}"></script>
+    
+    <th:block layout:fragment="jsFile"></th:block>
+    
+    <script th:src="@{/maincss/assets/js/main.js}"></script>
+    <script th:src="@{/maincss/assets/js/demos/demo-2.js}"></script>
+    
+    <th:block layout:fragment="jsScript"></th:block>
+    
+</body>
+</html>
