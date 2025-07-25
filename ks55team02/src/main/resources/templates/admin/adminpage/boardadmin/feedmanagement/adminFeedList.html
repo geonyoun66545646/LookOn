@@ -107,10 +107,14 @@
 							<select class="form-select d-inline-block" id="sortOrder"
 								name="sortOrder" style="width: auto;">
 								<option value="crtDtDesc"
-									th:selected="${searchCriteria.sortOrder == 'crtDtDesc'}">최신
-									작성일순</option>
+									th:selected="${searchCriteria.sortOrder == 'crtDtDesc' or searchCriteria.sortOrder == null}">최신순</option>
+								<option value="crtDtAsc"
+									th:selected="${searchCriteria.sortOrder == 'crtDtAsc'}">오래된순</option>
 								<option value="likeCountDesc"
 									th:selected="${searchCriteria.sortOrder == 'likeCountDesc'}">좋아요
+									많은 순</option>
+								<option value="commentCountDesc"
+									th:selected="${searchCriteria.sortOrder == 'commentCountDesc'}">댓글
 									많은 순</option>
 							</select> <select class="form-select d-inline-block" id="pageSize"
 								name="psize" style="width: auto;">
@@ -145,7 +149,7 @@
 						</thead>
 						<tbody>
 							<tr th:if="${#lists.isEmpty(feedList)}">
-								<td colspan="9" class="text-center py-5">조회된 피드가 없습니다.</td>
+								<td colspan="10" class="text-center py-5">조회된 피드가 없습니다.</td>
 
 							</tr>
 							<tr th:unless="${#lists.isEmpty(feedList)}"

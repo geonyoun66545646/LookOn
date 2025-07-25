@@ -1,4 +1,5 @@
 @charset "UTF-8";
+
 /* 전체 마이피드 컨테이너 */
 .my-feed-container {
     width: 100%;
@@ -26,9 +27,9 @@
 	flex-grow: 1; 
 }
 .profile-nickname { 
-	display: inline-block; /* h2 태그를 글자(인라인)처럼 취급하되, 크기는 유지합니다. */
-    vertical-align: middle;   /* 세로 정렬을 보기 좋게 맞춥니다. */
-    margin-right: 15px;    /* 닉네임과 팔로우 버튼 사이의 간격을 만듭니다. */ 
+	display: inline-block;
+    vertical-align: middle;
+    margin-right: 15px;
 }
 .profile-bio { 
 	color: #888; margin-bottom: 20px; 
@@ -66,6 +67,7 @@
 .btn-profile-edit:hover { 
 	background-color: #f5f5f5; 
 }
+
 /* 콘텐츠 탭 영역 */
 .content-tabs { 
 	border-bottom: 1px solid #ddd; 
@@ -91,26 +93,40 @@
 	border-bottom: 2px solid #000; 
 }
 
+/* =================================================== */
+/* [핵심 수정] 피드 정보 바 (총 개수, 정렬) 스타일     */
+/* - feedList.css와 동일한 스타일을 적용하여 디자인 통일  */
+/* =================================================== */
+.feed-info-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.content-count {
+    font-size: 14px;
+    color: #555;
+}
+.sort-dropdown {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
 
 /* 팔로우 버튼과 '...' 버튼을 함께 담고 있는 컨테이너 */
 .other-user-actions {
     /* 이 컨테이너는 이제 '...' 버튼의 위치에 영향을 주지 않습니다. */
-    /* 자바스크립트가 팔로우 버튼을 넣기 쉽도록 기본 상태로 둡니다. */
 }
-
-/* '...' 버튼을 부모 영역(.profile-actions)의 오른쪽 상단에 고정시킵니다. */
 .options-menu-btn {
-    position: relative; /* 매우 중요! */
+    position: relative;
     padding-right: 50px;
 }
-
-
 .follow-action-area {
-    display: inline-block; /* 닉네임과 한 줄에 오도록 설정 */
-    vertical-align: middle; /* 세로 중앙 정렬 */
+    display: inline-block;
+    vertical-align: middle;
 }
-/* 본인 게시물 그리드 영역 - 기존 feedList의 CSS를 재사용 */
-/* 이 부분의 스타일은 이미 feedList 작업 시 추가되었을 것입니다. */
+
+/* 본인 게시물 그리드 영역 */
 .feed-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
@@ -131,12 +147,9 @@
     object-fit: cover; 
     transition: transform 0.3s ease;
 }
-
 .feed-item:hover img {
-    transform: scale(1.05); /* 마우스를 올리면 이미지가 살짝 확대됨 */
+    transform: scale(1.05);
 }
-
-/* 마우스 올렸을 때 나타나는 오버레이 (기존과 동일, 확인용) */
 .feed-item .item-overlay {
     position: absolute;
     bottom: 0;
@@ -145,269 +158,53 @@
     background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
     color: white;
     padding: 20px 10px 10px 10px;
-    opacity: 0; /* 평소에는 숨김 */
+    opacity: 0;
     transition: opacity 0.3s;
     font-weight: bold;
 }
 .feed-item:hover .item-overlay {
-    opacity: 1; /* 마우스 올리면 나타남 */
+    opacity: 1;
 }
 
+/* (이하 기존 코드 유지) */
 /* =================================================== */
 /*             [신규 추가] 팔로우 기능 관련 CSS           */
 /* =================================================== */
-
-/* 팔로우/팔로잉 링크 공통 스타일 */
-.follow-link, .following-link {
-    font-weight: 550; /* 폰트 굵기 */
-    margin-left: 8px; /* 닉네임과의 간격 */
-    text-decoration: none;
-    cursor: pointer;
-    color: deepskyblue;
-}
-
-/* '팔로우' 링크 스타일 */
-.follow-link {
-	color: deepskyblue; /* 인스타그램의 파란색과 유사 */
-}
-
-/* '팔로잉' 링크 스타일 */
-.following-link {
-    color: deepskyblue; /* 기본 텍스트 색상 */
-}
-
-/* 1. '팔로잉' 버튼에 마우스를 올렸을 때 변화 없애기 */
-.following-link:hover {
-    color: deepskyblue; /* 원래 색상과 동일하게 설정 */
-    text-decoration: none; /* 밑줄 등 장식 제거 */
-}
-
-/* 2. '팔로우' 버튼에 마우스를 올렸을 때 변화 없애기 */
-.follow-link:hover {
-    color: deepskyblue; /* 원래 색상과 동일하게 설정 */
-    text-decoration: none; /* 밑줄 등 장식 제거 */
-}
-
-/* 언팔로우 모달 관련 스타일 */
-.unfollow-modal-content {
-    border-radius: 12px;
-}
-.unfollow-modal-content .modal-body {
-    text-align: center;
-    padding: 32px 16px 16px;
-}
-.unfollow-profile img {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 16px;
-    display: inline-block;
-}
-.unfollow-modal-content .modal-footer {
-    border-top: none;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-}
-.unfollow-modal-content .modal-footer button {
-    width: 100%;
-    border: none;
-    border-top: 1px solid #dbdbdb;
-    padding: 14px 8px;
-    margin: 0;
-    background-color: transparent;
-    font-weight: normal;
-    font-size: 14px;
-}
-.unfollow-modal-content .modal-footer .btn-danger {
-    color: #ed4956; /* 빨간색 텍스트 */
-    font-weight: 700;
-}
-.unfollow-modal-content .modal-footer .btn-secondary {
-    color: #262626;
-}
+.follow-link, .following-link { font-weight: 550; margin-left: 8px; text-decoration: none; cursor: pointer; color: deepskyblue; }
+.follow-link { color: deepskyblue; }
+.following-link { color: deepskyblue; }
+.following-link:hover { color: deepskyblue; text-decoration: none; }
+.follow-link:hover { color: deepskyblue; text-decoration: none; }
+.unfollow-modal-content { border-radius: 12px; }
+.unfollow-modal-content .modal-body { text-align: center; padding: 32px 16px 16px; }
+.unfollow-profile img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-bottom: 16px; display: inline-block; }
+.unfollow-modal-content .modal-footer { border-top: none; display: flex; flex-direction: column; padding: 0; }
+.unfollow-modal-content .modal-footer button { width: 100%; border: none; border-top: 1px solid #dbdbdb; padding: 14px 8px; margin: 0; background-color: transparent; font-weight: normal; font-size: 14px; }
+.unfollow-modal-content .modal-footer .btn-danger { color: #ed4956; font-weight: 700; }
+.unfollow-modal-content .modal-footer .btn-secondary { color: #262626; }
 
 /* =================================================== */
 /*        [신규 추가] 게시물 옵션 모달 관련 CSS           */
 /* =================================================== */
-
-/* '...' 옵션 버튼 스타일 */
-.options-menu-btn {
-    background: none;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
-}
-
-/* 모달 창의 전체적인 디자인 */
-.options-modal-content {
-    background-color: #ffffff;
-    border-radius: 12px;
-    border: none;
-}
-/* profile-details: 전체 프로필 상세 정보를 감싸는 컨테이너 */
-.profile-details {
-    /* display: flex; 이전에 인라인으로 있던 것을 여기로 옮깁니다. */
-    /* 필요에 따라 flex-direction: column; 등을 설정할 수 있습니다. */
-    /* 현재는 profile-actions-top과 profile-bio가 세로로 쌓이도록 합니다. */
-    width: 100%; /* 부모 요소에 맞춤 */
-    position: relative; /* 만약 내부 요소가 absolute를 쓴다면 기준점 */
-}
-
-
-
-/* 닉네임 스타일 */
-.profile-nickname {
-    font-size: 24px;
-    font-weight: bold;
-    margin: 0; /* 기본 마진 제거 */
-    margin-right: 10px; /* 닉네임과 팔로우 버튼 사이 간격 */
-}
-
-/* follow-action-area: 팔로우 버튼이 들어올 영역 */
-.follow-action-area {
-    /* 이 안에 실제 팔로우 버튼(follow-link 등)이 삽입됩니다. */
-    /* 필요에 따라 여기에도 flex 속성을 줄 수 있습니다. */
-    display: flex;
-    align-items: center;
-    position: absolute;
-}
-
-
-/* 프로필 수정 버튼 */
-.btn-profile-edit {
-    display: inline-block;
-    padding: 8px 15px;
-    border: 1px solid #ccc;
-    background-color: #fff;
-    color: #333;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-    text-align: center;
-}
-
-
-/* 자기소개 스타일 */
-.profile-bio {
-    color: #888;
-    margin-top: 5px; /* 닉네임 라인과의 간격 */
-    margin-bottom: 20px; /* 아래 다른 요소와의 간격 */
-}
-
-/* 2. '...' 버튼만 콕 집어서 오른쪽 상단으로 옮깁니다. */
-.other-user-actions .options-menu-btn {
-    position: absolute;
-    top: 5px; /* 닉네임과 높이를 맞추기 위해 살짝 내립니다. */
-    right: 0;
-}
-
-
-/* 모달 메뉴 목록(ul)의 기본 스타일 초기화 */
-#feed-options-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-}
-
-/* 모달 메뉴 항목(li) 각각의 스타일 */
-#feed-options-list li {
-    padding: 14px 8px;
-    font-size: 14px;
-    text-align: center;
-    border-top: 1px solid #dbdbdb; /* 메뉴 구분선 */
-    cursor: pointer;
-    background-color: transparent;
-    transition: background-color 0.2s;
-}
-
-/* 첫 번째 메뉴는 위쪽 구분선 제거 */
-#feed-options-list li:first-child {
-    border-top: none;
-}
-
-/* 마우스를 올렸을 때 약간의 배경색 변경 */
-#feed-options-list li:hover {
-    background-color: #f9f9f9;
-}
-
-/* '삭제', '신고', '팔로우 취소' 등 위험/중요 메뉴 스타일 */
-#feed-options-list li.text-danger b {
-    color: #ed4956; /* 빨간색 텍스트 */
-    font-weight: 700; /* 굵은 글씨 */
-}
-/* 1. 전체 영역을 위치 기준점으로 설정 */
-.profile-actions {
-    position: relative;
-    padding-right: 40px; /* '...' 버튼이 들어갈 공간 확보 */
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    justify-content: space-between;
-}
-
-/* 2. '...' 버튼만 오른쪽 상단으로 분리해서 고정 */
-.other-user-actions .options-menu-btn {
-    position: absolute;
-    top: 5px;
-    right: 0;
-}
-
-/* 3. 닉네임은 글자처럼 옆으로 흐르도록 설정 */
-.profile-nickname {
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 15px; /* 팔로우 버튼과의 간격 */
-}
-
-/* 4. 팔로우 버튼 영역도 닉네임 옆에 글자처럼 붙도록 설정 */
-.follow-action-area {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-/* =================================================== */
-/*    [디버깅용 최종 테스트] CSS 강제 적용 코드         */
-/* =================================================== */
-
-/* 1. 전체 영역을 위치 기준점으로 강제 설정 */
-.profile-actions {
-    position: relative !important;
-    padding-right: 50px !important; /* 공간 확보 */
-}
-
-/* 2. '...' 버튼을 오른쪽 상단으로 강제 이동 */
-.other-user-actions .options-menu-btn {
-    position: absolute !important;
-    top: 5px !important;
-    right: 0 !important;
-    /* 다른 display 속성과의 충돌을 막기 위해 기본값으로 초기화 */
-    display: block !important;
-}
-
-/* 3. 닉네임과 팔로우 버튼을 옆으로 붙도록 강제 설정 */
-.profile-nickname {
-    display: inline-block !important;
-    vertical-align: middle !important;
-    margin-right: 15px !important;
-}
-
-.follow-action-area {
-    display: inline-block !important;
-    vertical-align: middle !important;
-    /* 이전 스크린샷에서 보였던 모든 위치 관련 속성을 강제로 덮어쓰기 위해 초기화 */
-    position: static !important; /* absolute 해제 */
-    left: auto !important;
-    top: auto !important;
-}
-.no-feeds-container {
-    grid-column: 1 / -1; /* 그리드 레이아웃의 첫 번째 라인부터 마지막 라인까지 전체 너비를 차지 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 5rem 0; /* 상하 여백을 충분히 주어 다른 피드 아이템과 높이를 맞춤 */
-    color: #888;
-    font-size: 1.1rem;
-}
+.options-menu-btn { background: none; border: none; padding: 8px; cursor: pointer; }
+.options-modal-content { background-color: #ffffff; border-radius: 12px; border: none; }
+.profile-details { width: 100%; position: relative; }
+.profile-nickname { font-size: 24px; font-weight: bold; margin: 0; margin-right: 10px; }
+.follow-action-area { display: flex; align-items: center; position: absolute; }
+.btn-profile-edit { display: inline-block; padding: 8px 15px; border: 1px solid #ccc; background-color: #fff; color: #333; text-decoration: none; border-radius: 5px; font-weight: bold; text-align: center; }
+.profile-bio { color: #888; margin-top: 5px; margin-bottom: 20px; }
+.other-user-actions .options-menu-btn { position: absolute; top: 5px; right: 0; }
+#feed-options-list { list-style: none; padding: 0; margin: 0; width: 100%; }
+#feed-options-list li { padding: 14px 8px; font-size: 14px; text-align: center; border-top: 1px solid #dbdbdb; cursor: pointer; background-color: transparent; transition: background-color 0.2s; }
+#feed-options-list li:first-child { border-top: none; }
+#feed-options-list li:hover { background-color: #f9f9f9; }
+#feed-options-list li.text-danger b { color: #ed4956; font-weight: 700; }
+.profile-actions { position: relative; padding-right: 40px; display: flex; flex-wrap: nowrap; align-items: flex-start; justify-content: space-between; }
+.other-user-actions .options-menu-btn { position: absolute; top: 5px; right: 0; }
+.profile-nickname { display: inline-block; vertical-align: middle; margin-right: 15px; }
+.follow-action-area { display: inline-block; vertical-align: middle; }
+.profile-actions { position: relative !important; padding-right: 50px !important; }
+.other-user-actions .options-menu-btn { position: absolute !important; top: 5px !important; right: 0 !important; display: block !important; }
+.profile-nickname { display: inline-block !important; vertical-align: middle !important; margin-right: 15px !important; }
+.follow-action-area { display: inline-block !important; vertical-align: middle !important; position: static !important; left: auto !important; top: auto !important; }
+.no-feeds-container { grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; padding: 5rem 0; color: #888; font-size: 1.1rem; }

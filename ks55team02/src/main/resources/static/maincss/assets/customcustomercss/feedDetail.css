@@ -1,9 +1,3 @@
-@charset "UTF-8";
-
-/* ======================================================= */
-/* LookOn - Feed Detail Page Stylesheet (FINAL Version)    */
-/* ======================================================= */
-
 /* --- 1. Main Layout --- */
 .feed-detail-container { padding-top: 20px; padding-bottom: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
 .feed-post-wrapper {
@@ -15,8 +9,7 @@
     background-color: #fff;
     border-radius: 8px;
     overflow: hidden;
-    /* [핵심 수정] 뷰포트 높이를 기준으로 최대 높이를 설정하여, 내용이 많아져도 컨테이너가 무한정 늘어나는 것을 방지합니다. */
-    /* 120px는 헤더/푸터 등 다른 UI 요소를 고려한 여유 공간이며, 필요시 조정 가능합니다. */
+    /* [수정 1] 긴 콘텐츠를 위해 max-height를 유지합니다. */
     max-height: calc(100vh - 120px);
 }
 
@@ -27,24 +20,48 @@
 
 /* --- 3. Right Column (Info) --- */
 .post-info-section { flex: 1 1 40%; display: flex; flex-direction: column; min-width: 340px; overflow: hidden; }
-.post-info-section .feed-post { display: flex; flex-direction: column; height: 100%; }
+.post-info-section .feed-post {
+    display: flex;
+    flex-direction: column;
+    /* [수정 2] 정보 영역이 이미지 높이에 맞춰지도록 height: 100%를 다시 활성화합니다. */
+    height: 100%;
+}
 .post-info-section .feed-post-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #efefef; flex-shrink: 0; }
 .post-info-section .user-profile { display: flex; align-items: center; gap: 12px; }
 .post-info-section .user-profile .profile-image { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
 .post-info-section .user-profile .username { font-weight: 600; }
-.post-info-section .post-scrollable-content { flex-grow: 1; overflow-y: auto; padding: 16px; min-height: 0; }
+.post-info-section .post-scrollable-content {
+    /* [수정 3] 불필요하게 늘어나지 않도록 flex-grow를 0으로 설정합니다. */
+    flex-grow: 0;
+    overflow-y: auto;
+    padding: 16px;
+    min-height: 0;
+}
 .post-scrollable-content .feed-content-body { display: flex; gap: 8px; margin-bottom: 16px; }
-.post-scrollable-content .feed-content-body .writer-profile-img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 .post-scrollable-content .feed-content-body p { margin: 0; line-height: 1.5; }
 .post-scrollable-content .hashtags { color: #00376b; margin: 0 0 16px 0; }
 .post-scrollable-content .hashtags a { color: inherit; text-decoration: none; margin-right: 5px; }
-.post-info-section .feed-post-footer { padding: 16px; border-top: 1px solid #efefef; margin-top: auto; flex-shrink: 0; }
+.content-divider { border-top: 1px solid #efefef; margin: 16px 0; }
+
+.post-info-section .feed-post-footer {
+    padding: 16px;
+    border-top: 1px solid #efefef;
+    /* [수정 4] 이 속성이 푸터를 맨 아래로 밀어내는 핵심 역할을 합니다. */
+    margin-top: auto;
+    flex-shrink: 0;
+}
 .post-info-section .interaction-buttons { display: flex; gap: 16px; margin-bottom: 8px; }
 .post-info-section .interaction-buttons button { background: none; border: none; padding: 0; cursor: pointer; }
 .post-info-section .interaction-buttons svg { width: 24px; height: 24px; }
 .post-info-section .like-count { font-weight: 600; margin-bottom: 8px; }
 .post-info-section .post-timestamp { font-size: 11px; color: #8e8e8e; margin-bottom: 16px; }
-.post-info-section .comment-input-area { width: 100%; }
+
+/* [수정 5] 이전 수정에서 추가했던 구분선을 제거합니다. 푸터의 border-top이 그 역할을 대신합니다. */
+.post-info-section .comment-input-area {
+    width: 100%;
+    /* border-top: 1px solid #efefef; */ /* 제거 */
+    /* padding-top: 16px; */ /* 제거 */
+}
 .post-info-section .comment-input { width: 100%; border: none; padding: 8px 0; font-size: 14px; }
 .post-info-section .comment-input:focus { outline: none; }
 
@@ -58,6 +75,15 @@
 .comment-content p { margin: 0; line-height: 1.4; word-break: break-all; }
 .comment-content .comment-writer-username { font-weight: 600; margin-right: 6px; }
 .comment-content .comment-timestamp { font-size: 11px; color: #8e8e8e; margin-top: 4px; }
+
+/* [수정 6] '댓글 없음' 메시지 스타일 추가 */
+.no-comments-message {
+    padding: 40px 16px;
+    text-align: center;
+    color: #8e8e8e;
+    font-size: 14px;
+}
+
 .interaction-buttons button.liked svg { fill: #ed4956; stroke: #ed4956; }
 .hidden-comment { display: none; }
 .show-more-comments-btn { background: none; border: none; padding: 8px 0; margin-left: 50px; cursor: pointer; font-size: 12px; color: #8e8e8e; font-weight: 600; }
@@ -70,7 +96,6 @@
 .post-actions > div, .comment-actions { display: flex; align-items: center; gap: 12px; }
 .post-actions button { background: none; border: none; cursor: pointer; color: #8e8e8e; font-weight: 600; }
 .post-actions button:hover { color: #262626; }
-
 /* --- 5. Comment Edit Mode Styles --- */
 .comment-edit-mode { width: 100%; }
 .comment-edit-input { width: 100%; border: 1px solid #dbdbdb; border-radius: 4px; padding: 8px; resize: vertical; min-height: 60px; font-size: 14px; margin-bottom: 8px; }

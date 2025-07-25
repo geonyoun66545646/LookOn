@@ -15,7 +15,7 @@ public interface FeedService {
 	Feed selectFeedDetail(String feedSn);
 	List<Feed> selectNextFeedList(String currentFeedCrtDt, int limit, String context, String userNo);
 	
-	Map<String, Object> selectFollowingFeedList(String followerUserNo, int page, int size);
+	Map<String, Object> selectFollowingFeedList(String followerUserNo, int page, int size, String sortOrder);
 	
 	void insertFeed(String feedCn, String hashtags, List<MultipartFile> imageFiles, LoginUser loginUser);
 	
