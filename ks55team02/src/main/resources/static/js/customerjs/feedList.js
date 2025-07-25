@@ -1,143 +1,134 @@
-$(() => {
-	// --- 1. 요소 및 상태 변수 초기화 ---
-	const $feedContainer = $('.feed-container');
-	const $container = $('#feed-list-grid-container');
-	const $loadingIndicator = $('#loading-indicator');
-	const $sortDropdown = $('#sort-dropdown'); // [신규] 정렬 드롭다운 요소 캐싱
+// /js/customerjs/feedList.js (최종 수정본)
 
-	// HTML의 data 속성에서 초기 상태를 읽어옴
-	const state = {
-		currentPage: parseInt($feedContainer.data('current-page'), 10) || 1,
-		isLoading: false,
-		hasNext: $feedContainer.data('has-next'),
-		activeTab: $feedContainer.data('active-tab') || 'discover',
-		sortOrder: $sortDropdown.val() || 'latest' // [신규] 현재 정렬 상태 초기화
-	};
+$(document).ready(function() {
+    const $feedContainer = $('.feed-container');
+    let currentPage = parseInt($feedContainer.data('currentPage'), 10);
+    let hasNext = $feedContainer.data('hasNext');
+    let activeTab = $feedContainer.data('activeTab');
+    let isLoading = false;
 
-	// 비로그인 상태에서 팔로잉 탭으로 접근했을 경우 로그인 모달 띄우기
-	if ($feedContainer.data('needs-login')) {
-		$('#signin-modal').modal('show');
-	}
+    // 로딩 인디케이터 DOM 요소를 변수로 캐싱합니다.
+    const $loadingIndicator = $('#loading-indicator');
 
-	const loginUser = window.loginUser || null;
+    function loadFeeds(page, replace = false) {
+        if (isLoading) return;
+        isLoading = true;
+        
+        // 로딩 시작 시, 인디케이터를 보여줍니다.
+        $loadingIndicator.show();
 
-	// --- 2. 헬퍼 함수 (HTML 생성) ---
-	const createFeedItemHtml = (feed) => {
-		const defaultImageUrl = '/images/default-feed.png';
-		const imageUrl = feed.representativeImage?.imgFilePathNm || defaultImageUrl;
-		const imageAlt = feed.representativeImage?.imgAltTxtCn || '피드 대표 이미지';
-		const writerNickname = feed.writerInfo?.userNcnm || '알 수 없는 사용자';
-		const profileImageUrl = feed.writerInfo?.prflImg || '/uploads/profiles/defaultprofile.jpg';
-		const detailLink = `/customer/feed/feedDetail/${feed.feedSn}?context=all`;
+        const sortOrder = $('#sort-dropdown').val();
+        const url = activeTab === 'following' ? '/customer/api/feeds/following' : '/customer/api/feeds/list';
+        
+        if (activeTab === 'following' && !window.loginUser) {
+            alert("로그인이 필요한 기능입니다.");
+            $('#signin-modal').modal('show');
+            isLoading = false;
+            $loadingIndicator.hide();
+            return;
+        }
 
-		return `
-            <article class="feed-item">
-                <a href="${detailLink}" class="feed-image-link">
-                    <img src="${imageUrl}" alt="${imageAlt}">
-                    <div class="item-overlay">
-                        <span class="likes">♥ ${feed.likeCount}</span>
-                    </div>
-                </a>
-                <div class="feed-writer-info">
-                    <a href="/customer/feed/feedListByUserNo/${feed.wrtrUserNo}" class="writer-profile-link">
-                        <img src="${profileImageUrl}" alt="${writerNickname} 프로필" class="writer-profile-image">
-                        <span>${writerNickname}</span>
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {
+                page: page,
+                sort: sortOrder
+            },
+            dataType: 'json'
+        })
+        .done(function(response) {
+            if (replace) {
+                $('#feed-list-grid-container').empty();
+            }
+            
+            if (response.feedList && response.feedList.length > 0) {
+                renderFeeds(response.feedList);
+                hasNext = response.hasNext;
+            } else {
+                hasNext = false;
+                if (replace) {
+                    const message = activeTab === 'following' ? '<p>팔로우하는 사용자의 피드가 없습니다.</p>' : '<p>등록된 피드가 없습니다.</p>';
+                    $('#feed-list-grid-container').html(`<div class="no-feeds">${message}</div>`);
+                }
+            }
+            currentPage = page;
+        })
+        .fail(function(xhr) {
+            console.error("피드를 불러오는데 실패했습니다.", xhr.responseText);
+            hasNext = false; // 실패 시 더 이상 시도하지 않도록 설정
+            if (replace) {
+                $('#feed-list-grid-container').html('<div class="no-feeds"><p>오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p></div>');
+            }
+        })
+        .always(function() {
+            isLoading = false;
+            // 로딩이 끝나면, 다음 페이지가 있을 때만 인디케이터를 남겨두고 없으면 숨깁니다.
+            if (!hasNext) {
+                $loadingIndicator.hide();
+            }
+        });
+    }
+
+    function renderFeeds(feedList) {
+        let feedItemsHtml = '';
+        feedList.forEach(feed => {
+            const defaultFeedImg = '/images/default-feed.png';
+            const defaultProfileImg = '/uploads/profiles/defaultprofile.jpg';
+            const representativeImage = feed.representativeImage?.imgFilePathNm || defaultFeedImg;
+            const imageAltText = feed.representativeImage?.imgAltTxtCn || '피드 대표 이미지';
+            const profileImage = feed.writerInfo?.prflImg || defaultProfileImg;
+            const userNickname = feed.writerInfo?.userNcnm || '알 수 없는 사용자';
+            const likeCount = feed.likeCount || 0;
+
+            feedItemsHtml += `
+                <article class="feed-item">
+                    <a href="/customer/feed/feedDetail/${feed.feedSn}?context=all" class="feed-image-link">
+                        <img src="${representativeImage}" alt="${imageAltText}">
+                        <div class="item-overlay">
+                            <span class="likes">♥ ${likeCount}</span>
+                        </div>
                     </a>
-                </div>
-            </article>
-        `;
-	};
+                    <div class="feed-writer-info">
+                        <a href="/customer/feed/feedListByUserNo/${feed.wrtrUserNo}" class="writer-profile-link">
+                            <img src="${profileImage}" alt="${userNickname} 프로필" class="writer-profile-image">
+                            <span>${userNickname}</span>
+                        </a>
+                    </div>
+                </article>`;
+        });
+        $('#feed-list-grid-container').append(feedItemsHtml);
+    }
+    
+    $('#discover-tab, #following-tab').on('click', function(e) {
+        e.preventDefault();
+        
+        const newActiveTab = $(this).is('#following-tab') ? 'following' : 'discover';
+        if (newActiveTab === activeTab) return;
+        activeTab = newActiveTab; // [오타 수정] newActiveTba -> newActiveTab
+        
+        $('.feed-tabs li').removeClass('active');
+        $(this).parent('li').addClass('active');
+        
+        // 탭/정렬 변경 시, 다음 페이지가 있을 것이라 가정하고 인디케이터를 다시 보여줍니다.
+        $loadingIndicator.show(); 
+        loadFeeds(1, true); 
+    });
 
-	// --- 3. 핵심 로직 (2페이지부터 데이터 로딩) ---
-	const loadNextPage = () => {
-		if (state.isLoading || !state.hasNext) {
-			return;
-		}
-		state.isLoading = true;
-		$loadingIndicator.show();
+    $('#sort-dropdown').on('change', function() {
+        // 탭/정렬 변경 시, 다음 페이지가 있을 것이라 가정하고 인디케이터를 다시 보여줍니다.
+        $loadingIndicator.show();
+        loadFeeds(1, true);
+    });
 
-		const apiUrl = state.activeTab === 'following' ? '/customer/api/feeds/following' : '/customer/api/feeds/list';
-		const nextPage = state.currentPage + 1; // 다음 페이지 요청
-
-		$.ajax({
-			url: apiUrl,
-			type: 'GET',
-			data: {
-				page: nextPage,
-				sort: state.sortOrder
-			},
-			dataType: 'json'
-		})
-			.done(response => {
-				if (response && response.feedList && response.feedList.length > 0) {
-					response.feedList.forEach(feed => {
-						$container.append(createFeedItemHtml(feed));
-					});
-					state.currentPage = nextPage; // 현재 페이지 업데이트
-					state.hasNext = response.hasNext;
-				} else {
-					state.hasNext = false;
-				}
-			})
-			.fail((jqXHR) => {
-				console.error('피드 추가 로딩 중 오류 발생:', jqXHR.statusText);
-				state.hasNext = false;
-			})
-			.always(() => {
-				state.isLoading = false;
-				$loadingIndicator.hide();
-			});
-	};
-
-	const switchToNewTab = (newTab) => {
-		const targetUrl = `/customer/feed/feedList?tab=${newTab}`;
-		window.location.href = targetUrl;
-	};
-
-	// --- 4. 이벤트 핸들러 ---
-
-	// 무한 스크롤
-	$(window).on('scroll', () => {
-		if (state.hasNext) {
-			if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
-				loadNextPage();
-			}
-		}
-	});
-
-	// 탭 클릭 시 페이지 이동으로 처리
-	$('#discover-tab').on('click', function(e) {
-		e.preventDefault();
-		if (state.activeTab !== 'discover') {
-			switchToNewTab('discover');
-		}
-	});
-
-	$('#following-tab').on('click', function(e) {
-		e.preventDefault();
-		if (!loginUser) {
-			$('#signin-modal').modal('show');
-			return;
-		}
-		if (state.activeTab !== 'following') {
-			switchToNewTab('following');
-		}
-	});
-
-	// 정렬 순서 변경 이벤트 핸들러
-	$sortDropdown.on('change', function() {
-		const selectedSort = $(this).val();
-
-		// 현재 URL에서 쿼리 파라미터를 가져와 객체로 변환
-		const currentParams = new URLSearchParams(window.location.search);
-
-		// sort 파라미터 값을 새로 선택된 값으로 설정
-		currentParams.set('sort', selectedSort);
-
-		// 새로운 쿼리 스트링을 포함하여 페이지를 리로드
-		window.location.href = window.location.pathname + '?' + currentParams.toString();
-	});
-
-	// --- 초기 실행 ---
-	// JS는 초기 로딩을 하지 않으므로 이 섹션은 비워둡니다.
+    const observerTarget = document.getElementById('loading-indicator');
+    if (observerTarget) {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !isLoading && hasNext) {
+                loadFeeds(currentPage + 1, false);
+            }
+        }, { threshold: 0.1 });
+        
+        observer.observe(observerTarget);
+    }
 });

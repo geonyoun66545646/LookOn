@@ -80,6 +80,17 @@
 			</ul>
 		</nav>
 
+		<div class="feed-info-bar">
+			<span class="content-count" th:text="|총 ${userInfo.postCount}개|">총
+				0개</span> <select name="sort" id="sort-dropdown" class="sort-dropdown">
+				<option value="latest" th:selected="${currentSort == 'latest'}">최신순</option>
+				<option value="popular" th:selected="${currentSort == 'popular'}">인기순</option>
+				<option value="comments" th:selected="${currentSort == 'comments'}">댓글
+					많은 순</option>
+				<option value="oldest" th:selected="${currentSort == 'oldest'}">오래된순</option>
+			</select>
+		</div>
+
 
 		<section class="feed-grid" id="feed-grid-container"></section>
 		<div id="loading-indicator"
