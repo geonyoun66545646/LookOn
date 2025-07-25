@@ -110,11 +110,21 @@
 							<select class="form-select d-inline-block" id="sortOrder"
 								name="sortOrder" style="width: auto;">
 								<option value="crtDtDesc"
-									th:selected="${searchCriteria.sortOrder == 'crtDtDesc'}">최신
-									작성일순</option>
+									th:selected="${searchCriteria.sortOrder == 'crtDtDesc' or searchCriteria.sortOrder == null}">최신순</option>
+								<option value="crtDtAsc"
+									th:selected="${searchCriteria.sortOrder == 'crtDtAsc'}">오래된순</option>
 								<option value="likeCountDesc"
 									th:selected="${searchCriteria.sortOrder == 'likeCountDesc'}">좋아요
 									많은 순</option>
+								<option value="commentCountDesc"
+									th:selected="${searchCriteria.sortOrder == 'commentCountDesc'}">댓글
+									많은 순</option>
+								<option value="viewCntDesc"
+									th:selected="${searchCriteria.sortOrder == 'viewCntDesc'}">조회수
+									높은 순</option>
+								<option value="viewCntAsc"
+									th:selected="${searchCriteria.sortOrder == 'viewCntAsc'}">조회수
+									낮은 순</option>
 							</select> <select class="form-select d-inline-block" id="pageSize"
 								name="psize" style="width: auto;">
 								<option value="10"
@@ -141,6 +151,7 @@
 								<th style="width: 10%;">작성자</th>
 								<th style="width: 7%;">좋아요</th>
 								<th style="width: 7%;">댓글</th>
+								<th style="width: 7%;">조회수</th>
 								<th style="width: 7%;">상태</th>
 								<th style="width: 10%;">작성일</th>
 								<th style="width: 8%;">관리</th>
@@ -148,7 +159,7 @@
 						</thead>
 						<tbody>
 							<tr th:if="${#lists.isEmpty(postList)}">
-								<td colspan="10" class="text-center py-5">조회된 게시글이 없습니다.</td>
+								<td colspan="11" class="text-center py-5">조회된 게시글이 없습니다.</td>
 							</tr>
 							<tr th:unless="${#lists.isEmpty(postList)}"
 								th:each="post : ${postList}">
@@ -164,6 +175,7 @@
 								<td th:text="${post.userNickname}"></td>
 								<td th:text="${post.likeCount}"></td>
 								<td th:text="${post.commentCount}"></td>
+								<td th:text="${post.viewCount}"></td>
 								<td><span class="badge custom-badge"
 									th:text="${post.deletedDate == null ? '정상' : '숨김'}"
 									th:classappend="${post.deletedDate == null ? 'bg-success' : 'bg-secondary'}">

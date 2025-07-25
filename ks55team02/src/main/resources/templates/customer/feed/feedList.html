@@ -59,9 +59,11 @@
 			<span class="content-count"
 				th:text="|총 ${#numbers.formatInteger(totalCount, 0, 'COMMA')}개|">총
 				0개</span> <select name="sort" id="sort-dropdown" class="sort-dropdown">
-				<option value="latest" th:selected="${currentSort == 'latest'}">최신순</option>
-				<option value="popular" th:selected="${currentSort == 'popular'}">인기순</option>
-			</select>
+        <option value="latest" th:selected="${currentSort == 'latest'}">최신순</option>
+        <option value="popular" th:selected="${currentSort == 'popular'}">인기순</option>
+        <option value="comments" th:selected="${currentSort == 'comments'}">댓글 많은 순</option>
+        <option value="oldest" th:selected="${currentSort == 'oldest'}">오래된순</option>
+    </select>
 		</div>
 
 		<section class="feed-grid" id="feed-list-grid-container">
@@ -98,9 +100,9 @@
 		</section>
 
 		<div id="loading-indicator"
-			style="display: none; text-align: center; padding: 20px;">
-			<p>Loading...</p>
-		</div>
+    th:style="${hasNext} ? 'display: block; text-align: center; padding: 20px;' : 'display: none;'" >
+    <p>Loading...</p>
+</div>
 	</main>
 	<div class="fab-container">
 		<button th:if="${session.loginUser != null}" type="button"

@@ -54,12 +54,15 @@
 		ORDER BY
 		<choose>
 			<when
-				test="sortOrder != null and 'likeCountDesc'.equals(sortOrder)">
-				like_count DESC
-			</when>
-			<otherwise>
-				p.crt_dt DESC
-			</otherwise>
+				test="sortOrder != null and 'likeCountDesc'.equals(sortOrder)"> like_count DESC </when>
+			<when test="sortOrder != null and 'crtDtAsc'.equals(sortOrder)"> p.crt_dt ASC </when>
+			<when
+				test="sortOrder != null and 'commentCountDesc'.equals(sortOrder)"> comment_count DESC </when>
+			<when
+				test="sortOrder != null and 'viewCntDesc'.equals(sortOrder)"> p.view_cnt DESC </when>
+			<when
+				test="sortOrder != null and 'viewCntAsc'.equals(sortOrder)"> p.view_cnt ASC </when>
+			<otherwise> p.crt_dt DESC </otherwise> <!-- 기본값: 최신순 -->
 		</choose>
 		<if test="pageSize > 0">
 			LIMIT #{pageSize} OFFSET #{offset}
@@ -81,6 +84,7 @@
 
 	<sql id="commonSearchCondition">
 		<where>
+			<!-- ... (다른 <if> 조건들은 그대로 유지) ... -->
 			<if
 				test="filterConditions != null and !filterConditions.isEmpty()">
 				<foreach item="status" collection="filterConditions"
@@ -90,22 +94,39 @@
 				</foreach>
 			</if>
 			<if test="startDate != null">AND p.crt_dt >= #{startDate}</if>
-			<if test="endDate != null">AND p.crt_dt &gt; DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+			<if test="endDate != null">AND p.crt_dt &lt; DATE_ADD(#{endDate}, INTERVAL 1 DAY)
 			</if>
+
 			<if
 				test="searchKey != null and searchValue != null and searchValue != ''">
 				AND
 				<choose>
-					<when test="'userNickname'.equals(searchKey)">u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')
+					<when test="'userNickname'.equals(searchKey)">
+						u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')
 					</when>
-					<when test="'postTitle'.equals(searchKey)">p.pst_ttl LIKE CONCAT('%', #{searchValue}, '%')
+					<when test="'postTitle'.equals(searchKey)">
+						p.pst_ttl LIKE CONCAT('%', #{searchValue}, '%')
 					</when>
-					<when test="'postContent'.equals(searchKey)">p.pst_cn LIKE CONCAT('%', #{searchValue}, '%')
+					<when test="'postContent'.equals(searchKey)">
+						p.pst_cn LIKE CONCAT('%', #{searchValue}, '%')
 					</when>
-					<when test="'boardName'.equals(searchKey)">b.bbs_nm LIKE CONCAT('%', #{searchValue}, '%')
+					<when test="'boardName'.equals(searchKey)">
+						b.bbs_nm LIKE CONCAT('%', #{searchValue}, '%')
 					</when>
-					<otherwise>(p.pst_ttl LIKE CONCAT('%', #{searchValue}, '%') OR
-						u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%'))</otherwise>
+					<when test="'all'.equals(searchKey)">
+						(p.pst_ttl LIKE CONCAT('%', #{searchValue}, '%')
+						OR
+						p.pst_cn LIKE CONCAT('%', #{searchValue}, '%')
+						OR u.user_ncnm LIKE
+						CONCAT('%', #{searchValue}, '%')
+						OR b.bbs_nm LIKE CONCAT('%',
+						#{searchValue}, '%'))
+					</when>
+					<otherwise>
+						(p.pst_ttl LIKE CONCAT('%', #{searchValue}, '%') OR
+						u.user_ncnm LIKE
+						CONCAT('%', #{searchValue}, '%'))
+					</otherwise>
 				</choose>
 			</if>
 		</where>
