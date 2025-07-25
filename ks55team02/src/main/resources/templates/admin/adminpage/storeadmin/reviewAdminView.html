@@ -19,7 +19,6 @@
         <div class="card mb-4">
             <div class="card-body">
                 <form id="searchForm" th:action="@{/adminpage/storeadmin/reviewAdmin}" method="get">
-                    <!-- Hidden Inputs for pagination and sorting -->
                     <input type="hidden" name="currentPage" th:value="${pagination.currentPage}" id="currentPageInput"/>
                     <input type="hidden" name="pageSize" th:value="${pagination.recordSize}" id="pageSizeInput"/>
                     <input type="hidden" name="sortKey" th:value="${searchCriteria.sortKey}" id="sortKeyInput"/>

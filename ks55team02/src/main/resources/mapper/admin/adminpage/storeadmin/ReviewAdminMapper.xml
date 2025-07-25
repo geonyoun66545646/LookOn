@@ -11,7 +11,7 @@
         <result property="evlScr" column="evl_scr"/>
         <result property="reviewCn" column="review_cn"/>
         <result property="wrtYmd" column="wrt_ymd"/>
-        <result property="reviewStts" column="review_stts"/> <!-- tinyint(1)은 Boolean으로 자동 매핑됩니다. -->
+        <result property="reviewStts" column="review_stts"/> 
         <result property="lastMdfcnDt" column="last_mdfcn_dt"/>
         <result property="delDt" column="del_dt"/>
         <result property="delPrcrNo" column="del_prcr_no"/>
