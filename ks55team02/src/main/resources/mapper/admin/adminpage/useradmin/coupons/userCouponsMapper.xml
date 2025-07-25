@@ -7,7 +7,7 @@
 	<resultMap id="userCouponsResultMap"
 		type="ks55team02.admin.adminpage.useradmin.coupons.domain.AdminUserCoupons">
 		<id property="userCpnId" column="user_cpn_id" />
-		<result property="useYn" column="use_yn" />
+		<result property="useYn" column="use_yn" javaType="boolean" />
 		<result property="cpnGiveDt" column="cpn_give_dt" />
 		<result property="useDt" column="use_dt" />
 		<result property="userNo" column="user_no" />
@@ -19,46 +19,49 @@
 
 	<select id="findUserCoupons" resultMap="userCouponsResultMap">
 		SELECT
-			uc.user_cpn_id,
-			uc.use_yn,
-			uc.cpn_give_dt,
-			uc.use_dt,
-			u.user_no,
-			u.user_lgn_id,
-			u.user_nm,
-			c.pblcn_cpn_id,
-			c.cpn_nm
+		uc.user_cpn_id,
+		uc.use_yn,
+		uc.cpn_give_dt,
+		uc.use_dt,
+		u.user_no,
+		u.user_lgn_id,
+		u.user_nm,
+		c.pblcn_cpn_id,
+		c.cpn_nm
 		FROM
-			user_coupons uc
+		user_coupons uc
 		JOIN
-			users u ON uc.user_no = u.user_no
+		users u ON uc.user_no = u.user_no
 		JOIN
-			coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+		coupons c ON uc.pblcn_cpn_id
+		= c.pblcn_cpn_id
 		<include refid="userCouponSearchFragment" />
 		ORDER BY
-			uc.user_cpn_id ASC
+		uc.user_cpn_id ASC
 		LIMIT #{offset}, #{pageSize}
 	</select>
 
 	<select id="countUserCoupons" resultType="int">
 		SELECT COUNT(*)
 		FROM
-			user_coupons uc
+		user_coupons uc
 		JOIN
-			users u ON uc.user_no = u.user_no
+		users u ON uc.user_no =
+		u.user_no
 		JOIN
-			coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+		coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
 		<include refid="userCouponSearchFragment" />
 	</select>
-	
+
 	<update id="updateUserCouponStatus" parameterType="string">
-	    UPDATE 
-	        user_coupons
-	    SET 
-	        use_yn = 1,
-	        use_dt = NOW()
-	    WHERE 
-	        user_cpn_id = #{userCpnId}
+		UPDATE
+		user_coupons
+		SET
+		use_yn = 1,
+		use_dt = NOW()
+		WHERE
+		user_cpn_id =
+		#{userCpnId}
 	</update>
 
 	<sql id="userCouponSearchFragment">
@@ -69,27 +72,39 @@
 						AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
 					</when>
 					<when test="'userCpnId'.equals(searchType)">
-						AND uc.user_cpn_id LIKE CONCAT('%', #{keyword}, '%')
+						AND uc.user_cpn_id LIKE CONCAT('%', #{keyword},
+						'%')
 					</when>
 					<when test="'userNm'.equals(searchType)">
 						AND u.user_nm LIKE CONCAT('%', #{keyword}, '%')
 					</when>
 					<otherwise>
 						AND (
-                               c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-                            OR u.user_lgn_id LIKE CONCAT('%', #{keyword}, '%')
-                            OR u.user_nm LIKE CONCAT('%', #{keyword}, '%')
-                        )
+						c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+						OR
+						u.user_lgn_id LIKE CONCAT('%', #{keyword}, '%')
+						OR u.user_nm LIKE
+						CONCAT('%', #{keyword}, '%')
+						)
 					</otherwise>
 				</choose>
 			</if>
-			
-			<if test="actvtnYn != null and actvtnYn != ''">
-				AND uc.use_yn = #{actvtnYn}
+
+			<if test="usedStatusList != null and !usedStatusList.isEmpty()">
+				AND uc.use_yn IN
+				<foreach item="status" collection="usedStatusList" open="("
+					separator="," close=")">
+					<choose>
+						<when test="status == 'Y'.toString()">1</when>
+						<when test="status == 'N'.toString()">0</when>
+					</choose>
+				</foreach>
 			</if>
 
 			<if test="vldBgngDt != null and vldEndDt != null">
-				AND (c.vld_bgng_dt &lt;= #{vldEndDt} AND c.vld_end_dt &gt;= #{vldBgngDt})
+				AND (c.vld_bgngDt &lt;= #{vldEndDt} AND c.vld_end_dt
+				&gt;=
+				#{vldBgngDt})
 			</if>
 		</where>
 	</sql>

@@ -50,7 +50,7 @@ public class PaymentController {
         model.addAttribute("orderDetails", latestOrderDetails);
         model.addAttribute("tossClientKey", tossClientKey);
 
-        return "customer/fragments/checkout"; // Thymeleaf/JSP 뷰 파일 경로
+        return "customer/fragments/checkOut"; // Thymeleaf/JSP 뷰 파일 경로
     }
 
     // 2. 결제 준비 (주문 정보 DB 저장)
