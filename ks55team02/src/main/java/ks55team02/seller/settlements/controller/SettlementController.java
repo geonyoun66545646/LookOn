@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
@@ -87,7 +86,6 @@ public class SettlementController {
             return "redirect:/main?error=noStoreFound";
         }
         
-        // 5. ★★★ 하드코딩된 'store_01' 대신, DB에서 조회한 "진짜 storeId"를 사용합니다. ★★★
         List<SalesSttsDTO> salesHistoryList = settlementService.getSalesHistoryByStoreId(storeId);
         
         model.addAttribute("title", "나의 판매 현황");
