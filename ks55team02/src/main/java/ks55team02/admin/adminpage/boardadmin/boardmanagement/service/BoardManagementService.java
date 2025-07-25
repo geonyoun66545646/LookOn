@@ -16,4 +16,6 @@ public interface BoardManagementService {
      boolean deleteBoard(String boardCode);
      
      boolean restoreBoard(String boardCode);
+     
+     List<Board> selectAdminOnlyBoards();
 }
