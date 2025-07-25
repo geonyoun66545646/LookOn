@@ -84,163 +84,136 @@
                     </form>
                 </div>
                 <div class="col-md-6">
-                    <label for="product_name" class="form-label">필요 문서</label>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                            <tr>
-                                <th class="text-center">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" />
-                                    </div>
-                                </th>
-                                <th>문서 분류</th>
-                                <th>문서 이름</th>
-                                <th class="text-end">Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td class="text-center">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" />
-                                    </div>
-                                </td>
-                                <td>사업자 등록증</td>
-                                <td th:text="${appStore.brnoImgId}"></td>
-                                <td class="text-end">
-                                    <div class="dropdown">
-                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
-                                            <i class="material-icons md-more_horiz"></i>
-                                        </a>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">자세히 보기</a>
-                                            <a class="dropdown-item" href="#">다운 로드</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" />
-                                    </div>
-                                </td>
-                                <td>통신 판매업 신고증</td>
-                                <td th:text="${appStore.cmmDclrImgId}"></td>
-                                <td class="text-end">
-                                    <div class="dropdown">
-                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
-                                            <i class="material-icons md-more_horiz"></i>
-                                        </a>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">자세히 보기</a>
-                                            <a class="dropdown-item" href="#">다운 로드</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" />
-                                    </div>
-                                </td>
-                                <td>판매 상품 관련 증빙서류</td>
-                                <td th:text="${appStore.selGdsProofImgId}"></td>
-                                <td class="text-end">
-                                    <div class="dropdown">
-                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
-                                            <i class="material-icons md-more_horiz"></i>
-                                        </a>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">자세히 보기</a>
-                                            <a class="dropdown-item" href="#">다운 로드</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" />
-                                    </div>
-                                </td>
-                                <td>주민등록 증 사본</td>
-                                <td th:text="${appStore.rrnoCardCopyImgId}"></td>
-                                <td class="text-end">
-                                    <div class="dropdown">
-                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
-                                            <i class="material-icons md-more_horiz"></i>
-                                        </a>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">자세히 보기</a>
-                                            <a class="dropdown-item" href="#">다운 로드</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" />
-                                    </div>
-                                </td>
-                                <td>통장 사본</td>
-                                <td th:text="${appStore.bankbookCopyImgId}"></td>
-                                <td class="text-end">
-                                    <div class="dropdown">
-                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm">
-                                            <i class="material-icons md-more_horiz"></i>
-                                        </a>
-                                        <div class="dropdown-menu">
-                                           <a class="dropdown-item" href="#">자세히 보기</a>
-                                            <a class="dropdown-item" href="#">다운 로드</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" />
-                                    </div>
-                                </td>
-                                <td>기타</td>
-                                <td th:text="${appStore.etcDocImgId}"></td>
-                                <td class="text-end">
-                                    <div class="dropdown">
-                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">자세히 보기</a>
-                                            <a class="dropdown-item" href="#">다운 로드</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-center">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" />
-                                    </div>
-                                </td>
-                                <td>상점 로고</td>
-                                <td th:text="${appStore.storeLogoImg}"></td>
-                                <td class="text-end">
-                                    <div class="dropdown">
-                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">자세히 보기</a>
-                                            <a class="dropdown-item" href="#">다운 로드</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            </tbody>
-                        </table>
+    <label class="form-label">필요 문서</label>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>문서 분류</th>
+                <th>문서 ID</th>
+                <th class="text-end">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+    <!-- 1. 사업자 등록증 -->
+    <tr>
+        <td>사업자 등록증</td>
+        <td th:text="${appStore.brnoImgId}"></td>
+        <td class="text-end">
+            <!-- [수정] 높이 고정용 컨테이너 추가 -->
+            <div class="action-container">
+                <!-- 파일이 있을 때만 드롭다운 메뉴를 보여줌 -->
+                <div class="dropdown" th:if="${appStore.brnoImgId != null}">
+                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"><i class="material-icons md-more_horiz"></i></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/view/{imgId}(imgId=${appStore.brnoImgId})}" target="_blank">자세히 보기</a>
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/download/{imgId}(imgId=${appStore.brnoImgId})}">다운로드</a>
                     </div>
                 </div>
+            </div>
+        </td>
+    </tr>
+    <!-- 2. 통신 판매업 신고증 -->
+    <tr>
+        <td>통신 판매업 신고증</td>
+        <td th:text="${appStore.cmmDclrImgId}"></td>
+        <td class="text-end">
+            <div class="action-container">
+                <div class="dropdown" th:if="${appStore.cmmDclrImgId != null}">
+                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"><i class="material-icons md-more_horiz"></i></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/view/{imgId}(imgId=${appStore.cmmDclrImgId})}" target="_blank">자세히 보기</a>
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/download/{imgId}(imgId=${appStore.cmmDclrImgId})}">다운로드</a>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <!-- 4. 주민등록증 사본 -->
+    <tr>
+        <td>주민등록증 사본</td>
+        <td th:text="${appStore.rrnoCardCopyImgId}"></td>
+        <td class="text-end">
+            <div class="action-container">
+                <div class="dropdown" th:if="${appStore.rrnoCardCopyImgId != null}">
+                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"><i class="material-icons md-more_horiz"></i></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/view/{imgId}(imgId=${appStore.rrnoCardCopyImgId})}" target="_blank">자세히 보기</a>
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/download/{imgId}(imgId=${appStore.rrnoCardCopyImgId})}">다운로드</a>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <!-- 5. 통장 사본 -->
+    <tr>
+        <td>통장 사본</td>
+        <td th:text="${appStore.bankbookCopyImgId}"></td>
+        <td class="text-end">
+            <div class="action-container">
+                <div class="dropdown" th:if="${appStore.bankbookCopyImgId != null}">
+                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"><i class="material-icons md-more_horiz"></i></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/view/{imgId}(imgId=${appStore.bankbookCopyImgId})}" target="_blank">자세히 보기</a>
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/download/{imgId}(imgId=${appStore.bankbookCopyImgId})}">다운로드</a>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <!-- 7. 상점 로고 -->
+    <tr>
+        <td>상점 로고</td>
+        <td th:text="${appStore.storeLogoImg}"></td>
+        <td class="text-end">
+            <div class="action-container">
+                <div class="dropdown" th:if="${appStore.storeLogoImg != null}">
+                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"><i class="material-icons md-more_horiz"></i></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/view/{imgId}(imgId=${appStore.storeLogoImg})}" target="_blank">자세히 보기</a>
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/download/{imgId}(imgId=${appStore.storeLogoImg})}">다운로드</a>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+     <!-- 3. 판매 상품 관련 증빙서류 -->
+    <tr>
+        <td>판매 상품 관련 증빙서류</td>
+        <td th:text="${appStore.selGdsProofImgId}"></td>
+        <td class="text-end">
+            <div class="action-container">
+                <div class="dropdown" th:if="${appStore.selGdsProofImgId != null}">
+                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"><i class="material-icons md-more_horiz"></i></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/view/{imgId}(imgId=${appStore.selGdsProofImgId})}" target="_blank">자세히 보기</a>
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/download/{imgId}(imgId=${appStore.selGdsProofImgId})}">다운로드</a>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <!-- 6. 기타 -->
+    <tr>
+        <td>기타</td>
+        <td th:text="${appStore.etcDocImgId}"></td>
+        <td class="text-end">
+            <div class="action-container">
+                <div class="dropdown" th:if="${appStore.etcDocImgId != null}">
+                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"><i class="material-icons md-more_horiz"></i></a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/view/{imgId}(imgId=${appStore.etcDocImgId})}" target="_blank">자세히 보기</a>
+                        <a class="dropdown-item" th:href="@{/adminpage/storeadmin/files/download/{imgId}(imgId=${appStore.etcDocImgId})}">다운로드</a>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    
+</tbody>
+        </table>
+    </div>
+</div>
             </div>
         </div>
     </div>

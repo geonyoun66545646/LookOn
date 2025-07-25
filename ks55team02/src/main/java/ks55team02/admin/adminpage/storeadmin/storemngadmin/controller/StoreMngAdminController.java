@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import ks55team02.admin.adminpage.storeadmin.storemngadmin.service.StoreMngAdminService;
@@ -76,4 +77,5 @@ public class StoreMngAdminController {
             return new ResponseEntity<>(Map.of("success", false, "message", "상점 상태 변경 중 내부 서버 오류가 발생했습니다."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
 }
