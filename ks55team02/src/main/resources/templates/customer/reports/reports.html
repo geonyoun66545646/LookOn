@@ -7,6 +7,7 @@
 <link rel="stylesheet"
 	th:href="@{/maincss/assets/customcustomercss/reports.css}">
 
+
 </head>
 
 
@@ -85,18 +86,17 @@
 
 				<div id="fileAttachmentField" class="form-group full-width">
 					<div class="form-field full-width">
-						<!-- [★임의로 수정한 부분★] 사용자의 편의를 위해 안내 문구를 수정했습니다. -->
-						<label for="evidenceFile">첨부 파일 (선택, 여러 개 가능)</label>
+						<label for="evidenceFile" class="form-label">첨부 파일 (선택, 여러
+							개 가능)</label>
 
-						<!-- 
-          [★임의로 수정한 부분★] 
-          - accept 속성을 "image/*"로 변경하여 이미지 파일만 선택하도록 유도합니다.
-          - multiple 속성은 이전에 추가한 그대로 유지합니다.
-        -->
-						<input type="file" id="evidenceFile" name="evidenceFile"
-							accept="image/*" multiple>
-
-						<!-- [★임의로 추가한 부분★] 선택된 이미지의 미리보기가 표시될 빈 컨테이너입니다. -->
+						<div class="custom-file">
+							<input type="file" id="evidenceFile" name="evidenceFile" multiple
+								class="custom-file-input visually-hidden-input" accept="image/*"
+								aria-label="Evidence file upload"> <label
+								class="custom-file-label" for="evidenceFile"> 파일 선택... </label>
+							<span id="selectedFileName" class="selected-file-name-display">선택된
+								파일 없음</span>
+						</div>
 						<div id="imagePreview" class="image-preview-container"></div>
 
 						<small style="color: #888; display: block; margin-top: 5px;">
@@ -140,15 +140,13 @@
 						aria-label="Close"></button>
 				</div>
 				<div class="modal-body">
-					<div class="input-group mb-3">
+					<div class="input-group mb-3 custom-search-input-group">
 						<input type="text" id="searchInput" class="form-control"
 							placeholder="검색어를 입력하세요...">
 						<button class="btn btn-primary" type="button"
 							id="executeSearchBtn">검색</button>
 					</div>
-					<div id="searchResults">
-						<!-- 검색 결과가 여기에 동적으로 표시됩니다. -->
-					</div>
+					<div id="searchResults"></div>
 				</div>
 			</div>
 		</div>
@@ -156,8 +154,11 @@
 
 </th:block>
 
+<th:block layout:fragment="jsFile">
+</th:block>
 
 <th:block layout:fragment="jsScript">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script th:inline="javascript">
 	/*<![CDATA[*/
 	document.addEventListener('DOMContentLoaded', function() {
@@ -188,30 +189,41 @@
 		    });
 		}
 	
-	    // ===================================================================
-	    // 1. 기본 요소 선택 (변경 없음)
-	    // ===================================================================
-	    const reportForm = document.getElementById('reportForm');
-	    const reportTypeSelect = document.getElementById('reportType');
-	    const reportReasonSelect = document.getElementById('reportReason');
-	    const targetSearchField = document.getElementById('targetSearchField');
-	    const targetSearchLabel = document.getElementById('targetSearchLabel');
-	    const targetDisplayName = document.getElementById('targetDisplayName');
-	    const searchTargetBtn = document.getElementById('searchTargetBtn');
-	    const targetContentIdInput = document.getElementById('targetContentId');
-	    const targetUserIdInput = document.getElementById('targetUserId');
-	    const searchModal = new bootstrap.Modal(document.getElementById('searchModal'));
-	    const searchModalLabel = document.getElementById('searchModalLabel');
-	    const searchInput = document.getElementById('searchInput');
-	    const executeSearchBtn = document.getElementById('executeSearchBtn');
-	    const searchResultsContainer = document.getElementById('searchResults');
-	    const evidenceFileInput = document.getElementById('evidenceFile');
-	    const imagePreviewContainer = document.getElementById('imagePreview');
-	    
-	    let currentSearchType = '';
-	
-	    // [신규] 사용자가 선택한 파일들을 관리할 배열 (진짜 파일 목록)
-	    let attachedFiles = [];
+		// ===================================================================
+		// 1. 기본 요소 선택 (변경 없음)
+		// ===================================================================
+		const reportForm = document.getElementById('reportForm');
+		const reportTypeSelect = document.getElementById('reportType');
+		const reportReasonSelect = document.getElementById('reportReason');
+		const targetSearchField = document.getElementById('targetSearchField');
+		const targetSearchLabel = document.getElementById('targetSearchLabel');
+		const targetDisplayName = document.getElementById('targetDisplayName');
+		const searchTargetBtn = document.getElementById('searchTargetBtn');
+		const targetContentIdInput = document.getElementById('targetContentId');
+		const targetUserIdInput = document.getElementById('targetUserId');
+		const searchModal = new bootstrap.Modal(document.getElementById('searchModal'));  
+		const searchModalLabel = document.getElementById('searchModalLabel');
+		const searchInput = document.getElementById('searchInput');
+		const executeSearchBtn = document.getElementById('executeSearchBtn');
+		const searchResultsContainer = document.getElementById('searchResults');
+		const evidenceFileInput = document.getElementById('evidenceFile');
+		const imagePreviewContainer = document.getElementById('imagePreview');
+
+		// ⭐⭐ 여기에 추가합니다. (searchModal 객체 초기화 바로 다음) ⭐⭐
+		const modalCloseButton = document.querySelector('#searchModal .btn-close');
+
+		if (modalCloseButton) {
+		    modalCloseButton.addEventListener('click', function() {
+		        console.log("모달 닫기 버튼이 클릭되었습니다. 수동으로 모달을 닫습니다.");
+		        searchModal.hide(); // searchModal 객체의 hide() 메서드를 호출하여 모달을 닫습니다.
+		    });
+		}
+		// ⭐⭐ 추가 끝 ⭐⭐
+
+		let currentSearchType = '';
+
+		// [신규] 사용자가 선택한 파일들을 관리할 배열 (진짜 파일 목록)
+		let attachedFiles = [];
 	
 	    // ===================================================================
 	    // 2. 페이지 초기화 로직 (변경 없음)

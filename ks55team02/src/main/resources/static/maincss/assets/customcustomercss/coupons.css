@@ -136,79 +136,142 @@ body {
 	border-bottom: 1px solid #eee;
 }
 
-.member-coupon__total {
-	font-size: 0.9em;
-	color: #666;
-}
-
+/* 기존 .member-coupon__sort 관련 스타일은 모두 제거되거나 아래 새 스타일로 대체됨 */
 .member-coupon__sort {
-	position: relative;
+	position: relative; /* 자식 요소인 메뉴를 절대 위치시키기 위함 */
 }
 
-.member-coupon__sort input[type="checkbox"] {
-	display: none; /* 체크박스 숨기기 */
-}
+/* =================================================================== */
+/* 커스텀 드롭다운 (Sort Order) 스타일 - 수정/추가 부분 */
+/* =================================================================== */
 
-.member-coupon__sort label {
-	display: flex;
-	align-items: center;
-	gap: 5px;
-	cursor: pointer;
-	font-size: 0.9em;
-	color: #333;
-}
-
-.member-coupon__sort label svg {
-	fill: currentColor;
-	transform: rotate(0deg);
-	transition: transform 0.2s ease-in-out;
-}
-
-.member-coupon__sort input[type="checkbox"]:checked+label svg {
-	transform: rotate(180deg);
-}
-
-.member-coupon__sort__list {
+/* 실제 기능을 수행하지만 사용자에게 보이지 않을 <select> 태그 숨기기 */
+.visually-hidden-select {
 	position: absolute;
-	top: 100%;
-	right: 0;
-	background-color: #fff;
-	border: 1px solid #ddd;
-	border-radius: 5px;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-	min-width: 100px;
-	z-index: 10;
-	display: none; /* 기본 숨김 */
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
 }
 
-.member-coupon__sort input[type="checkbox"]:checked ~
-	.member-coupon__sort__list {
-	display: block; /* 체크되면 보이기 */
+/* 커스텀 드롭다운 전체 래퍼 (member-coupon__sort에 추가된 클래스) */
+.custom-sort-dropdown-wrapper {
+	position: relative; /* 자식 요소인 메뉴를 절대 위치시키기 위함 */
+	display: inline-block; /* 내용물만큼 너비 차지 */
 }
 
-.member-coupon__sort__list button {
-	display: block;
-	width: 100%;
-	text-align: left;
-	padding: 10px 15px;
-	background: none;
-	border: none;
-	cursor: pointer;
-	font-size: 0.9em;
-	color: #555;
+/* 드롭다운 버튼과 메뉴를 포함하는 컨테이너 */
+.sort-dropdown-container {
+	/* 이 컨테이너는 이제 custom-sort-dropdown-wrapper 안에 중첩되어 있으므로, 
+       굳이 display, position 속성이 다시 필요하지 않을 수 있습니다. */
+	
 }
 
-.member-coupon__sort__list button:hover, .member-coupon__sort__list button.is-active
-	{
-	background-color: #f0f0f0;
-	color: #333;
+/* 커스텀 드롭다운 버튼 스타일 */
+.sort-dropdown-button {
+	background-color: #fff; /* 흰색 배경 */
+	border: 1px solid #dee2e6; /* 옅은 회색 테두리 */
+	border-radius: 8px; /* 둥근 모서리 */
+	padding: 4px 4px; /* 내부 여백 */
+	padding-left: 8px;
+	font-size: 12.6px; /* 폰트 크기 */
+	color: #333; /* 폰트 색상 */
+	font-weight: 400;
+	cursor: pointer; /* 클릭 가능한 요소임을 표시 */
+	display: flex; /* 내부 요소(텍스트, 화살표) 정렬 */
+	align-items: center; /* 세로 중앙 정렬 */
+	justify-content: space-between; /* 텍스트와 화살표를 양 끝으로 분리 */
+	box-sizing: border-box; /* 패딩, 보더 포함하여 너비/높이 계산 */
+	-webkit-appearance: none; /* 브라우저 기본 버튼 스타일 제거 */
+	-moz-appearance: none;
+	appearance: none;
+	line-height: 1; /* 텍스트 높이 조정 */
+}
+
+.sort-dropdown-button::after {
+	content: '';
+	display: inline-block;
+	width: 24px; /* 필요에 따라 크기 조정 */
+	height: 24px; /* 필요에 따라 크기 조정 */
+	/* ▼▼▼ 이 부분을 아래 코드로 교체합니다. ▼▼▼ */
+	background-image:
+		url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath fill='%23333333' d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	transition: transform 0.2s;
+}
+
+/* 버튼이 활성화(메뉴가 열림)되었을 때 화살표 회전 */
+.sort-dropdown-button.active::after {
+	transform: rotate(180deg); /* 180도 회전 */
+}
+
+/* 드롭다운 메뉴 (ul) 스타일 */
+.sort-dropdown-menu {
+	list-style: none; /* 목록 마커 제거 */
+	margin: 0; /* 기본 마진 제거 */
+	position: absolute; /* 버튼을 기준으로 위치 지정 */
+	top: calc(100%); /* 버튼 바로 아래 5px 간격 두고 위치 */
+	left: 0;
+	right:0;
+	z-index: 1000; /* 다른 요소 위에 표시 */
+	background-color: #fff; /* 흰색 배경 */
+	border-radius: 8px; /* 둥근 모서리 */
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+	min-width: 100%; /* 버튼 너비에 맞게 */
+	display: none; /* 기본적으로 숨김 */
+	opacity: 0; /* 초기 투명도 (애니메이션을 위해) */
+	visibility: hidden; /* 초기 가시성 (애니메이션을 위해) */
+	transform: translateY(10px); /* 살짝 아래로 내려오면서 나타나는 효과 (애니메이션을 위해) */
+	transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+	/* 나타나는 애니메이션 */
+}
+
+/* 메뉴가 활성화되었을 때 표시 (JavaScript에서 'active' 클래스 토글) */
+.sort-dropdown-menu.active {
+	display: block; /* 메뉴 보이기 */
+	opacity: 1; /* 완전히 보이게 */
+	visibility: visible; /* 가시성 확보 */
+	transform: translateY(0); /* 원래 위치로 이동 */
+}
+
+/* 드롭다운 메뉴 항목 (li) */
+.sort-dropdown-menu li {
+	padding: 0;
+	margin: 0;
+}
+
+/* 드롭다운 메뉴 항목 링크 (a) */
+.sort-dropdown-menu .sort-option-link {
+	display: block; /* 블록 요소로 만들어 전체 영역 클릭 가능하게 */
+	padding: 8px 16px; /* 내부 여백 */
+	color: #333; /* 폰트 색상 */
+	text-decoration: none; /* 밑줄 제거 */
+	white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+	transition: background-color 0.2s ease, color 0.2s ease;
+	/* 부드러운 전환 효과 */
+}
+
+/* 메뉴 항목에 마우스 오버 시 스타일 */
+.sort-dropdown-menu .sort-option-link:hover {
+	font-weight: 500;
+	background-color: #f0f2f5; /* 옅은 회색 배경 (productToolbar의 호버 색상과 유사) */
+	color: #333; /* 폰트 색상 유지 */
+}
+
+/* 현재 선택된 메뉴 항목 스타일 */
+.sort-dropdown-menu .sort-option-link.active {
+	color: #000; /* 폰트 색상 */
 }
 
 /* 쿠폰 목록 컨테이너 */
 .coupon-list-container {
 	margin-top: 20px;
-	/* border-top: 1px solid #eee; */ /* 무신사 페이지처럼 구분선 추가 */
-	/* padding-top: 20px; */
 }
 
 /* 쿠폰 목록 */
@@ -341,7 +404,6 @@ body {
 
 /* --- 쿠폰 버튼 공통 스타일 --- */
 .coupon-download-btn {
-	/* flexbox를 사용하여 버튼 내부 텍스트/아이콘을 중앙에 정렬합니다. */
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -350,83 +412,80 @@ body {
 	border-radius: 5px;
 	font-size: 0.9em;
 	font-weight: bold;
-	color: white; /* 텍스트 색상 (모든 상태에 공통) */
-	text-decoration: none; /* `<a>` 태그로 버튼을 구현할 경우 밑줄 제거 */
+	color: white;
+	text-decoration: none;
 	transition: background-color 0.3s ease, opacity 0.3s ease;
-	/* 색상/투명도 변화 시 부드러운 전환 효과 */
-	min-width: 100px; /* 버튼의 최소 너비를 설정하여 일관된 모양 유지 */
-	white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 */
+	min-width: 100px;
+	white-space: nowrap;
 }
 
 /* --- 1. 발급 가능 상태 ('쿠폰 받기' 버튼) --- */
 .coupon-download-btn.can-issue {
-	background-color: #ff9900; /* 활성화된 주황색 */
-	cursor: pointer; /* 마우스 커서를 클릭 가능 모양으로 */
-	opacity: 1; /* 불투명하게 */
+	background-color: #ff9900;
+	cursor: pointer;
+	opacity: 1;
 }
-/* '쿠폰 받기' 버튼 호버 시 스타일 */
+
 .coupon-download-btn.can-issue:hover {
-	background-color: #e68a00; /* 호버 시 약간 더 어둡게 */
+	background-color: #e68a00;
 }
 
 /* --- 2. 보유 쿠폰 상태 (페이지 로드 시 이미 보유 중인 경우 또는 발급 완료 후) --- */
 .coupon-download-btn.owned-coupon {
-	background-color: #94cafc; /* 파란색 */
-	cursor: default; /* 마우스 커서를 기본 모양으로 (클릭은 가능하게) */
-	opacity: 0.8; /* 약간 흐리게 하여 비활성 느낌 */
-	/* pointer-events: none; <-- 이 줄이 있다면 삭제하세요! 클릭 이벤트 방지됨 */
+	background-color: #94cafc;
+	cursor: default;
+	opacity: 0.8;
 }
-/* '보유 쿠폰' 버튼은 호버 효과 없음 */
+
 .coupon-download-btn.owned-coupon:hover {
-	background-color: #94cafc; /* 호버 시에도 색상 유지 */
+	background-color: #94cafc;
 }
 
 /* --- 3. 발급 불가 상태 (조건 미충족, 만료 등) --- */
 .coupon-download-btn.unavailable-coupon {
-	background-color: #6c757d; /* 회색 (차분하고 비활성 느낌) */
-	cursor: default; /* 마우스 커서를 기본 모양으로 (클릭은 가능하게) */
-	opacity: 0.7; /* 더 흐리게 하여 확실한 비활성 느낌 */
-	/* pointer-events: none; <-- 이 줄이 있다면 삭제하세요! 클릭 이벤트 방지됨 */
+	background-color: #6c757d;
+	cursor: default;
+	opacity: 0.7;
 }
-/* '발급 불가' 버튼은 호버 효과 없음 */
+
 .coupon-download-btn.unavailable-coupon:hover {
-	background-color: #6c757d; /* 호버 시에도 색상 유지 */
+	background-color: #6c757d;
 }
 
 /* --- 4. 발급 완료 상태 (사용자가 '쿠폰 받기'를 눌러 발급 성공 후 즉시 변경되는 상태) --- */
-/* 이 상태는 '보유 쿠폰'이 되기 전의 임시적인 성공 상태를 나타낼 때 유용합니다. */
-/* 실제로는 '보유 쿠폰'과 동일하게 처리될 수 있으므로, .owned-coupon과 유사하게 설정하거나 통합할 수 있습니다. */
 .coupon-download-btn.issued-success {
-	background-color: #28a745; /* 초록색 (성공을 의미) */
+	background-color: #28a745;
 	cursor: default;
 	opacity: 0.8;
-	/* pointer-events: none; <-- 이 줄이 있다면 삭제하세요! 클릭 이벤트 방지됨 */
 }
-/* '발급 완료' 버튼은 호버 효과 없음 */
+
 .coupon-download-btn.issued-success:hover {
-	background-color: #28a745; /* 호버 시에도 색상 유지 */
+	background-color: #28a745;
 }
 
 /* coupons.css 또는 <style> 태그 안에 추가 */
 .member-coupon__filter-group {
-    margin: 15px 0;
-    display: flex;
-    gap: 10px;
+	margin: 15px 0;
+	display: flex;
+	gap: 10px;
 }
 
+/* ⭐⭐⭐ [수정 사항] '사용 가능' / '사용 완료' 버튼 크기 조정 ⭐⭐⭐ */
 .filter-btn {
-    padding: 5px 15px;
-    border: 1px solid #ddd;
-    background-color: #f7f7f7;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 14px;
+	padding: 3px 12px; /* productToolbar의 filter-button과 유사하게 패딩 조정 */
+	border: 1px solid #ddd;
+	background-color: #f7f7f7;
+	cursor: pointer;
+	border-radius: 8px; /* productToolbar의 filter-button과 유사하게 둥글게 */
+	font-size: 0.9em; /* productToolbar의 filter-button과 유사하게 폰트 크기 조정 */
+	white-space: nowrap;
+	transition: background-color 0.2s, border-color 0.2s;
+	/* 부드러운 전환 효과 추가 */
 }
 
 .filter-btn.active {
-    border-color: #333;
-    background-color: #333;
-    color: #fff;
-    font-weight: bold;
+	border-color: #333;
+	background-color: #333;
+	color: #fff;
+	font-weight: bold;
 }
-/* coupons.css */
