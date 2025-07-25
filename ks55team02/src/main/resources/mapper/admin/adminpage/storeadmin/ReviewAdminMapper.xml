@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="ks55team02.admin.adminpage.storeadmin.reviewadmin.mapper.ReviewAdminMapper">
 
-    <resultMap id="productReviewResultMap" type="ks55team02.common.domain.store.ProductReview"> <!-- type 경로 변경 -->
+    <resultMap id="productReviewResultMap" type="ks55team02.common.domain.store.ProductReview">
         <id property="reviewId" column="review_id"/>
         <result property="ordrDtlArtclNo" column="ordr_dtl_artcl_no"/>
         <result property="prchsrUserNo" column="prchsr_user_no"/>
@@ -11,7 +11,7 @@
         <result property="evlScr" column="evl_scr"/>
         <result property="reviewCn" column="review_cn"/>
         <result property="wrtYmd" column="wrt_ymd"/>
-        <result property="reviewStts" column="review_stts"/> <!-- tinyint(1)은 Boolean으로 자동 매핑됩니다. -->
+        <result property="reviewStts" column="review_stts"/>
         <result property="lastMdfcnDt" column="last_mdfcn_dt"/>
         <result property="delDt" column="del_dt"/>
         <result property="delPrcrNo" column="del_prcr_no"/>
@@ -22,7 +22,48 @@
         <result property="gdsNm" column="gds_nm"/>
     </resultMap>
 
-    <select id="getReviewCount" parameterType="ks55team02.common.domain.store.ProductReview" resultType="int"> <!-- parameterType 경로 변경 -->
+    <sql id="reviewSearchCondition">
+        <where>
+            <if test="searchKey != null and searchKey != '' and searchValue != null and searchValue != ''">
+                <choose>
+                    <when test="searchKey == 'reviewId'">
+                        AND pr.review_id LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchKey == 'prchsrUserNm'">
+                        AND u_prchsr.user_nm LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchKey == 'gdsNm'">
+                        AND p.gds_nm LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                    <when test="searchKey == 'reviewCn'">
+                        AND pr.review_cn LIKE CONCAT('%', #{searchValue}, '%')
+                    </when>
+                </choose>
+            </if>
+            <if test="(searchKey == null or searchKey == '') and searchValue != null and searchValue != ''">
+                AND (
+                pr.review_id LIKE CONCAT('%', #{searchValue}, '%')
+                OR u_prchsr.user_nm LIKE CONCAT('%', #{searchValue}, '%')
+                OR p.gds_nm LIKE CONCAT('%', #{searchValue}, '%')
+                OR pr.review_cn LIKE CONCAT('%', #{searchValue}, '%')
+                )
+            </if>
+            <if test="filterConditions != null and filterConditions.size > 0">
+                AND pr.review_stts IN
+                <foreach item="condition" collection="filterConditions" open="(" separator="," close=")">
+                    #{condition}
+                </foreach>
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND pr.wrt_ymd <![CDATA[ >= ]]> STR_TO_DATE(#{startDate}, '%Y-%m-%d')
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND pr.wrt_ymd <![CDATA[ < ]]> DATE_ADD(STR_TO_DATE(#{endDate}, '%Y-%m-%d'), INTERVAL 1 DAY)
+            </if>
+        </where>
+    </sql>
+
+    <select id="getReviewCount" parameterType="ks55team02.common.domain.store.ProductReview" resultType="int">
         SELECT
             COUNT(*)
         FROM
@@ -30,53 +71,11 @@
         LEFT JOIN
             users u_prchsr ON pr.prchsr_user_no = u_prchsr.user_no
         LEFT JOIN
-            users u_delprcr ON pr.del_prcr_no = u_delprcr.user_no
-        LEFT JOIN
             products p ON pr.gds_no = p.gds_no
-        <where>
-            <if test="searchKey != null and searchKey != '' and searchValue != null and searchValue != ''">
-                <choose>
-                    <when test="searchKey == 'reviewId'">
-                        pr.review_id LIKE CONCAT('%', #{searchValue}, '%')
-                    </when>
-                    <when test="searchKey == 'prchsrUserNm'">
-                        u_prchsr.user_nm LIKE CONCAT('%', #{searchValue}, '%')
-                    </when>
-                    <when test="searchKey == 'gdsNm'">
-                        p.gds_nm LIKE CONCAT('%', #{searchValue}, '%')
-                    </when>
-                    <when test="searchKey == 'reviewCn'">
-                        pr.review_cn LIKE CONCAT('%', #{searchValue}, '%')
-                    </when>
-                </choose>
-            </if>
-            <!-- searchKey가 비어있고 searchValue만 있을 경우 통합 검색 -->
-            <if test="(searchKey == null or searchKey == '') and searchValue != null and searchValue != ''">
-                AND (
-                    pr.review_id LIKE CONCAT('%', #{searchValue}, '%')
-                    OR u_prchsr.user_nm LIKE CONCAT('%', #{searchValue}, '%')
-                    OR p.gds_nm LIKE CONCAT('%', #{searchValue}, '%')
-                    OR pr.review_cn LIKE CONCAT('%', #{searchValue}, '%')
-                )
-            </if>
-            <!-- reviewStts 필터링 (0: 삭제/숨김, 1: 활성) -->
-            <if test="filterConditions != null and filterConditions.size > 0">
-                AND pr.review_stts IN
-                <foreach item="condition" collection="filterConditions" open="(" separator="," close=")">
-                    #{condition}
-                </foreach>
-            </if>
-            <!-- 작성일 기간 검색 -->
-            <if test="startDate != null">
-                AND pr.wrt_ymd &gt;= #{startDate, jdbcType=DATE}
-            </if>
-            <if test="endDate != null">
-                AND pr.wrt_ymd &lt; DATE_ADD(#{endDate, jdbcType=DATE}, INTERVAL 1 DAY)
-            </if>
-        </where>
+        <include refid="reviewSearchCondition"/>
     </select>
 
-    <select id="getReviewList" parameterType="map" resultMap="productReviewResultMap">
+    <select id="getReviewList" parameterType="ks55team02.common.domain.store.ProductReview" resultMap="productReviewResultMap">
         SELECT
             pr.review_id,
             pr.ordr_dtl_artcl_no,
@@ -102,81 +101,43 @@
             users u_delprcr ON pr.del_prcr_no = u_delprcr.user_no
         LEFT JOIN
             products p ON pr.gds_no = p.gds_no
-        <where>
-            <!-- review 객체 내부의 필드를 직접 참조 -->
-            <if test="review.searchKey != null and review.searchKey != '' and review.searchValue != null and review.searchValue != ''">
-                <choose>
-                    <when test="review.searchKey == 'reviewId'">
-                        pr.review_id LIKE CONCAT('%', #{review.searchValue}, '%')
-                    </when>
-                    <when test="review.searchKey == 'prchsrUserNm'">
-                        u_prchsr.user_nm LIKE CONCAT('%', #{review.searchValue}, '%')
-                    </when>
-                    <when test="review.searchKey == 'gdsNm'">
-                        p.gds_nm LIKE CONCAT('%', #{review.searchValue}, '%')
-                    </when>
-                    <when test="review.searchKey == 'reviewCn'">
-                        pr.review_cn LIKE CONCAT('%', #{review.searchValue}, '%')
-                    </when>
-                </choose>
-            </if>
-            <!-- searchKey가 비어있고 searchValue만 있을 경우 통합 검색 -->
-            <if test="(review.searchKey == null or review.searchKey == '') and review.searchValue != null and review.searchValue != ''">
-                AND (
-                    pr.review_id LIKE CONCAT('%', #{review.searchValue}, '%')
-                    OR u_prchsr.user_nm LIKE CONCAT('%', #{review.searchValue}, '%')
-                    OR p.gds_nm LIKE CONCAT('%', #{review.searchValue}, '%')
-                    OR pr.review_cn LIKE CONCAT('%', #{review.searchValue}, '%')
-                )
-            </if>
-            <!-- reviewStts 필터링 -->
-            <if test="review.filterConditions != null and review.filterConditions.size > 0">
-                AND pr.review_stts IN
-                <foreach item="condition" collection="review.filterConditions" open="(" separator="," close=")">
-                    #{condition}
-                </foreach>
-            </if>
-            <!-- 작성일 기간 검색 -->
-            <if test="review.startDate != null">
-                AND pr.wrt_ymd &gt;= #{review.startDate, jdbcType=DATE}
-            </if>
-            <if test="review.endDate != null">
-                AND pr.wrt_ymd &lt; DATE_ADD(#{review.endDate, jdbcType=DATE}, INTERVAL 1 DAY)
-            </if>
-        </where>
-        <if test="review.sortKey != null and review.sortOrder != null">
+        <include refid="reviewSearchCondition"/>
+        <if test="sortKey != null and sortOrder != null">
             ORDER BY
             <choose>
-                <when test="review.sortKey == 'wrtYmd'">
-                    pr.wrt_ymd
-                </when>
-                <when test="review.sortKey == 'reviewId'">
-                    pr.review_id
-                </when>
-                <when test="review.sortKey == 'evlScr'">
-                    pr.evl_scr
-                </when>
-                <when test="review.sortKey == 'helpdCnt'">
-                    pr.helpd_cnt
-                </when>
-                <otherwise>
-                    pr.wrt_ymd <!-- 기본 정렬 -->
-                </otherwise>
+                <when test="sortKey == 'wrtYmd'">pr.wrt_ymd</when>
+                <when test="sortKey == 'reviewId'">pr.review_id</when>
+                <when test="sortKey == 'evlScr'">pr.evl_scr</when>
+                <when test="sortKey == 'helpdCnt'">pr.helpd_cnt</when>
+                <otherwise>pr.wrt_ymd</otherwise>
             </choose>
-            <if test="review.sortOrder == 'ASC'">ASC</if><if test="review.sortOrder == 'DESC'">DESC</if>
+            <if test="sortOrder == 'ASC'">ASC</if>
+            <if test="sortOrder == 'DESC'">DESC</if>
         </if>
-        LIMIT #{limitStart}, #{pageSize}
+        LIMIT #{offset}, #{pageSize}
     </select>
 
-    <update id="updateReviewStatus">
+    <update id="updateReviewStatusBatch" parameterType="map">
         UPDATE product_reviews
-        SET
+        <set>
             review_stts = #{newStatus},
-            last_mdfcn_dt = #{lastMdfcnDt},
-            del_dt = #{delDt, jdbcType=TIMESTAMP},
-            del_prcr_no = #{delPrcrNo}
+            last_mdfcn_dt = NOW(),
+            <!-- [수정] '숨김' 또는 '삭제' 상태일 때 처리자 정보 업데이트 -->
+            <if test="newStatus == 'HIDDEN' or newStatus == 'DELETED'">
+                del_dt = NOW(),
+                del_prcr_no = #{delPrcrNo}
+            </if>
+            <!-- [수정] '활성' 상태일 때 처리자 정보 초기화 -->
+            <if test="newStatus == 'ACTIVE'">
+                del_dt = NULL,
+                del_prcr_no = NULL
+            </if>
+        </set>
         WHERE
-            review_id = #{reviewId}
+            review_id IN
+            <foreach item="id" collection="reviewIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
     </update>
 
     <select id="getUserNoByUserLgnId" parameterType="string" resultType="string">

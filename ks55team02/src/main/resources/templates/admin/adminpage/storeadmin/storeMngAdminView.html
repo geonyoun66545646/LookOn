@@ -152,7 +152,9 @@
                                 <td>
                                     <a class="text" th:href="@{/adminpage/storeadmin/storeDetail(storeId=${store.storeId})}" th:text="${store.storeConm}"></a>
                                 </td>
-                                <td class="ellipsis text" th:text="${store.storeIntroCn}" th:title="${store.storeIntroCn}"></td>
+                                <!-- ============== [수정된 부분] ============== -->
+                                <td class="ellipsis text text-left" th:text="${store.storeIntroCn}" th:title="${store.storeIntroCn}"></td>
+                                <!-- ============================================ -->
                                 <td th:text="${store.sellerUserNm}"></td>
                                 <td th:text="${store.sellerUserLoginId}"></td>
                                 <td class="store-status-cell"> <span class="badge custom-badge"

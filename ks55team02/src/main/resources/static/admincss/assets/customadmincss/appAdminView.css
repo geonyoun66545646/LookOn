@@ -1,49 +1,21 @@
 /* appAdminView.css */
 
-/* 기존 드롭다운 아이템 스타일 유지 */
-.dropdown-menu .dropdown-item {
-    justify-content: center;
-    /* text-align: center; (필요시 추가) */
-    white-space: nowrap; /* 내용이 길어져도 줄바꿈되지 않도록 방지 */
-}
-
-/* 드롭다운 메뉴 자체의 스타일 조정 */
-.dropdown-menu {
-    /* 부모 요소(버튼)의 너비를 따르도록 min-width 설정 */
-    min-width: 100%; /* 부모 버튼의 너비만큼 최소 너비를 가짐 */
-    /* 내용이 min-width보다 작을 때, 내용에 맞게 너비 조절 */
-    width: auto; 
-    /* 또는 내용이 길어져도 특정 최대 너비를 넘지 않도록 제한 */
-    /* max-width: 250px; (예시, 필요시 설정) */
-    /* overflow-x: auto; (max-width 사용 시 필요할 수 있음) */
-
-    /* 드롭다운 아이템 내부 텍스트 중앙 정렬을 위한 설정 */
-    text-align: center; /* 드롭다운 메뉴 내 모든 텍스트 중앙 정렬 */
-}
-
-
-/* 잘못된 선택자 수정 (제거 또는 올바르게 수정) */
-/* .dropdown-menu status > { */ /* 이 부분은 잘못된 선택자이므로 제거하거나 아래처럼 수정 */
-/* text-align : center; */
-/* } */
-
-/* 만약 status 클래스를 가진 dropdown-menu에만 적용하고 싶다면: */
+/* 드롭다운 메뉴 스타일 (기존 코드 유지) */
 .dropdown-menu.status {
+    min-width: 100%;
+    width: auto;
     text-align: center;
 }
-
-/* badge-dot 스타일 (기존 코드와 충돌하지 않도록 확인) */
 .badge-dot {
     display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    margin-right: 5px; /* 텍스트와의 간격 */
-    vertical-align: middle; /* 텍스트와 세로 정렬 */
+    margin-right: 5px;
+    vertical-align: middle;
 }
 
-/* 기존 CSS 코드 나머지 부분은 그대로 유지 */
-
+/* 일반 스타일 (기존 코드 유지) */
 .content-title {
     font-weight: 600;
     margin-bottom: 20px;
@@ -52,37 +24,6 @@
     margin-bottom: 0.5rem;
     font-weight: 500;
 }
-.member-table {
-    table-layout: fixed;
-    width: 100%;
-}
-.member-table th,
-.member-table td {
-    vertical-align: middle;
-    text-align: center;
-    padding: 12px 8px;
-    border-bottom: 1px solid #eee;
-    word-break: break-all;    
-}
-.member-table th {
-    background-color: #f8f9fa;
-   	font-weight: 600;
-}
-.ellipsis {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.text-center { text-align: center; }
-.member-table .col-checkbox { width: 5%; }
-.member-table .col-id       { width: 12%; }
-.member-table .col-name     { width: 8%; }
-.member-table .col-gender   { width: 5%; }
-.member-table .col-email    { width: 18%; }
-.member-table .col-phone    { width: 12%; }
-.member-table .col-address  { width: auto; }
-.member-table .col-status   { width: 8%; }
-.member-table .col-joindate { width: 10%; }
 .search-result-info {
     display: inline-block;
     padding: 8px 15px;
@@ -106,14 +47,54 @@
     text-align: center;
     border-radius: 10px;
 }
+
+/* ▼▼▼ [수정] 테이블 열 너비 전체 재조정 ▼▼▼ */
+.member-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.member-table th,
+.member-table td {
+    vertical-align: middle;
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.member-table th {
+    background-color: #f8f9fa;
+   	font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* 9개 열의 너비를 퍼센트로 재지정 (전체 합 100%) */
+.col-checkbox    { width: 5%; }
+.col-aply-id     { width: 10%; }
+.col-user-nm     { width: 9%; }
+.col-store-nm    { width: 25%; } /* 가장 넓게, 이전보다 조금 줄임 */
+.col-user-lgn-id { width: 13%; }
+.col-plcy-id     { width: 9%; }
+.col-status      { width: 9%; }
+.col-aply-ymd    { width: 10%; }
+.col-details     { width: 10%; } /* 새로 추가된 열 */
+
+
+/* ellipsis 스타일 (이전과 동일) */
 .ellipsis {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.ellipsis > * {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 정렬 헬퍼 클래스 (이전과 동일) */
 .text-left { text-align: left !important; }
 .text-center { text-align: center !important; }
 .text-right { text-align: right !important; }
-
-
-
+/* ▲▲▲ [수정] 테이블 열 너비 재조정 완료 ▲▲▲ */

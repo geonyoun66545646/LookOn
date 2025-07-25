@@ -74,7 +74,7 @@ public class InterceptorConfig implements WebMvcConfigurer{
 
                         // --- 모든 리소스 폴더 ---
                         "/admincss/assets/**", 
-                        "/maincss/assets/error/**", 
+                        "/maincss/assets/**", 
                         "/js/**", 
 
                         // --- 인터셉터가 관여하지 않을 페이지 영역 ---
