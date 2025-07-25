@@ -6,6 +6,7 @@
 	 <head>
 	 	<meta name="description" content="한국스마트정보교육원 ksmybatis" />
 	 	<th:block layout:fragment="customCss">
+        <!-- 수정된 CSS 파일 경로 -->
         <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/appAdminView.css}">
     </th:block>
 	 </head>
@@ -19,7 +20,7 @@
 	 <th:block layout:fragment="contents">
 		<main class="main-content">
 		    <section class="content-header">
-		        <h2 class="content-title">상점 신청 내용</h2>
+		        <h2 class="content-title">상점 신청 목록</h2>
 		    </section>
 
 		    <div class="card mb-4">
@@ -132,37 +133,38 @@
 				                <th scope="col" class="col-checkbox">
 				                	<input class="form-check-input" type="checkbox" id="checkAll">
 				                </th>
-				                <th scope="col">신청 ID</th>
-				                <th scope="col">상점명</th>
-				                <th scope="col">신청자 이름</th>
-				                <th scope="col">신청 유저 ID</th>
-				                <th scope="col">수수료 비율</th>
-				                <th scope="col">계약 신청일</th>
-				                <th scope="col">상태</th>
+				                <th scope="col" class="col-aply-id">신청 ID</th>
+				                <th scope="col" class="col-user-nm">신청자 이름</th>
+				                <th scope="col" class="col-store-nm">상점명</th>
+				                <th scope="col" class="col-user-lgn-id">신청 유저 ID</th>
+				                <th scope="col" class="col-plcy-id">수수료 비율</th>
+				                <th scope="col" class="col-status">상태</th>
+				                <th scope="col" class="col-aply-ymd">계약 신청일</th>
+				                <th scope="col" class="col-details">상세 보기</th>
 				            </tr>
 				        </thead>
 				        <tbody class="text-center">
 				            <tr th:if="${#lists.isEmpty(appAdminList)}">
-				                <td colspan="8" class="text-center py-5">조회된 신청이 없습니다.</td>
+				                <td colspan="9" class="text-center py-5">조회된 신청이 없습니다.</td>
 				            </tr>
 				            <tr th:unless="${#lists.isEmpty(appAdminList)}" th:each="appStore: ${appAdminList}">
-				                <td> <input class="form-check-input member-check" type="checkbox" th:value="${appStore.aplyId}"></td>
-				                <td class="ellipsis text" th:text="${appStore.aplyId}" th:title="${appStore.aplyId}"></td>
-				                <td>
-				                	<a class="text" th:href="@{/adminpage/storeadmin/appDetail(aplyId=${appStore.aplyId})}" th:text="${appStore.storeNm}"></a>
-				                </td>
-				                <td th:text="${appStore.user.userNm}"></td>
-				                <td th:text="${appStore.user.userLgnId}"></td>
-				                <td class="ellipsis text" th:text="${appStore.plcyId}"></td>
-				                <td th:text="${#temporals.format(appStore.ctrtAplyYmd, 'yyyy-MM-dd')}"></td>
-				                <td>
+				                <td class="col-checkbox"> <input class="form-check-input member-check" type="checkbox" th:value="${appStore.aplyId}"></td>
+				                <td class="col-aply-id ellipsis" th:text="${appStore.aplyId}" th:title="${appStore.aplyId}"></td>
+				                <td class="col-user-nm" th:text="${appStore.user.userNm}"></td>
+				                <td class="col-store-nm text-left ellipsis" th:text="${appStore.storeNm}" th:title="${appStore.storeNm}"></td>
+				                <td class="col-user-lgn-id" th:text="${appStore.user.userLgnId}"></td>
+				                <td class="col-plcy-id ellipsis" th:text="${appStore.plcyId}" th:title="${appStore.plcyId}"></td>
+				                <td class="col-status">
 				                    <span class="badge custom-badge"
-					      th:text="${appStore.aplySttsDisplayName}"
-					      th:classappend="${appStore.aplyStts == 'PENDING'} ? 'bg-warning' :
-					                     (${appStore.aplyStts == 'APPROVED'} ? 'bg-success' :
-					                     (${appStore.aplyStts == 'REJECTED'} ? 'bg-danger' : 'bg-secondary'))">
-					</span>
+					                      th:text="${appStore.aplySttsDisplayName}"
+					                      th:classappend="${appStore.aplyStts == 'PENDING'} ? 'bg-warning' :
+					                                     (${appStore.aplyStts == 'APPROVED'} ? 'bg-success' :
+					                                     (${appStore.aplyStts == 'REJECTED'} ? 'bg-danger' : 'bg-secondary'))">
+					                </span>
 				                </td>
+				                <td class="col-aply-ymd" th:text="${#temporals.format(appStore.ctrtAplyYmd, 'yyyy-MM-dd')}"></td>
+				                <td class="col-details">
+                                     <a th:href="@{/adminpage/storeadmin/appDetail(aplyId=${appStore.aplyId})}" class="btn btn-sm btn-outline-primary">상세 보기</a>
 				            </tr>
 				        </tbody>
 				    </table>
@@ -191,121 +193,153 @@
 	 </th:block>
 	 <th:block layout:fragment="jsScript">
 	 <script th:inline="javascript">
-	 /*<![CDATA[*/
-	 const mainContent = $('main.main-content');
-	 const searchForm = $('#searchForm');
-	 const currentPageInput = $('#currentPageInput');
-	 const pageSizeInput = $('#pageSizeInput');
-	 const sortKeyInput = $('#sortKeyInput'); // 새로 추가된 hidden input 변수 선언
-	 const sortOrderInput = $('#sortOrderInput');
-	 const filterConditionsInput = $('#filterConditionsInput');
-     const statusCheckboxes = $('.status-check');
-	 const filterCheckAll = $('#filterCheckAll');
+/*<![CDATA[*/
+$(document).ready(function() { // 전체 코드를 document.ready 안에 넣습니다.
 
-	 // 검색 폼 제출 함수
-	 function submitSearchForm() {
-         // 분류 조건 업데이트
-         const selectedStatuses = [];
-         statusCheckboxes.each(function() {
-             if ($(this).is(':checked')) {
-                 selectedStatuses.push($(this).val());
-             }
-         });
-         filterConditionsInput.val(selectedStatuses.join(',')); // 콤마로 구분된 문자열로 저장
+    const mainContent = $('main.main-content');
+    const searchForm = $('#searchForm');
+    const currentPageInput = $('#currentPageInput');
+    const pageSizeInput = $('#pageSizeInput');
+    const sortKeyInput = $('#sortKeyInput');
+    const sortOrderInput = $('#sortOrderInput');
+    const filterConditionsInput = $('#filterConditionsInput');
+    const statusCheckboxes = $('.status-check');
+    const filterCheckAll = $('#filterCheckAll');
 
-	 	searchForm.submit();
-	 }
+    // 검색 폼 제출 함수
+    function submitSearchForm() {
+        searchForm.submit();
+    }
 
-	 // [테이블] 헤더 체크박스로 전체 선택/해제
-	 mainContent.on('click', '#checkAll', function() {
+    // 검색 버튼 클릭 시 필터 조건 업데이트
+    searchForm.on('submit', function() {
+        const selectedStatuses = [];
+        statusCheckboxes.each(function() {
+            if ($(this).is(':checked')) {
+                selectedStatuses.push($(this).val());
+            }
+        });
+        filterConditionsInput.val(selectedStatuses.join(','));
+    });
+
+    // ▼▼▼ [핵심] 상태 변경 드롭다운 이벤트 핸들러 추가 ▼▼▼
+    mainContent.on('click', '.change-status-btn', function(e) {
+        e.preventDefault();
+
+        const selectedIds = [];
+        $('.member-check:checked').each(function() {
+            selectedIds.push($(this).val());
+        });
+
+        if (selectedIds.length === 0) {
+            alert('상태를 변경할 신청을 선택해주세요.');
+            return;
+        }
+
+        const newStatus = $(this).data('status'); // '승인' 또는 '반려'
+        let confirmationMessage = '';
+        let requestData = {
+            aplyIds: selectedIds,
+            newStatus: newStatus,
+            rejectionReason: null
+        };
+
+        if (newStatus === '반려') {
+            confirmationMessage = '상세 반려 사유는 상세 페이지에서만 작성 가능합니다.\n기본 사유로 선택한 ' + selectedIds.length + '건을 반려 처리하시겠습니까?';
+            // 반려 시 기본 사유 설정
+            requestData.rejectionReason = "관리자에 의해 신청이 반려되었습니다. 자세한 내용은 문의 바랍니다.";
+        } else { // '승인'일 경우
+            confirmationMessage = '선택한 ' + selectedIds.length + '건을 승인 처리하시겠습니까?';
+        }
+
+        if (confirm(confirmationMessage)) {
+            // AJAX 호출
+            updateMultipleStatus(requestData);
+        }
+    });
+
+    // AJAX 통신 함수
+    function updateMultipleStatus(data) {
+        $.ajax({
+            url: '/adminpage/storeadmin/updateMultipleStatus', // 여러 건을 처리할 새로운 API 엔드포인트
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                if(response.status === 'success') {
+                    alert(response.message);
+                    location.reload(); // 성공 시 페이지 새로고침
+                } else {
+                    alert('처리 실패: ' + response.message);
+                }
+            },
+            error: function(xhr) {
+                alert('처리 중 오류가 발생했습니다. (서버 오류)');
+                console.error(xhr.responseText);
+            }
+        });
+    }
+    // ▲▲▲ [핵심] 상태 변경 로직 추가 완료 ▲▲▲
+
+
+    // --- (기존의 다른 JS 코드는 그대로 유지) ---
+	mainContent.on('click', '#checkAll', function() {
 	     $('.member-check').prop('checked', $(this).is(':checked'));
-	 });
-
-	 // [테이블] 개별 체크박스 선택 시, 헤더 체크박스 상태 동기화
-	 mainContent.on('click', '.member-check', () => {
+	});
+	mainContent.on('click', '.member-check', () => {
 	     const totalChecks = $('.member-check').length;
 	     const checkedChecks = $('.member-check:checked').length;
 	     $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
-	 });
-
-	 // 페이지 번호 클릭 시
-	 mainContent.on('click', '.page-num', function(e) {
-	     e.preventDefault(); // 기본 링크 동작 방지
+	});
+	mainContent.on('click', '.page-num', function(e) {
+	     e.preventDefault();
 	     currentPageInput.val($(this).data('page'));
 	     submitSearchForm();
-	 });
-
-	 // 페이지 크기 변경 시
-	 $('#pageSizeSelect').on('change', function() {
+	});
+	$('#pageSizeSelect').on('change', function() {
 	     pageSizeInput.val($(this).val());
-	     currentPageInput.val(1); // 페이지 크기 변경 시 1페이지로 이동
+	     currentPageInput.val(1);
 	     submitSearchForm();
-	 });
-
-	 // 정렬 순서 변경 시
-	 $('#sortOrderSelect').on('change', function() {
+	});
+	$('#sortOrderSelect').on('change', function() {
 	     const selectedOption = $(this).find('option:selected');
-	     sortKeyInput.val(selectedOption.data('sort-key'));    // data-sort-key 값 설정
-	     sortOrderInput.val(selectedOption.data('sort-order')); // data-sort-order 값 설정
-	     currentPageInput.val(1); // 정렬 변경 시 1페이지로 이동
+	     sortKeyInput.val(selectedOption.data('sort-key'));
+	     sortOrderInput.val(selectedOption.data('sort-order'));
+	     currentPageInput.val(1);
 	     submitSearchForm();
-	 });
-
-     // 분류 체크박스 상태 변경 시 (개별 체크박스)
-     statusCheckboxes.on('change', function() {
+	});
+    statusCheckboxes.on('change', function() {
          const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
          filterCheckAll.prop('checked', allChecked);
-         // 개별 체크박스 변경 시 바로 폼 제출 (필요에 따라 주석 처리하여 검색 버튼으로 제출하게 할 수 있음)
-         submitSearchForm();
-     });
-
-     // '전체선택' 체크박스 클릭 시
-     filterCheckAll.on('change', function() {
+    });
+    filterCheckAll.on('change', function() {
          statusCheckboxes.prop('checked', $(this).is(':checked'));
-         submitSearchForm();
-     });
+    });
+    // 페이지 로드 시 초기화 로직 (이전과 동일)
+    const initialFilterConditions = filterConditionsInput.val();
+    if (initialFilterConditions) {
+        const conditionsArray = initialFilterConditions.split(',');
+        statusCheckboxes.each(function() {
+            $(this).prop('checked', conditionsArray.includes($(this).val()));
+        });
+    } else {
+        statusCheckboxes.prop('checked', true);
+    }
+    const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+    filterCheckAll.prop('checked', allChecked);
+    const initialSortKey = /*[[${searchCriteria.sortKey}]]*/ '';
+    const initialSortOrder = /*[[${searchCriteria.sortOrder}]]*/ '';
+    $('#sortOrderSelect option').each(function() {
+        const optionSortKey = $(this).data('sort-key');
+        const optionSortOrder = $(this).data('sort-order');
+        if (optionSortKey === initialSortKey && optionSortOrder === initialSortOrder) {
+            $(this).prop('selected', true);
+            return false;
+        }
+    });
 
-     // 페이지 로드 시 '전체선택' 체크박스 상태 초기화
-     $(document).ready(function() {
-         const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
-         filterCheckAll.prop('checked', allChecked);
-
-         // filterConditionsInput에서 값을 가져와 체크박스 초기화
-         const initialFilterConditions = filterConditionsInput.val();
-         if (initialFilterConditions) {
-             const conditionsArray = initialFilterConditions.split(',');
-             statusCheckboxes.each(function() {
-                 if (conditionsArray.includes($(this).val())) {
-                     $(this).prop('checked', true);
-                 } else {
-                     $(this).val() === 'APPLY' ? $(this).prop('checked', false) : $(this).prop('checked', false);
-                 }
-             });
-             // 초기 로드 시 전체선택 상태도 맞춰줌
-             const currentAllChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
-             filterCheckAll.prop('checked', currentAllChecked);
-         } else {
-             // filterConditionsInput이 비어있으면 (즉, 필터가 없을 때) 모든 체크박스를 선택된 상태로
-             statusCheckboxes.prop('checked', true);
-             filterCheckAll.prop('checked', true);
-         }
-
-         // 페이지 로드 시 정렬 select box 초기 선택값 설정
-         const initialSortKey = /*[[${searchCriteria.sortKey}]]*/ ''; // Thymeleaf 값 가져오기
-         const initialSortOrder = /*[[${searchCriteria.sortOrder}]]*/ ''; // Thymeleaf 값 가져오기
-
-         $('#sortOrderSelect option').each(function() {
-             const optionSortKey = $(this).data('sort-key');
-             const optionSortOrder = $(this).data('sort-order');
-
-             if (optionSortKey === initialSortKey && optionSortOrder === initialSortOrder) {
-                 $(this).prop('selected', true);
-                 return false; // 일치하는 것을 찾았으니 루프 종료
-             }
-         });
-     });
-
-	 /*]]>*/
-	 </script>
+});
+/*]]>*/
+</script>
    </th:block>
 </html>
