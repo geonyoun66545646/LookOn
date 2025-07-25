@@ -91,4 +91,77 @@ $(() => {
 		e.preventDefault();
 		searchAndReloadList($(e.currentTarget).data('page'));
 	});
+	
+	// --- 미리보기 모달 로직 추가 (adminPostList.js 버전) ---
+	const previewModal = new bootstrap.Modal($('#previewModal')[0]);
+	const $modalBody = $('#previewModalBody');
+
+	// 피드 미리보기 HTML 생성 함수 (비워둠)
+	const createFeedPreviewHtml = (data) => { return ''; };
+
+	// 게시글 미리보기 HTML 생성 함수
+	const createPostPreviewHtml = (data) => {
+	    // 이미지 캐러셀 HTML
+	    const imagesHtml = data.imageUrls && data.imageUrls.length > 0 ? `
+	        <div id="previewCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
+	             <div class="carousel-inner">
+	                ${data.imageUrls.map((url, index) => `
+	                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+	                        <img src="${url}" class="d-block w-100" alt="이미지 ${index + 1}" style="max-height: 400px; object-fit: contain;">
+	                    </div>
+	                `).join('')}
+	            </div>
+	            ${data.imageUrls.length > 1 ? `
+	                <button class="carousel-control-prev" type="button" data-bs-target="#previewCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+	                <button class="carousel-control-next" type="button" data-bs-target="#previewCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+	            ` : ''}
+	        </div>` : '';
+
+	    const formattedDate = new Date(data.createdDate).toLocaleString('ko-KR');
+
+	    return `
+	        <div class="mb-3">
+	            <h3>${data.postTitle}</h3>
+	            <div class="text-muted">
+	                <span><span class="badge bg-info">${data.boardName}</span></span>
+	                <span class="mx-2">|</span>
+	                <span>작성자: ${data.userNickname}</span>
+	                <span class="mx-2">|</span>
+	                <span>작성일: ${formattedDate}</span>
+	            </div>
+	        </div>
+	        <hr>
+	        ${imagesHtml}
+	        <div class="mt-3" style="white-space: pre-wrap; min-height: 150px;">${data.postContent || '내용 없음'}</div>
+	        <hr>
+	        <div>
+	            <span class="me-3"><i class="fas fa-eye"></i> 조회수 ${data.viewCount}</span>
+	            <span class="me-3"><i class="fas fa-heart text-danger"></i> 좋아요 ${data.likeCount}</span>
+	            <span><i class="fas fa-comment"></i> 댓글 ${data.commentCount}</span>
+	        </div>
+	    `;
+	};
+
+	// 미리보기 버튼 클릭 이벤트 위임 (피드와 동일한 코드)
+	mainContent.on('click', '.preview-btn', e => {
+	    const $btn = $(e.currentTarget);
+	    const type = $btn.data('type');
+	    const id = $btn.data('id');
+	    const url = type === 'feed' ?
+	        `/adminpage/boardadmin/feedManagement/preview/${id}` :
+	        `/adminpage/boardadmin/postManagement/preview/${id}`;
+	    
+	    $modalBody.html('<div class="text-center"><div class="spinner-border" role="status"></div></div>');
+	    previewModal.show();
+
+	    $.ajax({
+	        url: url,
+	        type: 'GET'
+	    }).done(data => {
+	        const html = type === 'feed' ? createFeedPreviewHtml(data) : createPostPreviewHtml(data);
+	        $modalBody.html(html);
+	    }).fail(() => {
+	        $modalBody.html('<p class="text-center text-danger">미리보기를 불러오는 데 실패했습니다.</p>');
+	    });
+	});
 });

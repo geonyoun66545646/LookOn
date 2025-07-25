@@ -1,8 +1,9 @@
 package ks55team02.admin.adminpage.boardadmin.feedmanagement.service;
 
-import ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed;
 import java.util.List;
-import java.util.Map;
+
+import ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed;
+import ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.FeedPreviewDto;
 
 public interface FeedManagementService {
 
@@ -33,4 +34,6 @@ public interface FeedManagementService {
      * @return 처리된 행의 수
      */
     int updateFeedsToRestored(List<String> feedSns);
+    
+    FeedPreviewDto getFeedPreview(String feedSn);
 }

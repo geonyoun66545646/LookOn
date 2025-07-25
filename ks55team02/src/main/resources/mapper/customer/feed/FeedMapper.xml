@@ -98,7 +98,11 @@
 		SELECT COUNT(fi2.feed_intract_sn) FROM feed_interactions fi2
 		WHERE fi2.feed_sn = f.feed_sn AND fi2.intract_type_cd = 'like' AND
 		fi2.rtrcn_dt IS NULL
-		) AS like_count
+		) AS like_count,
+		(
+            SELECT COUNT(fc.feed_cmnt_sn) FROM feed_comments fc
+            WHERE fc.feed_sn = f.feed_sn AND fc.del_dt IS NULL
+        ) AS comment_count
 		FROM
 		feeds f
 		JOIN
@@ -112,9 +116,25 @@
 		AND
 		uf.flwr_user_no = #{followerUserNo}
 		ORDER BY
-		f.crt_dt DESC
-		LIMIT #{limit} OFFSET #{offset}
-	</select>
+    <choose>
+        <when test="sortOrder == 'popular'">
+            like_count DESC, f.crt_dt DESC
+        </when>
+        <when test="sortOrder == 'oldest'">
+            f.crt_dt ASC
+        </when>
+        <when test="sortOrder == 'comments'">
+            comment_count DESC, f.crt_dt DESC
+        </when>
+        <when test="sortOrder == 'latest'">
+            f.crt_dt DESC
+        </when>
+        <otherwise> <!-- 기본값 보장 -->
+            f.crt_dt DESC
+        </otherwise>
+    </choose>
+    LIMIT #{limit} OFFSET #{offset}
+</select>
 
 	<select id="countFollowingFeeds" resultType="int">
 		SELECT
@@ -180,7 +200,11 @@
 		SELECT COUNT(fi2.feed_intract_sn) FROM feed_interactions fi2
 		WHERE fi2.feed_sn = f.feed_sn AND fi2.intract_type_cd = 'like' AND
 		fi2.rtrcn_dt IS NULL
-		) AS like_count
+		) AS like_count,
+		        (
+            SELECT COUNT(fc.feed_cmnt_sn) FROM feed_comments fc
+            WHERE fc.feed_sn = f.feed_sn AND fc.del_dt IS NULL
+        ) AS comment_count
 		FROM feeds f
 		LEFT JOIN users u ON f.wrtr_user_no = u.user_no
 		LEFT JOIN user_profiles up ON u.user_no = up.user_no
@@ -189,17 +213,25 @@
 			AND f.wrtr_user_no = #{userNo}
 		</if>
 		ORDER BY
-		<choose>
-			<when test="sortOrder == 'popular'">
-				like_count DESC, f.crt_dt DESC
-			</when>
-			<otherwise>
-				f.crt_dt DESC
-			</otherwise>
-		</choose>
-		LIMIT #{limit} OFFSET #{offset}
-	</select>
-
+    <choose>
+        <when test="sortOrder == 'popular'">
+            like_count DESC, f.crt_dt DESC
+        </when>
+        <when test="sortOrder == 'oldest'">
+            f.crt_dt ASC
+        </when>
+        <when test="sortOrder == 'comments'">
+            comment_count DESC, f.crt_dt DESC
+        </when>
+        <when test="sortOrder == 'latest'">
+            f.crt_dt DESC
+        </when>
+        <otherwise> <!-- 기본값 보장 -->
+            f.crt_dt DESC
+        </otherwise>
+    </choose>
+    LIMIT #{limit} OFFSET #{offset}
+</select>
 	<select id="selectFeedCount" resultType="int">
 		SELECT COUNT(*) FROM feeds f WHERE f.del_dt IS NULL
 		<if test="userNo != null and userNo != ''">
