@@ -56,7 +56,7 @@
 		const paginationHtml = generatePaginationHtml(pagination);
 
 		reviewSection.innerHTML = `
-			<h3>리뷰 (<span>${pagination.totalCount}</span>)</h3>
+			<h5>리뷰 (<span>${pagination.totalCount}</span>)</h5>
 			<hr class="mt-2 mb-4">
 			<div id="review-list-container">${reviewsHtml}</div>
 			<nav id="pagination-container" class="pagination-container d-flex justify-content-center">${paginationHtml}</nav>

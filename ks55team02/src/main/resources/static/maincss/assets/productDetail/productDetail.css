@@ -1508,3 +1508,64 @@
     box-shadow: 0 8px 16px rgba(0, 123, 255, 0.2); /* Primary color shadow */
     transform: translateY(-2px);
 }
+
+/* 리뷰 입력 프래그 먼트 */
+
+
+/* 새로 추가된 내부 컨테이너 스타일 */
+.review-form-inner-wrapper {
+    width: 70%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* 리뷰 폼 버튼 래퍼 스타일 */
+.form-buttons-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* 리뷰 제출 버튼 스타일 */
+.submit-review-btn {
+    width: 100px; /* 기존 너비 유지 또는 약간 더 줄여볼 수 있습니다 (예: 90px) */
+    padding: 0.7rem 1rem; /* ⭐ 가로 padding 값을 1.5rem에서 1rem으로 줄였습니다. ⭐ */
+    font-size: 1rem;
+    display: inline-block;
+}
+
+/* 취소 버튼 스타일 */
+.cancel-review-btn {
+    width: 100px; /* 기존 너비 유지 또는 약간 더 줄여볼 수 있습니다 (예: 90px) */
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #fff;
+    padding: 0.7rem 1rem; /* ⭐ 가로 padding 값을 1.5rem에서 1rem으로 줄였습니다. ⭐ */
+    font-size: 1rem;
+    transition: all 0.3s ease-in-out;
+    display: inline-block;
+}
+
+.cancel-review-btn:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+    box-shadow: 0 8px 16px rgba(108, 117, 125, 0.2);
+    transform: translateY(-2px);
+}
+
+/* 첨부파일 영역 래퍼 스타일 */
+.attachment-area-wrapper {
+    width: 50%;
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* 텍스트 에어리어 리사이즈 비활성화 */
+textarea.form-control {
+    resize: none;
+}
