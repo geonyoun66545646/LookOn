@@ -18,42 +18,45 @@
 }
 
 /* =======================================================
- *  드롭다운 메뉴 스타일 (수정 없음 - 정상 동작)
+ *  [수정] 드롭다운 메뉴 스타일 (최종본)
  * ======================================================= */
 
-/* 드롭다운 메뉴 아이템 (<a>) */
+/* 드롭다운 메뉴의 각 아이템(<a> 태그) 스타일 */
 .dropdown-menu .dropdown-item {
-    display: flex;
-    align-items: center;
-    padding: 8px 15px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    white-space: nowrap;
-    cursor: pointer;
+    /* 1. Flexbox로 설정 */
+    display: flex; 
+    
+    /* 2. 자식 요소들을 세로로 가운데 정렬 */
+    align-items: center; 
+    
+    /* 3. [핵심] 자식 요소들을 (점+텍스트) 그룹으로 묶어 가로로 가운데 정렬 */
+    justify-content: center; 
+    
+    /* 기타 스타일 */
+    white-space: nowrap; /* 줄바꿈 방지 */
+    padding: 0.5rem 1rem; /* 내부 여백으로 보기 좋게 */
 }
 
-.dropdown-menu .dropdown-item:hover,
-.dropdown-menu .dropdown-item:focus {
-    background-color: #f1f1f1;
-    color: #000;
-}
-
-/* 드롭다운 메뉴의 색상 점 스타일 */
-.dropdown-item .badge-dot {
+/* 드롭다운 메뉴의 색상 점(dot) 스타일 */
+.dropdown-menu .badge-dot {
     display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    margin-right: 10px;
-    flex-shrink: 0;
+    margin-right: 8px; /* 텍스트와의 간격 */
 }
 
-/* 드롭다운 메뉴 너비 */
-.btn-group .dropdown-menu {
-    width: 100%;
-    min-width: max-content;
+/* 드롭다운 메뉴(<div class="dropdown-menu">) 자체의 너비 설정 */
+.dropdown-menu.status {
+    min-width: 100%; /* 최소한 버튼 너비만큼은 확보 */
+    width: auto;     /* 내용물에 맞게 너비 자동 조절 */
 }
+
+/* 상태별 점 색상 (기존 코드와 동일) */
+.badge-dot.bg-secondary { background-color: #6c757d; }
+.badge-dot.bg-success { background-color: #198754; }
+.badge-dot.bg-warning { background-color: #ffc107; }
+.badge-dot.bg-danger  { background-color: #dc3545; }
 
 
 /* =======================================================

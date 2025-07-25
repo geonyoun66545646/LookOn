@@ -55,7 +55,6 @@
                             </div>
 
                             <label class="form-label mb-0 me-3 ms-4">문의 대상</label>
-                            <!-- ... (이하 동일) ... -->
                             <div class="form-check me-4">
                                 <input class="form-check-input inquiry-target-radio" type="radio" name="inquiryTargetRadio" id="targetAll" value=""
                                        th:checked="${searchCriteria.inqryTrgtTypeCd == null or searchCriteria.inqryTrgtTypeCd == ''}">
@@ -134,11 +133,11 @@
 			                    <a class="dropdown-item change-inquiry-status-btn" href="#" data-status="COMPLETED">
 			                        <span class="badge-dot bg-success"></span>완료
 			                    </a>
-			                    <a class="dropdown-item change-inquiry-status-btn" href="#" data-status="DELETED">
-			                        <span class="badge-dot bg-danger"></span>삭제
-			                    </a>
 			                    <a class="dropdown-item change-inquiry-status-btn" href="#" data-status="HIDDEN">
 			                        <span class="badge-dot bg-warning"></span>숨김
+			                    </a>
+			                    <a class="dropdown-item change-inquiry-status-btn" href="#" data-status="DELETED">
+			                        <span class="badge-dot bg-danger"></span>삭제
 			                    </a>
 			                </div>
                          </div>
@@ -169,8 +168,8 @@
                                  <th scope="col" class="col-title">제목</th>
                                  <th scope="col" class="col-writer-name">작성자 이름</th>
                                  <th scope="col" class="col-writer-id">작성자 ID</th>
-                                 <th scope="col" class="col-date">등록일</th>
                                  <th scope="col" class="col-status">처리 상태</th>
+                                 <th scope="col" class="col-date">등록일</th>
                                  <th scope="col" class="col-details">상세 보기</th>
                              </tr>
                          </thead>
@@ -185,7 +184,6 @@
                                  </td>
                                  <td><span th:text="${inquiry.writerInfo?.userNm}"></span></td>
                                  <td><span th:text="${inquiry.writerInfo?.userLgnId}"></span></td>
-                                 <td th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></td>
                                  <td>
                                      <!-- [핵심] DB 값(영문)에 따라 화면 표시(한글)를 분기 -->
                                      <th:block th:switch="${inquiry.prcsStts}">
@@ -196,6 +194,7 @@
                                          <span th:case="*"         class="badge custom-badge bg-dark" th:text="${inquiry.prcsStts}"></span>
                                      </th:block>
                                  </td>
+                                 <td th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></td>
                                  <td>
                                      <a th:href="@{/admin/inquiry/adminInquiryDetail(inqryId=${inquiry.inqryId})}" class="btn btn-sm btn-outline-primary">상세 보기</a>
                                  </td>

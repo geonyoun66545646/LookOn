@@ -133,12 +133,12 @@
 				                	<input class="form-check-input" type="checkbox" id="checkAll">
 				                </th>
 				                <th scope="col">신청 ID</th>
-				                <th scope="col">상점명</th>
 				                <th scope="col">신청자 이름</th>
+				                <th scope="col">상점명</th>
 				                <th scope="col">신청 유저 ID</th>
 				                <th scope="col">수수료 비율</th>
-				                <th scope="col">계약 신청일</th>
 				                <th scope="col">상태</th>
+				                <th scope="col">계약 신청일</th>
 				            </tr>
 				        </thead>
 				        <tbody class="text-center">
@@ -148,13 +148,12 @@
 				            <tr th:unless="${#lists.isEmpty(appAdminList)}" th:each="appStore: ${appAdminList}">
 				                <td> <input class="form-check-input member-check" type="checkbox" th:value="${appStore.aplyId}"></td>
 				                <td class="ellipsis text" th:text="${appStore.aplyId}" th:title="${appStore.aplyId}"></td>
+				                <td th:text="${appStore.user.userNm}"></td>
 				                <td>
 				                	<a class="text" th:href="@{/adminpage/storeadmin/appDetail(aplyId=${appStore.aplyId})}" th:text="${appStore.storeNm}"></a>
 				                </td>
-				                <td th:text="${appStore.user.userNm}"></td>
 				                <td th:text="${appStore.user.userLgnId}"></td>
 				                <td class="ellipsis text" th:text="${appStore.plcyId}"></td>
-				                <td th:text="${#temporals.format(appStore.ctrtAplyYmd, 'yyyy-MM-dd')}"></td>
 				                <td>
 				                    <span class="badge custom-badge"
 					      th:text="${appStore.aplySttsDisplayName}"
@@ -163,6 +162,7 @@
 					                     (${appStore.aplyStts == 'REJECTED'} ? 'bg-danger' : 'bg-secondary'))">
 					</span>
 				                </td>
+				                <td th:text="${#temporals.format(appStore.ctrtAplyYmd, 'yyyy-MM-dd')}"></td>
 				            </tr>
 				        </tbody>
 				    </table>
