@@ -1,15 +1,17 @@
 package ks55team02.admin.adminpage.boardadmin.postmanagement.service.impl;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.AdminPost;
+import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.PostPreviewDto;
 import ks55team02.admin.adminpage.boardadmin.postmanagement.mapper.PostManagementMapper;
 import ks55team02.admin.adminpage.boardadmin.postmanagement.service.PostManagementService;
 import ks55team02.customer.post.domain.Post; // [신규] 고객 DTO import
 import ks55team02.customer.post.service.PostService; // [신규] 고객 Service import
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -58,5 +60,11 @@ public class PostManagementServiceImpl implements PostManagementService {
         post.setPstCn(adminPost.getPostContent());
 
         customerPostService.insertPost(post, null);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public PostPreviewDto getPostPreview(String postSn) {
+        return postManagementMapper.selectPostPreviewById(postSn);
     }
 }

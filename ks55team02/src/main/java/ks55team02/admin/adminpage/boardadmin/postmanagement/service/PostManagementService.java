@@ -1,7 +1,9 @@
 package ks55team02.admin.adminpage.boardadmin.postmanagement.service;
 
-import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.AdminPost;
 import java.util.List;
+
+import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.AdminPost;
+import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.PostPreviewDto;
 
 public interface PostManagementService {
 
@@ -34,4 +36,6 @@ public interface PostManagementService {
     int updatePostsToRestored(List<String> postSns);
     
     void insertPost(AdminPost post);
+    
+    PostPreviewDto getPostPreview(String postSn);
 }

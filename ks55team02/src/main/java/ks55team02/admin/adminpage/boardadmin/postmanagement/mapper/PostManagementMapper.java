@@ -1,8 +1,12 @@
 package ks55team02.admin.adminpage.boardadmin.postmanagement.mapper;
 
-import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.AdminPost;
-import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.AdminPost;
+import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.PostPreviewDto;
 
 @Mapper
 public interface PostManagementMapper {
@@ -39,5 +43,5 @@ public interface PostManagementMapper {
 	 */
 	int updatePostsToRestored(List<String> postSns);
 	
-	
+	PostPreviewDto selectPostPreviewById(@Param("postSn") String postSn);
 }

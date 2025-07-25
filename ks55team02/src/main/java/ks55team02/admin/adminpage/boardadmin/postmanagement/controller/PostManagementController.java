@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import ks55team02.admin.adminpage.boardadmin.boardmanagement.service.BoardManagementService;
 import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.AdminPost;
+import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.PostPreviewDto;
 import ks55team02.admin.adminpage.boardadmin.postmanagement.service.PostManagementService;
 import ks55team02.admin.common.domain.Pagination;
 import ks55team02.customer.login.domain.LoginUser;
@@ -152,5 +154,15 @@ public class PostManagementController {
             log.error("게시글 등록 중 오류 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "서버 처리 중 오류가 발생했습니다."));
         }
+    }
+    
+    @GetMapping("/preview/{postSn}") // 클래스 레벨에 /postManagement가 있으므로 경로는 /postManagement/preview/{postSn}가 됨
+    @ResponseBody
+    public ResponseEntity<PostPreviewDto> getPostPreview(@PathVariable String postSn) {
+        PostPreviewDto postPreview = postManagementService.getPostPreview(postSn);
+        if (postPreview == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(postPreview);
     }
 }

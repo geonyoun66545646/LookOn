@@ -89,4 +89,87 @@ $(() => {
 		e.preventDefault();
 		searchAndReloadList($(e.currentTarget).data('page'));
 	});
+	
+	// --- 미리보기 모달 로직 추가 ---
+	const previewModal = new bootstrap.Modal($('#previewModal')[0]);
+	const $modalBody = $('#previewModalBody');
+
+	// 수정 후
+	const createFeedPreviewHtml = (data) => {
+	    // 이미지 캐러셀 HTML 생성
+	    const imagesHtml = data.imageUrls && data.imageUrls.length > 0 ? `
+	        <div id="previewCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
+	            <div class="carousel-inner">
+	                ${data.imageUrls.map((url, index) => `
+	                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+	                        <img src="${url}" class="d-block w-100" alt="이미지 ${index + 1}" style="max-height: 400px; object-fit: contain;">
+	                    </div>
+	                `).join('')}
+	            </div>
+	            ${data.imageUrls.length > 1 ? `
+	                <button class="carousel-control-prev" type="button" data-bs-target="#previewCarousel" data-bs-slide="prev">
+	                    <span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Previous</span>
+	                </button>
+	                <button class="carousel-control-next" type="button" data-bs-target="#previewCarousel" data-bs-slide="next">
+	                    <span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Next</span>
+	                </button>
+	            ` : ''}
+	        </div>` : '<p class="text-muted">이미지가 없습니다.</p>';
+
+	    // 해시태그 HTML 생성
+	    const tagsHtml = data.tags && data.tags.length > 0 ?
+	        data.tags.map(tag => `<span class="badge bg-secondary me-1">#${tag}</span>`).join(' ') :
+	        '<span class="text-muted">태그 없음</span>';
+	    
+	    // 날짜 포맷팅
+	    const formattedDate = new Date(data.crtDt).toLocaleString('ko-KR');
+
+	    return `
+	        <div class="d-flex align-items-center mb-3">
+	            <img src="${data.userImg || '/maincss/assets/images/default_profile.png'}" class="rounded-circle me-2" width="40" height="40" alt="프로필" style="object-fit: cover;">
+	            <div>
+	                <div class="fw-bold">${data.userNcnm}</div>
+	                <div class="text-muted small">${formattedDate}</div>
+	            </div>
+	        </div>
+	        <hr>
+	        ${imagesHtml}
+	        <p style="white-space: pre-wrap;">${data.feedCn || '내용 없음'}</p>
+	        <div class="mb-2">
+	            ${tagsHtml}
+	        </div>
+	        <hr>
+	        <div>
+	            <span class="me-3"><i class="fas fa-heart text-danger"></i> 좋아요 ${data.likeCount}</span>
+	            <span><i class="fas fa-comment"></i> 댓글 ${data.commentCount}</span>
+	        </div>
+	    `;
+	};
+
+	// 게시글 미리보기 HTML 생성 함수 (일단 adminFeedList.js에는 비워둠)
+	const createPostPreviewHtml = (data) => { return ''; };
+
+	// 미리보기 버튼 클릭 이벤트 위임
+	mainContent.on('click', '.preview-btn', e => {
+	    const $btn = $(e.currentTarget);
+	    const type = $btn.data('type');
+	    const id = $btn.data('id');
+	    const url = type === 'feed' ?
+	        `/adminpage/boardadmin/feedManagement/preview/${id}` :
+	        `/adminpage/boardadmin/postManagement/preview/${id}`;
+	    
+	    // 모달 내용 초기화
+	    $modalBody.html('<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+	    previewModal.show();
+
+	    $.ajax({
+	        url: url,
+	        type: 'GET'
+	    }).done(data => {
+	        const html = type === 'feed' ? createFeedPreviewHtml(data) : createPostPreviewHtml(data);
+	        $modalBody.html(html);
+	    }).fail(() => {
+	        $modalBody.html('<p class="text-center text-danger">미리보기를 불러오는 데 실패했습니다.</p>');
+	    });
+	});
 });
