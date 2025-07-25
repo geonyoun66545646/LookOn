@@ -154,12 +154,13 @@
 								<th style="width: 7%;">조회수</th>
 								<th style="width: 7%;">상태</th>
 								<th style="width: 10%;">작성일</th>
+								<th style="width: 8%;">미리보기</th>
 								<th style="width: 8%;">관리</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr th:if="${#lists.isEmpty(postList)}">
-								<td colspan="11" class="text-center py-5">조회된 게시글이 없습니다.</td>
+								<td colspan="12" class="text-center py-5">조회된 게시글이 없습니다.</td>
 							</tr>
 							<tr th:unless="${#lists.isEmpty(postList)}"
 								th:each="post : ${postList}">
@@ -182,6 +183,11 @@
 								</span></td>
 								<td
 									th:text="${#temporals.format(post.createdDate, 'yyyy-MM-dd')}"></td>
+								<td>
+									<button type="button"
+										class="btn btn-sm btn-outline-primary preview-btn"
+										data-type="post" th:data-id="${post.postSn}">미리보기</button>
+								</td>
 								<td>
 									<button th:if="${post.deletedDate == null}" type="button"
 										class="btn btn-sm btn-outline-warning individual-action-btn"

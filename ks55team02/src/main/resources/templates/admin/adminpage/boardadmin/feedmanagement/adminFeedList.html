@@ -143,13 +143,14 @@
 								<th style="width: 8%;">댓글</th>
 								<th style="width: 8%;">상태</th>
 								<th style="width: 10%;">작성일</th>
+								<th style="width: 8%;">미리보기</th>
 								<th style="width: 8%;">관리</th>
 								<!-- 관리 컬럼 추가 -->
 							</tr>
 						</thead>
 						<tbody>
 							<tr th:if="${#lists.isEmpty(feedList)}">
-								<td colspan="10" class="text-center py-5">조회된 피드가 없습니다.</td>
+								<td colspan="11" class="text-center py-5">조회된 피드가 없습니다.</td>
 
 							</tr>
 							<tr th:unless="${#lists.isEmpty(feedList)}"
@@ -170,6 +171,11 @@
 									th:classappend="${feed.delDt == null ? 'bg-success' : 'bg-secondary'}">
 								</span></td>
 								<td th:text="${#temporals.format(feed.crtDt, 'yyyy-MM-dd')}"></td>
+								<td>
+									<button type="button"
+										class="btn btn-sm btn-outline-primary preview-btn"
+										data-type="feed" th:data-id="${feed.feedSn}">미리보기</button>
+								</td>
 								<!-- 개별 처리 버튼 추가 -->
 								<td>
 									<button th:if="${feed.delDt == null}" type="button"

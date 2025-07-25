@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed;
+import ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.FeedPreviewDto;
 import ks55team02.admin.adminpage.boardadmin.feedmanagement.mapper.FeedManagementMapper;
 import ks55team02.admin.adminpage.boardadmin.feedmanagement.service.FeedManagementService;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,11 @@ public class FeedManagementServiceImpl implements FeedManagementService {
             return 0;
         }
         return feedManagementMapper.updateFeedsToRestored(feedSns);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public FeedPreviewDto getFeedPreview(String feedSn) {
+        return feedManagementMapper.selectFeedPreviewById(feedSn);
     }
 }

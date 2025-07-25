@@ -50,4 +50,10 @@ public class BoardManagementServiceImpl implements BoardManagementService {
     public boolean restoreBoard(String boardCode) {
         return boardManagementMapper.restoreBoard(boardCode) > 0;
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<Board> selectAdminOnlyBoards() {
+        return boardManagementMapper.selectAdminOnlyBoards();
+    }
 }

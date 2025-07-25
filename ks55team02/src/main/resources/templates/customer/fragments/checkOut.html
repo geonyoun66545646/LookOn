@@ -4,116 +4,179 @@
 	layout:decorate="~{customer/layout/layoutMain}">
 
 <head>
-    <title>주문/결제</title>
-    <!-- Toss Payments SDK -->
-    <script src="https://js.tosspayments.com/v1"></script>
-    <!-- Daum Postcode API -->
-    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<title>주문/결제</title>
+<!-- Toss Payments SDK -->
+<script src="https://js.tosspayments.com/v1"></script>
+<!-- Daum Postcode API -->
+<script
+	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-    <th:block layout:fragment="cssFile">
-        <style>
-            .checkout-container {
-                border: 1px solid #e9ecef;
-                border-radius: 8px;
-                padding: 24px;
-            }
-            .section {
-                margin-bottom: 24px;
-            }
-            .section-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 16px;
-                border-bottom: 1px solid #eee;
-                padding-bottom: 10px;
-            }
-            .section-header h2 {
-                font-size: 1.8rem;
-                font-weight: 600;
-                margin: 0;
-            }
-            #address-display {
-                min-height: 100px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                background-color: #f8f9fa;
-                padding: 20px;
-                border-radius: 5px;
-            }
-            .address-content-placeholder p {
-                color: #868e96;
-                font-size: 1.5rem;
-                margin: 0;
-            }
-            .order-product-item {
-                display: flex;
-                align-items: center;
-                padding: 1.5rem 0;
-                border-bottom: 1px solid #e9ecef;
-            }
-            .order-product-item:last-child {
-                border-bottom: none;
-            }
-            .order-product-image img {
-                width: 80px;
-                height: 80px;
-                object-fit: cover;
-                border-radius: 4px;
-                margin-right: 1.5rem;
-            }
-            .order-product-details {
-                flex-grow: 1;
-            }
-            .order-product-name {
-                font-weight: 500;
-                font-size: 1.6rem;
-                margin-bottom: 0.5rem;
-            }
-            .order-product-info {
-                font-size: 1.4rem;
-                color: #666;
-            }
-            .order-product-price {
-                font-size: 1.6rem;
-                font-weight: 600;
-            }
-            .address-form-wrapper { width: 100%; margin: 0 auto; border: 1px solid #e9e9e9; padding: 20px; border-radius: 5px; }
-            .address-form-group { display: flex; align-items: center; margin-bottom: 12px; }
-            .address-form-group label { width: 120px; flex-shrink: 0; }
-            .address-form-group .input-group { display: flex; align-items: center; }
-            
-            #search-postcode-btn{margin-bottom : 15px;}
-            
-            #coupon-select {
-                width: 100%;
-                padding: 8px;
-                border-radius: 4px;
-                border: 1px solid #ddd;
-            }
-            .summary-discount td {
-                color: #dc3545; /* 빨간색으로 할인 금액 표시 */
-            }
-        </style>
-    </th:block>
+<th:block layout:fragment="cssFile">
+	<style>
+.checkout-container {
+	border: 1px solid #e9ecef;
+	border-radius: 8px;
+	padding: 24px;
+}
+
+.section {
+	margin-bottom: 24px;
+}
+
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+	border-bottom: 1px solid #eee;
+	padding-bottom: 10px;
+}
+
+.section-header h2 {
+	font-size: 1.8rem;
+	font-weight: 600;
+	margin: 0;
+}
+
+#address-display {
+	min-height: 100px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background-color: #f8f9fa;
+	padding: 20px;
+	border-radius: 5px;
+}
+
+.address-content-placeholder p {
+	color: #868e96;
+	font-size: 1.5rem;
+	margin: 0;
+}
+
+.order-product-item {
+	display: flex;
+	align-items: center;
+	padding: 1.5rem 0;
+	border-bottom: 1px solid #e9ecef;
+}
+
+.order-product-item:last-child {
+	border-bottom: none;
+}
+
+.order-product-image img {
+	width: 80px;
+	height: 80px;
+	object-fit: cover;
+	border-radius: 4px;
+	margin-right: 1.5rem;
+}
+
+.order-product-details {
+	flex-grow: 1;
+}
+
+.order-product-name {
+	font-weight: 500;
+	font-size: 1.6rem;
+	margin-bottom: 0.5rem;
+}
+
+.order-product-info {
+	font-size: 1.4rem;
+	color: #666;
+}
+
+.order-product-price {
+	font-size: 1.6rem;
+	font-weight: 600;
+}
+
+.address-form-wrapper {
+	width: 100%;
+	margin: 0 auto;
+	border: 1px solid #e9e9e9;
+	padding: 20px;
+	border-radius: 5px;
+}
+
+.address-form-group {
+	display: flex;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.address-form-group label {
+	width: 120px;
+	flex-shrink: 0;
+}
+
+.address-form-group .input-group {
+	display: flex;
+	align-items: center;
+}
+
+#search-postcode-btn {
+	margin-bottom: 15px;
+}
+
+#coupon-select {
+	width: 100%;
+	padding: 8px;
+	border-radius: 4px;
+	border: 1px solid #ddd;
+}
+
+.summary-discount td {
+	color: #dc3545; /* 빨간색으로 할인 금액 표시 */
+}
+
+/* 추가된 스타일 */
+.checkout-steps {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 1.5rem; /* 글자 크기 조정 */
+	color: #ccc; /* 기본 비활성 색상 */
+	margin-top: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.checkout-steps>span {
+	padding: 0 1rem;
+}
+
+.checkout-steps>span.active {
+	color: #333; /* 현재 단계 활성 색상 */
+	font-weight: 600; /* 진하게 */
+}
+</style>
+</th:block>
 </head>
 
 <body>
 	<th:block layout:fragment="contents">
 		<div class="page-wrapper">
 			<main class="main">
-				<div class="page-header text-center">
+
+				<div class="page-header text-center"
+					style="background-image: url('maincss/assets/images/page-header-bg.jpg')">
 					<div class="container">
-						<h1 class="page-title">Checkout<span>Shop</span></h1>
+						<h1 class="page-title">주문결제</h1>
+						<div class="checkout-steps">
+							<span>장바구니</span> > <span class="active">주문결제</span> > <span>주문완료</span>
+						</div>
 					</div>
 				</div>
+
 				<nav aria-label="breadcrumb" class="breadcrumb-nav">
 					<div class="container">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-							<li class="breadcrumb-item"><a href="#">Shop</a></li>
+							<li class="breadcrumb-item"><a
+								th:href="@{/customer/products/list}">Shop</a></li>
 							<li class="breadcrumb-item active" aria-current="page">Checkout</li>
 						</ol>
 					</div>
@@ -128,7 +191,8 @@
 										<div class="section">
 											<div class="section-header">
 												<h2>배송 정보</h2>
-												<button type="button" id="register-address-btn" class="btn btn-outline-primary btn-sm">배송지 등록/변경</button>
+												<button type="button" id="register-address-btn"
+													class="btn btn-outline-primary btn-sm">배송지 등록/변경</button>
 											</div>
 											<div id="address-display" class="address-content-placeholder">
 												<p>배송지를 등록해 주세요.</p>
@@ -140,8 +204,7 @@
 											<div class="section-header">
 												<h2>주문 상품</h2>
 											</div>
-											<div id="order-product-list-container">
-											</div>
+											<div id="order-product-list-container"></div>
 										</div>
 									</div>
 								</div>
@@ -158,11 +221,10 @@
 												</tr>
 												<tr class="summary-coupon">
 													<td>쿠폰 적용:</td>
-													<td>
-														<select id="coupon-select" class="form-control form-control-sm">
+													<td><select id="coupon-select"
+														class="form-control form-control-sm">
 															<option value="">쿠폰 선택</option>
-														</select>
-													</td>
+													</select></td>
 												</tr>
 												<tr class="summary-discount">
 													<td>할인 금액:</td>
@@ -174,9 +236,9 @@
 												</tr>
 											</tbody>
 										</table>
-										<button id="payment-button" type="button" class="btn btn-outline-primary-2 btn-order btn-block">
-											결제하기
-										</button>
+										<button id="payment-button" type="button"
+											class="btn btn-outline-primary-2 btn-order btn-block">
+											결제하기</button>
 									</div>
 								</aside>
 							</div>
@@ -187,8 +249,8 @@
 		</div>
 	</th:block>
 
-<th:block layout:fragment="jsScript">
-   <script>
+	<th:block layout:fragment="jsScript">
+		<script>
 	    document.addEventListener('DOMContentLoaded', function() {
 	
             // =================================================================
@@ -323,7 +385,7 @@
                         <div class="address-form-wrapper">
                             <form id="address-entry-form">
                                 <div class="address-form-group"><label for="shipping-name">받는 사람 *</label><input type="text" id="shipping-name" class="form-control"></div>
-                                <div class="address-form-group"><label>주소 *</label><div class="input-group"><input type="text" id="postcode" class="form-control" readonly><button type="button" id="search-postcode-btn" class="btn btn-light">우편번호</button></div></div>
+                                <div class="address-form-group"><label>주소 *</label><div class="input-group"><input type="text" id="postcode" class="form-control" readonly placeholder="우편번호"><button type="button" id="search-postcode-btn" class="btn btn-light">우편번호</button></div></div>
                                 <div class="address-form-group"><label></label><input type="text" id="main-address" class="form-control" readonly></div>
                                 <div class="address-form-group"><label></label><input type="text" id="detail-address" class="form-control" placeholder="상세주소 입력"></div>
                                 <div class="address-form-group"><label>연락처 *</label><input type="tel" id="phone" class="form-control" placeholder="'-' 없이 숫자만 입력"></div>
@@ -486,6 +548,6 @@
             })();
 	    });
 	</script>
-</th:block>
+	</th:block>
 </body>
 </html>
