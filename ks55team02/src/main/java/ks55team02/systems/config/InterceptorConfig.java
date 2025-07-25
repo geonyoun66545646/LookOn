@@ -80,6 +80,7 @@ public class InterceptorConfig implements WebMvcConfigurer{
                         // --- 인터셉터가 관여하지 않을 페이지 영역 ---
                         "/adminpage/**", // 관리자 페이지 영역
                         "/admin/**",
+                        "/seller/products/preview/**",
                         "/seller/**"     // 판매자 페이지 영역
                 );
      // [신규] 3순위: 판매자 페이지 접근 제어 인터셉터
