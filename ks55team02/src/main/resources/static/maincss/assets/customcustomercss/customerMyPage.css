@@ -57,7 +57,7 @@
 }
 .mypage-w-style .nav-column ul li a {
     display: block;
-    FONT-WEIGHT: 500;
+    FONT-WEIGHT: 400;
     font-size: 13px;
     padding: 5px 0;
 }
@@ -146,7 +146,7 @@
     margin-bottom: 5px; /* 통계와의 간격 줄임 */
     font-size: 0.9em; /* 자기소개 글자 크기 */
     line-height: 1.4;
-    font-weight: 500;
+    font-weight: 400;
 }
 .mypage-w-style .profile-stats ul {
     display: flex;
@@ -205,14 +205,14 @@
     display: block;
     font-size: 13px; /* "쿠폰" 라벨과 유사한 크기 */
     margin-bottom: 5px; /* 라벨과 GO 사이 간격 */
-    font-weight: 500;
+    font-weight: 400;
     color: #666;
 }
 
 .mypage-w-style .my-feed-link-item .link-text {
     display: block;
     font-size: 32px; /* "쿠폰 개수"와 유사한 크기 */
-    font-weight: 500;
+    font-weight: 400;
     color: #000;
 }
 
