@@ -84,6 +84,8 @@
 		<result column="actvtn_yn" property="actvtnYn" />
 		<result column="thumbnail_image_path" property="thumbnailImagePath" />
 		<result column="latestApprovalStatus" property="latestApprovalStatus" />
+		<result column="rejectionReason" property="rejectionReason" />
+    	<result column="managerComment" property="managerComment" />
 		<association property="productCategory" javaType="ks55team02.seller.products.domain.ProductCategory">
 			<id property="categoryId" column="ctgry_no" />
 			<result property="categoryName" column="ctgry_nm" />
@@ -147,24 +149,28 @@
 	        p.reg_dt, p.expsr_yn, p.actvtn_yn, pc.ctgry_nm,
 	        (
 	            SELECT pi.img_file_path_nm
-	            FROM ks55team02db.product_images pi
+	            FROM product_images pi
 	            WHERE pi.gds_no = p.gds_no AND pi.img_type = 1 AND pi.actvtn_yn = TRUE
 	            ORDER BY pi.img_indct_sn ASC
 	            LIMIT 1
 	        ) AS thumbnail_image_path,
-	        IFNULL(pah.aprv_stts_cd, 'P') AS latestApprovalStatus
+	        IFNULL(pah.aprv_stts_cd, '대기') AS latestApprovalStatus,
+	        pah.rjct_rsn AS rejectionReason,      -- [추가] 반려 사유 요약
+	        pah.mngr_cmnt_cn AS managerComment    -- [추가] 관리자 코멘트
 	    FROM
-	        ks55team02db.products p
+	        products p
 	    LEFT JOIN
-	        ks55team02db.product_categories pc ON p.ctgry_no = pc.ctgry_no
+	        product_categories pc ON p.ctgry_no = pc.ctgry_no
 	    LEFT JOIN (
-	        SELECT gds_no, aprv_stts_cd, prcs_dt
-	        FROM product_approval_history
-	        WHERE (gds_no, aprv_rjct_cycl, prcs_dt) IN (
-	            SELECT gds_no, MAX(aprv_rjct_cycl), MAX(prcs_dt)
+	        -- 각 상품의 가장 최신 이력 1개만 가져오는 서브쿼리
+	        SELECT gds_no, aprv_stts_cd, rjct_rsn, mngr_cmnt_cn
+	        FROM (
+	            SELECT
+	                gds_no, aprv_stts_cd, rjct_rsn, mngr_cmnt_cn,
+	                ROW_NUMBER() OVER(PARTITION BY gds_no ORDER BY aprv_rjct_cycl DESC, prcs_dt DESC) as rn
 	            FROM product_approval_history
-	            GROUP BY gds_no
-	        )
+	        ) ranked_history
+	        WHERE rn = 1
 	    ) pah ON p.gds_no = pah.gds_no
 	    <include refid="productSearchCondition" />
 	    <choose>

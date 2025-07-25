@@ -33,15 +33,11 @@ public interface PremiumAddService {
      */
     boolean updateSubscriptionPlan(PremiumAddDTO premiumAddDTO);
 
-    /**
-     * ID로 구독 플랜을 삭제합니다.
-     * @param sbscrPlanId 삭제할 구독 플랜 ID
-     * @return 삭제 성공 여부
-     */
-    boolean deleteSubscriptionPlan(String sbscrPlanId);
-    
     // 구독권 수정
     PremiumAddDTO getPlanById(String planId);
     boolean modifySubscriptionPlan(String planId, PremiumAddDTO modifiedPlan);
+    
+ // 구독 플랜 삭제
+    boolean deleteSubscriptionPlan(String planId);
     
 }

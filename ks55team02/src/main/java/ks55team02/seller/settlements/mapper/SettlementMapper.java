@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
+import ks55team02.seller.settlements.domain.SalesSttsDTO;
 import ks55team02.seller.settlements.domain.SettlementDTO;
 import ks55team02.seller.settlements.domain.SettlementSearchCriteria;
 
@@ -15,4 +16,13 @@ public interface SettlementMapper {
     int countMySettlementList(SettlementSearchCriteria criteria);
     
     String selectStoreIdByUserNo(@Param("userNo") String userNo); // userNo를 파라미터로 받아 store_id 반환
+    
+    /**
+     * 특정 상점의 모든 판매(주문 항목) 내역을 조회합니다.
+     * @param storeId 상점 ID
+     * @return 판매 내역 DTO 목록
+     */
+    List<SalesSttsDTO> getSalesHistoryByStoreId(@Param("storeId") String storeId);
+    
+    List<SalesSttsDTO> getAllSalesHistory();
 }

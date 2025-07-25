@@ -71,6 +71,7 @@
 								<th>신청일</th>
 								<th>차수</th>
 								<th>상태</th>
+								<th>미리보기</th> <!-- [수정 1] 헤더 추가 -->
 								<th>관리</th>
 							</tr>
 						</thead>
@@ -92,6 +93,12 @@
 									</span>
 								</td>
 								<td>
+								    <!-- [수정 2] 미리보기 버튼 추가 -->
+                                    <a th:href="@{/seller/products/preview/{gdsNo}(gdsNo=${product.gdsNo})}" 
+                                       class="btn btn-info btn-sm" 
+                                       target="_blank">미리보기</a>
+								</td>
+								<td>
 								    <form th:action="@{/adminpage/productadmin/approveProduct}" method="post" style="display: inline;">
 								        <input type="hidden" name="gdsNo" th:value="${product.gdsNo}">
 								        <button type="submit" class="btn btn-success btn-sm">승인</button>
@@ -101,7 +108,7 @@
 							</tr>
 							<tr
 								th:if="${pagination.list == null or pagination.list.isEmpty()}">
-								<td colspan="8" class="text-center">승인 대기 중인 상품이 없습니다.</td>
+								<td colspan="9" class="text-center">승인 대기 중인 상품이 없습니다.</td> <!-- [수정 3] colspan을 9로 변경 -->
 							</tr>
 						</tbody>
 					</table>
@@ -218,9 +225,6 @@
 							} else {
 								$('#rejectReasonsContainer').append('<p>선택 가능한 반려 사유가 없습니다.</p>');
 							}
-
-							// ⭐⭐ Bootstrap 5 방식으로 모달 호출 ⭐⭐
-							// layoutMain에서 bootstrap.bundle.min.js가 올바르게 로드되면 'bootstrap' 객체는 자동으로 정의됩니다.
 							const rejectModalElement = document.getElementById('rejectModal');
                             const rejectModal = new bootstrap.Modal(rejectModalElement, {
                                 backdrop: 'static',

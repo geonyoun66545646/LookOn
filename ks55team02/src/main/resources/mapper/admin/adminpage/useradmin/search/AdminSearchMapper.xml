@@ -11,20 +11,25 @@
 	<!-- ✅ [리팩토링 1] 로그 조회용 공통 WHERE 조건을 분리하여 코드 중복을 제거합니다. -->
 	<sql id="logWhereCondition">
 		<where>
-			<!-- ✅ [단순화 1] 복잡한 choose문 삭제! 오직 searchValue로 키워드만 검색합니다. -->
-			<if test="searchValue != null and searchValue != ''">
-				AND srch_keyword_nm LIKE CONCAT('%', #{searchValue}, '%')
+			<if
+				test="searchParams.searchValue != null and searchParams.searchValue != ''">
+				AND srch_keyword_nm LIKE CONCAT('%',
+				#{searchParams.searchValue}, '%')
 			</if>
-			<if test="searchStartDate != null and searchStartDate != ''">
-				<!-- ✅ [오류 수정] CDATA를 적용하여 XML 파싱 오류를 방지합니다. -->
-				<![CDATA[
-					AND srch_dt >= STR_TO_DATE(#{searchStartDate}, '%Y-%m-%d')
-				]]>
+			<if
+				test="searchParams.searchStartDate != null and searchParams.searchStartDate != ''">
+            <![CDATA[
+                AND srch_dt >= STR_TO_DATE(#{searchParams.searchStartDate}, '%Y-%m-%d')
+            ]]>
 			</if>
-			<if test="searchEndDate != null and searchEndDate != ''">
-				<![CDATA[
-					AND srch_dt <= STR_TO_DATE(CONCAT(#{searchEndDate}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s')
-				]]>
+			<if
+				test="searchParams.searchEndDate != null and searchParams.searchEndDate != ''">
+            <![CDATA[
+                AND srch_dt <= STR_TO_DATE(CONCAT(#{searchParams.searchEndDate}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            ]]>
+			</if>
+
+			<if test="searchParams.statusList != null">
 			</if>
 		</where>
 	</sql>
@@ -36,15 +41,15 @@
 		<!-- ✅ [핵심 수정] 모든 컬럼에 DTO 필드명과 동일한 별칭(Alias)을 부여합니다. -->
 		srch_log_id AS srchLogId,
 		user_no AS userNo,
-		srch_keyword_nm AS srchKeywordNm,
+		srch_keyword_nm AS
+		srchKeywordNm,
 		srch_dt AS srchDt,
 		srch_user_ip_addr AS srchUserIpAddr
 		FROM
 		search_logs
 		<include refid="logWhereCondition" />
-		ORDER BY
-		srchLogId ASC
-		LIMIT #{start}, #{size}
+		ORDER BY srchLogId ASC
+		LIMIT #{searchParams.start}, #{searchParams.size}
 	</select>
 
 	<!-- '로그 보기' 목록 개수 조회 쿼리 -->
@@ -63,23 +68,25 @@
 	<!-- ✅ [리팩토링 2] 통계 조회용 공통 WHERE/HAVING 조건을 분리합니다. -->
 	<sql id="statsFilterCondition">
 		<where>
-			<if test="searchStartDate != null and searchStartDate != ''">
-				<![CDATA[
-					AND srch_dt >= STR_TO_DATE(#{searchStartDate}, '%Y-%m-%d')
-				]]>
+			<if
+				test="searchParams.searchStartDate != null and searchParams.searchStartDate != ''">
+            <![CDATA[
+                AND srch_dt >= STR_TO_DATE(#{searchParams.searchStartDate}, '%Y-%m-%d')
+            ]]>
 			</if>
-			<if test="searchEndDate != null and searchEndDate != ''">
-				<![CDATA[
-					AND srch_dt <= STR_TO_DATE(CONCAT(#{searchEndDate}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s')
-				]]>
+			<if
+				test="searchParams.searchEndDate != null and searchParams.searchEndDate != ''">
+            <![CDATA[
+                AND srch_dt <= STR_TO_DATE(CONCAT(#{searchParams.searchEndDate}, ' 23:59:59'), '%Y-%m-%d %H:%i:%s')
+            ]]>
 			</if>
 		</where>
 		GROUP BY
 		srch_keyword_nm
-		<!-- ✅ [기능 추가] 통계 결과에 대해 키워드(searchValue)로 검색하는 기능을 추가합니다. -->
-		<if test="searchValue != null and searchValue != ''">
-			HAVING srch_keyword_nm LIKE CONCAT('%', #{searchValue},
-			'%')
+		<if
+			test="searchParams.searchValue != null and searchParams.searchValue != ''">
+			HAVING srch_keyword_nm LIKE CONCAT('%',
+			#{searchParams.searchValue}, '%')
 		</if>
 	</sql>
 
@@ -95,9 +102,9 @@
 		FROM
 		search_logs
 		<include refid="statsFilterCondition" />
-		ORDER BY
-		searchCount DESC, srch_keyword_nm ASC
-		LIMIT #{start}, #{size}
+		ORDER BY searchCount DESC, srch_keyword_nm ASC
+		LIMIT
+		#{searchParams.start}, #{searchParams.size}
 	</select>
 
 	<!-- '통계 보기' 목록 개수 조회 쿼리 -->

@@ -23,4 +23,7 @@ public interface LoginService {
 	 * @return 가장 최신 UserSanction 객체 또는 기록이 없을 경우 null
 	 */
 	UserSanction getLatestSanctionByUserNo(String userNo); // [추가]
+	
+	// [추가] 로그아웃 시간을 기록하는 서비스 메소드
+    void updateLogoutTime(long lgnHstryId);
 }

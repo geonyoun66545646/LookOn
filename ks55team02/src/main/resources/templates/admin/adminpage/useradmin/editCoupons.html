@@ -5,6 +5,8 @@
 
 <head>
 <title>쿠폰 정보 수정</title>
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/customadmincss/editCoupons.css}">
 </head>
 
 <th:block layout:fragment="contents">
@@ -12,11 +14,13 @@
 		<form id="editCouponForm"
 			th:action="@{/adminpage/useradmin/editCoupons}" method="post">
 			<section class="content-header">
-				<h2 class="content-title">쿠폰 정보 수정</h2>
+				<h2 class="content-title">쿠폰 수정</h2>
 				<div>
 					<a th:href="@{/adminpage/useradmin/couponsList}"
-						class="btn btn-light rounded font-sm mr-5 text-body hover-up">목록으로</a>
-					<button type="submit" form="editCouponForm" class="btn btn-primary">수정하기</button>
+						class="btn btn-light rounded mr-5 text-body hover-up header-action-btn">목록으로</a>
+
+					<button type="submit" form="editCouponForm"
+						class="btn btn-primary header-action-btn">수정하기</button>
 				</div>
 			</section>
 

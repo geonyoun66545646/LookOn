@@ -26,6 +26,13 @@ public class LoginServiceImpl implements LoginService {
 	private final LoginMapper loginMapper;
 	private final AdminReportsMapper adminReportsMapper; // 25-07-22 염가은 추가
 	
+	// [추가] 로그아웃 시간 기록을 위한 메소드 구현
+    @Override
+    public void updateLogoutTime(long lgnHstryId) {
+        log.info("로그아웃 시간 기록 시도. lgn_hstry_id: {}", lgnHstryId);
+        loginMapper.updateLogoutTime(lgnHstryId);
+    }
+	
 	/**
 	 * 25-07-22 염가은 추가
 	 * [추가] 특정 사용자의 가장 최신 제재 기록을 조회하는 메소드 구현
@@ -151,6 +158,7 @@ public class LoginServiceImpl implements LoginService {
 
 		// 4. 새로운 세션에 로그인 사용자 정보를 저장한다.
 		newSession.setAttribute("loginUser", sessionUser);
+		newSession.setAttribute("lgnHstryId", userInfoFromDb.getLgnHstryId()); // lgnHstryId 저장
 		log.info("새로운 세션 생성 및 사용자 정보 저장 완료. New Session ID: {}", newSession.getId());
 
 		return userInfoFromDb;

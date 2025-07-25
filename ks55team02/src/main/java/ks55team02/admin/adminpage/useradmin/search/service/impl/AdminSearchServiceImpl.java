@@ -6,6 +6,8 @@ import ks55team02.admin.adminpage.useradmin.search.domain.AdminSearchStats;
 import ks55team02.admin.adminpage.useradmin.search.mapper.AdminSearchMapper;
 import ks55team02.admin.adminpage.useradmin.search.service.AdminSearchService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -66,6 +69,9 @@ public class AdminSearchServiceImpl implements AdminSearchService {
         int startPage = ((currentPage - 1) / PAGE_BLOCK_SIZE) * PAGE_BLOCK_SIZE + 1;
         int endPage = Math.min(startPage + PAGE_BLOCK_SIZE - 1, totalPageCount);
         int limitStart = (currentPage - 1) * PAGE_SIZE;
+        
+     // ▼▼▼ 진단을 위해 이 로그를 추가해주세요 ▼▼▼
+        log.info("▶▶▶ Mapper로 전달될 파라미터: {}", searchParams);
 
         // --- DB 조회용 파라미터 설정 ---
         searchParams.put("start", limitStart);
