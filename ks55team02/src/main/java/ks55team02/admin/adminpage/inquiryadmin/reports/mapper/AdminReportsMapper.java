@@ -45,8 +45,7 @@ public interface AdminReportsMapper {
 	 * @param searchCriteria 검색 조건
 	 * @return 전체 데이터 개수 (int)
 	 */
-	int getAdminTotalReportCount(SearchCriteria searchCriteria);
-
+	int getAdminTotalReportCount(Map<String, Object> paramMap);
 	/**
 	 * 조건에 맞는 신고 목록을 페이징하여 조회  
 	 * 

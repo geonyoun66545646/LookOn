@@ -1,5 +1,7 @@
 package ks55team02.admin.adminpage.useradmin.coupons.domain;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -18,6 +20,7 @@ public class AdminUserCoupons {
     // coupons 테이블 정보 (JOIN)
     private String pblcnCpnId;
     private String cpnNm;
+    private List<String> usedStatusList;
     
  
 }

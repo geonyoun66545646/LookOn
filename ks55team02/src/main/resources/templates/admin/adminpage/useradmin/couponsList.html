@@ -15,12 +15,34 @@
 			<h2 class="content-title">쿠폰 목록 조회</h2>
 		</section>
 
-		<div class="card mb-4">
+		<div class="search-container card mb-4">
 			<div class="card-body">
 				<form id="couponSearchForm" action="#" method="get">
-					<div class="row gx-3 align-items-end">
+					<div class="search-row">
+						<label class="search-label">활성 여부</label>
+						<div class="search-controls">
+							<div class="form-check">
+								<input class="form-check-input activation-status-check"
+									type="checkbox" name="activationStatusList" value="1" checked>
+								<label class="form-check-label">활성</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input activation-status-check"
+									type="checkbox" name="activationStatusList" value="0" checked>
+								<label class="form-check-label">비활성</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox"
+									id="activationStatusCheckAll" checked> <label
+									class="form-check-label">전체선택</label>
+							</div>
+						</div>
+					</div>
 
-						<div class="col-lg-4 mb-3">
+					<hr>
+
+					<div class="row gx-3 align-items-end">
+						<div class="col-lg-4">
 							<label class="form-label">유효 기간</label>
 							<div class="d-flex">
 								<input type="date" class="form-control" name="vldBgngDt">
@@ -28,8 +50,7 @@
 									type="date" class="form-control" name="vldEndDt">
 							</div>
 						</div>
-
-						<div class="col-lg-4 mb-3">
+						<div class="col-lg-4">
 							<label class="form-label">검색 키워드</label>
 							<div class="input-group">
 								<select class="form-select" name="searchType"
@@ -43,20 +64,9 @@
 									placeholder="쿠폰명, ID, 발행자 ID">
 							</div>
 						</div>
-
-						<div class="col-lg-2 mb-3">
-							<label for="actvtnYn" class="form-label">활성 여부</label> <select
-								class="form-select" id="actvtnYn" name="actvtnYn">
-								<option value="" selected>-- 전체 --</option>
-								<option value="1">활성</option>
-								<option value="0">비활성</option>
-							</select>
-						</div>
-
-						<div class="col-lg-2 mb-3 d-flex align-items-end">
-							<button type="button" class="btn btn-primary btn-block me-2"
+						<div class="col-lg-2">
+							<button type="button" class="btn btn-primary btn-block"
 								id="searchBtn">검색</button>
-							<button class="btn btn-light btn-block" type="reset">초기화</button>
 						</div>
 					</div>
 				</form>
@@ -65,24 +75,26 @@
 
 		<div class="card">
 			<div class="card-body">
-				<div class="d-flex justify-content-between align-items-end mb-3">
-
-					<div class="d-flex align-items-center">
-						<span class="font-weight-bold"> [ 전체 쿠폰 <span
-							class="text-primary" id="total-coupons-count"> 0 </span> 건 ]
-						</span> <a th:href="@{/adminpage/useradmin/createCoupons}"
-							class="btn btn-primary ms-3 btn-coupon-action"
+				<div class="table-header-controls">
+					<div class="search-result-info">
+						[ 전체 쿠폰 <span class="text-primary" id="total-coupons-count">0</span>
+						건 ]
+					</div>
+					<div class="table-actions">
+						<a th:href="@{/adminpage/useradmin/createCoupons}" class="btn"
 							id="create-coupon-btn">신규 쿠폰 생성</a>
+
+						<div class="btn-group">
+							<button type="button"
+								class="btn btn-sm btn-outline-secondary dropdown-toggle"
+								data-bs-toggle="dropdown">선택 항목 관리</button>
+							<div class="dropdown-menu dropdown-menu-end">
+								<a class="dropdown-item" href="#" id="batch-activate-btn">활성화</a>
+								<a class="dropdown-item text-danger" href="#"
+									id="batch-delete-btn">삭제</a>
+							</div>
+						</div>
 					</div>
-
-					<div class="batch-action-buttons">
-						<button type="button" class="btn btn-primary btn-coupon-action"
-							id="update-selected-btn">선택 활성화</button>
-
-						<button type="button" class="btn btn-danger btn-coupon-action"
-							id="delete-selected-btn">선택 삭제</button>
-					</div>
-
 				</div>
 
 				<table class="table table-hover text-center">
@@ -124,155 +136,129 @@
 </th:block>
 <th:block layout:fragment="jsScript">
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 	<script>
-    // [개선] 현재 페이지 번호를 저장할 변수를 선언합니다.
-    let currentPage = 1;
+    document.addEventListener('DOMContentLoaded', () => {
+        let currentPage = 1;
+        
+        
 
-    /**
-     * ======================================================
-     * [핵심] 모든 DOM 이벤트 리스너 설정 (최종 리팩토링 버전)
-     * ======================================================
-     */
-     document.addEventListener('DOMContentLoaded', () => {
-         
-         // 검색을 실행하는 공통 함수
-         const performSearch = () => {
-             getCoupons(1); // 검색은 항상 1페이지부터
-         };
-
-         // 1. 검색 버튼 클릭 또는 폼 제출(엔터키) 이벤트 처리
-         document.getElementById('couponSearchForm').addEventListener('submit', (e) => {
-             e.preventDefault(); 
-             performSearch();
-         });
-         document.getElementById('searchBtn').addEventListener('click', (e) => {
-              e.preventDefault(); 
-              performSearch();
-         });
-
-         // 2. '초기화' 버튼 클릭 이벤트
-         const resetBtn = document.querySelector('button[type="reset"]');
-         if (resetBtn) {
-             resetBtn.addEventListener('click', () => {
-                 setTimeout(() => getCoupons(1), 50); 
-             });
-         }
-         
-         // 3. 페이지 번호 클릭 이벤트 (이벤트 위임)
-         document.getElementById('pagination-container').addEventListener('click', (e) => {
+        // ===== 1. 이벤트 리스너 설정 =====
+        
+        // 검색 실행
+        document.getElementById('couponSearchForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            getCoupons(1);
+        });
+        document.getElementById('searchBtn').addEventListener('click', (e) => {
              e.preventDefault();
-             const pageLink = e.target.closest('.page-link');
-             if (pageLink && pageLink.dataset.page) {
-                 const page = parseInt(pageLink.dataset.page, 10);
-                 if (page !== currentPage) { 
-                     getCoupons(page);
-                 }
-             }
-         });
+             getCoupons(1);
+        });
 
-         // 4. '전체 선택' 체크박스 이벤트
-         const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-         if(selectAllCheckbox) {
-             selectAllCheckbox.addEventListener('click', (e) => {
-                 document.querySelectorAll('.coupon-checkbox')
-                         .forEach(checkbox => checkbox.checked = e.target.checked);
-             });
-         }
+        // 페이지네이션 클릭
+        document.getElementById('pagination-container').addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageLink = e.target.closest('.page-link');
+            if (pageLink && pageLink.dataset.page) {
+                const page = parseInt(pageLink.dataset.page, 10);
+                getCoupons(page);
+            }
+        });
 
-         // ================== [여기에 6번 코드를 추가하고, 기존 코드 ID 수정] ==================
+        // [추가] 활성 여부 '전체선택' 체크박스
+        const activationCheckAll = document.getElementById('activationStatusCheckAll');
+        if(activationCheckAll) {
+            activationCheckAll.addEventListener('change', function() {
+                document.querySelectorAll('.activation-status-check').forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+        }
+        
+        // [추가] 테이블 '전체선택' 체크박스
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        if(selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('click', (e) => {
+                document.querySelectorAll('.coupon-checkbox').forEach(checkbox => checkbox.checked = e.target.checked);
+            });
+        }
+
+        // [수정] 드롭다운 메뉴의 '활성화' 버튼 이벤트
+        const batchActivateBtn = document.getElementById('batch-activate-btn');
+        if (batchActivateBtn) {
+            batchActivateBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleBatchAction('activate');
+            });
+        }
+
+        // [수정] 드롭다운 메뉴의 '삭제' 버튼 이벤트
+        const batchDeleteBtn = document.getElementById('batch-delete-btn');
+        if (batchDeleteBtn) {
+            batchDeleteBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleBatchAction('delete');
+            });
+        }
+        
+        // ===== 2. 핵심 기능 함수 =====
+
+        // [수정] 일괄 처리(활성화/삭제) 공통 함수
+        function handleBatchAction(actionType) {
+            const checkedCheckboxes = document.querySelectorAll('.coupon-checkbox:checked');
+            if (checkedCheckboxes.length === 0) {
+                Swal.fire('알림', `처리할 쿠폰을 선택해주세요.`, 'warning');
+                return;
+            }
+            const ids = Array.from(checkedCheckboxes).map(cb => cb.value);
+            
+            const config = {
+                activate: {
+                    title: `${ids.length}개 쿠폰을 활성화 하시겠습니까?`,
+                    confirmButtonText: '네, 활성화합니다.',
+                    url: '/adminpage/useradmin/api/coupons/batch-activate',
+                    successText: '선택한 쿠폰이 활성화되었습니다.'
+                },
+                delete: {
+                    title: `${ids.length}개 쿠폰을 삭제(비활성화) 하시겠습니까?`,
+                    confirmButtonText: '네, 삭제합니다.',
+                    url: '/adminpage/useradmin/api/coupons/batch-delete',
+                    successText: '선택한 쿠폰이 삭제되었습니다.'
+                }
+            };
+
+            const actionConfig = config[actionType];
+
+            Swal.fire({
+                title: actionConfig.title,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: actionConfig.confirmButtonText,
+                cancelButtonText: '취소'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(actionConfig.url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(ids)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('성공!', actionConfig.successText, 'success');
+                            getCoupons(currentPage);
+                        } else {
+                            Swal.fire('실패', data.message || '처리 중 오류 발생', 'error');
+                        }
+                    })
+                    .catch(error => Swal.fire('오류', '요청 처리 중 문제가 발생했습니다.', 'error'));
+                }
+            });
+        }
+        getCoupons(1);
+	});
          
-         // 5. '선택 활성화' 버튼 이벤트 리스너 (신규 추가)
-         // [수정] HTML의 id인 'update-selected-btn'에 맞게 수정
-         const batchActivateBtn = document.getElementById('update-selected-btn'); 
-         if(batchActivateBtn) {
-             batchActivateBtn.addEventListener('click', () => {
-                 const checkedCheckboxes = document.querySelectorAll('.coupon-checkbox:checked');
-                 if (checkedCheckboxes.length === 0) {
-                     Swal.fire('알림', '활성화할 쿠폰을 선택해주세요.', 'warning');
-                     return;
-                 }
-                 const idsToActivate = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
-                 Swal.fire({
-                     title: `${idsToActivate.length}개 쿠폰을 활성화 하시겠습니까?`,
-                     icon: 'info',
-                     showCancelButton: true,
-                     confirmButtonColor: '#3085d6',
-                     cancelButtonColor: '#d33',
-                     confirmButtonText: '네, 활성화합니다.',
-                     cancelButtonText: '취소'
-                 }).then((result) => {
-                     if (result.isConfirmed) {
-                         fetch('/adminpage/useradmin/api/coupons/batch-activate', { 
-                             method: 'POST',
-                             headers: { 'Content-Type': 'application/json' },
-                             body: JSON.stringify(idsToActivate)
-                         })
-                         .then(response => response.json())
-                         .then(data => {
-                             if (data.success) {
-                                 Swal.fire('성공!', '선택한 쿠폰이 활성화되었습니다.', 'success');
-                                 getCoupons(currentPage);
-                             } else {
-                                  Swal.fire('실패', data.message || '활성화 중 오류 발생', 'error');
-                             }
-                         })
-                         .catch(error => {
-                             console.error('Batch activate error:', error);
-                             Swal.fire('오류', '요청 처리 중 문제가 발생했습니다.', 'error');
-                         });
-                     }
-                 });
-             });
-         }
-
-         // 6. '선택 삭제' 버튼 이벤트 리스너 (기존)
-         // [수정] HTML의 id인 'delete-selected-btn'에 맞게 수정
-         const batchDeleteBtn = document.getElementById('delete-selected-btn'); 
-         if(batchDeleteBtn) {
-             batchDeleteBtn.addEventListener('click', () => {
-                 const checkedCheckboxes = document.querySelectorAll('.coupon-checkbox:checked');
-                 if (checkedCheckboxes.length === 0) {
-                     Swal.fire('알림', '삭제할 쿠폰을 선택해주세요.', 'warning');
-                     return;
-                 }
-                 const idsToDelete = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
-                 Swal.fire({
-                     title: `${idsToDelete.length}개 쿠폰을 삭제(비활성화) 하시겠습니까?`,
-                     icon: 'warning',
-                     showCancelButton: true,
-                     confirmButtonColor: '#d33',
-                     cancelButtonColor: '#3085d6',
-                     confirmButtonText: '네, 삭제합니다.',
-                     cancelButtonText: '취소'
-                 }).then((result) => {
-                     if (result.isConfirmed) {
-                         fetch('/adminpage/useradmin/api/coupons/batch-delete', {
-                             method: 'POST',
-                             headers: { 'Content-Type': 'application/json' },
-                             body: JSON.stringify(idsToDelete)
-                         })
-                         .then(response => response.json())
-                         .then(data => {
-                             if (data.success) {
-                                 Swal.fire('성공!', '선택한 쿠폰이 삭제되었습니다.', 'success');
-                                 getCoupons(currentPage); 
-                             } else {
-                                  Swal.fire('실패', data.message || '삭제 중 오류 발생', 'error');
-                             }
-                         })
-                         .catch(error => {
-                             console.error('Batch delete error:', error);
-                             Swal.fire('오류', '요청 처리 중 문제가 발생했습니다.', 'error');
-                         });
-                     }
-                 });
-             });
-         }
-         
-         // 페이지 로드 시 첫 페이지 데이터 조회
-         getCoupons(1);
- 	});
 
 
     /**
@@ -356,35 +342,33 @@
     }
     
     // [완성] 페이지네이션을 그리는 함수
-    function renderPagination(pagination) {
-        const pageContainer = document.querySelector('#pagination-container .pagination');
-        pageContainer.innerHTML = '';
-
-        if (!pagination || pagination.totalPageCount === 0) return;
-
-        const { startPage, endPage, totalPageCount } = pagination;
-
-        let paginationHtml = '';
-        
-        // '이전' 버튼
-        paginationHtml += `<li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="#" data-page="${currentPage - 1}">이전</a>
-                           </li>`;
-
-        // 페이지 번호 버튼들
-        for (let i = startPage; i <= endPage; i++) {
-            paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
-                                   <a class="page-link" href="#" data-page="${i}">${i}</a>
-                               </li>`;
-        }
-
-        // '다음' 버튼
-        paginationHtml += `<li class="page-item ${currentPage >= totalPageCount ? 'disabled' : ''}">
-                                <a class="page-link" href="#" data-page="${currentPage + 1}">다음</a>
-                           </li>`;
-        
-        pageContainer.innerHTML = paginationHtml;
-    }
+	   function renderPagination(pagination) {
+	    const pageContainer = document.querySelector('#pagination-container .pagination');
+	    pageContainer.innerHTML = '';
+	
+	    // pagination 객체가 없거나 전체 페이지가 1 이하면 페이지네이션을 아예 그리지 않습니다.
+	    if (!pagination || pagination.totalPageCount <= 1) return;
+	
+	    const { startPage, endPage, totalPageCount, currentPage } = pagination;
+	    let paginationHtml = '';
+	
+	    // [수정] '이전' 버튼: 1페이지가 아닐 때만 버튼을 생성합니다.
+	    if (currentPage > 1) {
+	        paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 1}">이전</a></li>`;
+	    }
+	
+	    // 페이지 번호 (기존과 동일)
+	    for (let i = startPage; i <= endPage; i++) {
+	        paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+	    }
+	
+	    // [수정] '다음' 버튼: 마지막 페이지가 아닐 때만 버튼을 생성합니다.
+	    if (currentPage < totalPageCount) {
+	        paginationHtml += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 1}">다음</a></li>`;
+	    }
+	
+	    pageContainer.innerHTML = paginationHtml;
+	}
 
     // 날짜 포맷팅 함수
     function formatDate(dateString) {
@@ -394,21 +378,54 @@
     
     // 개별 삭제 확인 함수
     function confirmDelete(couponId) {
-        Swal.fire({
-            title: "정말로 삭제하시겠습니까?",
-            text: "이 쿠폰은 비활성화 상태로 변경됩니다.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "삭제",
-            cancelButtonText: "취소"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = `/adminpage/useradmin/deleteCoupons/${couponId}`;
-            }
-        });
-    }
+    Swal.fire({
+        title: "정말로 삭제하시겠습니까?",
+        text: "이 쿠폰은 비활성화 상태로 변경됩니다.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "삭제",
+        cancelButtonText: "취소"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            
+            // [수정] window.location.href 대신 fetch API를 사용합니다.
+            fetch('/adminpage/useradmin/api/coupons/batch-delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // 일괄 처리 API를 재사용하기 위해 ID를 배열에 담아 보냅니다.
+                body: JSON.stringify([couponId]) 
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // [추가] 성공 시 '비활성화되었습니다' 알림을 띄웁니다.
+                    Swal.fire(
+                        '성공!',
+                        '쿠폰이 비활성화되었습니다.',
+                        'success'
+                    );
+                    // 목록을 새로고침합니다.
+                    getCoupons(currentPage); 
+                } else {
+                    // [추가] 실패 시 에러 알림을 띄웁니다.
+                    Swal.fire(
+                        '실패',
+                        data.message || '삭제 처리 중 오류가 발생했습니다.',
+                        'error'
+                    );
+                }
+            })
+            .catch(error => {
+                console.error('Delete error:', error);
+                Swal.fire('오류', '요청 처리 중 문제가 발생했습니다.', 'error');
+            });
+        }
+    });
+}
+    
+
 </script>
 </th:block>
 </html>

@@ -50,10 +50,9 @@ public class PaymentController {
         model.addAttribute("orderDetails", latestOrderDetails);
         model.addAttribute("tossClientKey", tossClientKey);
 
-        return "customer/fragments/checkout"; // Thymeleaf/JSP 뷰 파일 경로
+        return "customer/fragments/checkOut"; // Thymeleaf/JSP 뷰 파일 경로
     }
 
-    // 2. 결제 준비 (주문 정보 DB 저장)
     // 2. 결제 준비 (주문 정보 DB 저장)
     @PostMapping("/api/orders")
     @ResponseBody
@@ -142,6 +141,7 @@ public class PaymentController {
             // 3. [수정] Model에 필요한 모든 데이터 추가
             model.addAttribute("paymentResult", paymentResult);
             model.addAttribute("orderId", orderId);
+            model.addAttribute("ordrNo", orderId);
             model.addAttribute("amount", amount);
             model.addAttribute("orderedItems", orderedItems); // 화면에 전달할 상품 목록
 

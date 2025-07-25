@@ -6,20 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관리자 - 구독 플랜 목록</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <style>
         /* 카드 내부 스타일링 */
         .card-body {
             padding: 1.5rem;
         }
-        
+
         /* 플랜 리스트 컨테이너 */
         .plan-list-container {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
         }
-        
+
         /* 개별 플랜 카드 */
         .plan-card {
             flex: 1 1 300px; /* 최소 300px, 가능한 공간에 맞춰 확장 */
@@ -29,12 +28,12 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: transform 0.2s;
         }
-        
+
         .plan-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-        
+
         /* 플랜 정보 스타일 */
         .plan-name {
             font-size: 1.25rem;
@@ -42,37 +41,37 @@
             margin-bottom: 10px;
             color: #333;
         }
-        
+
         .plan-price {
             font-size: 1.5rem;
             font-weight: bold;
             color: #28a745;
             margin-bottom: 8px;
         }
-        
+
         .plan-period {
             color: #6c757d;
             margin-bottom: 8px;
         }
-        
+
         .plan-desc {
             color: #555;
             margin-bottom: 15px;
             min-height: 60px;
         }
-        
+
         .plan-date {
             font-size: 0.85rem;
             color: #6c757d;
             margin-bottom: 15px;
         }
-        
+
         /* 버튼 그룹 */
         .plan-actions {
             display: flex;
             gap: 10px;
         }
-        
+
         /* 반응형 조정 */
         @media (max-width: 768px) {
             .plan-card {
@@ -98,17 +97,14 @@
 
         <div class="card mb-4">
             <div class="card-body">
-                <!-- 플랜 리스트 컨테이너 -->
                 <div class="plan-list-container">
-                    <!-- 플랜이 없는 경우 -->
                     <div th:if="${#lists.isEmpty(plans)}" class="w-100 text-center py-5">
                         등록된 구독 플랜이 없습니다.
                     </div>
-                    
-                    <!-- 플랜 리스트 -->
+
                     <div th:each="plan : ${plans}" class="plan-card">
                         <div class="plan-name" th:text="${plan.sbscrPlanNm}"></div>
-                        <div class="plan-price" 
+                        <div class="plan-price"
                              th:text="${#numbers.formatCurrency(plan.sbscrPlanPrc)} + '원'"></div>
                         <div class="plan-period">
                             <i class="fas fa-calendar-alt me-2"></i>
@@ -120,16 +116,10 @@
                             <span th:text="${#temporals.format(plan.sbscrPlanCrtDt, 'yyyy-MM-dd HH:mm')}"></span>
                         </div>
                         <div class="plan-actions">
-							<!--
-								<a th:href="@{/adminpage/storeadmin/premiumModify/{id}(id=${plan.sbscrPlanId})}" 
-	                               class="btn btn-sm btn-outline-primary">
-	                                <i class="fas fa-edit me-1"></i> 수정
-	                            </a> 
-                            -->
-							<a th:href="@{/adminpage/storeadmin/premiumModify/{id}(id=${plan.sbscrPlanId})}" 
-							       class="btn btn-sm btn-outline-primary">수정</a>
-                            <button class="btn btn-sm btn-outline-danger">
-                                <i class="fas fa-trash-alt me-1"></i> 삭제
+                            <a th:href="@{/adminpage/storeadmin/premiumModify/{id}(id=${plan.sbscrPlanId})}"
+                                   class="btn btn-sm btn-outline-primary">수정</a>
+                            <button class="btn btn-sm btn-outline-danger delete-btn"
+                                    th:data-plan-id="${plan.sbscrPlanId}"     th:data-plan-name="${plan.sbscrPlanNm}">  <i class="fas fa-trash-alt me-1"></i> 삭제
                             </button>
                         </div>
                     </div>
@@ -137,6 +127,75 @@
             </div>
         </div>
     </section>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const planId = this.dataset.planId;
+                    const planName = this.dataset.planName;
+
+                    Swal.fire({
+                        title: '정말 삭제하시겠습니까?',
+                        text: "'" + planName + "' 플랜을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '네, 삭제합니다!',
+                        cancelButtonText: '취소'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // AJAX 요청으로 삭제 처리
+                            fetch('/adminpage/storeadmin/premiumDelete/' + planId, {
+                                method: 'POST', // 또는 DELETE, 컨트롤러의 매핑에 따라 변경
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest' // AJAX 요청임을 알림
+                                }
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    // HTTP 상태 코드가 2xx가 아닌 경우
+                                    return response.text().then(text => { throw new Error(text) });
+                                }
+                                return response.json(); // JSON 응답 파싱
+                            })
+                            .then(data => {
+                                if (data.success) { // 서버 응답에 success 필드가 true인 경우
+                                    Swal.fire(
+                                        '삭제 완료!',
+                                        data.message, // 서버에서 보낸 메시지
+                                        'success'
+                                    ).then(() => {
+                                        window.location.reload(); // 성공 시 페이지 새로고침
+                                    });
+                                } else {
+                                    Swal.fire(
+                                        '삭제 실패!',
+                                        data.message, // 서버에서 보낸 에러 메시지
+                                        'error'
+                                    );
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire(
+                                    '오류 발생!',
+                                    '삭제 중 오류가 발생했습니다: ' + error.message,
+                                    'error'
+                                );
+                            });
+                        }
+                    });
+                });
+            });
+        });
+        /*]]>*/
+    </script>
 </th:block>
 </body>
 </html>

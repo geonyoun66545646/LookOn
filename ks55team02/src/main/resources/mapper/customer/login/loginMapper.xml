@@ -70,12 +70,21 @@
 	</update>
 	
 	<!-- 로그인 기록 추가 -->
-	<insert id="addLoginHistory" parameterType="ks55team02.customer.login.domain.Login">
+	<insert id="addLoginHistory" 
+            parameterType="ks55team02.customer.login.domain.Login"
+            useGeneratedKeys="true"
+            keyProperty="lgnHstryId">
 	    INSERT INTO login_history
 	        (user_no, lgn_use_id, lgn_dt, lgn_fail_nmtm, lgn_ip_addr)
 	    VALUES
 	        (#{userNo}, #{userLgnId}, NOW(), #{lgnFailNmtm}, #{ipAddress});
 	</insert>
+	<!-- [추가] 로그아웃 시간을 기록하기 위한 UPDATE 쿼리 -->
+    <update id="updateLogoutTime" parameterType="long">
+        UPDATE login_history
+           SET lgt_dt = NOW()
+         WHERE lgn_hstry_id = #{lgnHstryId}
+    </update>
 	
 	<!-- 로그인 성공 시 실패 횟수 0으로 초기화 -->
 	<update id="resetLoginFailCount" parameterType="String">
