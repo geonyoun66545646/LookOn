@@ -31,34 +31,35 @@ public class FeedController {
 
 	@GetMapping("/feedList")
 	public String selectFeedList(@RequestParam(name = "tab", defaultValue = "discover") String tab,
-			@RequestParam(name = "sort", defaultValue = "latest") String sort,
-			@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, Model model) {
+	        @RequestParam(name = "sort", defaultValue = "latest") String sort,
+	        @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, Model model) {
 
-		int currentPage = 1;
-		Map<String, Object> feedData;
+	    int currentPage = 1;
+	    Map<String, Object> feedData;
 
-		if ("following".equals(tab)) {
-			if (loginUser == null) {
-				model.addAttribute("feedList", Collections.emptyList());
-				model.addAttribute("hasNext", false);
-				model.addAttribute("totalCount", 0);
-				model.addAttribute("needsLogin", true);
-			} else {
-				String followerUserNo = loginUser.getUserNo();
-				feedData = feedService.selectFollowingFeedList(followerUserNo, currentPage, PAGE_SIZE);
-				model.addAllAttributes(feedData);
-			}
-		} else {
-			feedData = feedService.selectFeedList(null, currentPage, PAGE_SIZE, sort);
-			model.addAllAttributes(feedData);
-		}
+	    if ("following".equals(tab)) {
+	        if (loginUser == null) {
+	            model.addAttribute("feedList", Collections.emptyList());
+	            model.addAttribute("hasNext", false);
+	            model.addAttribute("totalCount", 0);
+	            model.addAttribute("needsLogin", true);
+	        } else {
+	            String followerUserNo = loginUser.getUserNo();
+	            // [수정] sort 파라미터를 추가하여 4개 파라미터로 메소드 호출
+	            feedData = feedService.selectFollowingFeedList(followerUserNo, currentPage, PAGE_SIZE, sort);
+	            model.addAllAttributes(feedData);
+	        }
+	    } else {
+	        feedData = feedService.selectFeedList(null, currentPage, PAGE_SIZE, sort);
+	        model.addAllAttributes(feedData);
+	    }
 
-		model.addAttribute("loginUser", loginUser);
-		model.addAttribute("activeTab", tab);
-		model.addAttribute("currentPage", currentPage);
-		model.addAttribute("currentSort", sort);
+	    model.addAttribute("loginUser", loginUser);
+	    model.addAttribute("activeTab", tab);
+	    model.addAttribute("currentPage", currentPage);
+	    model.addAttribute("currentSort", sort);
 
-		return "customer/feed/feedList";
+	    return "customer/feed/feedList";
 	}
 
 	@GetMapping("/feedDetail/{feedSn}")
@@ -80,7 +81,7 @@ public class FeedController {
 	}
 
 	@GetMapping("/feedListByUserNo")
-	public String selectFeedListByUserNo(@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
+	public String selectFeedListByUserNo(@RequestParam(name = "sort", defaultValue = "latest") String sort, @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser,
 			Model model) {
 
 		if (loginUser != null) {
@@ -89,12 +90,14 @@ public class FeedController {
 			model.addAttribute("userInfo", userInfo);
 			model.addAttribute("loginUserNo", userNo);
 		}
+		model.addAttribute("currentSort", sort);
 
 		return "customer/feed/feedListByUserNo";
 	}
 
 	@GetMapping("/feedListByUserNo/{userNo}")
 	public String viewUserFeedPage(@PathVariable("userNo") String userNo,
+			@RequestParam(name = "sort", defaultValue = "latest") String sort,
 			@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser, Model model) {
 		UserInfoResponse userInfo = userInfoService.getUserInfo(userNo);
 		model.addAttribute("userInfo", userInfo);
@@ -104,6 +107,8 @@ public class FeedController {
 		} else {
 			model.addAttribute("loginUserNo", "");
 		}
+		model.addAttribute("currentSort", sort);
+		
 		return "customer/feed/feedListByUserNo";
 	}
 

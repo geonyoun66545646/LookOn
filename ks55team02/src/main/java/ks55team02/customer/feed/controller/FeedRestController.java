@@ -42,15 +42,17 @@ public class FeedRestController {
 
 	@GetMapping("/following")
 	public ResponseEntity<Map<String, Object>> selectFollowingFeeds(
-			@RequestParam(value = "page", defaultValue = "1") int page,
-			@SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
+	        @RequestParam(value = "page", defaultValue = "1") int page,
+	        @RequestParam(value = "sort", defaultValue = "latest") String sort, // [추가] sort 파라미터
+	        @SessionAttribute(name = "loginUser", required = false) LoginUser loginUser) {
 
-		if (loginUser == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-		}
-		String followerUserNo = loginUser.getUserNo();
-		Map<String, Object> result = feedService.selectFollowingFeedList(followerUserNo, page, PAGE_SIZE);
-		return ResponseEntity.ok(result);
+	    if (loginUser == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	    }
+	    String followerUserNo = loginUser.getUserNo();
+	    // [수정] sort 파라미터를 서비스 호출에 전달
+	    Map<String, Object> result = feedService.selectFollowingFeedList(followerUserNo, page, PAGE_SIZE, sort);
+	    return ResponseEntity.ok(result);
 	}
 
 	@GetMapping("/next")
