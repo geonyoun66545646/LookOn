@@ -56,19 +56,28 @@ public class FeedServiceImpl implements FeedService {
 	    return result;
 	}
 	
-    @Override
-    public Map<String, Object> selectFollowingFeedList(String followerUserNo, int page, int size) {
-        int offset = (page - 1) * size;
-        List<Feed> feedList = feedMapper.selectFollowingFeedList(followerUserNo, size, offset);
-        int totalCount = feedMapper.countFollowingFeeds(followerUserNo);
-        boolean hasNext = (offset + feedList.size()) < totalCount;
+	@Override
+	// [수정] sortOrder 파라미터 추가
+	public Map<String, Object> selectFollowingFeedList(String followerUserNo, int page, int size, String sortOrder) {
+	    int offset = (page - 1) * size;
+	    
+	    // [수정] 파라미터를 Map으로 구성하여 전달
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("followerUserNo", followerUserNo);
+	    params.put("limit", size);
+	    params.put("offset", offset);
+	    params.put("sortOrder", sortOrder);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("feedList", feedList);
-        result.put("hasNext", hasNext);
-        result.put("totalCount", totalCount);
-        return result;
-    }
+	    List<Feed> feedList = feedMapper.selectFollowingFeedList(params);
+	    int totalCount = feedMapper.countFollowingFeeds(followerUserNo);
+	    boolean hasNext = (offset + feedList.size()) < totalCount;
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("feedList", feedList);
+	    result.put("hasNext", hasNext);
+	    result.put("totalCount", totalCount);
+	    return result;
+	}
     
     @Override
     public Feed selectFeedDetail(String feedSn) {

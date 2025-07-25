@@ -13,8 +13,12 @@ public class SettlementSearchCriteria {
     private List<String> filterConditions;
     private int currentPage = 1;
     private int pageSize = 10;
-    
+
     private int offset;
+    private int limit; // ⭐⭐ 추가: MyBatis LIMIT 절에 사용될 limit 필드 ⭐⭐
+
+    private String searchKey;   // ⭐⭐ 추가: 검색 기준 (예: 'productName') ⭐⭐
+    private String searchValue; // ⭐⭐ 추가: 검색어 ⭐⭐
 
 //    @Override
 //    public String toString() {
@@ -26,6 +30,9 @@ public class SettlementSearchCriteria {
 //               ", currentPage=" + currentPage +
 //               ", pageSize=" + pageSize +
 //               ", offset=" + offset +
+//               ", limit=" + limit + // toString에도 추가
+//               ", searchKey='" + searchKey + '\'' + // toString에도 추가
+//               ", searchValue='" + searchValue + '\'' + // toString에도 추가
 //               '}';
 //    }
 }

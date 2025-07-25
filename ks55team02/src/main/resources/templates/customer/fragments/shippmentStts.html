@@ -255,12 +255,6 @@
         </header>
 
         <main class="pkg-track-content">
-            <!-- 오류 메시지 표시 영역 (항상 상단에 표시) -->
-            <div th:if="${message}" class="pkg-track-message">
-                <p th:text="${message}"></p>
-                <a th:href="@{/track-form}" class="back-link">다시 조회하기</a>
-            </div>
-
             <!-- 운송장 정보 요약 섹션 (항상 표시) -->
             <section class="pkg-track-result-summary">
                 <h2><span class="pkg-track-icon-square"></span>조회결과</h2>

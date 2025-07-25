@@ -368,9 +368,8 @@
 
 /* 현재 활성화된 페이지 번호 스타일 */
 .pagination-container a.active {
-    background-color: #007bff; /* 원하는 활성 색상으로 변경하세요 */
-    color: white;
-    border: 1px solid #007bff;
+    color: #c96;
+    border: 1px solid #c96;
 }
 
 /* 마우스를 올렸을 때 스타일 */

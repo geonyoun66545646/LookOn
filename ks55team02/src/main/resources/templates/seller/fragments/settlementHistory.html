@@ -5,7 +5,6 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="${title}">나의 정산 내역</title>
-    <!-- 여기에 이 페이지에 필요한 CSS 링크를 추가하세요 -->
     <link rel="stylesheet" th:href="@{/css/admin_settlement_management.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -20,7 +19,6 @@
                 <h2 class="panel-title">정산 목록</h2>
                 
                 <div class="settlement-list-header">
-                    <!-- 헤더 내용은 기존과 동일 -->
                     <span class="header-item shop-name">상점명</span>
                     <span class="header-item sales-amount">총 판매액</span>
                     <span class="header-item commission-amount">수수료</span>
@@ -29,7 +27,6 @@
                     <span class="header-item status">상태</span>
                 </div>
 
-                <!-- ★★★ Thymeleaf가 컨트롤러에서 받은 실제 DB 데이터(${settlementList})를 여기에 그립니다 ★★★ -->
                 <div id="shop-settlement-list" class="shop-settlement-list">
                     <th:block th:each="settlement : ${settlementList}">
                         <div class="shop-settlement-item">
@@ -48,10 +45,28 @@
                 <div class="no-data" th:if="${#lists.isEmpty(settlementList)}">
                     <p>정산 내역이 없습니다.</p>
                 </div>
-                <!-- 여기에 페이지네이션 UI를 추가할 수 있습니다 -->
+
+                <div class="pagination" th:if="${pagination != null}">
+				    <span th:if="${pagination.hasPreviousBlock}"> <a th:href="@{/seller/settlement/settlementHistory(currentPage=1)}">처음</a>
+				        <a th:href="@{/seller/settlement/settlementHistory(currentPage=${pagination.currentPage - 1})}">이전</a>
+				    </span>
+				    
+				    <span th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}">
+				        <a th:if="${page != pagination.currentPage}" 
+				           th:href="@{/seller/settlement/settlementHistory(currentPage=${page})}"
+				           th:text="${page}"></a>
+				        <strong th:if="${page == pagination.currentPage}" 
+				                th:text="${page}"></strong>
+				    </span>
+				    
+				    <span th:if="${pagination.hasNextBlock}"> <a th:href="@{/seller/settlement/settlementHistory(currentPage=${pagination.currentPage + 1})}">다음</a>
+				        <a th:href="@{/seller/settlement/settlementHistory(currentPage=${pagination.totalPageCount})}">마지막</a>
+				    </span>
+				</div>
+				
             </div>
         </div>
     </div>
-
+</th:block>
 </body>
 </html>

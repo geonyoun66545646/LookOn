@@ -1,19 +1,28 @@
 package ks55team02.admin.adminpage.boardadmin.feedmanagement.controller;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
+
 import ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed;
+import ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.FeedPreviewDto;
 import ks55team02.admin.adminpage.boardadmin.feedmanagement.service.FeedManagementService;
 import ks55team02.admin.common.domain.Pagination;
 import ks55team02.customer.login.domain.LoginUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/adminpage/boardadmin") // 클래스 레벨의 공통 경로는 /adminpage/boardadmin
@@ -98,4 +107,14 @@ public class FeedManagementController {
 			return ResponseEntity.status(500).body(Map.of("result", "fail", "message", "처리 중 오류가 발생했습니다."));
 		}
 	}
+	
+	@GetMapping("/feedManagement/preview/{feedSn}")
+    @ResponseBody // @RestController가 아니므로 추가
+    public ResponseEntity<FeedPreviewDto> getFeedPreview(@PathVariable String feedSn) {
+        FeedPreviewDto feedPreview = feedManagementService.getFeedPreview(feedSn);
+        if (feedPreview == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(feedPreview);
+    }
 }

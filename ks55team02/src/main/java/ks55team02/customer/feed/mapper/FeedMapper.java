@@ -25,7 +25,7 @@ public interface FeedMapper {
 	List<FeedComment> selectCommentsByFeedSn(String feedSn);
 
 	// 팔로잉 피드 관련
-	List<Feed> selectFollowingFeedList(@Param("followerUserNo") String followerUserNo, @Param("limit") int limit, @Param("offset") int offset);
+	List<Feed> selectFollowingFeedList(Map<String, Object> params);
 	int countFollowingFeeds(@Param("followerUserNo") String followerUserNo);
 
 	// 피드 작성 관련

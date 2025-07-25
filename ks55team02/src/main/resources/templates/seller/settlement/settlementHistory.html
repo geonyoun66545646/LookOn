@@ -106,7 +106,7 @@
 					<div class="row gx-3 align-items-center mb-4">
 						<div class="col-md-12">
 							<div class="search-result-info">
-								총 <b class="text-brand" th:text="${pagination.totalCount}">0</b>
+								총 <b class="text-brand" th:text="${pagination.totalRecordCount}">0</b>
 								건의 정산 내역이 검색되었습니다.
 							</div>
 						</div>
@@ -125,11 +125,11 @@
 								</tr>
 							</thead>
 							<tbody id="settlement-list-body">
-								<tr th:if="${#lists.isEmpty(pagination.list)}">
+								<tr th:if="${#lists.isEmpty(settlementList)}">
 									<td colspan="6" class="text-center py-5">검색된 정산 내역이 없습니다.</td>
 								</tr>
 								<tr class="text-center"
-									th:each="settlement : ${pagination.list}"
+									th:each="settlement : ${settlementList}"
 									th:data-store-id="${settlement.storeId}"
 									th:data-store-clcln-id="${settlement.storeClclnId}">
 									<td class="col-store text-start"
@@ -152,10 +152,9 @@
 					</div>
 
 					<nav class="mt-4" aria-label="Page navigation"
-						th:if="${pagination.totalCount > 0}">
+						th:if="${pagination.totalRecordCount > 0}">
 						<ul class="pagination justify-content-center">
-							<li class="page-item" th:if="${pagination.hasPreviousBlock}">
-								<a class="page-link page-num" href="#"
+							<li class="page-item" th:if="${pagination.existPrevBlock}"> <a class="page-link page-num" href="#"
 								th:data-page="${pagination.startPage - 1}">이전</a>
 							</li>
 							<li class="page-item"
@@ -164,8 +163,7 @@
 								<a class="page-link page-num" href="#" th:data-page="${page}"
 								th:text="${page}"></a>
 							</li>
-							<li class="page-item" th:if="${pagination.hasNextBlock}"><a
-								class="page-link page-num" href="#"
+							<li class="page-item" th:if="${pagination.existNextBlock}"><a class="page-link page-num" href="#"
 								th:data-page="${pagination.endPage + 1}">다음</a></li>
 						</ul>
 					</nav>

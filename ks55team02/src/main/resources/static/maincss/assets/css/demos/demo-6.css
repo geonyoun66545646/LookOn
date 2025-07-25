@@ -265,11 +265,6 @@
 	border-bottom: .2rem solid #222
 }
 
-.btn-more:hover, .btn-more:focus {
-	color: #fff;
-	background-color: #222;
-	border-color: #222
-}
 
 .deal .container>.row {
 	padding-left: 1rem;

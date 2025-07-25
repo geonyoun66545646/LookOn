@@ -153,5 +153,4 @@
     WHERE
         store_id = #{storeId}
 </update>
-
 </mapper>
