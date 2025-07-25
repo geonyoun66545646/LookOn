@@ -1,133 +1,152 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" 
-	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	  layout:decorate="~{admin/layout/layoutMain}">
-		
-	<head>
-		<title>신규 쿠폰 생성</title>	
-	</head>
-	
-	<th:block layout:fragment="contents">
-		<main class="main-content">
-			<form id="createCouponForm" th:action="@{/adminpage/useradmin/createCoupons}" method="post">
-				<section class="content-header">
-					<h2 class="content-title">쿠폰 생성</h2> 
-					<div>
-						<a th:href="@{/adminpage/useradmin/couponsList}" class="btn btn-light rounded font-sm mr-5 text-body hover-up">목록으로</a>
-						<button type="submit" form="createCouponForm" class="btn btn-primary">등록하기</button> 
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout/layoutMain}">
+
+<head>
+<title>신규 쿠폰 생성</title>
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/customadmincss/createCoupons.css}">
+</head>
+
+<th:block layout:fragment="contents">
+	<main class="main-content">
+		<form id="createCouponForm"
+			th:action="@{/adminpage/useradmin/createCoupons}" method="post">
+			<section class="content-header">
+				<h2 class="content-title">쿠폰 생성</h2>
+				<div>
+					<a th:href="@{/adminpage/useradmin/couponsList}"
+						class="btn btn-light rounded mr-5 text-body hover-up header-action-btn">목록으로</a>
+
+					<button type="submit" form="createCouponForm"
+						class="btn btn-primary header-action-btn">등록하기</button>
+				</div>
+			</section>
+
+			<div class="card">
+				<div class="card-header">
+					<h4>쿠폰 정보</h4>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label for="cpnNm" class="form-label">쿠폰명</label> <input
+									type="text" placeholder="예: 첫 구매 웰컴 쿠폰" class="form-control"
+									name="cpnNm" required>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label for="dscntVl" class="form-label">할인 값 (%)</label> <input
+									type="number" step="0.01" class="form-control" name="dscntVl"
+									placeholder="예: 10 (10%)">
+							</div>
+						</div>
 					</div>
-				</section>
-	
-				<div class="card">
-					<div class="card-header">
-						<h4>쿠폰 정보</h4> 
+
+					<div class="row">
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label for="minOrdrAmt" class="form-label">최소 주문 금액</label> <input
+									type="number" class="form-control" name="minOrdrAmt"
+									placeholder="예: 10000">
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label for="maxDscntAmt" class="form-label">최대 할인 금액</label> <input
+									type="number" class="form-control" name="maxDscntAmt"
+									placeholder="예: 5000">
+							</div>
+						</div>
 					</div>
-					<div class="card-body">
-						<div class="row">
-							<div class="col-md-6">
-								<div class="mb-4">
-									<label for="cpnNm" class="form-label">쿠폰명</label>
-									<input type="text" placeholder="예: 첫 구매 웰컴 쿠폰" class="form-control" name="cpnNm" required>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="mb-4">
-									<label for="dscntVl" class="form-label">할인 값 (%)</label>
-									<input type="number" step="0.01" class="form-control" name="dscntVl" placeholder="예: 10 (10%)">
-								</div>
-							</div>
-						</div>
 
-						<div class="row">
-							<div class="col-md-6">
-								<div class="mb-4">
-									<label for="minOrdrAmt" class="form-label">최소 주문 금액</label>
-									<input type="number" class="form-control" name="minOrdrAmt" placeholder="예: 10000">
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="mb-4">
-									<label for="maxDscntAmt" class="form-label">최대 할인 금액</label>
-									<input type="number" class="form-control" name="maxDscntAmt" placeholder="예: 5000">
-								</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label for="vldBgngDt" class="form-label">유효 시작일</label> <input
+									type="datetime-local" class="form-control" name="vldBgngDt"
+									required>
 							</div>
 						</div>
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label for="vldEndDt" class="form-label">유효 종료일</label> <input
+									type="datetime-local" class="form-control" name="vldEndDt"
+									required>
+							</div>
+						</div>
+					</div>
 
-						<div class="row">
-							<div class="col-md-6">
-								<div class="mb-4">
-									<label for="vldBgngDt" class="form-label">유효 시작일</label>
-									<input type="datetime-local" class="form-control" name="vldBgngDt" required>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="mb-4">
-									<label for="vldEndDt" class="form-label">유효 종료일</label>
-									<input type="datetime-local" class="form-control" name="vldEndDt" required>
-								</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label for="totUseLmtNmtm" class="form-label">총 발급 제한 횟수</label>
+								<input type="number" class="form-control" name="totUseLmtNmtm"
+									placeholder="0 입력 시 무제한">
 							</div>
 						</div>
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label for="userPerUseLmtNmtm" class="form-label">사용자당
+									사용 제한 횟수</label> <input type="number" class="form-control"
+									name="userPerUseLmtNmtm" placeholder="예: 1">
+							</div>
+						</div>
+					</div>
 
-						<div class="row">
-							<div class="col-md-6">
-								<div class="mb-4">
-									<label for="totUseLmtNmtm" class="form-label">총 발급 제한 횟수</label>
-									<input type="number" class="form-control" name="totUseLmtNmtm" placeholder="0 입력 시 무제한">
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="mb-4">
-									<label for="userPerUseLmtNmtm" class="form-label">사용자당 사용 제한 횟수</label>
-									<input type="number" class="form-control" name="userPerUseLmtNmtm" placeholder="예: 1">
-								</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label for="issueConditionType" class="form-label">발급 조건
+									타입</label> <select class="form-select" name="issueConditionType">
+									<option value="NONE">없음</option>
+									<option value="SIGN_UP">회원가입</option>
+									<option value="FIRST_PURCHASE">첫 구매</option>
+									<option value="REVIEW">리뷰 작성</option>
+									<option value="BIRTHDAY">생일</option>
+									<option value="REISSUE_MONTHLY">매월 재발급</option>
+									<option value="MANUAL">관리자 수동 발급</option>
+								</select>
 							</div>
 						</div>
+						<div class="col-md-6">
+							<div class="mb-4">
+								<label for="reissueCycle" class="form-label">재발급 주기</label> <select
+									class="form-select" name="reissueCycle">
+									<option value="NONE">재발급 없음 (1회성)</option>
+									<option value="MONTHLY">매월</option>
+									<option value="YEARLY">매년</option>
+									<option value="UNLIMITED">제한 없음</option>
+								</select>
+							</div>
+						</div>
+					</div>
 
-						<div class="row">
-							<div class="col-md-6">
-								<div class="mb-4">
-									<label for="issueConditionType" class="form-label">발급 조건 타입</label>
-									<select class="form-select" name="issueConditionType">
-										<option value="NONE">없음</option>
-										<option value="SIGN_UP">회원가입</option>
-										<option value="FIRST_PURCHASE">첫 구매</option>
-										<option value="REVIEW">리뷰 작성</option>
-										<option value="BIRTHDAY">생일</option>
-										<option value="REISSUE_MONTHLY">매월 재발급</option>
-										<option value="MANUAL">관리자 수동 발급</option>
-									</select>
-								</div>
+					<div class="mb-4">
+						<label class="form-label">활성 여부</label>
+						<div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="actvtnYn"
+									id="activeYes" value="true" checked> <label
+									class="form-check-label" for="activeYes">활성화</label>
 							</div>
-							<div class="col-md-6">
-								<div class="mb-4">
-									<label for="reissueCycle" class="form-label">재발급 주기</label>
-									<select class="form-select" name="reissueCycle">
-										<option value="NONE">재발급 없음 (1회성)</option>
-										<option value="MONTHLY">매월</option>
-										<option value="YEARLY">매년</option>
-										<option value="UNLIMITED">제한 없음</option>
-									</select>
-								</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="actvtnYn"
+									id="activeNo" value="false"> <label
+									class="form-check-label" for="activeNo">비활성화</label>
 							</div>
 						</div>
-						
-						<div class="mb-4">
-							<label class="form-label">활성 여부</label>
-							<div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="actvtnYn" id="activeYes" value="true" checked>
-									<label class="form-check-label" for="activeYes">활성화</label>
-								</div>
-								<div class="form-check form-check-inline">
-									<input class="form-check-input" type="radio" name="actvtnYn" id="activeNo" value="false">
-									<label class="form-check-label" for="activeNo">비활성화</label>
-								</div>
-							</div>
-						</div>
-						
-						<input type="hidden" name="userNo" value="user_no_2">
-						
-					</div> </div> </form> </main>
-	</th:block>
-	 
+					</div>
+
+					<input type="hidden" name="userNo" value="user_no_2">
+
+				</div>
+			</div>
+		</form>
+	</main>
+</th:block>
+
 </html>

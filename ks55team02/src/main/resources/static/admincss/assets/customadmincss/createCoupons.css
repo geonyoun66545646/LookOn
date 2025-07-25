@@ -1,0 +1,37 @@
+/* [수정] content-header를 추가하여 선택자 우선순위를 높입니다. */
+
+/* 두 버튼의 공통 스타일 (크기, 폰트 등) */
+.content-header .header-action-btn {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid transparent; /* 기본 테두리 설정 */
+}
+
+/* '목록으로' 버튼 스타일 */
+.content-header .btn-light.header-action-btn {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #212529;
+}
+
+/* '목록으로' 버튼 호버 효과 */
+.content-header .btn-light.header-action-btn:hover {
+    background-color: #e2e6ea;
+    border-color: #dae0e5;
+}
+
+/* '등록하기' 버튼 스타일 */
+.content-header .btn-primary.header-action-btn {
+    background-color: #3BB77E;
+    border-color: #3BB77E;
+    color: #fff;
+}
+
+/* '등록하기' 버튼 호버 효과 */
+.content-header .btn-primary.header-action-btn:hover {
+    background-color: #29A65C;
+    border-color: #29A65C;
+}

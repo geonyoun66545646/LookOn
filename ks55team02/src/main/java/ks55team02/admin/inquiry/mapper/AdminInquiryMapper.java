@@ -1,6 +1,7 @@
 package ks55team02.admin.inquiry.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -17,10 +18,10 @@ public interface AdminInquiryMapper {
 
     // 전체 문의 목록 조회 (페이지네이션 및 검색/필터링 조건 포함)
     List<Inquiry> getAdminInquiryList(
-        @Param("inquiry") Inquiry inquiry,
-        @Param("limitStart") int limitStart,
-        @Param("pageSize") int pageSize
-    );
+            @Param("inquiry") Inquiry inquiry,
+            @Param("limitStart") int limitStart,
+            @Param("pageSize") int pageSize
+        );
 
     // 문의 상세 조회 (ID 기준)
     Inquiry getInquiryById(String inqryId);
@@ -51,4 +52,7 @@ public interface AdminInquiryMapper {
 
     // 문의 답변 이력 ID의 최대값 조회
     Integer getMaxAnsHstryIdNumber();
+    
+    void updateInquiryStatus(Map<String, Object> params);
+
 }

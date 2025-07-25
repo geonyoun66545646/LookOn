@@ -228,17 +228,32 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 	// 아래는 기존 목록/상세 조회 메소드 (수정 없음)
 	// =================================================================================
 
+	// AdminReportsServiceImpl.java 파일 내부
+
+	// AdminReportsServiceImpl.java (이전에 제안했던 코드)
 	@Override
 	public Map<String, Object> getAdminReportList(AdminReportSearch searchCriteria) {
-		int totalReportCount = adminReportsMapper.getAdminTotalReportCount(searchCriteria);
-		Pagination pagination = new Pagination(totalReportCount, searchCriteria);
-		Map<String, Object> paramMap = new HashMap<>();
-		paramMap.put("pagination", pagination);
-		paramMap.put("searchCriteria", searchCriteria);
-		List<AdminReport> reportList = adminReportsMapper.getAdminReportList(paramMap);
-		Map<String, Object> resultMap = new HashMap<>();
-		resultMap.put("reportList", reportList);
+	    Map<String, Object> paramMap = new HashMap<>();
+	    paramMap.put("statusList", searchCriteria.getStatusList());
+	    paramMap.put("startDate", searchCriteria.getStartDate()); // 여기에 날짜 필드를 담았었죠.
+	    paramMap.put("endDate", searchCriteria.getEndDate());     // 여기에 날짜 필드를 담았었죠.
+	    paramMap.put("searchKey", searchCriteria.getSearchKey());
+	    paramMap.put("searchValue", searchCriteria.getSearchValue());
+
+	    int totalReportCount = adminReportsMapper.getAdminTotalReportCount(paramMap);
+	    
+	    // Pagination 객체 생성 (이 부분은 날짜 검색과 직접적인 연관은 적음)
+	    Pagination pagination = new Pagination(totalReportCount, searchCriteria); 
+	    
+	    paramMap.put("pagination", pagination);
+	    
+	    // 이 paramMap을 가지고 매퍼를 호출합니다.
+	    List<AdminReport> reportList = adminReportsMapper.getAdminReportList(paramMap);
+
+	    Map<String, Object> resultMap = new HashMap<>();
+	    resultMap.put("reportList", reportList);
 		resultMap.put("pagination", pagination);
+
 		return resultMap;
 	}
 
