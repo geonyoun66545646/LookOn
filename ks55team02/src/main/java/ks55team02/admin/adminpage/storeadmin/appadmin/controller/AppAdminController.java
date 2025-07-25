@@ -1,11 +1,14 @@
 package ks55team02.admin.adminpage.storeadmin.appadmin.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+
 
 import ks55team02.admin.adminpage.storeadmin.appadmin.domain.StatusUpdateRequest;
 import ks55team02.admin.adminpage.storeadmin.appadmin.service.AppAdminService;
@@ -36,9 +41,23 @@ public class AppAdminController {
         Pagination pagination = new Pagination(totalCount, searchCriteria);
         List<AppStore> appAdminList = appAdminService.getAppAdminList(searchCriteria, pagination.getLimitStart(), pagination.getRecordSize());
 
+        /* 기간 기본 값. */
+        // 1. 시작 날짜가 비어있는지(null) 확인합니다.
+        if (searchCriteria.getStartDate() == null) {
+            searchCriteria.setStartDate(LocalDate.parse("2020-01-01"));
+        }
+
+        // 2. 종료 날짜가 비어있는지(null) 확인합니다.
+        if (searchCriteria.getEndDate() == null) {
+            searchCriteria.setEndDate(LocalDate.now());
+        }
+
+        
         model.addAttribute("title", "상점 신청 관리");
         model.addAttribute("appAdminList", appAdminList);
         model.addAttribute("pagination", pagination);
+        model.addAttribute("searchCriteria", searchCriteria);
+        
         return "admin/adminpage/storeadmin/appAdminView";
     }
 

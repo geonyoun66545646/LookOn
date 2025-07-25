@@ -1,6 +1,6 @@
 package ks55team02.admin.adminpage.storeadmin.storemngadmin.controller;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import ks55team02.admin.adminpage.storeadmin.storemngadmin.service.StoreMngAdminService;
@@ -48,6 +47,16 @@ public class StoreMngAdminController {
 
         List<Store> storeList = storeMngAdminService.getStoreList(store, pagination.getLimitStart(), store.getPageSize());
         log.info("컨트롤러: storeList 조회 결과 개수: {}", storeList.size());
+        
+        /* 기본 기간 설정 */
+        if (store.getStartDate() == null) {
+        	store.setStartDate(LocalDate.parse("2020-01-01"));
+        }
+
+        // 2. 종료 날짜가 비어있는지(null) 확인합니다.
+        if (store.getEndDate() == null) {
+        	store.setEndDate(LocalDate.now());
+        }
 
         model.addAttribute("title", "상점 관리");
         model.addAttribute("storeList", storeList);
