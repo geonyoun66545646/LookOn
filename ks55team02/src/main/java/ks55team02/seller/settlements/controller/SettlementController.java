@@ -1,7 +1,5 @@
 package ks55team02.seller.settlements.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.seller.settlements.domain.SalesSttsDTO;
-import ks55team02.seller.settlements.domain.SettlementDTO;
 import ks55team02.seller.settlements.domain.SettlementSearchCriteria;
 import ks55team02.seller.settlements.service.SettlementService;
 import ks55team02.admin.common.domain.Pagination; // Pagination 클래스 임포트

@@ -7,7 +7,6 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
-import ks55team02.customer.coupons.domain.Coupons;
 import ks55team02.customer.coupons.domain.UserCoupons;
 import ks55team02.tossapi.domain.PayOrderDTO;
 import ks55team02.tossapi.domain.PaymentDTO;
@@ -55,6 +54,9 @@ public interface PaymentMapper {
     // <<<<<<<<< [수정됨] 반환 타입을 Map<String, Object>에서 OrderDTO로 변경 >>>>>>>>>
     PayOrderDTO getOrderDetailsByOrderId(String orderId); 
 
+    // 상점별 매출액 업데이트 (Map 파라미터로 변경)
+    void updateTotalSalesAmount(Map<String, Object> params);
+
     /**
      * 특정 주문 ID에 해당하는 모든 주문 항목(상품 및 옵션) 정보를 조회합니다.
      * order_items, products, product_options 테이블을 조인하여 상세 정보를 반환합니다.
@@ -80,6 +82,10 @@ public interface PaymentMapper {
      * @param userCpnId 사용자 쿠폰 ID
      */
     void updateUserCouponToUsed(String userCpnId);
+    
+    // 사용된 쿠폰 상태 업데이트
+    void updateUserCouponStatus(String userCpnId);
+    
     
     // 추가: 결제 ID (pgDlngId)로 stlm_id 조회
     String getPaymentIdByPgDlngId(String pgDlngId);
@@ -108,6 +114,8 @@ public interface PaymentMapper {
      */
     List<UserCoupons> findUserCouponsByUserId(@Param("userNo") String userNo);
     
+
+    
     void deletePurchasedItemsFromCart(Map<String, Object> params);
     
     /**
@@ -117,5 +125,12 @@ public interface PaymentMapper {
      */
     void updateTotalSalesAmount(@Param("storeId") String storeId, @Param("salesAmount") BigDecimal salesAmount);
    
+    // ★★★ 수정: 사용자 기본 정보 (주소, 연락처, 이름) 조회 ★★★
+    // users 테이블에서 user_no를 사용하여 주소와 연락처, 이름 등을 조회합니다.
+    Map<String, Object> selectUserInfoForShipping(String userNo);
+
+    // ★★★ 수정: 사용자 기본 정보 (주소, 연락처) 업데이트 ★★★
+    // users 테이블의 주소와 연락처 정보를 업데이트합니다.
+    int updateUserInfoShippingAddress(Map<String, Object> userInfoData);
     
 }

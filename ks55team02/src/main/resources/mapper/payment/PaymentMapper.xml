@@ -5,18 +5,13 @@
   
 <mapper namespace="ks55team02.tossapi.mapper.PaymentMapper">
 
-    <!-- ===================================================================== -->
-    <!-- [최종 수정] 할인 유형(discountType)을 포함한 최종 ResultMap 입니다.      -->
-    <!-- ===================================================================== -->
     <resultMap id="UserCouponWithDetailsResultMap" type="ks55team02.customer.coupons.domain.UserCoupons">
-        <!-- user_coupons 테이블의 별칭(uc_)이 붙은 컬럼을 UserCoupons 클래스 필드에 매핑 -->
         <id     column="uc_user_cpn_id"    property="userCpnId"/>
         <result column="uc_user_no"        property="userNo"/>
         <result column="uc_use_yn"         property="useYn"/>
         <result column="uc_indiv_expry_dt" property="indivExpryDt"/>
         
-        <!-- 연관된 Coupon 객체 정보를 매핑합니다. -->
-       <association property="coupon" javaType="ks55team02.customer.coupons.domain.Coupons">
+        <association property="coupon" javaType="ks55team02.customer.coupons.domain.Coupons">
             <id     column="c_pblcn_cpn_id"   property="pblcnCpnId"/>
             <result column="c_cpn_nm"         property="cpnNm"/>
             <result column="c_dscnt_vl"       property="dscntVl"       javaType="double" jdbcType="DECIMAL" typeHandler="org.apache.ibatis.type.DoubleTypeHandler"/>
@@ -27,7 +22,6 @@
         </association>
     </resultMap>
 
-    <!-- ... (다른 resultMap들은 수정할 필요 없음) ... -->
     <resultMap type="ks55team02.tossapi.domain.PaymentDTO" id="paymentResultMap">
         <id     column="stlm_id"        property="stlmId"/>
         <result column="ordr_no"        property="ordrNo"/>
@@ -72,156 +66,207 @@
         <result column="ordr_dtl_artcl_dcsn_cd" property="ordrDtlArtclDcsnCd"/>
     </resultMap>
 
-    <!-- ======================= ID 생성 쿼리 섹션 ======================= -->
     <select id="selectNextOrderId" resultType="String">
 	    SELECT CONCAT('ORD', DATE_FORMAT(CURDATE(), '%Y%m%d'), LPAD(IFNULL(MAX(CAST(SUBSTRING(ordr_no, 12) AS UNSIGNED)), 0) + 1, 3, '0'))
-	    FROM orders WHERE ordr_no LIKE CONCAT('ORD', DATE_FORMAT(CURDATE(), '%Y%m%d'), '%')
+	    FROM toss_order WHERE ordr_no LIKE CONCAT('ORD', DATE_FORMAT(CURDATE(), '%Y%m%d'), '%')
 	</select>
     <select id="selectNextOrderItemId" resultType="String">
         SELECT CONCAT('ITEM', DATE_FORMAT(CURDATE(), '%Y%m%d'), LPAD(IFNULL(MAX(CAST(SUBSTRING(ordr_dtl_artcl_no, 13) AS UNSIGNED)), 0) + 1, 3, '0'))
-        FROM order_items WHERE ordr_dtl_artcl_no LIKE CONCAT('ITEM', DATE_FORMAT(CURDATE(), '%Y%m%d'), '%')
+        FROM toss_order_item WHERE ordr_dtl_artcl_no LIKE CONCAT('ITEM', DATE_FORMAT(CURDATE(), '%Y%m%d'), '%')
     </select>
     <select id="selectNextPaymentId" resultType="String">
-        SELECT CONCAT('pay_', LPAD(IFNULL(MAX(CAST(SUBSTRING(stlm_id, 5) AS UNSIGNED)), 0) + 1, 5, '0')) FROM payments
+        SELECT CONCAT('pay_', LPAD(IFNULL(MAX(CAST(SUBSTRING(stlm_id, 5) AS UNSIGNED)), 0) + 1, 5, '0'))
+        FROM toss_payment
     </select>
     <select id="selectNextPaymentHistoryId" resultType="String">
-        SELECT CONCAT('pay_his_', LPAD(IFNULL(MAX(CAST(SUBSTRING(stlm_hstry_id, 9) AS UNSIGNED)), 0) + 1, 5, '0')) FROM payments_history
+        SELECT CONCAT('pay_his_', LPAD(IFNULL(MAX(CAST(SUBSTRING(stlm_hstry_id, 9) AS UNSIGNED)), 0) + 1, 5, '0'))
+        FROM toss_payment_history
     </select>
-    
-    <!-- ======================= 주문 (Orders) 관련 쿼리 섹션 ======================= -->
+
     <insert id="insertOrder" parameterType="ks55team02.tossapi.domain.PayOrderDTO">
-	    INSERT INTO orders (ordr_no, user_no, ordr_dt, gds_tot_amt, dlvy_fee_amt, pblcn_cpn_id, user_cpn_id, apld_cpn_dscnt_amt, last_stlm_amt, ordr_stts_cd, rcvr_nm, rcvr_telno, dlvy_addr, dlvy_daddr, zip, dlvy_memo_cn, user_name)
-	    VALUES (#{ordrNo}, #{userNo}, #{ordrDt}, #{gdsTotAmt}, #{dlvyFeeAmt}, #{pblcnCpnId}, #{userCpnId}, #{apldCpnDscntAmt}, #{lastStlmAmt}, #{ordrSttsCd}, #{rcvrNm}, #{rcvrTelno}, #{dlvyAddr}, #{dlvyDaddr}, #{zip}, #{dlvyMemoCn}, #{userName})
-	</insert>
-	
+        INSERT INTO toss_order (
+            ordr_no,
+            user_no,
+            ordr_name,
+            final_amount,
+            coupon_id,
+            discount_amount,
+            recipient_name,
+            phone,
+            postcode,
+            address,
+            detail_address,
+            delivery_request,
+            ordr_status,
+            ordr_date
+        ) VALUES (
+            #{ordrNo},
+            #{userNo},
+            #{ordrName},
+            #{finalAmount},
+            #{couponId},
+            #{discountAmount},
+            #{recipientName},
+            #{phone},
+            #{postcode},
+            #{address},
+            #{detailAddress},
+            #{deliveryRequest},
+            #{ordrStatus},
+            NOW()
+        )
+    </insert>
+
     <insert id="insertOrderItem" parameterType="map">
-        INSERT INTO order_items (ordr_dtl_artcl_no, ordr_no, opt_no, gds_no, store_id, ordr_qntty, ordr_tm_untprc, ordr_dtl_artcl_dcsn_cd)
-        VALUES (#{ordrDtlArtclNo}, #{ordrNo}, #{optNo}, #{gdsNo}, #{storeId}, #{ordrQntty}, #{ordrTmUntprc}, #{ordrDtlArtclDcsnCd})
+        INSERT INTO toss_order_item (
+            ordr_no,
+            gds_no,
+            quantity,
+            price,
+            store_id,
+            reg_date
+        ) VALUES (
+            #{ordrNo},
+            #{gdsNo},
+            #{quantity},
+            #{price},
+            #{storeId},
+            NOW()
+        )
     </insert>
-    
+
+    <insert id="insertPayment" parameterType="map">
+        INSERT INTO toss_payment (
+            ordr_no,
+            payment_key,
+            amount,
+            method,
+            card_company,
+            approved_at,
+            pay_date
+        ) VALUES (
+            #{ordrNo},
+            #{paymentKey},
+            #{amount},
+            #{method},
+            #{cardCompany},
+            #{approvedAt},
+            NOW()
+        )
+    </insert>
+
     <update id="updateOrderStatus" parameterType="map">
-        UPDATE orders SET ordr_stts_cd = #{status} WHERE ordr_no = #{ordrNo}
-    </update>
-    
-    <select id="getOrderDetailsByOrderId" parameterType="String" resultMap="payorderResultMap">
-        SELECT o.*, (SELECT user_nm FROM users WHERE user_no = o.user_no) AS user_name FROM orders o WHERE ordr_no = #{ordrNo}
-    </select>
-    
-    <select id="getOrderedProductsByOrderId" parameterType="String" resultType="java.util.Map">
-        SELECT 
-            oi.ordr_dtl_artcl_no,
-            oi.ordr_no,
-            oi.gds_no,
-            oi.store_id,  -- store_id를 명시적으로 SELECT
-            oi.ordr_qntty,
-            oi.ordr_tm_untprc,
-            oi.ordr_dtl_artcl_dcsn_cd,
-            p.gds_nm AS product_name,
-            po.opt_nm AS option_name
-        FROM 
-            order_items oi
-        JOIN 
-            products p ON oi.gds_no = p.gds_no
-        LEFT JOIN 
-            product_options po ON oi.opt_no = po.opt_no
-        WHERE 
-            oi.ordr_no = #{ordrNo} 
-        ORDER BY 
-            oi.ordr_dtl_artcl_no ASC
-    </select>
-    
-    <select id="findLatestOrderIdByUserNo" parameterType="String" resultType="String">
-	    SELECT ordr_no FROM orders WHERE user_no = #{userNo} ORDER BY ordr_dt DESC LIMIT 1
-	</select>
-	
-	<select id="getUserOrderPaymentHistory" parameterType="String" resultType="Map">
-        SELECT o.ordr_no, o.ordr_dt, o.last_stlm_amt, o.ordr_stts_cd, p.stlm_mthd_cd,
-            (SELECT gds_nm FROM products WHERE gds_no = (SELECT gds_no FROM order_items WHERE ordr_no = o.ordr_no LIMIT 1)) AS first_product_name,
-            (SELECT COUNT(*) FROM order_items WHERE ordr_no = o.ordr_no) AS total_products_count
-        FROM orders o JOIN payments p ON o.ordr_no = p.ordr_no
-        WHERE o.user_no = #{userNo} ORDER BY o.ordr_dt DESC
-    </select>
-
-    <!-- ======================= 결제 (Payments) 관련 쿼리 섹션 ======================= -->
-	<insert id="insertPayment" parameterType="ks55team02.tossapi.domain.PaymentDTO">
-        INSERT INTO payments (stlm_id, ordr_no, user_no, stlm_mthd_cd, stlm_amt, stlm_stts_cd, pg_dlng_id, pg_co_info, stlm_cmptn_dt, stlm_dmnd_dt)
-        VALUES (#{stlmId}, #{ordrNo}, #{userNo}, #{stlmMthdCd}, #{stlmAmt}, #{stlmSttsCd}, #{pgDlngId}, #{pgCoInfo}, NOW(), #{stlmDmndDt})
-    </insert>
-    
-    <insert id="insertPaymentHistory" parameterType="ks55team02.tossapi.domain.PaymentHistoryDTO">
-        INSERT INTO payments_history (stlm_hstry_id, stlm_id, hstry_crt_dt, hstry_mdfcn_dt)
-        VALUES (#{stlmHstryId}, #{stlmId}, NOW(), NOW())
-    </insert>
-    
-    <select id="getPaymentIdByPgDlngId" parameterType="String" resultType="String">
-        SELECT stlm_id FROM payments WHERE pg_dlng_id = #{pgDlngId}
-    </select>
-    
-    <update id="updatePaymentStatusAndCompletionDate" parameterType="map">
-        UPDATE payments SET stlm_stts_cd = #{stlmSttsCd}, stlm_cmptn_dt = NOW() WHERE pg_dlng_id = #{pgDlngId} AND ordr_no = #{ordrNo}
+        UPDATE toss_order
+        SET
+            ordr_status = #{ordrStatus},
+            mod_date = NOW()
+        WHERE
+            ordr_no = #{ordrNo}
     </update>
 
-    <!-- ======================= 쿠폰 관련 쿼리 섹션 (최종 수정) ======================= -->
-    
-    <select id="findUserCouponsByUserId" resultMap="UserCouponWithDetailsResultMap">
+    <select id="getOrderByOrdrNo" parameterType="String" resultType="ks55team02.tossapi.domain.PayOrderDTO">
         SELECT
-            uc.user_cpn_id      AS uc_user_cpn_id,
-            uc.user_no          AS uc_user_no,
-            uc.use_yn           AS uc_use_yn,
-            uc.indiv_expry_dt   AS uc_indiv_expry_dt,
-            c.pblcn_cpn_id      AS c_pblcn_cpn_id,
-            c.cpn_nm            AS c_cpn_nm,
-            c.dscnt_vl          AS c_dscnt_vl,
-            c.min_ordr_amt      AS c_min_ordr_amt,
-            c.max_dscnt_amt     AS c_max_dscnt_amt,
-            c.vld_end_dt        AS c_vld_end_dt,
-            c.actvtn_yn         AS c_actvtn_yn
+            ordr_no AS ordrNo,
+            user_no AS userNo,
+            ordr_name AS ordrName,
+            final_amount AS finalAmount,
+            coupon_id AS couponId,
+            discount_amount AS discountAmount,
+            recipient_name AS recipientName,
+            phone,
+            postcode,
+            address,
+            detail_address AS detailAddress,
+            delivery_request AS deliveryRequest,
+            ordr_status AS ordrStatus,
+            ordr_date AS ordrDate,
+            mod_date AS modDate
+        FROM
+            toss_order
+        WHERE
+            ordr_no = #{ordrNo}
+    </select>
+    
+    <select id="getOrderedProductsByOrderId" parameterType="String" resultType="map">
+        SELECT
+            toi.gds_no AS gdsNo,
+            tg.gds_nm AS name,
+            toi.quantity,
+            toi.price
+        FROM
+            toss_order_item toi
+        JOIN
+            t_goods tg ON toi.gds_no = tg.gds_no
+        WHERE
+            toi.ordr_no = #{orderId}
+    </select>
+
+    <select id="findLatestOrderIdByUserNo" parameterType="String" resultType="String">
+        SELECT ordr_no
+        FROM toss_order
+        WHERE user_no = #{userNo}
+        ORDER BY ordr_date DESC
+        LIMIT 1
+    </select>
+
+    <select id="getOrderDetailsByOrderId" parameterType="String" resultType="map">
+        SELECT
+            ordr_no AS orderId,
+            ordr_name AS orderName,
+            final_amount AS amount,
+            recipient_name AS recipientName,
+            phone,
+            postcode,
+            address,
+            detail_address AS detailAddress,
+            delivery_request AS deliveryRequest,
+            ordr_status AS orderStatus,
+            ordr_date AS orderDate
+        FROM
+            toss_order
+        WHERE
+            ordr_no = #{orderId}
+    </select>
+
+    <select id="findUserCouponsByUserId" parameterType="String" resultMap="UserCouponWithDetailsResultMap">
+        SELECT
+            uc.user_coupon_id AS uc_user_cpn_id,
+            uc.user_no AS uc_user_no,
+            uc.use_yn AS uc_use_yn,
+            uc.indiv_expry_dt AS uc_indiv_expry_dt,
+            c.coupon_id AS c_pblcn_cpn_id,
+            c.coupon_name AS c_cpn_nm,
+            c.discount_type AS c_dscnt_type,
+            c.discount_value AS c_dscnt_vl,
+            c.min_order_amount AS c_min_ordr_amt,
+            c.max_discount_amount AS c_max_dscnt_amt,
+            c.valid_end_date AS c_vld_end_dt,
+            c.activation_status AS c_actvtn_yn
         FROM
             user_coupons uc
         JOIN
-            coupons c ON uc.pblcn_cpn_id = c.pblcn_cpn_id
+            coupons c ON uc.coupon_id = c.coupon_id
         WHERE
-            uc.user_no = #{userNo}
-            -- [수정] 사용하지 않은 쿠폰(0)을 조회합니다.
-            AND uc.use_yn = 0
-            AND c.actvtn_yn = 1
-            -- 만료일 체크는 임시로 주석 처리
-            -- AND (c.vld_end_dt IS NULL OR c.vld_end_dt >= NOW())
-            -- AND (uc.indiv_expry_dt IS NULL OR uc.indiv_expry_dt >= NOW())
-        ORDER BY 
-        	c.cpn_nm ASC
+            uc.user_no = #{userNo} AND uc.use_yn = 'N' AND uc.indiv_expry_dt >= NOW()
     </select>
 
-    <update id="updateUserCouponToUsed" parameterType="String">
-        UPDATE 
-        	user_coupons
-        SET
-            use_yn = 1,
-            use_dt = NOW()
+    <select id="selectUserInfoForShipping" parameterType="String" resultType="map">
+        SELECT
+            user_nm AS recipientName,   telno AS phone,             zip_cd AS postcode,         addr AS address,            daddr AS detailAddress      FROM
+            users
         WHERE
-            user_cpn_id = #{userCpnId}
-            AND use_yn = 0
+            user_no = #{userNo}
+    </select>
+
+    <update id="updateUserInfoShippingAddress" parameterType="map">
+        UPDATE users
+        SET
+            user_nm = #{recipientName},     telno = #{phone},
+            zip_cd = #{postcode},
+            addr = #{address},
+            daddr = #{detailAddress},
+            last_info_mdfcn_dt = NOW() WHERE
+            user_no = #{userNo}
     </update>
-    
-    <!-- 결제 시 총 매출액에 추가 -->
-    <update id="updateTotalSalesAmount">
-	    UPDATE 
-	    	store_settlements
-	    SET 
-	    	tot_sel_amt = IFNULL(tot_sel_amt, 0) + #{salesAmount}
-	    WHERE 
-	    	store_id = #{storeId}
-	</update>
-	
-	<!-- 결제가 완료된 상품 장바구니에서 제거 -->
-	<delete id="deletePurchasedItemsFromCart" parameterType="map">
-	    DELETE FROM cart_items
-	    WHERE
-	        user_no = #{userNo}
-	        AND gds_no IN
-	        <foreach item="item" collection="items" open="(" separator="," close=")">
-	            #{item.gdsNo}
-	        </foreach>
-	</delete>
 
 </mapper>
