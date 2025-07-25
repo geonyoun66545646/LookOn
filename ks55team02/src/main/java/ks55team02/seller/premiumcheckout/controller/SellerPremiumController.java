@@ -23,7 +23,7 @@ import ks55team02.admin.common.domain.SearchCriteria;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.seller.premiumcheckout.domain.SellerPremiumDTO;
 import ks55team02.seller.premiumcheckout.domain.SellerPremiumPaymentDTO;
-import ks55team02.seller.premiumcheckout.mapper.SellerPremiumMapper;
+import ks55team02.admin.common.domain.SearchCriteria;
 import ks55team02.seller.premiumcheckout.service.SellerPremiumService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 public class SellerPremiumController {
 
     private final SellerPremiumService sellerPremiumService;
-    private final SellerPremiumMapper sellerPremiumMapper;
     
     @Value("${toss.client-key}") // application.properties에서 client-key 주입
     private String tossClientKey;
