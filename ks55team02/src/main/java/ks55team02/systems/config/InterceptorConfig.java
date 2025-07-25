@@ -55,7 +55,8 @@ public class InterceptorConfig implements WebMvcConfigurer{
     	// [신규] 0순위: 관리자 페이지 캐시 방지 인터셉터
         registry.addInterceptor(noCacheInterceptor)
                 .order(0) // 가장 먼저 실행되어 응답 헤더를 설정
-                .addPathPatterns("/adminpage/**"); // 관리자 페이지에만 적용
+                .addPathPatterns("/adminpage/**") // 관리자 페이지에만 적용
+        		.addPathPatterns("/admin/**");
         
         // 관리자 페이지 접근 제어 인터셉터
         registry.addInterceptor(adminCheckInterceptor)
@@ -73,9 +74,12 @@ public class InterceptorConfig implements WebMvcConfigurer{
 
                         // --- 모든 리소스 폴더 ---
                         "/admincss/assets/**", 
+                        "/maincss/assets/error/**", 
+                        "/js/**", 
 
                         // --- 인터셉터가 관여하지 않을 페이지 영역 ---
                         "/adminpage/**", // 관리자 페이지 영역
+                        "/admin/**",
                         "/seller/**"     // 판매자 페이지 영역
                 );
      // [신규] 3순위: 판매자 페이지 접근 제어 인터셉터

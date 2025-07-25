@@ -224,49 +224,52 @@ public class ProductController {
 	// =============================================================
 	// ⭐ [추가] 판매자 상품 미리보기
 	// =============================================================
-	@GetMapping("/preview/{gdsNo}")
-	public String previewProduct(@PathVariable("gdsNo") String gdsNo, 
-	                             Model model, 
-	                             HttpSession session) {
-	    
-	    LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
-	    if (loginUser == null) { return "common/error/auth_error"; }
+	// ProductController.java 파일
 
-	    Products product = productsService.getProductDetailWithImages(gdsNo);
+    // =============================================================
+    // ⭐ [수정] 판매자 상품 미리보기 (세션 체크 제거)
+    // =============================================================
+    @GetMapping("/preview/{gdsNo}")
+    public String previewProduct(@PathVariable("gdsNo") String gdsNo, Model model) {
+        
+        // gdsNo만으로 상품 상세 정보 조회
+        Products product = productsService.getProductDetailWithImages(gdsNo);
 
-	    if (product == null || !product.getSelUserNo().equals(loginUser.getUserNo())) {
-	        return "common/error/auth_error";
-	    }
-	    
-	    // ⭐⭐⭐ [핵심 수정 부분] ⭐⭐⭐
-	    // 1. product.getProductImages()가 null일 경우를 대비하여 빈 리스트로 초기화합니다.
-	    List<ProductImage> allImages = product.getProductImages() != null ? product.getProductImages() : new ArrayList<>();
-	    
-	    // 2. 이미지를 타입별로 필터링합니다.
-	    ProductImage thumbnailImage = allImages.stream()
-	            .filter(img -> img.getImgType() == ProductImageType.THUMBNAIL)
-	            .findFirst()
-	            .orElse(null);
+        // 상품이 존재하지 않을 경우 에러 페이지로 이동
+        if (product == null) {
+            // 여기에 적절한 에러 처리 페이지 경로를 넣으세요.
+            // 예: return "error/404"; 또는 return "common/error/not_found";
+            return "common/error/auth_error"; 
+        }
+        
+        // 이미지를 타입별로 필터링하는 로직은 그대로 유지
+        List<ProductImage> allImages = product.getProductImages() != null ? product.getProductImages() : new ArrayList<>();
+        
+        ProductImage thumbnailImage = allImages.stream()
+                .filter(img -> img.getImgType() == ProductImageType.THUMBNAIL)
+                .findFirst()
+                .orElse(null);
 
-	    List<ProductImage> mainGalleryImages = allImages.stream()
-	            .filter(img -> img.getImgType() == ProductImageType.MAIN)
-	            .collect(Collectors.toList());
+        List<ProductImage> mainGalleryImages = allImages.stream()
+                .filter(img -> img.getImgType() == ProductImageType.MAIN)
+                .sorted(Comparator.comparing(ProductImage::getImgIndctSn)) // 순서대로 정렬
+                .collect(Collectors.toList());
 
-	    List<ProductImage> detailImages = allImages.stream()
-	            .filter(img -> img.getImgType() == ProductImageType.DETAIL)
-	            .collect(Collectors.toList());
-	            
-	    // 3. 템플릿에서 사용할 변수 이름으로 모델에 추가합니다.
-	    model.addAttribute("thumbnailImage", thumbnailImage);
-	    model.addAttribute("mainGalleryImages", mainGalleryImages);
-	    model.addAttribute("detailImages", detailImages);
-	    
-	    // 이전에 오류가 났던 product 객체는 그대로 사용
-	    model.addAttribute("product", product);
-	    model.addAttribute("isPreview", true);
+        List<ProductImage> detailImages = allImages.stream()
+                .filter(img -> img.getImgType() == ProductImageType.DETAIL)
+                .sorted(Comparator.comparing(ProductImage::getImgIndctSn)) // 순서대로 정렬
+                .collect(Collectors.toList());
+                
+        model.addAttribute("thumbnailImage", thumbnailImage);
+        model.addAttribute("mainGalleryImages", mainGalleryImages);
+        model.addAttribute("detailImages", detailImages);
+        
+        model.addAttribute("product", product);
+        model.addAttribute("isPreview", true);
+        model.addAttribute("title", "상품 미리보기"); // 페이지 제목 추가
 
-	    return "seller/products/sellerProductPreview"; 
-	}
+        return "seller/products/sellerProductPreview"; 
+    }
 
 	// 상품 삭제(비활성) 처리
 	@PostMapping("/deactivate")
