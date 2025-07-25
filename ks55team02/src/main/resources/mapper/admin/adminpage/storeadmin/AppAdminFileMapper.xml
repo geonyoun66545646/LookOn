@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ks55team02.admin.adminpage.storeadmin.appadmin.mapper.AppAdminFileMapper">
+
+    <resultMap id="storeImageResultMap" type="ks55team02.common.domain.store.StoreImage">
+        <id     property="imgId"        column="img_id"/>
+        <result property="imgAddr"      column="img_addr"/>
+        <result property="imgFileNm"    column="img_file_nm"/>
+        <result property="imgFileSz"    column="img_file_sz"/>
+        <result property="imgTypeCd"    column="img_type_cd"/>
+        <result property="regYmd"       column="reg_ymd"/>
+        <result property="delYn"        column="del_yn"/>
+    </resultMap>
+
+    <select id="findImageById" parameterType="String" resultMap="storeImageResultMap">
+        SELECT
+            img_id,
+            img_addr,
+            img_file_nm,
+            img_file_sz,
+            img_type_cd,
+            reg_ymd,
+            del_yn
+        FROM
+            store_images
+        WHERE
+            img_id = #{imgId}
+            AND del_yn = 0
+    </select>
+
+</mapper>

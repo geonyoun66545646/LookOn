@@ -1,4 +1,15 @@
-/* storeMngAdminView.css (수정 필요 없음) */
+/* storeMngAdminView.css */
+/* =======================================================
+ *  페이지 전체 폰트 굵기 설정 
+ * ======================================================= */
+
+body {
+    font-weight: 400;
+}
+
+h2.content-title {
+    font-weight: 800 !important;
+}
 
 /* 기존 드롭다운 아이템 스타일 유지 */
 .dropdown-menu .dropdown-item {
