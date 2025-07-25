@@ -4,21 +4,26 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import ks55team02.admin.adminpage.boardadmin.boardmanagement.service.BoardManagementService;
 import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.AdminPost;
+import ks55team02.admin.adminpage.boardadmin.postmanagement.domain.PostPreviewDto;
 import ks55team02.admin.adminpage.boardadmin.postmanagement.service.PostManagementService;
 import ks55team02.admin.common.domain.Pagination;
 import ks55team02.customer.login.domain.LoginUser;
+import ks55team02.customer.post.domain.Board;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PostManagementController {
 
 	private final PostManagementService postManagementService;
+	private final BoardManagementService boardManagementService;
 
 	// '게시글 관리' 메뉴 클릭 시 호출될 URL: /adminpage/boardadmin/postManagement
 	@GetMapping
@@ -117,4 +123,46 @@ public class PostManagementController {
 			return ResponseEntity.status(500).body(Map.of("result", "fail", "message", "처리 중 오류가 발생했습니다."));
 		}
 	}
+	
+    @GetMapping("/write")
+    public String showPostWriteForm(Model model) {
+        List<Board> adminOnlyBoards = boardManagementService.selectAdminOnlyBoards();
+        model.addAttribute("title", "공지사항/이벤트 작성");
+        model.addAttribute("adminOnlyBoards", adminOnlyBoards);
+        return "admin/adminpage/boardadmin/postmanagement/adminPostWrite";
+    }
+    
+    @PostMapping("/write")
+    @ResponseBody
+    public ResponseEntity<?> handlePostWrite(@RequestBody AdminPost post,
+                                             @SessionAttribute(name = "loginUser", required = false) LoginUser loginAdmin) {
+        if (loginAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "관리자 로그인이 필요합니다."));
+        }
+
+        String userGrade = loginAdmin.getMbrGrdCd();
+        if (!"grd_cd_0".equals(userGrade) && !"grd_cd_1".equals(userGrade)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "게시글을 작성할 권한이 없습니다."));
+        }
+
+        post.setWriterUserNo(loginAdmin.getUserNo());
+        
+        try {
+            postManagementService.insertPost(post);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (Exception e) {
+            log.error("게시글 등록 중 오류 발생", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "서버 처리 중 오류가 발생했습니다."));
+        }
+    }
+    
+    @GetMapping("/preview/{postSn}") // 클래스 레벨에 /postManagement가 있으므로 경로는 /postManagement/preview/{postSn}가 됨
+    @ResponseBody
+    public ResponseEntity<PostPreviewDto> getPostPreview(@PathVariable String postSn) {
+        PostPreviewDto postPreview = postManagementService.getPostPreview(postSn);
+        if (postPreview == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(postPreview);
+    }
 }

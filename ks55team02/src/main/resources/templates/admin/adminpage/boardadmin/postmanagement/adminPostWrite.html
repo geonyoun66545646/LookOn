@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout/layoutMain}">
+<head>
+    <title th:text="${title}"></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+</head>
+<th:block layout:fragment="contents">
+    <main class="main-content">
+        <section class="content-header">
+            <h2 class="content-title" th:text="${title}"></h2>
+        </section>
+        <div class="card">
+            <div class="card-body">
+                <form id="post-write-form">
+                    <!-- [수정] 카테고리 선택 드롭다운 -->
+                    <div class="mb-3">
+                        <label for="boardCategorySelect" class="form-label">카테고리 선택</label>
+                        <select class="form-select" id="boardCategorySelect" name="boardClassCode" required>
+                            <option value="" disabled selected>-- 게시판을 선택해주세요 --</option>
+                            <option th:each="board : ${adminOnlyBoards}"
+                                    th:value="${board.bbsClsfCd}"
+                                    th:text="${board.bbsNm}"></option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="postTitle" class="form-label">제목</label>
+                        <input type="text" class="form-control" id="postTitle" name="postTitle" placeholder="제목을 입력하세요" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="postContent" class="form-label">내용</label>
+                        <textarea id="postContent" name="postContent"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <a th:href="@{/adminpage/boardadmin/postManagement}" class="btn btn-secondary me-2">취소</a>
+                        <button type="submit" class="btn btn-primary">저장</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</th:block>
+
+<th:block layout:fragment="jsScript">
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script th:src="@{/js/admin/adminPostWrite.js}"></script>
+</th:block>
+</html>

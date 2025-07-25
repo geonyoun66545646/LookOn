@@ -52,23 +52,8 @@
 					        </button>
                         </div>
                     </header>
+                    
                     <div class="post-scrollable-content">
-                        <div class="feed-content-wrapper">
-                            <div class="feed-content-body" th:if="*{feedCn != null and !feedCn.isEmpty()}">
-                                <a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=*{writerInfo.userNo})}">
-                                	<img th:src="*{writerInfo.prflImg ?: '/uploads/profiles/defaultprofile.jpg'}" 
-                                	     th:alt="*{writerInfo.userNcnm} + ' 프로필'" class="writer-profile-img">
-                                </a>
-                                <p>
-                                <a th:href="@{/customer/feed/feedListByUserNo/{userNo}(userNo=*{writerInfo.userNo})}" 
-                                   class="comment-writer-username" th:text="*{writerInfo.userNcnm}"></a> 
-                                	<span class="feed-text" th:text="*{feedCn}"></span>
-                                </p>
-                            </div>
-                            <div class="hashtags" th:if="*{tagList != null and !tagList.isEmpty()}">
-                                <a th:each="tag : *{tagList}" href="#" th:text="|#${tag.tagNm}|">#해시태그</a>
-                            </div>
-                        </div>
                         <ul class="comment-list">
                             <li class="comment-item" th:each="comment, iterStat : *{commentList}" 
                             	th:attr="data-comment-sn=${comment.feedCmntSn}, data-writer-user-no=${comment.wrtrUserNo}" 
@@ -99,10 +84,12 @@
                                 <div class="comment-actions"></div>
                             </li>
                         </ul>
+                        <p class="no-comments-message" th:if="${#lists.isEmpty(feed.commentList)}">아직 댓글이 없습니다.</p>
                         <div class="show-more-wrapper" th:if="${#lists.size(feed.commentList) > 5}">
                         	<button class="show-more-comments-btn" th:text="|댓글 ${#lists.size(feed.commentList) - 5}개 더 보기|"></button>
                         </div>
                     </div>
+                    
                     <footer class="feed-post-footer">
                         <div class="interaction-buttons">
 	                        <button aria-label="좋아요">       
@@ -122,13 +109,22 @@
 						    </button>
 						</div>
                         <p class="like-count" th:text="|좋아요 *{likeCount}개|">좋아요 개수</p>
+                        
+                        <!-- [수정] 본문과 해시태그를 이 위치로 이동시켰습니다. -->
+                        <div class="feed-content-body" th:if="*{feedCn != null and !feedCn.isEmpty()}">
+                            <p class="feed-text" th:text="*{feedCn}"></p>
+                        </div>
+                        <div class="hashtags" th:if="*{tagList != null and !tagList.isEmpty()}">
+                            <a th:each="tag : *{tagList}" href="#" th:text="|#${tag.tagNm}|">#해시태그</a>
+                        </div>
+
                         <p class="post-timestamp" th:text="${#strings.substring(feed.crtDt, 0, 16)}">타임스탬프</p>
                         <div class="comment-input-area"><input type="text" placeholder="댓글 남기기..." class="comment-input"></div>
                     </footer>
                 </article>
             </section>
         </div>
-        <div id="loading-indicator" style="display: none; text-align: center; padding: 20px;"><p>Loading...</p></div>
+        <div id="loading-indicator" style="text-align: center; padding: 20px;"><p>Loading...</p></div>
     </div>
 
 	<div class="modal fade" id="unfollow-confirm-modal" tabindex="-1" role="dialog" aria-hidden="true">

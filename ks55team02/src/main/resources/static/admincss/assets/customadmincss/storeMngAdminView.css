@@ -1,48 +1,30 @@
-/* appAdminView.css */
+/* storeMngAdminView.css (수정 필요 없음) */
 
 /* 기존 드롭다운 아이템 스타일 유지 */
 .dropdown-menu .dropdown-item {
     justify-content: center;
-    /* text-align: center; (필요시 추가) */
-    white-space: nowrap; /* 내용이 길어져도 줄바꿈되지 않도록 방지 */
+    text-align: center; 
+    white-space: nowrap;
 }
 
-/* 드롭다운 메뉴 자체의 스타일 조정 */
 .dropdown-menu {
-    /* 부모 요소(버튼)의 너비를 따르도록 min-width 설정 */
-    min-width: 100%; /* 부모 버튼의 너비만큼 최소 너비를 가짐 */
-    /* 내용이 min-width보다 작을 때, 내용에 맞게 너비 조절 */
+    min-width: 100%;
     width: auto; 
-    /* 또는 내용이 길어져도 특정 최대 너비를 넘지 않도록 제한 */
-    /* max-width: 250px; (예시, 필요시 설정) */
-    /* overflow-x: auto; (max-width 사용 시 필요할 수 있음) */
-
-    /* 드롭다운 아이템 내부 텍스트 중앙 정렬을 위한 설정 */
-    text-align: center; /* 드롭다운 메뉴 내 모든 텍스트 중앙 정렬 */
+    text-align: center;
 }
 
-
-/* 잘못된 선택자 수정 (제거 또는 올바르게 수정) */
-/* .dropdown-menu status > { */ /* 이 부분은 잘못된 선택자이므로 제거하거나 아래처럼 수정 */
-/* text-align : center; */
-/* } */
-
-/* 만약 status 클래스를 가진 dropdown-menu에만 적용하고 싶다면: */
 .dropdown-menu.status {
     text-align: center;
 }
 
-/* badge-dot 스타일 (기존 코드와 충돌하지 않도록 확인) */
 .badge-dot {
     display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    margin-right: 5px; /* 텍스트와의 간격 */
-    vertical-align: middle; /* 텍스트와 세로 정렬 */
+    margin-right: 5px;
+    vertical-align: middle;
 }
-
-/* 기존 CSS 코드 나머지 부분은 그대로 유지 */
 
 .content-title {
     font-weight: 600;
@@ -59,7 +41,7 @@
 .member-table th,
 .member-table td {
     vertical-align: middle;
-    text-align: center;
+    text-align: center; /* 기본 정렬은 중앙 */
     padding: 12px 8px;
     border-bottom: 1px solid #eee;
     word-break: break-all;    
@@ -73,16 +55,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.text-center { text-align: center; }
-.member-table .col-checkbox { width: 5%; }
-.member-table .col-id       { width: 12%; }
-.member-table .col-name     { width: 8%; }
-.member-table .col-gender   { width: 5%; }
-.member-table .col-email    { width: 18%; }
-.member-table .col-phone    { width: 12%; }
-.member-table .col-address  { width: auto; }
-.member-table .col-status   { width: 8%; }
-.member-table .col-joindate { width: 10%; }
 .search-result-info {
     display: inline-block;
     padding: 8px 15px;
@@ -106,23 +78,26 @@
     text-align: center;
     border-radius: 10px;
 }
+
+/* ================== 핵심 스타일 ================== */
+/* 이 클래스들이 요청하신 기능을 수행합니다. */
 .ellipsis {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .text-left { text-align: left !important; }
+/* ================================================ */
+
 .text-center { text-align: center !important; }
 .text-right { text-align: right !important; }
 
+/* 테이블 컬럼 너비 설정 */
 .member-table th:nth-child(1) { width: 3%; min-width: 30px; } /* 체크박스 */
-.member-table th:nth-child(2) { width: 10%; min-width: 80px; } /* 상점 ID */
+.member-table th:nth-child(2) { width: 7%; min-width: 80px; } /* 상점 ID */
 .member-table th:nth-child(3) { width: 13%; min-width: 120px; } /* 상점 상호명 */
-.member-table th:nth-child(4) { width: 27%; min-width: 150px; } /* 상점 소개 (20% -> 18%) */
+.member-table th:nth-child(4) { width: 30%; min-width: 150px; } /* 상점 소개 */
 .member-table th:nth-child(5) { width: 10%; min-width: 80px; } /* 판매자 이름 */
-.member-table th:nth-child(6) { width: 10%; min-width: 80px; } /* 판매자 유저 번호 */
+.member-table th:nth-child(6) { width: 10%; min-width: 80px; } /* 판매자 ID */
 .member-table th:nth-child(7) { width: 7%; min-width: 60px; } /* 상점 상태 */
 .member-table th:nth-child(8) { width: 12%; min-width: 120px; } /* 정보 수정일시 */
-.member-table th:nth-child(9) { width: 8%; min-width: 80px; } /* 비활성화 일시 (10% -> 8%) */
-
-

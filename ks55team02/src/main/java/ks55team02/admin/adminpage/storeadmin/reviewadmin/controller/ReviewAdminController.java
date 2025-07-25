@@ -30,59 +30,64 @@ public class ReviewAdminController {
 
     private final ReviewAdminService reviewAdminService;
 
+    // reviewAdminManagementView 메소드는 기존과 동일
     @GetMapping("/reviewAdmin")
     public String reviewAdminManagementView(
             Model model,
             ProductReview review
     ) {
-        log.info("컨트롤러: reviewAdminManagementView 호출 - 현재 페이지: {}, 페이지 크기: {}, 검색 키: {}, 검색 값: {}",
-                 review.getCurrentPage(), review.getPageSize(), review.getSearchKey(), review.getSearchValue());
-        log.info("디버그 확인: review.filterConditions = {}", review.getFilterConditions());
+        log.info("컨트롤러 진입: filterConditions = {}", review.getFilterConditions());
+
+        // [핵심 수정] 사용자가 필터를 선택하지 않았거나, 최초 접속 시 기본으로 '활성'과 '숨김' 상태만 조회하도록 설정
+        if (review.getFilterConditions() == null || review.getFilterConditions().isEmpty()) {
+            review.setFilterConditions(List.of("ACTIVE", "HIDDEN"));
+            log.info("기본 필터 적용: ACTIVE, HIDDEN");
+        }
 
         int totalRecordCount = reviewAdminService.getReviewCount(review);
-
         Pagination pagination = new Pagination(totalRecordCount, review);
-        log.info("컨트롤러: pagination 계산 완료 - totalPageCount: {}, startPage: {}, endPage: {}, limitStart: {}",
-                 pagination.getTotalPageCount(), pagination.getStartPage(), pagination.getEndPage(), pagination.getLimitStart());
-
         review.setOffset(pagination.getLimitStart());
+        List<ProductReview> reviewList = reviewAdminService.getReviewList(review);
 
-        List<ProductReview> reviewList = reviewAdminService.getReviewList(review, pagination.getLimitStart(), review.getPageSize());
-        log.info("컨트롤러: reviewList 조회 결과 개수: {}", reviewList.size());
-
+        log.info("최종 조회 조건: {}", review);
+        log.info("조회된 리뷰 개수: {}", reviewList.size());
+        
         model.addAttribute("title", "상품 리뷰 관리");
         model.addAttribute("reviewList", reviewList);
         model.addAttribute("pagination", pagination);
-        model.addAttribute("searchCriteria", review);
+        model.addAttribute("searchCriteria", review); // 모델에 담는 searchCriteria에는 기본 필터가 적용된 상태
 
         return "admin/adminpage/storeadmin/reviewAdminView";
     }
 
+
+    // [수정] updateReviewStatus 메소드
     @PostMapping("/updateReviewStatus")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateReviewStatus(
             @RequestBody Map<String, Object> payload,
-            HttpSession session // HttpSession 파라미터 추가
+            HttpSession session
     ) {
         try {
             @SuppressWarnings("unchecked")
             List<String> reviewIds = (List<String>) payload.get("reviewIds");
-            Integer newStatus = (Integer) payload.get("newStatus");
+            // [수정] newStatus를 String으로 받음 (AJAX에서 'ACTIVE', 'HIDDEN', 'DELETED' 전송)
+            String newStatus = (String) payload.get("newStatus");
 
-            if (reviewIds == null || reviewIds.isEmpty() || newStatus == null) {
+            if (reviewIds == null || reviewIds.isEmpty() || newStatus == null || newStatus.isBlank()) {
                 return new ResponseEntity<>(Map.of("success", false, "message", "필수 파라미터가 누락되었습니다."), HttpStatus.BAD_REQUEST);
             }
 
-            String loggedInUserLgnId = null;
-            LoginUser loginUser = (LoginUser) session.getAttribute("loginUser"); // 세션에서 LoginUser 객체 가져오기
-
-            if (loginUser != null) {
-                loggedInUserLgnId = loginUser.getUserLgnId(); // LoginUser 객체에서 로그인 ID 가져오기
-            } else {
-                log.warn("로그인된 사용자 정보를 세션에서 찾을 수 없습니다. del_prcr_no는 NULL로 설정될 수 있습니다.");
+            // 세션에서 로그인된 사용자 ID 가져오기
+            LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+            if (loginUser == null) {
+                // 관리자 페이지이므로 로그인이 안된 경우는 비정상 접근으로 간주 가능
+                return new ResponseEntity<>(Map.of("success", false, "message", "로그인 정보가 없습니다. 다시 로그인해주세요."), HttpStatus.UNAUTHORIZED);
             }
+            String loggedInUserLgnId = loginUser.getUserLgnId();
 
-            reviewAdminService.updateReviewStatus(reviewIds, newStatus, loggedInUserLgnId);
+            // [수정] 서비스 호출 (일괄 처리 메소드 호출)
+            reviewAdminService.updateReviewStatusBatch(reviewIds, newStatus, loggedInUserLgnId);
 
             return new ResponseEntity<>(Map.of("success", true, "message", "리뷰 상태가 성공적으로 변경되었습니다."), HttpStatus.OK);
         } catch (Exception e) {
