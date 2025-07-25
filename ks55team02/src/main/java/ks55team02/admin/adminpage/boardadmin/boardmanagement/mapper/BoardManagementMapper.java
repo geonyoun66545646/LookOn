@@ -17,4 +17,6 @@ public interface BoardManagementMapper {
 	int deleteBoard(String boardCode);
 
 	int restoreBoard(String boardCode);
+	
+	List<Board> selectAdminOnlyBoards();
 }

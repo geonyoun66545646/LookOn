@@ -155,5 +155,6 @@
 			#{postSn}
 		</foreach>
 	</update>
+	
 
 </mapper>

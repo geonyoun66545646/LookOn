@@ -38,4 +38,6 @@ public interface PostManagementMapper {
 	 * @return 처리된 행의 수
 	 */
 	int updatePostsToRestored(List<String> postSns);
+	
+	
 }

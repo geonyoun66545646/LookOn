@@ -32,4 +32,6 @@ public interface PostManagementService {
      * @return 처리된 행의 수
      */
     int updatePostsToRestored(List<String> postSns);
+    
+    void insertPost(AdminPost post);
 }
