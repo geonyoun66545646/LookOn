@@ -94,7 +94,7 @@ $(() => {
 	const previewModal = new bootstrap.Modal($('#previewModal')[0]);
 	const $modalBody = $('#previewModalBody');
 
-	// 수정 후
+	// 수정 후 (이미지 태그를 완전히 제거한 최종 버전)
 	const createFeedPreviewHtml = (data) => {
 	    // 이미지 캐러셀 HTML 생성
 	    const imagesHtml = data.imageUrls && data.imageUrls.length > 0 ? `
@@ -120,17 +120,14 @@ $(() => {
 	    const tagsHtml = data.tags && data.tags.length > 0 ?
 	        data.tags.map(tag => `<span class="badge bg-secondary me-1">#${tag}</span>`).join(' ') :
 	        '<span class="text-muted">태그 없음</span>';
-	    
+
 	    // 날짜 포맷팅
 	    const formattedDate = new Date(data.crtDt).toLocaleString('ko-KR');
 
 	    return `
-	        <div class="d-flex align-items-center mb-3">
-	            <img src="${data.userImg || '/maincss/assets/images/default_profile.png'}" class="rounded-circle me-2" width="40" height="40" alt="프로필" style="object-fit: cover;">
-	            <div>
-	                <div class="fw-bold">${data.userNcnm}</div>
-	                <div class="text-muted small">${formattedDate}</div>
-	            </div>
+	        <div class="mb-3">
+	            <div class="fw-bold">${data.userNcnm}</div>
+	            <div class="text-muted small">${formattedDate}</div>
 	        </div>
 	        <hr>
 	        ${imagesHtml}
