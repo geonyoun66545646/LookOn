@@ -55,7 +55,6 @@
                             </div>
 
                             <label class="form-label mb-0 me-3 ms-4">문의 대상</label>
-                            <!-- ... (이하 동일) ... -->
                             <div class="form-check me-4">
                                 <input class="form-check-input inquiry-target-radio" type="radio" name="inquiryTargetRadio" id="targetAll" value=""
                                        th:checked="${searchCriteria.inqryTrgtTypeCd == null or searchCriteria.inqryTrgtTypeCd == ''}">
@@ -134,11 +133,11 @@
 			                    <a class="dropdown-item change-inquiry-status-btn" href="#" data-status="COMPLETED">
 			                        <span class="badge-dot bg-success"></span>완료
 			                    </a>
-			                    <a class="dropdown-item change-inquiry-status-btn" href="#" data-status="DELETED">
-			                        <span class="badge-dot bg-danger"></span>삭제
-			                    </a>
 			                    <a class="dropdown-item change-inquiry-status-btn" href="#" data-status="HIDDEN">
 			                        <span class="badge-dot bg-warning"></span>숨김
+			                    </a>
+			                    <a class="dropdown-item change-inquiry-status-btn" href="#" data-status="DELETED">
+			                        <span class="badge-dot bg-danger"></span>삭제
 			                    </a>
 			                </div>
                          </div>
@@ -169,25 +168,24 @@
                                  <th scope="col" class="col-title">제목</th>
                                  <th scope="col" class="col-writer-name">작성자 이름</th>
                                  <th scope="col" class="col-writer-id">작성자 ID</th>
-                                 <th scope="col" class="col-date">등록일</th>
                                  <th scope="col" class="col-status">처리 상태</th>
+                                 <th scope="col" class="col-date">등록일</th>
                                  <th scope="col" class="col-details">상세 보기</th>
                              </tr>
                          </thead>
                          <tbody class="text-center">
                              <tr th:if="${!inquiryList.isEmpty()}" th:each="inquiry : ${inquiryList}">
-                                 <td><input class="form-check-input member-check" type="checkbox" th:value="${inquiry.inqryId}"></td>
-                                 <td th:text="${inquiry.inqryId}"></td>
-                                 <td th:text="${inquiry.inqryTypeCd}"></td>
-                                 <td th:text="${inquiry.inqryTrgtTypeCd}"></td>
-                                 <td class="text-left ellipsis t-title">
+                                 <!-- ▼▼▼ [수정] 모든 td에 컬럼 클래스 추가 ▼▼▼ -->
+                                 <td class="col-check"><input class="form-check-input member-check" type="checkbox" th:value="${inquiry.inqryId}"></td>
+                                 <td class="col-num" th:text="${inquiry.inqryId}"></td>
+                                 <td class="col-type" th:text="${inquiry.inqryTypeCd}"></td>
+                                 <td class="col-target" th:text="${inquiry.inqryTrgtTypeCd}"></td>
+                                 <td class="col-title text-left ellipsis"> <!-- col-title은 너비가 auto이므로 클래스만 추가 -->
                                      <a class="text" th:href="@{/admin/inquiry/adminInquiryDetail(inqryId=${inquiry.inqryId})}" th:text="${inquiry.inqryTtl}"></a>
                                  </td>
-                                 <td><span th:text="${inquiry.writerInfo?.userNm}"></span></td>
-                                 <td><span th:text="${inquiry.writerInfo?.userLgnId}"></span></td>
-                                 <td th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></td>
-                                 <td>
-                                     <!-- [핵심] DB 값(영문)에 따라 화면 표시(한글)를 분기 -->
+                                 <td class="col-writer-name"><span th:text="${inquiry.writerInfo?.userNm}"></span></td>
+                                 <td class="col-writer-id"><span th:text="${inquiry.writerInfo?.userLgnId}"></span></td>
+                                 <td class="col-status">
                                      <th:block th:switch="${inquiry.prcsStts}">
                                          <span th:case="'RECEPTION'"   class="badge custom-badge bg-secondary">접수</span>
                                          <span th:case="'COMPLETED'"   class="badge custom-badge bg-success">완료</span>
@@ -196,9 +194,11 @@
                                          <span th:case="*"         class="badge custom-badge bg-dark" th:text="${inquiry.prcsStts}"></span>
                                      </th:block>
                                  </td>
-                                 <td>
+                                 <td class="col-date" th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></td>
+                                 <td class="col-details">
                                      <a th:href="@{/admin/inquiry/adminInquiryDetail(inqryId=${inquiry.inqryId})}" class="btn btn-sm btn-outline-primary">상세 보기</a>
                                  </td>
+                                 <!-- ▲▲▲ [수정] 모든 td에 컬럼 클래스 추가 완료 ▲▲▲ -->
                              </tr>
                              <tr th:if="${inquiryList.isEmpty()}">
                                  <td colspan="10" class="text-center py-5">조회된 문의가 없습니다.</td>

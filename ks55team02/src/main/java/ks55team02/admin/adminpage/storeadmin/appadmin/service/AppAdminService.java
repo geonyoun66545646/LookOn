@@ -26,5 +26,7 @@ public interface AppAdminService {
     
     // 상점 신청 상태 변경
     void updateAppStatus(AppStore appStore);
+    
+    
 
 }
