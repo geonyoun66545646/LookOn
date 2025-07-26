@@ -48,7 +48,7 @@
             sbscr_plan_mdfcn_dt
         FROM
             subscription_plans
-        ORDER BY sbscr_plan_crt_dt DESC <!-- 기본적으로 최신 생성일순으로 정렬 -->
+        ORDER BY sbscr_plan_crt_dt DESC
         LIMIT #{offset}, #{pageSize}
     </select>
 
@@ -72,7 +72,7 @@
             sbscr_stlm_id,
             user_no,
             sbscr_plan_id,
-            sbscr_prchs_nocs,       -- [추가됨]
+            sbscr_prchs_nocs,       
             sbscr_tot_stlm_amt,
             sbscr_stlm_stts_cd,
             stlm_dmnd_dt
@@ -80,14 +80,12 @@
             #{sbscrStlmId},
             #{userNo},
             #{sbscrPlanId},
-            #{sbscrPrchsNocs},       -- [추가됨] DTO에 담겨온 수량 값
-            #{sbscrTotStlmAmt},
+            #{sbscrPrchsNocs},       #{sbscrTotStlmAmt},
             'PENDING',
             NOW()
         )
     </insert>
     
-    <!--  플랜 ID로 플랜의 기본 기간(sbscr_plan_term_val)을 조회하는 쿼리 -->
     <select id="findPlanTermById" parameterType="string" resultType="int">
         SELECT 
             sbscr_plan_term_val
@@ -97,28 +95,32 @@
             sbscr_plan_id = #{planId}
     </select>
 
-    <!-- 결제 성공 시 업데이트하는 쿼리도 확인합니다. -->
     <update id="updatePaymentSuccess">
 	    UPDATE subscription_payments
         SET
-            sbscr_stlm_stts_cd = 'COMPLETED',       -- 상태를 '완료'로 변경
-            pg_dlng_id = #{paymentKey},             -- Toss에서 받은 결제 키 저장
-            sbscr_bgng_dt = #{startDate},           -- [추가] 구독 시작일 저장
-            sbscr_end_dt = #{endDate},              -- [추가] 구독 종료일 저장
-            stlm_cmptn_dt = NOW()                   -- 결제 완료 일시 저장
+            sbscr_stlm_stts_cd = 'COMPLETED',
+            pg_dlng_id = #{paymentKey},
+            sbscr_bgng_dt = #{startDate},           sbscr_end_dt = #{endDate},              stlm_cmptn_dt = NOW()
         WHERE
             sbscr_stlm_id = #{orderId}
 	</update>
 	
-	<!-- ✅ [추가] ID로 결제 정보를 조회하는 쿼리 -->
-    <select id="findPaymentById" parameterType="string" resultMap="paymentResultMap">
-        SELECT *
+	<select id="findPaymentById" parameterType="string" resultMap="paymentResultMap">
+        SELECT 
+        	sbscr_stlm_id,
+        	user_no,
+        	sbscr_plan_id,
+        	sbscr_prchs_nocs, sbscr_tot_stlm_amt,
+        	sbscr_stlm_mthd_cd,
+        	sbscr_stlm_stts_cd,
+        	pg_dlng_id,
+        	pg_co_info,
+        	stlm_cmptn_dt,
+        	stlm_dmnd_dt
         FROM subscription_payments
         WHERE sbscr_stlm_id = #{orderId}
     </select>
       
-    
-    <!-- ✅ [추가] ID로 구독 플랜 정보를 조회하는 쿼리 (기존에 있다면 재활용) -->
     <select id="findPlanById" parameterType="string" resultMap="subscriptionPlanResultMap">
 	    SELECT
 	        sbscr_plan_id,
@@ -134,25 +136,29 @@
 	        sbscr_plan_id = #{planId}
 	</select>
 
-	<!-- 주문 ID로 결제 정보와 '플랜 명칭'을 함께 조회하는 쿼리 -->
 	<select id="findPaymentWithPlanNameByOrderId" parameterType="string"
-            resultType="ks55team02.seller.premiumcheckout.domain.SellerPremiumPaymentDTO">
+        resultMap="paymentResultMap"> 
         SELECT
-            p.sbscr_stlm_id,
-            p.user_no,
-            p.sbscr_plan_id,
-            p.sbscr_tot_stlm_amt,
-            p.sbscr_stlm_mthd_cd,
-            p.sbscr_bgng_dt,      -- [추가] 구독 시작일
-            p.sbscr_end_dt,       -- [추가] 구독 종료일
-            s.sbscr_plan_nm
-        FROM
-            subscription_payments p
-        LEFT JOIN
-            subscription_plans s ON p.sbscr_plan_id = s.sbscr_plan_id
-        WHERE
-            p.sbscr_stlm_id = #{orderId}
-    </select>
+	        p.sbscr_stlm_id,
+	        p.user_no,
+	        p.sbscr_plan_id,
+	        p.sbscr_prchs_nocs,
+	        p.sbscr_tot_stlm_amt,
+	        p.sbscr_stlm_mthd_cd,
+	        p.sbscr_bgng_dt,
+	        p.sbscr_end_dt,
+	        p.sbscr_stlm_stts_cd, p.pg_dlng_id,
+	        p.pg_co_info,
+	        p.stlm_cmptn_dt,
+	        p.stlm_dmnd_dt,
+	        s.sbscr_plan_nm
+	    FROM
+	        subscription_payments p
+	    LEFT JOIN
+	        subscription_plans s ON p.sbscr_plan_id = s.sbscr_plan_id
+	    WHERE
+	        p.sbscr_stlm_id = #{orderId}
+	</select>
 
 	<select id="findPlanNameByOrderId" parameterType="string" resultType="string">
         SELECT
@@ -165,4 +171,39 @@
             p.sbscr_stlm_id = #{orderId}
     </select>
 
-</mapper>
+    <select id="getUserTotalSubscriptionCount" parameterType="string" resultType="int">
+        SELECT 
+            COALESCE(SUM(sbscr_prchs_nocs), 0)
+        FROM 
+            subscription_payments
+        WHERE 
+            user_no = #{userNo} AND sbscr_stlm_stts_cd = 'COMPLETED'
+    </select>
+
+    <select id="getStoreSettlementPolicyId" parameterType="string" resultType="string">
+        SELECT 
+            plcy_id
+        FROM 
+            store_settlements
+        WHERE 
+            store_id = #{storeId}
+    </select>
+
+    <update id="updateStoreSettlementPolicy" parameterType="map">
+        UPDATE 
+            store_settlements
+        SET 
+            plcy_id = #{newPolicyId}
+        WHERE 
+            store_id = #{storeId}
+    </update>
+    
+    <select id="getMaxSbscrStlmIdSequence" resultType="java.lang.Integer">
+        SELECT
+            MAX(CAST(SUBSTRING(sbscr_stlm_id, LENGTH('subpay_sell_') + 1) AS UNSIGNED))
+        FROM
+            subscription_payments
+        WHERE
+            sbscr_stlm_id LIKE 'subpay_sell_%'
+    </select>
+    </mapper>

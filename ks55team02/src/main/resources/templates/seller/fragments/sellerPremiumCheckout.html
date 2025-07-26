@@ -13,7 +13,6 @@
 	th:href="@{/maincss/assets/customcustomercss/premiumCheckout.css}">
 <script src="https://js.tosspayments.com/v1"></script>
 
-<!-- '쌈뽕한' 수량 조절 버튼을 위한 CSS -->
 <style>
 .quantity-selector-wrapper {
 	display: flex;
@@ -81,7 +80,6 @@
 				<div class="checkout-details-panel">
 					<h2 class="panel-title">주문 정보</h2>
 
-					<!-- 수량 선택 UI -->
 					<div class="order-item-display">
 						<span class="item-name" th:text="${planName}">프리미엄 플랜</span>
 						<div class="quantity-selector-wrapper">
@@ -97,7 +95,6 @@
 						</div>
 					</div>
 
-					<!-- 주문 요약 정보 -->
 					<div class="order-summary-box">
 						<div class="summary-line">
 							<span class="label">상품 단가</span> <span class="value"
@@ -105,12 +102,10 @@
 						</div>
 						<div class="summary-line total">
 							<span class="label">총 결제 금액</span>
-							<!-- ✅ [수정 완료] 여기에 id를 정확히 추가했습니다. -->
 							<span class="value highlight" id="dynamic-total-amount"></span>
 						</div>
 					</div>
 
-					<!-- ✅ [수정 완료] '...' 대신 실제 HTML 코드를 복원했습니다. -->
 					<div class="payment-methods-section">
 						<h3 class="section-heading">결제 수단</h3>
 						<div class="payment-options">
