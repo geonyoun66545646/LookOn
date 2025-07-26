@@ -3,6 +3,65 @@
 
 	// --- 상점 선택 및 문의 유형 동적 처리 ---
 $(document).ready(function () {
+	
+	// ✅ [수정] 각 Select2를 개별적으로 초기화하여 오류를 원천 차단합니다.
+
+	    // 1. '문의 대상' 드롭다운 (검색창 없음)
+	    $('#inqryTrgtTypeCd').select2({
+	        theme: 'bootstrap-5',
+	        width: '100%',
+	        dropdownParent: $('#inqryTrgtTypeCd').parent(), // 자신의 부모를 명시
+	        minimumResultsForSearch: Infinity // 검색창 숨기기
+	    });
+
+	    // 2. '문의 유형' 드롭다운 (검색창 없음)
+	    $('#inqryTypeCd').select2({
+	        theme: 'bootstrap-5',
+	        width: '100%',
+	        dropdownParent: $('#inqryTypeCd').parent(), // 자신의 부모를 명시
+	        minimumResultsForSearch: Infinity // 검색창 숨기기
+	    });
+
+	    // 3. '상점 선택' 드롭다운 (검색창 있음)
+	    $('#inqryStoreId').select2({
+	        theme: 'bootstrap-5',
+	        width: '100%',
+	        dropdownParent: $('#inqryStoreId').parent() // 자신의 부모를 명시
+	    });
+
+
+	    // --- 여기부터 아래 코드는 그대로 유지 ---
+
+	    // '문의 대상' 선택에 따른 '상점 선택' 드롭다운 동적 표시
+	    $('#inqryTrgtTypeCd').on('change', function() {
+	        const selectedTarget = $(this).val();
+	        const $storeSelectRow = $('#storeSelectRow');
+
+	        if (selectedTarget === 'STORE') {
+	            $storeSelectRow.slideDown();
+	        } else {
+	            $storeSelectRow.slideUp();
+	            $('#inqryStoreId').val(null).trigger('change');
+	        }
+	    });
+	    
+	    // (이하 기존 파일 업로드 관련 JS가 있다면 여기에 추가)
+	    // 예시: 파일 드래그 앤 드롭 및 미리보기 로직
+	    const fileDropZone = document.querySelector('.file-drop-zone');
+	    const fileInput = document.getElementById('attachedFilesInput');
+	    const filePreviewContainer = document.getElementById('filePreviewContainer');
+	    const files = [];
+
+	    fileDropZone.addEventListener('click', () => fileInput.click());
+	    fileDropZone.addEventListener('dragover', (e) => e.preventDefault());
+	    fileDropZone.addEventListener('drop', (e) => {
+	        e.preventDefault();
+	        handleFiles(e.dataTransfer.files);
+	    });
+	    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+	
+	
+	
     const $inquiryTargetSelect = $('#inqryTrgtTypeCd');
     const $storeSelectRow = $('#storeSelectRow');
     const $inquiryStoreSelect = $('#inqryStoreId');
