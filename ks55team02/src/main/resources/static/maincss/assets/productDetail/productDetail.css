@@ -1410,7 +1410,32 @@
 }
 
 
-/*  리뷰 입력 폼  */
+/* ======================================================= */
+/*             리뷰 작성 폼 스타일 (최종 정리본)            */
+/* ======================================================= */
+/* 폼 전체를 감싸는 내부 컨테이너 */
+.review-form-inner-wrapper {
+    width: 70%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* 첨부파일 영역 */
+.attachment-area-wrapper {
+    width: 50%;
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* 텍스트 입력창 리사이즈 비활성화 */
+textarea.form-control {
+    resize: none;
+}
+
+
 /* 리뷰 섹션 컨테이너 */
 .add-review {
     background-color: #ffffff;
@@ -1509,20 +1534,11 @@
     transform: translateY(-2px);
 }
 
-/* 리뷰 입력 프래그 먼트 */
+/* ======================================================= */
+/*               취소 & 제출 버튼 스타일                   */
+/* ======================================================= */
 
-
-/* 새로 추가된 내부 컨테이너 스타일 */
-.review-form-inner-wrapper {
-    width: 70%;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-}
-
-/* 리뷰 폼 버튼 래퍼 스타일 */
+/* 버튼들을 감싸는 래퍼 */
 .form-buttons-wrapper {
     display: flex;
     justify-content: center;
@@ -1531,41 +1547,68 @@
     margin: 0 auto;
 }
 
-/* 리뷰 제출 버튼 스타일 */
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+/* ★  취소(cancel) & 제출(submit) 버튼 핵심 스타일 ★ */
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+
+/* 1. 두 버튼에 공통으로 적용될 스타일 */
+.cancel-review-btn,
 .submit-review-btn {
-    width: 100px; /* 기존 너비 유지 또는 약간 더 줄여볼 수 있습니다 (예: 90px) */
-    padding: 0.7rem 1rem; /* ⭐ 가로 padding 값을 1.5rem에서 1rem으로 줄였습니다. ⭐ */
-    font-size: 1rem;
-    display: inline-block;
+    /* 버튼 크기 및 기본 모양 */
+    width: 130px; /* 아이콘을 포함하기에 적절한 너비 (조절 가능) */
+    padding: 1.2rem 1rem;
+    display: flex !important; /* 부트스트랩 스타일을 덮어쓰기 위해 !important 사용 */
+    justify-content: center; 
+    align-items: center;
+    font-size: 1.5rem;
 }
 
-/* 취소 버튼 스타일 */
+/* 2. 버튼 안의 아이콘 스타일 */
+.cancel-review-btn > i,
+.submit-review-btn > i {
+    margin-right: 8px; 
+}
+
+
+/* 3. 각 버튼의 고유한 스타일 (색상, 호버 효과 등) */
+
+/* 취소 버튼 기본 스타일 */
 .cancel-review-btn {
-    width: 100px; /* 기존 너비 유지 또는 약간 더 줄여볼 수 있습니다 (예: 90px) */
     background-color: #6c757d;
     border-color: #6c757d;
     color: #fff;
-    padding: 0.7rem 1rem; /* ⭐ 가로 padding 값을 1.5rem에서 1rem으로 줄였습니다. ⭐ */
-    font-size: 1rem;
     transition: all 0.3s ease-in-out;
-    display: inline-block;
 }
 
+/* 취소 버튼 호버(마우스 올렸을 때) 효과 */
 .cancel-review-btn:hover {
     background-color: #5a6268;
     border-color: #545b62;
-    box-shadow: 0 8px 16px rgba(108, 117, 125, 0.2);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
     transform: translateY(-2px);
 }
 
-/* 첨부파일 영역 래퍼 스타일 */
-.attachment-area-wrapper {
-    width: 50%;
-    margin-left: 0;
-    margin-right: auto;
+/* 제출 버튼은 부트스트랩의 .btn-primary 스타일을 따르므로 별도 지정이 적을 수 있습니다. */
+.submit-review-btn {
+}
+/* ======================================================= */
+/*             상품 상세 - 리뷰 리스트 스타일 (수정본)       */
+/* ======================================================= */
+
+/* 전체 리뷰 목록 컨테이너 */
+#review-list-container {
+    box-sizing: border-box;
 }
 
-/* 텍스트 에어리어 리사이즈 비활성화 */
-textarea.form-control {
-    resize: none;
+/* [수정] 구분선을 담당할 외부 래퍼 스타일 */
+.review-item-wrapper.review-item-border {
+    border-bottom: 1px solid #eee; /* 구분선 스타일 */
+    margin-bottom: 1.5rem;          /* 구분선과 다음 리뷰 사이의 간격 */
+    /* padding-bottom은 여기서 제거합니다. */
+}
+
+/* [수정] 실제 콘텐츠를 감싸는 .review div에 모든 패딩을 적용합니다. */
+.review {
+    padding: 0 5% 1.5rem; 
+    box-sizing: border-box;
 }
