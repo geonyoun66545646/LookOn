@@ -62,9 +62,9 @@ label {
 
 input[type="text"], input[type="email"], select, textarea {
 	width: 100%;
-	padding: 12px 15px;
+	padding: 12px 35px 12px 15px; /* 상, 우, 하, 좌 (오른쪽 패딩 확보) */
 	border: 1px solid #ddd;
-	border-radius: 5px;
+	/* border-radius: 5px; */
 	font-size: 1em;
 	box-sizing: border-box;
 	transition: border-color 0.3s;
@@ -81,43 +81,7 @@ textarea {
 	min-height: 120px;
 }
 
-.submit-btn {
-	background-color: var(--molla-main-color);
-	color: white;
-	padding: 15px 30px;
-	border: none;
-	border-radius: 5px;
-	font-size: 1.1em;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	display: inline-flex;
-	align-items: center;
-	gap: 10px;
-	margin-top: 20px;
-}
 
-.cancel-btn {
-	background-color: rgb(149, 149, 149);
-	color: white;
-	padding: 15px 30px;
-	border: none;
-	border-radius: 5px;
-	font-size: 1.1em;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-	display: inline-flex;
-	align-items: center;
-	gap: 10px;
-	margin-top: 20px;
-}
-
-.cancel-btn:hover {
-	background-color: rgb(126, 126, 126);
-}
-
-.submit-btn:hover {
-	background-color: var(--molla-darker-color);
-}
 
 .info-message {
 	margin-top: 30px;
@@ -125,7 +89,7 @@ textarea {
 	background-color: #e9f5ee;
 	border-left: 5px solid #4CAF50;
 	color: #333;
-	border-radius: 5px;
+	/* border-radius: 5px; */
 	font-size: 0.9em;
 	line-height: 1.4;
 }
@@ -154,7 +118,7 @@ textarea {
 	height: 100px;
 	object-fit: cover;
 	border: 1px solid #ddd;
-	border-radius: 5px;
+	/* border-radius: 5px; */
 }
 /* 개별 미리보기 아이템을 감싸는 컨테이너 (상대 위치 기준점) */
 .preview-item {
@@ -172,7 +136,7 @@ textarea {
 	background-color: rgba(0, 0, 0, 0.6); /* 반투명 검정 배경 */
 	color: white;
 	border: none;
-	border-radius: 50%; /* 동그란 모양 */
+/*	border-radius: 50%; /* 동그란 모양 */
 	font-size: 12px;
 	font-weight: bold;
 	line-height: 20px; /* 텍스트 세로 중앙 정렬 */
@@ -275,8 +239,46 @@ textarea {
 	padding: 25px; /* ⭐ 상하좌우 여백 추가 */
 }
 
-/* ⭐ (추가) 모달 닫기 버튼의 가시성 확보: 이미지는 'ㅡ' 모양으로 되어있어, 이는 커스텀 아이콘이 적용된 것으로 보입니다.
-             현재 Bootstrap의 btn-close는 'x' 모양입니다. 만약 이미지와 같은 'ㅡ' 모양을 원한다면
-             아래 CSS를 추가하고, 필요시 HTML의 button.btn-close 내부를 SVG로 교체해야 합니다.
-             여기서는 Bootstrap의 'x' 버튼을 보이게 하고 스타일을 조정합니다.
-*/
+/* =================================================================== */
+/* [추가] Custom Select Box Style for Report Page                      */
+/* =================================================================== */
+
+/* 1. select를 감싸는 wrapper 스타일 (위치 기준점) */
+.reports-receive-container .select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* 2. <select> 태그의 브라우저 기본 디자인 비활성화 */
+.reports-receive-container .select-wrapper select {
+  -webkit-appearance: none; /* for Chrome, Safari, Opera */
+  -moz-appearance: none;    /* for Firefox */
+  appearance: none;         /* Standard */
+  cursor: pointer;
+  
+  /* IE 10/11 용 화살표 숨기기 */
+  &::-ms-expand {
+    display: none;
+  }
+}
+
+.reports-receive-container .select-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  
+  /* ▼▼▼ 아이콘 영역(틀)의 크기를 키웁니다. (1rem -> 1.2rem) ▼▼▼ */
+  width: 1.2rem;  /* 기존 1rem (16px) -> 19.2px */
+  height: 1.2rem; /* 기존 1rem (16px) -> 19.2px */
+  
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: center;
+  
+  /* ▼▼▼ 아이콘 자체의 크기도 키웁니다. (60% -> 80%) ▼▼▼ */
+  background-size: 80%;
+  
+  pointer-events: none;
+}
