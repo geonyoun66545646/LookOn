@@ -4,69 +4,130 @@
       layout:decorate="~{customer/layout/layoutMain}">
 
 <head>
-    <meta charset="UTF-8">
-    <title>결제 완료</title>
+    <title>주문 완료</title>
+    <!-- 이 페이지에만 적용되는 스타일 -->
     <style>
-        .order-success-container { max-width: 700px; margin: 4rem auto; padding: 4rem; text-align: center; border: 1px solid #e9ecef; border-radius: 8px; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .success-icon { font-size: 6rem; color: #28a745; margin-bottom: 2rem; }
-        .success-title { font-size: 2.4rem; font-weight: 600; margin-bottom: 1rem; }
-        .success-message { font-size: 1.6rem; color: #666; margin-bottom: 3rem; }
-        .order-summary-table { width: 100%; margin: 2.5rem 0; text-align: left; border-top: 2px solid #333; border-bottom: 1px solid #e9ecef; }
-        .order-summary-table th, .order-summary-table td { padding: 1.5rem 1rem; border-bottom: 1px solid #e9ecef; font-size: 1.5rem; }
-        .order-summary-table th { width: 30%; background-color: #f8f9fa; font-weight: 500; }
-        .order-summary-table td { font-weight: 500; }
-        .action-buttons { margin-top: 3rem; display: flex; justify-content: center; gap: 1.5rem; }
+        /* 진행 단계 스타일 (다른 페이지에도 공통 적용 가능) */
+        .checkout-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: #ccc;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .checkout-steps > span {
+            padding: 0 1rem;
+        }
+        .checkout-steps > span.active {
+            color: #333;
+            font-weight: 600;
+        }
 
-        /* <<<<<<<<< [추가됨] 주문 상품 목록 스타일 >>>>>>>>> */
-        .ordered-products-section { margin-top: 3rem; border-top: 1px solid #e9ecef; padding-top: 2rem; }
-        .ordered-products-section h3 { font-size: 2rem; font-weight: 600; margin-bottom: 1.5rem; text-align: left; }
-        .ordered-product-item { display: flex; align-items: center; padding: 1rem 0; border-bottom: 1px dashed #e9ecef; }
-        .ordered-product-item:last-child { border-bottom: none; }
-        .ordered-product-details { flex-grow: 1; text-align: left; }
-        .ordered-product-name { font-weight: 500; font-size: 1.5rem; margin-bottom: 0.2rem; }
-        .ordered-product-info { font-size: 1.3rem; color: #666; }
-        .ordered-product-price { font-size: 1.5rem; font-weight: 600; white-space: nowrap; }
+        /* 주문 완료 페이지 전용 스타일 */
+        .order-success-container {
+            text-align: center; /* 내부 요소들 가운데 정렬 */
+            padding: 4rem 1rem; /* 상하좌우 여백 */
+            background-color: #fff;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .success-icon {
+            color: #28a745; /* 성공 아이콘은 초록색으로 */
+            font-size: 5rem; /* 아이콘 크기 확대 */
+        }
+        .success-title {
+            font-size: 2.2rem; /* 제목 폰트 크기 */
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .success-message {
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            color: #777; /* 부가 설명은 연한 색상으로 */
+        }
+        .order-summary-table {
+            margin: 0 auto 2.5rem auto; /* 테이블을 가운데 정렬하고 아래 여백 추가 */
+            max-width: 500px; /* 테이블 최대 너비 고정 */
+            width: 100%;
+            text-align: left; /* 테이블 내용은 좌측 정렬 */
+            border-top: 2px solid #333;
+        }
+        .order-summary-table th, 
+        .order-summary-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee; /* 각 행의 하단 구분선 */
+        }
+        .order-summary-table th {
+            width: 40%;
+            font-weight: 600;
+            background-color: #f9f9f9; /* 헤더 셀 배경색 */
+        }
+        .action-buttons .btn {
+            margin: 0 0.5rem; /* 버튼 사이의 간격 */
+        }
     </style>
 </head>
 
 <body>
-<th:block layout:fragment="contents">
-    <div class="page-content">
-        <div class="container">
-            <div class="order-success-container">
-                <i class="icon-check-circle success-icon"></i>
-                <h2 class="success-title">결제가 성공적으로 완료되었습니다.</h2>
-                <p class="success-message">주문해 주셔서 감사합니다. 주문 내역은 아래와 같습니다.</p>
-                
-                <table class="order-summary-table" th:if="${paymentResult != null}">
-                    <tbody>
-                        <tr>
-                            <th>주문 번호</th>
-                            <td th:text="${ordrNo}">ORD20250715-001</td>
-                        </tr>
-                        <tr>
-                            <th>총 결제 금액</th>
-                            <td th:text="${#numbers.formatInteger(amount, 0, 'COMMA') + '원'}">50,000원</td>
-                        </tr>
-                        <tr>
-                            <th>결제 수단</th>
-                            <td th:text="${paymentResult.method}">신용카드</td>
-                        </tr>
-                        <tr>
-                            <th>결제 승인일시</th>
-                            <td th:text="${#temporals.format(T(java.time.OffsetDateTime).parse(paymentResult.approvedAt).toLocalDateTime(), 'yyyy-MM-dd HH:mm:ss')}">2025-07-15 21:30:00</td>
-                        </tr>
-                    </tbody>
-                </table>
-                
-                <div class="action-buttons">
-				    <!-- <a th:href="@{/paymentHistory(userNo=${session.loginUser.userNo})}" class="btn btn-primary">주문 내역 확인</a> -->
-				    <a th:href="@{/paymentHistory(userNo=${session.loginUser.userNo})}" class="btn btn-primary" onclick="return false;">주문 내역 확인</a>
-				    <a th:href="@{/customer/products/list}" class="btn btn-outline-primary-2">쇼핑 계속하기</a>
-				</div>
-            </div>
+    <th:block layout:fragment="contents">
+        <div class="page-wrapper">
+            <main class="main">
+                <!-- 페이지 상단 헤더: 제목과 진행 단계를 표시 -->
+                <div class="page-header text-center"
+                     style="background-image: url('/maincss/assets/images/page-header-bg.jpg')">
+                    <div class="container">
+                        <h1 class="page-title">주문완료</h1>
+                        <div class="checkout-steps">
+                            <span>장바구니</span> >
+                            <span>주문결제</span> >
+                            <span class="active">주문완료</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 페이지 메인 컨텐츠 -->
+                <div class="page-content">
+                    <div class="container">
+                        <div class="order-success-container">
+                            <i class="icon-check-circle success-icon"></i>
+                            <h2 class="success-title">결제가 성공적으로 완료되었습니다.</h2>
+                            <p class="success-message">주문해 주셔서 감사합니다. 주문 내역은 아래와 같습니다.</p>
+                            
+                            <!-- 서버에서 전달된 정보가 있을 경우에만 테이블을 표시 -->
+                            <table class="order-summary-table" th:if="${paymentResult != null}">
+                                <tbody>
+                                    <tr>
+                                        <th>주문 번호</th>
+                                        <td th:text="${ordrNo}">ORD20250715-001</td>
+                                    </tr>
+                                    <tr>
+                                        <th>총 결제 금액</th>
+                                        <td th:text="${#numbers.formatInteger(amount, 0, 'COMMA') + '원'}">50,000원</td>
+                                    </tr>
+                                    <tr>
+                                        <th>결제 수단</th>
+                                        <td th:text="${paymentResult.method}">신용카드</td>
+                                    </tr>
+                                    <tr>
+                                        <th>결제 승인일시</th>
+                                        <td th:text="${#temporals.format(T(java.time.OffsetDateTime).parse(paymentResult.approvedAt).toLocalDateTime(), 'yyyy-MM-dd HH:mm:ss')}">2025-07-15 21:30:00</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="action-buttons">
+                                <a th:href="@{/paymentHistory(userNo=${session.loginUser.userNo})}" class="btn btn-primary">주문 내역 확인</a>
+                                <a th:href="@{/customer/products/list}" class="btn btn-outline-primary-2">쇼핑 계속하기</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
-    </div>
-</th:block>
+    </th:block>
+
 </body>
 </html>

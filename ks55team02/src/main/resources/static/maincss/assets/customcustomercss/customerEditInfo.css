@@ -12,9 +12,20 @@
 		}
 		
 		/* 상단 타이틀 영역 (재사용) */
-		.profile-management-page .page-title-area { text-align: center; padding: 50px 0; }
-		.profile-management-page .page-title-area h2 { font-size: 32px; font-weight: 500; letter-spacing: 4px; color: #333; margin: 0 0 10px 0; }
-		.profile-management-page .page-title-area .breadcrumbs { font-size: 11px; color: #999; }
+		.profile-management-page .page-title-area { 
+			text-align: center; padding: 50px 0; 
+		}
+		.profile-management-page .page-title-area h2 { 
+			font-size: 32px; 
+			font-weight: 500; 
+			letter-spacing: 4px; 
+			color: #333; 
+			margin: 0 0 10px 0; 
+		}
+		.profile-management-page .page-title-area .breadcrumbs { 
+			font-size: 11px; 
+			color: #999; 
+		}
 		
 		/* 메인 컨테이너 (사이드바 + 컨텐츠) */
 		.profile-container {
@@ -28,11 +39,17 @@
 		    width: 200px;
 		    flex-shrink: 0;
 		}
-		.profile-sidebar ul { list-style: none; padding: 0; margin: 0; border-top: 2px solid #333; }
+		.profile-sidebar ul { 
+			list-style: none; 
+			padding: 0; 
+			margin: 0; 
+			border-top: 2px solid #333; 
+		}
 		.profile-sidebar li a {
 		    display: block;
 		    padding: 15px 10px;
 		    font-size: 14px;
+		    font-weight: 400;
 		    color: #555;
 		    border-bottom: 1px solid #e9e9e9;
 		    text-decoration: none;
@@ -58,12 +75,23 @@
 		}
 		
 		/* 탭 기능 */
-		.tab-pane { display: none; }
-		.tab-pane.active { display: block; }
+		.tab-pane { 
+			display: none; 
+		}
+		.tab-pane.active { 
+			display: block; 
+		}
 		
 		/* 폼 스타일 */
-		.profile-form .form-group { margin-bottom: 25px; }
-		.profile-form label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 8px; }
+		.profile-form .form-group { 
+			margin-bottom: 25px; 
+		}
+		.profile-form label { 
+			display: block; 
+			font-size: 13px; 
+			font-weight: bold; 
+			margin-bottom: 8px; 
+		}
 		.profile-form input[type="text"],
 		.profile-form input[type="email"],
 		.profile-form input[type="password"],
@@ -75,9 +103,17 @@
 		    font-size: 13px;
 		    box-sizing: border-box;
 		}
-		.profile-form input[readonly] { background-color: #f7f7f7; }
-		.profile-form .address-group { display: flex; gap: 10px; margin-bottom: 10px; }
-		.profile-form .address-group input { flex: 1; }
+		.profile-form input[readonly] { 
+			background-color: #f7f7f7; 
+		}
+		.profile-form .address-group { 
+			display: flex; 
+			gap: 10px; 
+			margin-bottom: 10px; 
+		}
+		.profile-form .address-group input { 
+			flex: 1; 
+		}
 		.profile-form .address-group button {
 		    height: 40px;
 		    padding: 0 20px;
@@ -85,14 +121,24 @@
 		    background: #fff;
 		    cursor: pointer;
 		}
-		.profile-form .form-actions { text-align: center; margin-top: 40px; }
+		.profile-form .form-actions { 
+			text-align: center; 
+			margin-top: 40px; 
+		}
 		.profile-form .btn-primary {
-		    background-color: #333;
+		    color: #c96;
+		    background-color: transparent;
+		    background-image: none;
+		    border-color: #c96;
+		    box-shadow: none !important;
+		    padding: 10px;
+		    padding-right: 10px;
+		}
+		.profile-form .btn-primary:hover {
 		    color: #fff;
-		    border: none;
-		    padding: 12px 50px;
-		    font-size: 14px;
-		    cursor: pointer;
+		    background-color: #c96;
+		    border-color: #c96;
+		    box-shadow: none;
 		}
 		.error-message {
 		    color: #ff0000;
@@ -126,16 +172,65 @@
 		    cursor: pointer;
 		    background: #f8f9fa;
 		}
-		.profile-form hr { border: 0; border-top: 1px solid #e9e9e9; margin: 40px 0; }
-		.profile-form small { font-size: 12px; color: #888; margin-top: 5px; display: block; }
+		.profile-form hr { 
+			border: 0; 
+			border-top: 1px solid #e9e9e9; 
+			margin: 40px 0; 
+		}
+		.profile-form small { 
+			font-size: 12px; 
+			color: #888; 
+			margin-top: 5px; 
+			display: block; 
+		}
 		
 		/* 토글 스위치 (2단계 인증용) */
-		.switch { position: relative; display: inline-block; width: 50px; height: 28px; vertical-align: middle; }
-		.switch input { opacity: 0; width: 0; height: 0; }
-		.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; }
-		.slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; }
-		input:checked + .slider { background-color: #333; }
-		input:checked + .slider:before { transform: translateX(22px); }
-		.slider.round { border-radius: 34px; }
-		.slider.round:before { border-radius: 50%; }
-		.switch-label { vertical-align: middle; margin-left: 10px; font-size: 13px; }
+		.switch { 
+			position: relative; 
+			display: inline-block; 
+			width: 50px; 
+			height: 28px; 
+			vertical-align: middle; 
+		}
+		.switch input { 
+			opacity: 0; 
+			width: 0; 
+			height: 0; 
+		}
+		.slider { 
+			position: absolute; 
+			cursor: pointer; 
+			top: 0; 
+			left: 0; 
+			right: 0; 
+			bottom: 0; 
+			background-color: #ccc; 
+			transition: .4s; 
+		}
+		.slider:before { 
+			position: absolute; 
+			content: ""; 
+			height: 20px; 
+			width: 20px; 
+			left: 4px; 
+			bottom: 4px; 
+			background-color: white; 
+			transition: .4s; 
+		}
+		input:checked + .slider { 
+			background-color: #333; 
+		}
+		input:checked + .slider:before { 
+			transform: translateX(22px); 
+		}
+		.slider.round { 
+			border-radius: 34px; 
+		}
+		.slider.round:before { 
+			border-radius: 50%; 
+		}
+		.switch-label { 
+			vertical-align: middle; 
+			margin-left: 10px; 
+			font-size: 13px; 
+		}

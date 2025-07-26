@@ -180,6 +180,7 @@
     font-size: 13px;
     color: #888; /* 레퍼런스와 같이 회색 계열로 */
     margin-bottom: 10px;
+    font-weight: 400;
 }
 
 .author-info .separator {

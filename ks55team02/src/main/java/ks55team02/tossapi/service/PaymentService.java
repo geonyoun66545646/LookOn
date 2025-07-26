@@ -41,5 +41,23 @@ public interface PaymentService {
      * 사용자 ID로 전체 주문/결제 목록을 가져옵니다.
      */
     List<Map<String, Object>> getOrderPaymentHistoryByUser(String userNo);
-
+    
+    /**
+     * ★★★ 추가: 사용자 배송지 정보 저장 또는 업데이트 ★★★
+     * 전달받은 배송지 데이터(shippingAddressData)를 데이터베이스에 저장하거나 업데이트합니다.
+     * shippingAddressData 맵에는 userNo가 포함되어 있어야 합니다.
+     *
+     * @param shippingAddressData 배송지 정보 Map
+     */
+    public void saveOrUpdateShippingAddress(Map<String, Object> shippingAddressData);
+    
+    /**
+     * ★★★ 추가: 사용자 배송지 정보 조회 ★★★
+     * userNo를 통해 해당 사용자의 등록된 배송지 정보를 Map 형태로 반환합니다.
+     * 배송지 정보가 없을 경우 null 또는 빈 Map을 반환할 수 있습니다.
+     *
+     * @param userNo 사용자 고유 번호
+     * @return 배송지 정보 Map (recipientName, phone, postcode, address, detailAddress, deliveryRequest 등 포함)
+     */
+    public Map<String, Object> getShippingAddressByUserNo(String userNo);
 }

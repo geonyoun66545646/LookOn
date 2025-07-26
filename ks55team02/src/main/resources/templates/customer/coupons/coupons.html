@@ -21,10 +21,10 @@
 			<div class="member-coupon">
 				<div class="member-coupon__top">
 					<nav id="couponTabs" class="member-coupon__1depth">
-						<a href="#" id="my-coupons-tab" class="gtm-catch-click is-active">
-							보유 쿠폰 <span id="my-coupons-count"></span>
-						</a> <a href="#" id="available-coupons-tab" class="gtm-catch-click">
+						<a href="#" id="available-coupons-tab" class="gtm-catch-click">
 							쿠폰 받기 <span id="available-coupons-count"></span>
+						</a> <a href="#" id="my-coupons-tab" class="gtm-catch-click"> 보유
+							쿠폰 <span id="my-coupons-count"></span>
 						</a>
 					</nav>
 				</div>
@@ -50,24 +50,32 @@
 				<div class="member-coupon__util">
 					<div id="coupon-total-count" class="member-coupon__total">전체
 						0개</div>
-					<div class="member-coupon__sort">
-						<select id="coupon-sort-order" class="form-select form-select-sm">
-							<option value="expiry">만료임박순</option>
+					<div class="member-coupon__sort custom-sort-dropdown-wrapper">
+						<select id="coupon-sort-order"
+							class="form-select form-select-sm visually-hidden-select">
+							<option value="expiry" selected>만료임박순</option>
 							<option value="rate">할인율순</option>
 						</select>
+
+						<div class="sort-dropdown-container">
+							<button id="custom-coupon-sort-button"
+								class="sort-dropdown-button">만료임박순</button>
+							<ul id="custom-coupon-sort-menu" class="sort-dropdown-menu">
+								<li><a href="#" class="sort-option-link"
+									data-value="expiry">만료임박순</a></li>
+								<li><a href="#" class="sort-option-link" data-value="rate">할인율순</a></li>
+							</ul>
+						</div>
 					</div>
 				</div>
 
-				<!-- ======================================================= -->
-				<!-- ★★★ 이 부분을 추가하세요 ★★★ -->
-				<!-- ======================================================= -->
-				<div id="my-coupon-filter-group" class="member-coupon__filter-group">
+				<div id="my-coupon-filter-group" class="member-coupon__filter-group"
+					style="display: none;">
 					<button type="button" class="filter-btn active" data-used="false">사용
 						가능</button>
 					<button type="button" class="filter-btn" data-used="true">사용
 						완료</button>
 				</div>
-				<!-- ======================================================= -->
 
 				<div class="coupon-list-container">
 					<ul id="coupon-list-container" class="coupon-list">
@@ -80,11 +88,8 @@
 
 	</th:block>
 
-	<th:block layout:fragment="jsFile">
-		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-	</th:block>
-
 	<th:block layout:fragment="jsScript">
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 		<script th:inline="javascript">
     /* <![CDATA[ */
 
@@ -94,9 +99,10 @@
         // 1. 상태 및 요소 관리
         // ===================================================================
         let currentState = {
-            tab: 'my',
+            // ⭐ 초기 탭을 'available' (쿠폰 받기)로 설정합니다.
+            tab: 'available', 
             keyword: '',
-            sortOrder: 'recommended',
+            sortOrder: 'expiry', 
             page: 1,
             isUsed: false
         };
@@ -106,11 +112,16 @@
         const paginationContainer = document.querySelector('.pagination-container');
         const searchInput = document.getElementById('coupon-search-input');
         const searchBtn = document.getElementById('coupon-search-btn');
-        const sortOrderSelect = document.getElementById('coupon-sort-order');
+        
+        const sortOrderSelect = document.getElementById('coupon-sort-order'); 
+
+        const customSortButton = document.getElementById('custom-coupon-sort-button');
+        const customSortMenu = document.getElementById('custom-coupon-sort-menu');
+
         const totalCountEl = document.getElementById('coupon-total-count');
         const myCouponsCountEl = document.getElementById('my-coupons-count');
         const availableCouponsCountEl = document.getElementById('available-coupons-count');
-        const myCouponFilterGroup = document.getElementById('my-coupon-filter-group');
+        const myCouponFilterGroup = document.getElementById('my-coupon-filter-group'); 
 
         // ===================================================================
         // 2. 핵심 로직 함수 (데이터 로딩 및 화면 그리기)
@@ -123,7 +134,9 @@
             
             const params = new URLSearchParams({
                 keyword: currentState.keyword,
-                sortOrder: currentState.sortOrder,
+                // ⭐ sortOrder를 항상 파라미터로 포함시킵니다.
+                // 서버의 defaultValue를 expiry로 바꿨으므로, 이제 항상 보내도 됩니다.
+                sortOrder: currentState.sortOrder, 
                 page: currentState.page
             });
             
@@ -136,18 +149,14 @@
             fetch(`${apiUrl}?${params.toString()}`)
             .then(response => {
                 if (response.status === 401) {
-                    // [수정] Swal.fire에 객체 형태로 옵션을 전달하고 .then()을 추가합니다.
                     Swal.fire({
                         title: '로그인 필요',
                         text: '이 기능을 사용하려면 로그인이 필요합니다.',
                         icon: 'warning',
-                        confirmButtonText: '확인' // 버튼 텍스트 지정
+                        confirmButtonText: '확인'
                     }).then(() => {
-                        // 사용자가 '확인' 버튼을 누르면, 메인 페이지로 이동시킵니다.
                         window.location.href = '/';
                     });
-
-                    // 에러를 발생시켜 아래의 .then() 로직이 실행되지 않도록 하는 것은 그대로 유지합니다.
                     throw new Error('UNAUTHORIZED');
                 }
                 return response.json().then(data => ({ ok: response.ok, data: data }));
@@ -156,14 +165,15 @@
                     if (!ok) throw new Error(data.message || '데이터 로딩 실패');
                     
                     renderFunction(couponListContainer, data.list);
-                    paginationContainer.innerHTML = renderPagination(data); // 페이지네이션 그리기
+                    paginationContainer.innerHTML = renderPagination(data);
                     totalCountEl.textContent = `전체 ${data.totalCount}개`;
 
-                    if (isMyCouponsTab) {
-                        myCouponsCountEl.textContent = `(${data.totalCount})`;
-                    } else {
-                        availableCouponsCountEl.textContent = `(${data.totalCount})`;
-                    }
+                    // ⭐ 각 탭의 카운트 업데이트는 별도 함수에서 호출 (로직 아래에 추가됨)
+                    // if (isMyCouponsTab) {
+                    //     myCouponsCountEl.textContent = `(${data.totalCount})`;
+                    // } else {
+                    //     availableCouponsCountEl.textContent = `(${data.totalCount})`;
+                    // }
                 })
                 .catch(error => {
                     couponListContainer.innerHTML = `<li><p class="text-center p-5">${error.message === 'UNAUTHORIZED' ? '로그인이 필요합니다.' : '데이터 로딩에 실패했습니다.'}</p></li>`;
@@ -172,52 +182,37 @@
                 });
         }
         
-        
-        
-     // coupons.html의 <script> 블록 내부
+        function renderPagination(pageData) {
+            if (!pageData || pageData.totalCount === 0 || pageData.totalPages <= 1) return '';
 
-       function renderPagination(pageData) {
-    if (!pageData || pageData.totalCount === 0 || pageData.totalPages <= 1) return '';
+            const currentPage = pageData.currentPage;
+            const totalPages = pageData.totalPages;
+            const startPage = pageData.startPage;
+            const endPage = pageData.endPage;
 
-    const currentPage = pageData.currentPage;
-    const totalPages = pageData.totalPages;
-    const startPage = pageData.startPage;
-    const endPage = pageData.endPage;
+            let paginationHtml = '<nav><ul class="pagination justify-content-center">';
 
-    let paginationHtml = '<nav><ul class="pagination justify-content-center">';
+            paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" data-page="1">처음</a></li>`;
+            paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage - 1}">이전</a></li>`;
 
-    // ▼▼▼ [수정] '처음', '이전' 버튼 추가 ▼▼▼
-    paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" data-page="1">처음</a></li>`;
-    paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage - 1}">이전</a></li>`;
+            for (let i = startPage; i <= endPage; i++) {
+                // ⭐⭐ 'html'을 'paginationHtml'로 수정합니다. ⭐⭐
+                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+            }
 
-    // 페이지 번호 버튼 (기존과 동일)
-    for (let i = startPage; i <= endPage; i++) {
-        paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
-    }
+            paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage + 1}">다음</a></li>`;
+            paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${totalPages}">마지막</a></li>`;
 
-    // ▼▼▼ [수정] '다음', '마지막' 버튼 추가 ▼▼▼
-    paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${currentPage + 1}">다음</a></li>`;
-    paginationHtml += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${totalPages}">마지막</a></li>`;
-
-    paginationHtml += '</ul></nav>';
-    return paginationHtml;
-}
+            paginationHtml += '</ul></nav>';
+            return paginationHtml;
+        }
      
-     // ▼▼▼ [추가] 날짜 형식을 안전하게 변환하는 공통 함수 ▼▼▼
-        /**
-         * 날짜 문자열을 받아서 'YYYY. MM. DD.' 형식으로 변환합니다.
-         * 날짜가 null이거나 형식이 잘못된 경우 대체 텍스트를 반환합니다.
-         * @param {string} dateString - 변환할 날짜 문자열
-         * @param {string} fallbackText - 오류 시 보여줄 텍스트
-         * @returns {string} 포맷된 날짜 또는 대체 텍스트
-         */
         function formatDate(dateString, fallbackText = '알 수 없음') {
             if (!dateString) {
                 return fallbackText;
             }
             try {
                 const date = new Date(dateString.replace(' ', 'T'));
-                // Invalid Date인지 확인
                 if (isNaN(date.getTime())) {
                     return fallbackText;
                 }
@@ -227,61 +222,53 @@
             }
         }
 
-         /**
-          * '내 쿠폰' 목록을 그리는 함수
-          */
-         function renderMyCoupons(container, coupons) {
-             if (!coupons || coupons.length === 0) {
-                 const message = currentState.isUsed ? '사용한 쿠폰이 없습니다.' : '사용 가능한 쿠폰이 없습니다.';
-                 container.innerHTML = `<li><p class="text-center p-5">${message}</p></li>`;
-                 return;
-             }
-             let html = '';
-             coupons.forEach(userCoupon => {
-                 const coupon = userCoupon.coupon;
-                 const isUsed = userCoupon.used;
-                 const discount = `${coupon.dscntVl}%`;
+        function renderMyCoupons(container, coupons) {
+            if (!coupons || coupons.length === 0) {
+                const message = currentState.isUsed ? '사용한 쿠폰이 없습니다.' : '사용 가능한 쿠폰이 없습니다.';
+                container.innerHTML = `<li><p class="text-center p-5">${message}</p></li>`;
+                return;
+            }
+            let html = '';
+            coupons.forEach(userCoupon => {
+                const coupon = userCoupon.coupon;
+                const isUsed = userCoupon.used;
+                const discount = `${coupon.dscntVl}%`;
 
-                 // ▼▼▼ [수정] formatDate 함수를 사용하고, 잘못된 변수 참조를 수정합니다. ▼▼▼
-                 const startDate = formatDate(coupon.vldBgngDt, '시작일 미정');
-                 const endDate = formatDate(userCoupon.indivExpryDt, '만료일 미정');
-                 const periodText = `사용 가능 기간: ${startDate} ~ ${endDate}`;
-                 
-                 const itemClass = isUsed ? "coupon-item is-used" : "coupon-item";
-                 const buttonHtml = isUsed ? 
-                     `<button class="coupon-download-btn" disabled>사용완료</button>` :
-                     `<a href="/cart" class="coupon-download-btn use-coupon-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">사용 하기</a>`; 
+                const startDate = formatDate(coupon.vldBgngDt, '시작일 미정');
+                const endDate = formatDate(userCoupon.indivExpryDt, '만료일 미정');
+                const periodText = `사용 가능 기간: ${startDate} ~ ${endDate}`;
+                
+                const itemClass = isUsed ? "coupon-item is-used" : "coupon-item";
+                const buttonHtml = isUsed ? 
+                    `<button class="coupon-download-btn" disabled>사용완료</button>` :
+                    `<a href="/cart" class="coupon-download-btn use-coupon-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">사용 하기</a>`; 
 
-                 html += `<li class="${itemClass}"><div class="coupon-details"><span class="coupon-percentage">${discount}</span><span class="coupon-name">${coupon.cpnNm}</span><span class="coupon-conditions">${coupon.minOrdrAmt.toLocaleString()}원 이상 구매 시, 최대 ${coupon.maxDscntAmt.toLocaleString()}원 할인</span><span class="coupon-period">${periodText}</span></div>${buttonHtml}</li>`;
-             });
-             container.innerHTML = html;
-         }
+                html += `<li class="${itemClass}"><div class="coupon-details"><span class="coupon-percentage">${discount}</span><span class="coupon-name">${coupon.cpnNm}</span><span class="coupon-conditions">${coupon.minOrdrAmt.toLocaleString()}원 이상 구매 시, 최대 ${coupon.maxDscntAmt.toLocaleString()}원 할인</span><span class="coupon-period">${periodText}</span></div>${buttonHtml}</li>`;
+            });
+            container.innerHTML = html;
+        }
 
-         /**
-          * '발급 가능 쿠폰' 목록을 그리는 함수
-          */
-         function renderAvailableCoupons(container, coupons) {
-             if (!coupons || coupons.length === 0) {
-                 container.innerHTML = '<li><p class="text-center p-5">발급 가능한 쿠폰이 없습니다.</p></li>';
-                 return;
-             }
-             let html = '';
-             coupons.forEach(coupon => {
-                 const discount = `${coupon.dscntVl}%`;
+        function renderAvailableCoupons(container, coupons) {
+            if (!coupons || coupons.length === 0) {
+                container.innerHTML = '<li><p class="text-center p-5">발급 가능한 쿠폰이 없습니다.</p></li>';
+                return;
+            }
+            let html = '';
+            coupons.forEach(coupon => {
+                const discount = `${coupon.dscntVl}%`;
 
-                 // ▼▼▼ [수정] formatDate 함수를 사용합니다. ▼▼▼
-                 const startDate = formatDate(coupon.vldBgngDt, '시작일 미정');
-                 const endDate = formatDate(coupon.vldEndDt, '만료일 미정');
-                 const periodText = `발급 가능 기간: ${startDate} ~ ${endDate}`;
-                 
-                 let buttonHtml = coupon.owned ?
-                     `<button class="coupon-download-btn owned-coupon" disabled>보유 쿠폰</button>` :
-                     `<button class="coupon-download-btn" data-coupon-id="${coupon.pblcnCpnId}">쿠폰 받기</button>`;
+                const startDate = formatDate(coupon.vldBgngDt, '시작일 미정');
+                const endDate = formatDate(coupon.vldEndDt, '만료일 미정');
+                const periodText = `발급 가능 기간: ${startDate} ~ ${endDate}`;
+                
+                let buttonHtml = coupon.owned ?
+                    `<button class="coupon-download-btn owned-coupon" disabled>보유 쿠폰</button>` :
+                    `<button class="coupon-download-btn" data-coupon-id="${coupon.pblcnCpnId}">쿠폰 받기</button>`;
 
-                 html += `<li class="coupon-item"><div class="coupon-details"><span class="coupon-percentage">${discount}</span><span class="coupon-name">${coupon.cpnNm}</span><span class="coupon-conditions">${coupon.minOrdrAmt.toLocaleString()}원 이상 구매 시, 최대 ${coupon.maxDscntAmt.toLocaleString()}원 할인</span><span class="coupon-period">${periodText}</span></div>${buttonHtml}</li>`;
-             });
-             container.innerHTML = html;
-         }
+                html += `<li class="coupon-item"><div class="coupon-details"><span class="coupon-percentage">${discount}</span><span class="coupon-name">${coupon.cpnNm}</span><span class="coupon-conditions">${coupon.minOrdrAmt.toLocaleString()}원 이상 구매 시, 최대 ${coupon.maxDscntAmt.toLocaleString()}원 할인</span><span class="coupon-period">${periodText}</span></div>${buttonHtml}</li>`;
+            });
+            container.innerHTML = html;
+        }
 
         // ===================================================================
         // 3. 이벤트 핸들러 바인딩
@@ -323,8 +310,42 @@
             currentState.sortOrder = this.value;
             currentState.page = 1;
             loadCoupons();
+            customSortButton.textContent = this.options[this.selectedIndex].text;
         });
         
+        customSortButton.addEventListener('click', function(event) {
+            event.stopPropagation();
+            customSortMenu.classList.toggle('active');
+        });
+
+        customSortMenu.addEventListener('click', function(event) {
+            const clickedLink = event.target.closest('a.sort-option-link');
+            if (clickedLink) {
+                event.preventDefault();
+
+                const newValue = clickedLink.dataset.value;
+
+                sortOrderSelect.value = newValue; 
+
+                const changeEvent = new Event('change');
+                sortOrderSelect.dispatchEvent(changeEvent);
+
+                customSortMenu.querySelectorAll('.sort-option-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                clickedLink.classList.add('active');
+
+                customSortMenu.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('click', function(event) {
+            if (customSortMenu && !customSortButton.contains(event.target) && !customSortMenu.contains(event.target)) {
+                customSortMenu.classList.remove('active');
+            }
+        });
+
+
         paginationContainer.addEventListener('click', e => {
             const pageLink = e.target.closest('a.page-link');
             if (pageLink && pageLink.dataset.page) {
@@ -361,9 +382,13 @@
                         }))
                         .then(data => {
                             Swal.fire('발급 완료!', data.message, 'success');
-                            clickedBtn.textContent = '보유 쿠폰';
-                            clickedBtn.classList.add('owned-coupon');
-                            loadMyCouponsCount();
+                            // clickedBtn.textContent = '보유 쿠폰'; // ⭐ 이 줄 삭제
+                            // clickedBtn.classList.add('owned-coupon'); // ⭐ 이 줄 삭제
+                            
+                            loadMyCouponsCount(); // 보유 쿠폰 개수 업데이트는 유지
+                            loadAvailableCouponsCount(); // ⭐ 추가: 발급 가능 쿠폰 개수 업데이트
+
+                            loadCoupons(); // ⭐ 발급 후 현재 탭(쿠폰 받기) 목록 새로고침
                         })
                         .catch(error => {
                             Swal.fire('발급 실패', error.message, 'error');
@@ -374,16 +399,49 @@
             });
         });
 
+        // ⭐ 추가: '보유 쿠폰' 개수를 업데이트하는 함수
         function loadMyCouponsCount() {
-            fetch('/customer/api/coupons/my?page=1').then(res => res.ok ? res.json() : Promise.reject()).then(pageData => { myCouponsCountEl.textContent = `(${pageData.totalCount})` }).catch(error => console.error('보유 쿠폰 개수 조회 오류:', error));
+            fetch('/customer/api/coupons/my?page=1')
+                .then(res => res.ok ? res.json() : Promise.reject())
+                .then(pageData => { myCouponsCountEl.textContent = `(${pageData.totalCount})` })
+                .catch(error => console.error('보유 쿠폰 개수 조회 오류:', error));
         }
+
+        // ⭐ 추가: '발급 가능' 쿠폰 개수를 업데이트하는 함수
+        function loadAvailableCouponsCount() {
+            fetch('/customer/api/coupons/available?page=1')
+                .then(res => res.ok ? res.json() : Promise.reject())
+                .then(pageData => { availableCouponsCountEl.textContent = `(${pageData.totalCount})` })
+                .catch(error => console.error('발급 가능 쿠폰 개수 조회 오류:', error));
+        }
+
 
         // ===================================================================
         // 4. 최초 데이터 로딩
         // ===================================================================
-        myCouponFilterGroup.style.display = 'flex';
-        loadCoupons();
-        fetch('/customer/api/coupons/available?page=1').then(res => res.ok ? res.json() : Promise.reject()).then(pageData => { availableCouponsCountEl.textContent = `(${pageData.totalCount})` }).catch(() => availableCouponsCountEl.textContent = '');
+        // ⭐ 1-2. 초기 로드 시 '쿠폰 받기' 탭을 활성화합니다.
+        const myCouponsTabEl = document.getElementById('my-coupons-tab');
+        const availableCouponsTabEl = document.getElementById('available-coupons-tab');
+        
+        // 안전하게 기존 active 클래스 제거 (혹시 모를 잔존 방지)
+        if (myCouponsTabEl) myCouponsTabEl.classList.remove('is-active');
+        // '쿠폰 받기' 탭에 active 클래스 추가
+        if (availableCouponsTabEl) availableCouponsTabEl.classList.add('is-active');
+
+        // ⭐ '사용 가능/사용 완료' 필터 그룹 초기 숨김
+        myCouponFilterGroup.style.display = 'none'; 
+        
+        // ⭐ 페이지 로드 시, hidden select의 초기값에 따라 커스텀 버튼 텍스트와 active 상태 설정
+        const initialSelectedOption = sortOrderSelect.options[sortOrderSelect.selectedIndex];
+        customSortButton.textContent = initialSelectedOption.text;
+        const initialActiveLink = customSortMenu.querySelector(`a.sort-option-link[data-value="${initialSelectedOption.value}"]`);
+        if(initialActiveLink) {
+            initialActiveLink.classList.add('active');
+        }
+
+        loadCoupons(); // 현재 탭(available)의 쿠폰 목록 로드
+        loadMyCouponsCount(); // ⭐ 추가: 보유 쿠폰 개수를 로드하여 초기 화면에 표시
+        loadAvailableCouponsCount(); // ⭐ 추가: 발급 가능 쿠폰 개수를 로드하여 초기 화면에 표시 (중복될 수 있지만, 명시적으로)
     });
 
     /* ]]> */

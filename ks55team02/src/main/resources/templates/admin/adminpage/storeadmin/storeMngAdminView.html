@@ -150,9 +150,13 @@
                                 </td>
                                 <td class="ellipsis text" th:text="${store.storeId}" th:title="${store.storeId}"></td>
                                 <td>
-                                    <a class="text" th:href="@{/adminpage/storeadmin/storeDetail(storeId=${store.storeId})}" th:text="${store.storeConm}"></a>
-                                </td>
-                                <td class="ellipsis text" th:text="${store.storeIntroCn}" th:title="${store.storeIntroCn}"></td>
+								    <a class="text" 
+								       th:href="@{/customer/products/list(brand=${store.storeId})}" 
+								       th:text="${store.storeConm}"
+								       target="_blank">
+								    </a>
+								</td>
+                                   	<td class="ellipsis text text-left" th:text="${store.storeIntroCn}" th:title="${store.storeIntroCn}"></td>
                                 <td th:text="${store.sellerUserNm}"></td>
                                 <td th:text="${store.sellerUserLoginId}"></td>
                                 <td class="store-status-cell"> <span class="badge custom-badge"
@@ -255,9 +259,6 @@
                 statusCheckboxes.prop('checked', $(this).is(':checked'));
                 // submitSearchForm(); // [제거] '전체선택' 체크박스 변경 시 바로 폼 제출하던 코드
             });
-
-            // 검색 버튼 클릭 시에는 form의 기본 submit 동작이 실행됩니다.
-            // 별도의 click 이벤트 핸들러가 필요 없습니다.
 
             // 페이지 로드 시 '전체선택' 체크박스 상태 초기화
             const allCheckedOnLoad = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;

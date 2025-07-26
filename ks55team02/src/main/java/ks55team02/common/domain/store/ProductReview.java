@@ -27,7 +27,7 @@ public class ProductReview extends SearchCriteria{
 	private Integer 		evlScr;           	  // 평점 (evl_scr) - int로 변경 (DEFAULT NULL)
 	private String 			reviewCn;          	  // 리뷰 내용 (review_cn)
 	private LocalDateTime	wrtYmd;       			// 작성일 (wrt_ymd) - datetime으로 변경
-	private Boolean 		reviewStts;          // 리뷰 상태 (review_stts)
+	private String 			reviewStts;          // 리뷰 상태 (review_stts)
 	private LocalDateTime 	lastMdfcnDt; 		 // 최종 수정일시 (last_mdfcn_dt) - datetime으로 변경
 	private LocalDateTime	delDt;       		 // 삭제(숨김) 일시 (del_dt) - datetime으로 변경
 	private String 			delPrcrNo;           // 삭제(숨김) 처리자 번호 (del_prcr_no)

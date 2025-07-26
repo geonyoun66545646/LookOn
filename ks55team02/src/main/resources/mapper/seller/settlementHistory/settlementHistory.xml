@@ -39,6 +39,20 @@
         </if>
     </sql>
 
+    <sql id="salesHistoryWhereConditions">
+        WHERE oi.store_id = #{storeId}
+        <if test="startDate != null and endDate != null">
+            AND o.ordr_dt BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="searchKey != null and searchValue != null and searchValue != ''">
+            <choose>
+                <when test="searchKey == 'productName'">
+                    AND p.gds_nm LIKE CONCAT('%', #{searchValue}, '%')
+                </when>
+                </choose>
+        </if>
+    </sql>
+
     <select id="selectMySettlementList" resultMap="settlementResultMap">
         SELECT
             ss.store_clcln_id,
@@ -79,7 +93,6 @@
         LIMIT 1
     </select>
     
-    <!-- 판매현황 -->
     <select id="getSalesHistoryByStoreId" parameterType="String"
             resultType="ks55team02.seller.settlements.domain.SalesSttsDTO">
         SELECT
@@ -113,7 +126,7 @@
 	        oi.ordr_qntty           AS quantity,
 	        oi.ordr_tm_untprc       AS unitPrice,
 	        (oi.ordr_qntty * oi.ordr_tm_untprc) AS totalAmount,
-	        s.store_conm            AS storeName -- 상점명도 함께 조회
+	        s.store_conm            AS storeName
 	    FROM
 	        order_items AS oi
 	    JOIN
@@ -127,7 +140,40 @@
 	    ORDER BY
 	        o.ordr_dt DESC
 	</select>
-    
-    
-    
+
+    <select id="countSalesHistoryByStoreId" parameterType="ks55team02.seller.settlements.domain.SalesSttsDTO" resultType="int">
+        SELECT
+            COUNT(oi.ordr_dtl_artcl_no)
+        FROM
+            order_items AS oi
+        JOIN
+            orders AS o ON oi.ordr_no = o.ordr_no
+        LEFT JOIN
+            products AS p ON oi.gds_no = p.gds_no
+        <include refid="salesHistoryWhereConditions"/>
+    </select>
+
+    <select id="selectSalesHistoryByStoreIdAndPagination" parameterType="ks55team02.seller.settlements.domain.SalesSttsDTO"
+            resultMap="salesHistoryResultMap">
+        SELECT
+            oi.ordr_dtl_artcl_no    AS orderItemId,
+            o.ordr_no               AS orderId,
+            o.ordr_dt               AS orderDate,
+            p.gds_no                AS productId,
+            p.gds_nm                AS productName,
+            oi.ordr_qntty           AS quantity,
+            oi.ordr_tm_untprc       AS unitPrice,
+            (oi.ordr_qntty * oi.ordr_tm_untprc) AS totalAmount
+        FROM
+            order_items AS oi
+        JOIN
+            orders AS o ON oi.ordr_no = o.ordr_no
+        LEFT JOIN
+            products AS p ON oi.gds_no = p.gds_no
+        <include refid="salesHistoryWhereConditions"/>
+        ORDER BY
+            o.ordr_dt DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
 </mapper>

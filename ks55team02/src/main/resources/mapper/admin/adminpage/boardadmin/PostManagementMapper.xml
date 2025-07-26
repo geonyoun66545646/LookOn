@@ -22,6 +22,44 @@
 		<result column="like_count" property="likeCount" />
 		<result column="comment_count" property="commentCount" />
 	</resultMap>
+	
+	<resultMap id="postPreviewResultMap" type="ks55team02.admin.adminpage.boardadmin.postmanagement.domain.PostPreviewDto">
+    <id property="postSn" column="pst_sn"/>
+    <result property="postTitle" column="pst_ttl"/>
+    <result property="postContent" column="pst_cn"/>
+    <result property="createdDate" column="crt_dt"/>
+    <result property="userNickname" column="user_ncnm"/>
+    <result property="boardName" column="bbs_nm"/>
+    <result property="viewCount" column="view_cnt"/>
+    <result property="likeCount" column="like_count"/>
+    <result property="commentCount" column="comment_count"/>
+    <collection property="imageUrls" ofType="java.lang.String" select="selectPostImageUrls" column="pst_sn"/>
+</resultMap>
+
+<select id="selectPostImageUrls" resultType="java.lang.String">
+    SELECT img_file_path_nm FROM post_images WHERE pst_sn = #{pst_sn} AND del_dt IS NULL ORDER BY pst_img_sort_sn
+</select>
+
+<select id="selectPostPreviewById" parameterType="string" resultMap="postPreviewResultMap">
+    SELECT
+        p.pst_sn,
+        p.pst_ttl,
+        p.pst_cn,
+        p.crt_dt,
+        p.view_cnt,
+        u.user_ncnm,
+        b.bbs_nm,
+        (SELECT COUNT(*) FROM post_interactions pi WHERE pi.pst_sn = p.pst_sn AND pi.intract_type_cd = 'LIKE' AND pi.rtrcn_dt IS NULL) AS like_count,
+        (SELECT COUNT(*) FROM post_comments pc WHERE pc.pst_sn = p.pst_sn AND pc.del_dt IS NULL) AS comment_count
+    FROM
+        posts p
+    JOIN
+        users u ON p.wrtr_user_no = u.user_no
+    JOIN
+        boards b ON p.bbs_clsf_cd = b.bbs_clsf_cd
+    WHERE
+        p.pst_sn = #{postSn}
+</select>
 
 	<select id="selectPostList"
 		parameterType="ks55team02.admin.adminpage.boardadmin.postmanagement.domain.AdminPost"
@@ -54,12 +92,15 @@
 		ORDER BY
 		<choose>
 			<when
-				test="sortOrder != null and 'likeCountDesc'.equals(sortOrder)">
-				like_count DESC
-			</when>
-			<otherwise>
-				p.crt_dt DESC
-			</otherwise>
+				test="sortOrder != null and 'likeCountDesc'.equals(sortOrder)"> like_count DESC </when>
+			<when test="sortOrder != null and 'crtDtAsc'.equals(sortOrder)"> p.crt_dt ASC </when>
+			<when
+				test="sortOrder != null and 'commentCountDesc'.equals(sortOrder)"> comment_count DESC </when>
+			<when
+				test="sortOrder != null and 'viewCntDesc'.equals(sortOrder)"> p.view_cnt DESC </when>
+			<when
+				test="sortOrder != null and 'viewCntAsc'.equals(sortOrder)"> p.view_cnt ASC </when>
+			<otherwise> p.crt_dt DESC </otherwise> <!-- 기본값: 최신순 -->
 		</choose>
 		<if test="pageSize > 0">
 			LIMIT #{pageSize} OFFSET #{offset}
@@ -81,6 +122,7 @@
 
 	<sql id="commonSearchCondition">
 		<where>
+			<!-- ... (다른 <if> 조건들은 그대로 유지) ... -->
 			<if
 				test="filterConditions != null and !filterConditions.isEmpty()">
 				<foreach item="status" collection="filterConditions"
@@ -90,22 +132,39 @@
 				</foreach>
 			</if>
 			<if test="startDate != null">AND p.crt_dt >= #{startDate}</if>
-			<if test="endDate != null">AND p.crt_dt &gt; DATE_ADD(#{endDate}, INTERVAL 1 DAY)
+			<if test="endDate != null">AND p.crt_dt &lt; DATE_ADD(#{endDate}, INTERVAL 1 DAY)
 			</if>
+
 			<if
 				test="searchKey != null and searchValue != null and searchValue != ''">
 				AND
 				<choose>
-					<when test="'userNickname'.equals(searchKey)">u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')
+					<when test="'userNickname'.equals(searchKey)">
+						u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')
 					</when>
-					<when test="'postTitle'.equals(searchKey)">p.pst_ttl LIKE CONCAT('%', #{searchValue}, '%')
+					<when test="'postTitle'.equals(searchKey)">
+						p.pst_ttl LIKE CONCAT('%', #{searchValue}, '%')
 					</when>
-					<when test="'postContent'.equals(searchKey)">p.pst_cn LIKE CONCAT('%', #{searchValue}, '%')
+					<when test="'postContent'.equals(searchKey)">
+						p.pst_cn LIKE CONCAT('%', #{searchValue}, '%')
 					</when>
-					<when test="'boardName'.equals(searchKey)">b.bbs_nm LIKE CONCAT('%', #{searchValue}, '%')
+					<when test="'boardName'.equals(searchKey)">
+						b.bbs_nm LIKE CONCAT('%', #{searchValue}, '%')
 					</when>
-					<otherwise>(p.pst_ttl LIKE CONCAT('%', #{searchValue}, '%') OR
-						u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%'))</otherwise>
+					<when test="'all'.equals(searchKey)">
+						(p.pst_ttl LIKE CONCAT('%', #{searchValue}, '%')
+						OR
+						p.pst_cn LIKE CONCAT('%', #{searchValue}, '%')
+						OR u.user_ncnm LIKE
+						CONCAT('%', #{searchValue}, '%')
+						OR b.bbs_nm LIKE CONCAT('%',
+						#{searchValue}, '%'))
+					</when>
+					<otherwise>
+						(p.pst_ttl LIKE CONCAT('%', #{searchValue}, '%') OR
+						u.user_ncnm LIKE
+						CONCAT('%', #{searchValue}, '%'))
+					</otherwise>
 				</choose>
 			</if>
 		</where>
@@ -134,5 +193,6 @@
 			#{postSn}
 		</foreach>
 	</update>
+	
 
 </mapper>

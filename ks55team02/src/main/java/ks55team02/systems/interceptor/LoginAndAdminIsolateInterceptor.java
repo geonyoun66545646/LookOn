@@ -35,7 +35,7 @@ public class LoginAndAdminIsolateInterceptor implements HandlerInterceptor {
                 log.info("관리자(ID: {}, Grade: {}) 외부 페이지 접근 차단. 관리자 홈으로 리다이렉트. URI: {}", 
                          loginUser.getUserLgnId(), gradeCode, request.getRequestURI());
                 
-                response.sendRedirect(request.getContextPath() + "/adminpage");
+                response.sendRedirect(request.getContextPath() + "/adminpage/dashboard");
                 return false;
             }
         }

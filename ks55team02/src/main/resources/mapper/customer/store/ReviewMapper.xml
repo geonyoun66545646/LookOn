@@ -88,7 +88,7 @@
     <select id="findReviewIdsByGdsNo" resultType="string">
         SELECT review_id
         FROM ks55team02db.product_reviews
-        WHERE gds_no = #{gdsNo} AND review_stts = 1
+        WHERE gds_no = #{gdsNo} AND review_stts = 'ACTIVE'
         ORDER BY wrt_ymd DESC
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
@@ -132,7 +132,7 @@
     <select id="getReviewCountByGdsNo" parameterType="String" resultType="long">
         SELECT COUNT(*)
         FROM ks55team02db.product_reviews
-        WHERE gds_no = #{gdsNo} AND review_stts = 1
+        WHERE gds_no = #{gdsNo} AND review_stts = 'ACTIVE'
     </select>
 
     <!-- ================================================================= -->
@@ -161,7 +161,7 @@
             evl_scr, review_cn, review_stts, wrt_ymd, helpd_cnt
         ) VALUES (
             #{reviewId}, #{ordrDtlArtclNo}, #{prchsrUserNo}, #{gdsNo}, #{ordrNo},
-            #{evlScr}, #{reviewCn}, '1', NOW(), 0
+            #{evlScr}, #{reviewCn}, 'ACTIVE', NOW(), 0
         )
     </insert>
     <!-- 평점 평균 -->
@@ -171,7 +171,7 @@
     FROM 
         product_reviews
     WHERE 
-        gds_no = #{gdsNo} AND review_stts = 1
+        gds_no = #{gdsNo} AND review_stts = 'ACTIVE'
 </select>
     
 

@@ -4,16 +4,14 @@
 	layout:decorate="~{seller/layout/layout_main}">
 <head>
     <title th:text="${title}">판매 현황</title>
-    <!-- 여기에 이 페이지에 필요한 CSS를 추가할 수 있습니다. -->
     <style>
-        /* 제공해주신 CSS와 유사한 스타일 */
         .page-container { padding: 2rem; }
         .page-title { font-size: 2.5rem; margin-bottom: 0.5rem; }
         .page-subtitle { color: #6c757d; margin-bottom: 2rem; }
         .sales-panel { background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); padding: 1.5rem; }
         .panel-title { font-size: 1.25rem; font-weight: 500; margin-bottom: 1.5rem; }
         .sales-table { width: 100%; border-collapse: collapse; }
-        .sales-table th, .sales-table td { padding: 0.75rem 1rem; border-bottom: 1px solid #e9ecef; text-align: left; }
+        .sales-table th, .sales-table td { padding: 0.75rem 1rem; border-bottom: 1px solid #e9ecef; text-align: left; vertical-align: middle; }
         .sales-table thead { background-color: #f8f9fa; font-weight: 500; }
         .text-center { text-align: center; }
         .text-right { text-align: right; }
@@ -33,19 +31,17 @@
                     <thead>
                         <tr>
                             <th>주문일시</th>
-                            <th>상점명</th>
                             <th>상품명</th>
                             <th class="text-center">수량</th>
                             <th class="text-right">주문금액</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:if="${#lists.isEmpty(salesHistoryList)}">
-                            <td colspan="5" class="text-center" style="padding: 3rem 0;">판매 내역이 없습니다.</td>
+                        <tr th:if="${#lists.isEmpty(salesStts)}">
+                            <td colspan="4" class="text-center" style="padding: 3rem 0;">판매 내역이 없습니다.</td>
                         </tr>
-                        <tr th:each="sale : ${salesHistoryList}">
+                        <tr th:each="sale : ${salesStts}">
                             <td th:text="${#temporals.format(sale.orderDate, 'yyyy-MM-dd HH:mm')}"></td>
-                            <td th:text="${sale.storeName}"></td>
                             <td th:text="${sale.productName}"></td>
                             <td class="text-center" th:text="${sale.quantity}"></td>
                             <td class="text-right" th:text="${#numbers.formatDecimal(sale.totalAmount, 0, 'COMMA', 0, 'POINT') + '원'}"></td>
@@ -53,9 +49,52 @@
                     </tbody>
                 </table>
             </div>
-            <!-- 여기에 페이지네이션을 추가할 수 있습니다 -->
+            
+            <nav class="mt-4" aria-label="Page navigation" th:if="${pagination.totalRecordCount > 0}">
+			    <ul class="pagination justify-content-center">
+			        <li class="page-item" th:if="${pagination.existPrevBlock}">
+			            <a class="page-link page-num" href="#"
+			               th:onclick="movePage(event, [[${pagination.startPage - 1}]])">이전</a>
+			        </li>
+			
+			        <li class="page-item"
+			            th:each="pageNumber : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+			            th:classappend="${pageNumber == pagination.currentPage} ? 'active' : ''">
+			            <a class="page-link page-num" href="#"
+			               th:text="${pageNumber}"
+			               th:onclick="movePage(event, [[${pageNumber}]])"></a>
+			        </li>
+			
+			        <li class="page-item" th:if="${pagination.existNextBlock}">
+			            <a class="page-link page-num" href="#"
+			               th:onclick="movePage(event, [[${pagination.endPage + 1}]])">다음</a>
+			        </li>
+			    </ul>
+			</nav>
         </div>
     </div>
 </th:block>
+
+<!-- ========================================================== -->
+<!-- ▼▼▼ [수정된 부분] 스크립트를 올바른 fragment로 이동 ▼▼▼ -->
+<!-- ========================================================== -->
+<th:block layout:fragment="jsScript">
+    <script th:inline="javascript">
+        function movePage(event, pageNumber) {
+            // a 태그의 기본 동작(페이지 상단으로 이동)을 막습니다.
+            event.preventDefault();
+
+            // 현재 페이지의 URL을 기반으로 'page' 파라미터만 교체합니다.
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('page', pageNumber);
+
+            // 수정된 URL로 페이지를 이동시킵니다.
+            window.location.href = currentUrl.toString();
+        }
+    </script>
+</th:block>
+<!-- ========================================================== -->
+<!-- ▲▲▲ 스크립트 수정 완료 ▲▲▲ -->
+<!-- ========================================================== -->
 </body>
 </html>
