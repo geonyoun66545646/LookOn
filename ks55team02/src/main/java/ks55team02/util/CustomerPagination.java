@@ -6,15 +6,15 @@ import lombok.Setter; // ★★★ @Setter 어노테이션을 import 합니다. 
 import lombok.ToString;
 
 @Getter
+@Setter
 @ToString
 public class CustomerPagination<T> {
 
-    @Setter // ★★★ list 필드에 대한 setter를 자동으로 생성합니다. ★★★
     private List<T> list;            // 현재 페이지의 데이터 목록
     
     private int currentPage;         // 현재 페이지 번호
     private int totalPages;          // 전체 페이지 수
-    private long totalCount;         // 전체 아이템 개수
+    private int totalCount;         // 전체 아이템 개수
     private int pageSize;            // 한 페이지에 보여줄 아이템 개수
 
     private int startPage;           // 페이지네이션 블록의 시작 페이지
@@ -25,7 +25,7 @@ public class CustomerPagination<T> {
     // 생성자
     public CustomerPagination(List<T> list, long totalCount, int currentPage, int pageSize, int blockSize) {
         this.list = list;
-        this.totalCount = totalCount;
+        this.totalCount = (int)totalCount;
         this.currentPage = currentPage;
         this.pageSize = pageSize;
 

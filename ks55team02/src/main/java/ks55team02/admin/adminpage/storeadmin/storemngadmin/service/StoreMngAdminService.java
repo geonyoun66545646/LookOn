@@ -22,4 +22,5 @@ public interface StoreMngAdminService {
     List<Store> getStoreList(Store store, int limitStart, int pageSize);
     
     void updateStoreStatus(List<String> storeIds, String newStatus);
+    
 }

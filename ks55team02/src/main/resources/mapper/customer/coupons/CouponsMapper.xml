@@ -189,26 +189,30 @@
 
 	<select id="getAvailableCouponsCount" parameterType="map"
 		resultType="int">
-		SELECT COUNT(*) FROM coupons
-		WHERE actvtn_yn = 1
+		SELECT COUNT(c.pblcn_cpn_id)
+		FROM coupons c
+		LEFT JOIN user_coupons uc ON c.pblcn_cpn_id = uc.pblcn_cpn_id AND
+		uc.user_no = #{userNo} WHERE c.actvtn_yn = 1
+		AND uc.user_cpn_id IS NULL
 		<if test="keyword != null and keyword != ''">
-			AND cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
 		</if>
 	</select>
 
-	<!-- (추가) '쿠폰 받기' 탭의 실제 목록을 가져오는 이 쿼리가 누락되었습니다. -->
 	<select id="getAvailableCoupons" parameterType="map"
 		resultMap="couponsResultMap">
 		SELECT
-		pblcn_cpn_id, cpn_nm, dscnt_vl,
-		min_ordr_amt, max_dscnt_amt,
-		vld_end_dt, vld_bgng_dt,
-		crt_dt, issue_condition_type,
-		reissue_cycle
+		c.pblcn_cpn_id, c.cpn_nm, c.dscnt_vl,
+		c.min_ordr_amt, c.max_dscnt_amt,
+		c.vld_bgng_dt, c.vld_end_dt,
+		c.crt_dt, c.issue_condition_type,
+		c.reissue_cycle
 		FROM
 		coupons c
-		WHERE
+		LEFT JOIN user_coupons uc ON c.pblcn_cpn_id = uc.pblcn_cpn_id AND
+		uc.user_no = #{userNo} WHERE
 		c.actvtn_yn = 1
+		AND uc.user_cpn_id IS NULL
 		<if test="keyword != null and keyword != ''">
 			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
 		</if>
@@ -270,6 +274,22 @@
 		AND issu_rsn_src_cn = 'BIRTHDAY'
 		AND
 		YEAR(cpn_give_dt) = YEAR(NOW())
+	</select>
+
+	<select id="getAvailableCouponsCountExcludingOwned"
+		parameterType="map" resultType="int">
+		/* 사용자가 보유한 쿠폰을 제외한 발급 가능 쿠폰의 총 개수 조회 */
+		SELECT COUNT(c.pblcn_cpn_id)
+		FROM coupons c
+		LEFT JOIN user_coupons uc ON c.pblcn_cpn_id =
+		uc.pblcn_cpn_id AND
+		uc.user_no = #{userNo}
+		WHERE c.actvtn_yn = 1
+		AND
+		uc.user_cpn_id IS NULL
+		<if test="keyword != null and keyword != ''">
+			AND c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+		</if>
 	</select>
 
 

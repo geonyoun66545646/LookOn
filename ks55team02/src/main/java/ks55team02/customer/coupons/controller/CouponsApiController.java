@@ -27,7 +27,7 @@ public class CouponsApiController {
 	@GetMapping("/available")
 	public ResponseEntity<CustomerPagination<Coupons>> getAvailableCoupons(
 			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
-			@RequestParam(value = "sortOrder", required = false, defaultValue = "recent") String sortOrder,
+			@RequestParam(value = "sortOrder", required = false, defaultValue = "expiry") String sortOrder,
 			@RequestParam(value = "page", defaultValue = "1") int page, HttpSession session) { // HttpSession 추가
 
 		// (추가) 세션에서 사용자 정보 조회
@@ -46,7 +46,7 @@ public class CouponsApiController {
 	@GetMapping("/my")
 	public ResponseEntity<CustomerPagination<UserCoupons>> getMyCoupons(
 			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
-			@RequestParam(value = "sortOrder", required = false, defaultValue = "recent") String sortOrder,
+			@RequestParam(value = "sortOrder", required = false, defaultValue = "expiry") String sortOrder,
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "isUsed", required = false) Boolean isUsed, // (추가) 사용 여부 필터링
 			HttpSession session) {

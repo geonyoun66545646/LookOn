@@ -34,5 +34,6 @@ public interface StoreMngAdminMapper {
             @Param("newStatus") String newStatus,
             @Param("infoMdfcnDt") LocalDateTime infoMdfcnDt,
             @Param("delPrcrYn") String delPrcrYn); // delPrcrYn 파라미터 유지
+    
 }
 

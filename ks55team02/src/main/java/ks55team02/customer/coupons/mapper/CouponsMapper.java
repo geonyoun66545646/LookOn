@@ -115,5 +115,7 @@ public interface CouponsMapper {
     
     List<String> getOwnedCouponIds(String userNo);
     
+    int getAvailableCouponsCountExcludingOwned(Map<String, Object> paramMap);
+    
 
 }

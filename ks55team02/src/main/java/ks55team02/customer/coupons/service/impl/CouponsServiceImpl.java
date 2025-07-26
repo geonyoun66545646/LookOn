@@ -3,6 +3,7 @@ package ks55team02.customer.coupons.service.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,35 +26,31 @@ public class CouponsServiceImpl implements CouponsService {
 	private static final int PAGE_SIZE = 10;
 	private static final int BLOCK_SIZE = 10;
 
-	// (수정) getAvailableCoupons 메소드가 userNo를 받도록 변경합니다.
+	// CouponsServiceImpl.java
 	@Override
 	public CustomerPagination<Coupons> getAvailableCoupons(String userNo, String keyword, String sortOrder, int page) {
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.put("keyword", keyword);
 		paramMap.put("sortOrder", sortOrder);
+		paramMap.put("userNo", userNo); // ⭐⭐ userNo를 paramMap에 추가 ⭐⭐
 
-		int totalCount = couponsMapper.getAvailableCouponsCount(paramMap);
+		int totalCount = couponsMapper.getAvailableCouponsCount(paramMap); // ⭐ 이제 이 쿼리가 보유 쿠폰 제외한 개수를 반환
 
 		int offset = (page - 1) * PAGE_SIZE;
 		paramMap.put("limit", PAGE_SIZE);
 		paramMap.put("offset", offset);
 
-		List<Coupons> availableCoupons = couponsMapper.getAvailableCoupons(paramMap);
+		List<Coupons> availableCoupons = couponsMapper.getAvailableCoupons(paramMap); // ⭐ 이제 이 쿼리가 보유 쿠폰 제외한 리스트를 반환
 
-		// (핵심 로직 추가) 사용자가 로그인한 경우, 각 쿠폰의 보유 여부를 체크합니다.
-		if (userNo != null && !userNo.trim().isEmpty()) {
-			// 1. 사용자가 보유한 모든 쿠폰의 ID 목록을 한 번에 조회합니다. (성능 최적화)
-			List<String> ownedCouponIds = couponsMapper.getOwnedCouponIds(userNo);
+		// ⭐⭐ 이 for 루프 (혹은 stream 필터링)는 이제 필요 없습니다. ⭐⭐
+		// 매퍼에서 이미 제외되었기 때문입니다.
+		// if (userNo != null && !userNo.trim().isEmpty()) {
+		// List<String> ownedCouponIds = couponsMapper.getOwnedCouponIds(userNo);
+		// availableCoupons = availableCoupons.stream()
+		// .filter(coupon -> !ownedCouponIds.contains(coupon.getPblcnCpnId()))
+		// .collect(Collectors.toList());
+		// }
 
-			// 2. 조회된 쿠폰 목록을 순회하며, 보유 여부(isOwned)를 설정합니다.
-			// for (Coupons coupon : availableCoupons) 루프 내부
-			for (Coupons coupon : availableCoupons) {
-				if (ownedCouponIds.contains(coupon.getPblcnCpnId())) {
-					// (수정) setOwned(true)로 호출합니다.
-					coupon.setOwned(true);
-				}
-			}
-		}
 		return new CustomerPagination<>(availableCoupons, totalCount, page, PAGE_SIZE, BLOCK_SIZE);
 	}
 
@@ -176,7 +173,6 @@ public class CouponsServiceImpl implements CouponsService {
 		couponsMapper.issueUserCoupon(newUserCoupon);
 	}
 
-	
 	// * - 2025.07.11 gy -
 	@Override
 	public List<UserCoupons> getUserAvailableCoupons(String userNo) {
@@ -186,38 +182,33 @@ public class CouponsServiceImpl implements CouponsService {
 		// (개선) Mapper에서 이미 완벽하게 필터링하므로, 서비스단의 추가 필터링 로직은 제거합니다.
 		return couponsMapper.getUserAvailableCoupons(userNo);
 	}
-	
+
 	/*
-		
-		**
-     * - 2025.07.11 gy -
-     * 특정 사용자가 보유한 사용 가능한 쿠폰 목록을 조회합니다.
-     * 이 메서드는 CouponMapper를 호출하여 DB에서 데이터를 가져옵니다.
-     *
-     * @param userNo 사용자 번호
-     * @return 사용 가능한 UserCoupons 객체 리스트
-	@Override
-	public List<UserCoupons> getUserAvailableCoupons(String userNo) {
-	    // 1. 파라미터 검증
-	    if (userNo == null || userNo.trim().isEmpty()) {
-	        throw new IllegalArgumentException("사용자 번호가 유효하지 않습니다.");
-	    }
-
-	    // 2. 쿠폰 조회
-	    log.debug("사용자 보유 쿠폰 조회 시작 - userNo: {}", userNo);
-	    List<UserCoupons> coupons = couponsMapper.getUserAvailableCoupons(userNo); // 여기를 확인해주세요!
-
-	    // 3. 결과 검증 및 추가 필터링 (필요시) - 예: 만료일이 지난 쿠폰 제외
-	    List<UserCoupons> validCoupons = coupons.stream()
-	            .filter(c -> c.getIndivExpryDt() == null ||
-	                        !c.getIndivExpryDt().toLocalDate().isBefore(LocalDate.now())) // 만료일이 현재보다 이전이 아닌 쿠폰만 필터링
-	            .collect(Collectors.toList());
-
-	    log.debug("사용자 보유 쿠폰 조회 완료 - 유효 쿠폰 수: {}", validCoupons.size());
-	    return validCoupons;
-	}
-	     */
-
+	 **
+	 * 
+	 * - 2025.07.11 gy - 특정 사용자가 보유한 사용 가능한 쿠폰 목록을 조회합니다. 이 메서드는 CouponMapper를 호출하여
+	 * DB에서 데이터를 가져옵니다.
+	 *
+	 * @param userNo 사용자 번호
+	 * 
+	 * @return 사용 가능한 UserCoupons 객체 리스트
+	 * 
+	 * @Override public List<UserCoupons> getUserAvailableCoupons(String userNo) {
+	 * // 1. 파라미터 검증 if (userNo == null || userNo.trim().isEmpty()) { throw new
+	 * IllegalArgumentException("사용자 번호가 유효하지 않습니다."); }
+	 * 
+	 * // 2. 쿠폰 조회 log.debug("사용자 보유 쿠폰 조회 시작 - userNo: {}", userNo);
+	 * List<UserCoupons> coupons = couponsMapper.getUserAvailableCoupons(userNo); //
+	 * 여기를 확인해주세요!
+	 * 
+	 * // 3. 결과 검증 및 추가 필터링 (필요시) - 예: 만료일이 지난 쿠폰 제외 List<UserCoupons> validCoupons
+	 * = coupons.stream() .filter(c -> c.getIndivExpryDt() == null ||
+	 * !c.getIndivExpryDt().toLocalDate().isBefore(LocalDate.now())) // 만료일이 현재보다
+	 * 이전이 아닌 쿠폰만 필터링 .collect(Collectors.toList());
+	 * 
+	 * log.debug("사용자 보유 쿠폰 조회 완료 - 유효 쿠폰 수: {}", validCoupons.size()); return
+	 * validCoupons; }
+	 */
 
 	/*
 	 * ─── 삭제된 메소드 ──────────────────────────────────────────────────────────
