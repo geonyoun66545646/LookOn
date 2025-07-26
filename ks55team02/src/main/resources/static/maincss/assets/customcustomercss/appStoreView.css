@@ -12,7 +12,6 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600 !important;
 }
 
-
 /* ======================================== */
 /*            1. 기본 색상 변수             */
 /* ======================================== */
@@ -210,6 +209,7 @@ input[type="file"] {
     padding-left: 1.2rem; /* 좌우 패딩을 폼 컨트롤과 유사하게 조정 */
     transition: all 0.3s;
     box-shadow: none;
+    
 }
 
 .period-display {
@@ -256,6 +256,7 @@ input[type="file"] {
 .input-group-split .form-select {
     height: 100%; /* 부모 높이에 꽉 차게 */
     flex: 1 1 auto; /* 자동으로 공간 차지 */
+    margin-bottom : 20px;
 }
 
 /* 연락처 국번 선택 */
@@ -292,6 +293,7 @@ input[type="file"] {
 /* textarea는 높이가 가변적이므로 height는 auto로 재정의 */
 textarea.form-control {
     height: auto;
+    resize:none;
 }
 
 /* 포커스 받았을 때 스타일 */
@@ -304,20 +306,12 @@ textarea.form-control {
     box-shadow: none; /* 포커스 시 그림자 제거 */
 }
 
-/* 드롭다운 화살표 커스터마이징 (선택사항, 브라우저 호환성 고려 필요) */
-.form-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 1.2rem center;
-    background-size: 16px 12px;
-}
 
 /* 플레이스홀더 스타일 */
 .form-control::placeholder {
     color: #ccc;
     opacity: 1;
 }
-
 
 /* ======================================== */
 /*                9. 기타 UI 스타일           */
@@ -350,4 +344,26 @@ label {
     height: 40px;
     border-radius: 0;
     font-size: 1.4rem;
+}
+#bankNm{
+	width:100%;
+}
+.step-indicator{
+	margin-bottom : 10px;
+}
+.input-divider{
+	font-size: 20px;
+	margin-bottom : 20px;
+}
+
+#email-at{
+	font-size:20px;
+}
+.brno{
+	margin-bottom : 20px;
+	margin-left: auto;
+}
+
+.mng{
+	margin-bottom : 20px;
 }

@@ -6,15 +6,6 @@
     <title>스토어 신청</title>
     <!-- CSS 파일은 제공해주신 최종본을 링크합니다. -->
     <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/appStoreView.css}">
-    <style>
-        /* [추가] 계약기간, 연락처, 이메일 등 분할된 입력 필드 그룹 스타일 */
-        .input-group-split { display: flex; align-items: center; gap: .5rem; }
-        .input-group-split .form-control, .input-group-split .form-select { flex: 1; }
-        .input-group-split .input-divider { color: #6c757d; }
-
-        /* [수정] 계약기간 컨트롤 높이 조정 */
-        .contract-period-group { height: calc(1.5em + .75rem + 2px); }
-    </style>
 </head>
 <body>
 <th:block layout:fragment="contents">
@@ -29,150 +20,201 @@
 
             <div class="row justify-content-center mt-3 mb-5">
                 <div class="col-lg-10">
-                    <ul class="nav nav-pills wizard-nav" id="v-pills-tab" role="tablist">
-                        <li class="nav-item flex-fill" role="presentation"><a class="nav-link text-center active" id="step1-tab" data-bs-toggle="pill" href="#step1" role="tab" aria-controls="step1" aria-selected="true"><span class="step-indicator">1</span>신청자 정보</a></li>
-                        <li class="nav-item flex-fill" role="presentation"><a class="nav-link text-center" id="step2-tab" data-bs-toggle="pill" href="#step2" role="tab" aria-controls="step2" aria-selected="false"><span class="step-indicator">2</span>스토어 정보</a></li>
-                        <li class="nav-item flex-fill" role="presentation"><a class="nav-link text-center" id="step3-tab" data-bs-toggle="pill" href="#step3" role="tab" aria-controls="step3" aria-selected="false"><span class="step-indicator">3</span>서류 제출</a></li>
-                    </ul>
+                   <!-- [수정] 4단계 탭 구조 -->
+<ul class="nav nav-pills wizard-nav" id="v-pills-tab" role="tablist">
+    <li class="nav-item flex-fill" role="presentation"><a class="nav-link text-center active" id="step1-tab" data-bs-toggle="pill" href="#step1" role="tab" aria-controls="step1" aria-selected="true"><span class="step-indicator">1</span>신청자 정보</a></li>
+    <li class="nav-item flex-fill" role="presentation"><a class="nav-link text-center" id="step2-tab" data-bs-toggle="pill" href="#step2" role="tab" aria-controls="step2" aria-selected="false"><span class="step-indicator">2</span>스토어 정보</a></li>
+    <li class="nav-item flex-fill" role="presentation"><a class="nav-link text-center" id="step3-tab" data-bs-toggle="pill" href="#step3" role="tab" aria-controls="step3" aria-selected="false"><span class="step-indicator">3</span>스토어 정보2</a></li>
+    <li class="nav-item flex-fill" role="presentation"><a class="nav-link text-center" id="step4-tab" data-bs-toggle="pill" href="#step4" role="tab" aria-controls="step4" aria-selected="false"><span class="step-indicator">4</span>서류 제출</a></li>
+</ul>
 
-                    <div class="tab-content" id="v-pills-tabContent">
-                        <!-- Step 1: 신청자 정보 -->
-                        <div class="tab-pane fade show active" id="step1" role="tabpanel" aria-labelledby="step1-tab">
-                            <div class="card card-body p-4 p-md-5">
-                                <h5 class="form-section-title">신청자 기본 정보</h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3"><label>신청자 ID</label><div class="user-info" th:text="${userInfo.userLgnId}" id="applicantIdDisplay"></div></div>
-                                    <div class="col-md-6 mb-3"><label>신청자 이름</label><div class="user-info" th:text="${userInfo.userNm}" id="applicantNameDisplay"></div></div>
-                                    <div class="col-md-6 mb-3"><label>신청자 연락처</label><div class="user-info" th:text="${userInfo.telno}" id="applicantTelDisplay"></div></div>
-                                </div>
-                                <h5 class="form-section-title mt-4">정산 계좌 정보</h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3"><label>예금주 <span class="text-danger">*</span></label><input type="text" class="form-control" id="dpstrNm" name="dpstrNm" required></div>
-                                    <!-- [수정] 은행명 드롭다운 -->
-                                    <div class="col-md-6 mb-3">
-                                        <label>은행명 <span class="text-danger">*</span></label>
-                                        <div>
-                                        <select class="form-select" id="bankNm" name="bankNm" required>
-                                            <option value="" selected disabled>은행을 선택하세요</option>
-                                            <option value="KB국민은행">KB국민은행</option><option value="신한은행">신한은행</option><option value="우리은행">우리은행</option><option value="하나은행">하나은행</option><option value="IBK기업은행">IBK기업은행</option><option value="NH농협은행">NH농협은행</option><option value="SC제일은행">SC제일은행</option><option value="카카오뱅크">카카오뱅크</option><option value="케이뱅크">케이뱅크</option><option value="토스뱅크">토스뱅크</option><option value="수협은행">수협은행</option><option value="대구은행">대구은행</option><option value="부산은행">부산은행</option><option value="경남은행">경남은행</option><option value="광주은행">광주은행</option><option value="전북은행">전북은행</option><option value="제주은행">제주은행</option><option value="산업은행">산업은행</option><option value="새마을금고">새마을금고</option><option value="신협">신협</option><option value="우체국">우체국</option>
-                                        </select>
-                                        </div>
-                                    </div>
-                                    <!-- [수정] 계좌번호 입력 -->
-                                    <div class="col-md-6 mb-3">
-                                        <label>계좌번호 <span class="text-danger">*</span> ('-' 없이 숫자만 입력)</label>
-                                        <input type="text" class="form-control" id="actno" name="actno" required pattern="[0-9]{10,16}" title="10~16자리의 숫자만 입력해주세요.">
-                                    </div>
-                                </div>
-                                <div class="button-wrapper"><span></span><button type="button" class="btn btn-outline-primary next-step">다음</button></div>
-                            </div>
-                        </div>
-
-                        <!-- Step 2: 스토어 정보 -->
-                        <div class="tab-pane fade" id="step2" role="tabpanel" aria-labelledby="step2-tab">
-                            <div class="card card-body p-4 p-md-5">
-                                <h5 class="form-section-title">스토어 기본 정보</h5>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3"><label>스토어 명 <span class="text-danger">*</span></label><input type="text" class="form-control" id="storeNameInput" name="storeNm"></div>
-                                    <div class="col-md-6 mb-3"><label>수수료 정책</label><div class="user-info" id="commissionRateDisplay">일반 판매자 수수료 (18%)</div><div class="d-none" id="commissionRateCn">plcy_1</div></div>
-                                    <div class="col-md-12 mb-3"><label>스토어 소개 <span class="text-danger">*</span></label><textarea class="form-control" rows="4" placeholder="고객에게 보여질 스토어 소개를 입력해주세요." id="storeIntroTextarea" name="storeIntroCn"></textarea></div>
-                                </div>
-                                <h5 class="form-section-title mt-4">담당자 정보</h5>
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                    <label>매니저 명 <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" class="form-control" id="managerNameInput" name="mngrNm"></div>
-                                    <div>
-                                    <div class="col-md-4 mb-3">
-                                        <label>매니저 연락처 <span class="text-danger">*</span></label>
-                                        <div class="input-group-split">
-                                            <select class="form-select" id="managerTel1" style="flex: 0 0 100px;">
-                                                <option>010</option><option>011</option><option>016</option><option>017</option><option>018</option><option>019</option>
-                                            </select>
-                                            <span class="input-divider">-</span>
-                                            <input type="text" class="form-control" id="managerTel2" maxlength="4" pattern="[0-9]*">
-                                            <span class="input-divider">-</span>
-                                            <input type="text" class="form-control" id="managerTel3" maxlength="4" pattern="[0-9]*">
-                                        </div>
-                                        <input type="hidden" id="managerTelInput" name="mngrTelNo">
-                                    </div>
-                                    <!-- [수정] 매니저 이메일 UI -->
-                                    <div class="col-md-4 mb-3">
-                                        <label>매니저 이메일 <span class="text-danger">*</span></label>
-                                        <div class="input-group-split">
-                                            <input type="text" class="form-control" id="emailId">
-                                            <span class="input-divider">@</span>
-                                            <input type="text" class="form-control" id="emailDomain">
-                                            <select class="form-select" id="emailDomainSelector" style="flex: 0 0 140px;">
-                                                <option value="">직접입력</option>
-                                                <option value="naver.com">naver.com</option>
-                                                <option value="gmail.com">gmail.com</option>
-                                                <option value="daum.net">daum.net</option>
-                                                <option value="nate.com">nate.com</option>
-                                            </select>
-                                        </div>
-                                        <input type="hidden" id="managerEmailInput" name="mngrEml">
-                                    </div>
-                                </div>
-                                </div>
-                                <h5 class="form-section-title mt-4">사업장 정보</h5><div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label>사업자등록번호 조회 <span class="text-danger">*</span></label>
-                                        <div class="input-group">
-                                            <input class="form-control" type="text" id="brno" name="brno" placeholder="'-' 없이 10자리 숫자를 입력하세요." pattern="[0-9]{10}" title="숫자 10자리를 입력해주세요." required>
-                                            <button class="btn btn-outline-primary" type="button" id="checkBrnoButton">조회</button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="resetBrnoForm()">다시입력</button>
-                                        </div>
-                                        <div id="apiResponseContainer" class="mt-2" style="font-weight: bold;"></div>
-                                    </div>
-                                    <div class="col-md-12 mb-3">
-                                        <label>스토어 주소 <span class="text-danger">*</span></label>
-                                        <div class="input-group"><input type="text" class="form-control" id="sample2_postcode" placeholder="우편번호" readonly="readonly" name="bplcPostCode"><button class="btn btn-outline-secondary" type="button" onclick="sample2_execDaumPostcode()">주소 찾기</button></div>
-                                        <input type="text" class="form-control mt-2" id="sample2_address" placeholder="주소" readonly="readonly" name="bplcAddr"><input type="text" class="form-control mt-2" id="sample2_detailAddress" placeholder="상세주소" name="bplcDaddr"><div id="layer" style="display:none;position:fixed;overflow:hidden;z-index:9999;-webkit-overflow-scrolling:touch;"><img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼"></div>
-                                    </div>
-                                </div>
-                                <h5 class="form-section-title mt-4">계약 정보</h5><div class="row">
-                                    <div class="col-md-6 mb-3"><label>계약 신청일</label><input type="text" class="form-control" id="contractApplyDateInput" th:value="${todayDate}" readonly name="contractApplyDateInput"></div>
-                                    <div class="col-md-6 mb-3">
-                                        <label>계약 기간 <span class="text-danger">*</span></label>
-                                        <div class="contract-period-group">
-                                            <span class="period-display" id="contractDisplay"></span>
-                                            <div class="period-buttons">
-                                                <button type="button" class="btn-period" id="decrementYearBtn">-</button>
-                                                <button type="button" class="btn-period" id="incrementYearBtn">+</button>
-                                            </div>
-                                        </div>
-                                        <input type="hidden" id="contractTermInput" name="contractTermInput">
-                                    </div>
-                                </div>
-                                <div class="button-wrapper"><button type="button" class="btn btn-outline-secondary prev-step">이전</button><button type="button" class="btn btn-outline-primary next-step">다음</button></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Step 3: 서류 제출 (HTML 변경 없음) -->
-                        <div class="tab-pane fade" id="step3" role="tabpanel" aria-labelledby="step3-tab">
-                            <div class="card card-body p-4 p-md-5">
-                                <h5 class="form-section-title">필수 제출 서류</h5>
-                                <ul class="file-upload-list">
-                                    <li class="file-upload-item"><span class="doc-name">사업자 등록증 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-1">선택된 파일 없음</span><label for="file-upload-1" class="btn-file select">파일 선택</label><input id="file-upload-1" type="file" name="businessRegistrationDoc" /><button type="button" class="btn-file cancel" data-target="1">취소</button></li>
-                                    <li class="file-upload-item"><span class="doc-name">통신 판매업 신고증 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-2">선택된 파일 없음</span><label for="file-upload-2" class="btn-file select">파일 선택</label><input id="file-upload-2" type="file" name="telecommunicationLicense" /><button type="button" class="btn-file cancel" data-target="2">취소</button></li>
-                                    <li class="file-upload-item"><span class="doc-name">대표자 신분증 사본 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-4">선택된 파일 없음</span><label for="file-upload-4" class="btn-file select">파일 선택</label><input id="file-upload-4" type="file" name="idCardCopy"/><button type="button" class="btn-file cancel" data-target="4">취소</button></li>
-                                    <li class="file-upload-item"><span class="doc-name">통장 사본 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-5">선택된 파일 없음</span><label for="file-upload-5" class="btn-file select">파일 선택</label><input id="file-upload-5" type="file" name="bankAccountCopy" /><button type="button" class="btn-file cancel" data-target="5">취소</button></li>
-                                </ul>
-                                <h5 class="form-section-title mt-4">선택 제출 서류</h5>
-                                <ul class="file-upload-list">
-                                     <li class="file-upload-item"><span class="doc-name">판매상품 관련 증빙</span><span class="file-name-display" id="fileNameDisplay-3">선택된 파일 없음</span><label for="file-upload-3" class="btn-file select">파일 선택</label><input id="file-upload-3" type="file" name="productEvidence"/><button type="button" class="btn-file cancel" data-target="3">취소</button></li>
-                                     <li class="file-upload-item"><span class="doc-name">기타 서류</span><span class="file-name-display" id="fileNameDisplay-6">선택된 파일 없음</span><label for="file-upload-6" class="btn-file select">파일 선택</label><input id="file-upload-6" type="file" name="etcDocs"/><button type="button" class="btn-file cancel" data-target="6">취소</button></li>
-                                     <li class="file-upload-item"><span class="doc-name">스토어 로고</span><span class="file-name-display" id="fileNameDisplay-7">선택된 파일 없음</span><label for="file-upload-7" class="btn-file select">파일 선택</label><input id="file-upload-7" type="file" name="storeLogoImgFile"/><button type="button" class="btn-file cancel" data-target="7">취소</button></li>
-                                </ul>
-                                <div class="button-wrapper"><button type="button" class="btn btn-outline-secondary prev-step">이전</button><button type="button" class="btn btn-outline-primary" id="submitApplication">최종 제출</button></div>
-                            </div>
-                        </div>
-                    </div>
+<div class="tab-content" id="v-pills-tabContent">
+    <!-- Step 1: 신청자 정보 -->
+    <div class="tab-pane fade show active" id="step1" role="tabpanel" aria-labelledby="step1-tab">
+        <div class="card card-body p-4 p-md-5">
+            <h5 class="form-section-title">신청자 기본 정보</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3"><label>신청자 ID</label><div class="user-info" th:text="${userInfo.userLgnId}" id="applicantIdDisplay"></div></div>
+                <div class="col-md-6 mb-3"><label>신청자 이름</label><div class="user-info" th:text="${userInfo.userNm}" id="applicantNameDisplay"></div></div>
+                <div class="col-md-6 mb-3"><label>신청자 연락처</label><div class="user-info" th:text="${userInfo.telno}" id="applicantTelDisplay"></div></div>
+            </div>
+            <h5 class="form-section-title mt-4">정산 계좌 정보</h5>
+            <div class="row">
+                    <div class="col-md-4 mb-3">
+                       <label>예금주 <span class="text-danger">*</span></label>
+                       <input type="text" class="form-control" id="dpstrNm" name="dpstrNm" required>
+                   </div>
+                   <div class="col-md-3 mb-3">
+                       <label>은행명 <span class="text-danger">*</span></label>
+                       <!-- [수정] 표준 드롭다운으로 복원 (size, onmousedown, onchange, onblur 속성 제거) -->
+                       <select class="form-select" id="bankNm" name="bankNm" required>
+                           <option value="" selected disabled>은행 선택</option>
+                           <option value="KB국민은행">KB국민은행</option>
+                           <option value="신한은행">신한은행</option>
+                           <option value="우리은행">우리은행</option>
+                           <option value="하나은행">하나은행</option>
+                           <option value="IBK기업은행">IBK기업은행</option>
+                           <option value="NH농협은행">NH농협은행</option>
+                           <option value="SC제일은행">SC제일은행</option>
+                           <option value="카카오뱅크">카카오뱅크</option>
+                           <option value="케이뱅크">케이뱅크</option>
+                           <option value="토스뱅크">토스뱅크</option>
+                           <option value="수협은행">수협은행</option>
+                           <option value="대구은행">대구은행</option>
+                           <option value="부산은행">부산은행</option>
+                           <option value="경남은행">경남은행</option>
+                           <option value="광주은행">광주은행</option>
+                           <option value="전북은행">전북은행</option>
+                           <option value="제주은행">제주은행</option>
+                           <option value="산업은행">산업은행</option>
+                           <option value="새마을금고">새마을금고</option>
+                           <option value="신협">신협</option>
+                           <option value="우체국">우체국</option>
+                       </select>
+                   </div>
+                <div class="col-md-5 mb-3">
+                    <label>계좌번호 <span class="text-danger">*</span> ('-' 없이 숫자만 입력)</label>
+                    <input type="text" class="form-control" id="actno" name="actno" required pattern="[0-9]{10,16}" title="10~16자리의 숫자만 입력해주세요." maxlength="16">
                 </div>
             </div>
+            <div class="button-wrapper"><span></span><button type="button" class="btn btn-outline-primary next-step">다음</button></div>
         </div>
+    </div>
+
+    <!-- Step 2: 스토어 정보 -->
+    <div class="tab-pane fade" id="step2" role="tabpanel" aria-labelledby="step2-tab">
+         <div class="card card-body p-4 p-md-5">
+            <h5 class="form-section-title">스토어 기본 정보</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3"><label>스토어 명 <span class="text-danger">*</span></label><input type="text" class="form-control" id="storeNameInput" name="storeNm"></div>
+                <div class="col-md-6 mb-3"><label>수수료 정책</label><div class="user-info" id="commissionRateDisplay">일반 판매자 수수료 (18%)</div><div class="d-none" id="commissionRateCn">plcy_1</div></div>
+                <div class="col-md-12 mb-3"><label>스토어 소개 <span class="text-danger">*</span></label><textarea class="form-control" rows="4" placeholder="고객에게 보여질 스토어 소개를 입력해주세요." id="storeIntroTextarea" name="storeIntroCn"></textarea></div>
+            </div>
+            <h5 class="form-section-title mt-4">담당자 정보</h5>
+            <div class="row">
+                <div class="col-6 mb-3">
+                    <label>매니저 명 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="managerNameInput" name="mngrNm">
+                </div>
+                  </div>
+               <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class = "mng">매니저 연락처 <span class="text-danger">*</span></label>
+                    <div class="input-group-split">
+                        <select class="form-select" id="managerTel1" style="flex: 0 0 90px;">
+                            <option>010</option><option>011</option><option>016</option><option>017</option><option>018</option><option>019</option>
+                        </select>
+                        <span class="input-divider">-</span>
+                        <input type="text" class="form-control" id="managerTel2" maxlength="4" pattern="[0-9]*">
+                        <span class="input-divider">-</span>
+                        <input type="text" class="form-control" id="managerTel3" maxlength="4" pattern="[0-9]*">
+                    </div>
+                    <input type="hidden" id="managerTelInput" name="mngrTelNo">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class = "mng">매니저 이메일 <span class="text-danger">*</span></label>
+                    <div class="input-group-split">
+                        <input type="text" class="form-control" id="emailId" style="flex: 4;">
+                        <span class="input-divider">@</span>
+                        <input type="text" class="form-control" id="emailDomain" style="flex: 3;">
+                        <select class="form-select" id="emailDomainSelector" style="flex: 3;">
+                            <option value="">직접입력</option>
+                            <option value="naver.com">naver.com</option><option value="gmail.com">gmail.com</option><option value="daum.net">daum.net</option><option value="nate.com">nate.com</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="managerEmailInput" name="mngrEml">
+                </div>
+                </div>
+            <div class="button-wrapper"><button type="button" class="btn btn-outline-secondary prev-step">이전</button><button type="button" class="btn btn-outline-primary next-step">다음</button></div>
+        </div>
+    </div>
+    
+    <!-- [신규] Step 3: 사업 및 계약 정보 -->
+    <div class="tab-pane fade" id="step3" role="tabpanel" aria-labelledby="step3-tab">
+         <div class="card card-body p-4 p-md-5">
+            <h5 class="form-section-title">사업장 정보</h5>
+            <div class="row">
+               <div class="col-12 mb-3">
+                    <label for="brno">사업자등록번호 조회 <span class="text-danger">*</span></label>
+                    <div class="input-group-gap">
+                        <div class="row g-2"> 
+                            <div class="col">
+                                <input class="form-control" type="text" id="brno" name="brno" placeholder="'-' 없이 10자리 숫자를 입력하세요." pattern="[0-9]{10}" title="숫자 10자리를 입력해주세요." maxlength="10" required>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-outline-primary" type="button" id="checkBrnoButton">조회</button>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-outline-secondary" type="button" onclick="resetBrnoForm()">다시입력</button>
+                            </div>
+                        </div>
+                        <div id="apiResponseContainer" class="mt-2" style="font-weight: bold;"></div>
+                    </div>
+                </div>
+              <div class="col-12">
+                <label>스토어 주소 <span class="text-danger">*</span></label>
+                <div class="row gx-2 align-items-center">             
+                    <div class="col-6">
+                        <input type="text" class="form-control" id="sample2_postcode" placeholder="우편번호" readonly="readonly" name="bplcPostCode">
+                    </div>
+                    <div class="col-auto brno">
+                        <button class="btn btn-outline-secondary" type="button" onclick="sample2_execDaumPostcode()">주소 찾기</button>
+                    </div>								
+                </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <input type="text" class="form-control" id="sample2_address" placeholder="주소" readonly="readonly" name="bplcAddr">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <input type="text" class="form-control" id="sample2_detailAddress" placeholder="상세주소" name="bplcDaddr">
+                        </div>
+                    </div>
+                    <div id="layer" style="display:none;position:fixed;overflow:hidden;z-index:9999;-webkit-overflow-scrolling:touch;"><img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼"></div>
+                </div>
+            </div>
+            <h5 class="form-section-title mt-4">계약 정보</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3"><label>계약 신청일</label><div class="user-info" id="contractApplyDateDisplay" th:text="${todayDate}"></div></div>
+                <div class="col-md-6 mb-3">
+                    <label>계약 기간 <span class="text-danger">*</span></label>
+                    <div class="contract-period-group">
+                        <span class="period-display" id="contractDisplay"></span>
+                        <div class="period-buttons">
+                            <button type="button" class="btn-period" id="decrementYearBtn">-</button>
+                            <button type="button" class="btn-period" id="incrementYearBtn">+</button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="contractTermInput" name="ctrtTermVal">
+                    <input type="hidden" id="contractApplyDateInput" name="ctrtAplyYmd" th:value="${todayDate}">
+                </div>
+            </div>
+            <div class="button-wrapper"><button type="button" class="btn btn-outline-secondary prev-step">이전</button><button type="button" class="btn btn-outline-primary next-step">다음</button></div>
+        </div>
+    </div>
+    
+    <!-- [수정] Step 4: 서류 제출 (이제 tab-content 내부에 올바르게 위치합니다) -->
+    <div class="tab-pane fade" id="step4" role="tabpanel" aria-labelledby="step4-tab">
+        <div class="card card-body p-4 p-md-5">
+            <h5 class="form-section-title">필수 제출 서류</h5>
+            <ul class="file-upload-list">
+                <li class="file-upload-item"><span class="doc-name">사업자 등록증 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-1">선택된 파일 없음</span><label for="file-upload-1" class="btn-file select">파일 선택</label><input id="file-upload-1" type="file" name="businessRegistrationDoc" /><button type="button" class="btn-file cancel" data-target="1">취소</button></li>
+                <li class="file-upload-item"><span class="doc-name">통신 판매업 신고증 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-2">선택된 파일 없음</span><label for="file-upload-2" class="btn-file select">파일 선택</label><input id="file-upload-2" type="file" name="telecommunicationLicense" /><button type="button" class="btn-file cancel" data-target="2">취소</button></li>
+                <li class="file-upload-item"><span class="doc-name">대표자 신분증 사본 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-4">선택된 파일 없음</span><label for="file-upload-4" class="btn-file select">파일 선택</label><input id="file-upload-4" type="file" name="idCardCopy"/><button type="button" class="btn-file cancel" data-target="4">취소</button></li>
+                <li class="file-upload-item"><span class="doc-name">통장 사본 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-5">선택된 파일 없음</span><label for="file-upload-5" class="btn-file select">파일 선택</label><input id="file-upload-5" type="file" name="bankAccountCopy" /><button type="button" class="btn-file cancel" data-target="5">취소</button></li>
+            </ul>
+            <h5 class="form-section-title mt-4">선택 제출 서류</h5>
+            <ul class="file-upload-list">
+                 <li class="file-upload-item"><span class="doc-name">판매상품 관련 증빙</span><span class="file-name-display" id="fileNameDisplay-3">선택된 파일 없음</span><label for="file-upload-3" class="btn-file select">파일 선택</label><input id="file-upload-3" type="file" name="productEvidence"/><button type="button" class="btn-file cancel" data-target="3">취소</button></li>
+                 <li class="file-upload-item"><span class="doc-name">기타 서류</span><span class="file-name-display" id="fileNameDisplay-6">선택된 파일 없음</span><label for="file-upload-6" class="btn-file select">파일 선택</label><input id="file-upload-6" type="file" name="etcDocs"/><button type="button" class="btn-file cancel" data-target="6">취소</button></li>
+                 <li class="file-upload-item"><span class="doc-name">스토어 로고</span><span class="file-name-display" id="fileNameDisplay-7">선택된 파일 없음</span><label for="file-upload-7" class="btn-file select">파일 선택</label><input id="file-upload-7" type="file" name="storeLogoImgFile"/><button type="button" class="btn-file cancel" data-target="7">취소</button></li>
+            </ul>
+            <div class="button-wrapper"><button type="button" class="btn btn-outline-secondary prev-step">이전</button><button type="button" class="btn btn-outline-primary" id="submitApplication">최종 제출</button></div>
+        </div>
+    </div>
+</div>
+</div>
+                </div>
+            </div>
     </main>
 </th:block>
 
@@ -273,9 +315,10 @@ document.addEventListener('DOMContentLoaded', function() {
             checkField('storeNameInput', '스토어 명을 입력해주세요.', el => el.value.trim() !== '');
             checkField('storeIntroTextarea', '스토어 소개를 입력해주세요.', el => el.value.trim() !== '');
             checkField('managerNameInput', '매니저 명을 입력해주세요.', el => el.value.trim() !== '');
-            checkField('managerTelInput', '매니저 연락처를 올바르게 입력해주세요. (예: 010-1234-5678)', el => /^01[0-9]{1}-\d{3,4}-\d{4}$/.test(el.value));
+            checkField('managerTelInput', '매니저 연락처를 올바르게 입력해주세요. (예: 010-1234-5678)', el => /^01[0-9]-\d{3,4}-\d{4}$/.test(el.value));
             checkField('managerEmailInput', '매니저 이메일을 올바르게 입력해주세요.', el => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(el.value));
-            checkField('brno', '사업자등록번호를 입력해주세요.', el => el.value.trim() !== '');
+        } else if (stepId === 'step3') {
+             checkField('brno', '사업자등록번호를 입력해주세요.', el => el.value.trim() !== '');
             if(isValid && !isBrnoVerified) {
                 alert('사업자등록번호를 조회하고 인증을 완료해주세요.');
                 firstInvalidElement = document.getElementById('brno');
@@ -283,17 +326,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             checkField('sample2_postcode', '스토어 주소를 입력해주세요.', el => el.value.trim() !== '');
             checkField('sample2_detailAddress', '스토어 상세주소를 입력해주세요.', el => el.value.trim() !== '');
-            checkField('contractTermInput', '계약 기간을 확인해주세요.', el => el.value.trim() !== '');
         }
         
         if (!isValid && firstInvalidElement) {
-            firstInvalidElement.focus();
+            // 포커스를 줄 수 없는 엘리먼트(숨겨진)의 경우를 대비
+            if(firstInvalidElement.offsetParent !== null) {
+                firstInvalidElement.focus();
+            }
         }
         return isValid;
     }
     
     // --- 최종 제출시 필수 서류 유효성 검사 함수 ---
-    function validateRequiredFiles() { /* 기존 로직과 동일 */
+    function validateRequiredFiles() {
         const requiredFiles = [
             ['file-upload-1', '사업자 등록증'], ['file-upload-2', '통신 판매업 신고증'],
             ['file-upload-4', '대표자 신분증 사본'], ['file-upload-5', '통장 사본']
@@ -302,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById(id);
             if (!element.value) {
                 alert(`필수 서류인 '${name}'을(를) 첨부해주세요.`);
-                new bootstrap.Tab(document.getElementById('step3-tab')).show();
+                new bootstrap.Tab(document.getElementById('step4-tab')).show(); // 4단계 탭으로 이동
                 element.closest('.file-upload-item').querySelector('label').focus();
                 return false;
             }
@@ -310,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    // --- [신규] 연락처 및 이메일 조합 로직 ---
+    // --- 연락처 및 이메일 조합 로직 ---
     const tel1 = document.getElementById('managerTel1');
     const tel2 = document.getElementById('managerTel2');
     const tel3 = document.getElementById('managerTel3');
@@ -348,8 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     [emailId, emailDomain].forEach(el => el.addEventListener('input', updateManagerEmail));
 
-
-    // --- 파일 등록 및 취소 로직 --- (기존 로직과 동일)
+    // --- 파일 등록 및 취소 로직 ---
     document.querySelectorAll('input[type="file"]').forEach(input => {
         input.addEventListener('change', function() {
             const num = this.id.split('-').pop();
@@ -368,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- 사업자 등록정보 조회 --- (기존 로직과 동일)
+    // --- 사업자 등록정보 조회 ---
     document.getElementById('checkBrnoButton')?.addEventListener('click', function() {
         const brnoInput = document.getElementById('brno');
         const brno = brnoInput.value.replace(/-/g, '');
@@ -414,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('apiResponseContainer').innerHTML = '';
     });
 
-    // --- 계약 기간 조절 로직 --- (기존 로직과 동일)
+    // --- 계약 기간 조절 로직 ---
     const decrementBtn = document.getElementById('decrementYearBtn');
     const incrementBtn = document.getElementById('incrementYearBtn');
     const displaySpan = document.getElementById('contractDisplay');
@@ -433,34 +477,36 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('submitApplication')?.addEventListener('click', async function(event) {
         event.preventDefault();
         
-        // 1. 모든 단계 유효성 및 파일 검사
-        if (!validateStep('step1') || !validateStep('step2') || !validateRequiredFiles()) {
+        if (!validateStep('step1') || !validateStep('step2') || !validateStep('step3') || !validateRequiredFiles()) {
             if (!validateStep('step1')) new bootstrap.Tab(document.getElementById('step1-tab')).show();
             else if (!validateStep('step2')) new bootstrap.Tab(document.getElementById('step2-tab')).show();
+            else if (!validateStep('step3')) new bootstrap.Tab(document.getElementById('step3-tab')).show();
             return;
         }
         
-        // 2. 최종 제출 확인
         if (!confirm("입력하신 내용으로 스토어 신청을 제출하시겠습니까?")) return;
         
-        // 3. FormData 생성 (기존 로직과 동일)
         const formData = new FormData();
+        // Step 1
         formData.append('aplyUserNo', document.getElementById('applicantIdDisplay').textContent);
         formData.append('dpstrNm', document.getElementById('dpstrNm').value);
         formData.append('bankNm', document.getElementById('bankNm').value);
         formData.append('actno', document.getElementById('actno').value);
+        // Step 2
         formData.append('storeNm', document.getElementById('storeNameInput').value);
         formData.append('plcyId', document.getElementById('commissionRateCn').textContent);
         formData.append('storeIntroCn', document.getElementById('storeIntroTextarea').value);
         formData.append('mngrNm', document.getElementById('managerNameInput').value);
         formData.append('mngrTelNo', document.getElementById('managerTelInput').value);
         formData.append('mngrEml', document.getElementById('managerEmailInput').value);
+        // Step 3
         formData.append('brno', document.getElementById('brno').value);
         formData.append('bplcPostCode', document.getElementById('sample2_postcode').value);
         formData.append('bplcAddr', document.getElementById('sample2_address').value);
         formData.append('bplcDaddr', document.getElementById('sample2_detailAddress').value);
         formData.append('ctrtAplyYmd', document.getElementById('contractApplyDateInput').value);
         formData.append('ctrtTermVal', document.getElementById('contractTermInput').value);
+        // Step 4
         for(let i=1; i<=7; i++) {
             const fileInput = document.getElementById('file-upload-' + i);
             if (fileInput && fileInput.files.length > 0) {
@@ -468,7 +514,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // 4. 서버로 비동기 제출 (기존 로직과 동일)
         try {
             const response = await fetch('/store/appStore', { method: 'POST', body: formData });
             const responseText = await response.text();
