@@ -60,13 +60,40 @@ public interface SellerPremiumMapper {
     SellerPremiumPaymentDTO findPaymentWithPlanNameByOrderId(@Param("orderId") String orderId);
     
     /**
-     * ✅ [이 메서드를 추가하세요]
      * 서비스 계층에서 수량에 따른 총 구독 기간을 계산할 때,
      * 이 플랜의 '기본 단위 기간'(예: 30일, 1년)이 며칠인지 DB에 물어보기 위한 기능입니다.
-     * 
-     * @param planId 기간을 조회할 플랜의 ID
+     * * @param planId 기간을 조회할 플랜의 ID
      * @return 해당 플랜의 기간 값 (예: 30)
      */
     int findPlanTermById(@Param("planId") String planId);
-}
+    
+    /**
+     * 특정 상점 ID의 정산 정책 ID를 업데이트합니다.
+     * @param storeId 상점 ID
+     * @param newPolicyId 새로운 정책 ID
+     */
+    void updateStoreSettlementPolicy(@Param("storeId") String storeId, @Param("newPolicyId") String newPolicyId);
+    
+    /**
+     * 특정 상점 ID의 현재 정산 정책 ID를 조회합니다.
+     * @param storeId 상점 ID
+     * @return 현재 정책 ID (plcy_id) 또는 null
+     */
+    String getStoreSettlementPolicyId(@Param("storeId") String storeId);
+    
+    /**
+     * 특정 사용자의 총 구독 구매 횟수를 조회합니다. (COMPLETED 상태의 sbscr_prchs_nocs 합계)
+     * @param userNo 사용자 번호
+     * @return 총 구독 구매 횟수
+     */
+    int getUserTotalSubscriptionCount(@Param("userNo") String userNo);
 
+    // -------------------------------------------------------------
+    // 새롭게 추가되는 메서드
+    /**
+     * 'subpay_sell_' 접두사를 가진 sbscr_stlm_id 중 가장 큰 숫자 부분을 조회합니다.
+     * @return 가장 큰 숫자 부분 또는 해당 ID가 없을 경우 0
+     */
+    Integer getMaxSbscrStlmIdSequence(); // Nullable Integer로 반환하여 값이 없는 경우 처리
+    // -------------------------------------------------------------
+}

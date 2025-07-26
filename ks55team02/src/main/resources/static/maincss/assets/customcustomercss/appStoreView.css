@@ -1,528 +1,353 @@
-@charset "UTF-8";
+/* ======================================== */
+/*         0. 전역 폰트 및 타이포그래피         */
+/* ======================================== */
 
-/* 모든 요소에 box-sizing: border-box 적용 (일반적으로 가장 안전하고 권장되는 방법) */
-*, *::before, *::after {
-    box-sizing: border-box;
+/* 전역 기본 폰트 두께를 400으로 설정 */
+body {
+    font-weight: 400;
 }
 
-/* ======================================================================== */
-/* General Layout & Section Styling                                         */
-/* ======================================================================== */
-.summary {
-    padding: 2.5rem 3rem 3rem;
-    border: .1rem dashed #d7d7d7;
+/* 모든 제목(h1~h6) 태그의 폰트 두께를 600으로 설정 */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600 !important;
+}
+
+
+/* ======================================== */
+/*            1. 기본 색상 변수             */
+/* ======================================== */
+
+:root {
+    --point-color: #cc9966;
+    --point-color-dark: #b3824c;
+}
+
+
+/* ======================================== */
+/*           2. 버튼 공통 스타일            */
+/* ======================================== */
+
+/* 주요 액션 버튼 기본 스타일 (아웃라인) */
+.btn-outline-primary {
+    --bs-btn-color: var(--point-color);
+    --bs-btn-border-color: var(--point-color);
+    --bs-btn-active-bg: var(--point-color-dark);
+    --bs-btn-active-border-color: var(--point-color-dark);
+    --bs-btn-focus-shadow-rgb: 204, 153, 102;
+}
+
+/* 주요 액션 버튼 호버 스타일 (색 채우기) */
+.btn-outline-primary:hover {
+    color: #fff;
+    background-color: var(--point-color);
+    border-color: var(--point-color);
+}
+
+
+/* ======================================== */
+/*        3. 파일 첨부 전용 버튼 스타일       */
+/* ======================================== */
+
+.btn-file {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .45rem 1.2rem;
+    font-size: 1.4rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    border-radius: 0; /* 통일성을 위해 radius 0으로 변경 */
+    transition: all .3s;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.btn-file.select {
+    color: var(--point-color);
+    border-color: var(--point-color);
     background-color: transparent;
-    border-radius: .3rem;
-    margin-top: 2rem;
+}
+
+.btn-file.select:hover {
+    color: #fff;
+    background-color: var(--point-color);
+}
+
+.btn-file.cancel {
+    color: #6c757d;
+    border-color: #6c757d;
+    background-color: transparent;
+}
+
+.btn-file.cancel:hover {
+    color: #fff;
+    background-color: #6c757d;
+}
+
+
+/* ======================================== */
+/*         4. Wizard (마법사) UI 스타일      */
+/* ======================================== */
+
+.wizard-nav {
+    padding: 0;
     margin-bottom: 2rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.wizard-nav .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #6c757d;
+    font-weight: 500;
+    padding: 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.wizard-nav .nav-link.active,
+.wizard-nav .nav-link.completed {
+    border-bottom-color: var(--point-color);
+    color: var(--point-color);
+}
+
+.wizard-nav .nav-link:not(.active):hover {
+    color: var(--point-color);
+}
+
+.wizard-nav .nav-link .step-indicator {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    line-height: 28px;
+    border-radius: 50%;
+    border: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    text-align: center;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.wizard-nav .nav-link.active .step-indicator,
+.wizard-nav .nav-link.completed .step-indicator {
+    background-color: var(--point-color);
+    color: #fff;
+    border-color: var(--point-color);
+}
+
+.tab-content .card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.form-section-title {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.8rem;
 }
 
 .button-wrapper {
-    text-align: right;
-   	margin-bottom: 40px;
-}
-
-.btn-block {
-    width: 15%; /* 이 버튼의 너비는 15%로 고정 */
-}
-
-.cont{
-	margin-top : 26px;
-}
-
-#commissionRateCn{
-	padding: .85rem 1rem;
-}
-
-/* ======================================================================== */
-/* Table Styling (상점 신청 테이블)                                          */
-/* ======================================================================== */
-.table-reg {
-    text-align: center;
-    table-layout: fixed; /* 테이블 레이아웃을 고정하여 컬럼 너비를 엄격히 제어 */
-    width: 100%; /* 테이블 너비가 부모 컨테이너를 채우도록 */
-}
-
-/* 모든 테이블 헤더(th)의 기본 스타일 */
-.table thead th {
-    height: 40px;
-    padding: .85rem 2rem;
-    font-size: 1.4rem;
-    line-height: 1.5;
-    font-weight: 300;
-    color: #777;
-    background-color: #fafafa;
-    border: 1px solid #ebebeb;
-    border-radius: 0;
-    margin-bottom: 2rem;
-    transition: all 0.3s;
-    box-shadow: none;
-    border-left: none;
-    border-right: none;
-}
-
-/* 테이블 헤더의 첫 번째와 마지막 요소에 테두리 추가 */
-.table thead th:first-child {
-    border-left: 1px solid #ebebeb;
-}
-
-.table thead th:last-child {
-    border-right: 1px solid #ebebeb;
-}
-
-/* 모든 테이블 데이터 셀(td)의 기본 스타일 */
-.table td {
-    padding-top: 1.0rem;
-    padding-bottom: 1.0rem;
-    text-align: center; /* div.fileName을 가로 중앙에 정렬 */
-    vertical-align: middle; /* div.fileName을 세로 중앙에 정렬 */
-    color : #666;
-    /* TD 자체에는 더 이상 flex를 적용하지 않습니다. */
-}
-
-/* 테이블 헤더와 바디의 컬럼별 너비 지정 (재조정된 비율) */
-/* 1. '필요 문서' 컬럼 */
-.table-reg thead th:nth-child(1),
-.table-reg tbody td:nth-child(1) {
-    width: 25%;
-}
-
-/* 2. '첨부된 문서' 컬럼 (파일명 표시 TD) */
-.table-reg thead th:nth-child(2),
-.table-reg tbody td:nth-child(2) {
-    width: 40%; /* 이 TD는 div.fileName을 포함하며, div가 오버플로우를 처리 */
-}
-
-/* 3. '첨부 하기' 컬럼 */
-.table-reg thead th:nth-child(3),
-.table-reg tbody td:nth-child(3) {
-    width: 20%;
-}
-
-/* 4. '첨부 취소' 컬럼 */
-.table-reg thead th:nth-child(4),
-.table-reg tbody td:nth-child(4) {
-    width: 15%;
-}
-
-/* ======================================================================== */
-/* File Name Display DIV Styling                                            */
-/* ======================================================================== */
-
-/* <td> 안에 있는 div.fileName에 텍스트 오버플로우 스타일 적용 */
-.fileName {
-    width: 100%; /* 부모 TD의 가용 공간을 꽉 채우도록 */
-    height: 100%; /* 부모 TD의 높이를 채우도록 */
-    
-    white-space: nowrap;      /* 텍스트를 한 줄로 강제 */
-    overflow: hidden;         /* 넘치는 내용 숨김 */
-    text-overflow: ellipsis;  /* 숨겨진 내용을 ...으로 표시 */
-
-    /* div 내부 텍스트를 세로 및 가로 중앙에 정렬 */
     display: flex;
-    align-items: center;      /* 세로 중앙 정렬 */
-    justify-content: center;  /* 가로 중앙 정렬 */
+    justify-content: space-between;
+    margin-top: 2rem;
 }
 
-/* ======================================================================== */
-/* File Upload & Cancel Button Styling                                      */
-/* ======================================================================== */
 
-/* 파일 입력 필드는 숨김 */
+/* ======================================== */
+/*           5. 파일 첨부 리스트 스타일         */
+/* ======================================== */
+
+.file-upload-list {
+    list-style: none;
+    padding: 0;
+}
+
+.file-upload-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .75rem;
+    border: 1px solid #e9ecef;
+    border-radius: 0; /* 통일성을 위해 radius 0으로 변경 */
+    margin-bottom: 1rem;
+}
+
+.file-upload-item .doc-name {
+    font-weight: 500;
+    flex-grow: 1;
+}
+
+.file-upload-item .file-name-display {
+    color: #6c757d;
+    font-style: italic;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 input[type="file"] {
     display: none;
 }
 
-/* 사용자 정의 '파일 선택' 버튼 스타일 */
-.custom-file-upload {
-    display: inline-block; /* 버튼처럼 보이게 */
-    padding: 6px 12px;
-    cursor: pointer;
-    color: #c96;
-    background-image: none;
-    font-size: 14px;
-    line-height: 20px; /* 텍스트 세로 정렬 */
-    text-align: center;
-    vertical-align: middle;
-    margin: 0;
-    border : 1px solid #c96;
+
+/* ======================================== */
+/*       [수정] 6. 계약 기간 컨트롤 스타일        */
+/* ======================================== */
+
+.contract-period-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fafafa;
+    border: 1px solid #ebebeb;
+    border-radius: 0;
+    height: 40px;
+    padding-left: 1.2rem; /* 좌우 패딩을 폼 컨트롤과 유사하게 조정 */
+    transition: all 0.3s;
+    box-shadow: none;
 }
 
-/* '취소' 버튼 스타일 */
-.btn-cancel-file {
-    margin-left: 10px; /* 파일 선택 버튼과의 간격 */
-    padding: 6px 12px;
-    background-color: grey; /* 빨간색 배경 */
-    color: white;
+.period-display {
+    font-weight: 300;
+    color: #777;
+    font-size: 1.4rem;
+}
+
+.period-buttons {
+    display: flex;
+    height: 100%;
+}
+
+.btn-period {
     border: none;
-    border-radius: 4px;
+    background-color: var(--point-color);
+    color: white;
+    font-weight: bold;
+    height: 100%;
+    width: 40px;
     cursor: pointer;
-    font-size: 14px;
-    line-height: 20px;
-    vertical-align: middle;
-    transition: background-color 0.3s ease;
-}
-
-
-/* ======================================================================== */
-/* Other Specific Button Styles                                             */
-/* ======================================================================== */
-.btn-attachment {
-    color: #c96;
-    background-color: transparent;
-    background-image: none;
-    border-color: #c96;
-    box-shadow: none;
-    padding: 10px;
-    padding-right: 10px;
-}
-
-/* 파일 선택 호버 */
-.custom-file-upload:hover {
-  	color: #fff;
-    background-color: #c96;
-    border-color: #c96;
-    box-shadow: none;
-}
-
-.user-info{
-height: 40px;
-    padding: .85rem 2rem;
-    font-size: 1.4rem;
-    line-height: 1.5;
-    font-weight: 300;
-    color: #777;
-    background-color: #fafafa;
-    border: 1px solid #ebebeb;
+    transition: background-color .15s ease-in-out;
     border-radius: 0;
-    margin-bottom: 2rem;
-    transition: all 0.3s;
-    box-shadow: none;
+    border-left: 1px solid #ebebeb;
 }
 
-/* ======================================================================== */
-/* 주소 api                                                                  */
-/* ======================================================================== */
-
-/* appStoreView.css 또는 새로운 CSS 파일 */
-
-/* #layer (Daum Postcode 레이어) */
-#layer {
-    display: none; /* HTML에 있던 인라인 스타일 */
-    position: fixed; /* HTML에 있던 인라인 스타일 */
-    overflow: hidden; /* HTML에 있던 인라인 스타일 */
-    z-index: 1; /* HTML에 있던 인라인 스타일 */
-    -webkit-overflow-scrolling: touch; /* HTML에 있던 인라인 스타일 */
+.btn-period:hover {
+    background-color: var(--point-color-dark);
 }
 
-/* #btnCloseLayer (Daum Postcode 닫기 버튼) */
-#btnCloseLayer {
-    cursor: pointer; /* HTML에 있던 인라인 스타일 */
-    position: absolute; /* HTML에 있던 인라인 스타일 */
-    right: -3px; /* HTML에 있던 인라인 스타일 */
-    top: -3px; /* HTML에 있던 인라인 스타일 */
-    z-index: 1; /* HTML에 있던 인라인 스타일 */
+
+/* ======================================== */
+/*       [수정] 7. 분할 입력 필드 그룹 스타일    */
+/* ======================================== */
+
+.input-group-split {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    height: 40px; /* 그룹 전체 높이 고정 */
 }
-/* 주소찾기 입력창 */
-#sample2_address,
-#sample2_detailAddress,
-#sample2_extraAddress {
-    display: block;
-    width: 100%;
+
+.input-group-split .form-control,
+.input-group-split .form-select {
+    height: 100%; /* 부모 높이에 꽉 차게 */
+    flex: 1 1 auto; /* 자동으로 공간 차지 */
+}
+
+/* 연락처 국번 선택 */
+.input-group-split #managerTel1 { flex-grow: 0; flex-basis: 90px; }
+/* 이메일 도메인 선택 */
+.input-group-split #emailDomainSelector { flex-grow: 0; flex-basis: 120px; }
+
+.input-group-split .input-divider {
+    color: #777;
+    font-size: 1.4rem;
+}
+
+
+/* ======================================== */
+/*      [신규] 8. 폼 컨트롤(입력 필드) 스타일    */
+/* ======================================== */
+
+/* 모든 input, select, textarea에 공통 스타일 적용 */
+.form-control,
+.form-select {
     height: 40px;
-    padding: .85rem 2rem;
+    padding: .5rem 1.2rem; /* 세로 패딩 조정, 가로 패딩 1.2rem */
     font-size: 1.4rem;
-    line-height: 1.5;
     font-weight: 300;
+    line-height: 1.5;
     color: #777;
     background-color: #fafafa;
     border: 1px solid #ebebeb;
     border-radius: 0;
-    margin-bottom: 2rem; /* 다른 주소 필드들은 2rem 유지 */
     transition: all 0.3s;
     box-shadow: none;
 }
 
-/* #sample2_postcode만을 위한 새로운 규칙을 추가합니다. */
-#sample2_postcode {
-    display: block;
-    width: 100%;
-    height: 40px;
-    padding: .85rem 2rem;
-    font-size: 1.4rem;
-    line-height: 1.5;
-    font-weight: 300;
-    color: #777;
-    background-color: #fafafa;
-    border: 1px solid #ebebeb;
-    border-radius: 0;
-    margin-bottom: 1rem; /* 여기만 1rem으로 변경 */
-    transition: all 0.3s;
-    box-shadow: none;
-}
-
-/* 주소찾기 버튼 래퍼 */
-.postcode-search-wrapper{
-	text-align:right;
-}
-
-/* 주소찾기 버튼 */
-.address-btn{
-	color: #c96;
-    background-color: transparent;
-    background-image: none;
-    border: 1px solid #c96;
-    box-shadow: none;
-    margin-bottom : 7px;
-}
-/* 주소찾기 버튼 호버  */
-.address-btn:hover{
-    color: #fff;
-    background-color: #c96;
-    border-color: #c96;
-    box-shadow: none;
-}
-.address-container{
-	display:flex;
-	justify-content: space-between;
-	
-}
-.text-container{
-	position: relative;
-	display: block;
-    width: 100%;
+/* textarea는 높이가 가변적이므로 height는 auto로 재정의 */
+textarea.form-control {
     height: auto;
-    min-height : 150px;
-    padding: .85rem 2rem;
+}
+
+/* 포커스 받았을 때 스타일 */
+.form-control:focus,
+.form-select:focus {
+    color: #777;
+    background-color: #fff;
+    border-color: var(--point-color);
+    outline: 0;
+    box-shadow: none; /* 포커스 시 그림자 제거 */
+}
+
+/* 드롭다운 화살표 커스터마이징 (선택사항, 브라우저 호환성 고려 필요) */
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1.2rem center;
+    background-size: 16px 12px;
+}
+
+/* 플레이스홀더 스타일 */
+.form-control::placeholder {
+    color: #ccc;
+    opacity: 1;
+}
+
+
+/* ======================================== */
+/*                9. 기타 UI 스타일           */
+/* ======================================== */
+
+/* '신청자 정보' 등 읽기 전용 정보 표시 영역 스타일 */
+.user-info {
+    display: flex; /* 내부 텍스트 수직 중앙 정렬을 위해 */
+    align-items: center;
+    height: 40px;
+    padding: .5rem 1.2rem;
     font-size: 1.4rem;
-    line-height: 1.5;
     font-weight: 300;
     color: #777;
-    background-color: #fafafa;
+    background-color: #e9ecef;
     border: 1px solid #ebebeb;
     border-radius: 0;
-    margin-bottom: 2rem;
-    transition: all 0.3s;
-    box-shadow: none;
 }
-.text-box{
-	min-height: 150px; /* 최소 높이를 150px로 설정 */
-    width: 100%; /* 너비는 부모에 맞춰 100% */
-    padding: 10px;
-    box-sizing: border-box; /* 패딩 포함 */
-    resize: vertical; /* 사용자가 세로로만 크기 조절 가능하도록 */
-    overflow: auto; /* 내용이 넘칠 경우 스크롤바 생성 */
-    margin-top: 10px;
-}
-/* ======================================================================== */
-/* 사업자 등록 번호 조회 															*/
-/* ======================================================================== */
-.checkout-title{
-    color: #666;
-    font-weight: 300;
+
+/* 모든 레이블(label) 기본 스타일 */
+label {
+    margin-bottom: 1rem; /* 입력 필드와의 간격 조정 */
+    font-weight: 500;
+    color: #495057;
     font-size: 1.4rem;
-    margin: 0 0 1.1rem;
 }
 
-.brno-input{
-	padding: 6px 16px;
-    font-size: 14px;
-    line-height: 20px;
-    border: 1px solid #ccc;
-    height: 38px; /* 버튼과 동일한 높이로 설정 (예시 값) */
-    box-sizing: border-box; /* 패딩과 보더가 width/height에 포함되도록 설정 */
-    flex-grow: 1; /* 부모가 flex일 때 남은 공간을 채우도록 설정 */
-    background-color: #fafafa;
-    border: 1px solid #ebebeb;
-    color: #777;
-    margin-bottom: 2rem;
-     padding: .85rem 2rem;
-}
-
-
-#brnoStatusForm{
-	display: flex; /* 자식 요소들을 가로로 나열 */
-    align-items: center; /* 자식 요소들을 수직 중앙 정렬 */
-    box-sizing: border-box; /* 패딩과 보더가 width/height에 포함되도록 설정 */
-}
-#checkBrnoButton{
- 	display: inline-flex; /* 텍스트를 가로로 정렬하고 버튼 내부 콘텐츠를 중앙에 놓기 위해 flex 사용 */
-    align-items: center; /* 버튼 내부 텍스트를 수직 중앙 정렬 */
-    justify-content: center; /* 버튼 내부 텍스트를 수평 중앙 정렬 */
-    padding: 6px 30px;
-    background : transparent;
-    cursor: pointer;
-    color: #c96;
-    background-image: none;
-    font-size: 14px;
-    /* line-height: 20px; (display:flex를 사용하면 line-height는 텍스트 자체의 높이에만 영향을 줍니다.) */
-    text-align: center; /* (display:flex를 사용하면 justify-content가 더 효과적입니다.) */
-    vertical-align: middle; /* (display:flex를 사용하면 align-items가 더 효과적입니다.) */
-    margin: 0;
-    border: 1px solid #c96;
-    box-sizing: border-box; /* 패딩과 보더가 width/height에 포함되도록 설정 */
-    height: 38px; /* 입력 필드의 높이와 유사하게 조절 (예시 값) */
-    margin-bottom: 2rem;
-}
-#checkBrnoButton:hover{
-	color: #fff;
-    background-color: #c96;
-    border-color: #c96;
-    box-shadow: none;
-}
-
-#queriedBrno,#apiResponseContainer{
-	display: block;
-    width: 100%;
-	height: 40px;
-    padding: .85rem 2rem;
-    font-size: 1.4rem;
-    line-height: 1.5;
-    font-weight: 300;
-    color: #777;
-    background-color: #fafafa;
-    border: 1px solid #ebebeb;
+/* input-group (사업자번호 조회, 주소찾기) 버튼 스타일 통일 */
+.input-group .btn {
+    height: 40px;
     border-radius: 0;
-    margin-bottom: 2rem;
-    transition: all 0.3s;
-    box-shadow: none;
-}
-
-.reinput{
-	display: inline-flex; /* 텍스트를 가로로 정렬하고 버튼 내부 콘텐츠를 중앙에 놓기 위해 flex 사용 */
-    align-items: center; /* 버튼 내부 텍스트를 수직 중앙 정렬 */
-    justify-content: center; /* 버튼 내부 텍스트를 수평 중앙 정렬 */
-    padding: 6px 30px;
-    background : transparent;
-    cursor: pointer;
-    color: #c96;
-    background-image: none;
-    font-size: 14px;
-    /* line-height: 20px; (display:flex를 사용하면 line-height는 텍스트 자체의 높이에만 영향을 줍니다.) */
-    text-align: center; /* (display:flex를 사용하면 justify-content가 더 효과적입니다.) */
-    vertical-align: middle; /* (display:flex를 사용하면 align-items가 더 효과적입니다.) */
-    margin: 0;
-    border: 1px solid #c96;
-    box-sizing: border-box; /* 패딩과 보더가 width/height에 포함되도록 설정 */
-    height: 38px; /* 입력 필드의 높이와 유사하게 조절 (예시 값) */
-    margin-bottom: 2rem;
-}
-.reinput:hover{
-	color: #fff !important;
-    background-color: #c96 !important;
-    border-color: #c96;
-    box-shadow: none;
-}
-
-.reinput{
-	text-align : right;
-}
-
-.tab-pane fade show active{
-	width:100%;
-}
-
-
-
-/* ======================================================================== */
-/* 탭박스 															*/
-/* ======================================================================== */
-
-.tab-content-border {
-            border: 1px solid #dee2e6; /* 탭 내용에 테두리 추가 */
-            border-top: none; /* 상단 테두리는 없앰 */
-            padding: 1.5rem; /* 탭 내용 안쪽 여백 */
-            border-radius: 0.25rem; /* 모서리 둥글게 */
-            border-top-left-radius: 0; /* 좌상단은 직각 */
-}
- .nav-pills .nav-link {
-            border-radius: 0.25rem 0 0 0.25rem;
- }
- 
- .border-secondary{
-	border : none !important;
-}
-
- /* 탭박스 조절 */
-/* 1. 기본 상태 */
-#tab1, #tab2, #tab3, #tab4 {
-    color: #c96;
-    background-color: transparent;
-    background-image: none;
-    border: 1px solid #c96;
-    box-shadow: none;
-    margin-bottom: 15px; /* 이 값은 기존과 동일 */
-    /* 트랜지션 추가: 부드러운 효과를 위해 */
-    transition: all 0.3s ease; 
-}
-
-/* 2. 호버 상태 */
-#tab1:hover, #tab2:hover, #tab3:hover, #tab4:hover {
-    color: #fff !important; /* !important는 다른 규칙보다 우선합니다. */
-    background-color: #c96 !important; /* !important는 다른 규칙보다 우선합니다. */
-    border-color: #c96;
-    box-shadow: none;
-    cursor: pointer; /* 마우스 오버 시 포인터 변경 */
-}
-
-/* 3. 클릭 시 호버 상태 유지 (활성화 상태) */
-/* 이 부분은 JavaScript와 함께 사용되어야 합니다. */
-/* 클릭 시 해당 탭에 'active-tab' 또는 'is-selected'와 같은 클래스가 추가된다고 가정합니다. */
-#tab1.active-tab, #tab2.active-tab, #tab3.active-tab, #tab4.active-tab {
-    color: #fff !important;
-    background-color: #c96 !important;
-    border-color: #c96;
-    box-shadow: none;
-}
-
-
-.tab-content-border{
-	color: #c96;
-    background-color: transparent;
-    background-image: none;
-    border: 1px solid #c96;
-    box-shadow: none;
-}
-
-/* ======================================================================== */
-/* 모달												               			*/
-/* ======================================================================== */
-
-.modal-title{
-	margin : 15px;
-}
-.modal-body{
-	display: block;
-    width: 100%;
-	height: auto;
-    padding: .85rem 2rem;
     font-size: 1.4rem;
-    line-height: 1.5;
-    font-weight: 300;
-    color: #777;
-    background-color: #fafafa;
-    border: 1px solid #ebebeb;
-    border-radius: 0;
-    margin-bottom: 2rem;
-    transition: all 0.3s;
-    box-shadow: none;
 }
-.modal-header{
-	justify-content: flex-end !important;
-	background :   #777;
-}
-.close-btn{
-	color: #c96;
-    background-color: transparent;
-    background-image: none;
-    border: 1px solid #c96;
-    box-shadow: none;
-    margin-bottom : 7px;
-    width:15%
-}
-
-.col-lg-12 {
-    padding: 10px;
-    background-color: #f9f9f9;
-}
-
