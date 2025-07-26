@@ -56,7 +56,7 @@
                     </otherwise>
                 </choose>
             </if>
-            <if test="searchCriteria.startDate != null and searchCriteria.startDate != '' and searchCriteria.endDate != null and searchCriteria.endDate != ''">
+            <if test="searchCriteria.startDate != null and searchCriteria.endDate != null">
                 AND sa.ctrt_aply_ymd BETWEEN #{searchCriteria.startDate} AND #{searchCriteria.endDate}
             </if>
             <if test="searchCriteria.filterConditions != null and !searchCriteria.filterConditions.isEmpty()">
@@ -92,7 +92,7 @@
                     </otherwise>
                 </choose>
             </if>
-            <if test="searchCriteria.startDate != null and searchCriteria.startDate != '' and searchCriteria.endDate != null and searchCriteria.endDate != ''">
+            <if test="searchCriteria.startDate != null and searchCriteria.endDate != null">
                 AND sa.ctrt_aply_ymd BETWEEN #{searchCriteria.startDate} AND #{searchCriteria.endDate}
             </if>
             <if test="searchCriteria.filterConditions != null and !searchCriteria.filterConditions.isEmpty()">
