@@ -179,14 +179,14 @@ public class PaymentController {
 
     @GetMapping("/api/user/coupons")
     @ResponseBody
-    public ResponseEntity<List<ks55team02.customer.coupons.domain.UserCoupons>> getUserCoupons(HttpSession session) {
+    public ResponseEntity<?> getUserCoupons(HttpSession session) { // <--- 이 부분을 수정했습니다.
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         if (loginUser == null) {
             log.error("사용자 쿠폰 조회 실패: 세션에 로그인 정보가 없습니다.");
             Map<String, String> error = new HashMap<>();
             error.put("error", "Unauthorized");
             error.put("message", "로그인이 필요합니다.");
-            return new ResponseEntity(error, HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED); // 제네릭 타입 추가
         }
         String userNo = loginUser.getUserNo();
         log.info("API 호출: /api/user/coupons (사용자 쿠폰 조회) - 사용자 번호: {}", userNo);
@@ -199,14 +199,14 @@ public class PaymentController {
             Map<String, String> error = new HashMap<>();
             error.put("error", "Internal Server Error");
             error.put("message", "쿠폰 정보를 가져오는 데 실패했습니다.");
-            return new ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR); // 제네릭 타입 추가
         }
     }
 
     // ★★★ 새로 추가할 사용자 배송지 조회 API 엔드포인트 ★★★
     @GetMapping("/api/user/shipping-info")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getUserShippingInfo(HttpSession session) {
+    public ResponseEntity<?> getUserShippingInfo(HttpSession session) { // <--- 이 부분을 수정했습니다.
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         if (loginUser == null) {
             log.error("배송지 조회 실패: 세션에 로그인 정보가 없습니다.");
@@ -216,14 +216,10 @@ public class PaymentController {
         log.info("API 호출: /api/user/shipping-info (사용자 배송지 조회) - 사용자 번호: {}", userNo);
 
         try {
-            // PaymentService에 userNo를 인자로 받아 배송지 정보를 Map 형태로 반환하는 메소드가 필요합니다.
-            // 예: public Map<String, Object> getShippingAddressByUserNo(String userNo);
             Map<String, Object> shippingInfo = paymentService.getShippingAddressByUserNo(userNo);
             if (shippingInfo != null && !shippingInfo.isEmpty()) {
                 return ResponseEntity.ok(shippingInfo);
             } else {
-                // 등록된 배송지가 없을 경우 204 No Content 또는 404 Not Found 반환
-                // 프론트엔드에서 .ok()가 아닌 .noContent()를 확인하도록 처리해야 합니다.
                 return ResponseEntity.noContent().build(); 
             }
         } catch (Exception e) {
