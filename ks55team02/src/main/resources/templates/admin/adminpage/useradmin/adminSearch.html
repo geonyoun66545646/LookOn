@@ -5,6 +5,9 @@
 
 <head>
 <title>검색 기록 조회</title>
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/customadmincss/adminSearch.css}">
+<!-- 경로는 실제 경로에 맞춰주세요 -->
 </head>
 <th:block layout:fragment="contents">
 	<main class="main-content">
@@ -15,29 +18,43 @@
 		<div class="card mb-4">
 			<div class="card-body">
 				<form id="searchForm">
+					<!-- =================== [수정] 검색창 레이아웃 전체 재구성 =================== -->
 					<div class="row gx-3 align-items-end">
 
-						<div class="col-lg-5">
+						<!-- 
+      [1] '검색 기간' 레이블과 입력창을 col-md-auto를 사용하여
+      내용물의 크기만큼만 공간을 차지하도록 합니다.
+    -->
+						<div class="col-lg-4">
 							<label class="form-label">검색 기간</label>
-							<div class="d-flex">
+							<div class="input-group">
 								<input type="date" class="form-control" id="searchStartDate"
-									name="startDate"> <span
-									class="mx-2 d-flex align-items-center">-</span> <input
-									type="date" class="form-control" id="searchEndDate"
-									name="endDate">
+									name="startDate">
+								<!-- [2] 이 span은 CSS로 스타일을 제어합니다. -->
+								<span class="input-group-text">-</span> <input type="date"
+									class="form-control" id="searchEndDate" name="endDate">
 							</div>
 						</div>
 
-						<div class="col-lg-5">
+						<!-- 
+      [3] '검색 키워드' 입력창은 남은 공간을 모두 차지하도록
+      col-md 클래스를 사용합니다.
+    -->
+						<div class="col-lg-4">
 							<label class="form-label">검색 키워드</label> <input type="text"
 								class="form-control" id="searchValue" name="searchValue"
 								placeholder="검색 키워드를 입력하세요">
 						</div>
 
-						<div class="col-lg-2">
-							<button class="btn btn-primary btn-block" type="submit">검색</button>
+						<!-- 
+      [4] '검색 버튼'도 내용물 크기만큼만 차지하도록 col-md-auto를 사용합니다.
+      align-items-end 대신 align-items-center를 사용하여 수직 정렬을 맞춥니다.
+    -->
+						<div class="col-md-auto">
+							<button class="btn btn-primary w-100" type="submit">검색</button>
 						</div>
 					</div>
+					<!-- =================== [수정 끝] ============================================= -->
 				</form>
 			</div>
 		</div>
@@ -118,6 +135,28 @@
 	<!-- ✅ [JS 수정] 전체 스크립트를 새로운 통합 구조로 변경합니다. -->
 	<script>
         document.addEventListener('DOMContentLoaded', () => {
+        	
+        	// =================== [수정] 검색 기간 기본값 설정 로직 추가 ===================
+            // 1. 날짜 입력 필드를 가져옵니다.
+            const startDateInput = document.getElementById('searchStartDate');
+            const endDateInput = document.getElementById('searchEndDate');
+
+            // 2. 오늘 날짜를 YYYY-MM-DD 형식의 문자열로 만듭니다.
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작하므로 +1
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayString = `${year}-${month}-${day}`;
+
+            // 3. 날짜 입력 필드에 기본값을 설정합니다.
+            //    (값이 이미 있다면, 덮어쓰지 않고 그대로 둡니다. 페이지 뒤로가기 등을 대비)
+            if (!startDateInput.value) {
+                startDateInput.value = '2020-01-01';
+            }
+            if (!endDateInput.value) {
+                endDateInput.value = todayString;
+            }
+            // =================== [수정 끝] ===============================================
 
             // ===== 1. 전역 변수 및 DOM 요소 선언 =====
             const searchForm = document.getElementById('searchForm');
