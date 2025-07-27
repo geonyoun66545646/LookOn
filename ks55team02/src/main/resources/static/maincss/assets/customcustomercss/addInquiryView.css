@@ -218,6 +218,68 @@ textarea.form-control {
     --bs-btn-padding-y: 0.8rem;                   /* 상하 패딩 */
     font-weight: 500;
 }
+/* '문의 등록하기' 버튼 호버 효과 */
+.btn-outline-primary:hover {
+    color: #fff;                 /* 호버 시 텍스트 색상: 흰색 */
+    background-color: #c96;   /* 호버 시 배경 색상: 갈색 */
+    border-color: #a67c52;       /* 호버 시 테두리 색상: 갈색 */
+}
+
+/* '목록으로 돌아가기' 버튼 호버 효과 (일관성을 위해 함께 수정) */
+.btn-outline-secondary:hover {
+    color: #fff;                 /* 호버 시 텍스트 색상: 흰색 */
+    background-color: #868e96;   /* 호버 시 배경 색상: 회색 */
+    border-color: #868e96;       /* 호버 시 테두리 색상: 회색 */
+}
+
 .btn-outline-secondary + .btn-outline-primary {
     margin-left: 1rem !important; /* 약 16px의 왼쪽 여백을 강제로 적용 */
+}
+
+/* Select2 드롭다운 박스 크기 및 패딩 조절 */
+.select2-container--bootstrap-5 .select2-selection--single {
+    /* 
+    세로 패딩(0.7rem)으로 높이를 확보하고, 
+    가로 패딩(0.75rem)은 부트스트랩의 기본 입력란(.form-control)과 동일하게 맞춰
+    좌우 정렬이 깨지지 않도록 합니다.
+  */
+  padding: 0.7rem 0.75rem;
+  height: auto; /* padding에 맞춰 높이 자동 조절 */
+}
+
+/* Select2 드롭다운으로 나오는 목록의 글자 크기 및 패딩 조절 */
+.select2-results__option {
+    font-size: 1.2rem !important; /* 요청하신 1.2rem으로 설정 */
+}
+
+    /* Select2 드롭다운으로 나오는 목록의 글자 크기 및 패딩 조절 */
+    .select2-results__option {
+        font-size: 1.2rem !important; /* 요청하신 1.2rem으로 설정 */
+        padding: 10px 12px;      /* 목록 각 항목의 위아래 여백 추가 */
+    }
+    
+#inqryCn{
+	resize:none;
+}
+
+/* --- 유효성 검사 스타일 추가 --- */
+
+/* Select2에 유효성 검사 실패 스타일(빨간 테두리) 적용 */
+select.is-invalid + .select2-container .select2-selection {
+    border-color: #dc3545; /* Bootstrap의 기본 'danger' 색상 */
+}
+
+/* 유효성 검사 실패 메시지 스타일 */
+.invalid-feedback {
+    display: none; /* 평소에는 숨김 */
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.95rem; /* 기본 폰트보다 약간 작게 */
+    color: #dc3545;
+}
+
+/* is-invalid 클래스가 적용된 필드의 invalid-feedback 메시지만 보여줌 */
+.form-control.is-invalid ~ .invalid-feedback,
+.form-select.is-invalid ~ .invalid-feedback {
+    display: block;
 }
