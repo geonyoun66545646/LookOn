@@ -2,131 +2,111 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <th:block th:fragment="AnswerFragment (inquiryData, isEditMode, answerApiUrl)">
-    <div class="inquiryTable mt-4" id="answerFormContainer">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th colspan="2" class="table-header" th:text="${isEditMode ? '답변 수정' : '답변 작성'}"></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="2">
-                        <form id="answerHandlingForm">
-                            <input type="hidden" name="inqryId" th:value="${inquiryData.inqryId}" />
-                            <input type="hidden" name="ansId" th:value="${isEditMode ? inquiryData.answer.ansId : ''}" />
-                            <div class="form-group">
-                                <label for="answerContentInput">답변 내용</label>
-                                <textarea class="form-control" id="answerContentInput" name="ansCn" rows="5" required
-                                          th:text="${isEditMode ? inquiryData.answer.ansCn : ''}"></textarea>
-                            </div>
-                            <div id="ans-button" class="form-group d-flex justify-content-end mt-3">
-                                <button type="button" id="submitAnswerBtn" class="btn-bottom"
-                                        th:text="${isEditMode ? '수정 완료' : '답변 제출'}"></button>
-                                <button type="button" id="cancelAnswerBtn" class="btn-bottom" th:if="${isEditMode}">취소</button>
-                            </div>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="card answer-form-card mt-4" id="answerFormContainer">
+        <div class="card-header">
+            <h5 class="mb-0 card-title-text" th:text="${isEditMode ? '답변 수정' : '답변 작성'}"></h5>
+        </div>
+        <div class="card-body">
+            <form id="answerHandlingForm">
+                <!-- 중요: 기능 유지를 위해 hidden input들은 그대로 유지 -->
+                <input type="hidden" name="inqryId" th:value="${inquiryData.inqryId}" />
+                <input type="hidden" name="ansId" th:value="${isEditMode ? inquiryData.answer.ansId : ''}" />
+
+                <div class="form-group">
+                    <label for="answerContentInput" class="form-label">답변 내용</label>
+                    <textarea class="form-control" id="answerContentInput" name="ansCn" rows="6" required
+                              th:text="${isEditMode ? inquiryData.answer.ansCn : ''}"
+                              placeholder="답변을 입력해주세요."></textarea>
+                </div>
+                <div id="ans-button" class="form-group d-flex justify-content-end mt-3 gap-2">
+    <button type="button" id="submitAnswerBtn" class="btn btn-custom-positive"
+            th:text="${isEditMode ? '수정 완료' : '답변 제출'}"
+             style="width: 90px !important; height:42px; line-height: 1.5;"></button>
+    
+    <button type="button" id="cancelEditBtn" class="btn btn-custom-neutral d-flex justify-content-center align-items-center" th:if="${isEditMode}" 
+        style="width: 90px !important; height: 42px;">
+    취소
+</button>
+</div>
+            </form>
+        </div>
     </div>
+   <script th:inline="javascript">
+/* <![CDATA[ */
+document.addEventListener('DOMContentLoaded', function() {
+    const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+    if (submitAnswerBtn) {
+        submitAnswerBtn.addEventListener('click', function() {
+            const form = document.getElementById('answerHandlingForm');
+            const inqryId = form.inqryId.value;
+            const ansId = form.ansId.value;
+            const ansCn = form.ansCn.value;
 
-    <script th:inline="javascript">
-        /* <![CDATA[ */
-        document.addEventListener('DOMContentLoaded', function() {
-            const answerHandlingForm = document.getElementById('answerHandlingForm');
-            const submitAnswerBtn = document.getElementById('submitAnswerBtn');
-            const cancelAnswerBtn = document.getElementById('cancelAnswerBtn');
-            const answerContentInput = document.getElementById('answerContentInput');
-            const answerFormContainer = document.getElementById('answerFormContainer');
-            const answerSection = document.getElementById('answerSection'); // 답변 조회 영역
+            if (!ansCn.trim()) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '입력 필요',
+                    text: '답변 내용을 입력해주세요.',
+                });
+                return;
+            }
 
-            // AJAX 요청 URL은 컨트롤러에서 Model에 담아 전달
-            const answerApiUrl = /*[[${answerApiUrl}]]*/ '';
+            const answerApiUrl = /*[[${answerApiUrl}]]*/ '/default/api/url';
 
-            if (submitAnswerBtn) {
-                submitAnswerBtn.addEventListener('click', function() {
-                    const ansCn = answerContentInput.value;
-                    const inqryId = answerHandlingForm.inqryId.value;
-                    const ansId = answerHandlingForm.ansId ? answerHandlingForm.ansId.value : ''; // 수정 모드일 때만 ansId 가져옴
+            const payload = {
+                inqryId: inqryId,
+                ansCn: ansCn,
+                ansId: ansId
+            };
 
-                    // const answrUserNo = 'admin001'; // FIXME: 이 줄은 삭제하거나 주석 처리!
-                    // 백엔드 컨트롤러에서 로그인된 사용자 정보를 자동으로 가져와 처리하므로
-                    // 클라이언트에서 answrUserNo를 보낼 필요가 없습니다.
-
-                    if (!ansCn.trim()) {
-                        alert('답변 내용을 입력해주세요.');
-                        return;
-                    }
-
-                    const formData = {
-                        inqryId: inqryId,
-                        ansCn: ansCn
-                        // answrUserNo: answrUserNo // 이 줄도 삭제하거나 주석 처리!
-                    };
-
-                    if (ansId) {
-                        formData.ansId = ansId;
-                    }
-
-                    console.log('AJAX 요청 전송 데이터:', formData);
-                    console.log('AJAX 요청 전송 URL:', answerApiUrl);
-
-                    fetch(answerApiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams(formData).toString()
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            // HTTP 오류 상태 코드 (4xx, 5xx) 처리
-                            return response.json().then(errorData => {
-                                throw new Error(errorData.message || '서버 오류 발생');
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.status === 'success') {
-                            alert(data.message);
-                            
-                            answerFormContainer.style.display = 'none';
-       
-                            const answerHeader = document.getElementById('answer-header');
-                            if (answerHeader) {
-                                // inqryId는 inquiryData에서 가져와야 함
-                                const inqryTtl = /*[[${inquiryData.inqryTtl}]]*/ '문의';
-                                answerHeader.textContent = `${inqryTtl}에 대한 답변`;
-                            }
-
-                            // 페이지 새로고침하여 최종 상태 반영
-                            window.location.reload();
-
-                        } else {
-                            console.error('서버에서 반환된 오류 상태:', data);
-                            alert('답변 처리 실패: ' + (data.message || '알 수 없는 오류'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('AJAX 요청 중 치명적인 오류 발생:', error);
-                        alert('답변 처리 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
+            fetch(answerApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => {
+                const contentType = response.headers.get("content-type");
+                if (response.ok && contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json();
+                }
+                return response.text().then(text => {
+                    throw new Error(text || '서버 오류 발생');
+                });
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '성공',
+                        text: data.message,
+                    }).then(() => {
+                        window.location.reload();
                     });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '실패',
+                        text: '답변 처리 실패: ' + (data.message || '알 수 없는 오류'),
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('AJAX 요청 또는 응답 처리 오류:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: '오류 발생',
+                    text: '답변 처리 중 오류가 발생했습니다. 자세한 내용은 콘솔을 확인해주세요.',
                 });
-            }
-
-            if (cancelAnswerBtn) {
-                cancelAnswerBtn.addEventListener('click', function() {
-                    console.log('취소 버튼 클릭: 이전 페이지로 이동');
-                    history.back(); // 브라우저의 뒤로 가기 기능 실행
-                });
-            }
-            
+            });
         });
-        /* ]]> */
-    </script>
+    }
+});
+
+/* ]]> */
+</script>
+
 </th:block>
 </body>
 </html>
