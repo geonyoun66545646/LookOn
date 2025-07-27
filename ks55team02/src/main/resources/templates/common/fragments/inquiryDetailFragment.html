@@ -2,93 +2,101 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <th:block th:fragment="inquiryDetailFragment (inquiryData)">
-    <div class="inquiryTable">
-        <form id="inquiryDetailForm">
-            <table class="table table-bordered">
-                <tbody>
-                    <tr class="inquiry-row">
-                        <td th:text="${inquiryData.inqryTtl}" colspan="5" scope="row"></td>
-                    </tr>
-                    <tr class="inquiry-info-row">
-                        <td class="inquiry-sub">
-                            <span>비밀글 : </span>
-                            <span th:text="${inquiryData.prvtYn ? '🔒':'🔓'}"></span>
-                        </td>
-                        <td class="inquiry-sub">
-                            <span>문의 대상 : </span>
-                            <span th:text="${inquiryData.inqryTrgtTypeCd}"></span>
-                        </td>
-                        <td class="inquiry-sub">
-                            <span>문의 유형 : </span>
-                            <span th:text="${inquiryData.inqryTypeCd}"></span>
-                        </td>
-                        <td class="inquiry-sub">
-                            <span>작성자 : </span>
-                            <span th:text="${inquiryData.writerInfo.userNcnm}"></span>
-                        </td>
-                        <td class="inquiry-sub">
-                            <span>작성일 : </span>
-                            <span th:text="${#temporals.format(inquiryData.regYmd, 'yyyy-MM-dd HH:mm')}"></span>
-                        </td>
-                    </tr>
-                    <tr class="inquiry-row content-row">
-                        <td colspan="5">
-                            <div class="inquiry-content-box">
-                                <p class="inquiry-content-text" th:utext="${#strings.replace(inquiryData.inqryCn, '\n', '<br>') ?: '내용 없음'}"></p>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- 문의 카드 -->
+    <div class="card inquiry-card mb-4">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 card-title-text">
+                    <span th:text="${inquiryData.prvtYn ? '🔒 ' : ''}"></span>
+                    <span th:text="${inquiryData.inqryTtl}">문의 제목</span>
+                </h5>
+                <!-- 상태 표시 뱃지 (유지) -->
+                 <span th:if="${inquiryData.answer != null}" class="badge bg-success">답변 완료</span>
+        <span th:if="${inquiryData.answer == null}" class="badge bg-warning">답변 대기</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <!--
+                MODIFIED: 소제목(메타 정보) 스타일을 다시 한 줄 형태로 변경
+                - flex-wrap을 사용하여 화면이 좁아지면 자동으로 줄바꿈되도록 설정
+            -->
+            <div class="inquiry-meta-flex">
+                <span class="meta-item">
+                    <i class="bi bi-person"></i>
+                    <strong class="meta-label">작성자:</strong>
+                    <span th:text="${inquiryData.writerInfo.userNcnm}"></span>
+                </span>
+                <span class="meta-item">
+                    <i class="bi bi-calendar-event"></i>
+                    <strong class="meta-label">작성일:</strong>
+                    <span th:text="${#temporals.format(inquiryData.regYmd, 'yyyy-MM-dd HH:mm')}"></span>
+                </span>
+                <span class="meta-item">
+                    <i class="bi bi-tags"></i>
+                    <strong class="meta-label">문의 유형:</strong>
+                    <span th:text="|${inquiryData.inqryTrgtTypeCd} / ${inquiryData.inqryTypeCd}|"></span>
+                </span>
+            </div>
 
-            <div class="inquiry-images-section mt-4">
-                <h4>첨부 이미지</h4>
+            <hr class="my-4">
+
+            <div class="content-wrapper">
+                <p class="card-text inquiry-content" th:utext="${#strings.replace(inquiryData.inqryCn, '\n', '<br>') ?: '내용 없음'}">
+                    문의 내용이 여기에 표시됩니다.
+                </p>
+            </div>
+
+            <!-- 첨부 이미지 (유지) -->
+            <div th:if="${inquiryData.inquiryImages != null && !inquiryData.inquiryImages.isEmpty()}" class="inquiry-images-section mt-4">
+                <h6 class="mb-3">첨부 이미지</h6>
                 <div class="row">
-                    <div class="col-md-4 mb-3" th:each="image : ${inquiryData.inquiryImages}">
-                        <img th:src="${image.imgAddr}" alt="첨부 이미지" class="img-fluid rounded shadow-sm">
-                    </div>
-                    <div th:if="${inquiryData.inquiryImages == null || inquiryData.inquiryImages.isEmpty()}" class="col-12">
-                        <p>첨부된 이미지가 없습니다.</p>
+                    <div class="col-md-4 col-sm-6 mb-3" th:each="image : ${inquiryData.inquiryImages}">
+                        <a th:href="${image.imgAddr}" data-bs-toggle="tooltip" title="클릭하여 원본 이미지 보기">
+                            <img th:src="${image.imgAddr}" alt="첨부 이미지" class="img-fluid rounded shadow-sm inquiry-thumbnail">
+                        </a>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 
-    <div class="inquiryTable mt-4" id="answerSection">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th colspan="3" id="answer-header" class="table-header" th:text="${inquiryData.answer != null ? inquiryData.inqryTtl + '에 대한 답변' :'문의가 접수되었습니다'}"></th>
-                </tr>
-            </thead>
-            <tbody id="answerContentBody">
-                <tr th:if="${inquiryData.answer != null}" class="answer-info-row">
-                    <td class="answer-sub">
-                        <span>답변자 : </span>
-                        <span th:if="${inquiryData.storeInfo != null}" th:text="${inquiryData.storeInfo.storeConm}"></span>
-                        <span th:if="${inquiryData.storeInfo == null}">관리자</span> </td>
-                    <td class="answer-sub">
-                        <span>작성 시간 : </span>
-                        <span id="displayAnswerTime" th:text="${#temporals.format(inquiryData.answer.ansTm, 'yyyy-MM-dd HH:mm')}" th:if="${inquiryData.answer.ansTm != null}"></span>
-                    </td>
-                    <td class="answer-sub">
-                        <span>수정 시간 : </span>
-                        <span id="displayModifiedTime" th:text="${inquiryData.answer.lastMdfcnDt != null ? #temporals.format(inquiryData.answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm') : ''}"></span>
-                    </td>
-                </tr>
-                <tr th:if="${inquiryData.answer != null}" class="answer-content-row">
-                    <td colspan="3" class="answer-cn">
-                        <div id="displayAnswerContent" class="answer-content-box">
-                            <p class="answer-content-text" th:utext="${#strings.replace(inquiryData.answer.ansCn, '\n', '<br>') ?: '답변 내용 없음'}"></p>
-                        </div>
-                    </td>
-                </tr>
-                <tr th:if="${inquiryData.answer == null}" id="noAnswerMessageRow">
-                    <td colspan="3" class="text-center">빠른 시일 내에 답변드리겠습니다.</td>
-                </tr>
-            </tbody>
-        </table>
+    <!-- 답변 카드 (문의 카드와 동일한 디자인 컨셉 적용) -->
+    <div class="card answer-card" id="answerSection" th:if="${inquiryData.answer != null}">
+        <div class="card-header">
+            <h5 class="mb-0 card-title-text">
+                <i class="bi bi-chat-left-text-fill"></i>
+                <span>답변 내용</span>
+            </h5>
+        </div>
+        <div class="card-body">
+             <!-- 답변 메타 정보도 한 줄 스타일로 변경 -->
+            <div class="answer-meta-flex">
+                <span class="meta-item">
+                     <i class="bi bi-person-check"></i>
+                     <strong class="meta-label">답변자:</strong>
+                     <span th:if="${inquiryData.storeInfo != null}" th:text="${inquiryData.storeInfo.storeConm}"></span>
+                     <span th:if="${inquiryData.storeInfo == null}">관리자</span>
+                </span>
+                <span class="meta-item">
+                    <i class="bi bi-clock"></i>
+                    <strong class="meta-label">답변 시간:</strong>
+                    <span id="displayAnswerTime" th:text="${#temporals.format(inquiryData.answer.ansTm, 'yyyy-MM-dd HH:mm')}"></span>
+                </span>
+                 <span class="meta-item" th:if="${inquiryData.answer.lastMdfcnDt != null}">
+                    <i class="bi bi-pencil"></i>
+                    <strong class="meta-label">수정 시간:</strong>
+                    <span id="displayModifiedTime" th:text="${#temporals.format(inquiryData.answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></span>
+                </span>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="content-wrapper">
+                <p id="displayAnswerContent" class="card-text answer-content" th:utext="${#strings.replace(inquiryData.answer.ansCn, '\n', '<br>')}">
+                    답변 내용
+                </p>
+            </div>
+        </div>
     </div>
 </th:block>
 </body>

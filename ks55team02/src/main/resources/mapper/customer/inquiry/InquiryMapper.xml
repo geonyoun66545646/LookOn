@@ -223,48 +223,47 @@
     </select>
 
     <select id="getTotalInquiryCount" resultType="int">
-        SELECT COUNT(*) FROM inquiries
-    </select>
+    SELECT
+        COUNT(*)
+    FROM
+        inquiries
+    WHERE
+       prcs_stts != 'DELETED' and prcs_stts != 'HIDDEN' <!-- ★★★ 여기에도 동일한 조건을 추가합니다 ★★★ -->
+</select>
 
     <select id="getInquiryListPaging" resultMap="inquiryResultMap">
-        SELECT
-            i.inqry_id,
-            i.inqry_type_cd,
-            i.inqry_trgt_type_cd,
-            i.wrtr_id,
-            i.inqry_store_id,
-            i.inqry_ttl,
-            i.inqry_cn,
-            i.prvt_yn,
-            i.prcs_stts,
-            i.prcs_user_no,
-            i.reg_ymd,
-            i.mdfcn_ymd,
-            i.del_dt,
-            i.del_user_no,
-            i.del_actvtn_yn,
-            u.user_no,
-            u.mbr_grd_cd,
-            u.user_lgn_id,
-            u.user_nm,
-            u.user_pswd_encpt_val,
-            u.gender_se_cd,
-            u.eml_addr,
-            u.telno,
-            u.user_brdt,
-            u.zip_cd,
-            u.addr,
-            u.daddr,
-            u.user_ncnm,
-            u.user_status,
-            u.join_dt,
-            u.whdwl_dt,
-            u.last_info_mdfcn_dt
-        FROM inquiries i
-        JOIN users u ON i.wrtr_id = u.user_no
-        ORDER BY i.reg_ymd DESC, i.inqry_id DESC
-        LIMIT #{pageSize} OFFSET #{startRow}
-    </select>
+    SELECT
+        i.inqry_id,
+        i.inqry_type_cd,
+        i.inqry_trgt_type_cd,
+        i.wrtr_id,
+        i.inqry_store_id,
+        i.inqry_ttl,
+        i.inqry_cn,
+        i.prvt_yn,
+        i.prcs_stts,
+        i.prcs_user_no,
+        i.reg_ymd,
+        i.mdfcn_ymd,
+        i.del_dt,
+        i.del_user_no,
+        i.del_actvtn_yn,
+        u.user_no,
+        u.user_ncnm,
+        u.user_status
+        /* 필요 없는 user 컬럼들은 성능을 위해 제거하는 것이 좋습니다.
+           여기서는 user_ncnm과 user_status 정도만 가져오도록 축약했습니다.
+           모든 user 컬럼이 필요하다면 원래대로 두셔도 됩니다. */
+    FROM
+        inquiries i
+    JOIN
+        users u ON i.wrtr_id = u.user_no
+    WHERE
+        i.prcs_stts != 'DELETED' and i.prcs_stts != 'HIDDEN'
+    ORDER BY
+        i.reg_ymd DESC, i.inqry_id DESC
+    LIMIT #{pageSize} OFFSET #{startRow}
+</select>
     
     <select id="getAnswerByInquiryId" resultMap="answerResultMap">
     	SELECT 

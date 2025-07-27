@@ -87,6 +87,7 @@
         LEFT JOIN
             users u ON u.user_no = i.wrtr_id
         WHERE 1=1
+         AND i.prcs_stts NOT IN ('DELETED', 'HIDDEN')
         <if test="inqryStoreId != null and inqryStoreId != ''">
             AND i.inqry_store_id = #{inqryStoreId}
         </if>
@@ -188,7 +189,8 @@
         LEFT JOIN store_images stim ON stim.img_id = iim.img_id LEFT JOIN
             answer a ON a.inqry_id = i.inqry_id
         WHERE 1=1
-        AND i.inqry_store_id = #{param1.inqryStoreId}
+        AND i.prcs_stts NOT IN ('DELETED', 'HIDDEN')
+		AND i.inqry_store_id = #{param1.inqryStoreId}
         
         <if test="param1.searchValue != null and param1.searchValue != ''">
             <choose>

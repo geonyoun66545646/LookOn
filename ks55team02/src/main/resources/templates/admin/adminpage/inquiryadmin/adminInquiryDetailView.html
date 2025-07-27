@@ -30,11 +30,11 @@
 
                         <th:block th:if="${inquiryDetail.answer == null}">
                             <!-- 답변 작성 프래그먼트 호출 (contextPath 전달) -->
-                            <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false, contextPath='/adminpage/inquiryadmin')}"></div>
+                            <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=false, answerApiUrl='/admin/inquiry/answer')}"></div>
                         </th:block>
                         <th:block th:unless="${inquiryDetail.answer == null}">
                             <!-- 답변 수정 프래그먼트 호출 (contextPath 전달) -->
-                            <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true, contextPath='/adminpage/inquiryadmin')}"></div>
+                            <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(inquiryData=${inquiryDetail}, isEditMode=true, answerApiUrl='/admin/inquiry/answer')}"></div>
                         </th:block>
                     </div>
                 </div>
