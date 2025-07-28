@@ -1,7 +1,3 @@
-/* addInquiryView.css - V4, Select2 & Enhanced UX */
-
-/* --- 6. 전체 폰트 스타일 조정 --- */
-
 /* 1. inquiry-card 내부의 모든 텍스트에 기본 스타일 적용 */
 .inquiry-card {
     /* 이 컨테이너를 기준으로 모든 자식 요소에 기본 폰트 스타일이 상속됩니다. */
@@ -9,8 +5,7 @@
     font-weight: 400;
 }
 
-/* 
-   Bootstrap이나 Select2가 자체적으로 폰트 크기를 지정하는 경우가 있어,
+/* Bootstrap이나 Select2가 자체적으로 폰트 크기를 지정하는 경우가 있어,
    중요 요소들의 폰트 크기를 명시적으로 다시 설정하여 통일성을 유지합니다.
 */
 .inquiry-card .form-control,
@@ -154,9 +149,85 @@ textarea.form-control {
 .file-drop-zone:hover { background-color: #e9ecef; border-color: #0d6efd; }
 .file-drop-zone.is-dragover { background-color: #e9ecef; border-color: #0d6efd; }
 .file-drop-icon { font-size: 2.5rem; color: #adb5bd; margin-bottom: 0.75rem; }
-.file-preview-item { display: inline-flex; align-items: center; background-color: #f1f3f5; border: 1px solid #dee2e6; border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.9em; }
-.file-preview-item .fa-file-alt { margin-right: 0.5rem; }
-.file-preview-item .btn-close { margin-left: 0.7rem; }
+
+/* 🌟🌟🌟 파일 미리보기 항목 스타일 수정: 크기 통일성 확보 🌟🌟🌟 */
+.file-preview-item {
+    position: relative; /* 자식 요소의 absolute 위치를 위한 기준 */
+    display: flex; /* 내부 요소를 수평으로 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    background-color: #f1f3f5;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 0.8rem 0.4rem;
+    font-size: 0.9em;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    min-height: 80px; /* 모든 미리보기 박스가 최소한 이 높이를 가지도록 설정 */
+}
+
+/* 파일명 및 아이콘/이미지 래퍼 */
+.file-preview-item .file-name-wrapper {
+    display: flex; /* 이미지와 파일명 정렬 */
+    align-items: center;
+    flex-grow: 1; /* 파일명 래퍼가 가능한 공간을 모두 차지하도록 하여 이미지와 버튼 사이를 벌림 */
+    overflow: hidden; /* 파일명이 길어질 경우 대비 */
+}
+
+/* 🌟🌟🌟 미리보기 이미지 크기 고정 🌟🌟🌟 */
+.file-preview-item img {
+    width: 150px;  /* 이미지의 고정 너비 */
+    height: 150px; /* 이미지의 고정 높이 */
+    object-fit: cover; /* 이미지가 고정된 공간에 꽉 차도록 (비율 유지, 잘림) */
+   
+    border-radius: 4px; /* 이미지 모서리 둥글게 (선택 사항) */
+}
+
+/* 🌟🌟🌟 일반 파일 아이콘 크기 및 정렬 통일 🌟🌟🌟 */
+.file-preview-item .fa-file-alt {
+    font-size: 24px;
+    margin-right: 10px;
+    width: 60px; /* 이미지와 동일한 너비로 맞춰주면 정렬에 도움됨 */
+    height: 60px; /* 이미지와 동일한 높이로 맞춰주면 정렬에 도움됨 */
+    display: flex; /* 아이콘을 중앙에 정렬하기 위해 */
+    align-items: center;
+    justify-content: center;
+}
+
+/* 🌟🌟🌟 파일명 텍스트 처리 🌟🌟🌟 */
+.file-preview-item .file-name-text {
+    white-space: nowrap; /* 파일명이 길어도 한 줄에 표시 시도 */
+    overflow: hidden;    /* 넘치면 숨김 */
+    text-overflow: ellipsis; /* 넘치는 부분 ...으로 표시 */
+}
+
+/* 🌟🌟🌟 X 버튼 스타일 (위치 조정) 🌟🌟🌟 */
+.file-remove-button {
+    position: absolute;
+    top: -12px; /* 이미지 미리보기 박스 밖으로 빼는 위치 조정 */
+    right: -12px; /* 이미지 미리보기 박스 밖으로 빼는 위치 조정 */
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: none;
+    z-index: 10;
+}
+
+/* Font Awesome 아이콘 크기 및 정렬 조절 */
+.file-remove-button .fas {
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* 기존 불필요한 클래스 제거 */
+/* .file-preview-item .btn-close { margin-left: 0.7rem; } */
+
+
 .btn-primary.btn-lg { font-weight: 500; padding: 0.9rem; border-radius: 8px; }
 .btn-link { text-align: center; color: #6c757d; text-decoration: none; }
 .btn-link:hover { color: #212529; text-decoration: underline; }
@@ -238,8 +309,7 @@ textarea.form-control {
 
 /* Select2 드롭다운 박스 크기 및 패딩 조절 */
 .select2-container--bootstrap-5 .select2-selection--single {
-    /* 
-    세로 패딩(0.7rem)으로 높이를 확보하고, 
+    /* 세로 패딩(0.7rem)으로 높이를 확보하고, 
     가로 패딩(0.75rem)은 부트스트랩의 기본 입력란(.form-control)과 동일하게 맞춰
     좌우 정렬이 깨지지 않도록 합니다.
   */
