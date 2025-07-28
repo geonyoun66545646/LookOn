@@ -181,42 +181,51 @@ $(document).ready(function() {
         }
     });
 
-    // --- 파일 미리보기 로직 (기존 코드 유지) ---
-    $fileInput.on('change', function() {
-        $previewContainer.empty();
-        const files = this.files;
-        if (files.length > 0) {
-            // (파일 크기 검사 및 미리보기 생성 로직은 기존과 동일하므로 생략)
-            // ...
-            Array.from(files).forEach(file => {
-                const fileItem = $('<div class="file-preview-item d-flex align-items-center mt-2"></div>');
-                const fileNameWrapper = $('<div class="file-name-wrapper"></div>');
-                const fileNameSpan = $('<span class="file-name-text"></span>').text(file.name);
-                const MAX_FILE_SIZE = 5 * 1024 * 1024;
-                if (file.size > MAX_FILE_SIZE) {
-                    const sizeWarning = $('<span style="color: red;"></span>').text(
-                        ` (파일 크기 초과: ${Math.round(file.size / (1024 * 1024))}MB)`);
-                    fileNameSpan.append(sizeWarning);
-                }
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        const img = $('<img>').attr('src', e.target.result).css({ maxWidth: '100px', maxHeight: '100px' });
-                        fileNameWrapper.prepend(img);
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    const icon = $('<i class="fa fa-file-alt"></i>').css('fontSize', '24px');
-                    fileNameWrapper.prepend(icon);
-                }
-                fileNameWrapper.append(fileNameSpan);
-                fileItem.append(fileNameWrapper);
-                const deleteButton = $('<button type="button" class="btn btn-danger btn-extra-small">x</button>');
-                deleteButton.on('click', () => fileItem.remove());
-                const deleteWrapper = $('<div class="file-delete-button-container"></div>').append(deleteButton);
-                fileItem.append(deleteWrapper);
-                $previewContainer.append(fileItem);
-            });
-        }
-    });
-});
+	// --- 파일 미리보기 로직 수정 ---
+	$fileInput.on('change', function() {
+	        $previewContainer.empty();
+	        const files = this.files;
+	        if (files.length > 0) {
+	            Array.from(files).forEach(file => {
+	                const fileItem = $('<div class="file-preview-item"></div>'); 
+	                
+	                const fileNameWrapper = $('<div class="file-name-wrapper"></div>');
+	                const fileNameSpan = $('<span class="file-name-text"></span>').text(file.name);
+	                const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+	                if (file.size > MAX_FILE_SIZE) {
+	                    const sizeWarning = $('<span style="color: red;"></span>').text(
+	                        ` (파일 크기 초과: ${Math.round(file.size / (1024 * 1024))}MB)`);
+	                    fileNameSpan.append(sizeWarning);
+	                }
+
+	                if (file.type.startsWith('image/')) {
+	                    const reader = new FileReader();
+	                    reader.onload = function (e) {
+	                        const imgPreview = $('<img>').attr('src', e.target.result).css({ maxWidth: '100px', maxHeight: '100px' });
+	                        fileNameWrapper.prepend(imgPreview);
+	                    };
+	                    reader.readAsDataURL(file);
+	                } else {
+	                    const icon = $('<i class="fa fa-file-alt"></i>').css('fontSize', '24px');
+	                    fileNameWrapper.prepend(icon);
+	                }
+	                
+	                fileItem.append(fileNameWrapper);
+
+	                // 🌟🌟🌟 이 부분이 'X' 아이콘을 추가하는 부분입니다 🌟🌟🌟
+	                const deleteButton = $('<button type="button" class="file-remove-button"></button>');
+	                // Font Awesome 'times' 아이콘을 버튼 내부에 추가
+	                deleteButton.append('<i class="fas fa-times"></i>'); 
+
+	                deleteButton.on('click', function() {
+	                    $(this).closest('.file-preview-item').remove();
+	                });
+
+	                fileItem.append(deleteButton);
+	                
+	                $previewContainer.append(fileItem);
+	            });
+	        }
+	    });
+	});
