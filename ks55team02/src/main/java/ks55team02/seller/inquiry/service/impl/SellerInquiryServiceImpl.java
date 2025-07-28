@@ -74,7 +74,7 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 	        log.info("서비스: 답변 등록 성공 - 답변 ID: {}", ansId);
 
 	        // 문의 처리 상태 '완료'로 업데이트
-	        sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "완료");
+	        sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "COMPLETED");
 	        log.info("서비스: 문의 처리 상태 '완료'로 업데이트 성공 - 문의 ID: {}", inqryId);
 
 	        // 문의 답변 이력 기록
@@ -88,7 +88,7 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 	        history.setInqryId(inqryId);
 	        history.setPrcsUserNo(answrUserNo); // 처리 사용자 번호는 답변자 번호와 동일
 	        history.setChgBfrStts(prcsStts); // 변경 전 상태
-	        history.setChgAftrStts("완료"); // 변경 후 상태
+	        history.setChgAftrStts("COMPLETED"); // 변경 후 상태
 	        history.setChgCn("새로운 답변 등록으로 인한 상태 변경"); // 변경 내용
 	        // chgDt는 DB에서 NOW()로 자동 설정됩니다.
 
@@ -122,7 +122,7 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 			log.info("서비스: 답변 수정 성공 - 답변 ID: {}", ansId);
 
 			// 문의 처리 상태 '완료'로 업데이트
-			sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "완료");
+			sellerInquiryMapper.updateInquiryProcessStatus(inqryId, "COMPLETED");
 			log.info("서비스: 문의 처리 상태 '완료'로 업데이트 성공 - 문의 ID: {}", inqryId);
 
 			// 문의 답변 이력 기록
@@ -136,7 +136,7 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 			history.setInqryId(inqryId);
 			history.setPrcsUserNo(answrUserNo); // 처리 사용자 번호는 답변자 번호와 동일
 			history.setChgBfrStts(chgBfrStts); // 변경 전 상태
-			history.setChgAftrStts("완료"); // 변경 후 상태
+			history.setChgAftrStts("COMPLETED"); // 변경 후 상태
 			history.setChgCn("답변 수정으로 인한 상태 변경"); // 변경 내용
 			// chgDt는 DB에서 NOW()로 자동 설정됩니다.
 

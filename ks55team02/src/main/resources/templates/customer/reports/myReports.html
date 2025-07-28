@@ -69,8 +69,8 @@
 						</nav>
 
 						<div class="d-flex justify-content-end mt-4">
-							<a href="/customer/reports" class="btn btn-info btn-lg">새로운
-								신고 접수하기</a>
+							<a href="/customer/reports" class="btn btn-primary">새로운 신고
+								접수하기</a>
 						</div>
 
 					</div>
@@ -88,6 +88,7 @@
 				<div class="modal-content">
 					<div class="modal-header">
 						<h5 class="modal-title" id="reportDetailModalLabel">신고 상세 정보</h5>
+						<button type="button" class="btn-close" id="modalHeaderCloseBtn" aria-label="Close"></button>
 
 					</div>
 					<div class="modal-body">
@@ -142,11 +143,7 @@
 							</dd>
 						</dl>
 					</div>
-					<div class="modal-footer">
-						<!-- ★★★ [수정] id="modalCloseBtn"을 추가합니다. ★★★ -->
-						<button type="button" class="btn btn-secondary" id="modalCloseBtn"
-							data-bs-dismiss="modal">닫기</button>
-					</div>
+
 				</div>
 			</div>
 		</div>
@@ -208,11 +205,11 @@
             }
         });
         
-     // ★★★ [추가] 모달의 '닫기' 버튼에 수동으로 닫기 기능을 부여합니다. ★★★
-        const modalCloseBtn = document.getElementById('modalCloseBtn');
-        if(modalCloseBtn) {
-            modalCloseBtn.addEventListener('click', function() {
-                detailModal.hide(); // detailModal 객체를 사용해 모달을 숨깁니다.
+     // 찾는 대상을 기존 푸터의 버튼 id에서 헤더의 새 버튼 id로 변경합니다.
+        const modalHeaderCloseBtn = document.getElementById('modalHeaderCloseBtn');
+        if(modalHeaderCloseBtn) {
+            modalHeaderCloseBtn.addEventListener('click', function() {
+                detailModal.hide(); // 모달 숨기기 로직은 그대로 유지
             });
         }
 
@@ -249,6 +246,7 @@
             });
     }
 
+ // =================== [수정 2/2] "보기" 버튼 클래스 변경 =============================
     function renderReportList(reportList) {
         tbody.innerHTML = ''; 
         if (!reportList || reportList.length === 0) {
@@ -257,6 +255,8 @@
         }
         reportList.forEach((report, index) => {
             const row = document.createElement('tr');
+            // ▼▼▼ "보기" 버튼의 class에서 "btn-outline-primary"를 "btn-primary"로 변경합니다. ▼▼▼
+            // "view-detail-btn" 클래스는 JavaScript가 버튼을 찾는 데 사용하므로 반드시 남겨둬야 합니다.
             row.innerHTML = `
                 <th scope="row">${index + 1}</th>
                 <td>${formatReportId(report.dclrId, report.dclrRcptDt)}</td>
@@ -264,11 +264,12 @@
                 <td>${report.dclrRsnCn}</td>
                 <td>${report.dclrRcptDt.replace('T', ' ').substring(0, 16)}</td>
                 <td>${renderStatusBadge(report.prcsSttsCd)}</td>
-                <td><button type="button" class="btn btn-sm btn-outline-primary view-detail-btn" data-dclr-id="${report.dclrId}">보기</button></td>
+                <td><button type="button" class="btn btn-sm btn-primary view-detail-btn" data-dclr-id="${report.dclrId}">보기</button></td>
             `;
             tbody.appendChild(row);
         });
     }
+    // =================== [수정 끝] ========================================================
     
     function renderPagination(pageData) {
         paginationUl.innerHTML = '';

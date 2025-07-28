@@ -1,5 +1,7 @@
 package ks55team02.admin.adminpage.storeadmin.reviewadmin.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -7,18 +9,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import jakarta.servlet.http.HttpSession; 
-
-import ks55team02.common.domain.store.ProductReview;
+import jakarta.servlet.http.HttpSession;
 import ks55team02.admin.adminpage.storeadmin.reviewadmin.service.ReviewAdminService;
 import ks55team02.admin.common.domain.Pagination;
-import ks55team02.customer.login.domain.LoginUser; 
+import ks55team02.common.domain.store.ProductReview;
+import ks55team02.customer.login.domain.LoginUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -51,6 +53,16 @@ public class ReviewAdminController {
 
         log.info("최종 조회 조건: {}", review);
         log.info("조회된 리뷰 개수: {}", reviewList.size());
+        
+        /* 기본 기간 설정 */
+        if (review.getStartDate() == null) {
+        	review.setStartDate(LocalDate.parse("2020-01-01"));
+        }
+
+        // 2. 종료 날짜가 비어있는지(null) 확인합니다.
+        if (review.getEndDate() == null) {
+        	review.setEndDate(LocalDate.now());
+        }
         
         model.addAttribute("title", "상품 리뷰 관리");
         model.addAttribute("reviewList", reviewList);

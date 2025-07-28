@@ -56,7 +56,7 @@
 		const paginationHtml = generatePaginationHtml(pagination);
 
 		reviewSection.innerHTML = `
-			<h3>리뷰 (<span>${pagination.totalCount}</span>)</h3>
+			<h5>리뷰 (<span>${pagination.totalCount}</span>)</h5>
 			<hr class="mt-2 mb-4">
 			<div id="review-list-container">${reviewsHtml}</div>
 			<nav id="pagination-container" class="pagination-container d-flex justify-content-center">${paginationHtml}</nav>
@@ -98,36 +98,38 @@
 			` : '';
 
 			return `
-				<div class="review ${index < reviewList.length - 1 ? 'review-item-border' : ''}">
-					<div class="review-header d-flex align-items-center mb-1">
-						<div class="profile-image-wrapper mr-3">
-							<img src="${profileImg}" alt="프로필" class="rounded-circle">
-						</div>
-						<div class="review-meta-info w-100">
-							<div class="d-flex align-items-baseline">
-								<h5 class="mb-0"><a href="#">${nickname}</a></h5>
-								<span class="review-date text-muted ml-2">${writtenDate}</span>
+				<div class="review-item-wrapper ${index < reviewList.length - 1 ? 'review-item-border' : ''}">
+					<div class="review">
+						<div class="review-header d-flex align-items-center mb-1">
+							<div class="profile-image-wrapper mr-3">
+								<img src="${profileImg}" alt="프로필" class="rounded-circle">
 							</div>
-							<div class="review-meta">
-								<div class="ratings-container">
-									<div class="ratings"><div class="ratings-val" style="width: ${ratingWidth}%;"></div></div>
-									<span class="ratings-text ml-1">${review.evlScr || 0}</span>
+							<div class="review-meta-info w-100">
+								<div class="d-flex align-items-baseline">
+									<h5 class="mb-0"><a href="#">${nickname}</a></h5>
+									<span class="review-date text-muted ml-2">${writtenDate}</span>
+								</div>
+								<div class="review-meta">
+									<div class="ratings-container">
+										<div class="ratings"><div class="ratings-val" style="width: ${ratingWidth}%;"></div></div>
+										<span class="ratings-text ml-1">${review.evlScr || 0}</span>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="review-body">
-						${imagesHtml}
-						<div class="review-content mb-3"><p>${review.reviewCn || ''}</p></div>
-						<div class="review-footer">
-							<button class="btn btn-sm btn-outline-primary btn-helpful ${likedClass}" data-review-id="${review.reviewId}">
-								<i class="far fa-thumbs-up"></i> 도움이 돼요 
-								<span class="helpful-count">${likeCount}</span>
-							</button>
+						<div class="review-body">
+							${imagesHtml}
+							<div class="review-content mb-3"><p>${review.reviewCn || ''}</p></div>
+							<div class="review-footer">
+								<button class="btn btn-sm btn-outline-primary btn-helpful ${likedClass}" data-review-id="${review.reviewId}">
+									<i class="far fa-thumbs-up"></i> 도움이 돼요 
+									<span class="helpful-count">${likeCount}</span>
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
-			`;
+			`;			            
 		}).join('');
 	}
 	

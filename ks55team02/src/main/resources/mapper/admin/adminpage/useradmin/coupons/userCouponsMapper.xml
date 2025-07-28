@@ -81,10 +81,9 @@
 					<otherwise>
 						AND (
 						c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-						OR
-						u.user_lgn_id LIKE CONCAT('%', #{keyword}, '%')
-						OR u.user_nm LIKE
-						CONCAT('%', #{keyword}, '%')
+						OR u.user_lgn_id LIKE CONCAT('%', #{keyword}, '%')
+						OR u.user_nm LIKE CONCAT('%', #{keyword}, '%')
+						OR uc.user_cpn_id LIKE CONCAT('%', #{keyword}, '%')
 						)
 					</otherwise>
 				</choose>
@@ -102,7 +101,7 @@
 			</if>
 
 			<if test="vldBgngDt != null and vldEndDt != null">
-				AND (c.vld_bgngDt &lt;= #{vldEndDt} AND c.vld_end_dt
+				AND (c.vld_bgng_dt &lt;= #{vldEndDt} AND c.vld_end_dt
 				&gt;=
 				#{vldBgngDt})
 			</if>

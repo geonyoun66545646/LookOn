@@ -56,3 +56,8 @@
     align-items: center;     /* 세로 중앙 정렬 */
     gap: 1.5rem;             /* 각 체크박스 사이의 간격 */
 }
+.search-label {
+	margin-bottom: 0.5rem;
+	font-weight: 500;
+	font-size: 13px;
+}

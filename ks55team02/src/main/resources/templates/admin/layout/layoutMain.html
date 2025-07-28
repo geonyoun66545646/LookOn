@@ -1,60 +1,87 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
-	<head>
-		<meta charset="utf-8" />
-        <title th:text="${title}"></title>
-        <meta http-equiv="x-ua-compatible" content="ie=edge" />
-        <meta name="description" content="" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" th:href="@{/favicons/lookonfavicon1.png}" />
-        <!-- Template CSS -->
-        <link th:href="@{/admincss/assets/css/main.css?v=1.1}" rel="stylesheet" type="text/css" />      
-         <th:block layout:fragment="customCss"></th:block>
-         
-		<link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/adminFragments.css}" />	  
-        
-	</head>
-	<body>
-		<div class="screen-overlay"></div>
-		
-		<!--/* a
+<head>
+<meta charset="utf-8" />
+<title th:text="${title}"></title>
+<meta http-equiv="x-ua-compatible" content="ie=edge" />
+<meta name="description" content="" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Favicon -->
+<link rel="shortcut icon" type="image/x-icon"
+	th:href="@{/favicons/lookonfavicon1.png}" />
+<!-- Template CSS -->
+<link th:href="@{/admincss/assets/css/main.css?v=1.1}" rel="stylesheet"
+	type="text/css" />
+<th:block layout:fragment="customCss"></th:block>
+
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/customadmincss/adminFragments.css}" />
+
+</head>
+<body>
+	<div class="screen-overlay"></div>
+
+	<!--/* a
 			~{논리경로} : prefix /src/main/resources/templates/ subfix: .html
 			/src/main/resources/templates/admin/fragments/aside.html 
 		*/-->
-		<!-- aside start -->
-		<aside th:replace="~{admin/fragments/aside :: asideFragments}"></aside>
-		<!-- aside and -->
-		
-		<main class="main-wrap">
-			<!-- header start -->
-				<header th:replace="~{admin/fragments/header :: headerFragments}"></header>
-			<!-- header and -->
-			<section class="content-main">
-				<!-- contents start -->
-				<th:block layout:fragment="contents">
-					
-				</th:block>
-				<!-- contents and -->
-			</section>
-			<!-- footer start -->	
-				<footer th:replace="~{admin/fragments/footer :: footerFragments}"></footer>
-			<!-- footer and -->
-		</main>
-		<script th:src="@{/admincss/assets/js/vendors/jquery-3.6.0.min.js}"></script>
-		<script th:src="@{/admincss/assets/js/vendors/bootstrap.bundle.min.js}"></script>
-        <script th:src="@{/admincss/assets/js/vendors/select2.min.js}"></script>
-        <script th:src="@{/admincss/assets/js/vendors/perfect-scrollbar.js}"></script>
-        <script th:src="@{/admincss/assets/js/vendors/jquery.fullscreen.min.js}"></script>
-        
-        <!--/* 개발시 추가할 스크립트 파일 영역 정의 */-->
-        <th:block layout:fragment="jsFile"></th:block>
-        
-        <!-- Main Script -->
-        <script th:src="@{/admincss/assets/js/main.js?v=1.1}" type="text/javascript"></script>
-       
-        <!--/* 개발시 추가할 스크립트 영역 정의 */-->
-        <th:block layout:fragment="jsScript"></th:block>	
-	</body>
+	<!-- aside start -->
+	<aside th:replace="~{admin/fragments/aside :: asideFragments}"></aside>
+	<!-- aside and -->
+
+	<main class="main-wrap">
+		<!-- header start -->
+		<header th:replace="~{admin/fragments/header :: headerFragments}"></header>
+		<!-- header and -->
+		<section class="content-main">
+			<!-- contents start -->
+			<th:block layout:fragment="contents">
+
+			</th:block>
+			<!-- contents and -->
+		</section>
+		<!-- footer start -->
+		<footer th:replace="~{admin/fragments/footer :: footerFragments}"></footer>
+		<!-- footer and -->
+	</main>
+	<script th:src="@{/admincss/assets/js/vendors/jquery-3.6.0.min.js}"></script>
+	<script th:src="@{/admincss/assets/js/vendors/bootstrap.bundle.min.js}"></script>
+	<script th:src="@{/admincss/assets/js/vendors/select2.min.js}"></script>
+	<script th:src="@{/admincss/assets/js/vendors/perfect-scrollbar.js}"></script>
+	<script
+		th:src="@{/admincss/assets/js/vendors/jquery.fullscreen.min.js}"></script>
+
+	<!--/* 개발시 추가할 스크립트 파일 영역 정의 */-->
+	<th:block layout:fragment="jsFile"></th:block>
+
+	<!-- Main Script -->
+	<script th:src="@{/admincss/assets/js/main.js?v=1.1}"
+		type="text/javascript"></script>
+
+	<!--/* 개발시 추가할 스크립트 영역 정의 */-->
+	<th:block layout:fragment="jsScript"></th:block>
+
+	<div class="modal fade" id="previewModal" tabindex="-1"
+		aria-labelledby="previewModalLabel" aria-hidden="true">
+		<div
+			class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="previewModalLabel">미리보기</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body" id="previewModalBody">
+					<!-- 여기에 동적 콘텐츠가 채워집니다. -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
 </html>

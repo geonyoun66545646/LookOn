@@ -83,9 +83,13 @@ public class InterceptorConfig implements WebMvcConfigurer{
                         "/adminpage/**", // 관리자 페이지 영역
                         "/admin/**",
                         "/seller/products/preview/**",
+/*<<<<<<< HEAD
+                        "/seller/**"     // 판매자 페이지 영역
+=======*/
                         "/products/categories/primary", // 메인 카테고리 API
                         "/products/categories/sub/**" 
                         
+				/* >>>>>>> refs/heads/develop */
                 );
         // [신규] 3순위: 판매자 페이지 접근 제어 인터셉터
         registry.addInterceptor(sellerCheckInterceptor)

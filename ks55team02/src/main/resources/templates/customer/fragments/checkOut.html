@@ -4,116 +4,247 @@
 	layout:decorate="~{customer/layout/layoutMain}">
 
 <head>
-    <title>주문/결제</title>
-    <!-- Toss Payments SDK -->
-    <script src="https://js.tosspayments.com/v1"></script>
-    <!-- Daum Postcode API -->
-    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<title>주문/결제</title>
+<script src="https://js.tosspayments.com/v1"></script>
+<script
+	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-    <th:block layout:fragment="cssFile">
-        <style>
-            .checkout-container {
-                border: 1px solid #e9ecef;
-                border-radius: 8px;
-                padding: 24px;
-            }
-            .section {
-                margin-bottom: 24px;
-            }
-            .section-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 16px;
-                border-bottom: 1px solid #eee;
-                padding-bottom: 10px;
-            }
-            .section-header h2 {
-                font-size: 1.8rem;
-                font-weight: 600;
-                margin: 0;
-            }
-            #address-display {
-                min-height: 100px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                background-color: #f8f9fa;
-                padding: 20px;
-                border-radius: 5px;
-            }
-            .address-content-placeholder p {
-                color: #868e96;
-                font-size: 1.5rem;
-                margin: 0;
-            }
-            .order-product-item {
-                display: flex;
-                align-items: center;
-                padding: 1.5rem 0;
-                border-bottom: 1px solid #e9ecef;
-            }
-            .order-product-item:last-child {
-                border-bottom: none;
-            }
-            .order-product-image img {
-                width: 80px;
-                height: 80px;
-                object-fit: cover;
-                border-radius: 4px;
-                margin-right: 1.5rem;
-            }
-            .order-product-details {
-                flex-grow: 1;
-            }
-            .order-product-name {
-                font-weight: 500;
-                font-size: 1.6rem;
-                margin-bottom: 0.5rem;
-            }
-            .order-product-info {
-                font-size: 1.4rem;
-                color: #666;
-            }
-            .order-product-price {
-                font-size: 1.6rem;
-                font-weight: 600;
-            }
-            .address-form-wrapper { width: 100%; margin: 0 auto; border: 1px solid #e9e9e9; padding: 20px; border-radius: 5px; }
-            .address-form-group { display: flex; align-items: center; margin-bottom: 12px; }
-            .address-form-group label { width: 120px; flex-shrink: 0; }
-            .address-form-group .input-group { display: flex; align-items: center; }
-            
-            #search-postcode-btn{margin-bottom : 15px;}
-            
-            #coupon-select {
-                width: 100%;
-                padding: 8px;
-                border-radius: 4px;
-                border: 1px solid #ddd;
-            }
-            .summary-discount td {
-                color: #dc3545; /* 빨간색으로 할인 금액 표시 */
-            }
-        </style>
-    </th:block>
+<th:block layout:fragment="cssFile">
+	<style>
+.checkout-container {
+	border: 1px solid #e9ecef;
+	border-radius: 8px;
+	padding: 24px;
+}
+
+.section {
+	margin-bottom: 24px;
+}
+
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 16px;
+	border-bottom: 1px solid #eee;
+	padding-bottom: 10px;
+}
+
+.section-header h2 {
+	font-size: 1.8rem;
+	font-weight: 600;
+	margin: 0;
+}
+
+#address-display {
+	min-height: 100px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background-color: #f8f9fa;
+	padding: 20px;
+	border-radius: 5px;
+}
+
+.address-content-placeholder p {
+	color: #868e96;
+	font-size: 1.5rem;
+	margin: 0;
+}
+
+.order-product-item {
+	display: flex;
+	align-items: center;
+	padding: 1.5rem 0;
+	border-bottom: 1px solid #e9ecef;
+}
+
+.order-product-item:last-child {
+	border-bottom: none;
+}
+
+.order-product-image img {
+	width: 80px;
+	height: 80px;
+	object-fit: cover;
+	border-radius: 4px;
+	margin-right: 1.5rem;
+}
+
+.order-product-details {
+	flex-grow: 1;
+}
+
+.order-product-name {
+	font-weight: 500;
+	font-size: 1.6rem;
+	margin-bottom: 0.5rem;
+}
+
+.order-product-info {
+	font-size: 1.4rem;
+	color: #666;
+}
+
+.order-product-price {
+	font-size: 1.6rem;
+	font-weight: 600;
+}
+
+.address-form-wrapper {
+	width: 100%;
+	margin: 0 auto;
+	border: 1px solid #e9e9e9;
+	padding: 20px;
+	border-radius: 5px;
+}
+
+.address-form-group {
+	display: flex;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.address-form-group label {
+	width: 120px;
+	flex-shrink: 0;
+}
+
+.address-form-group .input-group {
+	display: flex;
+	align-items: center;
+	flex-grow: 1;
+}
+
+/* ★★★ 우편번호 입력 필드 너비 재재조정 ★★★ */
+.address-form-group .input-group #postcode {
+    flex-basis: 150px; /* 기본 너비를 150px로 */
+    max-width: 180px; /* 최대 너비를 180px로 설정 */
+    margin-right: 8px;
+}
+
+#search-postcode-btn {
+	margin-bottom: 15px;
+}
+
+#coupon-select {
+	width: 100%;
+	padding: 8px;
+	border-radius: 4px;
+	border: 1px solid #ddd;
+}
+
+.summary-discount td {
+	color: #dc3545; /* 빨간색으로 할인 금액 표시 */
+}
+
+/* 추가된 스타일 */
+.checkout-steps {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 1.5rem;
+	color: #ccc;
+	margin-top: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.checkout-steps>span {
+	padding: 0 1rem;
+}
+
+.checkout-steps>span.active {
+	color: #333;
+	font-weight: 600;
+}
+
+/* ★★★ 기존 margin-bottom 설정 ★★★ */
+.checkout .form-control {
+    margin-bottom: 1.3rem;
+}
+
+/* ★★★ 모바일 화면 스타일 수정 ★★★ */
+@media (max-width: 767.98px) { /* Small devices (landscape phones, 576px and up) */
+    /* ★★★ 모바일에서 form-control 마진 제거 ★★★ */
+    .checkout .form-control {
+        margin-bottom: 0px;
+    }
+
+    .address-form-group {
+        flex-direction: column; /* 레이블과 입력 필드를 세로로 정렬 */
+        align-items: flex-start; /* 좌측 정렬 */
+    }
+    .address-form-group label {
+        width: 100%; /* 레이블 너비를 100%로 설정 */
+        margin-bottom: 5px; /* 레이블과 입력 필드 사이 간격 */
+    }
+    /* .address-form-group input[type="text"], (기존에 있던 부분, 이제 .form-control에 포함되므로 필요 없음) */
+    /* .address-form-group input[type="tel"], (기존에 있던 부분, 이제 .form-control에 포함되므로 필요 없음) */
+    /* .address-form-group select { (기존에 있던 부분, 이제 .form-control에 포함되므로 필요 없음) */
+        /* width: 100%; */
+    /* } */
+
+    /* 우편번호 입력과 버튼은 모바일에서도 가로로 유지 */
+    .address-form-group .input-group {
+        width: 100%; /* 부모 input-group의 너비 */
+        display: flex; /* 가로 정렬 유지 */
+        flex-wrap: nowrap; /* 줄바꿈 방지 */
+        align-items: center; /* 세로 중앙 정렬 */
+        margin-bottom: 12px; /* 이 그룹 자체의 하단 마진 유지 */
+    }
+    .address-form-group .input-group #postcode {
+        flex-basis: auto; /* 자동 너비 */
+        max-width: 50%; /* 우편번호 필드의 최대 너비 비율 */
+        flex-grow: 1; /* 남은 공간을 채우도록 허용 */
+        margin-bottom: 0px; /* .form-control이지만 이 경우에는 0px 유지 */
+    }
+    .address-form-group .input-group #search-postcode-btn {
+        flex-shrink: 0; /* 버튼이 줄어들지 않도록 */
+        margin-bottom: 0; /* 버튼 하단 마진 제거 */
+    }
+
+    /* ★★★ 저장/취소 버튼 세로 정렬 ★★★ */
+    .address-form-wrapper .text-center {
+        display: flex;
+        flex-direction: column; /* 버튼들을 세로로 정렬 */
+        align-items: center; /* 가운데 정렬 */
+    }
+    .address-form-wrapper .text-center .btn {
+        width: 100%; /* 버튼 너비를 100%로 설정 */
+        margin-left: 0 !important; /* ml-2 마진 제거 */
+        margin-right: 0 !important; /* 혹시 모를 오른쪽 마진 제거 */
+        margin-bottom: 8px; /* 버튼 사이 간격 */
+    }
+    .address-form-wrapper .text-center .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+</style>
+</th:block>
 </head>
 
 <body>
 	<th:block layout:fragment="contents">
 		<div class="page-wrapper">
 			<main class="main">
-				<div class="page-header text-center">
+
+				<div class="page-header text-center"
+					style="background-image: url('maincss/assets/images/page-header-bg.jpg')">
 					<div class="container">
-						<h1 class="page-title">Checkout<span>Shop</span></h1>
+						<h1 class="page-title">주문결제</h1>
+						<div class="checkout-steps">
+							<span>장바구니</span> > <span class="active">주문결제</span> > <span>주문완료</span>
+						</div>
 					</div>
 				</div>
+
 				<nav aria-label="breadcrumb" class="breadcrumb-nav">
 					<div class="container">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-							<li class="breadcrumb-item"><a href="#">Shop</a></li>
+							<li class="breadcrumb-item"><a
+								th:href="@{/customer/products/list}">Shop</a></li>
 							<li class="breadcrumb-item active" aria-current="page">Checkout</li>
 						</ol>
 					</div>
@@ -124,29 +255,26 @@
 							<div class="row">
 								<div class="col-lg-8">
 									<div class="checkout-container">
-										<!-- 배송지 섹션 -->
 										<div class="section">
 											<div class="section-header">
 												<h2>배송 정보</h2>
-												<button type="button" id="register-address-btn" class="btn btn-outline-primary btn-sm">배송지 등록/변경</button>
+												<button type="button" id="register-address-btn"
+													class="btn btn-outline-primary btn-sm">배송지 등록/변경</button>
 											</div>
 											<div id="address-display" class="address-content-placeholder">
 												<p>배송지를 등록해 주세요.</p>
 											</div>
 										</div>
 
-										<!-- 주문 상품 섹션 -->
 										<div class="section">
 											<div class="section-header">
 												<h2>주문 상품</h2>
 											</div>
-											<div id="order-product-list-container">
-											</div>
+											<div id="order-product-list-container"></div>
 										</div>
 									</div>
 								</div>
 
-								<!-- 주문 요약 사이드바 -->
 								<aside class="col-lg-4">
 									<div class="summary">
 										<h3 class="summary-title">주문 요약</h3>
@@ -158,11 +286,10 @@
 												</tr>
 												<tr class="summary-coupon">
 													<td>쿠폰 적용:</td>
-													<td>
-														<select id="coupon-select" class="form-control form-control-sm">
+													<td><select id="coupon-select"
+														class="form-control form-control-sm">
 															<option value="">쿠폰 선택</option>
-														</select>
-													</td>
+													</select></td>
 												</tr>
 												<tr class="summary-discount">
 													<td>할인 금액:</td>
@@ -174,9 +301,9 @@
 												</tr>
 											</tbody>
 										</table>
-										<button id="payment-button" type="button" class="btn btn-outline-primary-2 btn-order btn-block">
-											결제하기
-										</button>
+										<button id="payment-button" type="button"
+											class="btn btn-outline-primary-2 btn-order btn-block">
+											결제하기</button>
 									</div>
 								</aside>
 							</div>
@@ -187,8 +314,8 @@
 		</div>
 	</th:block>
 
-<th:block layout:fragment="jsScript">
-   <script>
+	<th:block layout:fragment="jsScript">
+		<script>
 	    document.addEventListener('DOMContentLoaded', function() {
 	
             // =================================================================
@@ -310,6 +437,8 @@
 	        // =================================================================
 	        // 3. 배송지 관련 기능 (독립적으로 실행)
 	        // =================================================================
+            let userAddress = null; // 사용자 주소 정보를 저장할 변수
+
             (function setupAddress() {
                 const registerAddressBtn = document.getElementById('register-address-btn');
                 const addressDisplay = document.getElementById('address-display');
@@ -318,12 +447,50 @@
                 const originalAddressDisplayContent = addressDisplay.innerHTML;
 	            registerAddressBtn.addEventListener('click', showAddressForm);
 
+                // ★★★ 사용자 주소 정보 로딩 함수 ★★★
+                async function loadUserAddress() {
+                    try {
+                        const response = await fetch('/api/user/shipping-info'); // 예시 API 엔드포인트
+                        if (!response.ok) {
+                            if (response.status === 404 || response.status === 204) { // 주소 없음
+                                console.log('등록된 배송지가 없습니다.');
+                                userAddress = null;
+                            } else {
+                                throw new Error('사용자 주소 정보를 가져오는데 실패했습니다.');
+                            }
+                        } else {
+                            userAddress = await response.json();
+                            displayAddress(userAddress);
+                            registerAddressBtn.textContent = '배송지 변경';
+                        }
+                    } catch (error) {
+                        console.error('주소 로딩 에러:', error);
+                        userAddress = null; // 에러 발생 시 주소 정보 초기화
+                    }
+                }
+
+                // 주소 정보를 화면에 표시하는 함수
+                function displayAddress(address) {
+                    if (address && address.postcode && address.address) {
+                        addressDisplay.innerHTML = `
+                            <div style="width:100%; text-align:left; padding:1rem;">
+                                <p><strong>받는 사람:</strong> <span id="display-recipient">${address.recipientName || ''}</span></p>
+                                <p><strong>연락처:</strong> <span id="display-phone">${address.phone || ''}</span></p>
+                                <p><strong>주소:</strong> (<span id="display-postcode">${address.postcode}</span>) <span id="display-address">${address.address} ${address.detailAddress || ''}</span></p>
+                                <p><strong>요청사항:</strong> <span id="display-request">${address.deliveryRequest || '요청사항 없음'}</span></p>
+                            </div>`;
+                    } else {
+                        addressDisplay.innerHTML = originalAddressDisplayContent; // 초기 메시지 유지
+                    }
+                }
+
+                // 주소 폼을 보여주는 함수
                 function showAddressForm() {
                     addressDisplay.innerHTML = `
                         <div class="address-form-wrapper">
                             <form id="address-entry-form">
                                 <div class="address-form-group"><label for="shipping-name">받는 사람 *</label><input type="text" id="shipping-name" class="form-control"></div>
-                                <div class="address-form-group"><label>주소 *</label><div class="input-group"><input type="text" id="postcode" class="form-control" readonly><button type="button" id="search-postcode-btn" class="btn btn-light">우편번호</button></div></div>
+                                <div class="address-form-group"><label>주소 *</label><div class="input-group"><input type="text" id="postcode" class="form-control" readonly placeholder="우편번호"><button type="button" id="search-postcode-btn" class="btn btn-light">우편번호</button></div></div>
                                 <div class="address-form-group"><label></label><input type="text" id="main-address" class="form-control" readonly></div>
                                 <div class="address-form-group"><label></label><input type="text" id="detail-address" class="form-control" placeholder="상세주소 입력"></div>
                                 <div class="address-form-group"><label>연락처 *</label><input type="tel" id="phone" class="form-control" placeholder="'-' 없이 숫자만 입력"></div>
@@ -332,10 +499,20 @@
                             </form>
                         </div>`;
                     
+                    // ★★★ 기존 주소 정보가 있다면 폼 필드에 미리 채우기 ★★★
+                    if (userAddress) {
+                        document.getElementById('shipping-name').value = userAddress.recipientName || '';
+                        document.getElementById('postcode').value = userAddress.postcode || '';
+                        document.getElementById('main-address').value = userAddress.address || '';
+                        document.getElementById('detail-address').value = userAddress.detailAddress || '';
+                        document.getElementById('phone').value = userAddress.phone || '';
+                        document.getElementById('delivery-request').value = userAddress.deliveryRequest || '요청사항 없음';
+                    }
+
                     document.getElementById('search-postcode-btn').addEventListener('click', execDaumPostcode);
                     document.getElementById('save-address-btn').addEventListener('click', saveAddress);
                     document.getElementById('cancel-address-btn').addEventListener('click', () => {
-                        addressDisplay.innerHTML = originalAddressDisplayContent;
+                        displayAddress(userAddress); // 취소 시 기존에 로드된 주소로 되돌림
                     });
                 }
         
@@ -357,21 +534,31 @@
                     const phone = document.getElementById('phone').value.trim();
                     const deliveryRequest = document.getElementById('delivery-request').value;
         
-                    if (!recipientName || !postcode || !mainAddress || !phone) { // 상세주소는 필수가 아닐 수 있음
+                    if (!recipientName || !postcode || !mainAddress || !phone) {
                         alert('받는 사람, 주소, 연락처는 필수 항목입니다.');
                         return;
                     }
-        
-                    const fullAddress = `${mainAddress} ${detailAddress}`;
-                    addressDisplay.innerHTML = `
-                        <div style="width:100%; text-align:left; padding:1rem;">
-                            <p><strong>받는 사람:</strong> <span id="display-recipient">${recipientName}</span></p>
-                            <p><strong>연락처:</strong> <span id="display-phone">${phone}</span></p>
-                            <p><strong>주소:</strong> (<span id="display-postcode">${postcode}</span>) <span id="display-address">${fullAddress}</span></p>
-                            <p><strong>요청사항:</strong> <span id="display-request">${deliveryRequest}</span></p>
-                        </div>`;
+                    
+                    // ★★★ 저장된 주소 정보 업데이트 (실제 서버 저장 로직은 여기에 추가 필요) ★★★
+                    userAddress = {
+                        recipientName: recipientName,
+                        postcode: postcode,
+                        address: mainAddress,
+                        detailAddress: detailAddress,
+                        phone: phone,
+                        deliveryRequest: deliveryRequest
+                    };
+                    displayAddress(userAddress); // 업데이트된 주소 표시
                     registerAddressBtn.textContent = '배송지 변경';
+
+                    // TODO: 이 시점에서 `userAddress` 객체를 서버에 저장하는 API 호출 로직이 필요합니다.
+                    // 예: fetch('/api/user/shipping-info', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(userAddress) })
+                    // .then(response => { if (!response.ok) throw new Error('주소 저장 실패'); return response.json(); })
+                    // .then(data => console.log('주소 저장 성공', data))
+                    // .catch(error => alert('주소 저장 중 오류가 발생했습니다: ' + error.message));
                 }
+
+                loadUserAddress(); // 페이지 로드 시 사용자 주소 정보 로드
             })();
 
 	        // =================================================================
@@ -384,7 +571,7 @@
 
                 paymentButton.addEventListener("click", async function() {
                     const postcodeElem = document.querySelector('#display-postcode');
-                    if (!postcodeElem) {
+                    if (!postcodeElem || !userAddress) { // userAddress가 설정되어 있어야 함
                         alert('배송지를 먼저 등록해주세요.');
                         return;
                     }
@@ -409,14 +596,16 @@
                             store_id: p.store_id 
                         })),
                         totalAmount: subtotal,
+                        // userAddress 변수를 직접 사용
                         shippingAddress: {
-                            recipientName: document.querySelector('#display-recipient').textContent,
-                            phone: document.querySelector('#display-phone').textContent,
-                            postcode: postcodeElem.textContent,
-                            address: document.querySelector('#display-address').textContent,
-                            deliveryRequest: document.querySelector('#display-request').textContent,
+                            recipientName: userAddress.recipientName,
+                            phone: userAddress.phone,
+                            postcode: userAddress.postcode,
+                            address: userAddress.address, // 메인 주소
+                            detailAddress: userAddress.detailAddress, // 상세 주소
+                            deliveryRequest: userAddress.deliveryRequest,
                         },
-                        customerName: document.querySelector('#display-recipient').textContent,
+                        customerName: userAddress.recipientName, // 받는 사람 이름을 고객 이름으로 사용
                         couponId: selectedCouponId,
                         discountAmount: discountAmount,
                         finalAmount: finalAmount,
@@ -486,6 +675,6 @@
             })();
 	    });
 	</script>
-</th:block>
+	</th:block>
 </body>
 </html>
