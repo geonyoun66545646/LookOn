@@ -92,6 +92,7 @@ public class InterceptorConfig implements WebMvcConfigurer{
                 .order(3) // 다른 인터셉터와 겹치지 않는 순서로 설정
                 .addPathPatterns("/seller/**") // '/seller/'로 시작하는 모든 경로에 적용
                 .excludePathPatterns(
+                		"/seller/**",
                 		"/seller/admincss/**",
                         "/seller/maincss/**",
                         "/js/**", // <--- 이것도 추가!
