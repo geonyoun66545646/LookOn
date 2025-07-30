@@ -72,14 +72,12 @@ public class InterceptorConfig implements WebMvcConfigurer{
                 .excludePathPatterns(
                 		// --- 기본 페이지 및 로그인/아웃 ---
                         "/login", "/logout",
-                        "/seller/login",
-                        "/customer/login", // <-- 이 부분을 추가해야 합니다.
-                        "/customer/logout", // logout도 인터셉터 영향을 받지 않도록 추가
                         
                         // --- 모든 리소스 폴더 ---
                         "/admincss/assets/**", 
                         "/maincss/assets/**", 
                         "/js/**", 
+                        "/git", 
                         "/favicons/**",
                         "/attachment/**",
 
@@ -87,13 +85,8 @@ public class InterceptorConfig implements WebMvcConfigurer{
                         "/adminpage/**", // 관리자 페이지 영역
                         "/admin/**",
                         "/seller/products/preview/**",
-/*<<<<<<< HEAD
-                        "/seller/**"     // 판매자 페이지 영역
-=======*/
                         "/products/categories/primary", // 메인 카테고리 API
                         "/products/categories/sub/**" 
-                        
-				/* >>>>>>> refs/heads/develop */
                 );
         // [신규] 3순위: 판매자 페이지 접근 제어 인터셉터
         registry.addInterceptor(sellerCheckInterceptor)
