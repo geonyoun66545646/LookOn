@@ -48,7 +48,8 @@ public class InterceptorConfig implements WebMvcConfigurer{
     			.excludePathPatterns("/js/**")
     			.excludePathPatterns("/attachment/**")
     			.excludePathPatterns("/maincss/**")
-    			.excludePathPatterns("/uploads/**");
+    			.excludePathPatterns("/uploads/**")
+    			.excludePathPatterns("/seller/login"); 
     	
     	if (interceptorsEnabled) {
     	
@@ -71,7 +72,10 @@ public class InterceptorConfig implements WebMvcConfigurer{
                 .excludePathPatterns(
                 		// --- 기본 페이지 및 로그인/아웃 ---
                         "/login", "/logout",
-
+                        "/seller/login",
+                        "/customer/login", // <-- 이 부분을 추가해야 합니다.
+                        "/customer/logout", // logout도 인터셉터 영향을 받지 않도록 추가
+                        
                         // --- 모든 리소스 폴더 ---
                         "/admincss/assets/**", 
                         "/maincss/assets/**", 
