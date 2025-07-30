@@ -48,7 +48,8 @@ public class InterceptorConfig implements WebMvcConfigurer{
     			.excludePathPatterns("/js/**")
     			.excludePathPatterns("/attachment/**")
     			.excludePathPatterns("/maincss/**")
-    			.excludePathPatterns("/uploads/**");
+    			.excludePathPatterns("/uploads/**")
+    			.excludePathPatterns("/seller/login"); 
     	
     	if (interceptorsEnabled) {
     	
@@ -71,11 +72,12 @@ public class InterceptorConfig implements WebMvcConfigurer{
                 .excludePathPatterns(
                 		// --- 기본 페이지 및 로그인/아웃 ---
                         "/login", "/logout",
-
+                        
                         // --- 모든 리소스 폴더 ---
                         "/admincss/assets/**", 
                         "/maincss/assets/**", 
                         "/js/**", 
+                        "/git", 
                         "/favicons/**",
                         "/attachment/**",
 
@@ -83,13 +85,8 @@ public class InterceptorConfig implements WebMvcConfigurer{
                         "/adminpage/**", // 관리자 페이지 영역
                         "/admin/**",
                         "/seller/products/preview/**",
-/*<<<<<<< HEAD
-                        "/seller/**"     // 판매자 페이지 영역
-=======*/
                         "/products/categories/primary", // 메인 카테고리 API
                         "/products/categories/sub/**" 
-                        
-				/* >>>>>>> refs/heads/develop */
                 );
         // [신규] 3순위: 판매자 페이지 접근 제어 인터셉터
         registry.addInterceptor(sellerCheckInterceptor)
