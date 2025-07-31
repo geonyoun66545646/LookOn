@@ -94,6 +94,37 @@
     /* <![CDATA[ */
 
     document.addEventListener('DOMContentLoaded', function() {
+    	
+    	
+    	 // =================== [수정] 선제적 로그인 확인 로직 추가 ===================
+        // 페이지의 다른 어떤 기능보다 먼저, 이 페이지 자체에 접근하기 위한 인증 상태를 확인합니다.
+        fetch('/api/customer/reports/check-auth') // 사용자 인증 상태만 확인하는 가벼운 API 호출
+            .then(response => {
+                if (response.status === 401) { // 401 Unauthorized 응답을 받으면
+                    // 즉시 로그인 필요 알림을 띄우고, 확인 시 메인 페이지로 보냅니다.
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '로그인 필요',
+                        text: '로그인 후 이용 가능합니다.',
+                        confirmButtonText: '확인'
+                    }).then(() => {
+                        window.location.href = '/'; 
+                    });
+                    // 인증 실패 시, 이후의 모든 스크립트 실행을 막기 위해 에러를 발생시킵니다.
+                    throw new Error('Not Authenticated');
+                }
+                // 인증에 성공하면 콘솔에 로그를 남기고, 스크립트가 계속 실행되도록 합니다.
+                console.log("사용자 인증 완료. 쿠폰 페이지 기능을 활성화합니다.");
+            })
+            .catch(error => {
+                // Not Authenticated 에러는 우리가 의도적으로 발생시킨 것이므로,
+                // 콘솔에 에러 메시지를 남기고 조용히 처리를 중단합니다.
+                if (error.message === 'Not Authenticated') {
+                    console.error('인증되지 않은 사용자 접근, 기능 로딩 중단.');
+                    // 여기서 return을 사용하여 catch 블록 이후의 코드 실행을 막을 수도 있습니다.
+                }
+            });
+        // =================== [수정 끝] ============================================
 
         // ===================================================================
         // 1. 상태 및 요소 관리
@@ -127,15 +158,13 @@
         // 2. 핵심 로직 함수 (데이터 로딩 및 화면 그리기)
         // ===================================================================
 
-        function loadCoupons() {
+       function loadCoupons() {
             const isMyCouponsTab = currentState.tab === 'my';
             const apiUrl = isMyCouponsTab ? `/customer/api/coupons/my` : `/customer/api/coupons/available`;
             const renderFunction = isMyCouponsTab ? renderMyCoupons : renderAvailableCoupons;
             
             const params = new URLSearchParams({
                 keyword: currentState.keyword,
-                // ⭐ sortOrder를 항상 파라미터로 포함시킵니다.
-                // 서버의 defaultValue를 expiry로 바꿨으므로, 이제 항상 보내도 됩니다.
                 sortOrder: currentState.sortOrder, 
                 page: currentState.page
             });
@@ -146,37 +175,19 @@
 
             couponListContainer.innerHTML = '<li><p class="text-center p-5">로딩 중...</p></li>';
 
+            // [수정] fetch 바로 다음에 .then(response => response.json()) 이 오도록 변경합니다.
             fetch(`${apiUrl}?${params.toString()}`)
-            .then(response => {
-                if (response.status === 401) {
-                    Swal.fire({
-                        title: '로그인 필요',
-                        text: '이 기능을 사용하려면 로그인이 필요합니다.',
-                        icon: 'warning',
-                        confirmButtonText: '확인'
-                    }).then(() => {
-                        window.location.href = '/';
-                    });
-                    throw new Error('UNAUTHORIZED');
-                }
-                return response.json().then(data => ({ ok: response.ok, data: data }));
-            })
+                .then(response => response.json().then(data => ({ ok: response.ok, data: data })))
                 .then(({ ok, data }) => {
                     if (!ok) throw new Error(data.message || '데이터 로딩 실패');
                     
                     renderFunction(couponListContainer, data.list);
                     paginationContainer.innerHTML = renderPagination(data);
                     totalCountEl.textContent = `전체 ${data.totalCount}개`;
-
-                    // ⭐ 각 탭의 카운트 업데이트는 별도 함수에서 호출 (로직 아래에 추가됨)
-                    // if (isMyCouponsTab) {
-                    //     myCouponsCountEl.textContent = `(${data.totalCount})`;
-                    // } else {
-                    //     availableCouponsCountEl.textContent = `(${data.totalCount})`;
-                    // }
                 })
                 .catch(error => {
-                    couponListContainer.innerHTML = `<li><p class="text-center p-5">${error.message === 'UNAUTHORIZED' ? '로그인이 필요합니다.' : '데이터 로딩에 실패했습니다.'}</p></li>`;
+                    // [수정] UNATHORIZED 체크 부분을 삭제합니다.
+                    couponListContainer.innerHTML = `<li><p class="text-center p-5">데이터 로딩에 실패했습니다.</p></li>`;
                     paginationContainer.innerHTML = '';
                     totalCountEl.textContent = '전체 0개';
                 });
