@@ -72,7 +72,12 @@
 	<header class="lookon-main-header" th:fragment="mainHeaderFragment">
 		<div class="lookon-header-upper-bar">
 			<div class="lookon-header-content-wrapper">
+			<div>
 				<a th:href="@{/}" class="lookon-brand-logo">LookOn</a>
+				<a th:href="@{/git}">
+				<span class="index">index</span>
+				</a>
+				</div>
 				<form th:action="@{/customer/searchResult}" method="get"
 					class="lookon-search-input-area">
 					<i class="fas fa-search lookon-search-icon"></i> <input type="text"

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import jakarta.servlet.http.HttpSession;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.tossapi.service.PaymentService;
+// ks55team02.customer.coupons.domain.UserCoupons 임포트가 이미 존재합니다.
 
 @Controller
 public class PaymentController {
@@ -46,6 +47,7 @@ public class PaymentController {
         log.info("결제 페이지 로드 요청 - 사용자 번호: {}", userNo);
 
         // 가장 최근 주문 상세 정보 조회 (프론트엔드에 전달)
+        // 이 부분은 현재 checkout.html에서 직접 사용되지 않고 있으므로, 필요하다면 활용하거나 삭제할 수 있습니다.
         Map<String, Object> latestOrderDetails = paymentService.getLatestOrderDetailsForUser(userNo);
         model.addAttribute("orderDetails", latestOrderDetails);
         model.addAttribute("tossClientKey", tossClientKey);
@@ -78,12 +80,9 @@ public class PaymentController {
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put("orderId", orderId);
             
-            // =========================================================================
-            // [수정] 바로 이 부분입니다!
             // 토스페이먼츠에 전달할 결제 금액(amount)을 할인 전 금액(totalAmount)이 아닌,
             // 최종 결제 금액(finalAmount)으로 변경합니다.
-            // =========================================================================
-            Object finalAmountObj = orderData.get("finalAmount"); // totalAmount -> finalAmount로 변경
+            Object finalAmountObj = orderData.get("finalAmount");
             if (finalAmountObj instanceof Integer) {
                 responseBody.put("amount", ((Integer) finalAmountObj).longValue());
             } else if (finalAmountObj instanceof String) {
@@ -125,7 +124,7 @@ public class PaymentController {
             @RequestParam String paymentKey,
             @RequestParam String orderId,
             @RequestParam Long amount,
-            HttpSession session, // 세션은 현재 로직에서 직접 사용하지 않지만, 향후 확장을 위해 유지 가능합니다.
+            HttpSession session,
             Model model) {
 
         log.info("API 호출: /toss/success (결제 성공 콜백)");
@@ -135,10 +134,10 @@ public class PaymentController {
             // 1. 토스 결제 승인 및 DB 상태 업데이트
             Map<String, Object> paymentResult = paymentService.confirmTossPayment(paymentKey, orderId, amount);
             
-            // 2. [수정] 방금 결제 완료된 주문의 상품 목록 조회
+            // 2. 방금 결제 완료된 주문의 상품 목록 조회
             List<Map<String, Object>> orderedItems = paymentService.getOrderedProductsByOrderId(orderId);
 
-            // 3. [수정] Model에 필요한 모든 데이터 추가
+            // 3. Model에 필요한 모든 데이터 추가
             model.addAttribute("paymentResult", paymentResult);
             model.addAttribute("orderId", orderId);
             model.addAttribute("ordrNo", orderId);
@@ -178,34 +177,80 @@ public class PaymentController {
         return "customer/fragments/paymentFail";
     }
 
-
     @GetMapping("/api/user/coupons")
     @ResponseBody
-    public ResponseEntity<List<ks55team02.customer.coupons.domain.UserCoupons>> getUserCoupons(HttpSession session) { // 반환 타입 변경 (1)
+    public ResponseEntity<?> getUserCoupons(HttpSession session) { // <--- 이 부분을 수정했습니다.
         LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
         if (loginUser == null) {
             log.error("사용자 쿠폰 조회 실패: 세션에 로그인 정보가 없습니다.");
-            // 401 에러를 JSON 형태로 반환하여 프론트에서 처리할 수 있도록 개선
             Map<String, String> error = new HashMap<>();
             error.put("error", "Unauthorized");
             error.put("message", "로그인이 필요합니다.");
-            return new ResponseEntity(error, HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED); // 제네릭 타입 추가
         }
         String userNo = loginUser.getUserNo();
         log.info("API 호출: /api/user/coupons (사용자 쿠폰 조회) - 사용자 번호: {}", userNo);
 
         try {
-            // PaymentService에서 UserCoupons 리스트를 반환하는 메소드를 호출해야 합니다.
-            List<ks55team02.customer.coupons.domain.UserCoupons> userCoupons = paymentService.getActiveUserCoupons(userNo); // 서비스 메소드명 변경 제안 (2)
+            List<ks55team02.customer.coupons.domain.UserCoupons> userCoupons = paymentService.getActiveUserCoupons(userNo);
             return ResponseEntity.ok(userCoupons);
         } catch (Exception e) {
             log.error("쿠폰 정보를 가져오는 중 서버 에러 발생", e);
-            // 500 에러도 JSON 형태로 반환
             Map<String, String> error = new HashMap<>();
             error.put("error", "Internal Server Error");
             error.put("message", "쿠폰 정보를 가져오는 데 실패했습니다.");
-            return new ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR); // 제네릭 타입 추가
         }
     }
 
+    // ★★★ 새로 추가할 사용자 배송지 조회 API 엔드포인트 ★★★
+    @GetMapping("/api/user/shipping-info")
+    @ResponseBody
+    public ResponseEntity<?> getUserShippingInfo(HttpSession session) { // <--- 이 부분을 수정했습니다.
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            log.error("배송지 조회 실패: 세션에 로그인 정보가 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "로그인이 필요합니다."));
+        }
+        String userNo = loginUser.getUserNo();
+        log.info("API 호출: /api/user/shipping-info (사용자 배송지 조회) - 사용자 번호: {}", userNo);
+
+        try {
+            Map<String, Object> shippingInfo = paymentService.getShippingAddressByUserNo(userNo);
+            if (shippingInfo != null && !shippingInfo.isEmpty()) {
+                return ResponseEntity.ok(shippingInfo);
+            } else {
+                return ResponseEntity.noContent().build(); 
+            }
+        } catch (Exception e) {
+            log.error("사용자 배송지 정보를 가져오는 중 서버 에러 발생: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "배송지 정보를 가져오는 데 실패했습니다."));
+        }
+    }
+
+    // ★★★ 새로 추가할 사용자 배송지 저장/수정 API 엔드포인트 ★★★
+    @PostMapping("/api/user/shipping-info")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> saveUserShippingInfo(@RequestBody Map<String, Object> shippingAddressData, HttpSession session) {
+        log.info("API 호출: /api/user/shipping-info (배송지 저장/수정) - shippingAddressData: {}", shippingAddressData);
+
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            log.error("배송지 저장 실패: 세션에 로그인 정보가 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "로그인이 필요합니다."));
+        }
+        String userNo = loginUser.getUserNo();
+        shippingAddressData.put("userNo", userNo); // userNo를 데이터에 추가하여 서비스 계층으로 전달
+
+        try {
+            // PaymentService에 배송지 데이터를 받아 저장 또는 업데이트하는 메소드가 필요합니다.
+            // 예: public void saveOrUpdateShippingAddress(Map<String, Object> shippingAddressData);
+            paymentService.saveOrUpdateShippingAddress(shippingAddressData);
+            log.info("사용자 배송지가 성공적으로 저장/업데이트되었습니다. 사용자 번호: {}", userNo);
+            return ResponseEntity.ok(Map.of("message", "배송지가 성공적으로 저장되었습니다."));
+        } catch (Exception e) {
+            log.error("사용자 배송지 저장/업데이트 실패: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "배송지 저장/업데이트에 실패했습니다: " + e.getMessage()));
+        }
+    }
 }

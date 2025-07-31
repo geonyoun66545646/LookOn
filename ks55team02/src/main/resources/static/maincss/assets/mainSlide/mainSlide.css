@@ -510,3 +510,7 @@ html, body {
     visibility: hidden;
     pointer-events: none;
 }
+
+.index{
+	text-align : left;
+}

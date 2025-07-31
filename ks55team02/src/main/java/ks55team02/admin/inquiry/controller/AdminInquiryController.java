@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,6 +66,17 @@ public class AdminInquiryController {
         Map<String, String> processStatuses = new LinkedHashMap<>();
         processStatuses.put("RECEPTION", "접수");
         processStatuses.put("COMPLETED", "완료");
+        
+        /* 기간 기본 값. */
+        // 1. 시작 날짜가 비어있는지(null) 확인합니다.
+        if (searchCriteria.getStartDate() == null) {
+            searchCriteria.setStartDate(LocalDate.parse("2020-01-01"));
+        }
+
+        // 2. 종료 날짜가 비어있는지(null) 확인합니다.
+        if (searchCriteria.getEndDate() == null) {
+            searchCriteria.setEndDate(LocalDate.now());
+        }
 
         // 모델에 데이터 추가
         model.addAttribute("title", "관리자 문의 목록");
@@ -72,7 +84,8 @@ public class AdminInquiryController {
         model.addAttribute("pagination", pagination);
         model.addAttribute("filterConditionsString", filterConditionsString);
         model.addAttribute("processStatuses", processStatuses); // Map 전달
-
+        model.addAttribute("searchCriteria", searchCriteria);
+        
         return "admin/inquiry/adminInquiryList";
     }
     /**

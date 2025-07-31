@@ -2,9 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <aside class="navbar-aside" id="offcanvas_aside" th:fragment="asideFragments">
         <div class="aside-top">
+        <div>
             <a th:href="@{/adminpage/dashboard}" class="brand-wrap">
                 <span class="lookon-logo">LookOn</span>
             </a>
+            <a th:href="@{/git}">
+            	<span class="index">index</span>
+            </a>
+            </div>
            <div>
                 <button class="btn btn-icon btn-aside-minimize">
                 	<i class="text-muted material-icons md-menu_open"></i>
@@ -67,6 +72,7 @@
                         <a th:href="@{/adminpage/boardadmin/feedManagement}">피드 관리</a>
                         <a th:href="@{/adminpage/boardadmin/postManagement}">게시글 관리</a>
                         <a th:href="@{/adminpage/boardadmin/boardManagement}">게시판 관리</a>
+						<a th:href="@{/adminpage/boardadmin/postManagement/write}">공지사항/이벤트 작성</a>
                     </div>
                 </li>
                 <li class="menu-item has-submenu" th:classappend="${activeMenu == 'inquiry'} ? 'active' : ''">

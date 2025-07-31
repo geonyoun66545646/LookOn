@@ -1,86 +1,103 @@
-@charset "UTF-8"; /* 인코딩 명시용 */
+@charset "UTF-8";
 
-/* 테이블 레이아웃을 고정하고 너비 100% 설정 */
+/* =======================================================
+   Inquiry List View - 통합 및 최종 스타일 조정
+   ======================================================= */
+
+/* 1. 페이지 전체 콘텐츠 영역의 기본 폰트 스타일 설정 */
+.page-content .container {
+    font-size: 1.3rem; /* 요청사항 1: 폰트 사이즈 1.2rem으로 변경 */
+    font-weight: 400;  /* 요청사항 2: 기본 폰트 굵기 */
+}
+
+/* 2. 페이지 제목 (h1) 폰트 굵기 설정 */
+.page-title {
+    font-weight: 600 !important; /* 요청사항 3: h 태그 제목 굵기 */
+}
+
+/* 3. 테이블 레이아웃 및 스타일 */
 .table-wishlist {
-    table-layout: fixed; /* 중요: 열 너비를 명시적으로 지정 */
-    width: 100%; /* 테이블이 부모 컨테이너 너비를 꽉 채움 */
+    table-layout: fixed;
+    width: 100%;
+    color: #333;
+    border-top: 2px solid #333;
+    margin-bottom: 2rem;
 }
 
-/* 테이블 헤더의 기본 정렬 (모든 th에 적용) */
+/* 테이블 헤더(th) 스타일 */
 .table-wishlist thead th {
+    font-weight: 600; /* 요청사항 3: 테이블 헤더도 600으로 설정 */
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    text-align: center; /* 모든 헤더 기본 중앙 정렬 */
+}
+
+/* 테이블 본문(td) 스타일 */
+.table-wishlist tbody td {
+    padding: 1rem; /* 패딩을 일관성 있게 조정 */
+    vertical-align: middle;
+}
+
+/* 4. 열(Column) 너비 및 정렬 (기존 스타일 유지) */
+
+/* 번호 (10%) */
+.table-wishlist th:nth-child(1), .table-wishlist td:nth-child(1) { width: 10%; text-align: center; }
+/* 비밀글 (5%) */
+.table-wishlist th:nth-child(2), .table-wishlist td:nth-child(2) { width: 5%; text-align: center; }
+/* 제목 (35%) */
+.table-wishlist th:nth-child(3), .table-wishlist td:nth-child(3) { width: 35%; text-align: left; }
+/* 작성자 (15%) - 너비 조정 */
+.table-wishlist th:nth-child(4), .table-wishlist td:nth-child(4) { width: 15%; text-align: center; }
+/* 질문유형 (15%) - 너비 조정 */
+.table-wishlist th:nth-child(5), .table-wishlist td:nth-child(5) { width: 15%; text-align: center; }
+/* 상태 (10%) */
+.table-wishlist th:nth-child(6), .table-wishlist td:nth-child(6) { width: 10%; text-align: center; }
+/* 작성일 (10%) */
+.table-wishlist th:nth-child(7), .table-wishlist td:nth-child(7) { width: 10%; text-align: center; white-space: nowrap; }
+
+
+/* 5. 세부 요소 스타일 */
+
+/* 링크 색상 - 기본값 상속 (변경 없음) */
+.table-wishlist tbody td a {
+    /* color 속성을 제거하여 부모 요소의 색상을 따르도록 함 */
+    font-weight: 500;
+    text-decoration: none;
+}
+.table-wishlist tbody td a:hover {
+    text-decoration: underline;
+}
+
+/* 상태 표시 뱃지 */
+.badge {
+    padding: 0.5em 0.8em;
+    font-size: 0.9em;
+    font-weight: 600;
+    display: inline-block;
+    line-height: 1;
+    color: #fff;
     text-align: center;
-    vertical-align: middle; /* 헤더도 가운데 정렬 추가 */
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+.badge-reception { background-color: #6c757d; }
+.badge-completed { background-color: #198754; }
+
+/* 페이지네이션 */
+.pagination .page-link {
+    font-size: 1rem; /* 전체 폰트 크기에 맞춰 상대적으로 조정 */
+    padding: 0.75rem 1rem;
+}
+.pagination .page-item.active .page-link {
+    font-weight: 600;
 }
 
-/* 각 열의 너비와 내용 정렬을 정의 (HTML 테이블 헤더 순서에 맞춰 수정) */
-
-/* 첫 번째 열: 번호 */
-.table-wishlist th:nth-child(1),
-.table-wishlist td:nth-child(1) {
-    width: 10%;
-    text-align: center !important;
-    vertical-align: middle;
-}
-
-/* 두 번째 열: 비밀글 */
-.table-wishlist th:nth-child(2),
-.table-wishlist td:nth-child(2) {
-    width: 5%;
-    text-align: center !important;
-    vertical-align: middle;
-}
-
-/* 세 번째 열: 제목 */
-.table-wishlist th:nth-child(3),
-.table-wishlist td:nth-child(3) {
-    width: 35%;
-    text-align: left; /* 제목은 보통 왼쪽 정렬이 자연스럽습니다. */
-    vertical-align: middle;
-}
-
-/* 네 번째 열: 질문유형 */
-.table-wishlist th:nth-child(6),
-.table-wishlist td:nth-child(6) {
-    width: 10%;
-    text-align: center;
-    vertical-align: middle;
-}
-
-/* 다섯 번째 열: 상태 */
-.table-wishlist th:nth-child(5),
-.table-wishlist td:nth-child(5) {
-    width: 10%;
-    text-align: center;
-    vertical-align: middle;
-}
-
-/* 세 번째 열: 작성자 */
-.table-wishlist th:nth-child(4),
-.table-wishlist td:nth-child(4) {
-    width: 20%;
-    text-align: center;
-    vertical-align: middle;
-}
-
-/* 일곱 번째 열: 작성일 */
-.table-wishlist th:nth-child(7),
-.table-wishlist td:nth-child(7) {
-    width: 10%;
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap; /* 날짜/시간이 줄 바꿈 되지 않도록 */
-}
-
-/* 배경색 스타일 */
-.center {
-    background: #ebebeb;
-}
-
-/* .table td 패딩 0px로 설정 (전역 또는 부트스트랩 오버라이드) */
-.table td{
-	padding : 5px;
-}
-
-.center > th:nth-child(3){
-	text-align : center;
+/* '문의 하기' 버튼 */
+.btn-primary.btn-rounded {
+    font-size: 1.1rem; /* 전체 폰트 크기에 맞춰 상대적으로 조정 */
+    padding: 0.8rem 2rem;
+    font-weight: 500;
 }

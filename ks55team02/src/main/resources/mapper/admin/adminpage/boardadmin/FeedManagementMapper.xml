@@ -16,6 +16,49 @@
 		<result column="like_count" property="likeCount" />
 		<result column="comment_count" property="commentCount" />
 	</resultMap>
+	
+	<resultMap id="feedPreviewResultMap" type="ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.FeedPreviewDto">
+    <id property="feedSn" column="feed_sn"/>
+    <result property="feedCn" column="feed_cn"/>
+    <result property="crtDt" column="crt_dt"/>
+    <result property="userNcnm" column="user_ncnm"/>
+    <result property="userImg" column="user_img_path"/>
+    <result property="likeCount" column="like_count"/>
+    <result property="commentCount" column="comment_count"/>
+    <collection property="imageUrls" ofType="java.lang.String" select="selectFeedImageUrls" column="feed_sn"/>
+    <collection property="tags" ofType="java.lang.String" select="selectFeedTags" column="feed_sn"/>
+</resultMap>
+
+<select id="selectFeedImageUrls" resultType="java.lang.String">
+    SELECT img_file_path_nm FROM feed_images WHERE feed_sn = #{feed_sn} AND del_dt IS NULL ORDER BY feed_img_sort_sn
+</select>
+
+<select id="selectFeedTags" resultType="java.lang.String">
+    SELECT
+        t.tag_nm
+    FROM
+        feed_tags ft
+    JOIN
+        tags t ON ft.tag_sn = t.tag_sn
+    WHERE
+        ft.feed_sn = #{feed_sn}
+</select>
+
+<select id="selectFeedPreviewById" parameterType="string" resultMap="feedPreviewResultMap">
+    SELECT
+        f.feed_sn,
+        f.feed_cn,
+        f.crt_dt,
+        u.user_ncnm,
+        (SELECT COUNT(*) FROM feed_interactions fi WHERE fi.feed_sn = f.feed_sn AND fi.rtrcn_dt IS NULL) AS like_count,
+        (SELECT COUNT(*) FROM feed_comments fc WHERE fc.feed_sn = f.feed_sn AND fc.del_dt IS NULL) AS comment_count
+    FROM
+        feeds f
+    JOIN
+        users u ON f.wrtr_user_no = u.user_no
+    WHERE
+        f.feed_sn = #{feedSn}
+</select>
 
 	<select id="selectFeedList"
 		parameterType="ks55team02.admin.adminpage.boardadmin.feedmanagement.domain.AdminFeed"

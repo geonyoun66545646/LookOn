@@ -2,9 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <aside class="navbar-aside" id="offcanvas_aside" th:fragment="asideFragment">
         <div class="aside-top">
+        <div>
             <a th:href="@{/seller}" class="brand-wrap">
                 <span class="lookon-logo">LookOn</span>
             </a>
+            <a th:href="@{/git}">
+            	<span class="index">index</span>
+            </a>
+            	</div>
             <div>
                 <button class="btn btn-icon btn-aside-minimize"><i class="text-muted material-icons md-menu_open"></i></button>
             </div>
