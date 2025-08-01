@@ -53,26 +53,39 @@ $(() => {
 		});
 	});
 
-	// 새 이미지 파일 선택 시 미리보기 생성
+	// 새 이미지 파일 선택 시 미리보기 생성 (단일 파일 처리 로직으로 변경)
 	$imageFileInput.on('change', e => {
-		const files = e.target.files;
-		if (!files) return;
+		const file = e.target.files[0];
 
-		// 기존에 추가했던 '새 이미지' 미리보기는 모두 제거
-		$imagePreviewContainer.find('.new-image').remove();
+		// --- 단일 이미지 규칙 적용 ---
+		// 1. 기존의 모든 미리보기(기존 이미지, 새 이미지)를 화면에서 제거하고 삭제 목록에 추가
+		$imagePreviewContainer.children('.image-preview-item').each(function() {
+			const $item = $(this);
+			// 기존 이미지인 경우 삭제 목록에 추가
+			if (!$item.hasClass('new-image')) {
+				const imageSn = $item.data('image-sn');
+				if (imageSn && !deleteImageSns.includes(imageSn)) {
+					deleteImageSns.push(imageSn);
+				}
+			}
+			$item.remove(); // 화면에서 제거
+		});
 
-		Array.from(files).forEach(file => {
+		console.log('삭제할 이미지 목록:', deleteImageSns);
+
+		// 2. 새로운 파일이 선택되었을 때만 미리보기 생성
+		if (file) {
 			const reader = new FileReader();
 			reader.onload = (e) => {
 				const previewHtml = `
-                    <div class="image-preview-item new-image">
-                        <img src="${e.target.result}" alt="${file.name}">
-                    </div>
-                `;
-				$imagePreviewContainer.append(previewHtml);
+	                <div class="image-preview-item new-image">
+	                    <img src="${e.target.result}" alt="${file.name}">
+	                </div>
+	            `;
+				$imagePreviewContainer.html(previewHtml); 
 			};
 			reader.readAsDataURL(file);
-		});
+		}
 	});
 
 	// 기존 이미지의 삭제 버튼 클릭 이벤트
