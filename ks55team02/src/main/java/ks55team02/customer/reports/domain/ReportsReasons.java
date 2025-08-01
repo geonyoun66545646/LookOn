@@ -9,4 +9,5 @@ public class ReportsReasons {
 	private String dclrRsnCn;
 	private String dclrTrgtTypeCd;
 	private boolean actvtnYn;
+	
 }
