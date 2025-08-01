@@ -76,6 +76,7 @@ public class InterceptorConfig implements WebMvcConfigurer{
                         "/admincss/assets/**", 
                         "/maincss/assets/**", 
                         "/js/**", 
+                        "/git/**", 
                         "/favicons/**",
                         "/attachment/**",
 

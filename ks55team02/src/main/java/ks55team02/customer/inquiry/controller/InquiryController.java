@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -239,6 +240,80 @@ public class InquiryController {
         model.addAttribute("currentUserId", getCurrentUserId(session));
 
         return "customer/inquiry/inquiryListView";
+    }
+    
+ // ======================= [AJAX] 문의 수정 처리 (POST) =======================
+    @ResponseBody // JSON 응답을 위해 필수
+    @PostMapping("/updateInquiryAjax")
+    public ResponseEntity<Map<String, Object>> updateInquiryAjax(@RequestBody Inquiry inquiry, // JSON 데이터를 받기 위해 @RequestBody 사용
+                                                                   HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        String currentUserId = getCurrentUserId(session);
+        
+        if (currentUserId == null) {
+            response.put("status", "error");
+            response.put("message", "세션이 만료되었습니다. 다시 로그인해주세요.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        try {
+            // 서비스의 수정 메서드 호출 (inquiry 객체와 사용자 ID 전달)
+            // 서비스에서 권한 검사 및 답변 여부 검사를 수행합니다.
+            inquiryService.updateInquiry(inquiry, currentUserId);
+            
+            response.put("status", "success");
+            response.put("message", "문의가 성공적으로 수정되었습니다.");
+            // 수정된 내용을 utext로 변환하여 클라이언트에 보내주면 바로 화면에 적용 가능
+            response.put("updatedContentHtml", inquiry.getInqryCn().replace("\n", "<br>"));
+            return ResponseEntity.ok(response);
+
+        } catch (SecurityException | IllegalStateException e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        } catch (Exception e) {
+            log.error("문의 수정(AJAX) 중 오류 발생", e);
+            response.put("status", "error");
+            response.put("message", "문의 수정 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // ======================= [AJAX] 문의 삭제 처리 (POST) =======================
+    @ResponseBody // JSON 응답을 위해 필수
+    @PostMapping("/deleteInquiryAjax")
+    public ResponseEntity<Map<String, Object>> deleteInquiryAjax(@RequestBody Map<String, String> payload, // inquiryId를 받기 위함
+                                                                   HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        String inquiryId = payload.get("inquiryId");
+        String currentUserId = getCurrentUserId(session);
+
+        if (currentUserId == null) {
+            response.put("status", "error");
+            response.put("message", "세션이 만료되었습니다. 다시 로그인해주세요.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        try {
+            // 서비스의 삭제 메서드 호출
+            inquiryService.deleteInquiry(inquiryId, currentUserId);
+            
+            response.put("status", "success");
+            response.put("message", "문의가 삭제되었습니다.");
+            // 삭제 후 이동할 URL 전달
+            response.put("redirectUrl", "/customer/inquiry/inquiryList");
+            return ResponseEntity.ok(response);
+
+        } catch (SecurityException | IllegalStateException e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        } catch (Exception e) {
+            log.error("문의 삭제(AJAX) 중 오류 발생", e);
+            response.put("status", "error");
+            response.put("message", "문의 삭제 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
     
 }

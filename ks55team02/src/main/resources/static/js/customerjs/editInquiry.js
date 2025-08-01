@@ -1,49 +1,5 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org/"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{customer/layout/layoutMain}">
-<head>
-    <title>문의 상세</title>
-    <th:block layout:fragment="customCss">
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/inquiryDetailView.css}">
-    </th:block>
-</head>
-<body>
-    <th:block layout:fragment="contents">
-        <main class="main">
-            <div class="page-header text-center" style="background-image: url('assets/images/page-header-bg.jpg')">
-                <div class="container">
-                    <h1 class="page-title">INQUIRY DETAIL<span>문의 상세</span></h1>
-                </div>
-            </div>
-            <nav aria-label="breadcrumb" class="breadcrumb-nav">
-                <div class="container">
-                    <ol class="breadcrumb">
-                         <li class="breadcrumb-item"><a th:href="@{/}">Home</a></li>
-                         <li class="breadcrumb-item"><a th:href="@{/customer/inquiry/FAQ}">FAQ</a></li>
-                        <li class="breadcrumb-item"><a th:href="@{/customer/inquiry/inquiryList}">INQUIRYLIST</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">INQUIRY DETAIL</li>
-                    </ol>
-                </div>
-            </nav>
-            <div class="page-content">
-                <div class="container">
-                    <div th:insert="~{common/fragments/inquiryDetailFragment :: inquiryDetailFragment(${inquiry})}"></div>
+// inquiryDetail.js
 
-                    
-                    <div class="form-group d-flex justify-content-end mt-4 mb-3">
-                            <a th:href="@{/customer/inquiry/inquiryList}" class="btn btn-outline-secondary btn-rounded ml-2">목록으로</a>
-                        </div>
-                    </div>
-            </div>
-        </main>
-    </th:block>
-
-    <th:block layout:fragment="jsScript">
-
-        <script th:inline="javascript">
 document.addEventListener('DOMContentLoaded', function() {
     // 필요한 DOM 요소들을 찾음
     const editBtn = document.getElementById('editBtn');
@@ -55,14 +11,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const editMode = document.getElementById('editMode');
     const editContent = document.getElementById('editContent');
 
+    // ✅ [추가] 버튼 그룹을 제어하기 위한 요소
     const viewModeButtons = document.getElementById('viewModeButtons');
     const editModeButtons = document.getElementById('editModeButtons');
 
     // '수정하기' 버튼 클릭 이벤트
     if (editBtn) {
         editBtn.addEventListener('click', function() {
+            // 내용 <-> 입력창 전환
             viewMode.style.display = 'none';
             editMode.style.display = 'block';
+            
+            // ✅ [수정] '수정/삭제' 버튼 그룹을 숨기고 '저장/취소' 그룹을 보여줌
             if (viewModeButtons) viewModeButtons.style.display = 'none';
             if (editModeButtons) editModeButtons.style.display = 'inline-block';
         });
@@ -71,8 +31,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // '취소' 버튼 클릭 이벤트
     if (cancelEditBtn) {
         cancelEditBtn.addEventListener('click', function() {
+            // 내용 <-> 입력창 전환
             viewMode.style.display = 'block';
             editMode.style.display = 'none';
+            
+            // ✅ [수정] '저장/취소' 버튼 그룹을 숨기고 '수정/삭제' 그룹을 보여줌
             if (editModeButtons) editModeButtons.style.display = 'none';
             if (viewModeButtons) viewModeButtons.style.display = 'inline-block';
         });
@@ -81,23 +44,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // '저장' 버튼 클릭 이벤트 (AJAX)
     if (saveEditBtn) {
         saveEditBtn.addEventListener('click', function() {
-            // ✅ th:inline="javascript"를 통해 inquiry 객체를 바로 사용합니다.
-            const originalInquiry = /*[[${inquiry}]]*/ null;
-            
-            if (!originalInquiry) {
+            const inquiryDataContainer = document.getElementById('inquiryDataContainer');
+            if (!inquiryDataContainer || !inquiryDataContainer.dataset.inquiry) {
                 alert('문의 데이터를 찾을 수 없습니다.');
                 return;
             }
 
-            const updatedData = {
-                inqryId: originalInquiry.inqryId,
-                inqryCn: editContent.value,
-                inqryTtl: originalInquiry.inqryTtl,
-                inqryTypeCd: originalInquiry.inqryTypeCd,
-                inqryTrgtTypeCd: originalInquiry.inqryTrgtTypeCd,
-                inqryStoreId: originalInquiry.inqryStoreId,
-                prvtYn: originalInquiry.prvtYn
-            };
+            // data 속성에서 원본 데이터를 가져와 내용만 교체
+            const updatedData = JSON.parse(inquiryDataContainer.dataset.inquiry);
+            updatedData.inqryCn = editContent.value;
 
             fetch('/customer/inquiry/updateInquiryAjax', {
                 method: 'POST',
@@ -105,13 +60,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(updatedData)
             })
             .then(response => {
-                if (!response.ok) { return response.json().then(err => { throw new Error(err.message); }); }
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message || '서버 응답 오류'); });
+                }
                 return response.json();
             })
             .then(data => {
                 alert(data.message);
+                // 화면 내용 업데이트
                 document.querySelector('#viewMode .inquiry-content').innerHTML = data.updatedContentHtml;
-                cancelEditBtn.click(); // 모드 전환
+                
+                // ✅ [수정] 수정된 내용을 data-* 속성에도 반영 (선택사항이지만 좋은 습관입니다)
+                updatedData.inqryCn = data.updatedContentText; // 서버에서 받은 최종 텍스트로 업데이트
+                inquiryDataContainer.dataset.inquiry = JSON.stringify(updatedData);
+
+                // 모드 전환을 위해 '취소' 버튼 클릭 로직을 재사용
+                cancelEditBtn.click();
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -120,18 +84,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // '삭제하기' 버튼 클릭 이벤트 (AJAX)
+    // '삭제하기' 버튼 클릭 이벤트 (기존과 동일)
     if (deleteBtn) {
         deleteBtn.addEventListener('click', function() {
             if (confirm('정말로 이 문의를 삭제하시겠습니까?')) {
                 const inquiryId = this.dataset.inquiryId;
+                
                 fetch('/customer/inquiry/deleteInquiryAjax', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ inquiryId: inquiryId })
                 })
                 .then(response => {
-                    if (!response.ok) { return response.json().then(err => { throw new Error(err.message); }); }
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message || '서버 응답 오류'); });
+                    }
                     return response.json();
                 })
                 .then(data => {
@@ -148,8 +115,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-</script>
-   
-    </th:block>
-</body>
-</html>

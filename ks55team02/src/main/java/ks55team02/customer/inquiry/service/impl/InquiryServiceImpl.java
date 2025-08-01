@@ -237,4 +237,72 @@ public class InquiryServiceImpl implements InquiryService {
         return inquiryMapper.getAnswerByInquiryId(inquiryId);
     }
     
+    // 문의 수정
+    @Override
+    public void updateInquiry(Inquiry inquiry, String currentUserId) {
+        // 1. 수정하려는 문의의 원본 데이터를 DB에서 가져옵니다.
+        Inquiry originalInquiry = inquiryMapper.getInquiryById(inquiry.getInqryId());
+
+        // 2. 수정 권한을 확인합니다.
+        // - 문의가 존재하지 않거나, 작성자가 현재 로그인한 사용자와 다를 경우 예외를 발생시킵니다.
+        if (originalInquiry == null) {
+            throw new IllegalArgumentException("수정하려는 문의를 찾을 수 없습니다. ID: " + inquiry.getInqryId());
+        }
+        if (!originalInquiry.getWrtrId().equals(currentUserId)) {
+            log.warn("문의 수정 권한 없음. 원본 작성자: {}, 시도자: {}", originalInquiry.getWrtrId(), currentUserId);
+            throw new SecurityException("해당 문의를 수정할 권한이 없습니다.");
+        }
+        // 답변이 이미 달린 경우 수정을 막습니다.
+        if ("COMPLETED".equals(originalInquiry.getPrcsStts())) {
+            throw new IllegalStateException("처리가 완료된 문의는 수정할 수 없습니다.");
+        }
+		/*
+		 * if (originalInquiry.getAnswer() != null) { throw new
+		 * IllegalStateException("답변이 완료된 문의는 수정할 수 없습니다."); }
+		 */
+        
+        // 상점 문의가 아닌 경우, 상점 ID를 null로 설정
+        if (!"STORE".equals(inquiry.getInqryTrgtTypeCd())) {
+            inquiry.setInqryStoreId(null);
+        }
+
+        // 3. Mapper를 호출하여 DB 업데이트를 수행합니다.
+        int result = inquiryMapper.updateInquiry(inquiry);
+        if (result == 0) {
+            log.warn("문의 수정 실패 (영향 받은 행 없음): {}", inquiry.getInqryId());
+            throw new RuntimeException("문의 수정 중 오류가 발생했습니다.");
+        }
+        log.info("문의 수정 성공: {}", inquiry.getInqryId());
+        
+        // TODO: 첨부파일 수정 로직은 복잡하므로 여기서는 텍스트 내용만 수정합니다.
+        // 필요하다면 기존 파일 삭제 -> 새 파일 추가 로직을 여기에 구현해야 합니다.
+    }
+    // 자신의 문의 삭제
+    @Override
+    public void deleteInquiry(String inquiryId, String currentUserId) {
+        // 1. 삭제하려는 문의의 원본 데이터를 DB에서 가져옵니다.
+        Inquiry originalInquiry = inquiryMapper.getInquiryById(inquiryId);
+
+        // 2. 삭제 권한을 확인합니다.
+        if (originalInquiry == null) {
+            throw new IllegalArgumentException("삭제하려는 문의를 찾을 수 없습니다. ID: " + inquiryId);
+        }
+        if (!originalInquiry.getWrtrId().equals(currentUserId)) {
+            // TODO: 관리자도 삭제할 수 있게 하려면 여기에 관리자 권한 확인 로직 추가
+            log.warn("문의 삭제 권한 없음. 원본 작성자: {}, 시도자: {}", originalInquiry.getWrtrId(), currentUserId);
+            throw new SecurityException("해당 문의를 삭제할 권한이 없습니다.");
+        }
+        if ("COMPLETED".equals(originalInquiry.getPrcsStts())) {
+            throw new IllegalStateException("처리가 완료된 문의는 수정할 수 없습니다.");
+        }
+
+        // 3. Mapper를 호출하여 DB 업데이트 (삭제 처리)
+        int result = inquiryMapper.deleteInquiryById(inquiryId, currentUserId);
+        if (result == 0) {
+            log.warn("문의 삭제 실패 (영향 받은 행 없음): {}", inquiryId);
+            throw new RuntimeException("문의 삭제 중 오류가 발생했습니다.");
+        }
+        log.info("문의 삭제 성공 (상태 DELETED로 변경): {}", inquiryId);
+    }
+    
 }

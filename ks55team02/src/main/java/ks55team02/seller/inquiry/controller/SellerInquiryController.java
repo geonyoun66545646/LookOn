@@ -92,7 +92,9 @@ public class SellerInquiryController {
 	public String getSellerInquiryDetail(@RequestParam("inqryId") String inqryId, Model model) {
 	    log.info("컨트롤러: getSellerInquiryDetail 호출 - inqryId: {}", inqryId);
 
-	    Inquiry inquiryDetail = sellerInquiryService.getSellerInquiryByStoreId(inqryId);
+		
+		  Inquiry inquiryDetail = sellerInquiryService.getSellerInquiryByStoreId(inqryId);
+		 
 
 	    log.info("컨트롤러: sellerInquiryService.getSellerInquiryByStoreId 결과: {}", inquiryDetail);
 	    
@@ -108,6 +110,7 @@ public class SellerInquiryController {
 	        log.warn("해당 inqryId로 조회된 Inquiry 데이터가 없습니다: {}", inqryId);
 	        model.addAttribute("errorMessage", "문의 정보를 찾을 수 없습니다.");
 	        return "error/dataNotFound";
+	        
 	    }
 	}
 	

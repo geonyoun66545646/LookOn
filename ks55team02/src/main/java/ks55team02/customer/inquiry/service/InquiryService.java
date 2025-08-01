@@ -63,7 +63,14 @@ public interface InquiryService {
      */
     Map<String, Object> getInquiryList(int currentPage, int pageSize); // 페이징 메서드 시그니처 유지
     
+    
     Answer getAnswerByInquiryId(String answer);
     
+ // [추가] 문의 수정 서비스 메서드
+    void updateInquiry(Inquiry inquiry, String currentUserId);
+    
+ // [추가] 문의 삭제 서비스 메서드
+    void deleteInquiry(String inquiryId, String currentUserId);
+   
     
 }

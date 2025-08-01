@@ -21,6 +21,7 @@
         <!-- 작성자 정보 매핑 (1:1 관계) -->
         <!-- Inquiry 도메인 객체에 InquiryUser 타입의 'writerInfo' 필드가 있다고 가정합니다. -->
         <association property="writerInfo" resultMap="inquiryUserResultMap"/>
+         <association property="answer" resultMap="answerResultMap" />
         <!-- InquiryImage 리스트 매핑 (1:N 관계) -->
         <collection property="inquiryImages" 	ofType="ks55team02.common.domain.inquiry.InquiryImage"
 					select="ks55team02.customer.inquiry.mapper.InquiryImageMapper.getInquiryImagesByInquiryId"
@@ -280,5 +281,32 @@
          where
          	inqry_id = #{inquiryId}
     </select>
+
+	<update id="updateInquiry" parameterType="ks55team02.common.domain.inquiry.Inquiry">
+    UPDATE
+        inquiries
+    <set>
+        inqry_ttl = #{inqryTtl},
+        inqry_cn = #{inqryCn},
+        inqry_type_cd = #{inqryTypeCd},
+        inqry_trgt_type_cd = #{inqryTrgtTypeCd},
+        inqry_store_id = #{inqryStoreId},
+        prvt_yn = #{prvtYn},
+        mdfcn_ymd = NOW()
+    </set>
+    WHERE
+        inqry_id = #{inqryId}
+</update>
+<!-- 자기가 쓴 문의 삭제 -->
+<update id="deleteInquiryById">
+    UPDATE
+        inquiries
+    SET
+        prcs_stts = 'DELETED',
+        del_dt = NOW(),
+        del_user_no = #{deleteUserId}
+    WHERE
+        inqry_id = #{inquiryId}
+</update>
 
 </mapper>

@@ -60,7 +60,7 @@
 
         <association property="writerInfo" resultMap="inquiryUserResultMap"/>
         <association property="storeInfo" resultMap="storeResultMap"/>
-        <association property="answer" resultMap="ks55team02.seller.inquiry.mapper.AnswerMapper.answerResultMap"/>
+        <association property="answer" resultMap="answerResultMap"/>
         
         <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage" resultMap="inquiryImageResultMap"/>
     </resultMap>

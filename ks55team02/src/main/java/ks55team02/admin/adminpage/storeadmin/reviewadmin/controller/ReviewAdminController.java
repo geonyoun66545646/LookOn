@@ -45,6 +45,14 @@ public class ReviewAdminController {
             review.setFilterConditions(List.of("ACTIVE", "HIDDEN"));
             log.info("기본 필터 적용: ACTIVE, HIDDEN");
         }
+        
+        //정렬 조건이 없을 경우 기본값으로 최신순(작성일 기준 내림차순) 정렬 적용
+        if (review.getSortKey() == null || review.getSortKey().isEmpty()) {
+            review.setSortKey("wrtYmd"); // 작성일 기준으로 정렬
+        }
+        if (review.getSortOrder() == null || review.getSortOrder().isEmpty()) {
+            review.setSortOrder("DESC"); // 내림차순 (최신순)
+        }
 
         int totalRecordCount = reviewAdminService.getReviewCount(review);
         Pagination pagination = new Pagination(totalRecordCount, review);

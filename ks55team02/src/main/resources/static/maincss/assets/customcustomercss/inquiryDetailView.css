@@ -98,3 +98,20 @@
 .answer-meta-flex .meta-item { color: #6c757d; }
 .answer-meta-flex .meta-item i { color: #868e96; }
 .answer-meta-flex .meta-label { color: #495057; }
+
+.inquiry-card {
+  border-bottom: 1px solid #c96 !important;
+}
+
+.answer-card {
+  border-bottom: 1px solid #adb5bd !important;
+}
+
+.card-footer {
+    padding: .75rem 1.25rem;
+    background-color: rgba(0, 0, 0, .03);
+    border-top: 1px solid rgba(0, 0, 0, .125);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
