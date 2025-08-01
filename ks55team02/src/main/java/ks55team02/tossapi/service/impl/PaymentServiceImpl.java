@@ -98,14 +98,13 @@ public class PaymentServiceImpl implements PaymentService {
                     itemData.put("ordrTmUntprc", product.get("price"));
                     itemData.put("ordrDtlArtclDcsnCd", "ORDERED");
                     
-                    // ★★★ 수정된 부분 ★★★: 프론트에서 보내는 'store_id' 키로 값을 가져옴
+
                     itemData.put("storeId", product.get("store_id"));
                     
                     paymentMapper.insertOrderItem(itemData);
                 }
             }
 
-            // 3. 결제 정보 저장 (payments 테이블)
             PaymentDTO paymentDTO = new PaymentDTO();
             paymentDTO.setStlmId(paymentMapper.selectNextPaymentId());
             paymentDTO.setOrdrNo(orderId);
@@ -149,6 +148,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Map<String, Object> confirmTossPayment(String paymentKey, String orderId, Long amount) throws Exception {
         
+        // 1. 토스페이먼츠 API에 결제 승인을 요청합니다.
         String tossPaymentsUrl = "https://api.tosspayments.com/v1/payments/confirm";
         
         HttpHeaders headers = new HttpHeaders();
@@ -166,96 +166,99 @@ public class PaymentServiceImpl implements PaymentService {
             log.info("토스페이먼츠 승인 API 응답: {}", tossApiResponse);
 
             if (tossApiResponse == null || !"DONE".equals(tossApiResponse.get("status"))) {
-                String errorCode = (String) tossApiResponse.get("code");
-                String errorMessage = (String) tossApiResponse.get("message");
-                log.error("토스페이먼츠 결제 승인 실패. 코드: {}, 메시지: {}", errorCode, errorMessage);
-                throw new RuntimeException("토스페이먼츠 결제 승인 실패: " + errorMessage);
+                throw new RuntimeException("토스페이먼츠 결제 승인 실패");
             }
         } catch (Exception e) {
             log.error("토스페이먼츠 API 호출 중 오류 발생: {}", e.getMessage(), e);
-            throw new RuntimeException("토스페이먼츠 API 호출 실패: " + e.getMessage(), e);
+            throw new RuntimeException("토스페이먼츠 API 호출 실패", e);
         }
 
+        // 2. 결제 승인이 성공한 경우, 데이터베이스 업데이트를 시작합니다.
         try {
+            // 2-1. 방금 결제된 주문의 모든 상품 항목을 DB에서 가져옵니다.
             List<Map<String, Object>> orderedItems = paymentMapper.getOrderedProductsByOrderId(orderId);
+            // ★★★ 로그 1: DB에서 가져온 데이터 전체 확인
             log.info(">>>> [DEBUG] Ordered Items from DB: {}", orderedItems);
 
+            // 2-2. 상점별 매출을 집계할 Map 생성
             Map<String, BigDecimal> salesByStore = new HashMap<>();
             for (Map<String, Object> item : orderedItems) {
-                String storeId = (String) item.get("storeId");
-                Object unitPriceObj = item.get("price");
-                Object quantityObj = item.get("quantity");
+                String storeId = (String) item.get("store_id");
+                Object unitPriceObj = item.get("ordr_tm_untprc");
+                Object quantityObj = item.get("ordr_qntty");
                 
+                // ★★★ 로그 2: 반복문 내부의 각 아이템과 클래스 타입 확인 (매우 중요!)
                 log.info(">>>> [DEBUG] Processing Item - storeId: {}, unitPrice: {}, quantity: {}", storeId, unitPriceObj, quantityObj);
+                if(unitPriceObj != null) log.info(">>>> [DEBUG] Price Type: " + unitPriceObj.getClass().getName());
+                if(quantityObj != null) log.info(">>>> [DEBUG] Quantity Type: " + quantityObj.getClass().getName());
 
-                BigDecimal unitPrice = BigDecimal.ZERO;
-                if (unitPriceObj instanceof BigDecimal) {
-                    unitPrice = (BigDecimal) unitPriceObj;
-                } else if (unitPriceObj instanceof Number) {
-                    unitPrice = new BigDecimal(unitPriceObj.toString());
-                }
-
-                int quantity = 0;
-                if (quantityObj instanceof Integer) {
-                    quantity = (Integer) quantityObj;
-                } else if (quantityObj instanceof Number) {
-                    quantity = ((Number) quantityObj).intValue();
-                }
-
-                if (storeId != null && !storeId.isEmpty() && unitPrice.compareTo(BigDecimal.ZERO) > 0 && quantity > 0) {
+                // storeId가 있고, 가격과 수량이 정상적인 타입일 때만 계산
+                if (storeId != null && !storeId.isEmpty() && unitPriceObj instanceof BigDecimal && quantityObj instanceof Integer) {
+                    // ★★★ 로그 3: 조건문 통과 확인
                     log.info(">>>> [DEBUG] Condition PASSED for storeId: {}", storeId);
-                    BigDecimal salesAmount = unitPrice.multiply(new BigDecimal(quantity));
+                    BigDecimal salesAmount = ((BigDecimal) unitPriceObj).multiply(new BigDecimal((Integer) quantityObj));
                     salesByStore.put(storeId, salesByStore.getOrDefault(storeId, BigDecimal.ZERO).add(salesAmount));
                 } else {
-                    log.warn(">>>> [DEBUG] Condition FAILED for item. Check storeId, price type, or quantity type. Item: {}", item);
+                    // ★★★ 로그 4: 조건문 실패 원인 확인
+                    log.warn(">>>> [DEBUG] Condition FAILED for item. Check storeId, price type, or quantity type.");
                 }
             }
 
+            // ★★★ 로그 5: 최종 집계된 상점별 매출 확인
             log.info(">>>> [DEBUG] Final Sales By Store Map: {}", salesByStore);
             
+            // 2-3. 집계된 금액으로 각 상점의 총 판매 금액(tot_sel_amt)을 업데이트
             if (!salesByStore.isEmpty()) {
-                log.info("상점별 매출 누적 업데이트는 현재 비활성화 상태입니다.");
-                // 로직이 필요하다면 여기에 추가 (예: paymentMapper.updateTotalSalesAmount 호출)
+                log.info("상점별 매출 누적 업데이트 시작: {}", salesByStore);
+                for (Map.Entry<String, BigDecimal> entry : salesByStore.entrySet()) {
+                    // ★★★ 로그 6: 실제 DB 업데이트 직전 데이터 확인
+                    log.info(">>>> [DEBUG] Updating DB for Store ID: {}, Amount: {}", entry.getKey(), entry.getValue());
+                    paymentMapper.updateTotalSalesAmount(entry.getKey(), entry.getValue());
+                }
+                log.info("상점별 매출 누적 업데이트 완료.");
             } else {
                 log.warn(">>>> [DEBUG] salesByStore Map is empty. No updates will be made.");
             }
 
-            // ★★★ 수정된 부분 ★★★: getOrderDetailsByOrderId -> getOrderByOrdrNo 로 변경
-            PayOrderDTO orderDetails = paymentMapper.getOrderByOrdrNo(orderId);
+            // 2-4. 주문 및 결제 상태를 업데이트합니다.
+            PayOrderDTO orderDetails = paymentMapper.getOrderDetailsByOrderId(orderId);
             
-            Map<String, Object> orderStatusParams = Map.of("ordrNo", orderId, "ordrStatus", "PAID");
+            Map<String, Object> orderStatusParams = Map.of("ordrNo", orderId, "status", "PAID");
             paymentMapper.updateOrderStatus(orderStatusParams); 
 
-            Map<String, Object> paymentStatusUpdateParams = new HashMap<>();
-            paymentStatusUpdateParams.put("ordrNo", orderId);
-            paymentStatusUpdateParams.put("stlmSttsCd", "DONE");
-            paymentStatusUpdateParams.put("pgDlngId", paymentKey);
-            paymentMapper.updatePaymentStatusAndCompletionDate(paymentStatusUpdateParams);
+            Map<String, Object> paymentUpdateParams = Map.of("pgDlngId", paymentKey, "ordrNo", orderId, "stlmSttsCd", "DONE");
+            paymentMapper.updatePaymentStatusAndCompletionDate(paymentUpdateParams); 
 
             String paymentId = paymentMapper.getPaymentIdByPgDlngId(paymentKey);
             if(paymentId != null) {
                 PaymentHistoryDTO historyDTO = new PaymentHistoryDTO();
                 historyDTO.setStlmHstryId(paymentMapper.selectNextPaymentHistoryId());
                 historyDTO.setStlmId(paymentId);
-                historyDTO.setHstryCrtDt(LocalDateTime.now());
                 paymentMapper.insertPaymentHistory(historyDTO);
             }
 
+            // 2-5. 사용된 쿠폰 상태를 '사용됨'으로 업데이트합니다.
             if (orderDetails != null && orderDetails.getUserCpnId() != null && !orderDetails.getUserCpnId().isEmpty()) {
-                log.info("사용자 쿠폰 ({}) 상태 업데이트 시도.", orderDetails.getUserCpnId());
-                paymentMapper.updateUserCouponToUsed(orderDetails.getUserCpnId());
+                paymentMapper.updateUserCouponToUsed(orderDetails.getUserCpnId()); 
                 log.info("사용자 쿠폰 ({}) 상태가 '사용됨'으로 업데이트되었습니다.", orderDetails.getUserCpnId());
-            } else {
-                log.info("적용된 쿠폰이 없거나 userCpnId가 유효하지 않아 쿠폰 상태 업데이트를 건너뜜.");
             }
             
+            // 2-6. 장바구니에서 결제 완료된 상품을 삭제합니다.
             String userNo = (orderDetails != null) ? orderDetails.getUserNo() : null;
             if (userNo != null && !orderedItems.isEmpty()) {
-                // 장바구니 삭제 로직 (필요 시 주석 해제)
-                // log.info("결제 완료된 상품들을 장바구니에서 삭제합니다. 사용자: {}", userNo);
-                // paymentMapper.deletePurchasedItemsFromCart(...);
-            } else {
-                log.warn("장바구니 삭제를 위한 userNo 또는 orderedItems가 유효하지 않습니다.");
+                List<Map<String, Object>> itemsToDelete = new ArrayList<>();
+                for(Map<String, Object> item : orderedItems) {
+                    Map<String, Object> deleteInfo = new HashMap<>();
+                    deleteInfo.put("gdsNo", item.get("gds_no"));
+                    itemsToDelete.add(deleteInfo);
+                }
+                
+                Map<String, Object> deleteParams = new HashMap<>();
+                deleteParams.put("userNo", userNo);
+                deleteParams.put("items", itemsToDelete);
+
+                paymentMapper.deletePurchasedItemsFromCart(deleteParams);
+                log.info("결제 완료된 상품들을 장바구니에서 삭제했습니다. 사용자: {}", userNo);
             }
 
         } catch (Exception e) {
@@ -263,6 +266,7 @@ public class PaymentServiceImpl implements PaymentService {
             throw new RuntimeException("결제 승인 후 DB 처리 실패", e);
         }
 
+        // 3. 모든 처리가 성공하면 토스 API 응답을 컨트롤러로 반환합니다.
         return tossApiResponse;
     }
 
@@ -279,7 +283,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<Map<String, Object>> getOrderPaymentHistoryByUser(String userNo) {
         // 이 메소드가 필요하다면 PaymentMapper.xml에 getUserOrderPaymentHistory 쿼리를 정의해야 합니다.
-        return new ArrayList<>(); // 현재는 비어있는 리스트 반환
+        return paymentMapper.getUserOrderPaymentHistory(userNo); // 현재는 비어있는 리스트 반환
     }
 
     @Override

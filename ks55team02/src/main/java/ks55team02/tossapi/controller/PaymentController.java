@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import jakarta.servlet.http.HttpSession;
 import ks55team02.customer.login.domain.LoginUser;
 import ks55team02.tossapi.service.PaymentService;
-// ks55team02.customer.coupons.domain.UserCoupons 임포트가 이미 존재합니다.
 
 @Controller
 public class PaymentController {
