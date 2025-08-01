@@ -1,31 +1,51 @@
 <th:block th:fragment="AnswerFragment (inquiry, isEditMode, answerApiUrl)">
-    <div class="card answer-form-card mt-4" id="answerFormContainer">
-        <div class="card-header">
-            <h5 class="mb-0 card-title-text" th:text="${isEditMode ? '답변 수정' : '답변 작성'}"></h5>
+
+    <div id="answerDisplayMode">
+    <div class="card answer-card">
+
+        <!-- Header: "판매자 답변" 제목과 "수정" 버튼은 그대로 유지합니다. -->
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 card-title-text">판매자 답변</h5>
+            <button type="button" id="startEditBtn" class="btn btn-sm btn-outline-secondary">수정</button>
         </div>
+
+        <!-- Body: 이미지 상단 카드의 레이아웃을 여기에 적용합니다. -->
         <div class="card-body">
 
-            <form th:id="${isEditMode ? 'editAnswerForm' : 'newAnswerForm'}">
-                <input type="hidden" name="inqryId" th:value="${inquiry.inqryId}" />
-                <input type="hidden" name="ansId" th:value="${isEditMode ? inquiry.answer.ansId : ''}" />
+            <!-- Meta Info Line: 답변자, 답변시간, 수정시간을 한 줄에 표시합니다. -->
+            <div class="answer-meta-flex mb-3">
+                <span class="meta-item">
+                    <!-- 아이콘은 가독성을 위해 추가할 수 있습니다. <i class="bi bi-person-check"></i> -->
+                    <strong class="meta-label">답변자:</strong>
+                    <span th:if="${inquiryDetail.storeInfo != null}" th:text="${inquiryDetail.storeInfo.storeConm}">스토어 이름</span>
+                    <span th:if="${inquiryDetail.storeInfo == null}">관리자</span>
+                </span>
+                <span class="meta-item">
+                    <!-- <i class="bi bi-clock"></i> -->
+                    <strong class="meta-label">답변 시간:</strong>
+                    <span th:text="${#temporals.format(inquiryDetail.answer.ansTm, 'yyyy-MM-dd HH:mm')}"></span>
+                </span>
+                <span class="meta-item" th:if="${inquiryDetail.answer.lastMdfcnDt != null and !#temporals.format(inquiryDetail.answer.lastMdfcnDt, 'yyyyMMddHHmm').equals(#temporals.format(inquiryDetail.answer.ansTm, 'yyyyMMddHHmm'))}">
+                    <!-- <i class="bi bi-pencil"></i> -->
+                    <strong class="meta-label">수정 시간:</strong>
+                    <span th:text="${#temporals.format(inquiryDetail.answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></span>
+                </span>
+            </div>
 
-                <div class="form-group">
-                    <label for="answerContentInput" class="form-label">답변 내용</label>
-                    <textarea class="form-control" id="answerContentInput" name="ansCn" rows="6" required
-                        th:placeholder="${isEditMode ? '' : '답변을 입력해주세요.'}"
-                        th:text="${isEditMode ? inquiry.answer.ansCn : ''}"></textarea>
-                </div>
+            <!-- Separator -->
+            <hr>
 
-                <div id="ans-button" class="form-group d-flex justify-content-end mt-3 gap-2">
-                    <button type="button" id="submitAnswerBtn" class="btn btn-custom-positive"
-                            style="width: 90px; height:42px;">[[${isEditMode} ? '수정 완료' : '답변 제출']]</button>
-                    <button type="button" th:if="${isEditMode}" id="cancelEditBtn" class="btn btn-custom-neutral"
-                            style="width: 90px; height: 42px;">취소</button>
-                </div>
-            </form>
+            <!-- Answer Content -->
+            <div class="content-wrapper">
+                <p id="displayAnswerContent" class="card-text answer-content" 
+                   th:text="${inquiryDetail.answer.ansCn}" style="white-space: pre-wrap; min-height: 50px;">
+                    답변 내용이 여기에 표시됩니다.
+                </p>
+            </div>
 
         </div>
     </div>
+</div>
 
     <!-- 공통 스크립트 -->
     <script th:inline="javascript">
