@@ -1,30 +1,60 @@
-/* ⭐⭐ 여기에 style 태그 내용을 붙여넣습니다. ⭐⭐ */
+/* 푸터 컨테이너 기본 설정 */
+.footer {
+    background-color: #222;
+    font-size: 1.3rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    border-top: 2px solid #aaa;
+}
+
 .footer .footer-middle .container .row {
 	display: flex;
 	flex-wrap: nowrap;
 	flex-direction: row;
-	padding : 0 15px;
+	padding: 0 15px;
 	text-align: center;
 }
 
-.footer .footer-middle .container .row .col-lg-3 {
-	flex: 1;
-	padding-right: 0px;
-	padding-left: 0px;
+/* 푸터 헤더 영역 설정 */
+.footer-header {
+	display: flex;
+	gap: 40px;
+	padding-top: 50px;
+	padding-bottom: 50px;
 }
 
-@media ( max-width : 766px) {
-	.footer .footer-middle .container .row {
-		flex-wrap: wrap; /* 컬럼이 다음 줄로 래핑되도록 허용 */
-		/* 필요하다면 gap 등 조절 */
-	}
-	.footer .footer-middle .container .row .col-sm-6,
-		/* HTML에 있는 col-sm-6 클래스도 함께 타겟팅 */ .footer .footer-middle .container .row .col-lg-3
-		{
-		flex: none; /* flex: 1 속성을 재정의하여 컬럼이 늘어나지 않게 합니다 */
-		width: calc(100%/ 3); /* 각 컬럼이 한 줄 너비의 1/3을 차지하도록 설정 */
-		max-width: calc(100%/ 3); /* 너비가 1/3을 초과하지 않도록 제한 */
-		/* 필요하다면 부트스트랩의 gutter(간격)을 모방하기 위해 패딩을 추가할 수 있습니다.
-           예: padding: 0 15px; box-sizing: border-box; */
-	}
+/* 메인 위젯 영역 */
+.widget-lookon {
+	width: 100%;
 }
+
+/* LookOn 로고 스타일 */
+.lookon-brand-logo {
+	font-weight: 700;
+	font-size: 40px;
+	line-height: 38px;
+}
+
+.lookon-brand-logo-footer {
+	display: block; /* 블록 요소로 변경하여 한 줄을 차지하게 함 */
+	font-weight: 700;
+	font-size: 40px;
+	line-height: 38px;
+	margin-bottom: 30px;
+}
+
+/* 마지막 저작권 표시 p 태그의 간격 */
+.lookon-copy {
+	white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+/* 모든 p 태그에 공통으로 적용되는 스타일 */
+.widget-lookon p {
+	white-space: nowrap; /* 줄바꿈 방지 */
+	margin: 0; /* 기본 마진 제거 */
+	line-height: 1.5;
+	font-size: 14px; /* 글씨 크기 */
+	color: #ccc; /* 텍스트 색상 */
+	padding-bottom: 5px; /* 각 문단 아래 간격 */
+}
+

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="sale-products-section" th:fragment="saleProductsSliderFragment">
+    <div class="weekly-best-container container">
+        <div class="weekly-best-heading">
+            <h2 class="weekly-best-title">놓치기 아까운 특가 상품</h2>
+            <div class="weekly-best-more-link">
+                <a th:href="@{/customer/products/list(sortBy='discountDesc', discountRate='30')}" class="btn btn-outline-dark-2">
+                    <span>더보기</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="sale-products-slider-container">
+            <div class="sale-products-swiper swiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" th:each="product : ${saleProductList}">
+                        <div th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-prev sale-products-button-prev"></div>
+            <div class="swiper-button-next sale-products-button-next"></div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(saleProductList)}" class="col-12 text-center mt-4">
+            <p>현재 특가 상품이 없습니다.</p>
+        </div>
+    </div>
+</div>
+</html>

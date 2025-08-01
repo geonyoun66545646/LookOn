@@ -93,8 +93,47 @@ public class CustomerProductController {
 	}
 
 	@GetMapping(value = { "/customer", "/customer/" })
-	public String customerHomeView() {
-		return "/customer/main";
+	@SuppressWarnings("unchecked")
+	public String customerHomeView(Model model) {
+	    
+	    // 1. 메인 상단 슬라이더 상품 (랜덤 신상품) 로직
+	    Map<String, Object> mainSliderFilterParams = new HashMap<>();
+	    mainSliderFilterParams.put("pageSize", 4); // 보여줄 상품 수
+	    Map<String, Object> mainSliderProductsResult = productSearchService.getFilteredAndSortedProducts(
+	        null,
+	        "newRandom", // 랜덤 정렬 기준
+	        mainSliderFilterParams,
+	        1
+	    );
+	    List<Products> mainSlideProducts = (List<Products>) mainSliderProductsResult.get("productsList");
+	    model.addAttribute("mainSlideProducts", mainSlideProducts);
+
+	    // 2. '이번달 신상' 슬라이더 상품 (랜덤 신상품) 로직
+	    // ⭐ 이 부분이 getWeeklyBestProducts 대신 getFilteredAndSortedProducts를 사용해야 합니다.
+	    Map<String, Object> newProductsFilterParams = new HashMap<>();
+	    newProductsFilterParams.put("pageSize", 8); // 보여줄 상품 수
+	    Map<String, Object> newProductsResult = productSearchService.getFilteredAndSortedProducts(
+	        null,
+	        "newRandom", // 랜덤 정렬 기준
+	        newProductsFilterParams,
+	        1
+	    );
+	    List<Products> weeklyBestProducts = (List<Products>) newProductsResult.get("productsList");
+	    model.addAttribute("weeklyBestProducts", weeklyBestProducts);
+	    
+	    // 3. '놓치기 아까운 특가 상품' 슬라이더 (할인율 정렬) 로직
+	    Map<String, Object> saleProductsFilterParams = new HashMap<>();
+	    saleProductsFilterParams.put("pageSize", 8); // 보여줄 상품 수
+	    Map<String, Object> saleProductsResult = productSearchService.getFilteredAndSortedProducts(
+	        null,
+	        "discountDesc", // 할인율 높은 순으로 정렬
+	        saleProductsFilterParams,
+	        1
+	    );
+	    List<Products> saleProductList = (List<Products>) saleProductsResult.get("productsList");
+	    model.addAttribute("saleProductList", saleProductList);
+
+	    return "/customer/main";
 	}
 
 	@GetMapping("/customer/products")
@@ -238,11 +277,37 @@ public class CustomerProductController {
 				model.addAttribute("subCategories", productCategoryService.getAllTopLevelCategories());
 			}
 		}
-
+		
+		// ⭐⭐⭐ 이 부분을 수정하세요 ⭐⭐⭐
+	    // 신상 상품 목록을 가져오는 로직 (기존 메소드 재활용)
+	    Map<String, Object> newProductsResult = productSearchService.getFilteredAndSortedProducts(
+	        null, // categoryId (null이면 모든 카테고리)
+	        "newRandom", // ⭐ 여기가 'new'에서 'newRandom'으로 변경됩니다.
+	        new HashMap<>(), // 필터 파라미터는 비워둡니다
+	        1 // currentPage
+	    );
+	    List<Products> newProductsList = (List<Products>) newProductsResult.get("productsList");
+	    model.addAttribute("newProductsList", newProductsList);
+	    // ⭐⭐⭐ 여기까지 수정 ⭐⭐⭐
+	    
+	    // ⭐⭐⭐ 이 부분을 추가하세요 ⭐⭐⭐
+	    // 특가 상품 목록을 가져오는 로직 (메인 페이지와 동일)
+	    Map<String, Object> saleProductsResult = productSearchService.getFilteredAndSortedProducts(
+	        null, // categoryId (null이면 모든 카테고리)
+	        "discountDesc", // sortBy 파라미터를 'discountDesc'로 설정
+	        new HashMap<>(), // 필터 파라미터는 비워둡니다
+	        1 // currentPage
+	    );
+	    List<Products> saleProductList = (List<Products>) saleProductsResult.get("productsList");
+	    model.addAttribute("saleProductList", saleProductList);
+	    // ⭐⭐⭐ 여기까지 추가 ⭐⭐⭐
+		
 		Map<String, Object> productsResult = productSearchService.getFilteredAndSortedProducts(categoryId, sortBy,
 				filterParams, currentPage);
 		List<Products> productList = (List<Products>) productsResult.get("productsList");
-
+		
+		
+		
 		long totalProductCount = (long) productsResult.get("totalProductsCount");
 		int lastPage = (int) productsResult.get("lastPage");
 
