@@ -1,9 +1,11 @@
 package ks55team02.tossapi.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.repository.query.Param;
 
 import ks55team02.customer.coupons.domain.UserCoupons;
 import ks55team02.tossapi.domain.PayOrderDTO;
@@ -32,6 +34,11 @@ public interface PaymentMapper {
     String findLatestOrderIdByUserNo(String userNo);
     String getPaymentIdByPgDlngId(String paymentKey);
     
+    // 사용자 ID로 주문 및 결제 내역 조회
+    List<Map<String, Object>> getUserOrderPaymentHistory(String userNo);
+    
+    PayOrderDTO getOrderDetailsByOrderId(String orderId); 
+    
     /**
      * 주문 번호로 주문 상세 정보를 조회합니다. (이전 오류 수정)
      * @param orderId 조회할 주문 번호
@@ -44,13 +51,12 @@ public interface PaymentMapper {
     int updatePaymentStatusAndCompletionDate(Map<String, Object> params);
     int updateUserCouponToUsed(String userCpnId);
     int updateUserInfoShippingAddress(Map<String, Object> shippingAddressData);
-
-    // 장바구니 삭제 (필요 시 주석 해제)
-    // void deletePurchasedItemsFromCart(Map<String, Object> deleteParams);
-
-    // 매출 집계 (필요 시 주석 해제)
-    // int updateTotalSalesAmount(Map<String, Object> updateSalesParams);
+    /**
+     * 상점별 매출 금액을 누적 업데이트합니다.
+     * @param storeId 상점 ID
+     * @param salesAmount 추가할 매출 금액
+     */
+    void updateTotalSalesAmount(@Param("storeId") String storeId, @Param("salesAmount") BigDecimal salesAmount);
     
-    // 이력 조회 (필요 시 주석 해제)
-    // List<Map<String, Object>> getUserOrderPaymentHistory(String userNo);
+    void deletePurchasedItemsFromCart(Map<String, Object> params);
 }
