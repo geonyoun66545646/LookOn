@@ -69,13 +69,7 @@
 					</div>
 				</div>
 
-				<div id="my-coupon-filter-group" class="member-coupon__filter-group"
-					style="display: none;">
-					<button type="button" class="filter-btn active" data-used="false">사용
-						가능</button>
-					<button type="button" class="filter-btn" data-used="true">사용
-						완료</button>
-				</div>
+				
 
 				<div class="coupon-list-container">
 					<ul id="coupon-list-container" class="coupon-list">
@@ -135,7 +129,7 @@
             keyword: '',
             sortOrder: 'expiry', 
             page: 1,
-            isUsed: false
+          
         };
 
         const tabContainer = document.getElementById('couponTabs');
@@ -152,7 +146,6 @@
         const totalCountEl = document.getElementById('coupon-total-count');
         const myCouponsCountEl = document.getElementById('my-coupons-count');
         const availableCouponsCountEl = document.getElementById('available-coupons-count');
-        const myCouponFilterGroup = document.getElementById('my-coupon-filter-group'); 
 
         // ===================================================================
         // 2. 핵심 로직 함수 (데이터 로딩 및 화면 그리기)
@@ -170,7 +163,7 @@
             });
             
             if (isMyCouponsTab) {
-                params.append('isUsed', currentState.isUsed);
+                params.append('isUsed', 'false');
             }
 
             couponListContainer.innerHTML = '<li><p class="text-center p-5">로딩 중...</p></li>';
@@ -235,7 +228,7 @@
 
         function renderMyCoupons(container, coupons) {
             if (!coupons || coupons.length === 0) {
-                const message = currentState.isUsed ? '사용한 쿠폰이 없습니다.' : '사용 가능한 쿠폰이 없습니다.';
+                const message = '사용 가능한 쿠폰이 없습니다.';
                 container.innerHTML = `<li><p class="text-center p-5">${message}</p></li>`;
                 return;
             }
@@ -296,19 +289,9 @@
             const isMyCoupons = clickedTab.id === 'my-coupons-tab';
             currentState.tab = isMyCoupons ? 'my' : 'available';
             currentState.page = 1;
-            myCouponFilterGroup.style.display = isMyCoupons ? 'flex' : 'none';
             loadCoupons();
         });
         
-        myCouponFilterGroup.addEventListener('click', function(event) {
-            const clickedBtn = event.target.closest('.filter-btn');
-            if (!clickedBtn || clickedBtn.classList.contains('active')) return;
-            myCouponFilterGroup.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            clickedBtn.classList.add('active');
-            currentState.isUsed = (clickedBtn.dataset.used === 'true');
-            currentState.page = 1;
-            loadCoupons();
-        });
 
         searchBtn.addEventListener('click', () => {
             currentState.keyword = searchInput.value;
@@ -412,7 +395,7 @@
 
         // ⭐ 추가: '보유 쿠폰' 개수를 업데이트하는 함수
         function loadMyCouponsCount() {
-            fetch('/customer/api/coupons/my?page=1')
+            fetch('/customer/api/coupons/my?page=1&isUsed=false')
                 .then(res => res.ok ? res.json() : Promise.reject())
                 .then(pageData => { myCouponsCountEl.textContent = `(${pageData.totalCount})` })
                 .catch(error => console.error('보유 쿠폰 개수 조회 오류:', error));
@@ -420,7 +403,7 @@
 
         // ⭐ 추가: '발급 가능' 쿠폰 개수를 업데이트하는 함수
         function loadAvailableCouponsCount() {
-            fetch('/customer/api/coupons/available?page=1')
+            fetch('/customer/api/coupons/available?page=1&isUsed=false')
                 .then(res => res.ok ? res.json() : Promise.reject())
                 .then(pageData => { availableCouponsCountEl.textContent = `(${pageData.totalCount})` })
                 .catch(error => console.error('발급 가능 쿠폰 개수 조회 오류:', error));
@@ -431,16 +414,12 @@
         // 4. 최초 데이터 로딩
         // ===================================================================
         // ⭐ 1-2. 초기 로드 시 '쿠폰 받기' 탭을 활성화합니다.
-        const myCouponsTabEl = document.getElementById('my-coupons-tab');
         const availableCouponsTabEl = document.getElementById('available-coupons-tab');
         
-        // 안전하게 기존 active 클래스 제거 (혹시 모를 잔존 방지)
-        if (myCouponsTabEl) myCouponsTabEl.classList.remove('is-active');
         // '쿠폰 받기' 탭에 active 클래스 추가
         if (availableCouponsTabEl) availableCouponsTabEl.classList.add('is-active');
 
-        // ⭐ '사용 가능/사용 완료' 필터 그룹 초기 숨김
-        myCouponFilterGroup.style.display = 'none'; 
+        
         
         // ⭐ 페이지 로드 시, hidden select의 초기값에 따라 커스텀 버튼 텍스트와 active 상태 설정
         const initialSelectedOption = sortOrderSelect.options[sortOrderSelect.selectedIndex];
