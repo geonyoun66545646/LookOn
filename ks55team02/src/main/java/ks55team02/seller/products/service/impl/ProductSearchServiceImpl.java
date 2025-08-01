@@ -12,7 +12,9 @@ import ks55team02.seller.products.domain.Products;
 import ks55team02.seller.products.mapper.ProductSearchMapper;
 import ks55team02.seller.products.service.ProductSearchService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductSearchServiceImpl implements ProductSearchService {
@@ -85,6 +87,7 @@ public class ProductSearchServiceImpl implements ProductSearchService {
 
     @Override
     public Map<String, Object> getFilteredAndSortedProducts(String categoryId, String sortBy, Map<String, Object> filterParams, int currentPage) {
+    	log.info(">>>> 전달받은 sortBy 값: {}", sortBy); // ⭐ 이 줄을 추가합니다.
         // ⭐⭐ 핵심 수정: filterParams를 그대로 복사하여 모든 필터 조건을 유지합니다. ⭐⭐
         Map<String, Object> paramMap = new HashMap<>(filterParams);
         
