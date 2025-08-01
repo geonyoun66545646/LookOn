@@ -61,10 +61,9 @@
 									style="max-width: 150px;">
 									<option value="all" selected>전체</option>
 									<option value="cpnNm">쿠폰명</option>
-									<option value="userCpnId">쿠폰 ID</option>
 									<option value="userNm">사용자명</option>
 								</select> <input type="text" class="form-control" name="keyword" value=""
-									placeholder="쿠폰명, 쿠폰 ID, 이름">
+									placeholder="쿠폰명, 사용자명">
 							</div>
 						</div>
 
@@ -91,8 +90,6 @@
 				<table class="table table-hover text-center">
 					<thead class="thead-light">
 						<tr>
-							<th>쿠폰 ID</th>
-							<th>사용자 번호</th>
 							<th>사용자명</th>
 							<th>쿠폰명</th>
 							<th>발급일</th>
@@ -153,7 +150,8 @@
         tableBody.innerHTML = ''; 
 
         if (!userCouponsList || userCouponsList.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-5">조회된 회원 쿠폰 정보가 없습니다.</td></tr>`;
+            // [수정] colspan을 8에서 6으로 변경합니다.
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center py-5">조회된 회원 쿠폰 정보가 없습니다.</td></tr>`;
             return;
         }
 
@@ -162,10 +160,9 @@
                 ? '<span class="badge bg-secondary">사용</span>'
                 : '<span class="badge bg-success">미사용</span>';
 
+            // [수정] userCpnId와 userNo를 그리는 <td>를 제거합니다.
             const row = `
                 <tr>
-                    <td>${uc.userCpnId || ''}</td>
-                    <td>${uc.userNo || ''}</td>               
                     <td>${uc.userNm || ''}</td>
                     <td>${uc.cpnNm || ''}</td>
                     <td>${formatDate(uc.cpnGiveDt)}</td>
