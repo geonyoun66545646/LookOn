@@ -48,7 +48,8 @@ public class InterceptorConfig implements WebMvcConfigurer{
     			.excludePathPatterns("/js/**")
     			.excludePathPatterns("/attachment/**")
     			.excludePathPatterns("/maincss/**")
-    			.excludePathPatterns("/uploads/**");
+    			.excludePathPatterns("/uploads/**")
+    			.excludePathPatterns("/seller/login"); 
     	
     	if (interceptorsEnabled) {
     	
@@ -71,31 +72,29 @@ public class InterceptorConfig implements WebMvcConfigurer{
                 .excludePathPatterns(
                 		// --- 기본 페이지 및 로그인/아웃 ---
                         "/login", "/logout",
-
+                        
                         // --- 모든 리소스 폴더 ---
                         "/admincss/assets/**", 
                         "/maincss/assets/**", 
                         "/js/**", 
+                        "/git", 
                         "/favicons/**",
                         "/attachment/**",
 
                         // --- 인터셉터가 관여하지 않을 페이지 영역 ---
                         "/adminpage/**", // 관리자 페이지 영역
                         "/admin/**",
+                        "/api/**", // 25-07-31 염가은 추가
                         "/seller/products/preview/**",
-/*<<<<<<< HEAD
-                        "/seller/**"     // 판매자 페이지 영역
-=======*/
                         "/products/categories/primary", // 메인 카테고리 API
                         "/products/categories/sub/**" 
-                        
-				/* >>>>>>> refs/heads/develop */
                 );
         // [신규] 3순위: 판매자 페이지 접근 제어 인터셉터
         registry.addInterceptor(sellerCheckInterceptor)
                 .order(3) // 다른 인터셉터와 겹치지 않는 순서로 설정
                 .addPathPatterns("/seller/**") // '/seller/'로 시작하는 모든 경로에 적용
                 .excludePathPatterns(
+                		"/seller/**",
                 		"/seller/admincss/**",
                         "/seller/maincss/**",
                         "/js/**", // <--- 이것도 추가!

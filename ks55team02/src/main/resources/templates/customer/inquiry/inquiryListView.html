@@ -54,7 +54,13 @@
                                     </td>
                                     <td th:text="${l.writerInfo?.userNcnm}"></td>
                                     <td th:text="${l.inqryTypeCd}"></td>
-                                    <td th:text="${l.prcsStts}"></td>
+                                    <td>
+						                <th:block th:switch="${l.prcsStts}">
+						                    <span th:case="'RECEPTION'" class="reception">접수</span>
+						                    <span th:case="'COMPLETED'" class="completed">답변 완료</span>
+						                    <span th:case="*" th:text="${l.prcsStts}"></span>
+						                </th:block>
+						            </td>
                                     <td th:text="${#temporals.format(l.regYmd, 'yyyy-MM-dd')}" th:if="${l.regYmd != null}"></td>
                                 </tr>
                             </tbody>

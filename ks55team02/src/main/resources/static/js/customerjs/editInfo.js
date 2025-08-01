@@ -40,6 +40,7 @@
         // --- 탭 2: 프로필 관리 관련 이벤트 ---
         $('#profile-update-form').on('submit', updateProfileInfo);
         
+		/*
         $('#userNickname').on('blur', function() {
             const nickname = $(this).val();
             const $errorElement = $('#nicknameError');
@@ -71,6 +72,7 @@
                 $errorElement.text('닉네임 확인 중 오류가 발생했습니다.').show();
             });
         });
+		*/
 
         $('#profileImageInput').on('change', function(e) {
             const file = e.target.files[0];
@@ -223,32 +225,73 @@
     /**
      * [탭 2] '저장하기' 버튼 클릭 시, 프로필 정보(닉네임, 자기소개, 이미지)를 서버에 전송합니다.
      */
-    function updateProfileInfo(e) {
-        e.preventDefault();
+	function updateProfileInfo(e) {
+        e.preventDefault(); // 폼 기본 제출 동작 방지
 
-        const formData = new FormData();
-        formData.append('userNcnm', $('#userNickname').val());
-        formData.append('selfIntroCn', $('#userSelfIntro').val());
-        const imageFile = $('#profileImageInput')[0].files[0];
-        if (imageFile) {
-            formData.append('profileImageFile', imageFile);
-        }
+	        const nickname = $('#userNickname').val();
+	        const $nicknameErrorElement = $('#nicknameError');
+	        const nicknameRegex = /^[a-zA-Z0-9가-힣]{2,15}$/;
+	
+	        // 1. 닉네임이 비어있는지 확인
+	        if (nickname === '') {
+	            $nicknameErrorElement.text('닉네임을 입력해주세요.').css('color', 'red').show();
+	            return; // 유효성 검사 실패 시 함수 종료
+	        }
+	
+	        // 2. 닉네임 정규식 유효성 검사
+	        if (!nicknameRegex.test(nickname)) {
+	            $nicknameErrorElement.text('닉네임은 2~15자리의 한글, 영문, 숫자만 사용 가능합니다.').css('color', 'red').show();
+	            return; // 유효성 검사 실패 시 함수 종료
+	        }
+	
+	        // 3. 닉네임 중복 확인 (AJAX 호출)
+	        $.ajax({
+	            type: 'GET',
+	            url: '/api/v1/mypage/profile/check-nickname',
+	            data: { 'userNcnm': nickname }
+	        })
+	        .done(function(response) {
+	            if (response.isAvailable) { // 서버에서 닉네임이 '사용 가능'하다고 응답한 경우
+	                $nicknameErrorElement.text('사용 가능한 닉네임입니다.').css('color', 'green').show();
+	                // 닉네임 유효성 및 중복 확인 통과 후, 실제 프로필 저장 API 호출
+	                submitProfileUpdateForm();
+	            } else { // 서버에서 닉네임이 '이미 사용 중'이라고 응답한 경우
+	                $nicknameErrorElement.text('이미 사용 중인 닉네임입니다.').css('color', 'red').show();
+	            }
+	        })
+	        .fail(function(error) {
+	            console.error("닉네임 중복 확인 중 에러 발생:", error);
+	            $nicknameErrorElement.text('닉네임 확인 중 오류가 발생했습니다.').css('color', 'red').show();
+	        });
+	    }
+		
+		/**
+	     * 닉네임 유효성 검사 통과 후 실제 프로필 업데이트를 수행하는 내부 함수
+	     */
+	    function submitProfileUpdateForm() {
+	        const formData = new FormData();
+	        formData.append('userNcnm', $('#userNickname').val());
+	        formData.append('selfIntroCn', $('#userSelfIntro').val());
+	        const imageFile = $('#profileImageInput')[0].files[0];
+	        if (imageFile) {
+	            formData.append('profileImageFile', imageFile);
+	        }
 
-        $.ajax({
-            type: 'PUT',
-            url: '/api/v1/mypage/profile',
-            data: formData,
-            processData: false,
-            contentType: false
-        })
-        .done(function(response) {
-            alert(response.message);
-            loadMyInfo();
-        })
-        .fail(function(xhr) {
-            alert('오류: ' + (xhr.responseJSON?.message || '프로필 저장에 실패했습니다.'));
-        });
-    }
+	        $.ajax({
+	            type: 'PUT',
+	            url: '/api/v1/mypage/profile',
+	            data: formData,
+	            processData: false, // FormData 사용 시 필수
+	            contentType: false  // FormData 사용 시 필수
+	        })
+	        .done(function(response) {
+	            alert(response.message);
+	            loadMyInfo(); // 정보 업데이트 후 다시 불러오기
+	        })
+	        .fail(function(xhr) {
+	            alert('오류: ' + (xhr.responseJSON?.message || '프로필 저장에 실패했습니다.'));
+	        });
+	    }
 
     /**
      * [탭 3] '변경사항 저장' 버튼 클릭 시, 비밀번호 변경 정보를 서버에 전송합니다.

@@ -37,23 +37,29 @@ $(document).ready(function() {
             },
             dataType: 'json'
         })
-        .done(function(response) {
-            if (replace) {
-                $('#feed-list-grid-container').empty();
-            }
-            
-            if (response.feedList && response.feedList.length > 0) {
-                renderFeeds(response.feedList);
-                hasNext = response.hasNext;
-            } else {
-                hasNext = false;
-                if (replace) {
-                    const message = activeTab === 'following' ? '<p>팔로우하는 사용자의 피드가 없습니다.</p>' : '<p>등록된 피드가 없습니다.</p>';
-                    $('#feed-list-grid-container').html(`<div class="no-feeds">${message}</div>`);
-                }
-            }
-            currentPage = page;
-        })
+		.done(function(response) {
+		    // [추가] 총 피드 개수 업데이트
+		    if (response.totalCount !== undefined) {
+		        const formattedCount = response.totalCount.toLocaleString('en-US');
+		        $('.content-count').text(`총 ${formattedCount}개`);
+		    }
+
+		    if (replace) {
+		        $('#feed-list-grid-container').empty();
+		    }
+		    
+		    if (response.feedList && response.feedList.length > 0) {
+		        renderFeeds(response.feedList);
+		        hasNext = response.hasNext;
+		    } else {
+		        hasNext = false;
+		        if (replace) {
+		            const message = activeTab === 'following' ? '<p>팔로우하는 사용자의 피드가 없습니다.</p>' : '<p>등록된 피드가 없습니다.</p>';
+		            $('#feed-list-grid-container').html(`<div class="no-feeds">${message}</div>`);
+		        }
+		    }
+		    currentPage = page;
+		})
         .fail(function(xhr) {
             console.error("피드를 불러오는데 실패했습니다.", xhr.responseText);
             hasNext = false; // 실패 시 더 이상 시도하지 않도록 설정

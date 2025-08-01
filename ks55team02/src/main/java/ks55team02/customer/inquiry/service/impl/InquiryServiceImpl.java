@@ -122,11 +122,11 @@ public class InquiryServiceImpl implements InquiryService {
         inquiry.setWrtrId(currentUserId);
 
         // 기본값 설정 (컨트롤러에서 설정되지 않은 경우)
-        if (inquiry.getPrcsStts() == null || inquiry.getPrcsStts().isEmpty()) {
-            inquiry.setPrcsStts("접수"); // 기본 처리 상태: 접수
-        }
-        if (inquiry.getRegYmd() == null) {
-            inquiry.setRegYmd(LocalDateTime.now(ZoneId.of("Asia/Seoul"))); // 불필요한 공백 제거
+        inquiry.setPrcsStts("RECEPTION");
+        inquiry.setRegYmd(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+        
+        if (inquiry.getInqryStoreId() != null && inquiry.getInqryStoreId().isEmpty()) {
+            inquiry.setInqryStoreId(null);
         }
         // prvtYn은 HTML 폼에서 체크박스 미체크 시 false로 넘어오므로 별도 처리 필요 없음 (Boolean 타입)
 

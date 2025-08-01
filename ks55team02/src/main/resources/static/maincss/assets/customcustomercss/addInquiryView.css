@@ -1,174 +1,355 @@
-/* inquiryRegistraionView.css */
+/* 1. inquiry-card 내부의 모든 텍스트에 기본 스타일 적용 */
+.inquiry-card {
+    /* 이 컨테이너를 기준으로 모든 자식 요소에 기본 폰트 스타일이 상속됩니다. */
+    font-size: 1.2rem;
+    font-weight: 400;
+}
 
-/* 기본 폰트 설정 (Google Fonts 'Noto Sans KR' 적용) */
+/* Bootstrap이나 Select2가 자체적으로 폰트 크기를 지정하는 경우가 있어,
+   중요 요소들의 폰트 크기를 명시적으로 다시 설정하여 통일성을 유지합니다.
+*/
+.inquiry-card .form-control,
+.inquiry-card .form-select,
+.inquiry-card .btn,
+.inquiry-card .select2-selection__rendered, /* Select2에서 선택된 항목 */
+.inquiry-card .select2-results__option,    /* Select2 드롭다운의 옵션 */
+.inquiry-card .form-check-label {
+    font-size: 1.2rem; /* 기본 폰트 크기와 동일하게 맞춤 */
+}
+
+
+/* 2. 제목(h 태그)에는 굵은 폰트(600) 적용 */
+.inquiry-card h1,
+.inquiry-card h2,
+.inquiry-card h3,
+.inquiry-card h4,
+.inquiry-card h5,
+.inquiry-card h6 {
+    font-weight: 600 !important; /* 기본 400을 덮어쓰기 위해 !important를 사용합니다. */
+}
+
+/* --- 1. 기본 및 페이지 레이아웃 --- */
 body {
+    background-color: #f8f9fa; /* 배경색을 약간 부드럽게 */
     font-family: 'Noto Sans KR', sans-serif;
 }
 
-/* 테이블 전체 스타일 - 열 너비 고정을 위해 추가 */
-.table-bordered {
-    table-layout: fixed; /* 열 너비를 고정하여 찌그러짐 방지 */
-    width: 100%; /* 테이블 전체 너비를 부모 요소에 맞춤 */
-    border-collapse: collapse; /* 셀 경계를 합쳐서 보더 제거 효과를 더 명확히 함 */
+.inquiry-card-wrapper {
+    max-width: 800px; /* 최대 너비 조정 */
+    margin: 3rem auto;
 }
 
-/* 각 행의 첫 번째 열 (<th>) 스타일 */
-/* 기본적으로 여기에 음영이 정의되어 있습니다. */
-.table-bordered tbody th {
-    text-align: center;      /* 가운데 정렬 */
-    font-size: 1.2em;        /* 기존보다 1.2배 크게 */
-    font-weight: 700;        /* Noto Sans KR 폰트의 Bold (700) 굵기 */
-    vertical-align: middle;  /* 세로 가운데 정렬 */
-    background-color: #f8f9fa; /* 기본 배경색 (음영 적용) */
-    color: #343a40;          /* 글자색 조정 (선택 사항) */
-    width: 180px;            /* 너비 조정: 180px 유지. 필요에 따라 더 늘리세요. */
-    border: 1px solid #dee2e6; /* 기본 보더 유지 */
+.inquiry-card {
+    padding: 2.5rem 3rem;
+    border: none; /* 테두리 제거 */
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.07); /* 부드러운 그림자 효과 */
+    background-color: #fff;
 }
 
-/* no-shade 클래스가 적용된 th의 배경색 및 좌우 보더 제거 */
-/* **"첨부파일" th에 음영을 주려면 이 클래스가 HTML에서 제거되어야 합니다.** */
-.table-bordered tbody th.no-shade {
-    background-color: transparent; /* 배경색 투명하게 설정 */
-    border-left: none; /* 왼쪽 보더 제거 */
-    border-right: none; /* 오른쪽 보더 제거 */
+.form-title { font-weight: 700; text-align: center; margin-bottom: 0.5rem; color: #212529; }
+.form-subtitle { text-align: center; color: #6c757d; margin-bottom: 3rem; }
+
+/* [수정] .form-floating을 대체하는 일반 라벨 스타일 */
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block; /* 라벨이 한 줄을 차지하도록 */
 }
 
-/* 오른쪽 열의 셀 내용 (<td>)에 대한 스타일 */
-.table-bordered tbody td {
-    text-align: center;      /* 셀 내부 텍스트 및 인라인/인라인-블록 요소 가운데 정렬 */
-    font-size: 1.1em;        /* 글자 크기를 기본보다 1.1배 크게 */
-    font-weight: bold;       /* 글자를 두껍게 */
-    vertical-align: middle;  /* 세로 가운데 정렬 */
-    word-break: break-word; /* 긴 텍스트가 셀을 넘치지 않도록 단어 단위로 줄바꿈 */
-    border: 1px solid #dee2e6; /* 기본 보더 유지 */
-}
-
-/* 입력 필드 (select, input[type="text"], textarea, input[type="file"]) 너비 조정 및 가운데 정렬 */
-.table-bordered tbody td .form-control {
-    width: 95%;              /* 부모 td 요소 너비의 95%로 설정 */
-    margin-left: auto;       /* 가운데 정렬 */
-    margin-right: auto;
-    display: block;          /* margin: auto를 적용하려면 블록 요소여야 함 */
-}
-
-/* --- 비밀글 체크박스 그룹 스타일 --- */
-/* 비밀글 체크박스가 포함된 td의 마지막 셀 */
-.inquiry-row > td:last-child {
-    text-align: center !important;
-    vertical-align: middle !important;
-    border-left: none !important; /* 왼쪽 테두리 제거 */
-}
-
-/* custom-control 클래스가 붙은 비밀글 체크박스 div */
-.custom-control {
-    margin-left: auto !important;
-    margin-right: auto !important;
-    width: fit-content !important;
-    display: flex !important;
-    align-items: center !important;
-    white-space: nowrap;
-    justify-content: center !important;
-}
-
-/* --- 문의 유형 셀 스타일 --- */
-.inquiry-row .type-column {
-    text-align: left;
-    padding-left: 15px;
-    border-right: none;
-}
-
-/* --- 첨부파일 셀 스타일 --- */
-.file-column {
-    text-align: left !important;
-    padding-left: 20px !important;
-    border-left: none; /* 첨부파일 셀의 왼쪽 보더 제거 */
-    background-color: transparent; /* **음영 제거 유지** */
-}
-
-.inquiry-row .file-column .form-control-file {
-    width: auto;
-    margin-left: 0;
-    margin-right: 0;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.inquiry-row .file-column .form-text {
-    display: block;
-    margin-top: 5px;
-    text-align: left;
-    font-weight: normal;
-}
-
-/* --- 제목 행의 스타일 --- */
-.title-row .title-input-group {
+/* --- 2. Select2 커스텀 스타일 --- */
+.select2-container--bootstrap-5 .select2-selection {
+    min-height: 58px; /* Floating Label과 높이 맞춤 */
+    padding: 0.75rem 1rem;
+    border-radius: 8px !important;
+    border: 1px solid #ced4da;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    width: 95%;
-    margin: 0 auto;
 }
 
-.title-row .title-input-group .form-control {
-    flex-grow: 1;
-    margin: 0;
+/* 선택된 항목 텍스트 */
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    line-height: 1.5;
+    color: #212529;
 }
 
-/* colspan이 적용된 td는 기본적으로 왼쪽 정렬로 조정하여 콘텐츠가 왼쪽에서 시작하도록 */
-.table-bordered tbody tr td[colspan] {
-    text-align: left;
+/* 플레이스홀더 텍스트 */
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered[title] {
+    color: #6c757d;
 }
 
-.table-bordered tbody tr td[colspan] .form-control {
-    margin-left: auto;
-    margin-right: auto;
-    width: 95%;
+/* 드롭다운 화살표 */
+.select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    height: 56px;
 }
 
-/* --- 미리보기 삭제 버튼 및 레이아웃 관련 스타일 --- */
-
-/* 삭제 버튼 스타일 */
-.btn-extra-small {
-    padding: 1rem 1rem !important;
-    font-size: 0.65rem !important;
-    line-height: 1 !important;
-    border-radius: 0.2rem;
-    width: auto !important;
-    min-width: unset !important;
+/* 드롭다운 메뉴 스타일 */
+.select2-dropdown {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+    border-radius: 6px;
 }
 
-/* 파일 미리보기 레이아웃 고정 및 파일명 길이 제한 */
+/* --- 3. 커스텀 체크박스 스타일 --- */
+/* 기존 CSS가 좋으므로 그대로 사용하거나 약간만 조정합니다. */
+.form-check-custom {
+    display: flex;
+    align-items: center;
+    padding-left: 0;
+    margin-top: 0.5rem; /* 위쪽 여백 추가 */
+}
+
+.form-check-custom .form-check-input {
+    width: 1.5em; /* 크기 살짝 키움 */
+    height: 1.5em;
+    margin-top: 0;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+    border: 1px solid #adb5bd;
+    cursor: pointer;
+}
+
+.form-check-custom .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.form-check-custom .form-check-label {
+    cursor: pointer;
+    color: #495057;
+}
+
+/* --- 4. 일반 입력 필드 (input, textarea) --- */
+.form-control {
+    min-height: 58px; /* Select2와 높이 통일 */
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    border-radius: 8px;
+}
+.form-floating > .form-control {
+    height: 58px;
+}
+.form-floating > label {
+    padding: 1rem 1.25rem;
+}
+textarea.form-control {
+    min-height: 150px;
+}
+
+/* --- 5. 파일 업로드 및 버튼 스타일 (기존과 유사) --- */
+.file-drop-zone {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2rem 1rem; border: 2px dashed #dee2e6; border-radius: 10px;
+    background-color: #f8f9fa; cursor: pointer; transition: all 0.2s ease-in-out;
+}
+.file-drop-zone:hover { background-color: #e9ecef; border-color: #0d6efd; }
+.file-drop-zone.is-dragover { background-color: #e9ecef; border-color: #0d6efd; }
+.file-drop-icon { font-size: 2.5rem; color: #adb5bd; margin-bottom: 0.75rem; }
+
+/* 🌟🌟🌟 파일 미리보기 항목 스타일 수정: 크기 통일성 확보 🌟🌟🌟 */
 .file-preview-item {
-    display: flex;
+    position: relative; /* 자식 요소의 absolute 위치를 위한 기준 */
+    display: flex; /* 내부 요소를 수평으로 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    background-color: #f1f3f5;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 0.8rem 0.4rem;
+    font-size: 0.9em;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    min-height: 80px; /* 모든 미리보기 박스가 최소한 이 높이를 가지도록 설정 */
+}
+
+/* 파일명 및 아이콘/이미지 래퍼 */
+.file-preview-item .file-name-wrapper {
+    display: flex; /* 이미지와 파일명 정렬 */
     align-items: center;
-   /* justify-content: space-between; */
-    flex-wrap: nowrap;
-    width: 100%;
+    flex-grow: 1; /* 파일명 래퍼가 가능한 공간을 모두 차지하도록 하여 이미지와 버튼 사이를 벌림 */
+    overflow: hidden; /* 파일명이 길어질 경우 대비 */
 }
 
-.file-name-wrapper {
-    display: flex;
-    align-items: center;
-    flex-grow: 1;
-    min-width: 0;
-    gap: 10px;
+/* 🌟🌟🌟 미리보기 이미지 크기 고정 🌟🌟🌟 */
+.file-preview-item img {
+    width: 150px;  /* 이미지의 고정 너비 */
+    height: 150px; /* 이미지의 고정 높이 */
+    object-fit: cover; /* 이미지가 고정된 공간에 꽉 차도록 (비율 유지, 잘림) */
+   
+    border-radius: 4px; /* 이미지 모서리 둥글게 (선택 사항) */
 }
 
-.file-name-text {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: calc(100% - 120px);
-}
-
-/* 이미지와 아이콘에는 flex-shrink: 0; 적용 */
-.file-preview-item img,
+/* 🌟🌟🌟 일반 파일 아이콘 크기 및 정렬 통일 🌟🌟🌟 */
 .file-preview-item .fa-file-alt {
-    flex-shrink: 0;
+    font-size: 24px;
+    margin-right: 10px;
+    width: 60px; /* 이미지와 동일한 너비로 맞춰주면 정렬에 도움됨 */
+    height: 60px; /* 이미지와 동일한 높이로 맞춰주면 정렬에 도움됨 */
+    display: flex; /* 아이콘을 중앙에 정렬하기 위해 */
+    align-items: center;
+    justify-content: center;
 }
 
-.file-delete-button-container {
-    flex-shrink: 0;
-    margin-left: auto; /* 오른쪽으로 최대한 밀착 */
-    margin-right: 80px; /* 오른쪽에 약간의 여백 추가 (조절 가능) */
-} 
+/* 🌟🌟🌟 파일명 텍스트 처리 🌟🌟🌟 */
+.file-preview-item .file-name-text {
+    white-space: nowrap; /* 파일명이 길어도 한 줄에 표시 시도 */
+    overflow: hidden;    /* 넘치면 숨김 */
+    text-overflow: ellipsis; /* 넘치는 부분 ...으로 표시 */
+}
+
+/* 🌟🌟🌟 X 버튼 스타일 (위치 조정) 🌟🌟🌟 */
+.file-remove-button {
+    position: absolute;
+    top: -12px; /* 이미지 미리보기 박스 밖으로 빼는 위치 조정 */
+    right: -12px; /* 이미지 미리보기 박스 밖으로 빼는 위치 조정 */
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border: none;
+    z-index: 10;
+}
+
+/* Font Awesome 아이콘 크기 및 정렬 조절 */
+.file-remove-button .fas {
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* 기존 불필요한 클래스 제거 */
+/* .file-preview-item .btn-close { margin-left: 0.7rem; } */
+
+
+.btn-primary.btn-lg { font-weight: 500; padding: 0.9rem; border-radius: 8px; }
+.btn-link { text-align: center; color: #6c757d; text-decoration: none; }
+.btn-link:hover { color: #212529; text-decoration: underline; }
+
+
+/* --- 3. 커스텀 체크박스 / 토글 스위치 스타일 (최종 수정안) --- */
+
+/* --- 비밀글 체크박스 정렬 및 간격 문제 최종 해결 --- */
+
+.form-check {
+    /* 내부 요소들을 정렬하기 위해 flex 컨테이너로 만듭니다 (Bootstrap 5 기본값). */
+    display: flex;
+    align-items: center; /* 핵심 ①: 모든 자식 요소(체크박스, 라벨)를 세로 중앙에 정렬 */
+    padding-left: 0;     /* 불필요한 왼쪽 패딩 제거 */
+}
+
+.form-check .form-check-input {
+    /* 위치 및 간격 조정 */
+    margin-top: 0;          /* 다른 CSS에 의해 생길 수 있는 상단 마진을 강제 초기화 */
+    margin-right: 0.6em;    /* 핵심 ②: 텍스트와의 겹침을 막기 위한 오른쪽 간격 확보 */
+    
+    /* 크기 및 기타 */
+    flex-shrink: 0;         /* 공간이 좁아져도 체크박스가 찌그러지지 않도록 방지 */
+    float: none;            /* float 속성으로 인한 레이아웃 깨짐 방지 */
+}
+
+.form-check .form-check-label {
+    /* 라벨에 불필요한 스타일이 적용되는 것을 방지 */
+    margin-bottom: 0;
+}
+
+
+/* --- 5. 버튼 스타일 커스텀 --- */
+
+/* '문의 등록하기' 버튼 (갈색 계열) */
+.btn-outline-primary {
+    --bs-btn-color: #a67c52;                      /* 텍스트 및 테두리 색상 */
+    --bs-btn-border-color: #a67c52;               /* 테두리 색상 */
+    --bs-btn-hover-color: #fff;                   /* 호버 시 텍스트 색상 (흰색) */
+    --bs-btn-hover-bg: #a67c52;                    /* 호버 시 배경 색상 */
+    --bs-btn-hover-border-color: #a67c52;          /* 호버 시 테두리 색상 */
+    --bs-btn-active-bg: #8c6846;                   /* 클릭 시 배경 색상 (조금 더 진하게) */
+    --bs-btn-active-border-color: #8c6846;         /* 클릭 시 테두리 색상 */
+    --bs-btn-padding-x: 2rem;                     /* 좌우 패딩 */
+    --bs-btn-padding-y: 0.8rem;                   /* 상하 패딩 */
+    font-weight: 500;
+}
+
+/* '목록으로 돌아가기' 버튼 (회색 계열) */
+.btn-outline-secondary {
+    --bs-btn-color: #868e96;                      /* 텍스트 및 테두리 색상 */
+    --bs-btn-border-color: #868e96;               /* 테두리 색상 */
+    --bs-btn-hover-color: #fff;                   /* 호버 시 텍스트 색상 (흰색) */
+    --bs-btn-hover-bg: #868e96;                    /* 호버 시 배경 색상 */
+    --bs-btn-hover-border-color: #868e96;          /* 호버 시 테두리 색상 */
+    --bs-btn-active-bg: #6c757d;                   /* 클릭 시 배경 색상 (조금 더 진하게) */
+    --bs-btn-active-border-color: #6c757d;         /* 클릭 시 테두리 색상 */
+    --bs-btn-padding-x: 2rem;                     /* 좌우 패딩 */
+    --bs-btn-padding-y: 0.8rem;                   /* 상하 패딩 */
+    font-weight: 500;
+}
+/* '문의 등록하기' 버튼 호버 효과 */
+.btn-outline-primary:hover {
+    color: #fff;                 /* 호버 시 텍스트 색상: 흰색 */
+    background-color: #c96;   /* 호버 시 배경 색상: 갈색 */
+    border-color: #a67c52;       /* 호버 시 테두리 색상: 갈색 */
+}
+
+/* '목록으로 돌아가기' 버튼 호버 효과 (일관성을 위해 함께 수정) */
+.btn-outline-secondary:hover {
+    color: #fff;                 /* 호버 시 텍스트 색상: 흰색 */
+    background-color: #868e96;   /* 호버 시 배경 색상: 회색 */
+    border-color: #868e96;       /* 호버 시 테두리 색상: 회색 */
+}
+
+.btn-outline-secondary + .btn-outline-primary {
+    margin-left: 1rem !important; /* 약 16px의 왼쪽 여백을 강제로 적용 */
+}
+
+/* Select2 드롭다운 박스 크기 및 패딩 조절 */
+.select2-container--bootstrap-5 .select2-selection--single {
+    /* 세로 패딩(0.7rem)으로 높이를 확보하고, 
+    가로 패딩(0.75rem)은 부트스트랩의 기본 입력란(.form-control)과 동일하게 맞춰
+    좌우 정렬이 깨지지 않도록 합니다.
+  */
+  padding: 0.7rem 0.75rem;
+  height: auto; /* padding에 맞춰 높이 자동 조절 */
+}
+
+/* Select2 드롭다운으로 나오는 목록의 글자 크기 및 패딩 조절 */
+.select2-results__option {
+    font-size: 1.2rem !important; /* 요청하신 1.2rem으로 설정 */
+}
+
+    /* Select2 드롭다운으로 나오는 목록의 글자 크기 및 패딩 조절 */
+    .select2-results__option {
+        font-size: 1.2rem !important; /* 요청하신 1.2rem으로 설정 */
+        padding: 10px 12px;      /* 목록 각 항목의 위아래 여백 추가 */
+    }
+    
+#inqryCn{
+	resize:none;
+}
+
+/* --- 유효성 검사 스타일 추가 --- */
+
+/* Select2에 유효성 검사 실패 스타일(빨간 테두리) 적용 */
+select.is-invalid + .select2-container .select2-selection {
+    border-color: #dc3545; /* Bootstrap의 기본 'danger' 색상 */
+}
+
+/* 유효성 검사 실패 메시지 스타일 */
+.invalid-feedback {
+    display: none; /* 평소에는 숨김 */
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.95rem; /* 기본 폰트보다 약간 작게 */
+    color: #dc3545;
+}
+
+/* is-invalid 클래스가 적용된 필드의 invalid-feedback 메시지만 보여줌 */
+.form-control.is-invalid ~ .invalid-feedback,
+.form-select.is-invalid ~ .invalid-feedback {
+    display: block;
+}
