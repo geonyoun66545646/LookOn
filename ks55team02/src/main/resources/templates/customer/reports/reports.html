@@ -231,6 +231,7 @@
 		const searchResultsContainer = document.getElementById('searchResults');
 		const evidenceFileInput = document.getElementById('evidenceFile');
 		const imagePreviewContainer = document.getElementById('imagePreview');
+		const detailReasonTextarea = document.getElementById('detailReason'); 
 
 		// ⭐⭐ 여기에 추가합니다. (searchModal 객체 초기화 바로 다음) ⭐⭐
 		const modalCloseButton = document.querySelector('#searchModal .btn-close');
@@ -238,7 +239,7 @@
 		if (modalCloseButton) {
 		    modalCloseButton.addEventListener('click', function() {
 		        console.log("모달 닫기 버튼이 클릭되었습니다. 수동으로 모달을 닫습니다.");
-		        searchModal.hide(); // searchModal 객체의 hide() 메서드를 호출하여 모달을 닫습니다.
+		        searchModal.hide();
 		    });
 		}
 		// ⭐⭐ 추가 끝 ⭐⭐
@@ -247,23 +248,53 @@
 
 		// [신규] 사용자가 선택한 파일들을 관리할 배열 (진짜 파일 목록)
 		let attachedFiles = [];
+		
+		// 1. 신고 사유 코드(Key)와 그에 맞는 안내 문구(Value)를 정의한 객체입니다.
+        const placeholderMap = {
+            // --- 공통/게시글/댓글/상품 관련 ---
+            'RPT_AD_SPAM': '어떤 부분이 상업적인 광고/스팸인지 구체적으로 알려주세요.\n(예: 특정 사이트 가입을 유도하는 광고 링크를 반복적으로 게시함)',
+            'RPT_HARASSMENT': '괴롭힘(스토킹, 비방, 위협 등)에 해당하는 구체적인 내용을 알려주세요.\n문제가 되는 내용이 담긴 게시글/댓글 링크나, 쪽지 내용을 첨부해주시면 큰 도움이 됩니다.',
+            'RPT_ETC': '기타 신고 사유에 대해 구체적으로 작성해주세요.',
+
+            // --- 게시글/댓글 관련 ---
+            'RPT_ABUSE': '욕설이나 비방적인 표현이 포함된 부분을 정확히 알려주세요.\n(예: 3번째 댓글의 \'...\' 표현은 심각한 욕설입니다.)',
+            'RPT_COPYRIGHT': '어떤 부분이 저작권을 침해했는지, 원 저작물에 대한 정보를 함께 알려주세요.\n(예: 본인이 창작한 A 그림을 무단으로 도용함. 원본 링크: http://...)',
+            'RPT_DISCRIM': '특정 개인이나 집단에 대한 차별/혐오 발언이 포함된 부분을 알려주세요.',
+            'RPT_FLOOD': '여러 게시글이나 댓글에 동일한 내용을 반복적으로 게시하여 다른 사용자의 이용을 방해하고 있습니다.',
+            'RPT_ILLEGAL': '어떤 정보가 불법적인지 구체적으로 알려주세요.\n(예: 저작권을 위반한 불법 공유 링크가 포함되어 있습니다.)',
+            'RPT_OBSCENE': '음란하거나 불건전한 내용(사진, 영상, 텍스트 등)이 포함된 부분을 알려주세요.',
+            'RPT_OFFTOPIC': '해당 게시판의 주제와 관련 없는 내용임을 설명해주세요.',
+            'RPT_OFFTOPIC_CM': '해당 게시글의 주제와 관련 없는 댓글임을 설명해주세요.',
+            'RPT_PRIVACY': '노출된 개인정보가 무엇이며, 어떤 내용에 포함되어 있는지 구체적으로 알려주세요.\n(예: 3번째 댓글에 본인의 휴대폰 번호가 포함되어 있습니다.)',
+            'RPT_SPAM': '단순 스팸 또는 의미 없는 내용이 포함된 부분을 알려주세요.',
+            'RPT_MISCATEGORIZED': '해당 게시물이 어떤 카테고리로 이동하는 것이 적절한지 의견을 알려주시면 참고하겠습니다.',
+
+            // --- 상품 관련 ---
+            'RPT_FALSE_INFO': '상품의 어떤 정보가 허위인지, 실제 정보와 어떻게 다른지 구체적으로 비교하여 설명해주세요.\n(예: \'100% 순면\' 광고와 달리, 실제 상품 태그는 \'폴리에스터 50%\'로 표기됨)',
+            'RPT_FRAUD': '거래 사기로 의심되는 정황을 구체적으로 알려주세요.\n(예: 입금 후 판매자와 연락이 두절됨)',
+            'RPT_MISCATEGORIZED_PR': '해당 상품이 어떤 카테고리로 이동하는 것이 적절한지 의견을 알려주시면 참고하겠습니다.',
+
+            // --- 사용자 관련 ---
+            'RPT_FAKE_ACCOUNT': '가짜 계정으로 의심되는 활동이나, 비정상적인 방법으로 조회수/추천수 등을 조작하는 정황을 알려주세요.',
+            'RPT_IMPERSON': '누구를 사칭하고 있는지, 어떤 방식으로 사칭하고 있는지 구체적으로 설명해주세요.',
+            'RPT_INAPPRO_PROFILE': '프로필 사진이나 닉네임, 소개글의 어떤 부분이 부적절한지 알려주세요.',
+
+            // 기본 안내 문구
+            'default': '신고 내용을 최대한 자세히 설명해주세요.'
+        };
 	
-	    // ===================================================================
-	    // 2. 페이지 초기화 로직 (변경 없음)
+        // ===================================================================
+	    // 2. 페이지 초기화 로직
 	    // ===================================================================
 	    fetch('/api/customer/reports/check-auth')
 	        .then(response => {
 	            if (response.status === 401) {
-	                Swal.fire({
-	                    icon: 'warning', title: '로그인 필요', text: '신고 기능은 로그인 후 이용 가능합니다.', confirmButtonText: '확인'
-	                }).then(() => { window.location.href = '/'; });
+	                Swal.fire({ icon: 'warning', title: '로그인 필요', text: '신고 기능은 로그인 후 이용 가능합니다.', confirmButtonText: '확인' })
+	                .then(() => { window.location.href = '/'; });
 	                throw new Error('Not Authenticated');
 	            }
-	            console.log("사용자 인증 완료. 페이지 기능을 활성화합니다.");
 	        })
-	        .catch(error => {
-	            console.error(error.message);
-	        });
+	        .catch(error => { console.error(error.message); });
 	
 	    // ===================================================================
 	    // 3. 핵심 이벤트 리스너 (파일 첨부 로직 변경)
@@ -295,6 +326,15 @@
 	            targetSearchField.style.display = 'none';
 	        }
 	    });
+	    
+	    // [추가] '신고 사유' 드롭다운의 선택이 바뀔 때마다 실행될 이벤트 리스너
+        if (reportReasonSelect && detailReasonTextarea) {
+            reportReasonSelect.addEventListener('change', function() {
+                const selectedReasonCode = this.value;
+                const newPlaceholder = placeholderMap[selectedReasonCode] || placeholderMap['default'];
+                detailReasonTextarea.placeholder = newPlaceholder;
+            });
+        }
 	
 	    // [유지] "대상 찾기" 버튼 클릭 및 검색 로직 (변경 없음)
 	    searchTargetBtn.addEventListener('click', function() {
@@ -379,6 +419,7 @@
 	    function updateReportReasons(targetType) {
 	        // ... (기존 코드와 동일, 변경 없음)
 	        while (reportReasonSelect.options.length > 1) {
+	        	 detailReasonTextarea.placeholder = placeholderMap['default'];
 	            reportReasonSelect.remove(1);
 	        }
 	        if (!targetType) return;

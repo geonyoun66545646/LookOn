@@ -57,11 +57,9 @@
 									style="max-width: 150px;">
 									<option value="all" selected>전체</option>
 									<option value="cpnNm">쿠폰명</option>
-									<option value="pblcnCpnId">쿠폰 ID</option>
-									<option value="userNo">발행자 ID</option>
 									<option value="issueConditionType">발급 조건</option>
 								</select> <input type="text" class="form-control" name="keyword" value=""
-									placeholder="쿠폰명, ID, 발행자 ID">
+									placeholder="쿠폰명, 발급 조건">
 							</div>
 						</div>
 						<div class="col-lg-2">
@@ -104,16 +102,12 @@
 									<input class="form-check-input" type="checkbox"
 										id="selectAllCheckbox">
 								</div></th>
-							<th>쿠폰 ID</th>
 							<th>쿠폰명</th>
 							<th>할인 값</th>
 							<th>최소 주문 금액</th>
 							<th>최대 할인 금액</th>
 							<th>유효 기간</th>
-							<th>총 발급 제한</th>
-							<th>사용자당 제한</th>
 							<th>발급 조건</th>
-							<th>재발급 주기</th>
 							<th>활성 여부</th>
 							<th>등록일자</th>
 							<th>수정/삭제</th>
@@ -344,7 +338,8 @@
         tableBody.innerHTML = ''; 
 
         if (!couponsList || couponsList.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="14" class="text-center py-5">조회된 쿠폰 정보가 없습니다.</td></tr>`;
+            // [수정] colspan을 14에서 10으로 변경합니다. (제거된 컬럼 수만큼 감소)
+            tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-5">조회된 쿠폰 정보가 없습니다.</td></tr>`;
             return;
         }
 
@@ -354,19 +349,16 @@
                 ? '<span class="badge bg-success">활성</span>'
                 : '<span class="badge bg-danger">비활성</span>';
 
+         // [수정] pblcnCpnId, totUseLmtNmtm, userPerUseLmtNmtm, reissueCycle을 그리는 <td>를 제거합니다.
             const row = `
                 <tr id="coupon-row-${coupon.pblcnCpnId}">
                     <td><input class="form-check-input coupon-checkbox" type="checkbox" value="${coupon.pblcnCpnId}"></td>
-                    <td>${coupon.pblcnCpnId}</td>
                     <td>${coupon.cpnNm || ''}</td>
                     <td>${coupon.dscntVl || 0}%</td>
                     <td>${(coupon.minOrdrAmt || 0).toLocaleString()}원</td>
                     <td>${(coupon.maxDscntAmt || 0).toLocaleString()}원</td>
                     <td>${formatDate(coupon.vldBgngDt)} ~ ${formatDate(coupon.vldEndDt)}</td>
-                    <td>${coupon.totUseLmtNmtm === 0 ? '무제한' : coupon.totUseLmtNmtm + '회'}</td>
-                    <td>${coupon.userPerUseLmtNmtm}회</td>
                     <td>${coupon.issueConditionType || ''}</td>
-                    <td>${coupon.reissueCycle || ''}</td>
                     <td>${activeBadge}</td>
                     <td>${formatDate(coupon.crtDt)}</td>
                     <td>

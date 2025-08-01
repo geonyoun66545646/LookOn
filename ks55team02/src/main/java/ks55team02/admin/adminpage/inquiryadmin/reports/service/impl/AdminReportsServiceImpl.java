@@ -101,6 +101,10 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 				adminReportsMapper.updateUserStatus(postOwnerUserNo, "제한");
 				handleSanctionForContentOwner(postOwnerUserNo, actionType, report.getDclrId(), request.getActnCn(),
 						request.getAdminId(), request.getSanctionDuration()); // sanctionDuration 전달
+				
+				 log.info("'작성자 제한'에 따른 게시글 {} 동시 삭제 조치를 실행합니다.", targetPostSn);
+		            adminReportsMapper.updatePostStatus(targetPostSn, "DELETED");
+				
 			} else {
 				log.warn("게시글 작성자 userNo를 찾을 수 없어 계정 제한 조치를 할 수 없습니다. 게시글: {}", targetPostSn);
 			}
@@ -132,6 +136,15 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 				adminReportsMapper.updateUserStatus(commentOwnerUserNo, "제한");
 				handleSanctionForContentOwner(commentOwnerUserNo, actionType, report.getDclrId(), request.getActnCn(),
 						request.getAdminId(), request.getSanctionDuration()); // sanctionDuration 전달
+				
+				// ▼▼▼ [핵심 추가] 바로 여기에 댓글 삭제 로직을 추가합니다. ▼▼▼
+	            log.info("'작성자 제한'에 따른 댓글 {} 동시 삭제 조치를 실행합니다.", targetCommentSn);
+	            Map<String, Object> authorRestrictionCommentDeleteParams = new HashMap<>();
+	            authorRestrictionCommentDeleteParams.put("commentSn", targetCommentSn);
+	            authorRestrictionCommentDeleteParams.put("adminId", request.getAdminId());
+	            adminReportsMapper.deleteComment(authorRestrictionCommentDeleteParams);
+	            // ▲▲▲ [핵심 추가] ▲▲▲
+				
 			} else {
 				log.warn("댓글 작성자 userNo를 찾을 수 없어 계정 제한 조치를 할 수 없습니다. 댓글: {}", targetCommentSn);
 			}

@@ -83,22 +83,7 @@
 						</div>
 					</div>
 
-					<div class="row">
-						<div class="col-md-6">
-							<div class="mb-4">
-								<label class="form-label">총 발급 제한 횟수</label> <input
-									type="number" class="form-control" name="totUseLmtNmtm"
-									th:value="${couponInfo.totUseLmtNmtm}">
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="mb-4">
-								<label class="form-label">사용자당 사용 제한 횟수</label> <input
-									type="number" class="form-control" name="userPerUseLmtNmtm"
-									th:value="${couponInfo.userPerUseLmtNmtm}">
-							</div>
-						</div>
-					</div>
+					
 
 					<div class="row">
 						<div class="col-md-6">
@@ -126,23 +111,7 @@
 								</select>
 							</div>
 						</div>
-						<div class="col-md-6">
-							<div class="mb-4">
-								<label class="form-label">재발급 주기</label> <select
-									class="form-select" name="reissueCycle">
-									<option value="NONE"
-										th:selected="${couponInfo.reissueCycle == 'NONE'}">재발급
-										없음 (1회성)</option>
-									<option value="MONTHLY"
-										th:selected="${couponInfo.reissueCycle == 'MONTHLY'}">매월</option>
-									<option value="YEARLY"
-										th:selected="${couponInfo.reissueCycle == 'YEARLY'}">매년</option>
-									<option value="UNLIMITED"
-										th:selected="${couponInfo.reissueCycle == 'UNLIMITED'}">제한
-										없음</option>
-								</select>
-							</div>
-						</div>
+						
 					</div>
 
 					<div class="mb-4">
