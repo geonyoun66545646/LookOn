@@ -103,8 +103,8 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 			case "SUSPENSION_30D":
 			case "BAN_PERMANENT":
 			case "AUTHOR_RESTRICTION":
-				log.info("사용자 {}의 상태를 '정상'으로 복구합니다.", userToRelease);
-				adminReportsMapper.updateUserStatus(userToRelease, "정상");
+				log.info("사용자 {}의 상태를 '활동'으로 복구합니다.", userToRelease);
+				adminReportsMapper.updateUserStatus(userToRelease, "활동");
 				break;
 			}
 		} else {

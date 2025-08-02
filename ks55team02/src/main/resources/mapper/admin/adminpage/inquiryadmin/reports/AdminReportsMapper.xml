@@ -142,50 +142,35 @@
 		#{pagination.limitStart}
 	</select>
 
-	<select id="getAdminReportDetailById" parameterType="String"
-		resultMap="adminReportDetailResultMap">
-		SELECT
-		r.dclr_id,
-		r.dclr_user_no,
-		dclr_user.user_ncnm AS
-		dclr_user_ncnm,
-		r.dclr_trgt_user_no,
-		trgt_user.user_ncnm AS
-		dclr_trgt_user_ncnm,
-		r.dclr_rsn_cd,
-		rr.dclr_rsn_cn,
-		r.dtl_dclr_rsn_cn AS
-		dclr_cn,
-		DATE_FORMAT(r.dclr_rcpt_dt, '%Y-%m-%d %H:%i') AS dclr_dt,
-		r.prcs_stts_cd,
-		(SELECT COUNT(*) FROM report_attachments WHERE dclr_id
-		= r.dclr_id) AS
-		attachment_count,
-		r.prcs_pic_mngr_no,
-		r.dclr_prcs_rslt_cn,
-		r.dclr_trgt_type_cd,
-		r.dclr_trgt_conts_id,
-		COALESCE(r.prcs_cmptn_dt, us.prcs_dt) AS prcs_cmptn_dt
-		FROM
-		reports AS r
-		LEFT JOIN
-		users AS dclr_user ON
-		r.dclr_user_no = dclr_user.user_no
-		LEFT
-		JOIN
-		users AS trgt_user ON
-		r.dclr_trgt_user_no = trgt_user.user_no
-		LEFT
-		JOIN
-		report_reasons AS rr
-		ON r.dclr_rsn_cd = rr.dclr_rsn_cd
-		LEFT JOIN
-		user_sanctions AS us ON
-		r.dclr_id = us.dclr_id
-		WHERE
-		r.dclr_id =
-		#{dclrId};
-	</select>
+	<select id="getAdminReportDetailById" parameterType="String" resultMap="adminReportDetailResultMap">
+    SELECT
+        r.dclr_id,
+        r.dclr_user_no,
+        dclr_user.user_ncnm AS dclr_user_ncnm,
+        r.dclr_trgt_user_no,
+        trgt_user.user_ncnm AS dclr_trgt_user_ncnm,
+        r.dclr_rsn_cd,
+        rr.dclr_rsn_cn,
+        r.dtl_dclr_rsn_cn AS dclr_cn,
+        DATE_FORMAT(r.dclr_rcpt_dt, '%Y-%m-%d %H:%i') AS dclr_dt,
+        r.prcs_stts_cd,
+        (SELECT COUNT(*) FROM report_attachments WHERE dclr_id = r.dclr_id) AS attachment_count,
+        r.prcs_pic_mngr_no,
+        r.dclr_prcs_rslt_cn,
+        r.dclr_trgt_type_cd,
+        r.dclr_trgt_conts_id,
+        r.prcs_cmptn_dt
+    FROM
+        reports AS r
+    LEFT JOIN
+        users AS dclr_user ON r.dclr_user_no = dclr_user.user_no
+    LEFT JOIN
+        users AS trgt_user ON r.dclr_trgt_user_no = trgt_user.user_no
+    LEFT JOIN
+        report_reasons AS rr ON r.dclr_rsn_cd = rr.dclr_rsn_cd
+    WHERE
+        r.dclr_id = #{dclrId}
+</select>
 
 	<!-- AdminReportsMapper.xml -->
 
