@@ -27,5 +27,11 @@ public interface AdminReportsService {
 	 * @return AdminReportDetail (처리 이력이 포함된 상세 정보 DTO)
 	 */
 	AdminReportDetail getAdminReportDetail(String dclrId);
+	
+	/**
+	 * [신규 추가] 처리 완료된 신고 내용을 수정하는 메소드
+	 * @param request 수정할 내용을 담은 요청 객체
+	 */
+	void updateProcessedReport(ReportProcessRequest request);
 
 }
