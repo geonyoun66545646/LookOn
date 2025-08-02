@@ -129,3 +129,7 @@ textarea.form-control{
 	padding-top : 0;
 }
 
+.edit-option{
+	display:none;
+}
+
