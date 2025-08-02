@@ -45,13 +45,51 @@ public class InquiryServiceImpl implements InquiryService {
    
     @Qualifier("customerStoreMapper")
     private final CustomerStoreMapper customerStoreMapper;
-
-    // 질문 목록 (페이징 없는 버전)
     @Override
-    public List<Inquiry> getInquiryList() {
-        List<Inquiry> inquiryList = inquiryMapper.getInquiryList();
-       
-        return inquiryList;
+    public Map<String, Object> getInquiryList(int currentPage, int pageSize, String searchType, String keyword, String author, String status, String currentUserId) {
+        Map<String, Object> paramMap = new HashMap<>();
+
+
+        // 2. '내 문의 보기' 필터링 로직
+        // 컨트롤러에서 전달된 'author' 파라미터가 "me"이고, 현재 로그인한 사용자 ID가 존재할 경우
+        if ("me".equals(author) && currentUserId != null && !currentUserId.isEmpty()) {
+            paramMap.put("authorUserId", currentUserId);
+            log.info("내 문의 보기 필터 활성화. 사용자 ID: {}", currentUserId);
+        }
+
+        // 3. 검색 조건 파라미터 추가
+        // 검색 유형과 검색어가 모두 유효한 값일 경우에만 Map에 추가
+        if (searchType != null && !searchType.trim().isEmpty() && keyword != null && !keyword.trim().isEmpty()) {
+            paramMap.put("searchType", searchType);
+            paramMap.put("keyword", keyword);
+            log.info("검색 필터 활성화. 유형: {}, 키워드: {}", searchType, keyword);
+        }
+        if (status != null && !status.isEmpty()) {
+            paramMap.put("status", status);
+        }
+        
+        // 4. 전체 행의 개수를 **동적 쿼리**로 조회 (검색 조건이 포함될 수 있음)
+        int totalRows = inquiryMapper.getTotalInquiryCount(paramMap);
+        log.info("조회된 총 문의 개수 (필터링 적용됨): {}", totalRows);
+
+        // 5. 페이징 처리를 위한 시작 행(startRow) 계산 및 파라미터 추가
+        int startRow = (currentPage - 1) * pageSize;
+        paramMap.put("startRow", startRow);
+        paramMap.put("pageSize", pageSize);
+
+        // 6. 페이징 및 검색 조건이 적용된 문의 목록을 **동적 쿼리**로 조회
+        List<Inquiry> inquiryList = inquiryMapper.getInquiryListPaging(paramMap);
+        log.info("페이지 {}에 대해 조회된 문의 목록 수: {}", currentPage, inquiryList.size());
+
+        // 7. 컨트롤러에 전달할 최종 결과 Map 생성
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("inquiryList", inquiryList);
+        resultMap.put("totalRows", totalRows);
+        // 페이징 계산에 필요한 currentPage와 pageSize도 함께 넣어주면 컨트롤러에서 편리합니다.
+        resultMap.put("currentPage", currentPage);
+        resultMap.put("pageSize", pageSize);
+
+        return resultMap;
     }
     
 
@@ -188,33 +226,25 @@ public class InquiryServiceImpl implements InquiryService {
         }
     }
 
-    @Override
-    public Map<String, Object> getInquiryList(int currentPage, int pageSize) {
-        // 1. 전체 문의 개수 조회
-        int totalRows = inquiryMapper.getTotalInquiryCount();
-        log.info("총 문의 개수: {}", totalRows);
-
-        // 2. 시작 인덱스 계산
-        int startRow = (currentPage - 1) * pageSize;
-        if (startRow < 0) {
-            startRow = 0;
-        }
-        log.info("시작 행 (startRow): {}", startRow);
-
-        // 3. 페이징된 문의 목록 조회
-        List<Inquiry> inquiryList = inquiryMapper.getInquiryListPaging(startRow, pageSize);
-        log.info("조회된 문의 목록 항목 수: {}", inquiryList.size());
-
-        // 4. 반환할 데이터 Map 생성
-        Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("inquiryList", inquiryList);
-        resultMap.put("totalRows", totalRows);
-        resultMap.put("currentPage", currentPage);
-        resultMap.put("pageSize", pageSize);
-
-        return resultMap;
-    }
-
+	/*
+	 * @Override public Map<String, Object> getInquiryList(int currentPage, int
+	 * pageSize) { // 1. 전체 문의 개수 조회 int totalRows =
+	 * inquiryMapper.getTotalInquiryCount(); log.info("총 문의 개수: {}", totalRows);
+	 * 
+	 * // 2. 시작 인덱스 계산 int startRow = (currentPage - 1) * pageSize; if (startRow <
+	 * 0) { startRow = 0; } log.info("시작 행 (startRow): {}", startRow);
+	 * 
+	 * // 3. 페이징된 문의 목록 조회 List<Inquiry> inquiryList =
+	 * inquiryMapper.getInquiryListPaging(startRow, pageSize);
+	 * log.info("조회된 문의 목록 항목 수: {}", inquiryList.size());
+	 * 
+	 * // 4. 반환할 데이터 Map 생성 Map<String, Object> resultMap = new HashMap<>();
+	 * resultMap.put("inquiryList", inquiryList); resultMap.put("totalRows",
+	 * totalRows); resultMap.put("currentPage", currentPage);
+	 * resultMap.put("pageSize", pageSize);
+	 * 
+	 * return resultMap; }
+	 */
     @Override
     public List<InquiryOption> getAdminInquiryOptions() {
         // InquiryOption enum의 모든 상수를 리스트로 반환합니다.
@@ -297,5 +327,4 @@ public class InquiryServiceImpl implements InquiryService {
         }
         log.info("문의 삭제 성공 (상태 DELETED로 변경): {}", inquiryId);
     }
-    
 }

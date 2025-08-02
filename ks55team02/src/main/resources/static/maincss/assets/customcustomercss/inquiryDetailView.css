@@ -1,10 +1,14 @@
 /* ===================================================================
    Inquiry Detail Final Polished Style (Final Harmony & Refinement)
    =================================================================== */
+.sub-title{
+	font-size : 1.5rem;
+	color : black;
+}
 
 /* 카드 공통 스타일 */
 .card {
-    border-radius: 12px;
+    border-radius: 15px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     overflow: hidden;
     background-color: #ffffff;
@@ -164,8 +168,7 @@
 .options-menu-item {
     display: block;
     width: 100%;
-    padding: 8px 15px;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: #212529;
     text-align: center;
     background-color: transparent;

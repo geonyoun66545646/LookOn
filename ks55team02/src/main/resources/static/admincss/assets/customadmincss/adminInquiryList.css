@@ -116,8 +116,11 @@ h2.content-title {
 
 
 /* ▼▼▼ [수정] 링크 스타일에서 color: inherit 제거 ▼▼▼ */
-.member-table .col-title {
-    text-align: left !important;
+.col-title {
+    text-align: center !important;
+}
+.col-title-td{
+	text-align: left !important;
 }
 
 .member-table td.ellipsis {

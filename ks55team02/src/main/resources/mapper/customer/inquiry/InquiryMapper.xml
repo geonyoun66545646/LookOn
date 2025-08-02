@@ -223,44 +223,92 @@
             SUBSTRING(inqry_id, 5) REGEXP '^[0-9]+$';
     </select>
 
-    <select id="getTotalInquiryCount" resultType="int">
+     <select id="getTotalInquiryCount" parameterType="map" resultType="int">
     SELECT
         COUNT(*)
     FROM
-        inquiries
-    WHERE
-       prcs_stts != 'DELETED' and prcs_stts != 'HIDDEN' <!-- ★★★ 여기에도 동일한 조건을 추가합니다 ★★★ -->
+        inquiries i
+        <!-- 작성자 검색 시 JOIN이 필요하므로 조건부 JOIN 추가 -->
+        <if test="keyword != null and keyword != '' and searchType == 'writer'">
+            JOIN users u ON i.wrtr_id = u.user_no
+        </if>
+    <where>
+        i.prcs_stts != 'DELETED' AND i.prcs_stts != 'HIDDEN'
+
+        <!-- '내 문의 보기' 필터 -->
+        <if test="authorUserId != null and authorUserId != ''">
+            AND i.wrtr_id = #{authorUserId}
+        </if>
+
+        <!-- '답변완료' 등 상태 필터 (신규 추가) -->
+        <if test="status != null and status != ''">
+            AND i.prcs_stts = #{status}
+        </if>
+
+        <!-- 검색 조건 (확장) -->
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="searchType == 'title'">
+                    AND i.inqry_ttl LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="searchType == 'content'">
+                    AND i.inqry_cn LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <!-- 작성자 검색 (신규 추가) -->
+                <when test="searchType == 'writer'">
+                    AND u.user_ncnm LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <!-- 질문유형 검색 (신규 추가) -->
+                <when test="searchType == 'inquiryType'">
+                    AND i.inqry_type_cd LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+            </choose>
+        </if>
+    </where>
 </select>
 
-    <select id="getInquiryListPaging" resultMap="inquiryResultMap">
+
+    <select id="getInquiryListPaging" parameterType="map" resultMap="inquiryResultMap">
     SELECT
-        i.inqry_id,
-        i.inqry_type_cd,
-        i.inqry_trgt_type_cd,
-        i.wrtr_id,
-        i.inqry_store_id,
-        i.inqry_ttl,
-        i.inqry_cn,
-        i.prvt_yn,
-        i.prcs_stts,
-        i.prcs_user_no,
-        i.reg_ymd,
-        i.mdfcn_ymd,
-        i.del_dt,
-        i.del_user_no,
-        i.del_actvtn_yn,
-        u.user_no,
-        u.user_ncnm,
-        u.user_status
-        /* 필요 없는 user 컬럼들은 성능을 위해 제거하는 것이 좋습니다.
-           여기서는 user_ncnm과 user_status 정도만 가져오도록 축약했습니다.
-           모든 user 컬럼이 필요하다면 원래대로 두셔도 됩니다. */
+        i.inqry_id, i.inqry_type_cd, i.inqry_ttl, i.prvt_yn,
+        i.prcs_stts, i.reg_ymd, u.user_ncnm
     FROM
         inquiries i
     JOIN
         users u ON i.wrtr_id = u.user_no
-    WHERE
-        i.prcs_stts != 'DELETED' and i.prcs_stts != 'HIDDEN'
+    <where>
+        i.prcs_stts != 'DELETED' AND i.prcs_stts != 'HIDDEN'
+        
+        <!-- '내 문의 보기' 필터 -->
+        <if test="authorUserId != null and authorUserId != ''">
+            AND i.wrtr_id = #{authorUserId}
+        </if>
+        
+        <!-- '답변완료' 등 상태 필터 (신규 추가) -->
+        <if test="status != null and status != ''">
+            AND i.prcs_stts = #{status}
+        </if>
+        
+        <!-- 검색 조건 (확장) -->
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="searchType == 'title'">
+                    AND i.inqry_ttl LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="searchType == 'content'">
+                    AND i.inqry_cn LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <!-- 작성자 검색 (신규 추가) -->
+                <when test="searchType == 'writer'">
+                    AND u.user_ncnm LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <!-- 질문유형 검색 (신규 추가) -->
+                <when test="searchType == 'inquiryType'">
+                    AND i.inqry_type_cd LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+            </choose>
+        </if>
+    </where>
     ORDER BY
         i.reg_ymd DESC, i.inqry_id DESC
     LIMIT #{pageSize} OFFSET #{startRow}

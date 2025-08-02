@@ -46,7 +46,7 @@ public interface InquiryService {
      * 모든 문의 리스트를 조회합니다. (페이징 없는 버전, 필요시 유지)
      * @return Inquiry 객체 리스트
      */
-    List<Inquiry> getInquiryList();
+	/* List<Inquiry> getInquiryList(); */
 
     /**
      * 문의 상세, 문의 ID로 정보를 조회합니다.
@@ -61,7 +61,7 @@ public interface InquiryService {
      * @param pageSize 페이지 크기
      * @return 문의 목록 및 페이징 정보를 담은 Map
      */
-    Map<String, Object> getInquiryList(int currentPage, int pageSize); // 페이징 메서드 시그니처 유지
+    Map<String, Object> getInquiryList(int currentPage, int pageSize, String searchType, String keyword, String author, String status, String currentUserId);
     
     
     Answer getAnswerByInquiryId(String answer);

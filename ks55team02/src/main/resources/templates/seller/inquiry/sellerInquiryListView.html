@@ -5,7 +5,7 @@
 		
 	<head>
 		<meta name="description" content="한국스마트정보교육원 ksmybatis" />	
-		<link rel="stylesheet" th:href="@{/admincss/assets/css/customadminpagecss/userList.css}">
+		<link rel="stylesheet" th:href="@{/maincss/assets/customsellercss/sellerInquiryList.css}">
 	</head>
 	 
 	<th:block layout:fragment="jsFile">
@@ -117,10 +117,10 @@
 									<th scope="col" class="col-checkbox">
 										<input class="form-check-input" type="checkbox" id="checkAll">
 									</th>
-									<th scope="col">문의 아이디</th> 
+									<th scope="col">문의ID</th> 
 									<th scope="col">문의 유형</th> 
 									<th scope="col">문의 제목</th>
-									<th scope="col">작성자</th> 
+									<th scope="col">작성자ID</th> 
 									<th scope="col">등록일</th>
 									<th scope="col">처리 상태</th> 
 									<th scope="col">상세 보기</th>
@@ -137,9 +137,9 @@
 									<td class="ellipsis text" th:text="${inquiry.inqryId}" th:title="${inquiry.inqryId}"></td>
 									<td th:text="${inquiry.inqryTypeCd}"></td>
 									<td>
-										<a class="text" th:href="@{/seller/inquiry/sellerInquiryDetail(inqryId=${inquiry.inqryId})}" th:text="${inquiry.inqryTtl}"></a>
+										<a class="inquiry-title" th:href="@{/seller/inquiry/sellerInquiryDetail(inqryId=${inquiry.inqryId})}" th:text="${inquiry.inqryTtl}"></a>
 									</td>
-									<td th:text="${inquiry.writerInfo.userNcnm}"></td>
+									<td th:text="${inquiry.writerInfo.userLgnId}"></td>
 									<td th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd')}"></td>
 									
 									<!-- ================= [핵심 수정 2] 상태 표시를 한글로 변환 ================= -->
@@ -182,94 +182,118 @@
 	
 	<th:block layout:fragment="jsScript">
 		<!-- ================= [핵심 수정 3] JS 로직 정리 및 영문화 ================= -->
-		<script th:inline="javascript">
-		/*<![CDATA[*/
-		
-		$(document).ready(function() {
-			// 필요한 요소들을 변수에 할당
-			const mainContent = $('main.main-content');
-			const searchForm = $('#searchForm');
-			const currentPageInput = $('#currentPageInput');
-			const pageSizeInput = $('#pageSizeInput');
-			const sortKeyInput = $('#sortKeyInput');
-			const sortOrderInput = $('#sortOrderInput');
-			const filterConditionsInput = $('#filterConditionsInput');
-			const statusCheckboxes = $('.status-check');
-			const filterCheckAll = $('#filterCheckAll');
+		 <script th:inline="javascript">
+    /*<![CDATA[*/
+    
+    $(document).ready(function() {
+        // 필요한 요소들을 변수에 할당
+        const mainContent = $('main.main-content');
+        const searchForm = $('#searchForm');
+        const currentPageInput = $('#currentPageInput');
+        const pageSizeInput = $('#pageSizeInput');
+        const sortKeyInput = $('#sortKeyInput');
+        const sortOrderInput = $('#sortOrderInput');
+        const filterConditionsInput = $('#filterConditionsInput');
+        const statusCheckboxes = $('.status-check');
+        const filterCheckAll = $('#filterCheckAll');
 
-			// 검색 폼 제출 함수
-			function submitSearchForm() {
-				const selectedStatuses = [];
-				statusCheckboxes.each(function() {
-					if ($(this).is(':checked')) {
-						selectedStatuses.push($(this).val());
-					}
-				});
-				filterConditionsInput.val(selectedStatuses.join(','));
-				searchForm.submit();
-			}
-			
-			// 이벤트 핸들러 바인딩
-			mainContent.on('click', '#checkAll', function() {
-				$('.member-check').prop('checked', $(this).is(':checked'));
-			});
-			mainContent.on('click', '.member-check', () => {
-				const totalChecks = $('.member-check').length;
-				const checkedChecks = $('.member-check:checked').length;
-				$('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
-			});
-			mainContent.on('click', '.page-num', function(e) {
-				e.preventDefault();
-				currentPageInput.val($(this).data('page'));
-				submitSearchForm();
-			});
-			$('#pageSizeSelect').on('change', function() {
-				pageSizeInput.val($(this).val());
-				currentPageInput.val(1);
-				submitSearchForm();
-			});
-			$('#sortOrderSelect').on('change', function() {
-				const selectedOption = $(this).find('option:selected');
-				sortKeyInput.val(selectedOption.data('sort-key'));
-				sortOrderInput.val(selectedOption.data('sort-order'));
-				currentPageInput.val(1);
-				submitSearchForm();
-			});
-			statusCheckboxes.on('change', function() {
-				const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
-				filterCheckAll.prop('checked', allChecked);
-				submitSearchForm();
-			});
-			filterCheckAll.on('change', function() {
-				statusCheckboxes.prop('checked', $(this).is(':checked'));
-				submitSearchForm();
-			});
-			
-			// 페이지 로드 시 체크박스 및 정렬 상태 초기화
-			const initialFilterConditions = filterConditionsInput.val();
-			if (initialFilterConditions) {
-				const conditionsArray = initialFilterConditions.split(',');
-				statusCheckboxes.each(function() {
-					$(this).prop('checked', conditionsArray.includes($(this).val()));
-				});
-			} else {
-				// 필터 조건이 없으면 기본적으로 전체 선택
-				statusCheckboxes.prop('checked', true);
-			}
-			const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
-			filterCheckAll.prop('checked', allChecked);
+        // =======================================================
+        // [핵심 수정 1] 검색 폼 제출 이벤트를 가로채서, 제출 직전에 체크박스 값을 hidden input에 담습니다.
+        // =======================================================
+        searchForm.on('submit', function(e) {
+            const selectedStatuses = [];
+            statusCheckboxes.each(function() {
+                if ($(this).is(':checked')) {
+                    selectedStatuses.push($(this).val());
+                }
+            });
+            // 콤마(,)로 연결된 문자열로 만들어 hidden input에 값을 설정
+            filterConditionsInput.val(selectedStatuses.join(','));
+        });
+        
+        // 검색 폼을 프로그래밍 방식으로 제출하는 함수
+        function submitSearchForm() {
+            // 이 함수는 이제 프로그래밍 방식의 제출이 필요할 때만 호출됩니다.
+            // (예: 페이지 번호 클릭, 정렬 변경 등)
+            searchForm.submit(); 
+        }
+        
+        // --- 아래는 기존 이벤트 핸들러들입니다 ---
+        
+        mainContent.on('click', '#checkAll', function() {
+            $('.member-check').prop('checked', $(this).is(':checked'));
+        });
 
-			const initialSortKey = /*[[${searchCriteria.sortKey}]]*/ '';
-			const initialSortOrder = /*[[${searchCriteria.sortOrder}]]*/ '';
-			$('#sortOrderSelect option').each(function() {
-				if ($(this).data('sort-key') === initialSortKey && $(this).data('sort-order') === initialSortOrder) {
-					$(this).prop('selected', true);
-					return false;
-				}
-			});
-		});
+        mainContent.on('click', '.member-check', () => {
+            const totalChecks = $('.member-check').length;
+            const checkedChecks = $('.member-check:checked').length;
+            $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
+        });
 
-		/*]]>*/
-		</script>	
+        // 페이지 번호 클릭 시 (기존 로직 유지)
+        mainContent.on('click', '.page-num', function(e) {
+            e.preventDefault();
+            currentPageInput.val($(this).data('page'));
+            submitSearchForm();
+        });
+        
+        // 페이지 사이즈 변경 시 (기존 로직 유지)
+        $('#pageSizeSelect').on('change', function() {
+            pageSizeInput.val($(this).val());
+            currentPageInput.val(1);
+            submitSearchForm();
+        });
+        
+        // 정렬 순서 변경 시 (기존 로직 유지)
+        $('#sortOrderSelect').on('change', function() {
+            const selectedOption = $(this).find('option:selected');
+            sortKeyInput.val(selectedOption.data('sort-key'));
+            sortOrderInput.val(selectedOption.data('sort-order'));
+            currentPageInput.val(1);
+            submitSearchForm();
+        });
+        
+        // =======================================================
+        // [핵심 수정 2] 상태 체크박스 변경 시, 더 이상 폼을 바로 제출하지 않습니다.
+        // =======================================================
+        statusCheckboxes.on('change', function() {
+            const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+            filterCheckAll.prop('checked', allChecked);
+            // submitSearchForm();  <-- 이 부분을 제거!
+        });
+
+        // =======================================================
+        // [핵심 수정 3] 전체선택 체크박스 변경 시, 더 이상 폼을 바로 제출하지 않습니다.
+        // =======================================================
+        filterCheckAll.on('change', function() {
+            statusCheckboxes.prop('checked', $(this).is(':checked'));
+            // submitSearchForm();  <-- 이 부분을 제거!
+        });
+        
+        // --- 페이지 로드 시 상태 초기화 로직 (기존과 동일) ---
+        const initialFilterConditions = filterConditionsInput.val();
+        if (initialFilterConditions) {
+            const conditionsArray = initialFilterConditions.split(',');
+            statusCheckboxes.each(function() {
+                $(this).prop('checked', conditionsArray.includes($(this).val()));
+            });
+        } else {
+            statusCheckboxes.prop('checked', true);
+        }
+        const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+        filterCheckAll.prop('checked', allChecked);
+
+        const initialSortKey = /*[[${searchCriteria.sortKey}]]*/ '';
+        const initialSortOrder = /*[[${searchCriteria.sortOrder}]]*/ '';
+        $('#sortOrderSelect option').each(function() {
+            if ($(this).data('sort-key') === initialSortKey && $(this).data('sort-order') === initialSortOrder) {
+                $(this).prop('selected', true);
+                return false;
+            }
+        });
+    });
+
+    /*]]>*/
+    </script>	
 	</th:block>	
 </html>

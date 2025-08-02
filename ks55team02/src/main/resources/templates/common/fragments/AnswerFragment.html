@@ -13,15 +13,15 @@
                 <div class="answer-meta-flex mb-3">
                     <span class="meta-item">
                         <strong class="meta-label">답변자:</strong>
-                        <span th:text="${inquiryDetail.storeInfo?.storeConm ?: '관리자'}"></span>
+                        <span class="sub-title" th:text="${inquiryDetail.storeInfo?.storeConm ?: '관리자'}"></span>
                     </span>
                     <span class="meta-item">
                         <strong class="meta-label">답변 시간:</strong>
-                        <span th:text="${#temporals.format(inquiryDetail.answer.ansTm, 'yyyy-MM-dd HH:mm')}"></span>
+                        <span class="sub-title" th:text="${#temporals.format(inquiryDetail.answer.ansTm, 'yyyy-MM-dd HH:mm')}"></span>
                     </span>
                     <span class="meta-item" th:if="${inquiryDetail.answer.lastMdfcnDt != null and !#temporals.format(inquiryDetail.answer.lastMdfcnDt, 'yyyyMMddHHmm').equals(#temporals.format(inquiryDetail.answer.ansTm, 'yyyyMMddHHmm'))}">
                         <strong class="meta-label">수정 시간:</strong>
-                        <span th:text="${#temporals.format(inquiryDetail.answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></span>
+                        <span class="sub-title" th:text="${#temporals.format(inquiryDetail.answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></span>
                     </span>
                 </div>
                 <div class="content-wrapper">

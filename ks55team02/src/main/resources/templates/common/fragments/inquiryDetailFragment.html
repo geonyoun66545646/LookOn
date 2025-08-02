@@ -30,9 +30,9 @@
                 <!-- 문의 메타 정보 (드롭다운 위치 유지) -->
                 <div class="inquiry-meta-flex">
                 	<div>
-                    <span class="meta-item"><i class="bi bi-person"></i> <strong class="meta-label">작성자:</strong> <span th:text="${inquiry.writerInfo.userNcnm}"></span></span>
-                    <span class="meta-item"><i class="bi bi-calendar-event"></i> <strong class="meta-label">작성일:</strong> <span th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></span></span>
-                    <span class="meta-item"><i class="bi bi-tags"></i> <strong class="meta-label">문의 유형:</strong> <span th:text="|${inquiry.inqryTrgtTypeCd} / ${inquiry.inqryTypeCd}|"></span></span>
+                    <span class="meta-item"><i class="bi bi-person"></i> <strong class="meta-label">작성자:</strong> <span class="sub-title" th:text="${inquiry.writerInfo.userNcnm}"></span></span>
+                    <span class="meta-item"><i class="bi bi-calendar-event"></i> <strong class="meta-label">작성일:</strong> <span class="sub-title" th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></span></span>
+                    <span class="meta-item"><i class="bi bi-tags"></i> <strong class="meta-label">문의 유형:</strong> <span class="sub-title" th:text="|${inquiry.inqryTrgtTypeCd} / ${inquiry.inqryTypeCd}|"></span></span>
                     </div>
                     <div class="edit-option">
 				    <div class="options-container" th:if="${inquiry.wrtrId == session.loginUser?.userNo}">				    
@@ -95,22 +95,24 @@
             <div class="card-body">
                 <!-- ✅ [복원됨] 답변 메타 정보 (한 줄 스타일) -->
                 <div class="answer-meta-flex">
+                <div>
                     <span class="meta-item">
                         <i class="bi bi-person-check"></i>
                         <strong class="meta-label">답변자:</strong>
-                        <span th:if="${(inquiry).storeInfo != null}" th:text="${(inquiry).storeInfo.storeConm}"></span>
-                        <span th:if="${(inquiry).storeInfo == null}">관리자</span>
+                        <span class="sub-title" th:if="${(inquiry).storeInfo != null}" th:text="${(inquiry).storeInfo.storeConm}"></span>
+                        <span class="sub-title" th:if="${(inquiry).storeInfo == null}">관리자</span>
                     </span>
                     <span class="meta-item">
                         <i class="bi bi-clock"></i>
                         <strong class="meta-label">답변 시간:</strong>
-                        <span id="displayAnswerTime" th:text="${#temporals.format((inquiry).answer.ansTm, 'yyyy-MM-dd HH:mm')}"></span>
+                        <span class="sub-title" id="displayAnswerTime" th:text="${#temporals.format((inquiry).answer.ansTm, 'yyyy-MM-dd HH:mm')}"></span>
                     </span>
                     <span class="meta-item" th:if="${(inquiry).answer.lastMdfcnDt != null}">
                         <i class="bi bi-pencil"></i>
                         <strong class="meta-label">수정 시간:</strong>
-                        <span id="displayModifiedTime" th:text="${#temporals.format((inquiry).answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></span>
+                        <span class="sub-title" id="displayModifiedTime" th:text="${#temporals.format((inquiry).answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></span>
                     </span>
+                    </div>
                 </div>
                 
                 <!-- ✅ [복원됨] 답변 내용을 감싸는 div -->

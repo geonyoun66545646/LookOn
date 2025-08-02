@@ -212,35 +212,56 @@ public class InquiryController {
             Model model,
             @RequestParam(name = "page", defaultValue = "1") int currentPage,
             @RequestParam(name = "size", defaultValue = "15") int pageSize,
-            HttpSession session // 현재 사용자 ID를 활용 할 수 있도록 세션 추가
+            @RequestParam(name = "searchType", required = false) String searchType, // 검색 타입
+            @RequestParam(name = "keyword", required = false) String keyword,       // 검색어
+            @RequestParam(name = "author", required = false) String author,         // '내 문의 보기' 필터
+            @RequestParam(name = "status", required = false) String status,
+            HttpSession session
     ) {
-        //1. InquiryService를 호출하여 페이징된 문의 목록과 전체 개수 등 데이터를 가져옵니다.
-        Map<String, Object> pagingData = inquiryService.getInquiryList(currentPage, pageSize);
+        // 현재 로그인한 사용자 ID 가져오기
+        String currentUserId = getCurrentUserId(session);
+        
+        // '내 문의'를 보려는데 로그인이 안 되어있다면 로그인 페이지로 유도
+        if ("me".equals(author) && currentUserId == null) {
+            // 필요하다면 RedirectAttributes로 메시지 전달
+            return "redirect:/customer/login";
+        }
 
-        //2. 조회된 데이터 파싱
+        // 1. 서비스 호출 시 모든 파라미터 전달
+        Map<String, Object> pagingData = inquiryService.getInquiryList(currentPage, pageSize, searchType, keyword, author, status, currentUserId);
+
+        // 2. 데이터 파싱 (서비스에서 반환된 값)
         List<Inquiry> inquiryList = (List<Inquiry>) pagingData.get("inquiryList");
         int totalRows = (int) pagingData.get("totalRows");
 
-        //3. 페이징 관련 계산
+        // 3. 페이징 관련 계산
         int totalPages = (int) Math.ceil((double) totalRows / pageSize);
         int pageBlockSize = 5;
         int startPage = ((currentPage - 1) / pageBlockSize) * pageBlockSize + 1;
         int endPage = Math.min(startPage + pageBlockSize - 1, totalPages);
         
-
-        //5. Model에 데이터를 담아 뷰로 전달합니다.
+        // 4. Model에 데이터 담아 뷰로 전달
         model.addAttribute("title", "문의 목록");
         model.addAttribute("inquiryList", inquiryList);
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("pageSize", pageSize);
+        model.addAttribute("status", status);
         model.addAttribute("totalRows", totalRows);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-        model.addAttribute("currentUserId", getCurrentUserId(session));
+        
+        // 5. ★★★ 뷰에서 검색 조건을 유지하기 위해 파라미터 다시 전달 ★★★
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("author", author);
+
+        // 현재 사용자 ID도 전달 (비밀글 아이콘 등 표시용)
+        model.addAttribute("currentUserId", currentUserId);
 
         return "customer/inquiry/inquiryListView";
     }
+
     
  // ======================= [AJAX] 문의 수정 처리 (POST) =======================
     @ResponseBody // JSON 응답을 위해 필수

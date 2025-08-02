@@ -1,6 +1,7 @@
 package ks55team02.customer.inquiry.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -24,10 +25,10 @@ public interface InquiryMapper {
 	String getMaxInquiryId(); 
 	
 	// 전체 문의 개수 조회
-    int getTotalInquiryCount();
+	int getTotalInquiryCount(Map<String, Object> paramMap);
 
     // 페이징 처리된 문의 목록 조회
-    List<Inquiry> getInquiryListPaging(@Param("startRow") int startRow, @Param("pageSize") int pageSize);
+	List<Inquiry> getInquiryListPaging(Map<String, Object> paramMap);
     
     // 문의 상세조회시 이미지 정보 조회
     Inquiry getInquiryByIdWithImages(String inquiryId);
@@ -40,6 +41,8 @@ public interface InquiryMapper {
     
     // [추가] 문의 삭제 (상태 변경)
     int deleteInquiryById(@Param("inquiryId") String inquiryId, @Param("deleteUserId") String deleteUserId);
+    
+    
    
 }
     

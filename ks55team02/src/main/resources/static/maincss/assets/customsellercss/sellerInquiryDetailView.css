@@ -3,6 +3,10 @@
    =================================================================== */
 
 /* 1. Admin 페이지 전체 폰트 크기 및 레이아웃 강제 설정 */
+.sub-title{
+	font-size : 0.8rem;
+	color : black;
+}
 .main-content {
     font-size: 1.5rem !important;
 }
@@ -25,7 +29,7 @@
 .inquiry-card { border: 1px solid #c96; }
 .inquiry-card .card-header { background-color: #faf6f0; border-bottom: 1px solid #f0f0f0; padding: 1.5rem 2rem; }
 .inquiry-card .card-title-text { font-size: 1.2em; font-weight: 600; color: #212529; }
-.inquiry-card .card-body { padding: 2rem; min-height: 250px; }
+.inquiry-card .card-body { padding: 1.5rem; min-height: 250px; }
 
 /* --- MODIFIED: 상태 표시 뱃지 폰트 크기 조정 --- */
 .inquiry-card .card-header .badge {

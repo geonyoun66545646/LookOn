@@ -47,7 +47,8 @@
 /* 비밀글 (5%) */
 .table-wishlist th:nth-child(2), .table-wishlist td:nth-child(2) { width: 5%; text-align: center; }
 /* 제목 (35%) */
-.table-wishlist th:nth-child(3), .table-wishlist td:nth-child(3) { width: 35%; text-align: left; }
+.table-wishlist th:nth-child(3) { width: 35%; text-align: center; }
+.table-wishlist td:nth-child(3) { width: 35%; text-align: left; }
 /* 작성자 (15%) - 너비 조정 */
 .table-wishlist th:nth-child(4), .table-wishlist td:nth-child(4) { width: 15%; text-align: center; }
 /* 질문유형 (15%) - 너비 조정 */
@@ -95,17 +96,19 @@
     font-weight: 600;
 }
 
-.btn-primary.btn-rounded {
-    font-size: 1.1rem;
-    padding: 0.8rem 2rem;
+.btn-primary {
+    font-size: 1.4rem;
+    padding: 0.8rem 1.5rem;
     font-weight: 500;
     color: #c96;
     background-color: transparent;
     border-color: #c96;
     box-shadow: none;
+    min-width: 11rem;
+    height: 26px;
 }
-.btn-primary.btn-rounded:hover {
-    font-size: 1.1rem;
+.btn-primary:hover {
+    font-size: 1.4rem;
     padding: 0.8rem 2rem;
     font-weight: 500;
     color: #fff;
@@ -113,3 +116,46 @@
     border-color: #c96;
     box-shadow: none;
 }
+.btn-search{
+	font-size: 1.4rem;
+    padding: 0.8rem 1.5rem;
+    font-weight: 500;
+    color: #c96;
+    background-color: transparent;
+    border-color: #c96;
+    box-shadow: none;
+    min-width: 6rem;
+}
+.btn-search:hover{
+	 font-size: 1.4rem;
+    padding: 0.8rem 2rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #c96;
+    border-color: #c96;
+    box-shadow: none;
+
+	}
+	
+
+
+.d-flex {
+    display: -ms-flexbox!important;
+    display: flex !important
+;
+    justify-content: space-around;
+    margin: 15px;
+}
+.distribute{
+	display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+}	
+.search-cn{
+	min-width : 18rem;
+}
+
+.pagination {
+	margin-bottom : 5rem;
+}
+
