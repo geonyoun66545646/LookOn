@@ -372,6 +372,62 @@
 		gds_no =
 		#{gdsNo};
 	</update>
+	
+	<update id="expirePreviousSanctionByReportId" parameterType="String">
+		UPDATE 
+            user_sanctions
+		SET 
+            sanction_end_dt = NOW()
+		WHERE 
+            dclr_id = #{dclrId}
+          AND
+            sanction_end_dt IS NULL OR sanction_end_dt > NOW();
+	</update>
+	
+	<select id="findUserNoBySanctionedReportId" parameterType="String" resultType="String">
+        SELECT 
+            user_no
+        FROM 
+            user_sanctions
+        WHERE 
+            dclr_id = #{dclrId}
+        ORDER BY 
+            prcs_dt DESC
+        LIMIT 1
+    </select>
+    
+    <!-- [신규 추가] 삭제된 게시글을 복원하는 쿼리 (del_dt를 NULL로 변경) -->
+    <update id="restorePost" parameterType="String">
+        UPDATE 
+            posts
+        SET 
+            del_dt = NULL
+        WHERE 
+            pst_sn = #{postSn}
+    </update>
+
+    <!-- [신규 추가] 삭제된 댓글을 복원하는 쿼리 (del_dt와 del_user_no를 NULL로 변경) -->
+    <update id="restoreComment" parameterType="String">
+        UPDATE 
+            post_comments
+        SET 
+            del_dt = NULL,
+            del_user_no = NULL
+        WHERE 
+            pst_cmnt_sn = #{commentSn}
+    </update>
+
+    <!-- [신규 추가] 비활성화된 상품을 복원하는 쿼리 (노출/활성 상태로 변경) -->
+    <update id="restoreProduct" parameterType="String">
+        UPDATE
+            products
+        SET
+            expsr_yn = 1,
+            actvtn_yn = 1,
+            inactvtn_dt = NULL
+        WHERE
+            gds_no = #{gdsNo}
+    </update>
 
 
 </mapper>
