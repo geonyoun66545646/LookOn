@@ -254,12 +254,8 @@ public class InquiryServiceImpl implements InquiryService {
         }
         // 답변이 이미 달린 경우 수정을 막습니다.
         if ("COMPLETED".equals(originalInquiry.getPrcsStts())) {
-            throw new IllegalStateException("처리가 완료된 문의는 수정할 수 없습니다.");
+            throw new IllegalStateException("답변이 완료된 문의는 수정할 수 없습니다.");
         }
-		/*
-		 * if (originalInquiry.getAnswer() != null) { throw new
-		 * IllegalStateException("답변이 완료된 문의는 수정할 수 없습니다."); }
-		 */
         
         // 상점 문의가 아닌 경우, 상점 ID를 null로 설정
         if (!"STORE".equals(inquiry.getInqryTrgtTypeCd())) {
@@ -291,9 +287,6 @@ public class InquiryServiceImpl implements InquiryService {
             // TODO: 관리자도 삭제할 수 있게 하려면 여기에 관리자 권한 확인 로직 추가
             log.warn("문의 삭제 권한 없음. 원본 작성자: {}, 시도자: {}", originalInquiry.getWrtrId(), currentUserId);
             throw new SecurityException("해당 문의를 삭제할 권한이 없습니다.");
-        }
-        if ("COMPLETED".equals(originalInquiry.getPrcsStts())) {
-            throw new IllegalStateException("처리가 완료된 문의는 수정할 수 없습니다.");
         }
 
         // 3. Mapper를 호출하여 DB 업데이트 (삭제 처리)

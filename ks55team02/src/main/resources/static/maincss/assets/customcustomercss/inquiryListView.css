@@ -95,9 +95,21 @@
     font-weight: 600;
 }
 
-/* '문의 하기' 버튼 */
 .btn-primary.btn-rounded {
-    font-size: 1.1rem; /* 전체 폰트 크기에 맞춰 상대적으로 조정 */
+    font-size: 1.1rem;
     padding: 0.8rem 2rem;
     font-weight: 500;
+    color: #c96;
+    background-color: transparent;
+    border-color: #c96;
+    box-shadow: none;
+}
+.btn-primary.btn-rounded:hover {
+    font-size: 1.1rem;
+    padding: 0.8rem 2rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #c96;
+    border-color: #c96;
+    box-shadow: none;
 }

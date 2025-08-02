@@ -35,18 +35,19 @@
                     <span class="meta-item"><i class="bi bi-tags"></i> <strong class="meta-label">문의 유형:</strong> <span th:text="|${inquiry.inqryTrgtTypeCd} / ${inquiry.inqryTypeCd}|"></span></span>
                     </div>
                     <div class="edit-option">
-                     <div class="options-container "  th:if="${inquiry.prcsStts == 'RECEPTION' and inquiry.wrtrId == session.loginUser?.userNo}">
-                        <a href="javascript:void(0);" class="options-menu-toggle" id="options-toggle-btn">⋮</a>
-                        <div class="options-menu">
-                            <button class="options-menu-item" id="editBtn">
-                                <i class="bi bi-pencil-square"></i> 수정
-                            </button>
-                            <button class="options-menu-item text-danger" id="deleteBtn" th:data-inquiry-id="${inquiry.inqryId}">
-                                <i class="bi bi-trash"></i> 삭제
-                            </button>
-                        </div>
-                    </div>
-                    </div>
+				    <div class="options-container" th:if="${inquiry.wrtrId == session.loginUser?.userNo}">				    
+				        <a href="javascript:void(0);" class="options-menu-toggle" id="options-toggle-btn">⋮</a>				
+				        <div class="options-menu">
+				            <button class="options-menu-item" id="editBtn" th:if="${inquiry.prcsStts == 'RECEPTION'}">
+				                <i class="bi bi-pencil-square"></i> 수정
+				            </button>
+				            <button class="options-menu-item text-danger" id="deleteBtn" th:data-inquiry-id="${inquiry.inqryId}">
+				                <i class="bi bi-trash"></i> 삭제
+				            </button>
+				        </div>
+				    </div>
+				</div>
+
                 </div>
 
                 <!-- 내용 표시 및 수정 영역 -->
