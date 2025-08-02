@@ -1,114 +1,133 @@
-<th:block th:fragment="AnswerFragment (inquiry, isEditMode, answerApiUrl)">
+<th:block th:fragment="AnswerFragment (inquiryDetail, isEditMode, answerApiUrl)">
 
-    <div id="answerDisplayMode">
-    <div class="card answer-card">
-
-        <!-- Header: "판매자 답변" 제목과 "수정" 버튼은 그대로 유지합니다. -->
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 card-title-text">판매자 답변</h5>
-            <button type="button" id="startEditBtn" class="btn btn-sm btn-outline-secondary">수정</button>
-        </div>
-
-        <!-- Body: 이미지 상단 카드의 레이아웃을 여기에 적용합니다. -->
-        <div class="card-body">
-
-            <!-- Meta Info Line: 답변자, 답변시간, 수정시간을 한 줄에 표시합니다. -->
-            <div class="answer-meta-flex mb-3">
-                <span class="meta-item">
-                    <!-- 아이콘은 가독성을 위해 추가할 수 있습니다. <i class="bi bi-person-check"></i> -->
-                    <strong class="meta-label">답변자:</strong>
-                    <span th:if="${inquiryDetail.storeInfo != null}" th:text="${inquiryDetail.storeInfo.storeConm}">스토어 이름</span>
-                    <span th:if="${inquiryDetail.storeInfo == null}">관리자</span>
-                </span>
-                <span class="meta-item">
-                    <!-- <i class="bi bi-clock"></i> -->
-                    <strong class="meta-label">답변 시간:</strong>
-                    <span th:text="${#temporals.format(inquiryDetail.answer.ansTm, 'yyyy-MM-dd HH:mm')}"></span>
-                </span>
-                <span class="meta-item" th:if="${inquiryDetail.answer.lastMdfcnDt != null and !#temporals.format(inquiryDetail.answer.lastMdfcnDt, 'yyyyMMddHHmm').equals(#temporals.format(inquiryDetail.answer.ansTm, 'yyyyMMddHHmm'))}">
-                    <!-- <i class="bi bi-pencil"></i> -->
-                    <strong class="meta-label">수정 시간:</strong>
-                    <span th:text="${#temporals.format(inquiryDetail.answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></span>
-                </span>
+    <!-- =============================================================== -->
+    <!-- 1. 답변 보기 모드 (isEditMode가 true일 때만 렌더링) -->
+    <!-- =============================================================== -->
+    <div id="answerDisplayMode" th:if="${isEditMode}">
+        <div class="card answer-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 card-title-text">판매자 답변</h5>
+                <button type="button" id="startEditBtn" class="btn btn-sm btn-outline-secondary">수정</button>
             </div>
-
-            <!-- Separator -->
-            <hr>
-
-            <!-- Answer Content -->
-            <div class="content-wrapper">
-                <p id="displayAnswerContent" class="card-text answer-content" 
-                   th:text="${inquiryDetail.answer.ansCn}" style="white-space: pre-wrap; min-height: 50px;">
-                    답변 내용이 여기에 표시됩니다.
-                </p>
+            <div class="card-body">
+                <div class="answer-meta-flex mb-3">
+                    <span class="meta-item">
+                        <strong class="meta-label">답변자:</strong>
+                        <span th:text="${inquiryDetail.storeInfo?.storeConm ?: '관리자'}"></span>
+                    </span>
+                    <span class="meta-item">
+                        <strong class="meta-label">답변 시간:</strong>
+                        <span th:text="${#temporals.format(inquiryDetail.answer.ansTm, 'yyyy-MM-dd HH:mm')}"></span>
+                    </span>
+                    <span class="meta-item" th:if="${inquiryDetail.answer.lastMdfcnDt != null and !#temporals.format(inquiryDetail.answer.lastMdfcnDt, 'yyyyMMddHHmm').equals(#temporals.format(inquiryDetail.answer.ansTm, 'yyyyMMddHHmm'))}">
+                        <strong class="meta-label">수정 시간:</strong>
+                        <span th:text="${#temporals.format(inquiryDetail.answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></span>
+                    </span>
+                </div>
+                <div class="content-wrapper">
+                    <p class="card-text answer-content" th:text="${inquiryDetail.answer.ansCn}" style="white-space: pre-wrap; min-height: 50px;"></p>
+                </div>
             </div>
-
         </div>
     </div>
-</div>
 
-    <!-- 공통 스크립트 -->
+    <!-- =============================================================== -->
+    <!-- 2. 답변 작성/수정 폼 (isEditMode에 따라 초기 디스플레이 상태 결정) -->
+    <!-- =============================================================== -->
+    <div id="answerEditMode" th:style="${isEditMode} ? 'display:none;' : 'display:block;'">
+        <form name="answerForm">
+            <input type="hidden" name="inqryId" th:value="${inquiryDetail.inqryId}">
+            <input type="hidden" name="ansId" th:if="${isEditMode}" th:value="${inquiryDetail.answer?.ansId}">
+
+            <div class="card answer-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 card-title-text" th:text="${isEditMode} ? '답변 수정하기' : '답변 등록하기'"></h5>
+                </div>
+                <div class="card-body">
+                    <textarea class="form-control" name="ansCn" rows="5" placeholder="답변 내용을 입력해주세요." 
+                              th:text="${isEditMode} ? ${inquiryDetail.answer?.ansCn} : ''"></textarea>
+                </div>
+                <div class="card-footer d-flex justify-content-end gap-2">
+                    <button type="button" id="cancelEditBtn" class="btn btn-custom-neutral" th:if="${isEditMode}">취소</button>
+                    <button type="button" id="submitAnswerBtn" class="btn btn-custom-primary" th:text="${isEditMode} ? '수정 완료' : '답변 등록'"></button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- =============================================================== -->
+    <!-- 3. 스크립트 (UI 제어 + AJAX 제출) -->
+    <!-- =============================================================== -->
     <script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', function() {
+        // --- ★★★★★ UI 전환 로직 (추가된 부분) ★★★★★ ---
+        const startEditBtn = document.getElementById('startEditBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const answerDisplayMode = document.getElementById('answerDisplayMode');
+        const answerEditMode = document.getElementById('answerEditMode');
+
+        // '수정' 버튼 클릭 이벤트 (답변 보기 모드 -> 수정 모드로 전환)
+        if (startEditBtn) { // 버튼이 존재할 때만 리스너를 추가
+            startEditBtn.addEventListener('click', function() {
+                if (answerDisplayMode && answerEditMode) {
+                    answerDisplayMode.style.display = 'none';
+                    answerEditMode.style.display = 'block';
+                }
+            });
+        }
+
+        // '취소' 버튼 클릭 이벤트 (수정 모드 -> 답변 보기 모드로 전환)
+        if (cancelEditBtn) { // 버튼이 존재할 때만 리스너를 추가
+            cancelEditBtn.addEventListener('click', function() {
+                if (answerDisplayMode && answerEditMode) {
+                    answerEditMode.style.display = 'none';
+                    answerDisplayMode.style.display = 'block';
+                }
+            });
+        }
+
+        // --- 기존 AJAX 답변 제출 로직 (변경 없음) ---
         const submitBtn = document.getElementById('submitAnswerBtn');
-        const form = submitBtn?.closest('form');
+        const form = document.forms['answerForm'];
 
         if (submitBtn && form) {
             submitBtn.addEventListener('click', function() {
+                // ... (기존의 fetch를 사용한 AJAX 제출 코드는 그대로 유지)
                 const inqryId = form.inqryId.value;
-                const ansId = form.ansId.value;
+                const ansId = form.ansId ? form.ansId.value : null;
                 const ansCn = form.ansCn.value;
 
                 if (!ansCn.trim()) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: '입력 필요',
-                        text: '답변 내용을 입력해주세요.',
-                    });
+                    Swal.fire({ icon: 'warning', title: '입력 필요', text: '답변 내용을 입력해주세요.' });
                     return;
                 }
 
                 const answerApiUrl = /*[[${answerApiUrl}]]*/ '/default/api/url';
-
-                const payload = {
-                    inqryId: inqryId,
-                    ansCn: ansCn,
-                    ansId: ansId
-                };
+                const payload = { inqryId: inqryId, ansCn: ansCn, ansId: ansId };
 
                 fetch(answerApiUrl, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 })
                 .then(response => {
-                    const contentType = response.headers.get("content-type");
-                    if (response.ok && contentType?.includes("application/json")) {
-                        return response.json();
+                    if (!response.ok) {
+                        return response.text().then(text => { throw new Error(text || '서버 오류 발생'); });
                     }
-                    return response.text().then(text => { throw new Error(text || '서버 오류 발생'); });
+                    return response.json();
                 })
                 .then(data => {
                     if (data.status === 'success') {
                         Swal.fire({ icon: 'success', title: '성공', text: data.message })
                             .then(() => window.location.reload());
                     } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: '실패',
-                            text: '답변 처리 실패: ' + (data.message || '알 수 없는 오류'),
-                        });
+                        Swal.fire({ icon: 'error', title: '실패', text: data.message || '알 수 없는 오류' });
                     }
                 })
                 .catch(error => {
-                    console.error('AJAX 요청 또는 응답 처리 오류:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: '오류 발생',
-                        text: '답변 처리 중 오류가 발생했습니다. 자세한 내용은 콘솔을 확인해주세요.',
-                    });
+                    console.error('답변 처리 오류:', error);
+                    Swal.fire({ icon: 'error', title: '오류 발생', text: '답변 처리 중 오류가 발생했습니다.' });
                 });
             });
         }

@@ -53,7 +53,7 @@
 .answer-card .card-header { background-color: #f8f9fa; padding: 1.5rem 2rem; border-bottom: 1px solid #e9ecef; }
 .answer-card .card-title-text { font-size: 1.2em; font-weight: 600; color: #495057; }
 .answer-card .card-title-text i { color: #495057; }
-.answer-card .card-body { padding: 2rem; min-height: 200px; }
+.answer-card .card-body { padding: 1.5rem; }
 .answer-meta-flex .meta-item { color: #6c757d; }
 .answer-meta-flex .meta-item i { color: #868e96; }
 .answer-meta-flex .meta-label { color: #495057; }
@@ -104,3 +104,28 @@
     background-color: #6c757d;
     color: #ffffff;
 }
+
+#answerSection{
+	display : none;
+}
+
+#submitAnswerBtn {
+    border-color: #6c757d;
+    color: #6c757d;
+}
+#submitAnswerBtn:hover {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+textarea{
+	
+	resize:none;
+}
+
+textarea.form-control{
+	min-height: 8rem !important;
+}
+.card-footer{
+	padding-top : 0;
+}
+

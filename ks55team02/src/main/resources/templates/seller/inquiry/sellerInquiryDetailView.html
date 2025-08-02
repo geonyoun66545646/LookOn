@@ -28,41 +28,13 @@
                 <!-- ================== ★★★ 답변 영역 (구조 변경) ★★★ ================== -->
 
                 <!-- 2. 답변이 있을 경우의 처리 -->
-                <div id="answerSection" class="mt-4" th:if="${inquiryDetail.prcsStts =='COMPLETED'}">
-                    
-                    <!-- 2-1. 답변 표시 모드 (기본으로 보임) -->
-                    <div id="answerDisplayMode">
-                        <div class="card answer-card">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0 card-title-text">판매자 답변</h5>
-                                <!-- "답변 수정" 버튼이 이곳으로 이동 -->
-                                <button type="button" id="startEditBtn" class="btn btn-sm btn-outline-secondary">수정</button>
-                            </div>
-                            <div class="card-body">
-                                <!-- 기존 답변 내용을 보여주는 부분 -->
-                                <p th:text="${inquiryDetail.answer.ansCn}" style="white-space: pre-wrap;"></p>
-                                <hr>
-                                <div class="text-end">
-                                    <small class="text-muted" th:if="${inquiryDetail.answer.lastMdfcnDt != null}"
-                                           th:text="'최종 수정일: ' + ${#temporals.format(inquiryDetail.answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></small>
-                                    <small class="text-muted" th:if="${inquiryDetail.answer.lastMdfcnDt == null}"
-                                           th:text="'작성일: ' + ${#temporals.format(inquiryDetail.answer.ansTm, 'yyyy-MM-dd HH:mm')}"></small>
-                                </div>
-                            </div>
-                        </div>
+               <div class="mt-4">
+                    <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(
+                            inquiryDetail=${inquiryDetail}, 
+                            isEditMode=${inquiryDetail.prcsStts == 'COMPLETED'}, 
+                            answerApiUrl=${answerApiUrl}
+                        )}">
                     </div>
-
-                    <!-- 2-2. 답변 수정 모드 (기본적으로 숨겨져 있음) -->
-                    <div id="answerEditMode" style="display: none;">
-                        <!-- 재사용 가능한 AnswerFragment를 그대로 호출 -->
-                        <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(inquiry=${inquiryDetail}, isEditMode=true, answerApiUrl=${answerApiUrl})}"></div>
-                    </div>
-                </div>
-
-                <!-- 3. 답변이 없을 경우의 처리 -->
-                <div th:if="${inquiryDetail.prcsStts =='RECEPTION'}">
-                    <!-- 답변 작성 폼을 표시 -->
-                    <div th:replace="~{common/fragments/AnswerFragment :: AnswerFragment(inquiry=${inquiryDetail}, isEditMode=false, answerApiUrl=${answerApiUrl})}"></div>
                 </div>
 
                 <!-- 4. 페이지 액션 버튼 그룹 (목록 버튼만 남김) -->
