@@ -171,24 +171,68 @@
     </div>
     
     <!-- Step 4: 서류 제출 -->
-    <div class="tab-pane fade" id="step4" role="tabpanel" aria-labelledby="step4-tab">
-        <div class="card card-body p-4 p-md-5">
-            <h5 class="form-section-title">필수 제출 서류</h5>
-            <div class="file-upload-container"> <!-- ✅ 파일 그룹을 감싸는 컨테이너 추가 -->
-                <ul class="file-upload-list">
-                    <li class="file-upload-item"><span class="doc-name">사업자 등록증 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-1">선택된 파일 없음</span><label for="file-upload-1" class="btn-file select">파일 선택</label><input id="file-upload-1" type="file" name="businessRegistrationDoc" required /><button type="button" class="btn-file cancel" data-target="1">취소</button></li>
-                    <li class="file-upload-item"><span class="doc-name">통신 판매업 신고증 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-2">선택된 파일 없음</span><label for="file-upload-2" class="btn-file select">파일 선택</label><input id="file-upload-2" type="file" name="telecommunicationLicense" required /><button type="button" class="btn-file cancel" data-target="2">취소</button></li>
-                    <li class="file-upload-item"><span class="doc-name">대표자 신분증 사본 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-4">선택된 파일 없음</span><label for="file-upload-4" class="btn-file select">파일 선택</label><input id="file-upload-4" type="file" name="idCardCopy" required /><button type="button" class="btn-file cancel" data-target="4">취소</button></li>
-                    <li class="file-upload-item"><span class="doc-name">통장 사본 <span class="text-danger">*</span></span><span class="file-name-display" id="fileNameDisplay-5">선택된 파일 없음</span><label for="file-upload-5" class="btn-file select">파일 선택</label><input id="file-upload-5" type="file" name="bankAccountCopy" required /><button type="button" class="btn-file cancel" data-target="5">취소</button></li>
-                </ul>
-                <div class="invalid-feedback"></div> <!-- ✅ 파일 그룹 전체에 대한 오류 메시지 위치 -->
-            </div>
-            <h5 class="form-section-title mt-4">선택 제출 서류</h5>
+<div class="tab-pane fade" id="step4" role="tabpanel" aria-labelledby="step4-tab">
+    <div class="card card-body p-4 p-md-5">
+        <h5 class="form-section-title">필수 제출 서류</h5>
+        <div class="file-upload-container">
             <ul class="file-upload-list">
-                 <li class="file-upload-item"><span class="doc-name">판매상품 관련 증빙</span><span class="file-name-display" id="fileNameDisplay-3">선택된 파일 없음</span><label for="file-upload-3" class="btn-file select">파일 선택</label><input id="file-upload-3" type="file" name="productEvidence"/><button type="button" class="btn-file cancel" data-target="3">취소</button></li>
-                 <li class="file-upload-item"><span class="doc-name">기타 서류</span><span class="file-name-display" id="fileNameDisplay-6">선택된 파일 없음</span><label for="file-upload-6" class="btn-file select">파일 선택</label><input id="file-upload-6" type="file" name="etcDocs"/><button type="button" class="btn-file cancel" data-target="6">취소</button></li>
-                 <li class="file-upload-item"><span class="doc-name">스토어 로고</span><span class="file-name-display" id="fileNameDisplay-7">선택된 파일 없음</span><label for="file-upload-7" class="btn-file select">파일 선택</label><input id="file-upload-7" type="file" name="storeLogoImgFile"/><button type="button" class="btn-file cancel" data-target="7">취소</button></li>
+                <!-- ▼▼▼ 모든 input 태그에 accept 속성 추가 ▼▼▼ -->
+                <li class="file-upload-item">
+                    <span class="doc-name">사업자 등록증 <span class="text-danger">*</span></span>
+                    <span class="file-name-display" id="fileNameDisplay-1">선택된 파일 없음</span>
+                    <label for="file-upload-1" class="btn-file select">파일 선택</label>
+                    <input id="file-upload-1" type="file" name="businessRegistrationDoc" required accept="image/*, .pdf" />
+                    <button type="button" class="btn-file cancel" data-target="1">취소</button>
+                </li>
+                <li class="file-upload-item">
+                    <span class="doc-name">통신 판매업 신고증 <span class="text-danger">*</span></span>
+                    <span class="file-name-display" id="fileNameDisplay-2">선택된 파일 없음</span>
+                    <label for="file-upload-2" class="btn-file select">파일 선택</label>
+                    <input id="file-upload-2" type="file" name="telecommunicationLicense" required accept="image/*, .pdf" />
+                    <button type="button" class="btn-file cancel" data-target="2">취소</button>
+                </li>
+                <li class="file-upload-item">
+                    <span class="doc-name">대표자 신분증 사본 <span class="text-danger">*</span></span>
+                    <span class="file-name-display" id="fileNameDisplay-4">선택된 파일 없음</span>
+                    <label for="file-upload-4" class="btn-file select">파일 선택</label>
+                    <input id="file-upload-4" type="file" name="idCardCopy" required accept="image/*, .pdf" />
+                    <button type="button" class="btn-file cancel" data-target="4">취소</button>
+                </li>
+                <li class="file-upload-item">
+                    <span class="doc-name">통장 사본 <span class="text-danger">*</span></span>
+                    <span class="file-name-display" id="fileNameDisplay-5">선택된 파일 없음</span>
+                    <label for="file-upload-5" class="btn-file select">파일 선택</label>
+                    <input id="file-upload-5" type="file" name="bankAccountCopy" required accept="image/*, .pdf" />
+                    <button type="button" class="btn-file cancel" data-target="5">취소</button>
+                </li>
             </ul>
+            <div class="invalid-feedback"></div>
+        </div>
+        <h5 class="form-section-title mt-4">선택 제출 서류</h5>
+        <ul class="file-upload-list">
+             <li class="file-upload-item">
+                 <span class="doc-name">판매상품 관련 증빙</span>
+                 <span class="file-name-display" id="fileNameDisplay-3">선택된 파일 없음</span>
+                 <label for="file-upload-3" class="btn-file select">파일 선택</label>
+                 <input id="file-upload-3" type="file" name="productEvidence" accept="image/*, .pdf" />
+                 <button type="button" class="btn-file cancel" data-target="3">취소</button>
+             </li>
+             <li class="file-upload-item">
+                 <span class="doc-name">기타 서류</span>
+                 <span class="file-name-display" id="fileNameDisplay-6">선택된 파일 없음</span>
+                 <label for="file-upload-6" class="btn-file select">파일 선택</label>
+                 <input id="file-upload-6" type="file" name="etcDocs" accept="image/*, .pdf" />
+                 <button type="button" class="btn-file cancel" data-target="6">취소</button>
+             </li>
+             <li class="file-upload-item">
+                 <span class="doc-name">스토어 로고</span>
+                 <span class="file-name-display" id="fileNameDisplay-7">선택된 파일 없음</span>
+                 <label for="file-upload-7" class="btn-file select">파일 선택</label>
+                 <!-- 스토어 로고는 이미지만 받도록 하는 것이 더 좋습니다 -->
+                 <input id="file-upload-7" type="file" name="storeLogoImgFile" accept="image/*" />
+                 <button type="button" class="btn-file cancel" data-target="7">취소</button>
+             </li>
+        </ul>
             <div class="button-wrapper"><button type="button" class="btn btn-outline-secondary prev-step">이전</button><button type="button" class="btn btn-outline-primary" id="submitApplication">최종 제출</button></div>
         </div>
     </div>
@@ -207,94 +251,145 @@
 <th:block layout:fragment="jsScript">
 <script th:inline="javascript">
 /*<![CDATA[*/
+
 // =================================================================
-// 전역 스코프 함수 (HTML onclick 등에서 직접 호출)
+// 전역 스코프 함수 (HTML의 onclick 등에서 직접 호출)
 // =================================================================
+
+// 사업자등록번호 조회 상태를 저장하는 전역 변수
 let isBrnoVerified = false;
+
+// 사업자등록번호 입력폼 초기화 함수
 function resetBrnoForm() {
-    document.getElementById('brno').value = '';
-    document.getElementById('brno').readOnly = false;
-    document.getElementById('apiResponseContainer').innerHTML = '';
+    const brnoInput = document.getElementById('brno');
+    const apiResponseContainer = document.getElementById('apiResponseContainer');
+    
+    brnoInput.value = '';
+    brnoInput.readOnly = false;
+    brnoInput.classList.remove('is-invalid');
+    
+    apiResponseContainer.innerHTML = '';
+    apiResponseContainer.closest('.input-group-gap').querySelector('.invalid-feedback').textContent = '';
+    
     isBrnoVerified = false;
 }
+
+// 다음 주소 API 호출 함수
 function sample2_execDaumPostcode() {
     const element_layer = document.getElementById('layer');
+
     new daum.Postcode({
         oncomplete: function(data) {
+            // 주소 정보 필드에 값 설정
             document.getElementById('sample2_postcode').value = data.zonecode;
-            document.getElementById("sample2_address").value = (data.userSelectedType === 'R') ? data.roadAddress : data.jibunAddress;
+            const fullAddress = (data.userSelectedType === 'R') ? data.roadAddress : data.jibunAddress;
+            document.getElementById("sample2_address").value = fullAddress;
+            
+            // 유효성 검사 오류 제거
+            document.getElementById('sample2_postcode').classList.remove('is-invalid');
+
+            // 상세주소 필드로 포커스 이동
             document.getElementById("sample2_detailAddress").focus();
+            
+            // 주소 검색 레이어 닫기
             element_layer.style.display = 'none';
-        }, width: '100%', height: '100%', maxSuggestItems: 5
+        },
+        width: '100%',
+        height: '100%',
+        maxSuggestItems: 5
     }).embed(element_layer);
+
+    // 레이어 표시 및 위치 조정
     element_layer.style.display = 'block';
     initLayerPosition();
 }
-function closeDaumPostcode() { document.getElementById('layer').style.display = 'none'; }
+
+// 다음 주소 API 레이어 닫기 함수
+function closeDaumPostcode() {
+    document.getElementById('layer').style.display = 'none';
+}
+
+// 다음 주소 API 레이어 위치 초기화 함수
 function initLayerPosition() {
     const element_layer = document.getElementById('layer');
-    var width = 300, height = 400, borderWidth = 5;
+    const width = 300; // 레이어의 너비
+    const height = 400; // 레이어의 높이
+    const borderWidth = 5; // 테두리 두께
+
     element_layer.style.width = width + 'px';
     element_layer.style.height = height + 'px';
     element_layer.style.border = borderWidth + 'px solid';
+    // 화면 중앙에 레이어 위치시키기
     element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width) / 2 - borderWidth) + 'px';
     element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height) / 2 - borderWidth) + 'px';
 }
 
+
 // =================================================================
-// DOM 로드 후 실행되는 코드
+// DOM 로드 후 실행되는 메인 코드
 // =================================================================
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- Wizard 네비게이션 로직 ---
+    // --- 허용할 파일 MIME 타입 정의 ---
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+    const allowedLogoMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+    // --- Wizard 네비게이션(탭 이동) 로직 ---
     const nextStepButtons = document.querySelectorAll('.next-step');
     const prevStepButtons = document.querySelectorAll('.prev-step');
+
     nextStepButtons.forEach(button => {
         button.addEventListener('click', function() {
             const currentTabPane = this.closest('.tab-pane');
-            if (!validateStep(currentTabPane.id)) { return; }
+            // 현재 스텝의 유효성 검사 통과 못하면 다음으로 넘어가지 않음
+            if (!validateStep(currentTabPane.id)) {
+                return;
+            }
             const currentTab = document.querySelector(`.nav-link[href="#${currentTabPane.id}"]`);
             const nextTabEl = currentTab.parentElement.nextElementSibling?.querySelector('.nav-link');
             if (nextTabEl) {
-                currentTab.classList.add('completed');
-                new bootstrap.Tab(nextTabEl).show();
-                window.scrollTo(0, 0);
+                currentTab.classList.add('completed'); // 상단 탭에 완료 표시
+                new bootstrap.Tab(nextTabEl).show(); // 다음 탭 보여주기
+                window.scrollTo(0, 0); // 페이지 상단으로 스크롤
             }
         });
     });
+
     prevStepButtons.forEach(button => {
         button.addEventListener('click', function() {
             const currentTabPane = this.closest('.tab-pane');
             const prevTabEl = document.querySelector(`.nav-link[href="#${currentTabPane.id}"]`).parentElement.previousElementSibling?.querySelector('.nav-link');
             if (prevTabEl) {
-                new bootstrap.Tab(prevTabEl).show();
-                window.scrollTo(0, 0);
+                new bootstrap.Tab(prevTabEl).show(); // 이전 탭 보여주기
+                window.scrollTo(0, 0); // 페이지 상단으로 스크롤
             }
         });
     });
 
-    // --- ✅ [수정] 스텝별 유효성 검사 함수 ---
-    // --- ✅ [수정] 이메일/연락처 검사를 포함한 스텝별 유효성 검사 함수 ---
+    // --- 스텝별 유효성 검사 함수 ---
     function validateStep(stepId) {
         let isValid = true;
         let firstInvalidElement = null;
 
         const currentStepPane = document.getElementById(stepId);
+        // 기존 오류 메시지 초기화
         currentStepPane.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
         currentStepPane.querySelectorAll('.invalid-feedback').forEach(el => { el.textContent = ''; });
         
+        // 필드 유효성 검사를 위한 헬퍼 함수
         const checkField = (element, message, validationFn) => {
-            if (!element || !isValid) return;
+            if (!element || !isValid) return; // 요소가 없거나 이미 유효성 검사에 실패했으면 중단
 
             if (!validationFn(element)) {
                 isValid = false;
-                const feedback = element.nextElementSibling && element.nextElementSibling.classList.contains('invalid-feedback')
-                    ? element.nextElementSibling
-                    : element.closest('div').querySelector('.invalid-feedback');
+                // 오류 메시지를 표시할 .invalid-feedback 요소를 찾음
+                const feedback = element.nextElementSibling && element.nextElementSibling.classList.contains('invalid-feedback') ?
+                    element.nextElementSibling :
+                    element.closest('div').querySelector('.invalid-feedback');
                 
                 if (feedback) { feedback.textContent = message; }
                 element.classList.add('is-invalid');
-                if (!firstInvalidElement) { firstInvalidElement = element; }
+                if (!firstInvalidElement) { firstInvalidElement = element; } // 첫 번째 오류 필드로 저장
             }
         };
 
@@ -307,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
             checkField(document.getElementById('storeIntroTextarea'), '스토어 소개를 입력해주세요.', el => el.value.trim() !== '');
             checkField(document.getElementById('managerNameInput'), '매니저 명을 입력해주세요.', el => el.value.trim() !== '');
             
-            // ✅ 연락처 필드 특별 검사
+            // 연락처 필드 그룹 검사
             if (isValid) {
                 const telInput = document.getElementById('managerTelInput');
                 if (!/^01[0-9]-\d{3,4}-\d{4}$/.test(telInput.value)) {
@@ -317,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     telInput.closest('div').querySelector('.invalid-feedback').textContent = '매니저 연락처를 올바르게 입력해주세요. (예: 010-1234-5678)';
                 }
             }
-            // ✅ 이메일 필드 특별 검사
+            // 이메일 필드 그룹 검사
             if (isValid) {
                 const emailInput = document.getElementById('managerEmailInput');
                 if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(emailInput.value)) {
@@ -340,24 +435,21 @@ document.addEventListener('DOMContentLoaded', function() {
             checkField(document.getElementById('sample2_detailAddress'), '스토어 상세주소를 입력해주세요.', el => el.value.trim() !== '');
         }
         
+        // 첫 번째 오류 필드로 스크롤 및 포커스
         if (!isValid && firstInvalidElement) {
-            if (firstInvalidElement.offsetParent !== null) {
+            if (firstInvalidElement.offsetParent !== null) { // 화면에 보이는 요소일 경우에만
                 firstInvalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 firstInvalidElement.focus();
             }
         }
         return isValid;
     }
-    
-    
- // --- ✅ [수정] 최종 제출시 필수 서류 유효성 검사 함수 ---
-    // --- ✅ [수정] 필수 서류 유효성 검사 함수 (항목별 음영 처리 추가) ---
+
+    // --- 필수 서류 유효성 검사 함수 (첨부 여부 및 파일 형식 동시 검사) ---
     function validateRequiredFiles() {
-        // 1. 모든 오류 상태 초기화
         const fileContainer = document.querySelector('.file-upload-container');
         fileContainer.classList.remove('is-invalid');
         fileContainer.querySelector('.invalid-feedback').textContent = '';
-        // 이전에 추가된 모든 음영 효과 제거
         document.querySelectorAll('.file-upload-item.file-item-invalid').forEach(li => {
             li.classList.remove('file-item-invalid');
         });
@@ -365,35 +457,33 @@ document.addEventListener('DOMContentLoaded', function() {
         let allFilesValid = true;
         const requiredFileIds = ['file-upload-1', 'file-upload-2', 'file-upload-4', 'file-upload-5'];
 
-        // 2. 모든 필수 파일을 순회하며 검사 (중간에 멈추지 않음)
         for (const id of requiredFileIds) {
             const element = document.getElementById(id);
-            if (!element.value) {
-                allFilesValid = false; // 하나라도 없으면 전체 유효성 실패
-                const listItem = element.closest('.file-upload-item');
+            const listItem = element.closest('.file-upload-item');
+            
+            // 파일이 첨부되지 않았거나, 첨부되었지만 유효하지 않은 파일(dataset)인 경우
+            if (!element.value || element.dataset.isValid === 'false') {
+                allFilesValid = false;
                 if (listItem) {
-                    // 해당 항목에만 음영 클래스 추가
-                    listItem.classList.add('file-item-invalid');
+                    listItem.classList.add('file-item-invalid'); // 해당 항목 음영 처리
                 }
             }
         }
 
-        // 3. 최종 결과 처리
         if (!allFilesValid) {
-            // 전체 오류 메시지 표시
             fileContainer.classList.add('is-invalid');
-            fileContainer.querySelector('.invalid-feedback').textContent = '붉게 표시된 필수 서류(*)를 모두 첨부해주세요.';
-            new bootstrap.Tab(document.getElementById('step4-tab')).show(); // 4단계로 이동
+            fileContainer.querySelector('.invalid-feedback').textContent = '붉게 표시된 필수 서류(*)를 올바른 파일 형식(이미지, PDF)으로 모두 첨부해주세요.';
+            new bootstrap.Tab(document.getElementById('step4-tab')).show(); // 4단계로 강제 이동
         }
 
         return allFilesValid;
     }
- 
-    // --- 실시간으로 오류 상태 제거하는 리스너 추가 ---
+
+    // --- 실시간으로 오류 상태 제거하는 리스너 ---
     document.querySelectorAll('input, select, textarea').forEach(el => {
         el.addEventListener('input', () => {
             el.classList.remove('is-invalid');
-            // 특별 케이스: 연락처, 이메일
+            // 그룹화된 필드들의 오류 스타일도 함께 제거
             if (['managerTel1','managerTel2','managerTel3'].includes(el.id)) {
                 ['managerTel1','managerTel2','managerTel3'].forEach(id => document.getElementById(id).classList.remove('is-invalid'));
             }
@@ -403,33 +493,21 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // --- 연락처 및 이메일 조합 로직 ---
-    const tel1 = document.getElementById('managerTel1');
-    const tel2 = document.getElementById('managerTel2');
-    const tel3 = document.getElementById('managerTel3');
+    // --- 연락처 및 이메일 자동 조합 로직 ---
+    const tel1 = document.getElementById('managerTel1'), tel2 = document.getElementById('managerTel2'), tel3 = document.getElementById('managerTel3');
     const hiddenTel = document.getElementById('managerTelInput');
     const updateManagerTel = () => {
-        if(tel1.value && tel2.value.trim() && tel3.value.trim()) {
-            hiddenTel.value = `${tel1.value}-${tel2.value.trim()}-${tel3.value.trim()}`;
-        } else {
-            hiddenTel.value = '';
-        }
+        hiddenTel.value = (tel1.value && tel2.value.trim() && tel3.value.trim()) ? `${tel1.value}-${tel2.value.trim()}-${tel3.value.trim()}` : '';
     };
     [tel1, tel2, tel3].forEach(el => el.addEventListener('input', updateManagerTel));
     
-    const emailId = document.getElementById('emailId');
-    const emailDomain = document.getElementById('emailDomain');
-    const emailSelector = document.getElementById('emailDomainSelector');
+    const emailId = document.getElementById('emailId'), emailDomain = document.getElementById('emailDomain'), emailSelector = document.getElementById('emailDomainSelector');
     const hiddenEmail = document.getElementById('managerEmailInput');
     const updateManagerEmail = () => {
-        if(emailId.value.trim() && emailDomain.value.trim()) {
-            hiddenEmail.value = `${emailId.value.trim()}@${emailDomain.value.trim()}`;
-        } else {
-            hiddenEmail.value = '';
-        }
+        hiddenEmail.value = (emailId.value.trim() && emailDomain.value.trim()) ? `${emailId.value.trim()}@${emailDomain.value.trim()}` : '';
     };
     emailSelector.addEventListener('change', function() {
-        if(this.value) {
+        if (this.value) {
             emailDomain.value = this.value;
             emailDomain.readOnly = true;
         } else {
@@ -441,50 +519,72 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     [emailId, emailDomain].forEach(el => el.addEventListener('input', updateManagerEmail));
 
-    // --- 파일 등록 및 취소 로직 ---
-    // --- ✅ [수정] 파일 등록/취소 시 실시간 음영 제거 로직 추가 ---
+    // --- 파일 등록 및 유효성 검사 로직 ---
     document.querySelectorAll('input[type="file"]').forEach(input => {
         input.addEventListener('change', function() {
-            const num = this.id.split('-').pop();
-            const display = document.getElementById('fileNameDisplay-' + num);
+            const display = this.parentElement.querySelector('.file-name-display');
             const listItem = this.closest('.file-upload-item');
+            
+            this.dataset.isValid = 'false'; // 일단 유효성 상태 초기화
 
             if (this.files && this.files.length > 0) {
-                if(display) display.textContent = this.files[0].name;
-                // 파일이 선택되면 음영 효과 제거
-                if (listItem) listItem.classList.remove('file-item-invalid');
+                const file = this.files[0];
+                const isLogoInput = this.name === 'storeLogoImgFile';
+                const validTypes = isLogoInput ? allowedLogoMimeTypes : allowedMimeTypes;
+                
+                // MIME 타입 검사
+                if (validTypes.includes(file.type)) {
+                    this.dataset.isValid = 'true';
+                    if (display) display.textContent = file.name;
+                    if (listItem) listItem.classList.remove('file-item-invalid');
+                } else {
+                    this.value = ''; // 잘못된 파일이면 선택을 강제 취소
+                    if (display) display.textContent = '선택된 파일 없음';
+                    if (listItem) listItem.classList.add('file-item-invalid');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '잘못된 파일 형식',
+                        text: isLogoInput ? '스토어 로고는 이미지 파일만 첨부 가능합니다.' : '이미지(JPG, PNG 등) 또는 PDF 파일만 첨부 가능합니다.',
+                        confirmButtonText: '확인'
+                    });
+                }
             } else {
-                if(display) display.textContent = '선택된 파일 없음';
+                if (display) display.textContent = '선택된 파일 없음';
             }
         });
     });
+
+    // 파일 선택 '취소' 버튼 로직
     document.querySelectorAll('.btn-file.cancel').forEach(button => {
         button.addEventListener('click', function() {
             const num = this.dataset.target;
             const input = document.getElementById('file-upload-' + num);
             const display = document.getElementById('fileNameDisplay-' + num);
-            const listItem = this.closest('.file-upload-item');
-
-            if(input) input.value = '';
-            if(display) display.textContent = '선택된 파일 없음';
-            // 파일 선택이 취소되어도 음영 효과는 그대로 유지 (다시 제출 버튼을 눌러야 재검사)
+            
+            if (input) input.value = '';
+            if (display) display.textContent = '선택된 파일 없음';
+            // 취소 시에도 유효성 검사 음영은 그대로 유지 (사용자가 다시 제출 버튼을 눌러야 재검사)
         });
     });
 
-    // --- 사업자 등록정보 조회 ---
+    // --- 사업자 등록정보 조회 API 연동 ---
     document.getElementById('checkBrnoButton')?.addEventListener('click', function() {
         const brnoInput = document.getElementById('brno');
         const brno = brnoInput.value.replace(/-/g, '');
         const apiResponse = document.getElementById('apiResponseContainer');
-        isBrnoVerified = false;
+        
+        isBrnoVerified = false; // 조회 버튼 누를 때마다 인증 상태 초기화
+        
         if (!brno || brno.length !== 10 || !/^\d+$/.test(brno)) {
-            apiResponse.innerHTML = '<span style="color: red;">올바른 사업자등록번호 10자리를 입력해주세요.</span>';
+            apiResponse.innerHTML = '<span class="text-danger">올바른 사업자등록번호 10자리를 입력해주세요.</span>';
             return;
         }
+        
         apiResponse.innerHTML = '<span>조회 중...</span>';
+        
         fetch(`/api/brno/status?brno=${brno}`)
             .then(async res => {
-                if (!res.ok) {
+                if (!res.ok) { // HTTP 상태 코드가 200-299가 아닐 경우
                     const errorData = await res.json().catch(() => null);
                     const errorMessage = errorData ? errorData.message : await res.text();
                     return Promise.reject({ status: res.status, message: errorMessage });
@@ -492,25 +592,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 return res.json();
             })
             .then(data => {
-                if (data?.data?.[0]?.b_stt_cd === '01') {
+                // 국세청 API 응답 데이터 구조에 따라 응답 처리
+                if (data?.data?.[0]?.b_stt_cd === '01') { // '계속사업자' 코드
                     isBrnoVerified = true;
-                    apiResponse.innerHTML = `<span style="color: green;">확인되었습니다. 계속 진행해주세요. (상태: ${data.data[0].b_stt})</span>`;
-                    brnoInput.readOnly = true;
+                    apiResponse.innerHTML = `<span class="text-success">확인되었습니다. 계속 진행해주세요. (상태: ${data.data[0].b_stt})</span>`;
+                    brnoInput.readOnly = true; // 인증 성공 시 수정 불가
                 } else {
                     const status = data?.data?.[0]?.b_stt || '등록되지 않음';
                     const tax_type = data?.data?.[0]?.tax_type || '정보 없음';
-                    apiResponse.innerHTML = `<span style="color: red;">${status} 상태의 사업자입니다. (${tax_type})</span>`;
+                    apiResponse.innerHTML = `<span class="text-danger">${status} 상태의 사업자입니다. (${tax_type})</span>`;
                 }
             })
             .catch(err => {
-                if (err.status === 409) {
-                    apiResponse.innerHTML = `<span style="color: red;">${err.message || '이미 등록된 사업자등록번호입니다.'}</span>`;
+                // fetch 자체의 오류 또는 서버의 에러 응답 처리
+                if (err.status === 409) { // '이미 등록된 번호' 같은 특정 비즈니스 오류
+                    apiResponse.innerHTML = `<span class="text-danger">${err.message || '이미 등록된 사업자등록번호입니다.'}</span>`;
                 } else {
-                    apiResponse.innerHTML = `<span style="color: red;">조회 중 오류가 발생했습니다. (오류: ${err.message || '서버 응답 없음'})</span>`;
+                    apiResponse.innerHTML = `<span class="text-danger">조회 중 오류가 발생했습니다. (오류: ${err.message || '서버 응답 없음'})</span>`;
                 }
                 console.error('Fetch Error:', err);
             });
     });
+    
+    // 사업자 번호 다시 입력 시 인증 상태 초기화
     document.getElementById('brno')?.addEventListener('input', () => {
         if (document.getElementById('brno').readOnly) return;
         isBrnoVerified = false;
@@ -523,6 +627,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const displaySpan = document.getElementById('contractDisplay');
     const hiddenDaysInput = document.getElementById('contractTermInput');
     let currentYear = 1;
+    
     function updateContractDisplay() {
         const days = currentYear * 365;
         displaySpan.textContent = `${currentYear}년 (${days}일)`;
@@ -530,117 +635,114 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     incrementBtn.addEventListener('click', () => { currentYear++; updateContractDisplay(); });
     decrementBtn.addEventListener('click', () => { if (currentYear > 1) { currentYear--; updateContractDisplay(); } });
-    updateContractDisplay();
+    updateContractDisplay(); // 페이지 로드 시 초기값 설정
 
     // --- 최종 제출 로직 ---
     document.getElementById('submitApplication')?.addEventListener('click', async function(event) {
-        event.preventDefault();
+        event.preventDefault(); // form의 기본 제출 동작 방지
         
-        // 모든 스텝 유효성 검사
+        // --- 모든 유효성 검사 실행 ---
+        let allFilesFormatValid = true;
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            if (input.files.length > 0 && input.dataset.isValid === 'false') {
+                allFilesFormatValid = false;
+            }
+        });
+
+        if (!allFilesFormatValid) {
+             Swal.fire({
+                icon: 'warning', title: '잘못된 파일 포함', text: '허용되지 않는 형식의 파일이 포함되어 있습니다. 다시 확인해주세요.', confirmButtonText: '확인'
+            });
+            new bootstrap.Tab(document.getElementById('step4-tab')).show();
+            return;
+        }
+
         const isStep1Valid = validateStep('step1');
         const isStep2Valid = validateStep('step2');
         const isStep3Valid = validateStep('step3');
-        const areFilesValid = validateRequiredFiles();
+        const areRequiredFilesAttached = validateRequiredFiles();
 
-        if (!isStep1Valid || !isStep2Valid || !isStep3Valid || !areFilesValid) {
-            // 가장 첫번째로 유효하지 않은 탭으로 이동
+        // 하나라도 유효성 검사를 통과하지 못하면 제출 중단
+        if (!isStep1Valid || !isStep2Valid || !isStep3Valid || !areRequiredFilesAttached) {
+            // 가장 첫 번째로 유효하지 않은 탭으로 자동 이동
             if (!isStep1Valid) new bootstrap.Tab(document.getElementById('step1-tab')).show();
             else if (!isStep2Valid) new bootstrap.Tab(document.getElementById('step2-tab')).show();
             else if (!isStep3Valid) new bootstrap.Tab(document.getElementById('step3-tab')).show();
             
             Swal.fire({
-                icon: 'warning',
-                title: '입력 정보 확인 필요',
-                text: '필수 입력 항목을 모두 올바르게 채워주세요.',
-                confirmButtonText: '확인'
+                icon: 'warning', title: '입력 정보 확인 필요', text: '필수 입력 항목을 모두 올바르게 채워주세요.', confirmButtonText: '확인'
             });
             return;
         }
         
-        // SweetAlert2로 제출 여부 확인
+        // --- 모든 검사를 통과하면 사용자에게 최종 확인 ---
         Swal.fire({
-            title: '최종 제출 확인',
-            text: "입력하신 내용으로 스토어 신청을 제출하시겠습니까?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: '네, 제출합니다',
-            cancelButtonText: '아니요'
+            title: '최종 제출 확인', text: "입력하신 내용으로 스토어 신청을 제출하시겠습니까?", icon: 'question',
+            showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33',
+            confirmButtonText: '네, 제출합니다', cancelButtonText: '아니요'
         }).then(async (result) => {
             if (result.isConfirmed) {
-        const formData = new FormData();
-        // Step 1
-        formData.append('aplyUserNo', document.getElementById('applicantIdDisplay').textContent);
-        formData.append('dpstrNm', document.getElementById('dpstrNm').value);
-        formData.append('bankNm', document.getElementById('bankNm').value);
-        formData.append('actno', document.getElementById('actno').value);
-        // Step 2
-        formData.append('storeNm', document.getElementById('storeNameInput').value);
-        formData.append('plcyId', document.getElementById('commissionRateCn').textContent);
-        formData.append('storeIntroCn', document.getElementById('storeIntroTextarea').value);
-        formData.append('mngrNm', document.getElementById('managerNameInput').value);
-        formData.append('mngrTelNo', document.getElementById('managerTelInput').value);
-        formData.append('mngrEml', document.getElementById('managerEmailInput').value);
-        // Step 3
-        formData.append('brno', document.getElementById('brno').value);
-        formData.append('bplcPostCode', document.getElementById('sample2_postcode').value);
-        formData.append('bplcAddr', document.getElementById('sample2_address').value);
-        formData.append('bplcDaddr', document.getElementById('sample2_detailAddress').value);
-        formData.append('ctrtAplyYmd', document.getElementById('contractApplyDateInput').value);
-        formData.append('ctrtTermVal', document.getElementById('contractTermInput').value);
-        // Step 4
-        for(let i=1; i<=7; i++) {
-            const fileInput = document.getElementById('file-upload-' + i);
-            if (fileInput && fileInput.files.length > 0) {
-                formData.append(fileInput.name, fileInput.files[0]);
+                // --- FormData 객체 생성 및 데이터 담기 ---
+                const formData = new FormData();
+                // Step 1 데이터
+                formData.append('aplyUserNo', document.getElementById('applicantIdDisplay').textContent);
+                formData.append('dpstrNm', document.getElementById('dpstrNm').value);
+                formData.append('bankNm', document.getElementById('bankNm').value);
+                formData.append('actno', document.getElementById('actno').value);
+                // Step 2 데이터
+                formData.append('storeNm', document.getElementById('storeNameInput').value);
+                formData.append('plcyId', document.getElementById('commissionRateCn').textContent);
+                formData.append('storeIntroCn', document.getElementById('storeIntroTextarea').value);
+                formData.append('mngrNm', document.getElementById('managerNameInput').value);
+                formData.append('mngrTelNo', document.getElementById('managerTelInput').value);
+                formData.append('mngrEml', document.getElementById('managerEmailInput').value);
+                // Step 3 데이터
+                formData.append('brno', document.getElementById('brno').value);
+                formData.append('bplcPostCode', document.getElementById('sample2_postcode').value);
+                formData.append('bplcAddr', document.getElementById('sample2_address').value);
+                formData.append('bplcDaddr', document.getElementById('sample2_detailAddress').value);
+                formData.append('ctrtAplyYmd', document.getElementById('contractApplyDateInput').value);
+                formData.append('ctrtTermVal', document.getElementById('contractTermInput').value);
+                // Step 4 데이터 (파일)
+                for(let i=1; i<=7; i++) {
+                    const fileInput = document.getElementById('file-upload-' + i);
+                    if (fileInput && fileInput.files.length > 0) {
+                        formData.append(fileInput.name, fileInput.files[0]);
+                    }
+                }
+                
+                try {
+                    // 로딩 스피너 표시
+                    Swal.fire({
+                        title: '제출 중...', text: '잠시만 기다려주세요.', allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    // 서버에 데이터 전송
+                    const response = await fetch('/store/appStore', { method: 'POST', body: formData });
+                    const responseText = await response.text(); // 서버 응답 메시지
+
+                    if (!response.ok) { // HTTP 에러 발생 시
+                        Swal.fire({ icon: 'error', title: `신청 실패 (HTTP ${response.status})`, text: responseText, confirmButtonText: '확인' });
+                        return;
+                    }
+
+                    // 성공 시
+                    Swal.fire({
+                        icon: 'success', title: '신청 완료', text: responseText, confirmButtonText: '확인'
+                    }).then(() => {
+                        location.href = '/customer/mypage'; // 성공 후 마이페이지로 이동
+                    });
+
+                } catch (error) { // 네트워크 오류 등
+                    console.error('신청 제출 중 오류 발생:', error);
+                    Swal.fire({
+                        icon: 'error', title: '제출 오류', text: `신청 제출 중 네트워크 오류가 발생했습니다: ${error.message}`, confirmButtonText: '확인'
+                    });
+                }
             }
-        }
-        
-        try {
-            Swal.fire({ // 로딩창 표시
-                title: '제출 중...',
-                text: '잠시만 기다려주세요.',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
-
-            const response = await fetch('/store/appStore', { method: 'POST', body: formData });
-            const responseText = await response.text();
-
-            if (!response.ok) {
-                // 서버 오류 발생 시
-                Swal.fire({
-                    icon: 'error',
-                    title: `신청 실패 (HTTP ${response.status})`,
-                    text: responseText,
-                    confirmButtonText: '확인'
-                });
-                return;
-            }
-
-            // 성공 시
-            Swal.fire({
-                icon: 'success',
-                title: '신청 완료',
-                text: responseText,
-                confirmButtonText: '확인'
-            }).then(() => {
-                location.href = '/customer/mypage'; 
-            });
-
-        } catch (error) {
-            console.error('신청 제출 중 오류 발생:', error);
-            Swal.fire({
-                icon: 'error',
-                title: '제출 오류',
-                text: `신청 제출 중 네트워크 오류가 발생했습니다: ${error.message}`,
-                confirmButtonText: '확인'
-            });
-        }
-    }
-});
-});
+        });
+    });
 });
 /*]]>*/
 </script>

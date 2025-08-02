@@ -2,7 +2,9 @@ package ks55team02.customer.store.controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -104,9 +106,49 @@ public class StoreController {
 	        }
 	        appStore.setAplyUserNo(loggedInUserNo);
 
-	        // ★★★ DTO에 데이터가 이미 바인딩 되었으므로 별도의 set 작업이 대부분 필요 없습니다.
-	        // String -> LocalDate, String -> Integer/Long 같은 타입 변환은 Spring이 자동으로 처리해줍니다.
+	        // =================================================================
+            // [수정] 파일 형식 검증 로직 (모든 파일 대상)
+            // =================================================================
 
+            // 1. 허용할 MIME 타입 목록 정의 (단일 목록)
+            List<String> allowedMimeTypes = Arrays.asList("image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf");
+
+            // 2. 검증할 모든 파일을 하나의 Map에 담아 관리
+            Map<String, MultipartFile> allFilesToValidate = new HashMap<>();
+            // 필수 서류
+            allFilesToValidate.put("사업자 등록증", brnoImg);
+            allFilesToValidate.put("통신 판매업 신고증", cmmDclrImg);
+            allFilesToValidate.put("대표자 신분증 사본", rrnoCardCopyImg);
+            allFilesToValidate.put("통장 사본", bankbookCopyImg);
+            // 선택 서류
+            allFilesToValidate.put("판매상품 관련 증빙", selGdsProofImg);
+            allFilesToValidate.put("기타 서류", etcDocImg);
+            allFilesToValidate.put("스토어 로고", storeLogoImgFile);
+
+            // 3. 모든 파일에 대해 반복하며 검증 수행
+            for (Map.Entry<String, MultipartFile> entry : allFilesToValidate.entrySet()) {
+                String fieldName = entry.getKey();
+                MultipartFile file = entry.getValue();
+
+                // 파일이 첨부된 경우에만 검증 수행
+                if (file != null && !file.isEmpty()) {
+                    String fileContentType = file.getContentType();
+                    if (fileContentType == null || !allowedMimeTypes.contains(fileContentType)) {
+                        log.warn("허용되지 않은 파일 형식 감지: 필드명={}, 파일명={}, MIME타입={}", fieldName, file.getOriginalFilename(), fileContentType);
+                        return new ResponseEntity<>(fieldName + " 파일은 이미지(JPG, PNG 등) 또는 PDF 형식만 업로드 가능합니다.", HttpStatus.BAD_REQUEST);
+                    }
+                }
+            }
+            
+            // 4. 필수 서류 누락 여부 별도 체크 (필요시)
+            // 위 로직은 파일 형식만 검사하므로, 필수 파일이 아예 없는 경우를 추가로 체크합니다.
+            if (brnoImg == null || brnoImg.isEmpty() ||
+                cmmDclrImg == null || cmmDclrImg.isEmpty() ||
+                rrnoCardCopyImg == null || rrnoCardCopyImg.isEmpty() ||
+                bankbookCopyImg == null || bankbookCopyImg.isEmpty()) {
+                return new ResponseEntity<>("필수 서류가 모두 첨부되지 않았습니다. 다시 확인해주세요.", HttpStatus.BAD_REQUEST);
+            }
+                
 	        // 초기 신청 상태 설정
 	        appStore.setAplyStts("APPLY");
 

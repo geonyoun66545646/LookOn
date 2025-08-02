@@ -30,17 +30,25 @@
                 <div class="page-content">
                     <div class="container">
                     
-                    <!-- 모아보기버튼 -->
-                     <div class="distribute">
-                        <a th:href="@{/customer/inquiry/inquiryList(status='COMPLETED')}" class="btn"
-                           th:classappend="${param.status == 'COMPLETED' ? 'btn-success' : 'btn-primary'}">답변완료 보기</a>
-                       <a th:href="@{/customer/inquiry/inquiryList(author='me')}" class="btn"
-                           th:classappend="${param.author == 'me' ? 'btn-success' : 'btn-primary'}"
-                           th:if="${session.loginUser != null}">내 문의 보기</a>
-                        <a th:href="@{/customer/inquiry/inquiryList}" class="btn btn-primary">전체 목록</a>
-                        <a th:href="@{/customer/inquiry/addInquiry}" class="btn btn-primary">문의하기</a>
-                    </div>
-                    
+                    <div class="distribute">
+				    <!-- 답변완료 보기 버튼 -->
+				    <a href="#" class="btn btn-filter" 
+				       data-filter-type="status" data-filter-value="COMPLETED"
+				       th:classappend="${param.status == 'COMPLETED' ? 'btn-success' : 'btn-primary'}">답변완료 보기</a>
+				
+				    <!-- 내 문의 보기 버튼 (로그인 시에만 보임) -->
+				    <a href="#" class="btn btn-filter"
+				       data-filter-type="author" data-filter-value="me"
+				       th:classappend="${param.author == 'me' ? 'btn-success' : 'btn-primary'}"
+				       th:if="${session.loginUser != null}">내 문의 보기</a>
+				
+				    <!-- 전체 목록 보기 버튼 -->
+				    <a th:href="@{/customer/inquiry/inquiryList}" class="btn btn-primary">전체 목록</a>
+				
+				    <!-- 문의하기 버튼 -->
+				    <a th:href="@{/customer/inquiry/addInquiry}" class="btn btn-primary">문의하기</a>
+				</div>
+				                    
                     <!-- 검색창  -->           
                 <div class="d-flex">
                     <!-- 검색 폼 (왼쪽) -->
@@ -129,19 +137,42 @@
         </th:block>
 
         <th:block layout:fragment="jsScript">
-            <script th:inline="javascript">
-            /*<![CDATA[*/
-            // 컨트롤러에서 전달받은 errorMessage가 있다면 alert 창 띄우기
-            // errorMessage 변수에 서버에서 넘어온 값이 할당됩니다.
-            var errorMessage = /*[[${errorMessage}]]*/ null;
+             <script th:inline="javascript">
+    /*<![CDATA[*/
+       $(document).ready(function() {
+    const currentUrl = new URL(window.location.href);
+    const params = new URLSearchParams(currentUrl.search);
+    
+    // --- 필터 버튼 공통 이벤트 처리 ---
+    // 'data-filter-type'과 'data-filter-value' 속성을 사용하여 어떤 필터를 제어할지 결정
+    $('.btn-filter').on('click', function(e) {
+        e.preventDefault();
 
-            if (errorMessage != null && errorMessage !== '') {
-                // 서버에서 전달된 메시지를 그대로 alert에 사용
-                alert(errorMessage);
-            }
-            /*]]>*/
-                console.log("문의 게시판 스크립트 실행!");
-            </script>
+        const filterType = $(this).data('filter-type'); // 'status' 또는 'author'
+        const filterValue = $(this).data('filter-value'); // 'COMPLETED' 또는 'me'
+
+        // URL에 파라미터가 이미 있으면 삭제(토글 끄기), 없으면 추가(토글 켜기)
+        if (params.get(filterType) === filterValue) {
+            params.delete(filterType);
+        } else {
+            params.set(filterType, filterValue);
+        }
+        
+        params.set('page', '1'); // 필터 변경 시 항상 1페이지로 이동
+        
+        window.location.href = '/customer/inquiry/inquiryList?' + params.toString();
+    });
+
+    // --- 서버에서 전달된 에러 메시지 처리 ---
+    var errorMessage = /*[[${errorMessage}]]*/ null;
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+
+    console.log("문의 게시판 스크립트가 정상적으로 실행되었습니다!");
+});
+    /*]]>*/
+    </script>
         </th:block>
     </body>
 </html>
