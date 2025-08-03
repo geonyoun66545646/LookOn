@@ -41,5 +41,7 @@ public class AdminReportDetail {
     private String dclrTrgtContsId; // 신고 대상 콘텐츠 ID
     
     private String prcsCmptnDt; // 처리 완료 일시
+    
+    private List<AdminReportAttachment> attachments;
 
 }

@@ -7,11 +7,11 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReport;
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportAttachment;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportHistory;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.ReportProcessRequest;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.UserSanction;
-import ks55team02.admin.common.domain.SearchCriteria;
 
 @Mapper
 public interface AdminReportsMapper {
@@ -177,4 +177,7 @@ public interface AdminReportsMapper {
 
     /** [신규 추가] 상품 ID로 판매자 정보(번호, 닉네임)를 조회합니다. */
     Map<String, String> findProductAuthorInfo(String contentId);
+    
+    /** [신규 추가] 신고 ID로 첨부파일 목록을 조회합니다. */
+    List<AdminReportAttachment> findAttachmentsByReportId(String dclrId);
 }
