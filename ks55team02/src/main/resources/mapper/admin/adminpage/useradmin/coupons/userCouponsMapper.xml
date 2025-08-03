@@ -75,17 +75,15 @@
 						AND uc.user_cpn_id LIKE CONCAT('%', #{keyword},
 						'%')
 					</when>
-					<when test="'userNm'.equals(searchType)">
-						AND u.user_nm LIKE CONCAT('%', #{keyword}, '%')
+					 <when test="'userLgnId'.equals(searchType)">
+						 AND u.user_lgn_id LIKE CONCAT('%', #{keyword}, '%')
 					</when>
 					<otherwise>
-						AND (
-						c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
-						OR u.user_lgn_id LIKE CONCAT('%', #{keyword}, '%')
-						OR u.user_nm LIKE CONCAT('%', #{keyword}, '%')
-						OR uc.user_cpn_id LIKE CONCAT('%', #{keyword}, '%')
-						)
-					</otherwise>
+                    AND (
+                    c.cpn_nm LIKE CONCAT('%', #{keyword}, '%')
+                    OR u.user_lgn_id LIKE CONCAT('%', #{keyword}, '%')
+                    )
+                </otherwise>
 				</choose>
 			</if>
 
