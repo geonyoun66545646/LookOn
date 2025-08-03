@@ -7,11 +7,12 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReport;
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportAttachment;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportHistory;
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminSanctionDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.ReportProcessRequest;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.UserSanction;
-import ks55team02.admin.common.domain.SearchCriteria;
 
 @Mapper
 public interface AdminReportsMapper {
@@ -146,4 +147,41 @@ public interface AdminReportsMapper {
 	 * @return 영향받은 행의 수
 	 */
 	int updateProductExposureYn(Map<String, Object> params);
+	
+	/**
+     * [신규 추가] 신고 ID를 기반으로, 이전에 적용되었던 제재를 무효화(종료)시키는 메소드
+     * @param dclrId 제재를 종료시킬 신고의 ID
+     */
+    void expirePreviousSanctionByReportId(String dclrId);
+    
+    /**
+     * [신규 추가] 신고 ID를 통해, user_sanctions 테이블에서 제재받은 사용자의 user_no를 찾습니다.
+     * @param dclrId 신고 ID
+     * @return 제재받은 사용자의 user_no
+     */
+    String findUserNoBySanctionedReportId(String dclrId);
+    
+    /** [신규 추가] 삭제된 게시글을 복원합니다. */
+    void restorePost(String postSn);
+
+    /** [신규 추가] 삭제된 댓글을 복원합니다. */
+    void restoreComment(String commentSn);
+
+    /** [신규 추가] 비활성화된 상품을 복원(재활성/재노출)합니다. */
+    void restoreProduct(String gdsNo);
+    
+    /** [신규 추가] 게시글 ID로 작성자 정보(번호, 닉네임)를 조회합니다. */
+    Map<String, String> findPostAuthorInfo(String contentId);
+
+    /** [신규 추가] 댓글 ID로 작성자 정보(번호, 닉네임)를 조회합니다. */
+    Map<String, String> findCommentAuthorInfo(String contentId);
+
+    /** [신규 추가] 상품 ID로 판매자 정보(번호, 닉네임)를 조회합니다. */
+    Map<String, String> findProductAuthorInfo(String contentId);
+    
+    /** [신규 추가] 신고 ID로 첨부파일 목록을 조회합니다. */
+    List<AdminReportAttachment> findAttachmentsByReportId(String dclrId);
+    
+    /** [신규 추가] 신고 ID로 가장 최근의 실제 제재 상세 정보를 조회합니다. */
+    AdminSanctionDetail findSanctionDetailByReportId(String dclrId);
 }

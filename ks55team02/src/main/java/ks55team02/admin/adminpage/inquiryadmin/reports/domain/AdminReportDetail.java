@@ -23,6 +23,8 @@ public class AdminReportDetail {
     private String dclrCn;
     private String dclrDt;
     private String prcsSttsCd;
+    private String dclrUserLgnId;
+    private String dclrTrgtUserLgnId; 
     
     // report_attachments 테이블 정보
     private int attachmentCount;
@@ -32,6 +34,7 @@ public class AdminReportDetail {
 
     // 처리 완료 후 정보
     private String prcsPicMngrNo;
+    private String prcsPicMngrLgnId; // 처리 담당자 로그인 ID
     private String dclrPrcsRsltCn;
     
     // [수정 3] 유효성 검사에 필요한 필드들을 추가합니다.
@@ -39,5 +42,9 @@ public class AdminReportDetail {
     private String dclrTrgtContsId; // 신고 대상 콘텐츠 ID
     
     private String prcsCmptnDt; // 처리 완료 일시
+    
+    private List<AdminReportAttachment> attachments;
+    private AdminSanctionDetail sanctionDetail; 
+
 
 }

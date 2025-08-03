@@ -16,62 +16,67 @@ $(() => {
 
 	// --- 2. 이벤트 핸들러 ---
 
-	// '새 이미지 추가' input 파일 선택 변경 시
+	// '새 이미지 추가' input 파일 선택 변경 시 (단일 파일 처리 로직으로 변경)
 	imageInput.on('change', function(event) {
-		newPreviewContainer.find('.preview-image-wrapper').remove();
+	    const file = event.target.files[0];
 
-		const files = event.target.files;
-		if (files && files.length > 0) {
-			uploadPlaceholder.hide();
-			const dataTransfer = new DataTransfer();
-			Array.from(files).forEach(file => dataTransfer.items.add(file));
-			imageInput[0].files = dataTransfer.files;
+	    // 새로운 이미지가 선택되지 않았으면 아무 작업도 하지 않음
+	    if (!file) {
+	        // 만약 사용자가 파일 선택을 취소했고, 보이는 이미지가 없다면 placeholder를 다시 표시
+	        if (newPreviewContainer.find('.preview-image-wrapper').length === 0 && existingPreviewContainer.find('.preview-image-wrapper:visible').length === 0) {
+	            uploadPlaceholder.show();
+	        }
+	        return;
+	    }
 
-			Array.from(files).forEach((file, index) => {
-				const reader = new FileReader();
-				reader.onload = (e) => {
-					const imgWrapper = $('<div>').addClass('preview-image-wrapper').attr('data-file-index', index);
-					const img = $('<img>').attr('src', e.target.result).addClass('preview-image');
-					const deleteBtn = $('<button>').attr('type', 'button').addClass('delete-new-image-btn').html('×');
-					imgWrapper.append(img).append(deleteBtn);
-					newPreviewContainer.append(imgWrapper);
-				};
-				reader.readAsDataURL(file);
-			});
-		}
-		if (newPreviewContainer.find('.preview-image-wrapper').length === 0) {
-			if (existingPreviewContainer.find('.preview-image-wrapper:visible').length === 0) {
-				uploadPlaceholder.show();
-			}
-		}
+	    // --- 단일 이미지 규칙 적용 ---
+	    // 1. 기존에 있던 '새 이미지' 미리보기를 모두 제거
+	    newPreviewContainer.find('.preview-image-wrapper').remove();
+
+	    // 2. (수정 모드) 기존 이미지가 있다면 모두 숨기고 '삭제 목록'에 추가
+	    if (isEditMode) {
+	        existingPreviewContainer.find('.preview-image-wrapper:visible').each(function() {
+	            const imageWrapper = $(this);
+	            const imageSnToDelete = imageWrapper.data('image-sn');
+	            if (!imageSnToDelete) return;
+
+	            imageWrapper.hide(); // 화면에서 숨김
+
+	            const currentDeletedSns = deleteImageSnsInput.val().split(',').filter(Boolean);
+	            if (!currentDeletedSns.includes(imageSnToDelete.toString())) {
+	                currentDeletedSns.push(imageSnToDelete);
+	                deleteImageSnsInput.val(currentDeletedSns.join(','));
+	            }
+	        });
+	    }
+	    
+	    // 3. 업로드 placeholder 숨기기
+	    uploadPlaceholder.hide();
+
+	    // 4. 선택된 단일 파일의 미리보기 생성
+	    const reader = new FileReader();
+	    reader.onload = (e) => {
+	        const imgWrapper = $('<div>').addClass('preview-image-wrapper');
+	        const img = $('<img>').attr('src', e.target.result).addClass('preview-image');
+	        const deleteBtn = $('<button>').attr('type', 'button').addClass('delete-new-image-btn').html('×');
+	        imgWrapper.append(img).append(deleteBtn);
+	        newPreviewContainer.append(imgWrapper);
+	    };
+	    reader.readAsDataURL(file);
 	});
 
-	// 새로 추가한 이미지 미리보기의 'X' 삭제 버튼
+	// 새로 추가한 이미지 미리보기의 'X' 삭제 버튼 (단일 파일 처리 로직으로 변경)
 	newPreviewContainer.on('click', '.delete-new-image-btn', function() {
-		const wrapperToRemove = $(this).closest('.preview-image-wrapper');
-		const fileIndexToRemove = parseInt(wrapperToRemove.data('file-index'), 10);
+	    // 미리보기 제거
+	    $(this).closest('.preview-image-wrapper').remove();
+	    
+	    // input의 파일 값 초기화
+	    imageInput.val('');
 
-		const dataTransfer = new DataTransfer();
-		const originalFiles = imageInput[0].files;
-
-		for (let i = 0; i < originalFiles.length; i++) {
-			if (i !== fileIndexToRemove) {
-				dataTransfer.items.add(originalFiles[i]);
-			}
-		}
-		imageInput[0].files = dataTransfer.files;
-
-		wrapperToRemove.remove();
-
-		newPreviewContainer.find('.preview-image-wrapper').each(function(newIndex) {
-			$(this).attr('data-file-index', newIndex);
-		});
-
-		if (newPreviewContainer.find('.preview-image-wrapper').length === 0) {
-			if (existingPreviewContainer.find('.preview-image-wrapper:visible').length === 0) {
-				uploadPlaceholder.show();
-			}
-		}
+	    // 보이는 이미지가 아무것도 없으면 placeholder 다시 표시
+	    if (existingPreviewContainer.find('.preview-image-wrapper:visible').length === 0) {
+	        uploadPlaceholder.show();
+	    }
 	});
 
 	// '기존 이미지'의 'X' 삭제 버튼 클릭 시 (수정 모드 전용)

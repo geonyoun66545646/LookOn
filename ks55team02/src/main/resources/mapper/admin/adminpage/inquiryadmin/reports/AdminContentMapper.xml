@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="ks55team02.admin.adminpage.inquiryadmin.reports.mapper.AdminContentMapper">
+
+	<!-- 게시글 원본 조회 -->
+	<select id="findOriginalPostById" parameterType="String"
+		resultType="map">
+		SELECT
+		pst_ttl AS title,
+		pst_cn AS content
+		FROM
+		posts
+		WHERE
+		pst_sn = #{contentId}
+	</select>
+
+	<!-- 댓글 원본 조회 -->
+	<select id="findOriginalCommentById" parameterType="String"
+		resultType="map">
+		SELECT
+		cmnt_cn AS content
+		FROM
+		post_comments
+		WHERE
+		pst_cmnt_sn = #{contentId}
+	</select>
+
+	<!-- 상품 원본 조회 -->
+	<select id="findOriginalProductById" parameterType="String"
+		resultType="map">
+		SELECT
+		gds_nm AS name,
+		gds_expln AS description
+		FROM
+		products
+		WHERE
+		gds_no = #{contentId}
+	</select>
+
+	<!-- 사용자 원본 조회 -->
+	<select id="findOriginalUserById" parameterType="String"
+		resultType="map">
+		SELECT
+		user_ncnm AS nickname,
+		user_lgn_id AS loginId
+		FROM
+		users
+		WHERE
+		user_no = #{userId}
+	</select>
+
+</mapper>

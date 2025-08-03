@@ -96,8 +96,10 @@
         SELECT
             ss.store_clcln_id,
             ss.store_id,
-            s.store_conm,        ss.plcy_id,
-            c.plcy_expln,        ss.tot_sel_amt,
+            s.store_conm,        
+            ss.plcy_id,
+            c.plcy_expln,        
+            ss.tot_sel_amt,
             ss.sel_fee_rt,
             ss.clcln_amt,
             ss.actno_id,
@@ -188,7 +190,7 @@
 	    <selectKey keyProperty="storeClclnId" resultType="String" order="BEFORE">
         SELECT CONCAT('stl_sale_', IFNULL(MAX(CAST(SUBSTRING_INDEX(store_clcln_id, '_', -1) AS UNSIGNED)), 0) + 1)
         FROM store_settlements WHERE store_clcln_id LIKE 'stl_sale_%'
-    </selectKey>
+    	</selectKey>
     
     INSERT INTO store_settlements (
         store_clcln_id, store_id, plcy_id, sel_fee_rt, actno_id,

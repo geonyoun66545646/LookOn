@@ -175,8 +175,7 @@
         WHERE
             p.actvtn_yn = true AND p.expsr_yn = true AND s.del_prcr_yn = FALSE
         ORDER BY
-            p.reg_dt DESC
-        LIMIT 24
+            RAND() LIMIT 24
     </select>
 	
 	<!-- 비슷한 상품 목록 조회 (현재 상품 제외) -->
@@ -277,7 +276,6 @@
             p.reg_dt DESC
     </select>
 	
-    <!-- 다양한 필터 및 정렬 조건에 따라 상품 목록 조회 -->
     <select id="getFilteredAndSortedProducts" parameterType="java.util.Map" resultMap="productsWithFilterResultMap">
 	    SELECT
 	        p.gds_no,
@@ -309,9 +307,10 @@
 	        ks55team02db.product_status ps ON p.gds_no = ps.gds_no AND ps.actvtn_yn = TRUE
 	    
 	    <where> p.expsr_yn = 1 AND p.actvtn_yn = 1 AND s.del_prcr_yn = FALSE
-	    		<if test="isNewProductPage == true">
-		            AND p.reg_dt >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
-		        </if>
+	    
+	        <if test="sortBy == 'new' or sortBy == 'newRandom'">
+	            AND p.reg_dt >= DATE_SUB(NOW(), INTERVAL 1 MONTH)
+	        </if>
 	        
 	        <if test="categoryId != null and categoryId != ''">
 	            AND (
@@ -325,29 +324,28 @@
 	            )
 	        </if>
 	        
-	        <!-- 성별 필터 (옵션 테이블을 통해 조회) -->
-			<if test="gender != null and gender != ''">
-			    AND p.gds_no IN (
-			        SELECT po.gds_no
-			        FROM ks55team02db.product_options po
-			        JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
-			        WHERE
-			            po.opt_nm = '성별'
-			            AND 
-			            <choose>
-			                <when test="gender == '남성'">
-			                    pov.vl_nm IN ('남성', '공용')
-			                </when>
-			                <when test="gender == '여성'">
-			                    pov.vl_nm IN ('여성', '공용')
-			                </when>
-			                <otherwise>
-			                    pov.vl_nm = #{gender}
-			                </otherwise>
-			            </choose>
-			            AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
-			    )
-			</if>
+	        <if test="gender != null and gender != ''">
+	            AND p.gds_no IN (
+	                SELECT po.gds_no
+	                FROM ks55team02db.product_options po
+	                JOIN ks55team02db.product_option_values pov ON po.opt_no = pov.opt_no
+	                WHERE
+	                    po.opt_nm = '성별'
+	                    AND 
+	                    <choose>
+	                        <when test="gender == '남성'">
+	                            pov.vl_nm IN ('남성', '공용')
+	                        </when>
+	                        <when test="gender == '여성'">
+	                            pov.vl_nm IN ('여성', '공용')
+	                        </when>
+	                        <otherwise>
+	                            pov.vl_nm = #{gender}
+	                        </otherwise>
+	                    </choose>
+	                    AND po.actvtn_yn = TRUE AND pov.actvtn_yn = TRUE
+	            )
+	        </if>
 	        
 	        <choose>
 	            <when test="minPrice != null and maxPrice != null">
@@ -405,8 +403,8 @@
 	        </if>
 	        
 	        <if test="discountRate != null and discountRate != '' and discountRate != 'all'">
-			    AND p.dscnt_rt <![CDATA[ >= ]]> #{discountRate}
-			</if>
+	            AND p.dscnt_rt <![CDATA[ >= ]]> #{discountRate}
+	        </if>
 	    </where>
 	    
 	    GROUP BY p.gds_no
@@ -419,12 +417,12 @@
 	    
 	    ORDER BY
 	        <choose>
+	            <when test="sortBy == 'newRandom'">RAND()</when>
 	            <when test="sortBy == 'new'">p.reg_dt DESC</when>
 	            <when test="sortBy == 'old'">p.reg_dt ASC</when>
 	            <when test="sortBy == 'priceAsc'">last_sel_prc ASC</when>
 	            <when test="sortBy == 'priceDesc'">last_sel_prc DESC</when>
-	            <!-- ⭐⭐⭐ 이 라인을 추가하세요. ⭐⭐⭐ -->
-        		<when test="sortBy == 'discountDesc'">p.dscnt_rt DESC</when>
+	            <when test="sortBy == 'discountDesc'">p.dscnt_rt DESC</when>
 	            <when test="sortBy == 'popularity'">p.gds_view_cnt DESC</when>
 	            <otherwise>p.reg_dt DESC</otherwise>
 	        </choose>

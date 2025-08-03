@@ -7,13 +7,8 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title th:text="${title} ?: 'LookOn'">룩온 전체 상품 페이지</title>
-<!-- ⭐⭐⭐ Favicon 설정 추가 시작 ⭐⭐⭐ -->
 <link rel="icon" type="image/png"
 	th:href="@{/favicons/lookonfavicon2.png}">
-<!-- ⭐⭐⭐ Favicon 설정 추가 끝 ⭐⭐⭐ -->
-
-
-<!-- 스타일 -->
 <link rel="stylesheet"
 	th:href="@{/maincss/assets/css/bootstrap.min.css}">
 <link rel="stylesheet" th:href="@{/maincss/assets/css/style.css}">
@@ -44,6 +39,9 @@
 
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet" th:href="@{/maincss/assets/mainSlide/mainSlide.css}" />
 </head>
 
 <body>
@@ -53,24 +51,18 @@
 
 		<main class="main">
 			<div class="page-content">
-
-				<div class="container">
+							<div class="container">
 					<div class="row">
 						<div class="col-lg-12">
-							<!-- ⭐ 기존 brand-header 삭제 후, 이 블록으로 교체해주세요. ⭐ -->
 							<div class="brand-page-container"
 								th:if="${currentBrandId != null}">
-								<!-- 브랜드 헤더 -->
 								<div class="brand-page-header">
-									<!-- ⭐ 이 부분을 수정합니다. ⭐ -->
 									<div class="brand-name-wrapper">
-										<!-- 1. 브랜드 로고가 있을 경우 -->
 										<div class="brand-page-logo"
 											th:if="${currentBrand?.storeLogoImg != null and !#strings.isEmpty(currentBrand.storeLogoImg)}">
 											<img th:src="@{${currentBrand.storeLogoImg}}" alt="브랜드 로고"
 												onerror="this.parentElement.style.display='none';">
 										</div>
-										<!-- 2. 브랜드 로고가 없을 경우, 브랜드명 첫 글자 표시 -->
 										<div class="brand-page-logo-initial"
 											th:if="${currentBrand?.storeLogoImg == null or #strings.isEmpty(currentBrand.storeLogoImg)}">
 											<span
@@ -89,7 +81,6 @@
 									</div>
 								</div>
 
-								<!-- 브랜드 스냅 -->
 								<div class="brand-snap-container">
 									<div class="brand-snap-item"
 										th:each="snap : ${brandSnapProducts}">
@@ -101,8 +92,7 @@
 									</div>
 								</div>
 							</div>
-							<!-- 브랜드 끝 -->
-
+							
 							<div
 								th:replace="~{customer/fragments/productToolbar :: productToolbarFragment}"></div>
 							<th:block layout:fragment="content"></th:block>
@@ -111,15 +101,18 @@
 				</div>
 			</div>
 		</main>
+		
+		<div th:replace="~{customer/fragments/sliderNewProducts :: newProductsSliderFragment}"></div>
 
+		<div th:replace="~{customer/fragments/sliderSaleProducts :: saleProductsSliderFragment}"></div>
+		
 		<footer th:replace="~{customer/fragments/footer :: footerFragment}"></footer>
 	</div>
 
 	<div
 		th:replace="~{customer/fragments/categoryFilterModal :: categoryFilterModalFragment}"></div>
-		<div th:replace="~{customer/fragments/loginRegisterModals :: signinModalFragment}"></div>
+	<div th:replace="~{customer/fragments/loginRegisterModals :: signinModalFragment}"></div>
 
-	<!-- ⭐ 브랜드 정보 모달 추가 ⭐ -->
 	<div class="modal fade" id="brandInfoModal" tabindex="-1" role="dialog"
 		aria-labelledby="brandInfoModalLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered" role="document">
@@ -130,28 +123,25 @@
 						<span aria-hidden="true">×</span>
 					</button>
 				</div>
-				<!-- ⭐ th:if 조건을 추가하여 currentBrand가 null이 아닐 때만 내용을 표시하도록 함 ⭐ -->
 				<div class="modal-body text-center" th:if="${currentBrand != null}">
 					<img
 						th:if="${currentBrand.storeLogoImg != null and !#strings.isEmpty(currentBrand.storeLogoImg)}"
 						th:src="@{${currentBrand.storeLogoImg}}" alt="Brand Logo"
 						class="brand-modal-logo mb-3" onerror="this.style.display='none'">
-					<!-- 이미지 로드 실패 시 숨김 처리 -->
-
 					<h4 class="brand-modal-title" th:text="${currentBrand.storeConm}">브랜드
 						이름</h4>
-
 					<p class="brand-modal-description"
 						th:text="${currentBrand.storeIntroCn}">브랜드 소개글이 여기에 들어갑니다.</p>
 				</div>
-				<!-- currentBrand가 null일 경우를 위한 대체 메시지 (선택 사항) -->
 				<div class="modal-body text-center" th:if="${currentBrand == null}">
 					<p>브랜드 정보를 불러올 수 없습니다.</p>
 				</div>
 			</div>
 		</div>
 	</div>
-
+	
+	
+	
 	<script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
 	<script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
 	<script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>
@@ -182,9 +172,6 @@
 	<script th:src="@{/maincss/assets/productToolbar/productToolbar.js}"></script>
 
 
-	<!-- <script th:src="@{/maincss/assets/js/customer/feedWriteBtn.js}"></script> 지성 수정 경로에 없다는데 이거 왜있는거야? -->
-	<!-- 이건 따로 빼서 사용할수없어서 여기 있는 거에여 -->
-	<!-- 이스크립트 코드 사용처는 비로그인 사용자 접근 막는 용도 에여 -->
 	<script th:inline="javascript">
 		/*<![CDATA[*/
 		// authAlert 값이 실제로 존재하는 경우에만 세션 클리어 요청을 보냅니다.
@@ -198,6 +185,9 @@
 		}
 		/*]]>*/
 	</script>
+	
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
 	<th:block layout:fragment="jsScript"></th:block>
 
 </body>
