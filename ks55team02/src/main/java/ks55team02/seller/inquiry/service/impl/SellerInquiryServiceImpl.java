@@ -156,4 +156,5 @@ public class SellerInquiryServiceImpl implements SellerInquiryService{
 		log.info("서비스: getStoreIdByUserLgnId 호출 - 로그인 ID: {}", userLgnId);
 		return sellerInquiryMapper.getStoreIdByUserLgnId(userLgnId);
 	}
+	
 }

@@ -79,10 +79,11 @@
                         </div>
                         <div class="mb-4">
                             <label for="plcy_id" class="form-label">수수료 비율</label>
-                            <div class="form-control" id="plcy_id" th:text="${appStore.plcyId}"></div>
+							<div class="form-control" id="plcy_id" th:text="${appStore.plcyId == 'plcy_1'} ? '일반 수수료 18%' : ${appStore.plcyId}"></div>
                         </div>
                     </form>
                 </div>
+
                 <div class="col-md-6">
     <label class="form-label">필요 문서</label>
     <div class="table-responsive">

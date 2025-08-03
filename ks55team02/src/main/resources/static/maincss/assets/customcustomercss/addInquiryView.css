@@ -60,13 +60,15 @@ body {
 
 /* --- 2. Select2 커스텀 스타일 --- */
 .select2-container--bootstrap-5 .select2-selection {
-    min-height: 58px; /* Floating Label과 높이 맞춤 */
+    min-height: 58px !important; /* Floating Label과 높이 맞춤 */
     padding: 0.75rem 1rem;
     border-radius: 8px !important;
     border: 1px solid #ced4da;
     display: flex;
     align-items: center;
 }
+
+
 
 /* 선택된 항목 텍스트 */
 .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
@@ -309,12 +311,8 @@ textarea.form-control {
 
 /* Select2 드롭다운 박스 크기 및 패딩 조절 */
 .select2-container--bootstrap-5 .select2-selection--single {
-    /* 세로 패딩(0.7rem)으로 높이를 확보하고, 
-    가로 패딩(0.75rem)은 부트스트랩의 기본 입력란(.form-control)과 동일하게 맞춰
-    좌우 정렬이 깨지지 않도록 합니다.
-  */
   padding: 0.7rem 0.75rem;
-  height: auto; /* padding에 맞춰 높이 자동 조절 */
+   min-height: 58px !important; 
 }
 
 /* Select2 드롭다운으로 나오는 목록의 글자 크기 및 패딩 조절 */
@@ -352,4 +350,79 @@ select.is-invalid + .select2-container .select2-selection {
 .form-control.is-invalid ~ .invalid-feedback,
 .form-select.is-invalid ~ .invalid-feedback {
     display: block;
+}
+
+/* --- 파일 미리보기 스타일 (가로 정렬 버전) --- */
+
+/* 미리보기 파일들을 감싸는 컨테이너 */
+#filePreviewContainer {
+    display: flex;         /* Flexbox 레이아웃 사용 */
+    flex-direction: row;   /* 주 방향을 가로로 설정 */
+    flex-wrap: wrap;       /* 공간이 부족하면 다음 줄로 자동 줄바꿈 */
+    gap: 15px;             /* 각 아이템 사이의 간격 */
+    padding: 10px;         /* 컨테이너 내부 여백 */
+}
+
+/* 개별 파일 미리보기 아이템 (정사각형 모양) */
+.file-preview-item {
+    position: relative;    /* 삭제 버튼 위치의 기준점 */
+    width: 100px;          /* 너비 */
+    height: 100px;         /* 높이 */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    overflow: hidden;      /* 아이템 밖으로 나가는 내용은 숨김 */
+    
+    /* 내부 아이콘/이미지 중앙 정렬 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 아이템 내부의 이미지 스타일 */
+.file-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지가 아이템 박스에 꽉 차도록 설정 (잘리는 부분 발생 가능) */
+}
+
+/* 아이템 내부의 파일 아이콘 스타일 */
+.file-preview-item .fa-file-alt {
+    font-size: 40px;      /* 아이콘 크기 */
+    color: #868e96;
+}
+
+/* 파일 제거 버튼 */
+.file-remove-button {
+    position: absolute;      /* 아이템 기준으로 위치 지정 */
+    top: 5px;
+    right: 5px;
+
+    width: 24px;
+    height: 24px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;     /* 원 모양 */
+    cursor: pointer;
+    
+    /* 내부 X 아이콘 중앙 정렬 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+    transition: background-color 0.2s ease;
+}
+
+.file-remove-button:hover {
+    background-color: rgba(220, 53, 69, 0.9); /* 호버 시 빨간색으로 변경 */
+}
+
+/* (선택사항) 파일이 있을 때 드롭존 안내 문구를 숨기는 스타일 */
+.file-drop-zone.has-files .file-drop-zone-content {
+    display: none;
+}
+.file-drop-zone .file-drop-zone-content {
+    padding: 20px;
 }
