@@ -89,15 +89,8 @@
     </insert>
 
     <insert id="insertOrderItem" parameterType="map">
-        INSERT INTO order_items (
-            ordr_dtl_artcl_no,      ordr_no,        gds_no,
-            ordr_qntty,             ordr_tm_untprc, store_id,
-            ordr_dtl_artcl_dcsn_cd
-        ) VALUES (
-            #{ordrDtlArtclNo},      #{ordrNo},          #{gdsNo},
-            #{ordrQntty},           #{ordrTmUntprc},    #{storeId},
-            #{ordrDtlArtclDcsnCd}
-        )
+        INSERT INTO order_items (ordr_dtl_artcl_no, ordr_no, opt_no, gds_no, store_id, ordr_qntty, ordr_tm_untprc, ordr_dtl_artcl_dcsn_cd)
+        VALUES (#{ordrDtlArtclNo}, #{ordrNo}, #{optNo}, #{gdsNo}, #{storeId}, #{ordrQntty}, #{ordrTmUntprc}, #{ordrDtlArtclDcsnCd})
     </insert>
 
     <insert id="insertPayment" parameterType="ks55team02.tossapi.domain.PaymentDTO">
@@ -124,13 +117,17 @@
         SELECT * FROM orders WHERE ordr_no = #{ordrNo}
     </select>
     
+    <select id="getOrderDetailsByOrderId" parameterType="String" resultMap="payorderResultMap">
+        SELECT o.*, (SELECT user_nm FROM users WHERE user_no = o.user_no) AS user_name FROM orders o WHERE ordr_no = #{ordrNo}
+    </select>
+    
     <select id="getOrderedProductsByOrderId" parameterType="String" resultType="map">
         SELECT
-            oi.gds_no           AS gdsNo,
-            p.gds_nm            AS name,
-            oi.ordr_qntty       AS quantity,
-            oi.ordr_tm_untprc   AS price,
-            oi.store_id         AS storeId
+            oi.gds_no,      
+            p.gds_nm,         
+            oi.ordr_qntty,    
+            oi.ordr_tm_untprc, 
+            oi.store_id 
         FROM
             order_items oi
         JOIN
@@ -142,6 +139,15 @@
     <select id="findLatestOrderIdByUserNo" parameterType="String" resultType="String">
         SELECT ordr_no FROM orders WHERE user_no = #{userNo} ORDER BY ordr_dt DESC LIMIT 1
     </select>
+    
+    <select id="getUserOrderPaymentHistory" parameterType="String" resultType="Map">
+        SELECT o.ordr_no, o.ordr_dt, o.last_stlm_amt, o.ordr_stts_cd, p.stlm_mthd_cd,
+            (SELECT gds_nm FROM products WHERE gds_no = (SELECT gds_no FROM order_items WHERE ordr_no = o.ordr_no LIMIT 1)) AS first_product_name,
+            (SELECT COUNT(*) FROM order_items WHERE ordr_no = o.ordr_no) AS total_products_count
+        FROM orders o JOIN payments p ON o.ordr_no = p.ordr_no
+        WHERE o.user_no = #{userNo} ORDER BY o.ordr_dt DESC
+    </select>
+    
 
     <select id="findUserCouponsByUserId" parameterType="String" resultMap="UserCouponWithDetailsResultMap">
          SELECT
@@ -172,7 +178,7 @@
         SELECT
             user_nm AS recipientName,   
             telno AS phone,             
-            zip AS postcode,         
+            zip_cd AS postcode,         
             addr AS address,            
             daddr AS detailAddress      
         FROM
@@ -185,9 +191,6 @@
         SELECT stlm_id FROM payments WHERE pg_dlng_id = #{paymentKey}
     </select>
 
-    <!-- =================================================================== -->
-    <!-- UPDATE 문들 -->
-    <!-- =================================================================== -->
     <update id="updateOrderStatus" parameterType="map">
         UPDATE orders SET ordr_stts_cd = #{ordrStatus} WHERE ordr_no = #{ordrNo}
     </update>
@@ -210,6 +213,27 @@
         WHERE
             user_cpn_id = #{userCpnId}
     </update>
+    
+        <!-- 결제 시 총 매출액에 추가 -->
+    <update id="updateTotalSalesAmount">
+	    UPDATE 
+	    	store_settlements
+	    SET 
+	    	tot_sel_amt = IFNULL(tot_sel_amt, 0) + #{salesAmount}
+	    WHERE 
+	    	store_id = #{storeId}
+	</update>
+	
+		<!-- 결제가 완료된 상품 장바구니에서 제거 -->
+	<delete id="deletePurchasedItemsFromCart" parameterType="map">
+	    DELETE FROM cart_items
+	    WHERE
+	        user_no = #{userNo}
+	        AND gds_no IN
+	        <foreach item="item" collection="items" open="(" separator="," close=")">
+	            #{item.gdsNo}
+	        </foreach>
+	</delete>
     
     <update id="updateUserInfoShippingAddress" parameterType="map">
         UPDATE users

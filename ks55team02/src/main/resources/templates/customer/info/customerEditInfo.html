@@ -55,7 +55,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>이름</label>
-                                    <input type="text" id="userName">
+                                    <input type="text" id="userName" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label for="userEmail">이메일</label>
@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="userTelNo">전화번호</label>
-                                    <input type="text" class="form-control" id="userTelNo" name="telno">
+                                    <input type="text" class="form-control" id="userTelNo" name="telno" placeholder="000-0000-0000이런 형식으로 입력해주세여">
     								<p class="error-message" id="telError" style="color: red; display: none;"></p>
                                 </div>
                                 <div class="form-group">
@@ -104,7 +104,7 @@
 							
 							        <!-- 닉네임 -->
 							        <div class="form-group">
-							            <label>닉네임 *</label>
+							            <label>닉네임</label>
 							            <input type="text" id="userNickname" name="userNcnm">
 							            <p class="error-message" id="nicknameError" style="color: red; display: none;"></p>
 							        </div>
@@ -112,7 +112,7 @@
 							        <!-- 자기소개 -->
 							        <div class="form-group">
 							            <label>자기소개</label>
-							            <textarea id="userSelfIntro" name="selfIntroCn" style="resize: none"></textarea>
+							            <textarea id="userSelfIntro" name="selfIntroCn" style="resize: none; width: -webkit-fill-available;"></textarea>
 							        </div>
 							        <button type="submit" class="btn btn-outline-primary-2">저장하기</button>
                             </form>
@@ -123,18 +123,18 @@
 						    <h3>보안 설정</h3>
 						    <form id="password-change-form" class="profile-form">
 						        <div class="form-group">
-						            <label for="currentPassword">현재 비밀번호 <span class="required-star">*</span></label>
-						            <input type="password" id="currentPassword" name="currentPassword">
+						            <label for="currentPassword">현재 비밀번호 <span class="required-star"></span></label>
+						            <input type="password" id="currentPassword" name="currentPassword" placeholder="현재 비밀번호를 입력해주세요">
 						            <span class="error-message" id="currentPasswordError"></span> <!-- 비워둡니다 -->
 						        </div>
 						        <div class="form-group">
-						            <label for="newPassword">새 비밀번호 <span class="required-star">*</span></label>
-						            <input type="password" id="newPassword" name="newPassword">
+						            <label for="newPassword">새 비밀번호 <span class="required-star"></span></label>
+						            <input type="password" id="newPassword" name="newPassword" placeholder="8~16자, 영문/숫자/특수문자 조합">
 						            <span class="error-message" id="newPasswordError"></span> <!-- 비워둡니다 -->
 						        </div>
 						        <div class="form-group">
-						            <label for="confirmNewPassword">새 비밀번호 확인 <span class="required-star">*</span></label>
-						            <input type="password" id="confirmNewPassword" name="confirmNewPassword">
+						            <label for="confirmNewPassword">새 비밀번호 확인 <span class="required-star"></span></label>
+						            <input type="password" id="confirmNewPassword" name="confirmNewPassword" placeholder="8~16자, 영문/숫자/특수문자 조합">
 						            <span class="error-message" id="confirmNewPasswordError"></span> <!-- 비워둡니다 -->
 						        </div>
 						        <hr>

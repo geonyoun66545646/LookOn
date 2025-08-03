@@ -61,12 +61,11 @@
 							<div class="input-group">
 								<select class="form-select" name="searchKey"
 									style="max-width: 150px;">
-									<option value="dclrId">신고 ID</option>
 									<option value="dclrUserLoginId">신고자 ID</option>
 									<option value="dclrTrgtTypeCd">신고 대상 타입</option>
 									<option value="dclrReasonContent">신고 사유</option>
 								</select> <input type="text" class="form-control" name="searchValue"
-									placeholder="검색어를 입력하세요">
+									placeholder="신고자 ID, 신고 대상 타입, 신고 사유">
 							</div>
 						</div>
 						<div class="col-lg-2">
@@ -97,11 +96,9 @@
 									<input class="form-check-input" type="checkbox"
 										id="checkAllRows">
 								</div></th>
-							<th>신고 ID</th>
 							<th>신고 일시</th>
 							<th>신고자 ID</th>
-							<th>대상 타입</th>
-							<th>대상 ID</th>
+							<th>신고 대상 타입</th>
 							<th>신고 사유</th>
 							<th>처리 상태</th>
 							<th>관리</th>
@@ -173,7 +170,8 @@
         function renderTable(reportList) {
             tableBody.innerHTML = '';
             if (!reportList || reportList.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="9" class="text-center py-5">조회된 신고 내역이 없습니다.</td></tr>`;
+                // [수정] colspan을 8에서 7로 변경합니다.
+                tableBody.innerHTML = `<tr><td colspan="7" class="text-center py-5">조회된 신고 내역이 없습니다.</td></tr>`;
                 return;
             }
             let html = '';
@@ -191,11 +189,9 @@
                 html += `
                     <tr>
                         <td><div class="form-check"><input class="form-check-input" type="checkbox" value="${report.dclrId}"></div></td>
-                        <td>${report.dclrId}</td>
                         <td>${dclrRcptDt}</td>
                         <td>${report.dclrUserLoginId}</td>
                         <td>${report.dclrTrgtTypeCd}</td>
-                        <td>${report.intelligentTargetInfo}</td>
                         <td>${report.dclrReasonContent}</td>
                         <td><span class="badge ${badgeClass}">${statusText}</span></td>
                         <td><a href="/adminpage/inquiryadmin/reports/${report.dclrId}" class="btn btn-sm btn-primary" style="min-width: 90px;">${buttonText}</a></td>

@@ -13,9 +13,12 @@
 		<section class="content-header">
 			<h2 class="content-title">신고 상세 처리</h2>
 			<div>
-				<!-- [수정] 목록으로 돌아가는 링크를 실제 경로로 변경 -->
 				<a th:href="@{/adminpage/inquiryadmin/reportsList}"
 					class="btn btn-light rounded font-sm mr-5 text-body hover-up">목록으로</a>
+
+				<button type="button"
+					class="btn btn-light rounded font-sm text-body hover-up"
+					id="modifyBtn" th:if="...">수정하기</button>
 			</div>
 		</section>
 
@@ -129,195 +132,239 @@
 <th:block layout:fragment="jsFile">
 </th:block>
 
-
 <th:block layout:fragment="jsScript">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script th:inline="javascript">
 /*<![CDATA[*/
 
-// 신고 ID는 페이지 로드 시 Thymeleaf를 통해 미리 받아둡니다.
-const dclrId = /*[[${reportDetail.dclrId}]]*/ null; 
-const reportProcessTab = document.getElementById('process-tab');
-const reportProcessContainer = document.getElementById('reportProcess');
+// [핵심] HTML 문서가 완전히 로드된 후에 스크립트를 실행하도록 보장합니다.
+document.addEventListener('DOMContentLoaded', function() {
 
-// 1. '신고 처리' 탭을 처음 클릭했을 때 데이터 로딩을 시작합니다.
-reportProcessTab.addEventListener('click', function() {
-	
-    console.log("'신고 처리' 탭이 클릭되었습니다! AJAX 요청을 시작합니다.");
-    // 이미 내용이 그려져 있다면 중복해서 로드하지 않습니다.
-    if (reportProcessContainer.getAttribute('data-loaded') === 'true') {
-        return;
-    }
-    fetchAndRenderReportDetails(dclrId);
-});
-
-// 2. AJAX로 신고 데이터를 가져와서 상태에 맞는 화면을 그리는 메인 함수
-function fetchAndRenderReportDetails(dclrId) {
-    // 로딩 아이콘을 먼저 보여줍니다.
-    reportProcessContainer.innerHTML = `
-        <div class="p-5 text-center">
-            <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
-        </div>`;
-
-    fetch(`/api/admin/reports/${dclrId}`) // 백엔드에 추가한 데이터 제공 API 호출
-        .then(response => {
-            if (!response.ok) throw new Error('신고 정보를 불러오는 데 실패했습니다.');
-            return response.json();
-        })
-        .then(reportDetail => {
-            // 신고 상태에 따라 다른 HTML을 그려줍니다.
-            if (reportDetail.prcsSttsCd === 'RECEIVED') {
-                reportProcessContainer.innerHTML = renderInputForm(reportDetail);
-                addEventListenersToForm(reportDetail.dclrId); // 폼이 생긴 후에 이벤트 리스너를 붙여줍니다.
-            } else {
-                reportProcessContainer.innerHTML = renderReadOnlyView(reportDetail);
-            }
-            // 로딩 완료 상태를 기록합니다.
-            reportProcessContainer.setAttribute('data-loaded', 'true');
-        })
-        .catch(error => {
-            reportProcessContainer.innerHTML = `<div class="p-5 text-center text-danger">${error.message}</div>`;
-        });
-}
-
-// 3-1. '입력 폼'의 HTML 문자열을 생성하는 함수
-function renderInputForm(reportDetail) {
-    // 신고 대상 타입에 따라 '조치 유형' 옵션을 동적으로 생성합니다.
-    const targetType = reportDetail.dclrTrgtTypeCd;
-    let optionsHtml = '<option value="NONE" selected>제재 없음</option>';
-    if (targetType === 'USER') {
-        optionsHtml += `
-            <option value="SUSPENSION_3D">3일 이용 정지</option> <option value="SUSPENSION_7D">7일 이용 정지</option>
-            <option value="SUSPENSION_14D">14일 이용 정지</option> <option value="SUSPENSION_30D">30일 이용 정지</option>
-            <option value="BAN_PERMANENT">영구 이용 정지</option>`;
-    } else if (targetType === 'POST' || targetType === 'COMMENT') {
-        optionsHtml += `<option value="CONTENT_DELETION">삭제 조치</option><option value="AUTHOR_RESTRICTION">작성자 제한</option>`;
-    } else if (targetType === 'PRODUCT') {
-        optionsHtml += `<option value="CONTENT_DELETION">삭제 조치</option>`;
-    }
-
-    // Template Literal(백틱 `)을 사용하여 전체 폼 HTML을 만듭니다.
-    return `
-        <h5 class="mt-4 mb-3">신고 처리 정보 입력</h5>
-        <form id="reportProcessingForm" method="post">
-            <input type="hidden" name="dclrId" value="${reportDetail.dclrId}">
-            <div class="mb-4 form-group">
-                <label for="newStatus" class="form-label">처리 상태 변경</label>
-                <select class="form-select" id="newStatus" name="newStatus">
-                    <option value="COMPLETED" selected>처리 완료</option>
-                    <option value="REJECTED">반려</option>
-                </select>
-            </div>
-            <div class="mb-4 form-group">
-                <label for="dclrPrcsRsltCn" class="form-label">최종 처리 결과 내용</label>
-                <textarea class="form-control" id="dclrPrcsRsltCn" name="dclrPrcsRsltCn" rows="4"></textarea>
-            </div>
-            <hr class="my-4">
-            <h5>세부 조치 및 이력 기록 (관리자용)</h5>
-            <div class="mb-4 form-group">
-                <label for="sanctionType" class="form-label">조치 유형</label>
-                <select class="form-select" id="sanctionType" name="sanctionType">${optionsHtml}</select>
-            </div>
-            <div class="mb-4 form-group" id="sanctionDurationGroup" style="display: none;">
-                <label for="sanctionDuration" class="form-label">제한 기간</label>
-                <select class="form-select" id="sanctionDuration" name="sanctionDuration">
-                    <option value="3일" selected>3일</option> <option value="7일">7일</option> <option value="14일">14일</option>
-                    <option value="30일">30일</option> <option value="영구">영구</option>
-                </select>
-            </div>
-            <div class="mb-4 form-group">
-                <label for="actnCn" class="form-label">조치 내용</label>
-                <textarea class="form-control" id="actnCn" name="actnCn" rows="3"></textarea>
-            </div>
-            <div class="mb-4 form-group">
-                <label for="prcsDsctnMemoCn" class="form-label">내부 처리 메모</label>
-                <textarea class="form-control" id="prcsDsctnMemoCn" name="prcsDsctnMemoCn" rows="3"></textarea>
-            </div>
-            <div class="text-end">
-                <button type="submit" class="btn btn-primary">처리 내용 저장</button>
-            </div>
-        </form>
-    `;
-}
-
-// 3-2. '조회 화면'의 HTML 문자열을 생성하는 함수
-function renderReadOnlyView(reportDetail) {
-    const history = reportDetail.historyList && reportDetail.historyList.length > 0 ? reportDetail.historyList[0] : null;
-    let sanctionTypeHtml = '기타 또는 알 수 없는 조치';
-    if(history && history.actionType) {
-        switch(history.actionType) {
-            case 'NONE': sanctionTypeHtml = '제재 없음'; break;
-            case 'SUSPENSION_3D': sanctionTypeHtml = '3일 이용 정지'; break;
-            case 'SUSPENSION_7D': sanctionTypeHtml = '7일 이용 정지'; break;
-            case 'SUSPENSION_14D': sanctionTypeHtml = '14일 이용 정지'; break;
-            case 'SUSPENSION_30D': sanctionTypeHtml = '30일 이용 정지'; break;
-            case 'BAN_PERMANENT': sanctionTypeHtml = '영구 이용 정지'; break;
-            case 'CONTENT_DELETION': sanctionTypeHtml = '삭제 조치'; break;
-            case 'AUTHOR_RESTRICTION': sanctionTypeHtml = '작성자 제한'; break;
-            default: sanctionTypeHtml = history.actionType;
-        }
-    }
-
-    return `
-        <h5 class="mt-4 mb-3">처리 완료된 신고 정보 (조회)</h5>
-        <div class="mb-3">
-            <label class="form-label">최종 처리 상태</label>
-            <input type="text" class="form-control" value="${reportDetail.prcsSttsCd === 'COMPLETED' ? '✅ 처리 완료' : '❌ 반려'}" readonly>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">최종 처리 결과 내용</label>
-            <textarea class="form-control" rows="4" readonly>${reportDetail.dclrPrcsRsltCn || ''}</textarea>
-        </div>
-        <hr class="my-4">
-        <h5>처리 이력</h5>
-        ${history ? `
-            <div class="mb-3">
-                <label class="form-label">조치 유형</label>
-                <div class="form-control" style="background-color: #e9ecef;">${sanctionTypeHtml}</div>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">조치 내용</label>
-                <textarea class="form-control" rows="3" readonly>${history.actnCn || ''}</textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">내부 처리 메모</label>
-                <textarea class="form-control" rows="3" readonly>${history.prcsDsctnMemoCn || ''}</textarea>
-            </div>
-        ` : '<p>처리 이력이 없습니다.</p>'}
-    `;
-}
-
-// 4. 동적으로 생성된 '입력 폼'에 이벤트 리스너를 추가하는 함수
-function addEventListenersToForm(dclrId) {
-    const processForm = document.getElementById('reportProcessingForm');
-    const sanctionTypeSelect = document.getElementById('sanctionType');
-    const sanctionDurationGroup = document.getElementById('sanctionDurationGroup');
-
-    // '조치 유형' 변경 이벤트
-    sanctionTypeSelect.addEventListener('change', (event) => {
-        sanctionDurationGroup.style.display = event.target.value === 'AUTHOR_RESTRICTION' ? 'block' : 'none';
-    });
+    // --- 1. 변수 선언 ---
+    const dclrId = /*[[${reportDetail.dclrId}]]*/ null; 
+    const reportProcessTab = document.getElementById('process-tab');
+    const reportProcessContainer = document.getElementById('reportProcess');
     
-    // 폼 제출 이벤트
-    processForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const formData = new FormData(processForm);
-        const reportData = Object.fromEntries(formData.entries());
-        
-        const processUrl = `/api/admin/reports/${dclrId}/process`;
-        
-        fetch(processUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(reportData),
-        })
-        .then(response => response.json().then(data => ({ ok: response.ok, data })))
-        .then(({ ok, data }) => {
-            alert(data.message);
-            if (ok) window.location.reload(); // 성공 시 페이지 전체를 새로고침하여 최신 상태를 반영
-        })
-        .catch(error => alert('처리 중 오류가 발생했습니다.'));
+    // AJAX로 불러온 신고 상세 정보를 저장할 변수 (수정 모드에서 재사용하기 위함)
+    let loadedReportDetail = null;
+    // 현재 페이지가 '수정 모드'인지 상태를 관리하는 변수 (기본값은 false)
+    let isModifyMode = false;
+
+    // --- 2. 초기 이벤트 리스너 ---
+
+    // '신고 처리' 탭을 처음 클릭했을 때 데이터 로딩을 시작합니다.
+    reportProcessTab.addEventListener('click', function() {
+        // 이미 내용이 그려져 있다면 중복해서 로드하지 않습니다.
+        if (reportProcessContainer.getAttribute('data-loaded') === 'true') {
+            return;
+        }
+        fetchAndRenderReportDetails(dclrId);
     });
-}
+
+    // --- 3. 핵심 기능 함수 ---
+
+    // AJAX로 신고 데이터를 가져와서 상태에 맞는 화면을 그리는 메인 함수
+    function fetchAndRenderReportDetails(dclrId) {
+        reportProcessContainer.innerHTML = `
+            <div class="p-5 text-center">
+                <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+            </div>`;
+
+        fetch(`/api/admin/reports/${dclrId}`)
+            .then(response => {
+                if (!response.ok) throw new Error('신고 정보를 불러오는 데 실패했습니다.');
+                return response.json();
+            })
+            .then(reportDetail => {
+                // 받아온 데이터를 나중에 '수정하기' 버튼이 쓸 수 있도록 저장해둡니다.
+                loadedReportDetail = reportDetail;
+                
+                if (reportDetail.prcsSttsCd === 'RECEIVED') {
+                    isModifyMode = false; // 신규 처리 모드로 명시
+                    reportProcessContainer.innerHTML = renderInputForm(reportDetail);
+                    addEventListenersToForm(reportDetail.dclrId);
+                } else {
+                    reportProcessContainer.innerHTML = renderReadOnlyView(reportDetail);
+                }
+                reportProcessContainer.setAttribute('data-loaded', 'true');
+            })
+            .catch(error => {
+                reportProcessContainer.innerHTML = `<div class="p-5 text-center text-danger">${error.message}</div>`;
+            });
+    }
+
+    // '입력 폼'의 HTML 문자열을 생성하는 함수 (데이터 채우기 기능 포함)
+    function renderInputForm(reportDetail) {
+        const targetType = reportDetail.dclrTrgtTypeCd;
+        const history = reportDetail.historyList && reportDetail.historyList.length > 0 ? reportDetail.historyList[0] : {};
+        const previousSanction = history.actionType || 'NONE';
+
+        let optionsHtml = `<option value="NONE" ${previousSanction === 'NONE' ? 'selected' : ''}>제재 없음</option>`;
+        if (targetType === 'USER') {
+            optionsHtml += `
+                <option value="SUSPENSION_3D" ${previousSanction === 'SUSPENSION_3D' ? 'selected' : ''}>3일 이용 정지</option>
+                <option value="SUSPENSION_7D" ${previousSanction === 'SUSPENSION_7D' ? 'selected' : ''}>7일 이용 정지</option>
+                <option value="SUSPENSION_14D" ${previousSanction === 'SUSPENSION_14D' ? 'selected' : ''}>14일 이용 정지</option>
+                <option value="SUSPENSION_30D" ${previousSanction === 'SUSPENSION_30D' ? 'selected' : ''}>30일 이용 정지</option>
+                <option value="BAN_PERMANENT" ${previousSanction === 'BAN_PERMANENT' ? 'selected' : ''}>영구 이용 정지</option>`;
+        } else if (targetType === 'POST' || targetType === 'COMMENT') {
+            optionsHtml += `
+                <option value="CONTENT_DELETION" ${previousSanction === 'CONTENT_DELETION' ? 'selected' : ''}>삭제 조치</option>
+                <option value="AUTHOR_RESTRICTION" ${previousSanction === 'AUTHOR_RESTRICTION' ? 'selected' : ''}>작성자 제한</option>`;
+        } else if (targetType === 'PRODUCT') {
+            optionsHtml += `<option value="CONTENT_DELETION" ${previousSanction === 'CONTENT_DELETION' ? 'selected' : ''}>삭제 조치</option>`;
+        }
+
+        const previousStatus = reportDetail.prcsSttsCd || 'COMPLETED';
+        const previousResult = reportDetail.dclrPrcsRsltCn || '';
+        const previousAction = history.actnCn || '';
+        const previousMemo = history.prcsDsctnMemoCn || '';
+        
+        const formTitle = isModifyMode ? '신고 처리 정보 수정' : '신고 처리 정보 입력';
+        const buttonText = isModifyMode ? '수정 내용 저장' : '처리 내용 저장';
+
+        return `
+            <h5 class="mt-4 mb-3">${formTitle}</h5>
+            <form id="reportProcessingForm" method="post">
+                <input type="hidden" name="dclrId" value="${reportDetail.dclrId}">
+                <div class="mb-4 form-group">
+                    <label for="newStatus" class="form-label">처리 상태 변경</label>
+                    <select class="form-select" id="newStatus" name="newStatus">
+                        <option value="COMPLETED" ${previousStatus === 'COMPLETED' ? 'selected' : ''}>처리 완료</option>
+                        <option value="REJECTED" ${previousStatus === 'REJECTED' ? 'selected' : ''}>반려</option>
+                    </select>
+                </div>
+                <div class="mb-4 form-group">
+                    <label for="dclrPrcsRsltCn" class="form-label">최종 처리 결과 내용</label>
+                    <textarea class="form-control" id="dclrPrcsRsltCn" name="dclrPrcsRsltCn" rows="4" placeholder="신고자에게 안내될 최종 처리 결과를 입력하세요.">${previousResult}</textarea>
+                </div>
+                <hr class="my-4">
+                <h5>세부 조치 및 이력 기록 (관리자용)</h5>
+                <div class="mb-4 form-group">
+                    <label for="sanctionType" class="form-label">조치 유형</label>
+                    <select class="form-select" id="sanctionType" name="sanctionType">${optionsHtml}</select>
+                </div>
+                <div class="mb-4 form-group" id="sanctionDurationGroup" style="display: none;">
+                    <label for="sanctionDuration" class="form-label">제한 기간</label>
+                    <select class="form-select" id="sanctionDuration" name="sanctionDuration">
+                        <option value="3일" selected>3일</option> <option value="7일">7일</option> <option value="14일">14일</option>
+                        <option value="30일">30일</option> <option value="영구">영구</option>
+                    </select>
+                </div>
+                <div class="mb-4 form-group">
+                    <label for="actnCn" class="form-label">조치 내용</label>
+                    <textarea class="form-control" id="actnCn" name="actnCn" rows="3" placeholder="실제로 어떤 조치가 이루어졌는지 구체적인 내용을 기록합니다.">${previousAction}</textarea>
+                </div>
+                <div class="mb-4 form-group">
+                    <label for="prcsDsctnMemoCn" class="form-label">내부 처리 메모</label>
+                    <textarea class="form-control" id="prcsDsctnMemoCn" name="prcsDsctnMemoCn" rows="3" placeholder="동료 관리자가 참고해야 할 내용을 기재합니다. (신고자에게 노출되지 않음)">${previousMemo}</textarea>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">${buttonText}</button>
+                </div>
+            </form>
+        `;
+    }
+
+    // '조회 화면'의 HTML 문자열을 생성하는 함수
+    function renderReadOnlyView(reportDetail) {
+        const history = reportDetail.historyList && reportDetail.historyList.length > 0 ? reportDetail.historyList[0] : null;
+        let sanctionTypeHtml = '기타 또는 알 수 없는 조치';
+        if(history && history.actionType) {
+            switch(history.actionType) {
+                case 'NONE': sanctionTypeHtml = '제재 없음'; break;
+                case 'SUSPENSION_3D': sanctionTypeHtml = '3일 이용 정지'; break;
+                case 'SUSPENSION_7D': sanctionTypeHtml = '7일 이용 정지'; break;
+                case 'SUSPENSION_14D': sanctionTypeHtml = '14일 이용 정지'; break;
+                case 'SUSPENSION_30D': sanctionTypeHtml = '30일 이용 정지'; break;
+                case 'BAN_PERMANENT': sanctionTypeHtml = '영구 이용 정지'; break;
+                case 'CONTENT_DELETION': sanctionTypeHtml = '삭제 조치'; break;
+                case 'AUTHOR_RESTRICTION': sanctionTypeHtml = '작성자 제한'; break;
+                default: sanctionTypeHtml = history.actionType;
+            }
+        }
+
+        return `
+            <h5 class="mt-4 mb-3">처리 완료된 신고 정보 (조회)</h5>
+            <div class="mb-3"><label class="form-label">최종 처리 상태</label><input type="text" class="form-control" value="${reportDetail.prcsSttsCd === 'COMPLETED' ? '✅ 처리 완료' : '❌ 반려'}" readonly></div>
+            <div class="mb-3"><label class="form-label">최종 처리 결과 내용</label><textarea class="form-control" rows="4" readonly>${reportDetail.dclrPrcsRsltCn || ''}</textarea></div>
+            <hr class="my-4">
+            <h5>처리 이력</h5>
+            ${history ? `
+                <div class="mb-3"><label class="form-label">조치 유형</label><div class="form-control" style="background-color: #e9ecef;">${sanctionTypeHtml}</div></div>
+                <div class="mb-3"><label class="form-label">조치 내용</label><textarea class="form-control" rows="3" readonly>${history.actnCn || ''}</textarea></div>
+                <div class="mb-3"><label class="form-label">내부 처리 메모</label><textarea class="form-control" rows="3" readonly>${history.prcsDsctnMemoCn || ''}</textarea></div>
+            ` : '<p>처리 이력이 없습니다.</p>'}
+        `;
+    }
+
+    // [업그레이드] '입력 폼'에 이벤트 리스너를 추가하는 함수
+    function addEventListenersToForm(dclrId) {
+        const processForm = document.getElementById('reportProcessingForm');
+        if (!processForm) return;
+
+        const sanctionTypeSelect = document.getElementById('sanctionType');
+        const sanctionDurationGroup = document.getElementById('sanctionDurationGroup');
+
+        sanctionTypeSelect.addEventListener('change', (event) => {
+            sanctionDurationGroup.style.display = event.target.value === 'AUTHOR_RESTRICTION' ? 'block' : 'none';
+        });
+        
+        processForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(processForm);
+            const reportData = Object.fromEntries(formData.entries());
+            
+            const apiUrl = isModifyMode ? `/api/admin/reports/${dclrId}/update` : `/api/admin/reports/${dclrId}/process`;
+            const httpMethod = isModifyMode ? 'PUT' : 'POST';
+            const confirmTitle = isModifyMode ? '수정된 내용을 저장하시겠습니까?' : '이대로 신고를 처리하시겠습니까?';
+
+            Swal.fire({
+                title: confirmTitle,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '네, 저장합니다.',
+                cancelButtonText: '아니요'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(apiUrl, {
+                        method: httpMethod,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(reportData),
+                    })
+                    .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                    .then(({ ok, data }) => {
+                        Swal.fire({ icon: ok ? 'success' : 'error', title: ok ? '성공' : '실패', text: data.message, })
+                        .then(() => { if (ok) window.location.reload(); });
+                    })
+                    .catch(error => Swal.fire('오류', '요청 처리 중 문제가 발생했습니다.', 'error'));
+                }
+            });
+        });
+    }
+
+    // [추가] '수정하기' 버튼에 대한 이벤트 리스너
+    const modifyBtn = document.getElementById('modifyBtn');
+    if (modifyBtn) {
+        modifyBtn.addEventListener('click', function() {
+            if (!loadedReportDetail) {
+                Swal.fire('알림', '신고 정보를 먼저 불러와주세요.\n"신고 처리" 탭을 한 번 클릭해주세요.', 'info');
+                return;
+            }
+
+            const tabTrigger = new bootstrap.Tab(reportProcessTab);
+            tabTrigger.show();
+
+            isModifyMode = true;
+            
+            reportProcessContainer.innerHTML = renderInputForm(loadedReportDetail);
+            
+            addEventListenersToForm(loadedReportDetail.dclrId);
+        });
+    }
+
+}); // <-- DOMContentLoaded 닫는 괄호
+
 /*]]>*/
 </script>
 </th:block>

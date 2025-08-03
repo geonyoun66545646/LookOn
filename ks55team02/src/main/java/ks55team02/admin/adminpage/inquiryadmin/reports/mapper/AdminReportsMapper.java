@@ -146,4 +146,26 @@ public interface AdminReportsMapper {
 	 * @return 영향받은 행의 수
 	 */
 	int updateProductExposureYn(Map<String, Object> params);
+	
+	/**
+     * [신규 추가] 신고 ID를 기반으로, 이전에 적용되었던 제재를 무효화(종료)시키는 메소드
+     * @param dclrId 제재를 종료시킬 신고의 ID
+     */
+    void expirePreviousSanctionByReportId(String dclrId);
+    
+    /**
+     * [신규 추가] 신고 ID를 통해, user_sanctions 테이블에서 제재받은 사용자의 user_no를 찾습니다.
+     * @param dclrId 신고 ID
+     * @return 제재받은 사용자의 user_no
+     */
+    String findUserNoBySanctionedReportId(String dclrId);
+    
+    /** [신규 추가] 삭제된 게시글을 복원합니다. */
+    void restorePost(String postSn);
+
+    /** [신규 추가] 삭제된 댓글을 복원합니다. */
+    void restoreComment(String commentSn);
+
+    /** [신규 추가] 비활성화된 상품을 복원(재활성/재노출)합니다. */
+    void restoreProduct(String gdsNo);
 }

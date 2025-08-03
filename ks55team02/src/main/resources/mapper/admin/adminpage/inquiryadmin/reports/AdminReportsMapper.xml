@@ -142,50 +142,35 @@
 		#{pagination.limitStart}
 	</select>
 
-	<select id="getAdminReportDetailById" parameterType="String"
-		resultMap="adminReportDetailResultMap">
-		SELECT
-		r.dclr_id,
-		r.dclr_user_no,
-		dclr_user.user_ncnm AS
-		dclr_user_ncnm,
-		r.dclr_trgt_user_no,
-		trgt_user.user_ncnm AS
-		dclr_trgt_user_ncnm,
-		r.dclr_rsn_cd,
-		rr.dclr_rsn_cn,
-		r.dtl_dclr_rsn_cn AS
-		dclr_cn,
-		DATE_FORMAT(r.dclr_rcpt_dt, '%Y-%m-%d %H:%i') AS dclr_dt,
-		r.prcs_stts_cd,
-		(SELECT COUNT(*) FROM report_attachments WHERE dclr_id
-		= r.dclr_id) AS
-		attachment_count,
-		r.prcs_pic_mngr_no,
-		r.dclr_prcs_rslt_cn,
-		r.dclr_trgt_type_cd,
-		r.dclr_trgt_conts_id,
-		COALESCE(r.prcs_cmptn_dt, us.prcs_dt) AS prcs_cmptn_dt
-		FROM
-		reports AS r
-		LEFT JOIN
-		users AS dclr_user ON
-		r.dclr_user_no = dclr_user.user_no
-		LEFT
-		JOIN
-		users AS trgt_user ON
-		r.dclr_trgt_user_no = trgt_user.user_no
-		LEFT
-		JOIN
-		report_reasons AS rr
-		ON r.dclr_rsn_cd = rr.dclr_rsn_cd
-		LEFT JOIN
-		user_sanctions AS us ON
-		r.dclr_id = us.dclr_id
-		WHERE
-		r.dclr_id =
-		#{dclrId};
-	</select>
+	<select id="getAdminReportDetailById" parameterType="String" resultMap="adminReportDetailResultMap">
+    SELECT
+        r.dclr_id,
+        r.dclr_user_no,
+        dclr_user.user_ncnm AS dclr_user_ncnm,
+        r.dclr_trgt_user_no,
+        trgt_user.user_ncnm AS dclr_trgt_user_ncnm,
+        r.dclr_rsn_cd,
+        rr.dclr_rsn_cn,
+        r.dtl_dclr_rsn_cn AS dclr_cn,
+        DATE_FORMAT(r.dclr_rcpt_dt, '%Y-%m-%d %H:%i') AS dclr_dt,
+        r.prcs_stts_cd,
+        (SELECT COUNT(*) FROM report_attachments WHERE dclr_id = r.dclr_id) AS attachment_count,
+        r.prcs_pic_mngr_no,
+        r.dclr_prcs_rslt_cn,
+        r.dclr_trgt_type_cd,
+        r.dclr_trgt_conts_id,
+        r.prcs_cmptn_dt
+    FROM
+        reports AS r
+    LEFT JOIN
+        users AS dclr_user ON r.dclr_user_no = dclr_user.user_no
+    LEFT JOIN
+        users AS trgt_user ON r.dclr_trgt_user_no = trgt_user.user_no
+    LEFT JOIN
+        report_reasons AS rr ON r.dclr_rsn_cd = rr.dclr_rsn_cd
+    WHERE
+        r.dclr_id = #{dclrId}
+</select>
 
 	<!-- AdminReportsMapper.xml -->
 
@@ -372,6 +357,62 @@
 		gds_no =
 		#{gdsNo};
 	</update>
+	
+	<update id="expirePreviousSanctionByReportId" parameterType="String">
+		UPDATE 
+            user_sanctions
+		SET 
+            sanction_end_dt = NOW()
+		WHERE 
+            dclr_id = #{dclrId}
+          AND
+            sanction_end_dt IS NULL OR sanction_end_dt > NOW();
+	</update>
+	
+	<select id="findUserNoBySanctionedReportId" parameterType="String" resultType="String">
+        SELECT 
+            user_no
+        FROM 
+            user_sanctions
+        WHERE 
+            dclr_id = #{dclrId}
+        ORDER BY 
+            prcs_dt DESC
+        LIMIT 1
+    </select>
+    
+    <!-- [신규 추가] 삭제된 게시글을 복원하는 쿼리 (del_dt를 NULL로 변경) -->
+    <update id="restorePost" parameterType="String">
+        UPDATE 
+            posts
+        SET 
+            del_dt = NULL
+        WHERE 
+            pst_sn = #{postSn}
+    </update>
+
+    <!-- [신규 추가] 삭제된 댓글을 복원하는 쿼리 (del_dt와 del_user_no를 NULL로 변경) -->
+    <update id="restoreComment" parameterType="String">
+        UPDATE 
+            post_comments
+        SET 
+            del_dt = NULL,
+            del_user_no = NULL
+        WHERE 
+            pst_cmnt_sn = #{commentSn}
+    </update>
+
+    <!-- [신규 추가] 비활성화된 상품을 복원하는 쿼리 (노출/활성 상태로 변경) -->
+    <update id="restoreProduct" parameterType="String">
+        UPDATE
+            products
+        SET
+            expsr_yn = 1,
+            actvtn_yn = 1,
+            inactvtn_dt = NULL
+        WHERE
+            gds_no = #{gdsNo}
+    </update>
 
 
 </mapper>

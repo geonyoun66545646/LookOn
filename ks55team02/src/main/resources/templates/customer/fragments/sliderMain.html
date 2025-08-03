@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div class="main-page-slider-container" th:fragment="mainSliderFragment">
+    <div class="main-page-swiper swiper">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide" th:each="product : ${mainSlideProducts}">
+                <a th:href="@{/products/detail/{id}(id=${product.gdsNo})}">
+                    <img th:src="${product.thumbnailImagePath}" th:alt="${product.gdsNm}"
+                         onerror="this.onerror=null; this.src='/maincss/assets/images/no_image.jpg';">
+                    <div class="slide-content">
+                        <h3 th:text="${product.gdsNm}">상품명</h3>
+                        <p>
+                            <span th:text="${product.productCategory?.categoryName}">카테고리</span>
+                            <span th:if="${product.dscntRt != null and product.dscntRt > 0}">|</span>
+                            <span th:if="${product.dscntRt != null and product.dscntRt > 0}"
+                                  th:text="'~' + ${#numbers.formatInteger(product.dscntRt, 0)} + '%'">할인율</span>
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="main-swiper-controls">
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <button class="swiper-autoplay-button">
+            <span class="icon-pause">||</span> <span class="icon-play"></span>
+        </button>
+    </div>
+</div>

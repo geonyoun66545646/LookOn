@@ -84,6 +84,7 @@ public class InterceptorConfig implements WebMvcConfigurer{
                         // --- 인터셉터가 관여하지 않을 페이지 영역 ---
                         "/adminpage/**", // 관리자 페이지 영역
                         "/admin/**",
+                        "/api/**", // 25-07-31 염가은 추가
                         "/seller/products/preview/**",
                         "/products/categories/primary", // 메인 카테고리 API
                         "/products/categories/sub/**" 

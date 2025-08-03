@@ -1,101 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <footer class="footer" th:fragment="footerFragment">
-	<div class="footer-middle">
-		<div class="container">
-			<div class="row">
-
-				<div class="col-sm-6 col-lg-3">
-					<div class="widget">
-						<h4 class="widget-title">김성주</h4>
-
-                        <ul class="widget-list">
-                            <li><a th:href="@{/customer/mypage}">마이페이지</a></li>
-                            <li><a th:href="@{/aditinfo}">회원정보수정</a></li>
-                        </ul>
-
-					</div>
-				</div>
-				<div class="col-sm-6 col-lg-3">
-					<div class="widget">
-						<h4 class="widget-title">서요셉</h4>
-                        <ul class="widget-list">
-                            <li><a th:href="@{/customer/post/postList}">커뮤니티 게시판</a></li>
-                            <li><a th:href="@{/customer/feed/feedList}">피드 게시판</a></li>
-                        </ul>
-					</div>
-				</div>
-				<div class="col-sm-6 col-lg-3">
-					<div class="widget">
-						<h4 class="widget-title">염가은</h4>
-						<ul class="widget-list">
-                            <li><a th:href="@{/customer/coupons}">사용자 쿠폰</a></li>
-                            <li><a th:href="@{/customer/searchResult}">사용자 검색 결과</a></li>
-                            <li><a th:href="@{/customer/reports}">사용자 신고</a></li>
-                            <!-- <li><a th:href="@{/customer/myReports}">사용자 내 신고 내역</a></li> -->
-                            <li><a th:href="@{/adminpage/useradmin/search}">관리자 검색 기록 조회</a></li>
-                            <li><a th:href="@{/adminpage/inquiryadmin/reportsList}">관리자 신고 관리</a></li>
-                            <!-- <li><a th:href="@{/adminpage/inquiryadmin/reportsDetail}">관리자 신고 상세 처리</a></li> -->
-                            <li><a th:href="@{/adminpage/useradmin/createCoupons}">관리자 쿠폰 관리</a></li>
-                           <!--  <li><a th:href="@{/adminpage/useradmin/memberCoupons}">관리자 회원 쿠폰 조회</a></li>
-                            <li><a th:href="@{/adminpage/useradmin/couponsList}">관리자 쿠폰 목록 조회</a></li> -->
-                        </ul>
-					</div>
-				</div>
-				<div class="col-sm-6 col-lg-3">
-					<div class="widget">
-						<h4 class="widget-title">이건영</h4>
-						<ul class="widget-list">
-							<li><a th:href="@{/cart}">장바구니</a></li>
-							<li><a th:href="@{/checkout}">결제</a></li>
-							<li><a th:href="@{/paymentHistory}">결제 내역</a></li>
-							<li><a th:href="@{/track-delivery}">배송</a></li>
-							<li><a th:href="@{/adminpage/storeadmin/premiumAdd}">관리자/구독권등록</a></li>
-							<li><a th:href="@{/adminpage/storeadmin/list}">판매하는 구독권 리스트</a></li>
-							<li><a th:href="@{/adminpage/storeadmin/settlementDetailByStore}">스토어 정산</a></li>				
-						</ul>
-					</div>
-				</div>
-				<div class="col-sm-6 col-lg-3">
-					<div class="widget">
-						<h4 class="widget-title">이지성</h4>
-						<ul class="widget-list">
-							<li><a href="/customer/inquiry/inquiryList">문의 조회 페이지</a></li>
-							<li><a href="/customer/inquiry/inquiryDetail?inquiryId=inq_111">문의 상세 페이지</a></li>
-							<li><a href="/customer/inquiry/addInquiry">문의 등록 페이지</a></li>
-							<li><a href="/store/appStore">상점 신청 페이지</a></li>
-							<li><a href="#">상점 리뷰페이지</a></li>
-							<li><a href="/seller">상점 관리 메인 페이지</a></li>
-							<li><a href="/seller/inquiry/sellerInquiryList">상점 문의 조회 페이지</a></li>
-							<li><a href="/seller/inquiry/sellerInquiryDetail?inqryId=inq_112">상점 문의 상세 페이지</a></li>
-							<li><a href="/adminpage/storeadmin/appAdmin">상점 신청 목록 조회 페이지</a></li>
-							<li><a href="/adminpage/storeadmin/appDetail?aplyId=aply_50">상점 신청 상세 페이지</a></li>
-						</ul>
-					</div>
-				</div>
-				
-				<div class="col-sm-6 col-lg-3">
-					<div class="widget">
-						<h4 class="widget-title">정성훈</h4>
-						<ul class="widget-list">
-							<li><a th:href="@{/}">메인페이지</a></li>
-							<li><a th:href="@{/seller/products/list}">상품관리</a></li>
-							<li><a th:href="@{/customer/products/list?brand=store_1}">브랜드페이지</a></li>
-							<li><a th:href="@{/products/detail/gds_no_2049}">상품디테일</a></li>
-							<li><a th:href="@{/customer/products/list}">상품목록</a></li>
-							<li><a th:href="@{/adminpage/productadmin/adminProductManagement}">상품 승인/반려</a></li>
-							<li><a th:href="@{/adminpage/productadmin/adminCategoryManagement}">카테고리관리</a></li>
-						</ul>
-					</div>
-				</div>
-				
-			</div>	
-		</div>
-	</div>
-	<div class="footer-bottom">
-		<div class="container">
-			<a th:href="@{/}" class="lookon-brand-logo">LookOn</a>
-			<p class="footer-copyright">Copyright © 2025 LookOn. All Rights Reserved.</p>
+	<div class="container">
+		<div class="col-sm-6 col-lg-3 footer-header">
+			<div class="widget-lookon">
+				<a th:href="@{/}" class="lookon-brand-logo-footer">LookOn</a>
+				<p>본 사이트는 이메일주소를 무단수집하는 행위를 거부합니다. [법률 제 8486호]</p>
+				<p>대표 : 이형열&nbsp;&nbsp;&nbsp;&nbsp;주소 : 전북 전주시 덕진구 기린대로 499 3층 한국스마트정보교육원 (덕진광장 맞은편)&nbsp;&nbsp;&nbsp;&nbsp;사업자번호 : 402-21-80224</p>
+				<p>대표전화 : 063-717-1008&nbsp;&nbsp;&nbsp;&nbsp;FAX : 063-717-1122&nbsp;&nbsp;&nbsp;&nbsp;E-mail : hyoung814@daum.net</p><br>
+				<span class="lookon-copy">Copyright © 2025 LookOn. All Rights Reserved.</span>
+			</div>
 		</div>
 	</div>
 </footer>

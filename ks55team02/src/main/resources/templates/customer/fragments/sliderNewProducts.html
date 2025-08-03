@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<div class="weekly-best-section" th:fragment="newProductsSliderFragment">
+    <div class="weekly-best-container">
+        <div class="weekly-best-heading">
+            <h2 class="weekly-best-title">이번달 신상</h2>
+            <div class="weekly-best-more-link">
+                <a th:href="@{/customer/products(type='new-products')}" class="btn btn-outline-dark-2">
+                    <span>더보기</span>
+                </a>
+            </div>
+        </div>
+        <div class="weekly-best-slider-container">
+            <div class="swiper weekly-best-swiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide" th:each="product : ${newProductsList}">
+                        <div th:replace="~{customer/fragments/products :: productCardFragment(${product})}"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-prev weekly-best-button-prev"></div>
+            <div class="swiper-button-next weekly-best-button-next"></div>
+        </div>
+    </div>
+</div>

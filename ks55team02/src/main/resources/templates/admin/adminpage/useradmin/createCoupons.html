@@ -66,36 +66,21 @@
 					<div class="row">
 						<div class="col-md-6">
 							<div class="mb-4">
-								<label for="vldBgngDt" class="form-label">유효 시작일</label> <input
-									type="datetime-local" class="form-control" name="vldBgngDt"
-									required>
+								<label for="vldBgngDt" class="form-label">유효 시작일</label> 
+								<!-- [추가] JS에서 제어할 수 있도록 id 속성 추가 -->
+								<input type="datetime-local" class="form-control" name="vldBgngDt" id="vldBgngDt" required>
 							</div>
 						</div>
 						<div class="col-md-6">
 							<div class="mb-4">
-								<label for="vldEndDt" class="form-label">유효 종료일</label> <input
-									type="datetime-local" class="form-control" name="vldEndDt"
-									required>
+								<label for="vldEndDt" class="form-label">유효 종료일</label> 
+								<!-- [추가] JS에서 제어할 수 있도록 id 속성 추가 -->
+								<input type="datetime-local" class="form-control" name="vldEndDt" id="vldEndDt" required>
 							</div>
 						</div>
 					</div>
 
-					<div class="row">
-						<div class="col-md-6">
-							<div class="mb-4">
-								<label for="totUseLmtNmtm" class="form-label">총 발급 제한 횟수</label>
-								<input type="number" class="form-control" name="totUseLmtNmtm"
-									placeholder="0 입력 시 무제한">
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="mb-4">
-								<label for="userPerUseLmtNmtm" class="form-label">사용자당
-									사용 제한 횟수</label> <input type="number" class="form-control"
-									name="userPerUseLmtNmtm" placeholder="예: 1">
-							</div>
-						</div>
-					</div>
+					<!-- [삭제 완료] '총 발급 제한 횟수'와 '사용자당 사용 제한 횟수' 필드가 있던 row가 제거되었습니다. -->
 
 					<div class="row">
 						<div class="col-md-6">
@@ -112,17 +97,7 @@
 								</select>
 							</div>
 						</div>
-						<div class="col-md-6">
-							<div class="mb-4">
-								<label for="reissueCycle" class="form-label">재발급 주기</label> <select
-									class="form-select" name="reissueCycle">
-									<option value="NONE">재발급 없음 (1회성)</option>
-									<option value="MONTHLY">매월</option>
-									<option value="YEARLY">매년</option>
-									<option value="UNLIMITED">제한 없음</option>
-								</select>
-							</div>
-						</div>
+						<!-- [삭제 완료] '재발급 주기' 필드가 있던 col-md-6가 제거되었습니다. -->
 					</div>
 
 					<div class="mb-4">
@@ -147,6 +122,47 @@
 			</div>
 		</form>
 	</main>
+</th:block>
+
+<!-- [추가] JavaScript 코드를 위한 블록 추가 -->
+<th:block layout:fragment="jsScript">
+<script th:inline="javascript">
+/* <![CDATA[ */
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // =============================================================
+    // 날짜/시간 입력 필드에 기본값 설정
+    // =============================================================
+
+    // 1. 대상 요소를 ID로 가져옵니다.
+    const startDateInput = document.getElementById('vldBgngDt');
+    const endDateInput = document.getElementById('vldEndDt');
+
+    // 2. input type="datetime-local" 형식(YYYY-MM-DDTHH:mm)에 맞는 문자열로 포맷하는 함수
+    function formatDateTimeLocal(date) {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    // 3. 각 입력 필드에 기본값을 설정합니다.
+    if (startDateInput) {
+        // 시작일: '2020-01-01 00:00'으로 고정
+        startDateInput.value = '2020-01-01T00:00';
+    }
+
+    if (endDateInput) {
+        // 종료일: 현재 시간으로 설정
+        const now = new Date();
+        endDateInput.value = formatDateTimeLocal(now);
+    }
+});
+/* ]]> */
+</script>
 </th:block>
 
 </html>
