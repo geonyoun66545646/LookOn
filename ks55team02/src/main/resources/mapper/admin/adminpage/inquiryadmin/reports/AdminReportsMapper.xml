@@ -37,6 +37,7 @@
 		<result property="prcsCmptnDt" column="prcs_cmptn_dt" />
 		<result property="dclrPrcsRsltCn" column="dclr_prcs_rslt_cn" />
 		<result property="dclrUserLgnId" column="dclr_user_lgn_id" />
+		<result property="prcsPicMngrLgnId" column="prcs_pic_mngr_lgn_id" />
 		<result property="dclrTrgtUserLgnId"
 			column="dclr_trgt_user_lgn_id" />
 	</resultMap>
@@ -165,6 +166,7 @@
 		= r.dclr_id) AS
 		attachment_count,
 		r.prcs_pic_mngr_no,
+		mngr_user.user_lgn_id AS prcs_pic_mngr_lgn_id,
 		r.dclr_prcs_rslt_cn,
 		r.dclr_trgt_type_cd,
 		r.dclr_trgt_conts_id,
@@ -180,6 +182,7 @@
 		LEFT JOIN
 		report_reasons AS rr
 		ON r.dclr_rsn_cd = rr.dclr_rsn_cd
+		LEFT JOIN users AS mngr_user ON r.prcs_pic_mngr_no = mngr_user.user_no
 		WHERE
 		r.dclr_id = #{dclrId}
 	</select>

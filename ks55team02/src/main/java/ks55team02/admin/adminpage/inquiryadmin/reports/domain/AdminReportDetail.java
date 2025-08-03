@@ -34,6 +34,7 @@ public class AdminReportDetail {
 
     // 처리 완료 후 정보
     private String prcsPicMngrNo;
+    private String prcsPicMngrLgnId; // 처리 담당자 로그인 ID
     private String dclrPrcsRsltCn;
     
     // [수정 3] 유효성 검사에 필요한 필드들을 추가합니다.
