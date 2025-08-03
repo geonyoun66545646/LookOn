@@ -502,6 +502,29 @@
 		dclr_id = #{dclrId}
 	</select>
 
+	<!-- [신규 추가] 제재 상세 정보 조회를 위한 resultMap -->
+	<resultMap id="adminSanctionDetailResultMap"
+		type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminSanctionDetail">
+		<result property="sanctionType" column="sanction_type" />
+		<result property="sanctionStartDt" column="sanction_start_dt" />
+		<result property="sanctionEndDt" column="sanction_end_dt" />
+	</resultMap>
+
+	<!-- [신규 추가] 신고 ID로 가장 최근 제재 정보를 조회하는 쿼리 -->
+	<select id="findSanctionDetailByReportId" parameterType="String"
+		resultMap="adminSanctionDetailResultMap">
+		SELECT
+		sanction_type,
+		sanction_start_dt,
+		sanction_end_dt
+		FROM
+		user_sanctions
+		WHERE
+		dclr_id = #{dclrId}
+		ORDER BY
+		prcs_dt DESC
+		LIMIT 1
+	</select>
 
 
 </mapper>

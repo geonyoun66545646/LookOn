@@ -13,6 +13,7 @@ import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportAttachm
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportHistory;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportSearch;
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminSanctionDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.ReportProcessRequest;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.UserSanction;
 import ks55team02.admin.adminpage.inquiryadmin.reports.mapper.AdminReportsMapper;
@@ -423,6 +424,9 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 			List<AdminReportAttachment> attachments = adminReportsMapper.findAttachmentsByReportId(dclrId);
 			reportDetail.setAttachments(attachments);
 			// ▲▲▲ [핵심 추가] ▲▲▲
+			
+			 AdminSanctionDetail sanctionDetail = adminReportsMapper.findSanctionDetailByReportId(dclrId);
+		        reportDetail.setSanctionDetail(sanctionDetail);
 		}
 
 		return reportDetail;

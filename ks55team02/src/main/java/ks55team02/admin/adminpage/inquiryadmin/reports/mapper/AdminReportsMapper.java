@@ -10,6 +10,7 @@ import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReport;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportAttachment;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportHistory;
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminSanctionDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.ReportProcessRequest;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.UserSanction;
 
@@ -180,4 +181,7 @@ public interface AdminReportsMapper {
     
     /** [신규 추가] 신고 ID로 첨부파일 목록을 조회합니다. */
     List<AdminReportAttachment> findAttachmentsByReportId(String dclrId);
+    
+    /** [신규 추가] 신고 ID로 가장 최근의 실제 제재 상세 정보를 조회합니다. */
+    AdminSanctionDetail findSanctionDetailByReportId(String dclrId);
 }

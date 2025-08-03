@@ -43,5 +43,7 @@ public class AdminReportDetail {
     private String prcsCmptnDt; // 처리 완료 일시
     
     private List<AdminReportAttachment> attachments;
+    private AdminSanctionDetail sanctionDetail; 
+
 
 }
