@@ -37,6 +37,7 @@
 		<result property="prcsCmptnDt" column="prcs_cmptn_dt" />
 		<result property="dclrPrcsRsltCn" column="dclr_prcs_rslt_cn" />
 		<result property="dclrUserLgnId" column="dclr_user_lgn_id" /> 
+		<result property="dclrTrgtUserLgnId" column="dclr_trgt_user_lgn_id" />
 	</resultMap>
 
 	<resultMap id="adminReportHistoryResultMap"
@@ -151,6 +152,7 @@
         dclr_user.user_lgn_id AS dclr_user_lgn_id,
         r.dclr_trgt_user_no,
         trgt_user.user_ncnm AS dclr_trgt_user_ncnm,
+        trgt_user.user_lgn_id AS dclr_trgt_user_lgn_id,
         r.dclr_rsn_cd,
         rr.dclr_rsn_cn,
         r.dtl_dclr_rsn_cn AS dclr_cn,
