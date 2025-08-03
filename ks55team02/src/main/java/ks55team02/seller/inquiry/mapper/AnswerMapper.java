@@ -20,4 +20,5 @@ public interface AnswerMapper {
      * @return 가장 큰 숫자 부분 (없으면 null 또는 0)
      */
     Integer getMaxAnsIdNumber(); // Integer로 반환하여 null 처리 가능하도록
+    
 }

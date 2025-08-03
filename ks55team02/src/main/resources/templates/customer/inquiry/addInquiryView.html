@@ -99,25 +99,30 @@
                                                 <input class="form-check-input" type="checkbox" role="switch" id="privateInquiry" name="prvtYn" value="1" style="margin-left: 0;">
                                             </div>
                                         </div>
-                                        <div class="col" style="padding-left: 0.5rem;">
+                                        <div class="col" style="padding-left: 1.0rem;">
                                             <label for="privateInquiry" class="form-check-label" style="cursor: pointer;">비밀글로 문의하기</label>
                                         </div>
                                         <input type="hidden" name="_prvtYn" value="on"/>
                                     </div>
         
                                     <!-- 3. 첨부파일 -->
-                                    <div class="mb-4">
-                                        <label class="form-label mb-2">첨부 파일</label>
-                                        <label for="attachedFilesInput" class="file-drop-zone">
-                                            <i class="fas fa-cloud-upload-alt file-drop-icon"></i>
-                                            <span class="file-drop-text">클릭하거나 파일을 여기에 끌어다 놓으세요.</span>
-                                        </label>
-                                        <input type="file" class="d-none" name="attachedFiles" multiple id="attachedFilesInput">
-                                        <div id="filePreviewContainer" class="mt-3 d-flex flex-wrap gap-2"></div>
-                                    </div>
-                                </div>
-                            </div>
-
+									<div class="mb-4">
+									    <label class="form-label mb-2">첨부 파일</label>
+									    
+									    <!-- filePreviewContainer를 이 안으로 옮깁니다. -->
+									    <label for="attachedFilesInput" class="file-drop-zone">
+									        <div class="file-drop-zone-content"> <!-- 아이콘과 텍스트를 감싸는 div 추가 (선택사항이지만 추천) -->
+									            <i class="fas fa-cloud-upload-alt file-drop-icon"></i>
+									            <span class="file-drop-text">클릭하거나 파일을 여기에 끌어다 놓으세요.</span>
+									        </div>
+									        
+									        <!-- ⭐ 해결: 미리보기 컨테이너를 드롭 존 안으로 이동 ⭐ -->
+									        <div id="filePreviewContainer"></div> 
+									    </label>
+									
+									    <!-- 숨겨진 파일 인풋 (위치는 상관없음) -->
+									    <input type="file" class="d-none" name="attachedFiles" multiple id="attachedFilesInput">
+									</div>
                             <!-- 4. 버튼 영역 (기존과 동일) -->
 							<div class="d-flex justify-content-end align-items-center mt-5">
 							    <a th:href="@{/customer/inquiry/inquiryList}" class="btn btn-outline-secondary btn-lg">목록으로 돌아가기</a>
