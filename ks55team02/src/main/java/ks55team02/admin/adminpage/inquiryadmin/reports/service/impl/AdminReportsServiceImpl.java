@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReport;
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportAttachment;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportHistory;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportSearch;
@@ -381,13 +382,50 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 		return resultMap;
 	}
 
+
 	@Override
 	public AdminReportDetail getAdminReportDetail(String dclrId) {
+		// 1. 신고 기본 정보를 조회합니다.
 		AdminReportDetail reportDetail = adminReportsMapper.getAdminReportDetailById(dclrId);
+
 		if (reportDetail != null) {
+			// 2. 처리 이력 목록을 가져와서 DTO에 담습니다.
 			List<AdminReportHistory> historyList = adminReportsMapper.getAdminReportHistoryListById(dclrId);
 			reportDetail.setHistoryList(historyList);
+
+			// 3. 콘텐츠 신고의 경우, 원본 작성자 정보를 찾아 DTO에 채워 넣습니다.
+			if ((reportDetail.getDclrTrgtUserNo() == null || reportDetail.getDclrTrgtUserNcnm() == null)
+					&& reportDetail.getDclrTrgtContsId() != null) {
+
+				Map<String, String> authorInfo = null;
+				String contentId = reportDetail.getDclrTrgtContsId();
+
+				switch (reportDetail.getDclrTrgtTypeCd()) {
+				case "POST":
+					authorInfo = adminReportsMapper.findPostAuthorInfo(contentId);
+					break;
+				case "COMMENT":
+					authorInfo = adminReportsMapper.findCommentAuthorInfo(contentId);
+					break;
+				case "PRODUCT":
+					authorInfo = adminReportsMapper.findProductAuthorInfo(contentId);
+					break;
+				}
+
+				if (authorInfo != null) {
+					reportDetail.setDclrTrgtUserNo(authorInfo.get("userNo"));
+					reportDetail.setDclrTrgtUserNcnm(authorInfo.get("userNcnm"));
+					reportDetail.setDclrTrgtUserLgnId(authorInfo.get("userLgnId"));
+				}
+			}
+
+			// ▼▼▼ [핵심 추가] 4. 첨부파일 목록을 조회하여 DTO에 담습니다. ▼▼▼
+			List<AdminReportAttachment> attachments = adminReportsMapper.findAttachmentsByReportId(dclrId);
+			reportDetail.setAttachments(attachments);
+			// ▲▲▲ [핵심 추가] ▲▲▲
 		}
+
 		return reportDetail;
 	}
+
 }
