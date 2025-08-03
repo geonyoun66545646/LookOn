@@ -76,3 +76,22 @@ table {
     font-weight: 900;
     color: #333;
 }
+#logoImageContainer{
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 이미지가 컨테이너를 채우도록 설정 */
+}
+
+.intro-text {
+            white-space: pre-wrap; /* CSS3, 최신 브라우저 지원 */
+            word-wrap: break-word; /* 긴 단어가 영역을 벗어나지 않도록 함 */
+            font-family: inherit;  /* 부모 요소의 폰트 상속 */
+            font-size: inherit;    /* 부모 요소의 폰트 크기 상속 */
+        }
+        
+textarea{
+	resize : none;
+}
+#myChart{
+	display:none;
+}      

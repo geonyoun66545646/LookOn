@@ -6,6 +6,8 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import ks55team02.common.domain.store.StoreImage;
+
 import ks55team02.seller.common.domain.Store;
 import ks55team02.seller.common.domain.TopSellingProduct;
 
@@ -33,4 +35,13 @@ public interface StoreMngMapper {
 
 	// 상점별 판매 랭킹
 	List<TopSellingProduct> getTopSellingProductsByStoreId(@Param("storeId") String storeId);
+	
+	int insertStoreImage(StoreImage storeImage);
+	
+    int updateStoreLogoReference(Map<String, Object> params);
+    
+    int updateStoreIntro(Store store);
+    
+    int markImageAsDeleted(String imgId);
+    
 }

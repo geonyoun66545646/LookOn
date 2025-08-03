@@ -3,6 +3,8 @@ package ks55team02.seller.common.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import ks55team02.seller.common.domain.Store;
 import ks55team02.seller.common.domain.TopSellingProduct;
 
@@ -28,4 +30,9 @@ public interface StoreMngService {
 	
 	// 특정 상점 ID에 대한 상점별 판매 탑 5 랭킹
 	List<TopSellingProduct> getTopSellingProductsByStoreId(String storeId);
+	
+	void updateStoreLogo(String storeId, MultipartFile logoFile);
+	
+    void updateStoreIntro(String storeId, String storeIntro);
+	
 }
