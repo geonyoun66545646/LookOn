@@ -13,6 +13,7 @@ import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportAttachm
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportHistory;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportSearch;
+import ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminSanctionDetail;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.ReportProcessRequest;
 import ks55team02.admin.adminpage.inquiryadmin.reports.domain.UserSanction;
 import ks55team02.admin.adminpage.inquiryadmin.reports.mapper.AdminReportsMapper;
@@ -184,8 +185,9 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 				if (!"NONE".equals(sanctionType)) {
 					adminReportsMapper.updateUserStatus(targetUserNo, "제한");
 				}
-				handleSanctionForContentOwner(targetUserNo, sanctionType, report.getDclrId(), request.getActnCn(),
-						request.getAdminId(), request.getSanctionDuration());
+				 handleSanctionForContentOwner(targetUserNo, sanctionType, report.getDclrId(), 
+		                    request.getDclrPrcsRsltCn(), // getActnCn() -> getDclrPrcsRsltCn()
+		                    request.getAdminId(), request.getSanctionDuration());
 			} else {
 				log.warn("사용자 제재 대상 userNo가 없거나 비어있어 제재 로직을 건너뜁니다. 신고ID: {}", request.getDclrId());
 			}
@@ -208,11 +210,11 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 			String postOwnerUserNo = adminReportsMapper.getPostOwnerUserNo(targetPostSn);
 			if (postOwnerUserNo != null && !postOwnerUserNo.isEmpty()) {
 				adminReportsMapper.updateUserStatus(postOwnerUserNo, "제한");
-				handleSanctionForContentOwner(postOwnerUserNo, actionType, report.getDclrId(), request.getActnCn(),
-						request.getAdminId(), request.getSanctionDuration()); // sanctionDuration 전달
+				handleSanctionForContentOwner(postOwnerUserNo, actionType, report.getDclrId(), 
+	                    request.getDclrPrcsRsltCn(), // getActnCn() -> getDclrPrcsRsltCn()
+	                    request.getAdminId(), request.getSanctionDuration());
 
-				log.info("'작성자 제한'에 따른 게시글 {} 동시 삭제 조치를 실행합니다.", targetPostSn);
-				adminReportsMapper.updatePostStatus(targetPostSn, "DELETED");
+	            adminReportsMapper.updatePostStatus(targetPostSn, "DELETED");
 
 			} else {
 				log.warn("게시글 작성자 userNo를 찾을 수 없어 계정 제한 조치를 할 수 없습니다. 게시글: {}", targetPostSn);
@@ -243,8 +245,9 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 			String commentOwnerUserNo = adminReportsMapper.getCommentOwnerUserNo(targetCommentSn);
 			if (commentOwnerUserNo != null && !commentOwnerUserNo.isEmpty()) {
 				adminReportsMapper.updateUserStatus(commentOwnerUserNo, "제한");
-				handleSanctionForContentOwner(commentOwnerUserNo, actionType, report.getDclrId(), request.getActnCn(),
-						request.getAdminId(), request.getSanctionDuration()); // sanctionDuration 전달
+				 handleSanctionForContentOwner(commentOwnerUserNo, actionType, report.getDclrId(),
+		                    request.getDclrPrcsRsltCn(), // getActnCn() -> getDclrPrcsRsltCn()
+		                    request.getAdminId(), request.getSanctionDuration());
 
 				// ▼▼▼ [핵심 추가] 바로 여기에 댓글 삭제 로직을 추가합니다. ▼▼▼
 				log.info("'작성자 제한'에 따른 댓글 {} 동시 삭제 조치를 실행합니다.", targetCommentSn);
@@ -423,6 +426,9 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 			List<AdminReportAttachment> attachments = adminReportsMapper.findAttachmentsByReportId(dclrId);
 			reportDetail.setAttachments(attachments);
 			// ▲▲▲ [핵심 추가] ▲▲▲
+			
+			 AdminSanctionDetail sanctionDetail = adminReportsMapper.findSanctionDetailByReportId(dclrId);
+		        reportDetail.setSanctionDetail(sanctionDetail);
 		}
 
 		return reportDetail;

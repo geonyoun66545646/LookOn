@@ -92,10 +92,6 @@
 				<table class="table table-hover text-center">
 					<thead class="thead-light">
 						<tr>
-							<th><div class="form-check">
-									<input class="form-check-input" type="checkbox"
-										id="checkAllRows">
-								</div></th>
 							<th>신고 일시</th>
 							<th>신고자 ID</th>
 							<th>신고 대상 타입</th>
@@ -188,7 +184,7 @@
                 const buttonText = (report.prcsSttsCd === 'COMPLETED' || report.prcsSttsCd === 'REJECTED') ? '상세' : '처리';
                 html += `
                     <tr>
-                        <td><div class="form-check"><input class="form-check-input" type="checkbox" value="${report.dclrId}"></div></td>
+                 
                         <td>${dclrRcptDt}</td>
                         <td>${report.dclrUserLoginId}</td>
                         <td>${report.dclrTrgtTypeCd}</td>
