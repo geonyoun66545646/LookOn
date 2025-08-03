@@ -21,7 +21,6 @@ h1, h2, h3, h4, h5, h6 {
     --point-color-dark: #b3824c;
 }
 
-
 /* ======================================== */
 /*           2. 버튼 공통 스타일            */
 /* ======================================== */
@@ -187,6 +186,7 @@ h1, h2, h3, h4, h5, h6 {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    padding-right: 5px;
 }
 
 input[type="file"] {

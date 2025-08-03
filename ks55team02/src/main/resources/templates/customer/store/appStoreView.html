@@ -43,7 +43,7 @@
             <div class="row">
                 <div class="col-md-4 mb-3">
                    <label for="dpstrNm">예금주 <span class="text-danger">*</span></label>
-                   <input type="text" class="form-control" id="dpstrNm" name="dpstrNm" required>
+                   <input type="text" class="form-control" id="dpstrNm" name="dpstrNm" placeholder="예금주를 입력해주세요"required>
                    <div class="invalid-feedback"></div>
                </div>
                <div class="col-md-3 mb-3">
@@ -67,7 +67,7 @@
                </div>
                 <div class="col-md-5 mb-3">
                     <label for="actno">계좌번호 <span class="text-danger">*</span> ('-' 없이 숫자만 입력)</label>
-                    <input type="text" class="form-control" id="actno" name="actno" required pattern="[0-9]{10,16}" title="10~16자리의 숫자만 입력해주세요." maxlength="16">
+                    <input type="text" class="form-control" id="actno" name="actno" required pattern="[0-9]{10,16}" title="10~16자리의 숫자만 입력해주세요." placeholder="10~16자리의 숫자만 입력해주세요." maxlength="16">
                     <div class="invalid-feedback"></div>
                 </div>
             </div>
@@ -80,15 +80,15 @@
          <div class="card card-body p-4 p-md-5">
             <h5 class="form-section-title">스토어 기본 정보</h5>
             <div class="row">
-                <div class="col-md-6 mb-3"><label for="storeNameInput">스토어 명 <span class="text-danger">*</span></label><input type="text" class="form-control" id="storeNameInput" name="storeNm" required><div class="invalid-feedback"></div></div>
+                <div class="col-md-6 mb-3"><label for="storeNameInput">스토어 명 <span class="text-danger">*</span></label><input type="text" class="form-control" id="storeNameInput" name="storeNm" placeholder="상점명을 입력하세요" required><div class="invalid-feedback"></div></div>
                 <div class="col-md-6 mb-3"><label>수수료 정책</label><div class="user-info" id="commissionRateDisplay">일반 판매자 수수료 (18%)</div><div class="d-none" id="commissionRateCn">plcy_1</div></div>
                 <div class="col-md-12 mb-3"><label for="storeIntroTextarea">스토어 소개 <span class="text-danger">*</span></label><textarea class="form-control" rows="4" placeholder="고객에게 보여질 스토어 소개를 입력해주세요." id="storeIntroTextarea" name="storeIntroCn" required></textarea><div class="invalid-feedback"></div></div>
             </div>
             <h5 class="form-section-title mt-4">담당자 정보</h5>
             <div class="row">
                 <div class="col-6 mb-3">
-                    <label for="managerNameInput">매니저 명 <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="managerNameInput" name="mngrNm" required>
+                    <label for="managerNameInput" >매니저 명 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="managerNameInput" name="mngrNm" placeholder="매니저 이름을 입력하세요" required>
                     <div class="invalid-feedback"></div>
                 </div>
             </div>
@@ -96,7 +96,7 @@
             <div class="col-md-6 mb-3">
                 <label class = "mng">매니저 연락처 <span class="text-danger">*</span></label>
                 <div class="input-group-split">
-                    <select class="form-select" id="managerTel1" style="flex: 0 0 90px;"><option>010</option><option>011</option><option>016</option><option>017</option><option>018</option><option>019</option></select>
+                    <select class="form-select" id="managerTel1" style="flex: 0 0 90px;"><option>010</option><option>011</option></select>
                     <span class="input-divider">-</span>
                     <input type="text" class="form-control" id="managerTel2" maxlength="4" pattern="[0-9]*">
                     <span class="input-divider">-</span>
@@ -157,9 +157,9 @@
             <div class="row">
                 <div class="col-md-6 mb-3"><label>계약 신청일</label><div class="user-info" id="contractApplyDateDisplay" th:text="${todayDate}"></div></div>
                 <div class="col-md-6 mb-3">
-                    <label>계약 기간 <span class="text-danger">*</span></label>
+                    <label>계약 기간(최대 5년) <span class="text-danger">*</span></label>
                     <div class="contract-period-group">
-                        <span class="period-display" id="contractDisplay"></span>
+                        <span class="period-display" id="contractDisplay"> </span>
                         <div class="period-buttons"><button type="button" class="btn-period" id="decrementYearBtn">-</button><button type="button" class="btn-period" id="incrementYearBtn">+</button></div>
                     </div>
                     <input type="hidden" id="contractTermInput" name="ctrtTermVal">
@@ -179,28 +179,28 @@
                 <!-- ▼▼▼ 모든 input 태그에 accept 속성 추가 ▼▼▼ -->
                 <li class="file-upload-item">
                     <span class="doc-name">사업자 등록증 <span class="text-danger">*</span></span>
-                    <span class="file-name-display" id="fileNameDisplay-1">선택된 파일 없음</span>
+                    <span class="file-name-display" id="fileNameDisplay-1">이미지 또는 PDF파일</span>
                     <label for="file-upload-1" class="btn-file select">파일 선택</label>
                     <input id="file-upload-1" type="file" name="businessRegistrationDoc" required accept="image/*, .pdf" />
                     <button type="button" class="btn-file cancel" data-target="1">취소</button>
                 </li>
                 <li class="file-upload-item">
                     <span class="doc-name">통신 판매업 신고증 <span class="text-danger">*</span></span>
-                    <span class="file-name-display" id="fileNameDisplay-2">선택된 파일 없음</span>
+                    <span class="file-name-display" id="fileNameDisplay-2">이미지 또는 PDF파일</span>
                     <label for="file-upload-2" class="btn-file select">파일 선택</label>
                     <input id="file-upload-2" type="file" name="telecommunicationLicense" required accept="image/*, .pdf" />
                     <button type="button" class="btn-file cancel" data-target="2">취소</button>
                 </li>
                 <li class="file-upload-item">
                     <span class="doc-name">대표자 신분증 사본 <span class="text-danger">*</span></span>
-                    <span class="file-name-display" id="fileNameDisplay-4">선택된 파일 없음</span>
+                    <span class="file-name-display" id="fileNameDisplay-4">이미지 또는 PDF파일</span>
                     <label for="file-upload-4" class="btn-file select">파일 선택</label>
                     <input id="file-upload-4" type="file" name="idCardCopy" required accept="image/*, .pdf" />
                     <button type="button" class="btn-file cancel" data-target="4">취소</button>
                 </li>
                 <li class="file-upload-item">
                     <span class="doc-name">통장 사본 <span class="text-danger">*</span></span>
-                    <span class="file-name-display" id="fileNameDisplay-5">선택된 파일 없음</span>
+                    <span class="file-name-display" id="fileNameDisplay-5">이미지 또는 PDF파일</span>
                     <label for="file-upload-5" class="btn-file select">파일 선택</label>
                     <input id="file-upload-5" type="file" name="bankAccountCopy" required accept="image/*, .pdf" />
                     <button type="button" class="btn-file cancel" data-target="5">취소</button>
@@ -212,21 +212,21 @@
         <ul class="file-upload-list">
              <li class="file-upload-item">
                  <span class="doc-name">판매상품 관련 증빙</span>
-                 <span class="file-name-display" id="fileNameDisplay-3">선택된 파일 없음</span>
+                 <span class="file-name-display" id="fileNameDisplay-3">이미지 또는 PDF파일</span>
                  <label for="file-upload-3" class="btn-file select">파일 선택</label>
                  <input id="file-upload-3" type="file" name="productEvidence" accept="image/*, .pdf" />
                  <button type="button" class="btn-file cancel" data-target="3">취소</button>
              </li>
              <li class="file-upload-item">
                  <span class="doc-name">기타 서류</span>
-                 <span class="file-name-display" id="fileNameDisplay-6">선택된 파일 없음</span>
+                 <span class="file-name-display" id="fileNameDisplay-6">이미지 또는 PDF파일</span>
                  <label for="file-upload-6" class="btn-file select">파일 선택</label>
                  <input id="file-upload-6" type="file" name="etcDocs" accept="image/*, .pdf" />
                  <button type="button" class="btn-file cancel" data-target="6">취소</button>
              </li>
              <li class="file-upload-item">
                  <span class="doc-name">스토어 로고</span>
-                 <span class="file-name-display" id="fileNameDisplay-7">선택된 파일 없음</span>
+                 <span class="file-name-display" id="fileNameDisplay-7">이미지 파일</span>
                  <label for="file-upload-7" class="btn-file select">파일 선택</label>
                  <!-- 스토어 로고는 이미지만 받도록 하는 것이 더 좋습니다 -->
                  <input id="file-upload-7" type="file" name="storeLogoImgFile" accept="image/*" />
@@ -398,9 +398,9 @@ document.addEventListener('DOMContentLoaded', function() {
             checkField(document.getElementById('bankNm'), '은행을 선택해주세요.', el => el.value !== '');
             checkField(document.getElementById('actno'), '10~16자리의 숫자만 입력 가능합니다.', el => /^\d{10,16}$/.test(el.value));
         } else if (stepId === 'step2') {
-            checkField(document.getElementById('storeNameInput'), '스토어 명을 입력해주세요.', el => el.value.trim() !== '');
+            checkField(document.getElementById('storeNameInput'), '상점 명을 입력해주세요.', el => el.value.trim() !== '');
             checkField(document.getElementById('storeIntroTextarea'), '스토어 소개를 입력해주세요.', el => el.value.trim() !== '');
-            checkField(document.getElementById('managerNameInput'), '매니저 명을 입력해주세요.', el => el.value.trim() !== '');
+            checkField(document.getElementById('managerNameInput'), '매니저 이름을 입력해주세요.', el => el.value.trim() !== '');
             
             // 연락처 필드 그룹 검사
             if (isValid) {
@@ -622,6 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // --- 계약 기간 조절 로직 ---
+    // --- 계약 기간 조절 로직 ---
     const decrementBtn = document.getElementById('decrementYearBtn');
     const incrementBtn = document.getElementById('incrementYearBtn');
     const displaySpan = document.getElementById('contractDisplay');
@@ -633,8 +634,22 @@ document.addEventListener('DOMContentLoaded', function() {
         displaySpan.textContent = `${currentYear}년 (${days}일)`;
         hiddenDaysInput.value = days;
     }
-    incrementBtn.addEventListener('click', () => { currentYear++; updateContractDisplay(); });
-    decrementBtn.addEventListener('click', () => { if (currentYear > 1) { currentYear--; updateContractDisplay(); } });
+
+    // 수정된 부분: currentYear가 5보다 작을 때만 증가
+    incrementBtn.addEventListener('click', () => { 
+        if (currentYear < 5) { 
+            currentYear++; 
+            updateContractDisplay(); 
+        } 
+    });
+
+    decrementBtn.addEventListener('click', () => { 
+        if (currentYear > 1) { 
+            currentYear--; 
+            updateContractDisplay(); 
+        } 
+    });
+    
     updateContractDisplay(); // 페이지 로드 시 초기값 설정
 
     // --- 최종 제출 로직 ---
