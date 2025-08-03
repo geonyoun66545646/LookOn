@@ -168,4 +168,13 @@ public interface AdminReportsMapper {
 
     /** [신규 추가] 비활성화된 상품을 복원(재활성/재노출)합니다. */
     void restoreProduct(String gdsNo);
+    
+    /** [신규 추가] 게시글 ID로 작성자 정보(번호, 닉네임)를 조회합니다. */
+    Map<String, String> findPostAuthorInfo(String contentId);
+
+    /** [신규 추가] 댓글 ID로 작성자 정보(번호, 닉네임)를 조회합니다. */
+    Map<String, String> findCommentAuthorInfo(String contentId);
+
+    /** [신규 추가] 상품 ID로 판매자 정보(번호, 닉네임)를 조회합니다. */
+    Map<String, String> findProductAuthorInfo(String contentId);
 }

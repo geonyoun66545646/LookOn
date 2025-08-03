@@ -56,7 +56,7 @@
 									<label for="dclrUserNo" class="form-label">신고한 사용자
 										(닉네임/ID)</label> <input type="text" class="form-control"
 										id="dclrUserNo" name="dclrUserNo"
-										th:value="|*{dclrUserNcnm} (*{dclrUserNo})|" readonly>
+										th:value="|*{dclrUserNcnm} (*{dclrUserLgnId})|" readonly>
 								</div>
 
 								<div class="mb-4 form-group">
@@ -65,18 +65,20 @@
 										name="dclrTrgtTypeCd" th:value="*{dclrTrgtTypeCd}" readonly>
 								</div>
 
+								<!-- 파일: reportDetail.html -->
+
 								<div class="mb-4 form-group">
 									<label for="dclrTrgtUserNo" class="form-label">신고 대상
-										사용자 (닉네임/ID)</label> <input type="text" class="form-control"
-										id="dclrTrgtUserNo" name="dclrTrgtUserNo"
-										th:value="*{dclrTrgtTypeCd} == 'USER' ? |*{dclrTrgtUserNcnm} (*{dclrTrgtUserNo})| : 
-                             (*{dclrTrgtTypeCd} == 'POST' ? '- (게시글 신고)' :
-                              (*{dclrTrgtTypeCd} == 'COMMENT' ? '- (댓글 신고)' :
-                               (*{dclrTrgtTypeCd} == 'PRODUCT' ? '- (상품 신고)' : '-')))"
+										사용자 (닉네임/ID)</label>
+
+									<!-- ▼▼▼ 이 input 태그의 th:value를 최종 수정합니다 ▼▼▼ -->
+									<input type="text" class="form-control"
+										th:value="*{dclrTrgtUserNcnm != null ? dclrTrgtUserNcnm + ' (' + dclrTrgtUserLgnId + ')' : '- (작성자 정보 없음)-'}"
 										readonly> <small class="form-text text-muted"
-										th:if="*{dclrTrgtTypeCd != 'USER'}"> 콘텐츠 신고이므로, 직접적인
-										신고 대상 사용자는 없습니다. </small>
+										th:if="*{dclrTrgtUserNcnm == null}"> 해당 콘텐츠의 작성자 정보를
+										찾을 수 없거나, 사용자 직접 신고가 아닙니다. </small>
 								</div>
+
 								<div class="mb-4 form-group">
 									<label for="dclrTrgtContsId" class="form-label">신고 대상
 										콘텐츠 ID</label> <input type="text" class="form-control"
@@ -86,6 +88,23 @@
 										th:if="*{dclrTrgtTypeCd == 'USER'}"> 사용자 신고이므로, 직접적인
 										콘텐츠 ID는 없습니다. </small>
 								</div>
+
+								<!-- ▼▼▼ 이 블록 전체를 바로 아래에 추가해주세요 ▼▼▼ -->
+								<div class="mb-4 form-group">
+									<label class="form-label">신고 대상 원본 내용</label>
+									<div id="originalContentContainer"
+										class="original-content-wrapper p-3 border rounded bg-light">
+										<!-- JS가 이곳에 내용을 동적으로 채워 넣을 겁니다. -->
+										<div class="text-center">
+											<div class="spinner-border spinner-border-sm" role="status">
+												<span class="visually-hidden">Loading...</span>
+											</div>
+											<span class="ms-2">원본 내용 로딩 중...</span>
+										</div>
+									</div>
+								</div>
+
+
 								<div class="mb-4 form-group">
 									<label for="dclrRsnCd" class="form-label">신고 사유</label> <input
 										type="text" class="form-control" id="dclrRsnCd"
@@ -362,6 +381,93 @@ document.addEventListener('DOMContentLoaded', function() {
             addEventListenersToForm(loadedReportDetail.dclrId);
         });
     }
+    
+ // ▼▼▼▼▼ 바로 이 자리에 붙여넣으세요 ▼▼▼▼▼
+    // 페이지가 로드되면 즉시 원본 콘텐츠를 불러옵니다.
+    loadOriginalContent();
+
+    /**
+     * 신고 대상 원본 콘텐츠를 AJAX로 불러와 화면에 그려주는 함수
+     */
+    function loadOriginalContent() {
+        const targetType = /*[[${reportDetail.dclrTrgtTypeCd}]]*/ null;
+        const contentId = /*[[${reportDetail.dclrTrgtContsId}]]*/ null;
+        const userId = /*[[${reportDetail.dclrTrgtUserNo}]]*/ null;
+        const container = document.getElementById('originalContentContainer');
+
+        if (!targetType) {
+            container.innerHTML = '<div class="text-muted p-3">원본 콘텐츠 정보가 없습니다.</div>';
+            return;
+        }
+
+        // 신고 대상이 'USER' 타입이고, 콘텐츠 ID가 없을 경우를 위한 처리
+        if (targetType === 'USER' && !contentId) {
+            // 이 경우에는 userId를 사용합니다.
+            if (!userId) {
+                container.innerHTML = '<div class="text-muted p-3">원본 사용자 정보를 특정할 수 없습니다.</div>';
+                return;
+            }
+        } else if (!contentId) {
+            // 그 외 콘텐츠 타입인데 콘텐츠 ID가 없는 경우
+            container.innerHTML = '<div class="text-muted p-3">원본 콘텐츠 정보를 특정할 수 없습니다.</div>';
+            return;
+        }
+        
+        let apiUrl = '/api/admin/content/';
+        switch (targetType) {
+            case 'POST':    apiUrl += `posts/${contentId}`; break;
+            case 'COMMENT': apiUrl += `comments/${contentId}`; break;
+            case 'PRODUCT': apiUrl += `products/${contentId}`; break;
+            case 'USER':    apiUrl += `users/${userId}`; break; // 사용자 신고는 userId를 사용
+            default:
+                container.innerHTML = `<div class="text-danger p-3">알 수 없는 대상 타입: ${targetType}</div>`;
+                return;
+        }
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) throw new Error('원본 콘텐츠를 찾을 수 없습니다 (삭제되었을 수 있습니다).');
+                    throw new Error('원본 정보를 불러오는 데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                let contentHtml = '<dl class="row mb-0">';
+                // 타입별로 다른 HTML을 그려줍니다.
+                switch (targetType) {
+                    case 'POST':
+                        contentHtml += `
+                            <dt class="col-sm-3">게시글 제목</dt><dd class="col-sm-9">${data.title || ' (정보 없음)'}</dd>
+                            <dt class="col-sm-3">내용</dt><dd class="col-sm-9"><pre>${data.content || ' (정보 없음)'}</pre></dd>
+                        `;
+                        break;
+                    case 'COMMENT':
+                        contentHtml += `<dt class="col-sm-3">댓글 내용</dt><dd class="col-sm-9"><pre>${data.content || ' (정보 없음)'}</pre></dd>`;
+                        break;
+                    case 'PRODUCT':
+                        contentHtml += `
+                            <dt class="col-sm-3">상품명</dt><dd class="col-sm-9">${data.name || ' (정보 없음)'}</dd>
+                            <dt class="col-sm-3">상품 설명</dt><dd class="col-sm-9"><pre>${data.description || ' (정보 없음)'}</pre></dd>
+                        `;
+                        break;
+                    case 'USER':
+                        contentHtml += `
+                            <dt class="col-sm-3">사용자 닉네임</dt><dd class="col-sm-9">${data.nickname || ' (정보 없음)'}</dd>
+                            <dt class="col-sm-3">소개글</dt><dd class="col-sm-9"><pre>${data.bio || ' (정보 없음)'}</pre></dd>
+                        `;
+                        break;
+                }
+                contentHtml += '</dl>';
+                container.innerHTML = contentHtml;
+            })
+            .catch(error => {
+                container.innerHTML = `<div class="text-danger p-3">${error.message}</div>`;
+            });
+    }
+    // ▲▲▲▲▲ 여기까지 ▲▲▲▲▲
+    
+    
 
 }); // <-- DOMContentLoaded 닫는 괄호
 

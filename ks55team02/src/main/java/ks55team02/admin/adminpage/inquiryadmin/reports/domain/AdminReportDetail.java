@@ -23,6 +23,8 @@ public class AdminReportDetail {
     private String dclrCn;
     private String dclrDt;
     private String prcsSttsCd;
+    private String dclrUserLgnId;
+    private String dclrTrgtUserLgnId; 
     
     // report_attachments 테이블 정보
     private int attachmentCount;

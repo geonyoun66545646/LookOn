@@ -384,9 +384,36 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 	@Override
 	public AdminReportDetail getAdminReportDetail(String dclrId) {
 		AdminReportDetail reportDetail = adminReportsMapper.getAdminReportDetailById(dclrId);
+
 		if (reportDetail != null) {
 			List<AdminReportHistory> historyList = adminReportsMapper.getAdminReportHistoryListById(dclrId);
 			reportDetail.setHistoryList(historyList);
+
+			if ((reportDetail.getDclrTrgtUserNo() == null || reportDetail.getDclrTrgtUserNcnm() == null)
+					&& reportDetail.getDclrTrgtContsId() != null) {
+
+				Map<String, String> authorInfo = null;
+				String contentId = reportDetail.getDclrTrgtContsId();
+
+				switch (reportDetail.getDclrTrgtTypeCd()) {
+				case "POST":
+					authorInfo = adminReportsMapper.findPostAuthorInfo(contentId);
+					break;
+				case "COMMENT":
+					authorInfo = adminReportsMapper.findCommentAuthorInfo(contentId);
+					break;
+				case "PRODUCT":
+					authorInfo = adminReportsMapper.findProductAuthorInfo(contentId);
+					break;
+				}
+
+				if (authorInfo != null) {
+					// ▼▼▼ 이 부분을 수정합니다 ▼▼▼
+					reportDetail.setDclrTrgtUserNo(authorInfo.get("userNo"));
+					reportDetail.setDclrTrgtUserNcnm(authorInfo.get("userNcnm"));
+					reportDetail.setDclrTrgtUserLgnId(authorInfo.get("userLgnId")); // 로그인 ID도 채워넣기
+				}
+			}
 		}
 		return reportDetail;
 	}
