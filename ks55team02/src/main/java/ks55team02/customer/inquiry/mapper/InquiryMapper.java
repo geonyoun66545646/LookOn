@@ -1,6 +1,7 @@
 package ks55team02.customer.inquiry.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -20,27 +21,29 @@ public interface InquiryMapper {
 	// 문의 등록
 	int addInquiry(Inquiry inquiry); 
 	
-	// 문의 이미지 매핑 정보 DB 삽입 (InquiryImageMapper로 이동)
-	// int insertInquiryImage(InquiryImage inquiryImage); 
-	
-	// 여러 문의 이미지 매핑 정보를 데이터베이스에 삽입합니다. (InquiryImageMapper로 이동)
-	// int addInquiryImages(List<InquiryImage> inquiryImageList);
-	
-	// 문의 ID로 문의 이미지 매핑 리스트를 조회합니다 (InquiryImageMapper로 이동)
-	// List<InquiryImage> getInquiryImagesByInquiryId(String inqryId);
-	
 	// 조회 아이디중 가장 큰 값
 	String getMaxInquiryId(); 
 	
 	// 전체 문의 개수 조회
-    int getTotalInquiryCount();
+	int getTotalInquiryCount(Map<String, Object> paramMap);
 
     // 페이징 처리된 문의 목록 조회
-    List<Inquiry> getInquiryListPaging(@Param("startRow") int startRow, @Param("pageSize") int pageSize);
+	List<Inquiry> getInquiryListPaging(Map<String, Object> paramMap);
     
     // 문의 상세조회시 이미지 정보 조회
     Inquiry getInquiryByIdWithImages(String inquiryId);
     
+    // 답변 조회
     Answer getAnswerByInquiryId(String answer);
     
+    // 문의 수정
+    int updateInquiry(Inquiry inquiry);
+    
+    // [추가] 문의 삭제 (상태 변경)
+    int deleteInquiryById(@Param("inquiryId") String inquiryId, @Param("deleteUserId") String deleteUserId);
+    
+    
+   
 }
+    
+

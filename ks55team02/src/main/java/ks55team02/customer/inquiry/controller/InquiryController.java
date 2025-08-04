@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -211,34 +212,129 @@ public class InquiryController {
             Model model,
             @RequestParam(name = "page", defaultValue = "1") int currentPage,
             @RequestParam(name = "size", defaultValue = "15") int pageSize,
-            HttpSession session // 현재 사용자 ID를 활용 할 수 있도록 세션 추가
+            @RequestParam(name = "searchType", required = false) String searchType, // 검색 타입
+            @RequestParam(name = "keyword", required = false) String keyword,       // 검색어
+            @RequestParam(name = "author", required = false) String author,         // '내 문의 보기' 필터
+            @RequestParam(name = "status", required = false) String status,
+            HttpSession session
     ) {
-        //1. InquiryService를 호출하여 페이징된 문의 목록과 전체 개수 등 데이터를 가져옵니다.
-        Map<String, Object> pagingData = inquiryService.getInquiryList(currentPage, pageSize);
+        // 현재 로그인한 사용자 ID 가져오기
+        String currentUserId = getCurrentUserId(session);
+        
+        // '내 문의'를 보려는데 로그인이 안 되어있다면 로그인 페이지로 유도
+        if ("me".equals(author) && currentUserId == null) {
+            // 필요하다면 RedirectAttributes로 메시지 전달
+            return "redirect:/customer/login";
+        }
 
-        //2. 조회된 데이터 파싱
+        // 1. 서비스 호출 시 모든 파라미터 전달
+        Map<String, Object> pagingData = inquiryService.getInquiryList(currentPage, pageSize, searchType, keyword, author, status, currentUserId);
+
+        // 2. 데이터 파싱 (서비스에서 반환된 값)
         List<Inquiry> inquiryList = (List<Inquiry>) pagingData.get("inquiryList");
         int totalRows = (int) pagingData.get("totalRows");
 
-        //3. 페이징 관련 계산
+        // 3. 페이징 관련 계산
         int totalPages = (int) Math.ceil((double) totalRows / pageSize);
         int pageBlockSize = 5;
         int startPage = ((currentPage - 1) / pageBlockSize) * pageBlockSize + 1;
         int endPage = Math.min(startPage + pageBlockSize - 1, totalPages);
         
-
-        //5. Model에 데이터를 담아 뷰로 전달합니다.
+        // 4. Model에 데이터 담아 뷰로 전달
         model.addAttribute("title", "문의 목록");
         model.addAttribute("inquiryList", inquiryList);
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("pageSize", pageSize);
+        model.addAttribute("status", status);
         model.addAttribute("totalRows", totalRows);
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
-        model.addAttribute("currentUserId", getCurrentUserId(session));
+        
+        // 5. ★★★ 뷰에서 검색 조건을 유지하기 위해 파라미터 다시 전달 ★★★
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("author", author);
+
+        // 현재 사용자 ID도 전달 (비밀글 아이콘 등 표시용)
+        model.addAttribute("currentUserId", currentUserId);
 
         return "customer/inquiry/inquiryListView";
+    }
+
+    
+ // ======================= [AJAX] 문의 수정 처리 (POST) =======================
+    @ResponseBody // JSON 응답을 위해 필수
+    @PostMapping("/updateInquiryAjax")
+    public ResponseEntity<Map<String, Object>> updateInquiryAjax(@RequestBody Inquiry inquiry, // JSON 데이터를 받기 위해 @RequestBody 사용
+                                                                   HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        String currentUserId = getCurrentUserId(session);
+        
+        if (currentUserId == null) {
+            response.put("status", "error");
+            response.put("message", "세션이 만료되었습니다. 다시 로그인해주세요.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        try {
+            // 서비스의 수정 메서드 호출 (inquiry 객체와 사용자 ID 전달)
+            // 서비스에서 권한 검사 및 답변 여부 검사를 수행합니다.
+            inquiryService.updateInquiry(inquiry, currentUserId);
+            
+            response.put("status", "success");
+            response.put("message", "문의가 성공적으로 수정되었습니다.");
+            // 수정된 내용을 utext로 변환하여 클라이언트에 보내주면 바로 화면에 적용 가능
+            response.put("updatedContentHtml", inquiry.getInqryCn().replace("\n", "<br>"));
+            return ResponseEntity.ok(response);
+
+        } catch (SecurityException | IllegalStateException e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        } catch (Exception e) {
+            log.error("문의 수정(AJAX) 중 오류 발생", e);
+            response.put("status", "error");
+            response.put("message", "문의 수정 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // ======================= [AJAX] 문의 삭제 처리 (POST) =======================
+    @ResponseBody // JSON 응답을 위해 필수
+    @PostMapping("/deleteInquiryAjax")
+    public ResponseEntity<Map<String, Object>> deleteInquiryAjax(@RequestBody Map<String, String> payload, // inquiryId를 받기 위함
+                                                                   HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        String inquiryId = payload.get("inquiryId");
+        String currentUserId = getCurrentUserId(session);
+
+        if (currentUserId == null) {
+            response.put("status", "error");
+            response.put("message", "세션이 만료되었습니다. 다시 로그인해주세요.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        try {
+            // 서비스의 삭제 메서드 호출
+            inquiryService.deleteInquiry(inquiryId, currentUserId);
+            
+            response.put("status", "success");
+            response.put("message", "문의가 삭제되었습니다.");
+            // 삭제 후 이동할 URL 전달
+            response.put("redirectUrl", "/customer/inquiry/inquiryList");
+            return ResponseEntity.ok(response);
+
+        } catch (SecurityException | IllegalStateException e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        } catch (Exception e) {
+            log.error("문의 삭제(AJAX) 중 오류 발생", e);
+            response.put("status", "error");
+            response.put("message", "문의 삭제 중 오류가 발생했습니다.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
     
 }

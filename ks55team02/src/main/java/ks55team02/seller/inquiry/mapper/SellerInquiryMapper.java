@@ -36,4 +36,6 @@ public interface SellerInquiryMapper {
 
     // ⭐ 추가: 로그인 ID로 상점 ID 조회
     String getStoreIdByUserLgnId(String userLgnId);
+    
+
 }

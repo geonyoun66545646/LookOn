@@ -14,10 +14,24 @@
         <result property="inactvtnDt"   column="inactvtn_dt"/>
         <result property="delPrcrYn"    column="del_prcr_yn"/>
     </resultMap>
+    
+    <!--  1. 목록 조회용 resultMap  -->
+    <resultMap id="inquiryListResultMap" type="ks55team02.common.domain.inquiry.Inquiry">
+        <id property="inqryId" column="inqry_id"/>
+        <result property="inqryTypeCd" column="inqry_type_cd"/>
+        <result property="inqryTtl" column="inqry_ttl"/>
+        <result property="prvtYn" column="prvt_yn"/>
+        <result property="prcsStts" column="prcs_stts"/>
+        <result property="regYmd" column="reg_ymd"/>
+        <association property="writerInfo" javaType="ks55team02.common.domain.inquiry.InquiryUser">
+        <result property="userNcnm" column="user_ncnm"/>
+    </association>
+    </resultMap>
 
     <resultMap id="inquiryUserResultMap" type="ks55team02.common.domain.inquiry.InquiryUser">
         <id property="userNo"       column="user_no"/>
         <result property="userNcnm" column="user_ncnm"/>
+        <result property="userLgnId" column="user_lgn_id"/>
     </resultMap>
 
     <resultMap id="inquiryImageResultMap" type="ks55team02.common.domain.inquiry.InquiryImage">
@@ -60,7 +74,7 @@
 
         <association property="writerInfo" resultMap="inquiryUserResultMap"/>
         <association property="storeInfo" resultMap="storeResultMap"/>
-        <association property="answer" resultMap="ks55team02.seller.inquiry.mapper.AnswerMapper.answerResultMap"/>
+        <association property="answer" resultMap="answerResultMap"/>
         
         <collection property="inquiryImages" ofType="ks55team02.common.domain.inquiry.InquiryImage" resultMap="inquiryImageResultMap"/>
     </resultMap>
@@ -135,104 +149,72 @@
         </if>
     </select>
 
-    <select id="getSellerInquiryList" parameterType="map" resultMap="inquiryResultMap">
+    <select id="getSellerInquiryList" resultMap="inquiryListResultMap">
         SELECT
             i.inqry_id,
             i.inqry_type_cd,
-            i.inqry_trgt_type_cd,
-            i.wrtr_id,
-            i.inqry_store_id,
             i.inqry_ttl,
-            i.inqry_cn,
             i.prvt_yn,
             i.prcs_stts,
-            i.prcs_user_no,
             i.reg_ymd,
-            i.mdfcn_ymd,
-            i.del_dt,
-            i.del_user_no,
-            i.del_actvtn_yn,
-            s.store_id,
-            s.aply_id,
-            s.seller_user_no,
-            s.store_conm,
-            s.store_intro_cn,
-            s.store_logo_img,
-            s.store_stts,
-            s.info_mdfcn_dt,
-            s.inactvtn_dt,
-            s.del_prcr_yn,
-            u.user_no,
             u.user_ncnm,
-            iim.inqry_img_id,
-            iim.img_id,
-            iim.inqry_id AS inquiry_image_inqry_id,
-            iim.ord,
-            stim.img_addr, a.ans_id,
-            a.inqry_id AS answer_inqry_id,
-            a.answr_user_no,
-            a.ans_cn,
-            a.ans_tm,
-            a.answr_type_cd,
-            a.rls_yn,
-            a.last_mdfcn_dt,
-            a.actvtn_yn,
-            a.del_dt,
-            a.del_user_no
+            (SELECT COUNT(*) FROM answer a WHERE a.inqry_id = i.inqry_id) AS answer_count
         FROM
             inquiries i
-        JOIN
-            stores s ON s.store_id = i.inqry_store_id
         LEFT JOIN
             users u ON u.user_no = i.wrtr_id
-        LEFT JOIN inquiry_images iim ON iim.inqry_id = i.inqry_id
-        LEFT JOIN store_images stim ON stim.img_id = iim.img_id LEFT JOIN
-            answer a ON a.inqry_id = i.inqry_id
-        WHERE 1=1
-        AND i.prcs_stts NOT IN ('DELETED', 'HIDDEN')
-		AND i.inqry_store_id = #{param1.inqryStoreId}
-        
-        <if test="param1.searchValue != null and param1.searchValue != ''">
-            <choose>
-                <when test="param1.searchKey != null and param1.searchKey != ''">
-                    <choose>
-                        <when test="param1.searchKey == 'inqryTtl'">
-                            AND i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                        <when test="param1.searchKey == 'inqryCn'">
-                            AND i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                        <when test="param1.searchKey == 'wrtrId'">
-                            AND u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                        <when test="param1.searchKey == 'inqryId'">
-                            AND i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                        <when test="param1.searchKey == 'prcsStts'">
-                            AND i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        </when>
-                    </choose>
-                </when>
-                <otherwise>
-                    AND (
-                        i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                        i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                        u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                        i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                        i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
+        WHERE
+            i.inqry_store_id = #{param1.inqryStoreId}
+            AND i.prcs_stts NOT IN ('DELETED', 'HIDDEN')
+            
+            <!-- 전체 검색 조건 -->
+            <if test="param1.searchValue != null and param1.searchValue != ''">
+                <choose>
+                    <when test="param1.searchKey != null and param1.searchKey != ''">
+                        <choose>
+                            <when test="param1.searchKey == 'inqryTtl'">
+                                AND i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%')
+                            </when>
+                            <when test="param1.searchKey == 'inqryCn'">
+                                AND i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%')
+                            </when>
+                            <when test="param1.searchKey == 'wrtrId'">
+                                AND u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%')
+                            </when>
+                            <when test="param1.searchKey == 'inqryId'">
+                                AND i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%')
+                            </when>
+                            <when test="param1.searchKey == 'prcsStts'">
+                                AND i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
+                            </when>
+                        </choose>
+                    </when>
+                    <otherwise>
+                        AND (
+                            i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%') OR
+                            i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%') OR
+                            u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%') OR
+                            i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%') OR
+                            i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
                         )
-                </otherwise>
-            </choose>
-        </if>
-        <if test="param1.filterConditions != null and param1.filterConditions.size() > 0">
-            AND i.prcs_stts IN
-            <foreach collection="param1.filterConditions" item="status" open="(" separator="," close=")">
-                #{status}
-            </foreach>
-        </if>
-        <if test="param1.startDate != null and param1.endDate != null">
-            AND i.reg_ymd BETWEEN #{param1.startDate} AND #{param1.endDate}
-        </if>        
+                    </otherwise>
+                </choose>
+            </if>
+
+            <!-- 처리 상태 필터 조건 -->
+            <if test="param1.filterConditions != null and param1.filterConditions.size() > 0">
+                AND i.prcs_stts IN
+                <foreach collection="param1.filterConditions" item="status" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+            
+            <!-- 기간 필터 조건 -->
+            <if test="param1.startDate != null and param1.endDate != null">
+                AND i.reg_ymd BETWEEN #{param1.startDate} AND #{param1.endDate}
+            </if>
+        
+        <!-- 정렬 조건 -->
         ORDER BY
             <choose>
                 <when test="param1.sortKey == 'inqryId'">
@@ -251,6 +233,8 @@
             <if test="param1.sortOrder == null or param1.sortOrder == ''">
                 DESC
             </if>
+            
+        <!-- 페이징 처리 -->
         LIMIT #{param2}, #{param3}
     </select>
 
@@ -283,6 +267,7 @@
             s.del_prcr_yn,
             u.user_no,
             u.user_ncnm,
+            u.user_lgn_id,
             iim.inqry_img_id,
             iim.img_id,
             iim.inqry_id AS inquiry_image_inqry_id,

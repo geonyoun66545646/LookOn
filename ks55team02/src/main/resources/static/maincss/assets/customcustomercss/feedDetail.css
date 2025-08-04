@@ -98,7 +98,7 @@
 .post-actions button:hover { color: #262626; }
 /* --- 5. Comment Edit Mode Styles --- */
 .comment-edit-mode { width: 100%; }
-.comment-edit-input { width: 100%; border: 1px solid #dbdbdb; border-radius: 4px; padding: 8px; resize: vertical; min-height: 60px; font-size: 14px; margin-bottom: 8px; }
+.comment-edit-input { width: 100%; border: 1px solid #dbdbdb; border-radius: 4px; padding: 8px; resize: none; min-height: 60px; font-size: 14px; margin-bottom: 8px; }
 .edit-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .edit-actions button { border: 1px solid #dbdbdb; background-color: #fff; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; line-height: normal; }
 .edit-actions .save-edit-btn { background-color: #0095f6; color: white; border-color: #0095f6; }

@@ -165,7 +165,7 @@
                                  <th scope="col" class="col-num">문의 ID</th>
                                  <th scope="col" class="col-type">문의 유형</th>
                                  <th scope="col" class="col-target">문의 대상</th>
-                                 <th scope="col" class="col-title">제목</th>
+                                 <th scope="col" class="col-title">문의 제목</th>
                                  <th scope="col" class="col-writer-name">작성자 이름</th>
                                  <th scope="col" class="col-writer-id">작성자 ID</th>
                                  <th scope="col" class="col-status">처리 상태</th>
@@ -180,7 +180,7 @@
                                  <td class="col-num" th:text="${inquiry.inqryId}"></td>
                                  <td class="col-type" th:text="${inquiry.inqryTypeCd}"></td>
                                  <td class="col-target" th:text="${inquiry.inqryTrgtTypeCd}"></td>
-                                 <td class="col-title text-left ellipsis"> <!-- col-title은 너비가 auto이므로 클래스만 추가 -->
+                                 <td class="col-title-td text-left ellipsis"> <!-- col-title은 너비가 auto이므로 클래스만 추가 -->
                                      <a class="text" th:href="@{/admin/inquiry/adminInquiryDetail(inqryId=${inquiry.inqryId})}" th:text="${inquiry.inqryTtl}"></a>
                                  </td>
                                  <td class="col-writer-name"><span th:text="${inquiry.writerInfo?.userNm}"></span></td>

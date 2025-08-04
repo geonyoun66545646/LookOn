@@ -5,6 +5,8 @@
 
 <head>
 <meta name="description" content="사용자 신고 상세 처리 페이지" />
+<link rel="stylesheet"
+	th:href="@{/admincss/assets/customadmincss/reportsDetail.css}">
 <title>신고 상세 처리</title>
 </head>
 
@@ -56,7 +58,7 @@
 									<label for="dclrUserNo" class="form-label">신고한 사용자
 										(닉네임/ID)</label> <input type="text" class="form-control"
 										id="dclrUserNo" name="dclrUserNo"
-										th:value="|*{dclrUserNcnm} (*{dclrUserNo})|" readonly>
+										th:value="|*{dclrUserNcnm} (*{dclrUserLgnId})|" readonly>
 								</div>
 
 								<div class="mb-4 form-group">
@@ -65,27 +67,38 @@
 										name="dclrTrgtTypeCd" th:value="*{dclrTrgtTypeCd}" readonly>
 								</div>
 
+								<!-- 파일: reportDetail.html -->
+
 								<div class="mb-4 form-group">
 									<label for="dclrTrgtUserNo" class="form-label">신고 대상
-										사용자 (닉네임/ID)</label> <input type="text" class="form-control"
-										id="dclrTrgtUserNo" name="dclrTrgtUserNo"
-										th:value="*{dclrTrgtTypeCd} == 'USER' ? |*{dclrTrgtUserNcnm} (*{dclrTrgtUserNo})| : 
-                             (*{dclrTrgtTypeCd} == 'POST' ? '- (게시글 신고)' :
-                              (*{dclrTrgtTypeCd} == 'COMMENT' ? '- (댓글 신고)' :
-                               (*{dclrTrgtTypeCd} == 'PRODUCT' ? '- (상품 신고)' : '-')))"
+										사용자 (닉네임/ID)</label>
+
+									<!-- ▼▼▼ 이 input 태그의 th:value를 최종 수정합니다 ▼▼▼ -->
+									<input type="text" class="form-control"
+										th:value="*{dclrTrgtUserNcnm != null ? dclrTrgtUserNcnm + ' (' + dclrTrgtUserLgnId + ')' : '- (작성자 정보 없음)-'}"
 										readonly> <small class="form-text text-muted"
-										th:if="*{dclrTrgtTypeCd != 'USER'}"> 콘텐츠 신고이므로, 직접적인
-										신고 대상 사용자는 없습니다. </small>
+										th:if="*{dclrTrgtUserNcnm == null}"> 해당 콘텐츠의 작성자 정보를
+										찾을 수 없거나, 사용자 직접 신고가 아닙니다. </small>
 								</div>
+
+
+
+								<!-- ▼▼▼ 이 블록 전체를 바로 아래에 추가해주세요 ▼▼▼ -->
 								<div class="mb-4 form-group">
-									<label for="dclrTrgtContsId" class="form-label">신고 대상
-										콘텐츠 ID</label> <input type="text" class="form-control"
-										id="dclrTrgtContsId" name="dclrTrgtContsId"
-										th:value="*{dclrTrgtTypeCd} != 'USER' ? *{dclrTrgtContsId} : '- (사용자 신고)'"
-										readonly> <small class="form-text text-muted"
-										th:if="*{dclrTrgtTypeCd == 'USER'}"> 사용자 신고이므로, 직접적인
-										콘텐츠 ID는 없습니다. </small>
+									<label class="form-label">신고 대상 원본 내용</label>
+									<div id="originalContentContainer"
+										class="original-content-wrapper p-3 border rounded bg-light">
+										<!-- JS가 이곳에 내용을 동적으로 채워 넣을 겁니다. -->
+										<div class="text-center">
+											<div class="spinner-border spinner-border-sm" role="status">
+												<span class="visually-hidden">Loading...</span>
+											</div>
+											<span class="ms-2">원본 내용 로딩 중...</span>
+										</div>
+									</div>
 								</div>
+
+
 								<div class="mb-4 form-group">
 									<label for="dclrRsnCd" class="form-label">신고 사유</label> <input
 										type="text" class="form-control" id="dclrRsnCd"
@@ -96,6 +109,22 @@
 									<textarea class="form-control" id="dtlDclrRsnCn"
 										name="dtlDclrRsnCn" rows="4" th:text="*{dclrCn}" readonly></textarea>
 								</div>
+
+								<!-- ▼▼▼ 이 블록 전체를 바로 아래에 추가해주세요 ▼▼▼ -->
+								<div class="mb-4 form-group"
+									th:if="${reportDetail.attachments != null and !reportDetail.attachments.isEmpty()}">
+									<label class="form-label">첨부된 증거 자료</label>
+									<div class="attachment-thumbnail-container">
+										<a th:each="file : ${reportDetail.attachments}"
+											th:href="@{${file.filePath}}" target="_blank"
+											class="attachment-thumbnail-item"
+											th:title="${file.originalFileName}"> <img
+											th:src="@{${file.filePath}}"
+											th:alt="${file.originalFileName}">
+										</a>
+									</div>
+								</div>
+
 								<div class="mb-4 form-group">
 									<label for="dclrRcptDt" class="form-label">신고 접수 일시</label> <input
 										type="text" class="form-control" id="dclrRcptDt"
@@ -265,13 +294,20 @@ document.addEventListener('DOMContentLoaded', function() {
             </form>
         `;
     }
+ // 파일: reportDetail.html 내 <script>
 
-    // '조회 화면'의 HTML 문자열을 생성하는 함수
+ // 파일: reportDetail.html 내 <script>
+
+ // 3-2. '조회 화면'의 HTML 문자열을 생성하는 함수
     function renderReadOnlyView(reportDetail) {
         const history = reportDetail.historyList && reportDetail.historyList.length > 0 ? reportDetail.historyList[0] : null;
-        let sanctionTypeHtml = '기타 또는 알 수 없는 조치';
-        if(history && history.actionType) {
-            switch(history.actionType) {
+        const sanction = reportDetail.sanctionDetail;
+        const managerId = reportDetail.prcsPicMngrLgnId;
+
+        let sanctionTypeHtml = '정보 없음';
+
+        if (sanction) {
+            switch(sanction.sanctionType) {
                 case 'NONE': sanctionTypeHtml = '제재 없음'; break;
                 case 'SUSPENSION_3D': sanctionTypeHtml = '3일 이용 정지'; break;
                 case 'SUSPENSION_7D': sanctionTypeHtml = '7일 이용 정지'; break;
@@ -279,22 +315,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 case 'SUSPENSION_30D': sanctionTypeHtml = '30일 이용 정지'; break;
                 case 'BAN_PERMANENT': sanctionTypeHtml = '영구 이용 정지'; break;
                 case 'CONTENT_DELETION': sanctionTypeHtml = '삭제 조치'; break;
-                case 'AUTHOR_RESTRICTION': sanctionTypeHtml = '작성자 제한'; break;
-                default: sanctionTypeHtml = history.actionType;
+                
+                // ▼▼▼ [핵심 수정] 이 케이스를 아래와 같이 단순화합니다. ▼▼▼
+                case 'AUTHOR_RESTRICTION':
+                    sanctionTypeHtml = '작성자 제한';
+                    break;
+                // ▲▲▲ [핵심 수정] 여기까지 ▲▲▲
+
+                default: sanctionTypeHtml = sanction.sanctionType;
+            }
+        } else if (history) {
+            switch(history.actionType) {
+                case 'NONE': sanctionTypeHtml = '제재 없음'; break;
+                case 'CONTENT_DELETION': sanctionTypeHtml = '삭제 조치'; break;
+                default: sanctionTypeHtml = '기타 조치';
             }
         }
+
+        const managerInfoHtml = managerId 
+            ? `<div class="mb-3"><label class="form-label">처리 담당자</label><input type="text" class="form-control" value="${managerId}" readonly></div>`
+            : '';
 
         return `
             <h5 class="mt-4 mb-3">처리 완료된 신고 정보 (조회)</h5>
             <div class="mb-3"><label class="form-label">최종 처리 상태</label><input type="text" class="form-control" value="${reportDetail.prcsSttsCd === 'COMPLETED' ? '✅ 처리 완료' : '❌ 반려'}" readonly></div>
+            ${managerInfoHtml}
             <div class="mb-3"><label class="form-label">최종 처리 결과 내용</label><textarea class="form-control" rows="4" readonly>${reportDetail.dclrPrcsRsltCn || ''}</textarea></div>
             <hr class="my-4">
             <h5>처리 이력</h5>
-            ${history ? `
-                <div class="mb-3"><label class="form-label">조치 유형</label><div class="form-control" style="background-color: #e9ecef;">${sanctionTypeHtml}</div></div>
-                <div class="mb-3"><label class="form-label">조치 내용</label><textarea class="form-control" rows="3" readonly>${history.actnCn || ''}</textarea></div>
-                <div class="mb-3"><label class="form-label">내부 처리 메모</label><textarea class="form-control" rows="3" readonly>${history.prcsDsctnMemoCn || ''}</textarea></div>
-            ` : '<p>처리 이력이 없습니다.</p>'}
+            <div class="mb-3"><label class="form-label">조치 유형</label><div class="form-control" style="background-color: #e9ecef;">${sanctionTypeHtml}</div></div>
+            <div class="mb-3"><label class="form-label">조치 내용</label><textarea class="form-control" rows="3" readonly>${history ? history.actnCn || '' : ''}</textarea></div>
+            <div class="mb-3"><label class="form-label">내부 처리 메모</label><textarea class="form-control" rows="3" readonly>${history ? history.prcsDsctnMemoCn || '' : ''}</textarea></div>
         `;
     }
 
@@ -362,6 +413,112 @@ document.addEventListener('DOMContentLoaded', function() {
             addEventListenersToForm(loadedReportDetail.dclrId);
         });
     }
+    
+ // ▼▼▼▼▼ 바로 이 자리에 붙여넣으세요 ▼▼▼▼▼
+    // 페이지가 로드되면 즉시 원본 콘텐츠를 불러옵니다.
+    loadOriginalContent();
+
+    /**
+     * 신고 대상 원본 콘텐츠를 AJAX로 불러와 화면에 그려주는 함수
+     */
+    function loadOriginalContent() {
+        const targetType = /*[[${reportDetail.dclrTrgtTypeCd}]]*/ null;
+        const contentId = /*[[${reportDetail.dclrTrgtContsId}]]*/ null;
+        const userId = /*[[${reportDetail.dclrTrgtUserNo}]]*/ null;
+        const container = document.getElementById('originalContentContainer');
+
+        if (!targetType) {
+            container.innerHTML = '<div class="text-muted p-3">원본 콘텐츠 정보가 없습니다.</div>';
+            return;
+        }
+
+        // 신고 대상이 'USER' 타입이고, 콘텐츠 ID가 없을 경우를 위한 처리
+        if (targetType === 'USER' && !contentId) {
+            // 이 경우에는 userId를 사용합니다.
+            if (!userId) {
+                container.innerHTML = '<div class="text-muted p-3">원본 사용자 정보를 특정할 수 없습니다.</div>';
+                return;
+            }
+        } else if (!contentId) {
+            // 그 외 콘텐츠 타입인데 콘텐츠 ID가 없는 경우
+            container.innerHTML = '<div class="text-muted p-3">원본 콘텐츠 정보를 특정할 수 없습니다.</div>';
+            return;
+        }
+        
+        let apiUrl = '/api/admin/content/';
+        switch (targetType) {
+            case 'POST':    apiUrl += `posts/${contentId}`; break;
+            case 'COMMENT': apiUrl += `comments/${contentId}`; break;
+            case 'PRODUCT': apiUrl += `products/${contentId}`; break;
+            case 'USER':    apiUrl += `users/${userId}`; break; // 사용자 신고는 userId를 사용
+            default:
+                container.innerHTML = `<div class="text-danger p-3">알 수 없는 대상 타입: ${targetType}</div>`;
+                return;
+        }
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) throw new Error('원본 콘텐츠를 찾을 수 없습니다 (삭제되었을 수 있습니다).');
+                    throw new Error('원본 정보를 불러오는 데 실패했습니다.');
+                }
+                return response.json();
+            })
+            .then(data => {
+            	let contentHtml = '';
+                // 타입별로 다른 HTML을 그려줍니다.
+                switch (targetType) {
+                    case 'POST':
+                        contentHtml = `
+                            <div class="content-card">
+                                <div class="card-content-title">게시글 제목</div>
+                                <div class="card-content-body">${data.title || '(제목 없음)'}</div>
+                            </div>
+                            <div class="content-card mt-2">
+                                <div class="card-content-title">내용</div>
+                                <div class="card-content-body">${data.content || '(내용 없음)'}</div>
+                            </div>`;
+                        break;
+                    case 'COMMENT':
+                        contentHtml = `
+                            <div class="content-card">
+                                <div class="card-content-title">댓글 내용</div>
+                                <div class="card-content-body">${data.content || '(내용 없음)'}</div>
+                            </div>`;
+                        break;
+                    case 'PRODUCT':
+                        contentHtml = `
+                            <div class="content-card">
+                                <div class="card-content-title">상품명</div>
+                                <div class="card-content-body">${data.name || '(상품명 없음)'}</div>
+                            </div>
+                            <div class="content-card mt-2">
+                                <div class="card-content-title">상품 설명</div>
+                                <div class="card-content-body">${data.description || '(설명 없음)'}</div>
+                            </div>`;
+                        break;
+                    case 'USER':
+                        contentHtml = `
+                            <div class="content-card">
+                                <div class="card-content-title">사용자 닉네임</div>
+                                <div class="card-content-body">${data.nickname || '(닉네임 없음)'}</div>
+                            </div>
+                            <div class="content-card mt-2">
+                                <div class="card-content-title">소개글</div>
+                                <div class="card-content-body">${data.bio || '(소개글 없음)'}</div>
+                            </div>`;
+                        break;
+                }
+                container.innerHTML = contentHtml;
+                // ▲▲▲ 여기까지 교체 ▲▲▲
+            })
+            .catch(error => {
+                container.innerHTML = `<div class="text-danger p-3">${error.message}</div>`;
+            });
+    }
+    // ▲▲▲▲▲ 여기까지 ▲▲▲▲▲
+    
+    
 
 }); // <-- DOMContentLoaded 닫는 괄호
 

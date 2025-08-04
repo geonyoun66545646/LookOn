@@ -21,7 +21,7 @@
     width: 100%;
     color: #333;
     border-top: 2px solid #333;
-    margin-bottom: 2rem;
+  	margin-bottom: 2rem;
 }
 
 /* 테이블 헤더(th) 스타일 */
@@ -47,7 +47,8 @@
 /* 비밀글 (5%) */
 .table-wishlist th:nth-child(2), .table-wishlist td:nth-child(2) { width: 5%; text-align: center; }
 /* 제목 (35%) */
-.table-wishlist th:nth-child(3), .table-wishlist td:nth-child(3) { width: 35%; text-align: left; }
+.table-wishlist th:nth-child(3) { width: 35%; text-align: center; }
+.table-wishlist td:nth-child(3) { width: 35%; text-align: left; }
 /* 작성자 (15%) - 너비 조정 */
 .table-wishlist th:nth-child(4), .table-wishlist td:nth-child(4) { width: 15%; text-align: center; }
 /* 질문유형 (15%) - 너비 조정 */
@@ -95,9 +96,121 @@
     font-weight: 600;
 }
 
-/* '문의 하기' 버튼 */
-.btn-primary.btn-rounded {
-    font-size: 1.1rem; /* 전체 폰트 크기에 맞춰 상대적으로 조정 */
+.btn-primary {
+    font-size: 1.4rem;
+    padding: 0.8rem 1.5rem;
+    font-weight: 500;
+    color: #c96;
+    background-color: transparent;
+    border-color: #c96;
+    box-shadow: none;
+    min-width: 11rem;
+    height: 26px;
+}
+.btn-primary:hover {
+    font-size: 1.4rem;
     padding: 0.8rem 2rem;
     font-weight: 500;
+    color: #fff;
+    background-color: #c96;
+    border-color: #c96;
+    box-shadow: none;
+}
+.btn-search{
+	font-size: 1.4rem;
+    padding: 0.8rem 1.5rem;
+    font-weight: 500;
+    color: #c96;
+    background-color: transparent;
+    border-color: #c96;
+    box-shadow: none;
+    min-width: 6rem;
+}
+.btn-search:hover{
+	 font-size: 1.4rem;
+    padding: 0.8rem 2rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #c96;
+    border-color: #c96;
+    box-shadow: none;
+
+	}
+	
+
+
+.d-flex {
+    display: -ms-flexbox!important;
+    display: flex !important;
+    justify-content: space-around;
+   margin-bottom: 40px; 
+}
+
+.distribute{
+	display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-bottom : 10px;
+}	
+.search-cn{
+	min-width : 18rem;
+}
+
+/* .pagination {
+	margin-bottom : 5rem;
+} */
+
+
+/* =======================================================
+   최종 통합 버튼 스타일
+   ======================================================= */
+
+/* --- 1. 모든 버튼의 공통 기반 스타일 --- */
+/* .distribute 안의 버튼과 .btn-search에 공통 적용 */
+.distribute .btn,
+.btn-search {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 500;
+    height: 40px; /* 높이 고정 */
+    padding: 0.8rem 1.5rem; /* 기본 패딩 고정 */
+    box-shadow: none;
+    border: 1px solid #c96; /* 테두리 기본값 */
+    transition: all 0.2s ease-in-out; /* 부드러운 전환 효과 */
+}
+
+/* --- 2. 필터 및 일반 버튼 스타일 --- */
+/* '답변완료', '내 문의' 등 필터 버튼의 기본 너비 */
+.distribute .btn {
+    min-width: 11rem;
+}
+
+/* '검색' 버튼만 너비를 다르게 설정 */
+.btn-search {
+    min-width: 6rem;
+}
+
+/* --- 3. 비활성 상태 스타일 (.btn-primary) --- */
+/* .btn-primary는 투명한 배경에 주황색 글씨 */
+.btn-primary {
+    color: #c96;
+    background-color: transparent;
+}
+
+/* --- 4. 호버 및 활성 상태 스타일 (.btn-success) --- */
+/* 호버하거나, .btn-success 클래스가 붙었을 때 (눌린 상태) */
+.distribute .btn:hover,
+.btn-search:hover,
+.btn.btn-success {
+    color: #fff;
+    background-color: #c96;
+    border-color: #c96;
+}
+
+/* --- 5. 활성 상태(.btn-success)일 때 호버 효과 제거 --- */
+/* 이미 활성화된 버튼은 호버해도 스타일이 변하지 않도록 유지 */
+.btn.btn-success:hover {
+    cursor: default; /* 마우스 커서를 기본 모양으로 변경 */
 }

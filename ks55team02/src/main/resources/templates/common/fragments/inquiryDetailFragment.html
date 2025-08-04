@@ -1,103 +1,139 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <body>
-<th:block th:fragment="inquiryDetailFragment (inquiryData)">
-    <!-- 문의 카드 -->
-    <div class="card inquiry-card mb-4">
-        <div class="card-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 card-title-text">
-                    <span th:text="${inquiryData.prvtYn ? '🔒 ' : ''}"></span>
-                    <span th:text="${inquiryData.inqryTtl}">문의 제목</span>
-                </h5>
-                <!-- 상태 표시 뱃지 (유지) -->
-                 <span th:if="${inquiryData.answer != null}" class="badge bg-success">답변 완료</span>
-        <span th:if="${inquiryData.answer == null}" class="badge bg-warning">답변 대기</span>
-            </div>
-        </div>
-        <div class="card-body">
-            <!--
-                MODIFIED: 소제목(메타 정보) 스타일을 다시 한 줄 형태로 변경
-                - flex-wrap을 사용하여 화면이 좁아지면 자동으로 줄바꿈되도록 설정
-            -->
-            <div class="inquiry-meta-flex">
-                <span class="meta-item">
-                    <i class="bi bi-person"></i>
-                    <strong class="meta-label">작성자:</strong>
-                    <span th:text="${inquiryData.writerInfo.userNcnm}"></span>
-                </span>
-                <span class="meta-item">
-                    <i class="bi bi-calendar-event"></i>
-                    <strong class="meta-label">작성일:</strong>
-                    <span th:text="${#temporals.format(inquiryData.regYmd, 'yyyy-MM-dd HH:mm')}"></span>
-                </span>
-                <span class="meta-item">
-                    <i class="bi bi-tags"></i>
-                    <strong class="meta-label">문의 유형:</strong>
-                    <span th:text="|${inquiryData.inqryTrgtTypeCd} / ${inquiryData.inqryTypeCd}|"></span>
-                </span>
-            </div>
 
-            <hr class="my-4">
+<!-- ======================= ✅ [구조 복원됨] inquiryDetailFragment ======================= -->
+<th:block th:fragment="inquiryDetailFragment (inquiry)">
 
-            <div class="content-wrapper">
-                <p class="card-text inquiry-content" th:utext="${#strings.replace(inquiryData.inqryCn, '\n', '<br>') ?: '내용 없음'}">
-                    문의 내용이 여기에 표시됩니다.
-                </p>
+    <!-- ✅ [추가됨] 전체 카드를 감싸는 컨테이너. 영역 침범 문제를 해결합니다. -->
+    <div class="inquiry-detail-container">
+
+        <!-- ======================= 문의 카드 ======================= -->
+        <div class="card inquiry-card mb-4">
+            <!-- 카드 헤더 -->
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 card-title-text">
+                        <span th:text="${inquiry.prvtYn ? '🔒 ' : ''}"></span>
+                        <span th:text="${inquiry.inqryTtl}">문의 제목</span>
+                    </h5>
+                    <th:block th:switch="${inquiry.prcsStts}">
+                        <span th:case="'COMPLETED'" class="badge bg-success">답변완료</span>
+                        <span th:case="'RECEPTION'" class="badge bg-warning">접수</span>
+                        <span th:case="*" class="badge bg-secondary">확인중</span>
+                    </th:block>
+                </div>
             </div>
+            <!-- 카드 본문 -->
+            <div class="card-body">
+                <!-- 문의 메타 정보 (드롭다운 위치 유지) -->
+                <div class="inquiry-meta-flex">
+                	<div>
+                    <span class="meta-item"><i class="bi bi-person"></i> <strong class="meta-label">작성자:</strong> <span class="sub-title" th:text="${inquiry.writerInfo.userNcnm}"></span></span>
+                    <span class="meta-item"><i class="bi bi-calendar-event"></i> <strong class="meta-label">작성일:</strong> <span class="sub-title" th:text="${#temporals.format(inquiry.regYmd, 'yyyy-MM-dd HH:mm')}"></span></span>
+                    <span class="meta-item"><i class="bi bi-tags"></i> <strong class="meta-label">문의 유형:</strong> <span class="sub-title" th:text="|${inquiry.inqryTrgtTypeCd} / ${inquiry.inqryTypeCd}|"></span></span>
+                    </div>
+                    <div class="edit-option">
+				    <div class="options-container" th:if="${inquiry.wrtrId == session.loginUser?.userNo}">				    
+				        <a href="javascript:void(0);" class="options-menu-toggle" id="options-toggle-btn">⋮</a>				
+				        <div class="options-menu">
+				            <button class="options-menu-item" id="editBtn" th:if="${inquiry.prcsStts == 'RECEPTION'}">
+				                <i class="bi bi-pencil-square"></i> 수정
+				            </button>
+				            <button class="options-menu-item text-danger" id="deleteBtn" th:data-inquiry-id="${inquiry.inqryId}">
+				                <i class="bi bi-trash"></i> 삭제
+				            </button>
+				        </div>
+				    </div>
+				</div>
 
-            <!-- 첨부 이미지 (유지) -->
-            <div th:if="${inquiryData.inquiryImages != null && !inquiryData.inquiryImages.isEmpty()}" class="inquiry-images-section mt-4">
-                <h6 class="mb-3">첨부 이미지</h6>
-                <div class="row">
-                    <div class="col-md-4 col-sm-6 mb-3" th:each="image : ${inquiryData.inquiryImages}">
-                        <a th:href="${image.imgAddr}" data-bs-toggle="tooltip" title="클릭하여 원본 이미지 보기">
-                            <img th:src="${image.imgAddr}" alt="첨부 이미지" class="img-fluid rounded shadow-sm inquiry-thumbnail">
-                        </a>
+                </div>
+
+                <!-- 내용 표시 및 수정 영역 -->
+                <div class="content-wrapper">
+                    <div id="viewMode">
+                        <p class="card-text inquiry-content" th:utext="${#strings.replace(inquiry.inqryCn, '\n', '<br>')}"></p>
+                    </div>
+                    <div id="editMode" style="display: none;">
+                        <textarea id="editContent" class="form-control" rows="10" th:text="${inquiry.inqryCn}"></textarea>
+                    </div>
+                </div>
+                
+                <!-- 첨부 이미지 -->
+                <div th:if="${inquiry.inquiryImages != null && !inquiry.inquiryImages.isEmpty()}" class="inquiry-images-section mt-4">
+                    <h6 class="mb-3">첨부 이미지</h6>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-6 mb-3" th:each="image : ${inquiry.inquiryImages}">
+                            <a th:href="${image.imgAddr}" data-bs-toggle="tooltip" title="클릭하여 원본 이미지 보기">
+                                <img th:src="${image.imgAddr}" alt="첨부 이미지" class="img-fluid rounded shadow-sm inquiry-thumbnail">
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- 답변 카드 (문의 카드와 동일한 디자인 컨셉 적용) -->
-    <div class="card answer-card" id="answerSection" th:if="${inquiryData.answer != null}">
-        <div class="card-header">
-            <h5 class="mb-0 card-title-text">
-                <i class="bi bi-chat-left-text-fill"></i>
-                <span>답변 내용</span>
-            </h5>
-        </div>
-        <div class="card-body">
-             <!-- 답변 메타 정보도 한 줄 스타일로 변경 -->
-            <div class="answer-meta-flex">
-                <span class="meta-item">
-                     <i class="bi bi-person-check"></i>
-                     <strong class="meta-label">답변자:</strong>
-                     <span th:if="${inquiryData.storeInfo != null}" th:text="${inquiryData.storeInfo.storeConm}"></span>
-                     <span th:if="${inquiryData.storeInfo == null}">관리자</span>
-                </span>
-                <span class="meta-item">
-                    <i class="bi bi-clock"></i>
-                    <strong class="meta-label">답변 시간:</strong>
-                    <span id="displayAnswerTime" th:text="${#temporals.format(inquiryData.answer.ansTm, 'yyyy-MM-dd HH:mm')}"></span>
-                </span>
-                 <span class="meta-item" th:if="${inquiryData.answer.lastMdfcnDt != null}">
-                    <i class="bi bi-pencil"></i>
-                    <strong class="meta-label">수정 시간:</strong>
-                    <span id="displayModifiedTime" th:text="${#temporals.format(inquiryData.answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></span>
-                </span>
+            <!-- 카드 푸터: 수정 모드 버튼 -->
+            <div class="card-footer text-end" id="editModeButtons" style="display: none;">
+                <button type="button" id="cancelEditBtn" class="btn btn-secondary btn-sm">취소</button>
+                <button type="button" id="saveEditBtn" class="btn btn-primary btn-sm">저장</button>
             </div>
+            
+        </div> <!-- 문의 카드 끝 --> <!-- 문의 카드 끝 -->
 
-            <hr class="my-4">
-
-            <div class="content-wrapper">
-                <p id="displayAnswerContent" class="card-text answer-content" th:utext="${#strings.replace(inquiryData.answer.ansCn, '\n', '<br>')}">
-                    답변 내용
-                </p>
+        <!-- ======================= 답변 카드 ======================= -->
+        <!-- <div class="card answer-card" id="answerSection" th:if="${(inquiry).answer != null}"> -->
+        <div class="card answer-card" id="answerSection" th:if="${(inquiry).prcsStts == 'COMPLETED'}">
+            <!-- 카드 헤더 -->
+            <div class="card-header">
+                <h5 class="mb-0 card-title-text">
+                    <i class="bi bi-chat-left-text-fill"></i>
+                    <span>답변 내용</span>
+                </h5>
             </div>
-        </div>
-    </div>
+            <!-- 카드 본문 -->
+            <div class="card-body">
+                <!-- ✅ [복원됨] 답변 메타 정보 (한 줄 스타일) -->
+                <div class="answer-meta-flex">
+                <div>
+                    <span class="meta-item">
+                        <i class="bi bi-person-check"></i>
+                        <strong class="meta-label">답변자:</strong>
+                        <span class="sub-title" th:if="${(inquiry).storeInfo != null}" th:text="${(inquiry).storeInfo.storeConm}"></span>
+                        <span class="sub-title" th:if="${(inquiry).storeInfo == null}">관리자</span>
+                    </span>
+                    <span class="meta-item">
+                        <i class="bi bi-clock"></i>
+                        <strong class="meta-label">답변 시간:</strong>
+                        <span class="sub-title" id="displayAnswerTime" th:text="${#temporals.format((inquiry).answer.ansTm, 'yyyy-MM-dd HH:mm')}"></span>
+                    </span>
+                    <span class="meta-item" th:if="${(inquiry).answer.lastMdfcnDt != null}">
+                        <i class="bi bi-pencil"></i>
+                        <strong class="meta-label">수정 시간:</strong>
+                        <span class="sub-title" id="displayModifiedTime" th:text="${#temporals.format((inquiry).answer.lastMdfcnDt, 'yyyy-MM-dd HH:mm')}"></span>
+                    </span>
+                    </div>
+                </div>
+                
+                <!-- ✅ [복원됨] 답변 내용을 감싸는 div -->
+                <div class="content-wrapper">
+                    <p id="displayAnswerContent" class="card-text answer-content" th:utext="${#strings.replace((inquiry).answer.ansCn, '\n', '<br>')}">
+                        답변 내용
+                    </p>
+                </div>
+            </div>
+        </div> <!-- 답변 카드 끝 -->
+
+
+    </div> <!-- 전체 컨테이너 끝 -->
+
 </th:block>
+
+<!-- ✅ [중요] JavaScript 로직을 fragment의 일부로 포함 -->
+<!-- 이 스크립트가 메인 레이아웃의 올바른 위치에 삽입되도록 layout:fragment를 사용합니다. -->
+
+<script th:inline="javascript">
+
+</script>
 </body>
 </html>

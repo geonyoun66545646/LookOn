@@ -7,6 +7,9 @@
     <th:block layout:fragment="customCss">
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" th:href="@{/maincss/assets/customcustomercss/inquiryDetailView.css}">
+        
+        <!-- ★★★★★ SweetAlert2 CSS 추가 ★★★★★ -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     </th:block>
 </head>
 <body>
@@ -30,22 +33,188 @@
             </nav>
             <div class="page-content">
                 <div class="container">
+                    <!-- 프래그먼트는 변경 없이 그대로 사용됩니다. -->
                     <div th:insert="~{common/fragments/inquiryDetailFragment :: inquiryDetailFragment(${inquiry})}"></div>
 
-                    
                     <div class="form-group d-flex justify-content-end mt-4 mb-3">
-                     	    <!-- <a href="#" class="btn btn-primary btn-rounded">문의 수정</a>  -->
-                            <a th:href="@{/customer/inquiry/inquiryList}" class="btn btn-outline-secondary btn-rounded ml-2">목록으로</a>
-                        </div>
+                        <a th:href="@{/customer/inquiry/inquiryList}" class="btn btn-outline-secondary btn-rounded ml-2">목록으로</a>
                     </div>
+                </div>
             </div>
         </main>
     </th:block>
 
     <th:block layout:fragment="jsScript">
-        <script>
-   
+        
+        <!-- ★★★★★ SweetAlert2 JS 추가 (사용자 스크립트보다 먼저 와야 함) ★★★★★ -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+        <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- 1. UI 요소 참조 (페이지의 모든 제어 대상) ---
+            const optionsToggleBtn = document.getElementById('options-toggle-btn');
+            const optionsMenu = document.querySelector('.options-menu');
+            const viewMode = document.getElementById('viewMode');
+            const editMode = document.getElementById('editMode');
+            const editContent = document.getElementById('editContent');
+            const editBtn = document.getElementById('editBtn');
+            const deleteBtn = document.getElementById('deleteBtn');
+            const saveEditBtn = document.getElementById('saveEditBtn');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+            const editModeButtons = document.getElementById('editModeButtons');
+
+            // --- 2. 이벤트 리스너 등록 ---
+
+            // --- 드롭다운 메뉴 제어 로직 ---
+            if (optionsToggleBtn) {
+                optionsToggleBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (optionsMenu) {
+                        optionsMenu.classList.toggle('show');
+                    }
+                });
+            }
+            window.addEventListener('click', function() {
+                if (optionsMenu && optionsMenu.classList.contains('show')) {
+                    optionsMenu.classList.remove('show');
+                }
+            });
+
+            // --- '수정하기' 버튼 클릭 이벤트 ---
+            if (editBtn) {
+                editBtn.addEventListener('click', function() {
+                    viewMode.style.display = 'none';
+                    editMode.style.display = 'block';
+                    if (optionsToggleBtn) {
+                        optionsToggleBtn.closest('.options-container').style.display = 'none';
+                    }
+                    if (editModeButtons) {
+                        editModeButtons.style.display = 'flex';
+                    }
+                });
+            }
+
+            // --- '취소' 버튼 클릭 이벤트 ---
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', function() {
+                    viewMode.style.display = 'block';
+                    editMode.style.display = 'none';
+                    if (optionsToggleBtn) {
+                        optionsToggleBtn.closest('.options-container').style.display = 'inline-block';
+                    }
+                    if (editModeButtons) {
+                        editModeButtons.style.display = 'none';
+                    }
+                });
+            }
+
+            // --- '저장' 버튼 클릭 이벤트 (SweetAlert2 적용) ---
+            if (saveEditBtn) {
+                saveEditBtn.addEventListener('click', function() {
+                    const originalInquiry = /*[[${inquiry}]]*/ null;
+                    if (!originalInquiry) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '오류 발생',
+                            text: '문의 데이터를 찾을 수 없습니다.'
+                        });
+                        return;
+                    }
+                    const updatedData = {
+                        inqryId: originalInquiry.inqryId, inqryCn: editContent.value,
+                        inqryTtl: originalInquiry.inqryTtl, inqryTypeCd: originalInquiry.inqryTypeCd,
+                        inqryTrgtTypeCd: originalInquiry.inqryTrgtTypeCd, inqryStoreId: originalInquiry.inqryStoreId,
+                        prvtYn: originalInquiry.prvtYn
+                    };
+
+                    fetch('/customer/inquiry/updateInquiryAjax', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updatedData)
+                    })
+                    .then(response => {
+                        if (!response.ok) { return response.json().then(err => { throw new Error(err.message); }); }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '저장 완료',
+                            text: data.message
+                        }).then(() => {
+                            // 확인 버튼을 누른 후 UI 업데이트 및 모드 전환
+                            document.querySelector('#viewMode .inquiry-content').innerHTML = data.updatedContentHtml;
+                            cancelEditBtn.click();
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: '저장 실패',
+                            text: error.message
+                        });
+                    });
+                });
+            }
+
+            // --- '삭제하기' 버튼 클릭 이벤트 (SweetAlert2 적용) ---
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    const inquiryId = this.dataset.inquiryId;
+
+                    Swal.fire({
+                        title: '정말로 삭제하시겠습니까?',
+                        text: "삭제된 데이터는 복구할 수 없습니다.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '네, 삭제하겠습니다.',
+                        cancelButtonText: '아니요, 취소합니다.'
+                    }).then((result) => {
+                        // 사용자가 '삭제하겠다'고 확인한 경우에만 아래 로직 실행
+                        if (result.isConfirmed) {
+                            fetch('/customer/inquiry/deleteInquiryAjax', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ inquiryId: inquiryId })
+                            })
+                            .then(response => {
+                                if (!response.ok) { return response.json().then(err => { throw new Error(err.message); }); }
+                                return response.json();
+                            })
+                            .then(data => {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '삭제 완료',
+                                    text: data.message
+                                }).then(() => {
+                                    // 확인 버튼 누른 후 페이지 이동
+                                    if (data.redirectUrl) {
+                                        window.location.href = data.redirectUrl;
+                                    }
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: '삭제 실패',
+                                    text: error.message
+                                });
+                            });
+                        }
+                    });
+                });
+            }
+        });
+        /*]]>*/
         </script>
+   
     </th:block>
 </body>
 </html>

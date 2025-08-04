@@ -36,6 +36,10 @@
 		<result property="dclrTrgtContsId" column="dclr_trgt_conts_id" />
 		<result property="prcsCmptnDt" column="prcs_cmptn_dt" />
 		<result property="dclrPrcsRsltCn" column="dclr_prcs_rslt_cn" />
+		<result property="dclrUserLgnId" column="dclr_user_lgn_id" />
+		<result property="prcsPicMngrLgnId" column="prcs_pic_mngr_lgn_id" />
+		<result property="dclrTrgtUserLgnId"
+			column="dclr_trgt_user_lgn_id" />
 	</resultMap>
 
 	<resultMap id="adminReportHistoryResultMap"
@@ -142,35 +146,46 @@
 		#{pagination.limitStart}
 	</select>
 
-	<select id="getAdminReportDetailById" parameterType="String" resultMap="adminReportDetailResultMap">
-    SELECT
-        r.dclr_id,
-        r.dclr_user_no,
-        dclr_user.user_ncnm AS dclr_user_ncnm,
-        r.dclr_trgt_user_no,
-        trgt_user.user_ncnm AS dclr_trgt_user_ncnm,
-        r.dclr_rsn_cd,
-        rr.dclr_rsn_cn,
-        r.dtl_dclr_rsn_cn AS dclr_cn,
-        DATE_FORMAT(r.dclr_rcpt_dt, '%Y-%m-%d %H:%i') AS dclr_dt,
-        r.prcs_stts_cd,
-        (SELECT COUNT(*) FROM report_attachments WHERE dclr_id = r.dclr_id) AS attachment_count,
-        r.prcs_pic_mngr_no,
-        r.dclr_prcs_rslt_cn,
-        r.dclr_trgt_type_cd,
-        r.dclr_trgt_conts_id,
-        r.prcs_cmptn_dt
-    FROM
-        reports AS r
-    LEFT JOIN
-        users AS dclr_user ON r.dclr_user_no = dclr_user.user_no
-    LEFT JOIN
-        users AS trgt_user ON r.dclr_trgt_user_no = trgt_user.user_no
-    LEFT JOIN
-        report_reasons AS rr ON r.dclr_rsn_cd = rr.dclr_rsn_cd
-    WHERE
-        r.dclr_id = #{dclrId}
-</select>
+	<select id="getAdminReportDetailById" parameterType="String"
+		resultMap="adminReportDetailResultMap">
+		SELECT
+		r.dclr_id,
+		r.dclr_user_no,
+		dclr_user.user_ncnm AS
+		dclr_user_ncnm,
+		dclr_user.user_lgn_id AS dclr_user_lgn_id,
+		r.dclr_trgt_user_no,
+		trgt_user.user_ncnm AS dclr_trgt_user_ncnm,
+		trgt_user.user_lgn_id AS dclr_trgt_user_lgn_id,
+		r.dclr_rsn_cd,
+		rr.dclr_rsn_cn,
+		r.dtl_dclr_rsn_cn AS dclr_cn,
+		DATE_FORMAT(r.dclr_rcpt_dt, '%Y-%m-%d %H:%i') AS dclr_dt,
+		r.prcs_stts_cd,
+		(SELECT COUNT(*) FROM report_attachments WHERE dclr_id
+		= r.dclr_id) AS
+		attachment_count,
+		r.prcs_pic_mngr_no,
+		mngr_user.user_lgn_id AS prcs_pic_mngr_lgn_id,
+		r.dclr_prcs_rslt_cn,
+		r.dclr_trgt_type_cd,
+		r.dclr_trgt_conts_id,
+		r.prcs_cmptn_dt
+		FROM
+		reports AS r
+		LEFT JOIN
+		users AS dclr_user ON
+		r.dclr_user_no = dclr_user.user_no
+		LEFT JOIN
+		users AS trgt_user ON
+		r.dclr_trgt_user_no = trgt_user.user_no
+		LEFT JOIN
+		report_reasons AS rr
+		ON r.dclr_rsn_cd = rr.dclr_rsn_cd
+		LEFT JOIN users AS mngr_user ON r.prcs_pic_mngr_no = mngr_user.user_no
+		WHERE
+		r.dclr_id = #{dclrId}
+	</select>
 
 	<!-- AdminReportsMapper.xml -->
 
@@ -357,62 +372,162 @@
 		gds_no =
 		#{gdsNo};
 	</update>
-	
-	<update id="expirePreviousSanctionByReportId" parameterType="String">
-		UPDATE 
-            user_sanctions
-		SET 
-            sanction_end_dt = NOW()
-		WHERE 
-            dclr_id = #{dclrId}
-          AND
-            sanction_end_dt IS NULL OR sanction_end_dt > NOW();
+
+	<update id="expirePreviousSanctionByReportId"
+		parameterType="String">
+		UPDATE
+		user_sanctions
+		SET
+		sanction_end_dt = NOW()
+		WHERE
+		dclr_id = #{dclrId}
+		AND
+		sanction_end_dt IS NULL OR sanction_end_dt >
+		NOW();
 	</update>
-	
-	<select id="findUserNoBySanctionedReportId" parameterType="String" resultType="String">
-        SELECT 
-            user_no
-        FROM 
-            user_sanctions
-        WHERE 
-            dclr_id = #{dclrId}
-        ORDER BY 
-            prcs_dt DESC
-        LIMIT 1
-    </select>
-    
-    <!-- [신규 추가] 삭제된 게시글을 복원하는 쿼리 (del_dt를 NULL로 변경) -->
-    <update id="restorePost" parameterType="String">
-        UPDATE 
-            posts
-        SET 
-            del_dt = NULL
-        WHERE 
-            pst_sn = #{postSn}
-    </update>
 
-    <!-- [신규 추가] 삭제된 댓글을 복원하는 쿼리 (del_dt와 del_user_no를 NULL로 변경) -->
-    <update id="restoreComment" parameterType="String">
-        UPDATE 
-            post_comments
-        SET 
-            del_dt = NULL,
-            del_user_no = NULL
-        WHERE 
-            pst_cmnt_sn = #{commentSn}
-    </update>
+	<select id="findUserNoBySanctionedReportId"
+		parameterType="String" resultType="String">
+		SELECT
+		user_no
+		FROM
+		user_sanctions
+		WHERE
+		dclr_id = #{dclrId}
+		ORDER BY
+		prcs_dt DESC
+		LIMIT 1
+	</select>
 
-    <!-- [신규 추가] 비활성화된 상품을 복원하는 쿼리 (노출/활성 상태로 변경) -->
-    <update id="restoreProduct" parameterType="String">
-        UPDATE
-            products
-        SET
-            expsr_yn = 1,
-            actvtn_yn = 1,
-            inactvtn_dt = NULL
-        WHERE
-            gds_no = #{gdsNo}
-    </update>
+	<!-- [신규 추가] 삭제된 게시글을 복원하는 쿼리 (del_dt를 NULL로 변경) -->
+	<update id="restorePost" parameterType="String">
+		UPDATE
+		posts
+		SET
+		del_dt =
+		NULL
+		WHERE
+		pst_sn = #{postSn}
+	</update>
+
+	<!-- [신규 추가] 삭제된 댓글을 복원하는 쿼리 (del_dt와 del_user_no를 NULL로 변경) -->
+	<update id="restoreComment" parameterType="String">
+		UPDATE
+		post_comments
+		SET
+		del_dt = NULL,
+		del_user_no = NULL
+		WHERE
+		pst_cmnt_sn = #{commentSn}
+	</update>
+
+	<!-- [신규 추가] 비활성화된 상품을 복원하는 쿼리 (노출/활성 상태로 변경) -->
+	<update id="restoreProduct" parameterType="String">
+		UPDATE
+		products
+		SET
+		expsr_yn = 1,
+		actvtn_yn = 1,
+		inactvtn_dt = NULL
+		WHERE
+		gds_no = #{gdsNo}
+	</update>
+
+	<!-- [신규 추가] 게시글 ID로 작성자 정보(번호, 닉네임, 로그인ID)를 조회하는 쿼리 -->
+	<select id="findPostAuthorInfo" parameterType="String"
+		resultType="map">
+		SELECT
+		u.user_no AS userNo,
+		u.user_ncnm AS userNcnm,
+		u.user_lgn_id AS userLgnId
+		FROM
+		posts p
+		JOIN
+		users u ON p.wrtr_user_no =
+		u.user_no
+		WHERE
+		p.pst_sn = #{contentId}
+	</select>
+
+	<!-- [신규 추가] 댓글 ID로 작성자 정보(번호, 닉네임, 로그인ID)를 조회하는 쿼리 -->
+	<select id="findCommentAuthorInfo" parameterType="String"
+		resultType="map">
+		SELECT
+		u.user_no AS userNo,
+		u.user_ncnm AS userNcnm,
+		u.user_lgn_id AS userLgnId
+		FROM
+		post_comments pc
+		JOIN
+		users u ON
+		pc.wrtr_user_no = u.user_no
+		WHERE
+		pc.pst_cmnt_sn = #{contentId}
+	</select>
+
+	<!-- [신규 추가] 상품 ID로 판매자 정보(번호, 닉네임, 로그인ID)를 조회하는 쿼리 -->
+	<select id="findProductAuthorInfo" parameterType="String"
+		resultType="map">
+		SELECT
+		u.user_no AS userNo,
+		u.user_ncnm AS userNcnm,
+		u.user_lgn_id AS userLgnId
+		FROM
+		products pr
+		JOIN
+		stores s ON pr.store_id =
+		s.store_id
+		JOIN
+		users u ON s.seller_user_no = u.user_no
+		WHERE
+		pr.gds_no =
+		#{contentId}
+	</select>
+
+
+	<resultMap id="adminReportAttachmentResultMap"
+		type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminReportAttachment">
+		<result property="filePath" column="file_path" />
+		<result property="originalFileName" column="original_filename" />
+	</resultMap>
+
+
+
+
+	<select id="findAttachmentsByReportId" parameterType="String"
+		resultMap="adminReportAttachmentResultMap">
+		SELECT
+		file_path,
+		original_filename
+		FROM
+		report_attachments
+		WHERE
+		dclr_id = #{dclrId}
+	</select>
+
+	<!-- [신규 추가] 제재 상세 정보 조회를 위한 resultMap -->
+	<resultMap id="adminSanctionDetailResultMap"
+		type="ks55team02.admin.adminpage.inquiryadmin.reports.domain.AdminSanctionDetail">
+		<result property="sanctionType" column="sanction_type" />
+		<result property="sanctionStartDt" column="sanction_start_dt" />
+		<result property="sanctionEndDt" column="sanction_end_dt" />
+	</resultMap>
+
+	<!-- [신규 추가] 신고 ID로 가장 최근 제재 정보를 조회하는 쿼리 -->
+	<select id="findSanctionDetailByReportId" parameterType="String"
+		resultMap="adminSanctionDetailResultMap">
+		SELECT
+		sanction_type,
+		sanction_start_dt,
+		sanction_end_dt
+		FROM
+		user_sanctions
+		WHERE
+		dclr_id = #{dclrId}
+		ORDER BY
+		prcs_dt DESC
+		LIMIT 1
+	</select>
 
 
 </mapper>

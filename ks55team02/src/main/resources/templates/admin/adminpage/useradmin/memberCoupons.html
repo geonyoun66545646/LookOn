@@ -61,9 +61,11 @@
 									style="max-width: 150px;">
 									<option value="all" selected>전체</option>
 									<option value="cpnNm">쿠폰명</option>
-									<option value="userNm">사용자명</option>
+									<option value="userLgnId">사용자 ID</option>
+									<!-- value와 텍스트 변경 -->
 								</select> <input type="text" class="form-control" name="keyword" value=""
-									placeholder="쿠폰명, 사용자명">
+									placeholder="쿠폰명, 사용자 ID">
+								<!-- placeholder 변경 -->
 							</div>
 						</div>
 
@@ -90,7 +92,7 @@
 				<table class="table table-hover text-center">
 					<thead class="thead-light">
 						<tr>
-							<th>사용자명</th>
+							<th>사용자 ID</th>
 							<th>쿠폰명</th>
 							<th>발급일</th>
 							<th>사용 여부</th>
@@ -160,10 +162,10 @@
                 ? '<span class="badge bg-secondary">사용</span>'
                 : '<span class="badge bg-success">미사용</span>';
 
-            // [수정] userCpnId와 userNo를 그리는 <td>를 제거합니다.
+            // [수정] userNm 대신 userLgnId를 표시합니다.
             const row = `
                 <tr>
-                    <td>${uc.userNm || ''}</td>
+                    <td>${uc.userLgnId || ''}</td>
                     <td>${uc.cpnNm || ''}</td>
                     <td>${formatDate(uc.cpnGiveDt)}</td>
                     <td>${usedBadge}</td>
