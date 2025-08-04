@@ -39,9 +39,11 @@
 
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-	
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<link rel="stylesheet" th:href="@{/maincss/assets/mainSlide/mainSlide.css}" />
+
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet"
+	th:href="@{/maincss/assets/mainSlide/mainSlide.css}" />
 </head>
 
 <body>
@@ -51,7 +53,7 @@
 
 		<main class="main">
 			<div class="page-content">
-							<div class="container">
+				<div class="container">
 					<div class="row">
 						<div class="col-lg-12">
 							<div class="brand-page-container"
@@ -92,7 +94,7 @@
 									</div>
 								</div>
 							</div>
-							
+
 							<div
 								th:replace="~{customer/fragments/productToolbar :: productToolbarFragment}"></div>
 							<th:block layout:fragment="content"></th:block>
@@ -101,17 +103,20 @@
 				</div>
 			</div>
 		</main>
-		
-		<div th:replace="~{customer/fragments/sliderNewProducts :: newProductsSliderFragment}"></div>
 
-		<div th:replace="~{customer/fragments/sliderSaleProducts :: saleProductsSliderFragment}"></div>
-		
+		<div
+			th:replace="~{customer/fragments/sliderNewProducts :: newProductsSliderFragment}"></div>
+
+		<div
+			th:replace="~{customer/fragments/sliderSaleProducts :: saleProductsSliderFragment}"></div>
+
 		<footer th:replace="~{customer/fragments/footer :: footerFragment}"></footer>
 	</div>
 
 	<div
 		th:replace="~{customer/fragments/categoryFilterModal :: categoryFilterModalFragment}"></div>
-	<div th:replace="~{customer/fragments/loginRegisterModals :: signinModalFragment}"></div>
+	<div
+		th:replace="~{customer/fragments/loginRegisterModals :: signinModalFragment}"></div>
 
 	<div class="modal fade" id="brandInfoModal" tabindex="-1" role="dialog"
 		aria-labelledby="brandInfoModalLabel" aria-hidden="true">
@@ -123,25 +128,30 @@
 						<span aria-hidden="true">×</span>
 					</button>
 				</div>
+
 				<div class="modal-body text-center" th:if="${currentBrand != null}">
-					<img
-						th:if="${currentBrand.storeLogoImg != null and !#strings.isEmpty(currentBrand.storeLogoImg)}"
-						th:src="@{${currentBrand.storeLogoImg}}" alt="Brand Logo"
-						class="brand-modal-logo mb-3" onerror="this.style.display='none'">
-					<h4 class="brand-modal-title" th:text="${currentBrand.storeConm}">브랜드
-						이름</h4>
+					<div class="brand-info-header">
+						<div class="brand-page-logo">
+							<img th:src="@{${currentBrand.storeLogoImg}}" alt="Brand Logo"
+								onerror="this.style.display='none'">
+						</div>
+						<h4 class="brand-modal-title" th:text="${currentBrand.storeConm}">브랜드
+							이름</h4>
+					</div>
 					<p class="brand-modal-description"
 						th:text="${currentBrand.storeIntroCn}">브랜드 소개글이 여기에 들어갑니다.</p>
 				</div>
+
 				<div class="modal-body text-center" th:if="${currentBrand == null}">
 					<p>브랜드 정보를 불러올 수 없습니다.</p>
 				</div>
+				
 			</div>
 		</div>
 	</div>
-	
-	
-	
+
+
+
 	<script th:src="@{/maincss/assets/js/jquery.min.js}"></script>
 	<script th:src="@{/maincss/assets/js/bootstrap.bundle.min.js}"></script>
 	<script th:src="@{/maincss/assets/js/jquery.hoverIntent.min.js}"></script>
@@ -185,8 +195,9 @@
 		}
 		/*]]>*/
 	</script>
-	
-	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 	<script th:src="@{/maincss/assets/mainSlide/mainSlide.js}"></script>
 	<th:block layout:fragment="jsScript"></th:block>
 

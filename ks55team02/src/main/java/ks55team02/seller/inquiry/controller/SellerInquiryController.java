@@ -77,7 +77,8 @@ public class SellerInquiryController {
         if (inquiry.getEndDate() == null) {
         	inquiry.setEndDate(LocalDate.now());
         }
-		
+        inquiry.setEndDate(inquiry.getEndDate().plusDays(1));
+        
 		inquiry.setInqryStoreId(storeId);
 
 		int totalRecordCount = sellerInquiryService.getSellerInquiryCnt(inquiry);
