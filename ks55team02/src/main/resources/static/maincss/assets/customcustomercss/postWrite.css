@@ -39,7 +39,7 @@ body {
 
 .write-form-container {
     max-width: 800px; /* 이전 상세 보기와 동일한 최대 너비 */
-    margin: 0 auto 30px auto; /* 상하 0, 좌우 자동 중앙 정렬 */
+    margin: 30px auto 30px auto; /* 상하 0, 좌우 자동 중앙 정렬 */
     padding: 30px;
     background-color: #fff;
     border: 1px solid #dee2e6;
@@ -83,7 +83,7 @@ body {
 /* 내용 입력 필드 (textarea) */
 .form-group textarea.form-control {
     min-height: 200px; /* 내용 입력창 최소 높이 */
-    resize: vertical; /* 세로 크기 조절만 가능 */
+    resize: none; /* 세로 크기 조절만 가능 */
 }
 
 /* 카테고리 선택 */
