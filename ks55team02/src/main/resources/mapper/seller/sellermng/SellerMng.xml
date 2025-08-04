@@ -15,7 +15,19 @@
         <result property="storeStts" 			column="store_stts"/> 		<!-- 상점 상태 -->
         <result property="infoMdfcnDt" 			column="info_mdfcn_dt"/> 	<!-- 정보 수정일시 -->
         <result property="delPrcrYn" 			column="del_prcr_yn"/> 		<!-- 폐쇄 여부 -->
+        
+        <association property="logo" resultMap="storeImageResultMap" />
     </resultMap>
+    
+    <resultMap id="storeImageResultMap" type="ks55team02.common.domain.store.StoreImage">
+    <id property="imgId" column="img_id"/>
+    <result property="imgAddr" column="img_addr"/>
+    <result property="imgFileNm" column="img_file_nm"/>
+    <result property="imgFileSz" column="img_file_sz"/>
+    <result property="imgTypeCd" column="img_type_cd"/>
+    <result property="regYmd" column="reg_ymd"/>
+    <result property="delYn" column="del_yn"/>
+</resultMap>
     
     <!-- 정산 테이블  -->
    <resultMap id="storeSettlementResultMap" 	type="ks55team02.seller.common.domain.StoreSettlement">
@@ -132,14 +144,16 @@
   </resultMap>
    	
    	<select id="getStoreIdBySellerId" parameterType="string" resultType="string">
-   		<!-- ⭐ 판매자 ID(user_no)로 상점 ID(store_id) 조회 ⭐ -->
-	    SELECT
-	        store_id
-	    FROM
-	        stores
-	    WHERE
-	        seller_user_no = #{sellerId}
-	</select>
+    /* [수정] users 테이블과 JOIN하여 로그인 아이디(user_no)로 조회합니다. */
+    SELECT
+        s.store_id
+    FROM
+        stores s
+    JOIN
+        users u ON s.seller_user_no = u.user_no
+    WHERE
+        u.user_no= #{sellerLgnId}
+</select>
    	
 	
      <select id="getStoreList" resultMap="storeResultMap">
@@ -160,21 +174,23 @@
     </select>
     
     
-    <select id="getStoreInfoById" resultMap="storeResultMap">
-    <!-- /* 스토어 아이디로 정보 조회 */ -->
-    	 SELECT
-            store_id,
-            aply_id,
-            store_conm,
-            store_intro_cn,
-            store_logo_img,
-            store_stts,
-            info_mdfcn_dt,
-            del_prcr_yn
+     <select id="getStoreInfoById" resultMap="storeResultMap" parameterType="string">
+        SELECT
+            s.store_id,
+            s.store_conm,
+            s.store_intro_cn,
+            /* ... s 테이블의 다른 필드들 ... */
+            si.img_id,
+            si.img_addr,
+            si.img_file_nm,
+            si.img_file_sz,
+            si.img_type_cd
         FROM
-            stores
-		where
-			store_id = #{storeId}
+            stores s
+        LEFT JOIN
+            store_images si ON s.store_logo_img = si.img_id AND si.del_yn = 0
+        WHERE
+            s.store_id = #{storeId}
     </select>
     
     
@@ -268,5 +284,41 @@
 	        total_sold_quantity DESC
 	    LIMIT 5
     </select>
+    
+	    <insert id="insertStoreImage" parameterType="ks55team02.common.domain.store.StoreImage">
+        INSERT INTO store_images
+            (img_id, img_addr, img_file_nm, img_file_sz, img_type_cd, reg_ymd, del_yn)
+        VALUES
+            (#{imgId}, #{imgAddr}, #{imgFileNm}, #{imgFileSz}, #{imgTypeCd}, NOW(), 0)
+    </insert>
+
+    <!-- [신규] stores 테이블의 로고 참조(FK) 업데이트 -->
+    <update id="updateStoreLogoReference" parameterType="map">
+        UPDATE stores
+        SET
+            store_logo_img = #{newLogoId},
+            info_mdfcn_dt = NOW()
+        WHERE
+            store_id = #{storeId}
+    </update>
+
+    <!-- [신규] 기존 로고 이미지의 del_yn을 1로 업데이트 (논리적 삭제) -->
+    <update id="markImageAsDeleted" parameterType="string">
+        UPDATE store_images
+        SET
+            del_yn = 1
+        WHERE
+            img_id = #{imgId}
+    </update>
+    
+    <!-- [수정] 상점 소개 업데이트 -->
+    <update id="updateStoreIntro" parameterType="ks55team02.seller.common.domain.Store">
+        UPDATE stores
+        SET
+            store_intro_cn = #{storeIntroCn},
+            info_mdfcn_dt = NOW()
+        WHERE
+            store_id = #{storeId}
+    </update>
   		
   </mapper>

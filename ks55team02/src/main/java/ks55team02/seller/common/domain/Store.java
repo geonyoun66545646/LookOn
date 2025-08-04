@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.apache.ibatis.type.Alias;
 
+import ks55team02.common.domain.store.StoreImage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,7 @@ public class Store {
     private LocalDateTime 		infoMdfcnDt; // 정보 수정일시
     private LocalDateTime 		inactvtnDt; // 비활성화 일시
     private Boolean 			delPrcrYn; // 폐쇄 여부 (tinyint(1)은 보통 boolean으로 매핑됩니다)
+    
+    private StoreImage logo;
+    
 }

@@ -50,7 +50,7 @@
 						<th:block
 							th:if="${loginUser != null and loginUser.userNo == postDetail.writerInfo.userNo}">
 							<a
-								th:href="@{/customer/post/postUpdate/{pstSn}(pstSn=${postDetail.pstSn})}">수정하기</a>
+								th:href="@{/customer/post/postUpdate/{pstSn}(pstSn=${postDetail.pstSn})}" style="color: black;  font-weight: 400;">수정하기</a>
 							<button type="button" id="delete-post-btn"
 								th:data-post-delete-url="@{/customer/api/post/delete/{pstSn}(pstSn=${postDetail.pstSn})}">삭제하기</button>
 						</th:block>
