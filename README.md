@@ -37,11 +37,11 @@
 
 | 이름 | 역할 | 이메일 |
 | :--- | :--- | :--- |
-| 팀원 1 | 김성주 | team1@example.com |
-| 팀원 2 | 서요셉 | team2@example.com |
-| 팀원 3 | 염가은 | team3@example.com |
-| 팀원 4 | 이건영 | team4@example.com |
-| 팀원 5 | 이지성 | team5@example.com |
+| 팀원 1 | 김성주 | nmzxcvb1234@naver.com |
+| 팀원 2 | 서요셉 | sisi331@naver.com |
+| 팀원 3 | 염가은 | tayonim@naver.com |
+| 팀원 4 | 이건영 | qaz9621@naver.com |
+| 팀원 5 | 이지성 | lgsd3@naver.com |
 | 팀원 6 | 정성훈 | 96f22l@gamil.com |
 
 ---
@@ -173,7 +173,7 @@
 | **WAS** | Apache Tomcat 10.1.30 | Apache Tomcat 10.1.30 |
 | **웹 브라우저** | Chrome, Microsoft Edge | Chrome, Safari, Microsoft Edge, Firefox |
 | **개발 언어** |
-| 서버 | JDK 17 / Servlet 6.x / UTF-8 | NGINX 1.18.0 |
+| 서버 | JDK 17 / Servlet 6.x / UTF-8 | NGINX 1.29.0 |
 | 클라이언트 | JavaScript / HTML5 / CSS / Thymeleaf / jQuery | - |
 | **Framework** | Bootstrap 5 / Spring Framework 6.x / Mybatis 3.x | - |
 | **DBMS** | MySQL 8.0.26 | MySQL 8.0.26 |
