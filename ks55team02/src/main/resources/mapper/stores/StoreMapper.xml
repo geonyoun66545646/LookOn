@@ -16,22 +16,21 @@
 	</resultMap>
 	
 
-	<!-- 키워드로 브랜드(상점) 검색 -->
-    <select id="searchStoresByKeyword" parameterType="string" resultMap="storesResultMap">
+	<select id="searchStoresByKeyword" parameterType="string" resultMap="storesResultMap">
         SELECT
-            store_id,
-            store_conm,
-            store_logo_img
-        FROM
-            ks55team02db.stores
-        WHERE
-            store_stts = 'ACTIVE'
-            AND del_prcr_yn = FALSE
+            s.store_id,
+            s.store_conm,
+            si.img_addr AS store_logo_img FROM
+            ks55team02db.stores s
+        LEFT JOIN
+            ks55team02db.store_images si ON s.store_id = si.img_id WHERE
+            s.store_stts = 'ACTIVE'
+            AND s.del_prcr_yn = FALSE
             <if test="keyword != null and keyword != ''">
-                AND store_conm LIKE CONCAT(#{keyword}, '%')
+                AND s.store_conm LIKE CONCAT(#{keyword}, '%')
             </if>
         ORDER BY
-            store_conm;
+            s.store_conm;
     </select>
 	
 	<select id="getStoreById" parameterType="string" resultMap="storesResultMap">
@@ -42,21 +41,22 @@
 	    FROM
 	        stores s
 	    LEFT JOIN
-	        store_images si ON s.store_id = si.img_id WHERE
+	        store_images si ON s.store_logo_img = si.img_id AND si.del_yn = 0
+	    WHERE
 	        s.store_id = #{storeId};
 	</select>
 	
 	<select id="getAllStores" resultMap="storesResultMap">
 		/* 모든 브랜드(상점) 목록 조회 */
 		SELECT
-			store_id,
-			store_conm,
-			store_logo_img,
-			del_prcr_yn
+			s.store_id,
+			s.store_conm,
+			si.img_addr AS store_logo_img, s.del_prcr_yn
 		FROM
-			ks55team02db.stores
-		WHERE store_stts = 'ACTIVE' AND del_prcr_yn = FALSE
-		ORDER BY store_conm;
+			ks55team02db.stores s
+		LEFT JOIN
+		    ks55team02db.store_images si ON s.store_id = si.img_id WHERE s.store_stts = 'ACTIVE' AND s.del_prcr_yn = FALSE
+		ORDER BY s.store_conm;
 	</select>
 
 </mapper>
