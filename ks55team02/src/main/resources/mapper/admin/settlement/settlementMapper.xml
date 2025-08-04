@@ -197,7 +197,7 @@
         clcln_stts_cd, tot_sel_amt, clcln_amt, clcln_prcs_ymd
     ) VALUES (
         #{storeClclnId}, #{storeId}, #{plcyId}, #{selFeeRt}, #{actnoId},
-        '판매정산대기', NULL, NULL, NULL
+        '판매정산대기', 0, 0, NULL
     )
 	</insert>
 
