@@ -36,14 +36,14 @@
 	
 	<select id="getStoreById" parameterType="string" resultMap="storesResultMap">
 	    SELECT
-	        store_id,
-	        store_conm,
-	        store_logo_img,
-	        store_intro_cn
+	        s.store_id,
+	        s.store_conm,
+	        si.img_addr AS store_logo_img, s.store_intro_cn
 	    FROM
-	        stores
-	    WHERE
-	        store_id = #{storeId};
+	        stores s
+	    LEFT JOIN
+	        store_images si ON s.store_id = si.img_id WHERE
+	        s.store_id = #{storeId};
 	</select>
 	
 	<select id="getAllStores" resultMap="storesResultMap">
