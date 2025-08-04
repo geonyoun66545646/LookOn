@@ -49,28 +49,6 @@
 				    <a th:href="@{/customer/inquiry/addInquiry}" class="btn btn-primary">문의하기</a>
 				</div>
 				                    
-                    <!-- 검색창  -->           
-                <div class="d-flex">
-                    <!-- 검색 폼 (왼쪽) -->
-                    <form th:action="@{/customer/inquiry/inquiryList}" method="get">
-                        <div class="input-group">
-                            <select name="searchType" class="form-control" style="flex: 0 0 10rem;">
-                                <option value="title" th:selected="${param.searchType == 'title' or param.searchType == null}">제목</option>
-                                <option value="content" th:selected="${param.searchType == 'content'}">내용</option>
-                                <!-- ★★★★★ 검색 옵션 추가 ★★★★★ -->
-                                <option value="writer" th:selected="${param.searchType == 'writer'}">작성자</option>
-                                <option value="inquiryType" th:selected="${param.searchType == 'inquiryType'}">질문유형</option>
-                            </select>
-                            <input type="text" name="keyword" class="form-control" placeholder="검색어를 입력하세요" th:value="${param.keyword}" style="flex: 0 0 35rem;">
-                            <div class="input-group-append">
-                                <button class="btn btn-search" type="submit">검색</button>
-                            </div>
-                        </div>
-                    </form>
-
-                  
-                </div>
-                    
                         <table class="table table-wishlist table-mobile">
                             <thead>
                                 <tr class="center">
@@ -108,7 +86,7 @@
                             </tbody>
                         </table>
 
-                         <nav aria-label="Page navigation">
+                         <nav aria-label="Page navigation mb-0">
                     <ul class="pagination justify-content-center">
                         <!-- 이전 버튼 -->
                         <li class="page-item" th:classappend="${currentPage <= 1 ? 'disabled' : ''}">
@@ -130,6 +108,27 @@
                         </li>
                     </ul>
                 </nav>
+                
+                    <!-- 검색창  -->           
+                <div class="d-flex">
+                    <!-- 검색 폼 (왼쪽) -->
+                    <form th:action="@{/customer/inquiry/inquiryList}" method="get">
+                        <div class="input-group">
+                            <select name="searchType" class="form-control" style="flex: 0 0 10rem;">
+                                <option value="title" th:selected="${param.searchType == 'title' or param.searchType == null}">제목</option>
+                                <option value="content" th:selected="${param.searchType == 'content'}">내용</option>
+                                <!-- ★★★★★ 검색 옵션 추가 ★★★★★ -->
+                                <option value="writer" th:selected="${param.searchType == 'writer'}">작성자</option>
+                                <option value="inquiryType" th:selected="${param.searchType == 'inquiryType'}">질문유형</option>
+                            </select>
+                            <input type="text" name="keyword" class="form-control" placeholder="검색어를 입력하세요" th:value="${param.keyword}" style="flex: 0 0 35rem;">
+                            <div class="input-group-append">
+                                <button class="btn btn-search" type="submit">검색</button>
+                            </div>
+                        </div>
+                    </form>                  
+                </div>
+                
             </div>
         </div>
     </main>

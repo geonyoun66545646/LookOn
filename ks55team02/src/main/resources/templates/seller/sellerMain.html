@@ -4,6 +4,7 @@
 	  layout:decorate="~{seller/layout/layoutSeller}">
 	
 	<head>
+	
 		<meta name="description" content="한국스마트정보교육원 ksmybatis" />
 		<link rel="stylesheet" th:href="@{/maincss/assets/customsellercss/layoutSeller.css}">
 	</head>
@@ -20,13 +21,14 @@
     <div>
         <h2 class="content-title card-title" th:text="${store.storeConm} + '님 스토어 관리'">스토어 관리</h2>
     </div>
+    <div class ="intro-head">
         <!-- 1. 로고 영역 -->
         <!-- 2. 스토어 소개 영역 -->
- <div class="row">
+ <div class="row cn-top">
         <!-- 1. 로고 영역 -->
-        <div class="col-xl-2 col-lg-3">
+        <div class="col-xl-2 col-lg-3 ">
              <!-- ✅ 3. h-100 클래스 제거, CSS로 높이 제어 -->
-             <div class="card mb-4">
+             <div class="card mb-4 intro">
                 <!-- 로고 수정을 위한 숨겨진 form (기능을 위해 다시 추가) -->
                 <form id="logoUpdateForm" th:action="@{/seller/store/update/logo}" method="post" enctype="multipart/form-data">
                     <input type="file" id="logoFileInput" name="logoFile" accept="image/*" style="display: none;"/>
@@ -49,7 +51,7 @@
         <div class="col-xl-10 col-lg-9">
              <!-- ✅ 3. h-100 클래스 제거 -->
             <div class="card mb-4">
-                <article class="card-body">
+                <article class="card-body intro">
                     <!-- ✅ 5. 소개 수정 기능 UI (버튼, 폼) 다시 추가 -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h3 class="card-title mb-0">스토어 소개</h3>
@@ -78,8 +80,9 @@
             </div>
             </div>
         </div>
+        </div>
                 	<div class="row">
-               			<div class="col-lg-3">
+               			<div class="col-lg-6">
 					    <div class="card card-body mb-4">
 					        <article class="icontext sub-box">
 					        <div class="row">
@@ -89,9 +92,8 @@
 					            <div class="col-lg-10">
 					            <div class="text">
 					                <div th:if="${hasSubscription}">
-					                    <h5 class="mb-1 card-title text-start">구독 시작일:</h5>
+					                    <h5 class="mb-1 card-title text-start">구독 상태:</h5>
 					                    <span class="d-block text-end pe-3" th:text="${earliestSubscriptionStartDate}"></span>
-					                    <h5 class="mb-1 card-title text-start">구독 종료일:</h5>
 					                    <span class="d-block text-end pe-3" th:text="${latestSubscriptionEndDate}"></span>
 					                </div>
 					                <div th:unless="${hasSubscription}">
@@ -103,7 +105,7 @@
 					        </article>
 					    </div>
 					</div>
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
 					    <div class="card card-body mb-4">
 					        <article class="icontext sub-box">
 					        <div class="row">
@@ -120,7 +122,9 @@
 					        </article>
 					    </div>
 					</div>
-                    <div class="col-lg-3">
+					</div>
+					<div class="row">
+                    <div class="col-lg-6">
 					    <div class="card card-body mb-4">
 					        <article class="icontext sub-box">
 					        <div class="row">
@@ -137,7 +141,8 @@
 					        </article>
 					    </div>
 					</div>
-                   <div class="col-lg-3">
+				
+                   <div class="col-lg-6">
 					    <div class="card card-body mb-4">
 					        <article class="icontext sub-box">
 					        <div class="row">
@@ -154,7 +159,7 @@
 					        </article>
 					    </div>
 					    </div>
-					</div>
+					    	</div>
                 <div class="card mb-4">
                     <header class="card-header">
                         <h4 class="card-title">BEST SELLER</h4>
