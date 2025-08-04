@@ -144,7 +144,7 @@
   </resultMap>
    	
    	<select id="getStoreIdBySellerId" parameterType="string" resultType="string">
-    <!-- ✅ [수정] users 테이블과 JOIN하여 로그인 아이디(user_lgn_id)로 조회합니다. -->
+    /* [수정] users 테이블과 JOIN하여 로그인 아이디(user_no)로 조회합니다. */
     SELECT
         s.store_id
     FROM
@@ -152,7 +152,7 @@
     JOIN
         users u ON s.seller_user_no = u.user_no
     WHERE
-        u.user_lgn_id = #{sellerLgnId}
+        u.user_no= #{sellerLgnId}
 </select>
    	
 	
