@@ -152,8 +152,8 @@
     JOIN
         users u ON s.seller_user_no = u.user_no
     WHERE
-        u.user_no= #{sellerLgnId}
-</select>
+        u.user_no = #{sellerLgnId}
+	</select>
    	
 	
      <select id="getStoreList" resultMap="storeResultMap">
