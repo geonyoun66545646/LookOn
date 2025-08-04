@@ -44,4 +44,5 @@ public interface StoreMngMapper {
     
     int markImageAsDeleted(String imgId);
     
+    String getStoreIdBySellerLgnId(String sellerId);
 }
