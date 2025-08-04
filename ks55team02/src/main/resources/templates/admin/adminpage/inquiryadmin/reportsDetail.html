@@ -306,7 +306,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let sanctionTypeHtml = '정보 없음';
 
-        // [수정] 제재 정보(sanction)가 있을 때, JS 날짜 계산 대신 sanctionType 코드를 직접 사용합니다.
         if (sanction) {
             switch(sanction.sanctionType) {
                 case 'NONE': sanctionTypeHtml = '제재 없음'; break;
@@ -316,30 +315,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 case 'SUSPENSION_30D': sanctionTypeHtml = '30일 이용 정지'; break;
                 case 'BAN_PERMANENT': sanctionTypeHtml = '영구 이용 정지'; break;
                 case 'CONTENT_DELETION': sanctionTypeHtml = '삭제 조치'; break;
+                
+                // ▼▼▼ [핵심 수정] 이 케이스를 아래와 같이 단순화합니다. ▼▼▼
                 case 'AUTHOR_RESTRICTION':
-                     // sanctionType에 따라 기간을 명시합니다. (이 부분은 정책에 따라 달라질 수 있음)
-                     // 예시: 작성자 제한 시 sanction_end_dt가 3일 뒤라면
-                     if (sanction.sanctionStartDt && sanction.sanctionEndDt) {
-                        const start = new Date(sanction.sanctionStartDt);
-                        const end = new Date(sanction.sanctionEndDt);
-                        const diffTime = Math.abs(end - start);
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        sanctionTypeHtml = `작성자 제한 (${diffDays}일)`;
-                     } else if (!sanction.sanctionEndDt) {
-                        sanctionTypeHtml = '작성자 제한 (영구)';
-                     } else {
-                        sanctionTypeHtml = '작성자 제한';
-                     }
+                    sanctionTypeHtml = '작성자 제한';
                     break;
+                // ▲▲▲ [핵심 수정] 여기까지 ▲▲▲
+
                 default: sanctionTypeHtml = sanction.sanctionType;
             }
-        } 
-        // [수정] sanction 정보가 없을 경우, history.actionType을 더 상세하게 확인합니다.
-        else if (history) {
+        } else if (history) {
             switch(history.actionType) {
                 case 'NONE': sanctionTypeHtml = '제재 없음'; break;
                 case 'CONTENT_DELETION': sanctionTypeHtml = '삭제 조치'; break;
-                default: sanctionTypeHtml = '기타 조치'; // 그 외의 경우는 '기타 조치'로 표시
+                default: sanctionTypeHtml = '기타 조치';
             }
         }
 
