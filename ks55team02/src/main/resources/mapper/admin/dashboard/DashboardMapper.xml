@@ -93,8 +93,7 @@
 		WHERE
 		    prcs_stts = 'RECEPTION';
     </select>
-    
-    
+
 
     <!-- 월별 통계 데이터 조회 (수수료 수익) -->
     <select id="getMonthlyRevenue" resultType="map">
