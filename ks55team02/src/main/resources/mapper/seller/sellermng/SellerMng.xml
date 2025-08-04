@@ -152,7 +152,7 @@
     JOIN
         users u ON s.seller_user_no = u.user_no
     WHERE
-        u.user_lgn_id = #{sellerLgnId}
+        u.user_no = #{sellerLgnId}
 </select>
    	
 	

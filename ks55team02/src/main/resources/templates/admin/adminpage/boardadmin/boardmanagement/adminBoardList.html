@@ -35,8 +35,16 @@
 							<tr th:each="board : ${boardList}">
 								<td th:text="${board.bbsClsfCd}"></td>
 								<td th:text="${board.bbsNm}"></td>
-								<td th:text="${board.wrtAuthrtLvlVal}"></td>
-								<td th:text="${board.cmntWrtAuthrtLvlVal}"></td>
+								<td th:switch="${board.wrtAuthrtLvlVal}"><span
+									th:case="'public'">공용</span> <span th:case="'admin_only'">관리자
+										전용</span> <span th:case="'seller_only'">판매자 전용</span> <span
+									th:case="*">알 수 없음</span></td>
+
+								<!-- [수정] 댓글쓰기 권한 -->
+								<td th:switch="${board.cmntWrtAuthrtLvlVal}"><span
+									th:case="'public'">공용</span> <span th:case="'admin_only'">관리자
+										전용</span> <span th:case="'seller_only'">판매자 전용</span> <span
+									th:case="*">알 수 없음</span></td>
 
 								<td><span class="badge"
 									th:text="${board.delDt == null ? '정상' : '삭제됨'}"

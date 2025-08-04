@@ -23,11 +23,65 @@ $(() => {
 	}
 
 	// --- 3. 헬퍼 함수 (HTML 생성 및 UI 업데이트) ---
+	const formatTimeAgo = (dateString) => {
+		if (!dateString) return '';
+
+		const now = new Date();
+		// 브라우저 호환성을 위해 공백을 'T'로 교체하여 ISO 8601 형식과 유사하게 만듭니다.
+		const postDate = new Date(dateString.replace(' ', 'T'));
+		// 유효하지 않은 날짜인 경우 원본 반환
+	    if (isNaN(postDate.getTime())) {
+			return dateString;
+		}
+
+		const seconds = Math.floor((now.getTime() - postDate.getTime()) / 1000);
+
+		if (seconds < 60) return "방금 전";
+		const minutes = Math.floor(seconds / 60);
+		if (minutes < 60) return `${minutes}분 전`;
+		const hours = Math.floor(minutes / 60);
+		if (hours < 24) return `${hours}시간 전`;
+		const days = Math.floor(hours / 24);
+		if (days < 7) return `${days}일 전`;
+
+		// 7일 이상 지난 경우 YYYY.MM.DD 형식으로 표시
+		const year = postDate.getFullYear();
+		const month = String(postDate.getMonth() + 1).padStart(2, '0');
+		const day = String(postDate.getDate()).padStart(2, '0');
+		return `${year}.${month}.${day}`;
+	};
+	
+	const updateInitialTimestamps = () => {
+			// 피드 게시물 타임스탬프 업데이트
+			$('.feed-post-wrapper').each(function() {
+				const $wrapper = $(this);
+				const crtDt = $wrapper.data('crt-dt');
+				if (crtDt) {
+					const formattedTime = formatTimeAgo(crtDt);
+					$wrapper.find('.post-timestamp').text(formattedTime);
+				}
+			});
+
+			// 댓글 타임스탬프 업데이트
+			$('.comment-item').each(function() {
+				const $comment = $(this);
+				// [수정] 댓글의 원본 날짜를 가져오기 위해,
+				// 화면에 표시된 텍스트 대신 HTML에 원본 날짜 데이터를 추가해야 합니다.
+				// 우선 임시로 텍스트를 파싱하여 사용합니다.
+				// 추후 feedDetail.html 수정을 통해 data-crt-dt 속성을 추가하는 것이 더 좋습니다.
+				const timestampText = $comment.find('.comment-timestamp').text();
+				if (timestampText) {
+					const formattedTime = formatTimeAgo(timestampText.split(' ')[0]); // "YYYY-MM-DD HH:mm" 부분을 추출
+					$comment.find('.comment-timestamp').text(formattedTime);
+				}
+			});
+		};
+		
 	const createCommentHtml = (comment, isHiddenClass = '') => {
 		const writerProfileImg = comment.writerInfo?.prflImg || '/uploads/profiles/defaultprofile.jpg';
 		const writerNickname = comment.writerInfo?.userNcnm || '작성자';
 		const writerLink = `/customer/feed/feedListByUserNo/${comment.writerInfo?.userNo}`;
-		const commentTimestamp = (comment.mdfcnDt || comment.crtDt).substring(0, 16);
+		const commentTimestamp = formatTimeAgo(comment.mdfcnDt || comment.crtDt);
 		const editedMark = comment.mdfcnDt ? ' (수정됨)' : '';
 		return `<li class="comment-item ${isHiddenClass}" data-comment-sn="${comment.feedCmntSn}" data-writer-user-no="${comment.wrtrUserNo}"><div class="comment-writer-profile"><a href="${writerLink}"><img src="${writerProfileImg}" alt="프로필 사진"></a></div><div class="comment-content"><div class="comment-view-mode"><p><a href="${writerLink}" class="comment-writer-username">${writerNickname}</a> <span class="comment-text">${comment.cmntCn}</span></p><span class="comment-timestamp">${commentTimestamp}${editedMark}</span></div><div class="comment-edit-mode" style="display: none;"><textarea class="comment-edit-input">${comment.cmntCn}</textarea><div class="edit-actions"><button class="cancel-edit-btn">취소</button><button class="save-edit-btn">저장</button></div></div></div><div class="comment-actions"></div></li>`;
 	};
@@ -43,7 +97,7 @@ $(() => {
 		const commentListHtml = comments.map((comment, index) => createCommentHtml(comment, index >= INITIAL_COMMENT_COUNT ? 'hidden-comment' : '')).join('');
         const noCommentsHtml = (comments.length === 0) ? `<p class="no-comments-message">아직 댓글이 없습니다.</p>` : '';
 		const showMoreBtnHtml = (comments.length > INITIAL_COMMENT_COUNT) ? `<div class="show-more-wrapper"><button class="show-more-comments-btn">댓글 ${comments.length - INITIAL_COMMENT_COUNT}개 더 보기</button></div>` : '';
-        const postTimestamp = feed.crtDt ? feed.crtDt.substring(0, 16) : '';
+        const postTimestamp = formatTimeAgo(feed.crtDt);
 		const followActionHtml = (loginUserNo && loginUserNo != feed.wrtrUserNo) ? `<div class="follow-action-area"></div>` : '';
 		const postActionsHtml = `<button class="options-menu-btn" aria-label="옵션 더 보기"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><circle cx="12" cy="12" r="1.5"></circle><circle cx="6" cy="12" r="1.5"></circle><circle cx="18" cy="12" r="1.5"></circle></svg></button>`;
 		
@@ -156,6 +210,37 @@ $(() => {
                     alert('좋아요 처리에 실패했습니다.');
                 });
         })
+		
+		.on('click', '.feed-share-btn', function(e) {
+		    e.preventDefault();
+
+		    const $wrapper = $(this).closest('.feed-post-wrapper');
+		    const feedSn = $wrapper.data('feed-sn');
+
+		    if (!feedSn) {
+		        console.error('공유 기능 오류: data-feed-sn 속성을 찾을 수 없습니다.');
+		        alert('피드 주소를 복사하는 데 실패했습니다.');
+		        return;
+		    }
+
+		    // 해당 피드의 고유 URL 생성
+		    const feedUrl = `${window.location.origin}/customer/feed/feedDetail/${feedSn}`;
+
+		    // Clipboard API를 사용하여 URL 복사
+		    if (navigator.clipboard) {
+		        navigator.clipboard.writeText(feedUrl)
+		            .then(() => {
+		                alert('피드 주소가 클립보드에 복사되었습니다.');
+		            })
+		            .catch(err => {
+		                console.error('클립보드 복사 실패:', err);
+		                alert('주소 복사에 실패했습니다.');
+		            });
+		    } else {
+		        alert('이 브라우저에서는 자동 복사 기능이 지원되지 않습니다.');
+		    }
+		})
+		
 		.on('keypress', '.comment-input', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -271,6 +356,7 @@ $(() => {
     }
     
     // --- 6. 초기 실행 ---
+	updateInitialTimestamps();
 	applyCommentActions();
 	initializeAllFollowButtons();
 });
