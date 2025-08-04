@@ -7,7 +7,10 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -123,5 +126,61 @@ public class ProductSellerHomeController {
         model.addAttribute("topSellingProduct", topSellingProducts);
 
         return "seller/sellerMain";
+    }
+    
+    @PostMapping("/store/update/logo")
+    public String updateStoreLogo(@RequestParam("logoFile") MultipartFile logoFile,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/seller/login";
+        }
+        
+        String sellerLgnId = loginUser.getUserLgnId(); 
+        String storeId = storeMngService.getStoreIdBySellerId(sellerLgnId);
+
+        if (logoFile.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "업로드할 파일을 선택해주세요.");
+            return "redirect:/seller";
+        }
+        
+        try {
+            storeMngService.updateStoreLogo(storeId, logoFile);
+            redirectAttributes.addFlashAttribute("successMessage", "로고가 성공적으로 변경되었습니다.");
+        } catch (Exception e) {
+            log.error("로고 업데이트 중 오류 발생: storeId={}, error={}", storeId, e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("errorMessage", "로고 변경 중 오류가 발생했습니다.");
+        }
+        
+        return "redirect:/seller";
+    }
+
+    /**
+     * 상점 소개 업데이트 요청을 처리합니다.
+     */
+    @PostMapping("/store/update/intro")
+    public String updateStoreIntro(@RequestParam("storeIntroCn") String storeIntroCn,
+                                   HttpSession session,
+                                   RedirectAttributes redirectAttributes) {
+        
+        LoginUser loginUser = (LoginUser) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return "redirect:/seller/login";
+        }
+        
+        String sellerLgnId = loginUser.getUserLgnId(); 
+        String storeId = storeMngService.getStoreIdBySellerId(sellerLgnId);
+
+        try {
+            storeMngService.updateStoreIntro(storeId, storeIntroCn);
+            redirectAttributes.addFlashAttribute("successMessage", "상점 소개가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            log.error("상점 소개 수정 실패: storeId={}, error={}", storeId, e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("errorMessage", "소개 수정 중 오류가 발생했습니다.");
+        }
+
+        return "redirect:/seller";
     }
 }

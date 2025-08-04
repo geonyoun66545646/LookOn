@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       layout:decorate="~{seller/layout/layout_main}">
+<head>
+    <meta name="description" content="한국스마트정보교육원 ksmybatis" />
+    <th:block layout:fragment="customCss">
+        <link rel="stylesheet" th:href="@{/admincss/assets/customadmincss/reviewAdminView.css}">
+    </th:block>
+</head>
+
+<th:block layout:fragment="contents">
+    <main class="main-content">
+        <section class="content-header">
+            <h2 class="content-title">상품 리뷰 관리</h2>
+        </section>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <form id="searchForm" th:action="@{/adminpage/storeadmin/reviewAdmin}" method="get">
+                    <input type="hidden" name="currentPage" th:value="${pagination.currentPage}" id="currentPageInput"/>
+                    <input type="hidden" name="pageSize" th:value="${pagination.recordSize}" id="pageSizeInput"/>
+                    <input type="hidden" name="sortKey" th:value="${searchCriteria.sortKey}" id="sortKeyInput"/>
+                    <input type="hidden" name="sortOrder" th:value="${searchCriteria.sortOrder}" id="sortOrderInput"/>
+
+                    <!-- [수정] '삭제' 상태 필터 체크박스 제거 -->
+                    <div class="row gx-3">
+                        <div class="col-lg-12">
+                            <label class="form-label">리뷰 상태</label>
+                            <div class="d-flex align-items-center">
+                                <div class="form-check me-4">
+                                   <!--  <input class="form-check-input status-check" type="checkbox" name="filterConditions" value="ACTIVE"
+                                           th:checked="${#lists.contains(searchCriteria.filterConditions, 'ACTIVE')}"> -->
+                                    <input class="form-check-input status-check" name="filterConditions" value="ACTIVE" type="checkbox" th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, 'ACTIVE')}">
+                                    <label class="form-check-label">활성</label>
+                                </div>
+                                <div class="form-check me-4">
+                                    <!-- <input class="form-check-input status-check" type="checkbox" name="filterConditions" value="HIDDEN"
+                                           th:checked="${#lists.contains(searchCriteria.filterConditions, 'HIDDEN')}"> -->
+                                    <input class="form-check-input status-check" type="checkbox" name="filterConditions" value="HIDDEN" th:checked="${searchCriteria.filterConditions != null and #lists.contains(searchCriteria.filterConditions, 'HIDDEN')}">
+                                    <label class="form-check-label">숨김</label>
+                                </div>
+                                <!-- '삭제' 체크박스 완전히 제거됨 -->
+                                <div class="form-check me-4">
+                                    <input class="form-check-input" type="checkbox" id="filterCheckAll">
+                                    <label class="form-check-label">전체선택</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- 검색 조건 (기존과 동일) -->
+                    <div class="row gx-3 align-items-end">
+                        <div class="col-lg-4">
+                            <label class="form-label">작성일 기간</label>
+                            <div class="d-flex">
+	                            <input type="date" class="form-control" name="startDate" th:value="${searchCriteria.startDate}">
+	                            <span class="mx-2 d-flex align-items-center">-</span>
+	                            <input type="date" class="form-control" name="endDate" th:value="${searchCriteria.endDate}">
+	                        </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="form-label">검색 키워드</label>
+                            <div class="input-group">
+                                <select class="form-select" name="searchKey" style="max-width: 120px; background-color: #fff;">
+                                    <option value="" th:selected="${searchCriteria.searchKey == null or searchCriteria.searchKey == ''}">전체</option>
+                                    <option value="reviewId" th:selected="${searchCriteria.searchKey == 'reviewId'}">리뷰 ID</option>
+                                    <option value="gdsNm" th:selected="${searchCriteria.searchKey == 'gdsNm'}">상품명</option>
+                                    <option value="prchsrUserNm" th:selected="${searchCriteria.searchKey == 'prchsrUserNm'}">구매자 이름</option>
+                                    <option value="reviewCn" th:selected="${searchCriteria.searchKey == 'reviewCn'}">리뷰 내용</option>
+                                </select>
+                                <input type="text" class="form-control" name="searchValue" placeholder="검색어를 입력하세요" th:value="${searchCriteria.searchValue}">
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <button class="btn btn-primary btn-block" type="submit" id="searchBtn">검색</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card" id="reviewListContainer">
+            <div class="card-body">
+                <div class="row gx-3 align-items-center mb-4">
+                    <div class="col-md-6">
+                        <div class="search-result-info">
+                            총 <b class="text-brand" th:text="${pagination.totalRecordCount}"></b> 건의 리뷰가 검색되었습니다.
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <!-- '삭제' 기능은 여기에 그대로 유지 -->
+                        <div class="btn-group me-2">
+						    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+						        선택한 리뷰 상태 변경
+						    </button>
+						    <!-- [수정] 드롭다운 메뉴에 점(dot) 추가 -->
+						    <div class="dropdown-menu status">
+						        <a class="dropdown-item change-status-btn" href="#" data-status="ACTIVE">
+						            <span class="badge-dot bg-success"></span>활성
+						        </a>
+						        <a class="dropdown-item change-status-btn" href="#" data-status="HIDDEN">
+						            <span class="badge-dot bg-warning"></span>숨김
+						        </a>
+						        <a class="dropdown-item change-status-btn" href="#" data-status="DELETED">
+						            <span class="badge-dot bg-danger"></span>삭제
+						        </a>
+						    </div>
+						</div>
+                        <!-- 정렬 및 보기 개수 (기존과 동일) -->
+                        <div class="d-inline-block">
+                            <select class="form-select d-inline-block" id="sortOrderSelect" style="width: auto;">
+                                <option value="" data-sort-key="wrtYmd" data-sort-order="DESC" th:selected="${searchCriteria.sortKey == 'wrtYmd' and searchCriteria.sortOrder == 'DESC'}">최신 작성일순</option>
+                                <option value="" data-sort-key="wrtYmd" data-sort-order="ASC" th:selected="${searchCriteria.sortKey == 'wrtYmd' and searchCriteria.sortOrder == 'ASC'}">오래된 작성일순</option>
+                                <option value="" data-sort-key="evlScr" data-sort-order="DESC" th:selected="${searchCriteria.sortKey == 'evlScr' and searchCriteria.sortOrder == 'DESC'}">평점 (높은순)</option>
+                                <option value="" data-sort-key="evlScr" data-sort-order="ASC" th:selected="${searchCriteria.sortKey == 'evlScr' and searchCriteria.sortOrder == 'ASC'}">평점 (낮은순)</option>
+                                <option value="" data-sort-key="helpdCnt" data-sort-order="DESC" th:selected="${searchCriteria.sortKey == 'helpdCnt' and searchCriteria.sortOrder == 'DESC'}">도움돼요 (높은순)</option>
+                                <option value="" data-sort-key="helpdCnt" data-sort-order="ASC" th:selected="${searchCriteria.sortKey == 'helpdCnt' and searchCriteria.sortOrder == 'ASC'}">도움돼요 (낮은순)</option>
+                            </select>
+                            <select class="form-select d-inline-block" id="pageSizeSelect" name="pageSize" style="width: auto;">
+                                <option value="10" th:selected="${searchCriteria.pageSize == 10}">10개씩 보기</option>
+                                <option value="30" th:selected="${searchCriteria.pageSize == 30}">30개씩 보기</option>
+                                <option value="50" th:selected="${searchCriteria.pageSize == 50}">50개씩 보기</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover member-table">
+                        <thead>
+                            <tr class="text-center">
+                                <th><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                                <th>리뷰 ID</th>
+                                <th>상품명</th>
+                                <th>구매자 이름</th>
+                                <th>평점</th>
+                                <th>리뷰 내용</th>
+                                <th>작성일</th>
+                                <th>리뷰 상태</th>
+                                <th>최종 수정일시</th>
+                                <th>처리자</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+						    <tr th:if="${#lists.isEmpty(reviewList)}">
+						        <td colspan="10" class="text-center py-5">조회된 리뷰가 없습니다.</td>
+						    </tr>
+						    <tr th:unless="${#lists.isEmpty(reviewList)}" th:each="review: ${reviewList}">
+						        <td><input class="form-check-input member-check" type="checkbox" th:value="${review.reviewId}"></td>
+						        <td th:text="${review.reviewId}"></td>
+						        <td th:text="${review.gdsNm}"></td>
+						        <td th:text="${review.prchsrUserNm}"></td>
+						        <td th:text="${review.evlScr}"></td>
+						        
+						        <!-- [최종 수정] <td> 안에 <span>을 넣어 클래스 적용 -->
+						        <td>
+						            <span class="ellipsis text-left" th:text="${review.reviewCn}"></span>
+						        </td>
+						        
+						        <td th:text="${#temporals.format(review.wrtYmd, 'yyyy-MM-dd HH:mm:ss')}"></td>
+						        <td>
+						            <th:block th:switch="${review.reviewStts}">
+						                <span th:case="'ACTIVE'" class="badge custom-badge bg-success">활성</span>
+						                <span th:case="'HIDDEN'" class="badge custom-badge bg-warning">숨김</span>
+						                <span th:case="'DELETED'" class="badge custom-badge bg-danger">삭제</span>
+						                <span th:case="*" class="badge custom-badge bg-secondary" th:text="${review.reviewStts}">기타</span>
+						            </th:block>
+						        </td>
+						        <td th:text="${review.lastMdfcnDt != null ? #temporals.format(review.lastMdfcnDt, 'yyyy-MM-dd HH:mm:ss') : 'N/A'}"></td>
+						        <td th:text="${review.delPrcrUserNm != null ? review.delPrcrUserNm : 'N/A'}"></td>
+						    </tr>
+                    </table>
+                </div>
+                <nav class="mt-4" aria-label="Page navigation" th:if="${pagination.totalRecordCount > 0}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:if="${pagination.currentPage > 1}">
+                            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage - 1}">이전</a>
+                        </li>
+                        <li class="page-item" th:each="page : ${#numbers.sequence(pagination.startPage, pagination.endPage)}"
+                            th:classappend="${page == pagination.currentPage} ? 'active' : ''">
+                            <a class="page-link page-num" href="#" th:text="${page}" th:data-page="${page}"></a>
+                        </li>
+                        <li class="page-item" th:if="${pagination.currentPage < pagination.totalPageCount}">
+                            <a class="page-link page-num" href="#" th:data-page="${pagination.currentPage + 1}">다음</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </main>
+</th:block>
+
+<th:block layout:fragment="jsScript">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function() {
+            const mainContent = $('main.main-content');
+            const searchForm = $('#searchForm');
+            const currentPageInput = $('#currentPageInput');
+            const pageSizeInput = $('#pageSizeInput');
+            const sortKeyInput = $('#sortKeyInput');
+            const sortOrderInput = $('#sortOrderInput');
+            const statusCheckboxes = $('.status-check');
+            const filterCheckAll = $('#filterCheckAll');
+
+            function submitSearchForm() {
+                searchForm.submit();
+            }
+
+            mainContent.on('click', '#checkAll', function() {
+                $('.member-check').prop('checked', $(this).is(':checked'));
+            });
+
+            mainContent.on('click', '.member-check', () => {
+                const totalChecks = $('.member-check').length;
+                const checkedChecks = $('.member-check:checked').length;
+                $('#checkAll').prop('checked', totalChecks > 0 && totalChecks === checkedChecks);
+            });
+
+            mainContent.on('click', '.page-num', function(e) {
+                e.preventDefault();
+                currentPageInput.val($(this).data('page'));
+                submitSearchForm();
+            });
+
+            $('#pageSizeSelect, #sortOrderSelect').on('change', function() {
+                if ($(this).is('#pageSizeSelect')) {
+                    pageSizeInput.val($(this).val());
+                } else {
+                    const selectedOption = $(this).find('option:selected');
+                    sortKeyInput.val(selectedOption.data('sort-key'));
+                    sortOrderInput.val(selectedOption.data('sort-order'));
+                }
+                currentPageInput.val(1);
+                submitSearchForm();
+            });
+
+            // [수정] 필터 체크박스 초기화 로직 단순화
+            (function initFilterCheckboxes() {
+                // Thymeleaf의 th:checked가 서버에서 받은 값으로 체크 상태를 결정하므로,
+                // JS에서는 '전체선택' 체크박스의 상태만 동기화해주면 됨.
+                const allChecked = statusCheckboxes.length > 0 && statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+                filterCheckAll.prop('checked', allChecked);
+            })();
+
+            // 필터 체크박스 관련 로직
+            statusCheckboxes.on('change', function() {
+                const allChecked = statusCheckboxes.length === statusCheckboxes.filter(':checked').length;
+                filterCheckAll.prop('checked', allChecked);
+            });
+            filterCheckAll.on('change', function() {
+                statusCheckboxes.prop('checked', $(this).is(':checked'));
+            });
+            
+            // 상태 변경 기능 (기존과 동일)
+            mainContent.on('click', '.change-status-btn', function(e) {
+                e.preventDefault();
+                const newStatus = $(this).data('status');
+                const selectedReviewIds = $('.member-check:checked').map(function() {
+                    return $(this).val();
+                }).get();
+
+                if (selectedReviewIds.length === 0) {
+                    alert('상태를 변경할 리뷰를 선택해주세요.');
+                    return;
+                }
+
+                let confirmMessage = '';
+                switch (newStatus) {
+                    case 'ACTIVE':
+                        confirmMessage = `선택된 ${selectedReviewIds.length}개 리뷰를 '활성' 상태로 변경하시겠습니까?`;
+                        break;
+                    case 'HIDDEN':
+                        confirmMessage = `선택된 ${selectedReviewIds.length}개 리뷰를 '숨김' 상태로 변경하시겠습니까?`;
+                        break;
+                    case 'DELETED':
+                        confirmMessage = `선택된 ${selectedReviewIds.length}개 리뷰를 '삭제' 상태로 변경하시겠습니까? 이 작업은 되돌릴 수 없습니다.`;
+                        break;
+                }
+
+                if (confirm(confirmMessage)) {
+                    $.ajax({
+                        url: '/adminpage/storeadmin/updateReviewStatus',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            reviewIds: selectedReviewIds,
+                            newStatus: newStatus
+                        }),
+                        success: function(response) {
+                            if (response.success) {
+                                alert(response.message);
+                                submitSearchForm(); 
+                            } else {
+                                alert('상태 변경 실패: ' + response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('상태 변경 중 오류가 발생했습니다: ' + xhr.responseText);
+                        }
+                    });
+                }
+            });
+        });
+        /*]]>*/
+    </script>
+</th:block>
+</html>

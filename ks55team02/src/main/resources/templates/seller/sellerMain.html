@@ -16,35 +16,68 @@
 	<th:block layout:fragment="jsScript">
 	</th:block>
 	
-	<!-- 추가할 페이지 contents -->
 	<th:block layout:fragment="contents">
-                    <div>
-                        <h2 class="content-title card-title" th:text="${store.storeConm +'님  스토어관리'}">스토어 관리</h2>
-                        <p></p>
+    <div>
+        <h2 class="content-title card-title" th:text="${store.storeConm} + '님 스토어 관리'">스토어 관리</h2>
+    </div>
+        <!-- 1. 로고 영역 -->
+        <!-- 2. 스토어 소개 영역 -->
+ <div class="row">
+        <!-- 1. 로고 영역 -->
+        <div class="col-xl-2 col-lg-3">
+             <!-- ✅ 3. h-100 클래스 제거, CSS로 높이 제어 -->
+             <div class="card mb-4">
+                <!-- 로고 수정을 위한 숨겨진 form (기능을 위해 다시 추가) -->
+                <form id="logoUpdateForm" th:action="@{/seller/store/update/logo}" method="post" enctype="multipart/form-data">
+                    <input type="file" id="logoFileInput" name="logoFile" accept="image/*" style="display: none;"/>
+                </form>
+                
+                <!-- 로고 이미지를 감싸는 클릭 가능한 컨테이너 (CSS 클래스 적용) -->
+                <div id="logoImageContainer" class="store-logo card-body p-0" style="cursor: pointer;" title="클릭하여 로고 변경">
+                    <!-- ✅ 4. store.logo 객체를 사용하여 올바른 이미지 경로 표시 (기능을 위해 수정) -->
+                    <img th:if="${store.logo != null and store.logo.imgAddr != null}"
+                         th:src="@{${store.logo.imgAddr}}"
+                         alt="상점 로고" />
+                    <img th:unless="${store.logo != null and store.logo.imgAddr != null}"
+                         th:src="@{/admincss/assets/imgs/stores/img-1.jpg}"
+                         alt="기본 로고" />
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 스토어 소개 영역 -->
+        <div class="col-xl-10 col-lg-9">
+             <!-- ✅ 3. h-100 클래스 제거 -->
+            <div class="card mb-4">
+                <article class="card-body">
+                    <!-- ✅ 5. 소개 수정 기능 UI (버튼, 폼) 다시 추가 -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="card-title mb-0">스토어 소개</h3>
+                        <button id="editIntroBtn" class="btn btn-sm btn-light">수정</button>
                     </div>
                     
-                   <div class="row">
-				    <div class="col-xl-2 col-lg-2"> 
-        <div class="store-logo">
-            <img th:if="${store.storeLogoImg != null and store.storeLogoImg != ''}"
-                 th:src="${'/path/to/your/upload/directory/' + store.storeLogoImg}"
-                 alt="상점 로고" style="max-width: 200px; height: auto;"/>
-            <img th:unless="${store.storeLogoImg != null and store.storeLogoImg != ''}"
-                 th:src="@{/admincss/assets/imgs/stores/img-1.jpg}"
-                 alt="기본 로고" style="max-width: 200px; height: auto; border: 1px solid #ccc;"/>
-        	</div>
-       			 </div>
-				
-				    <div class="col-xl-10 col-lg-12">
-                        <div class="card mb-4">
-                            <article class="card-body" >
-                                <h3 class="card-title" >스토어 소개</h3>
-                                <div th:text="${store.storeIntroCn}"></div>
-                                <canvas id="myChart" height="120px" ></canvas>
-                            </article>
-                        </div>                      
-                    </div>                    
-                </div>           
+                    <div>
+                        <!-- 보기 모드 -->
+                        <div id="introView">
+                            <p class="intro-text" th:text="${store.storeIntroCn}"></p>
+                        </div>
+                        <!-- 편집 모드 (숨김) -->
+                        <div id="introEdit" style="display: none;">
+                            <form th:action="@{/seller/store/update/intro}" method="post">
+                                <textarea name="storeIntroCn" class="form-control" rows="5" th:text="${store.storeIntroCn}" required></textarea>
+                                <div class="mt-2 text-end">
+                                    <button type="button" id="cancelEditBtn" class="btn btn-sm btn-secondary">취소</button>
+                                    <button type="submit" class="btn btn-sm btn-primary">저장</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <canvas id="myChart" height="120px"></canvas>
+                </article>
+            </div>
+            </div>
+        </div>
                 	<div class="row">
                			<div class="col-lg-3">
 					    <div class="card card-body mb-4">
@@ -120,6 +153,7 @@
 					            </div>
 					        </article>
 					    </div>
+					    </div>
 					</div>
                 <div class="card mb-4">
                     <header class="card-header">
@@ -174,20 +208,61 @@
 </table>
                     </div>
                 </div>
+                </div>
             
 		    </div>
 
 	</th:block>
-	
+	<th:block layout:fragment="jsScript">
+	 <script>
+        // 페이지의 모든 HTML 요소가 로드된 후 스크립트를 실행합니다.
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // --- 로고 수정 관련 스크립트 ---
+            const logoImageContainer = document.getElementById('logoImageContainer');
+            const logoFileInput = document.getElementById('logoFileInput');
+            const logoUpdateForm = document.getElementById('logoUpdateForm');
+
+            // 로고 이미지 컨테이너를 클릭하면 숨겨진 파일 입력(input) 창을 클릭합니다.
+            if (logoImageContainer) {
+                logoImageContainer.addEventListener('click', () => {
+                    logoFileInput.click();
+                });
+            }
+
+            // 파일 입력 창에서 파일이 선택되면(change), 자동으로 폼(form)을 제출합니다.
+            if (logoFileInput) {
+                logoFileInput.addEventListener('change', () => {
+                    if (logoFileInput.files.length > 0) {
+                        logoUpdateForm.submit();
+                    }
+                });
+            }
+
+
+            // --- 상점 소개 수정 관련 스크립트 ---
+            const editIntroBtn = document.getElementById('editIntroBtn');
+            const introViewDiv = document.getElementById('introView');
+            const introEditDiv = document.getElementById('introEdit');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+            // '수정' 버튼 클릭 시: 보기 모드를 숨기고, 편집 모드를 보여줍니다.
+            if (editIntroBtn) {
+                editIntroBtn.addEventListener('click', () => {
+                    introViewDiv.style.display = 'none';
+                    introEditDiv.style.display = 'block';
+                });
+            }
+            
+            // '취소' 버튼 클릭 시: 편집 모드를 숨기고, 다시 보기 모드를 보여줍니다.
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', () => {
+                    introViewDiv.style.display = 'block';
+                    introEditDiv.style.display = 'none';
+                });
+            }
+        });
+    </script>
+	</th:block>
 	
 </html>
-
-
-
-
-
-
-
-
-
-
