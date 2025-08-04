@@ -166,8 +166,8 @@
     WHERE
         u.user_lgn_id= #{sellerId}
 </select>
-   	
-	
+
+
      <select id="getStoreList" resultMap="storeResultMap">
 	 /* 스토어 목록 조회 */
         SELECT
