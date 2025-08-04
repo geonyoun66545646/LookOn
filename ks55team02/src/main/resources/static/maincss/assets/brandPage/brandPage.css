@@ -180,3 +180,29 @@
 		font-size: 2.2rem;
 	}
 }
+
+
+
+#brandInfoModal .brand-info-header {
+    display: flex;
+    align-items: center; /* 로고와 이름 수직 중앙 정렬 */
+    justify-content: center; /* 전체 요소를 수평 중앙 정렬 */
+    gap: 12px; /* 로고와 이름 사이 간격 */
+    margin-bottom: 2.5rem; /* 브랜드 이름 아래 여백 */
+}
+
+/* 기존 .brand-modal-title의 마진 속성 수정 */
+#brandInfoModal .brand-modal-title {
+	font-size: 2.4rem;
+	font-weight: 700;
+	margin: 0; /* 부모 flexbox 컨테이너의 gap 속성을 사용하도록 마진 제거 */
+	text-align: center;
+}
+
+#brandInfoModal .brand-modal-description {
+	font-size: 1.3rem;
+	font-weight: 400;
+	color: #555;
+	line-height: 1.7;
+	text-align: center;
+}
