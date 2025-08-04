@@ -12,6 +12,7 @@ public interface StoreMngService {
 	
 	String getStoreIdBySellerId(String sellerId); // ⭐ 이 메서드를 추가합니다.
 
+	String getStoreIdBySellerLgnId(String sellerId);
 	
 	// List<Store> getSotreList();
 	Store getStoreInfoById(String storeId);
@@ -31,7 +32,7 @@ public interface StoreMngService {
 	// 특정 상점 ID에 대한 상점별 판매 탑 5 랭킹
 	List<TopSellingProduct> getTopSellingProductsByStoreId(String storeId);
 	
-	void updateStoreLogo(String storeId, MultipartFile logoFile);
+	void updateStoreLogo(String userlgnId, MultipartFile logoFile);
 	
     void updateStoreIntro(String storeId, String storeIntro);
 	

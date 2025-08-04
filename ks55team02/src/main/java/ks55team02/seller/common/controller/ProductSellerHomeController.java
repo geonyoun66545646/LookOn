@@ -139,18 +139,17 @@ public class ProductSellerHomeController {
         }
         
         String sellerLgnId = loginUser.getUserLgnId(); 
-        String storeId = storeMngService.getStoreIdBySellerId(sellerLgnId);
-
+        
         if (logoFile.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "업로드할 파일을 선택해주세요.");
             return "redirect:/seller";
         }
         
         try {
-            storeMngService.updateStoreLogo(storeId, logoFile);
+            storeMngService.updateStoreLogo(sellerLgnId, logoFile);
             redirectAttributes.addFlashAttribute("successMessage", "로고가 성공적으로 변경되었습니다.");
         } catch (Exception e) {
-            log.error("로고 업데이트 중 오류 발생: storeId={}, error={}", storeId, e.getMessage(), e);
+            log.error("로고 업데이트 중 오류 발생: sellerLgnId={}, error={}", sellerLgnId, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("errorMessage", "로고 변경 중 오류가 발생했습니다.");
         }
         
@@ -171,13 +170,11 @@ public class ProductSellerHomeController {
         }
         
         String sellerLgnId = loginUser.getUserLgnId(); 
-        String storeId = storeMngService.getStoreIdBySellerId(sellerLgnId);
-
         try {
-            storeMngService.updateStoreIntro(storeId, storeIntroCn);
+            storeMngService.updateStoreIntro(sellerLgnId, storeIntroCn);
             redirectAttributes.addFlashAttribute("successMessage", "상점 소개가 성공적으로 수정되었습니다.");
         } catch (Exception e) {
-            log.error("상점 소개 수정 실패: storeId={}, error={}", storeId, e.getMessage(), e);
+            log.error("상점 소개 수정 실패: sellerLgnId={}, error={}", sellerLgnId, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("errorMessage", "소개 수정 중 오류가 발생했습니다.");
         }
 
