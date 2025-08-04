@@ -21,7 +21,7 @@
     width: 100%;
     color: #333;
     border-top: 2px solid #333;
-    margin-bottom: 2rem;
+  	margin-bottom: 2rem;
 }
 
 /* 테이블 헤더(th) 스타일 */
@@ -141,23 +141,24 @@
 
 .d-flex {
     display: -ms-flexbox!important;
-    display: flex !important
-;
+    display: flex !important;
     justify-content: space-around;
-    margin: 15px;
+   margin-bottom: 40px; 
 }
+
 .distribute{
 	display: flex;
     justify-content: flex-end;
     gap: 5px;
+    margin-bottom : 10px;
 }	
 .search-cn{
 	min-width : 18rem;
 }
 
-.pagination {
+/* .pagination {
 	margin-bottom : 5rem;
-}
+} */
 
 
 /* =======================================================
