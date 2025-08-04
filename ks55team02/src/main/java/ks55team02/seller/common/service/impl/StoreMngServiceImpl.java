@@ -40,6 +40,11 @@ public class StoreMngServiceImpl implements StoreMngService{
 	}
 	
 	@Override
+	public String getStoreIdBySellerLgnId(String sellerId) {
+		return storeMngMapper.getStoreIdBySellerLgnId(sellerId);
+	}
+	
+	@Override
 	public Store getStoreInfoById(String storeId) {
 		Store store = storeMngMapper.getStoreInfoById(storeId);
 		
@@ -82,11 +87,13 @@ public class StoreMngServiceImpl implements StoreMngService{
 	
 	@Override
     @Transactional // 중요: 이 메소드는 하나의 트랜잭션으로 처리됩니다.
-    public void updateStoreLogo(String storeId, MultipartFile logoFile) {
+    public void updateStoreLogo(String userlgnId, MultipartFile logoFile) {
         if (logoFile == null || logoFile.isEmpty()) {
             throw new IllegalArgumentException("업로드된 파일이 없습니다.");
         }
 
+        String storeId = storeMngMapper.getStoreIdBySellerLgnId(userlgnId);
+        
         // 1. 기존 로고 정보 조회 (삭제 처리를 위해)
         Store existingStore = storeMngMapper.getStoreInfoById(storeId);
         if (existingStore == null) {
