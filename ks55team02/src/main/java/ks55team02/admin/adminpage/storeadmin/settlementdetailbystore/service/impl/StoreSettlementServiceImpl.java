@@ -65,10 +65,8 @@ public class StoreSettlementServiceImpl implements StoreSettlementService {
     @Override
     public boolean completeSettlement(String storeClclnId) {
         try {
-            // 1. DB에서 정산할 데이터 전체를 가져옵니다. (재료 찾아오기)
             StoreSettlementDTO settlementToComplete = storeSettlementMapper.getStoreSettlementById(storeClclnId);
             
-            // 1-1. 재료가 없으면 요리를 시작할 수 없습니다.
             if (settlementToComplete == null) {
                 logger.error("completeSettlement 실패: 정산 대상을 찾을 수 없음 - ID: {}", storeClclnId);
                 return false;
@@ -78,20 +76,18 @@ public class StoreSettlementServiceImpl implements StoreSettlementService {
                 return false;
             }
 
-            // 2. "정산 예정액"을 계산합니다. (재료로 요리하기)
+            // 수수료 계산
             BigDecimal totSelAmt = settlementToComplete.getTotSelAmt();
             BigDecimal selFeeRt = settlementToComplete.getSelFeeRt();
-            
             BigDecimal hundred = new BigDecimal("100");
             BigDecimal feePercentage = selFeeRt.divide(hundred, 4, RoundingMode.HALF_UP);
             BigDecimal feeAmount = totSelAmt.multiply(feePercentage);
             BigDecimal finalClclnAmt = totSelAmt.subtract(feeAmount).setScale(2, RoundingMode.HALF_UP);
             
-            // 3. 계산된 금액과 함께 DB에 업데이트를 요청합니다. (완성된 요리 내놓기)
+            // DB 업데이트
             int updatedRows = storeSettlementMapper.updateSettlementStatus(storeClclnId, "판매정산완료", finalClclnAmt);
             
             return updatedRows > 0;
-
         } catch (Exception e) {
             logger.error("completeSettlement 중 오류 발생 - ID: {}", storeClclnId, e);
             return false;

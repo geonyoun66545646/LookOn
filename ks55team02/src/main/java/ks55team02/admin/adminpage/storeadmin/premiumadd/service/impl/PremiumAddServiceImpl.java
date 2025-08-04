@@ -117,14 +117,20 @@ public class PremiumAddServiceImpl implements PremiumAddService {
 
     /**
      * 구독 플랜 삭제
-     * @param planId 삭제할 플랜 ID
+     * @param sbscrPlanId 삭제할 구독 플랜 ID
      * @return 삭제 성공 여부
      */
     @Override
-    @Transactional
-    public boolean deleteSubscriptionPlan(String planId) {
-        log.info("구독 플랜 삭제 서비스 시작. planId: {}", planId);
-        int affectedRows = premiumAddMapper.deleteSubscriptionPlan(planId); // 매퍼에 deleteSubscriptionPlan 쿼리 필요
+    public boolean deleteSubscriptionPlan(String sbscrPlanId) {
+        log.info("구독 플랜 삭제 서비스 시작. planId: {}", sbscrPlanId);
+        
+        // 1. 해당 구독 플랜 ID에 연결된 결제 내역(자식 데이터)을 먼저 삭제합니다.
+        // 이 작업이 성공해야 부모 데이터를 삭제할 수 있습니다.
+        premiumAddMapper.deleteSubscriptionPaymentsByPlanId(sbscrPlanId);
+
+        // 2. 결제 내역 삭제 후, 부모 데이터인 구독 플랜을 삭제합니다.
+        int affectedRows = premiumAddMapper.deleteSubscriptionPlan(sbscrPlanId);
+
         return affectedRows > 0;
     }
 }
