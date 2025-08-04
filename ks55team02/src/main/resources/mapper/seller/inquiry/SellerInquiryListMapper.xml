@@ -91,152 +91,109 @@
     </select>
     
 
-    <select id="getSellerInquiryCnt" parameterType="ks55team02.common.domain.inquiry.Inquiry" resultType="int">
-        SELECT
-            COUNT(i.inqry_id)
-        FROM
-            inquiries i
-        JOIN
-            stores s ON s.store_id = i.inqry_store_id
-        LEFT JOIN
-            users u ON u.user_no = i.wrtr_id
-        WHERE 1=1
-         AND i.prcs_stts NOT IN ('DELETED', 'HIDDEN')
-        <if test="inqryStoreId != null and inqryStoreId != ''">
-            AND i.inqry_store_id = #{inqryStoreId}
-        </if>
-        
+    <select id="getSellerInquiryCnt" resultType="int">
+    SELECT
+        COUNT(i.inqry_id)
+    FROM
+        inquiries i
+    LEFT JOIN
+        users u ON u.user_no = i.wrtr_id
+    WHERE
+        i.inqry_store_id = #{inqryStoreId}
+        AND i.prcs_stts NOT IN ('DELETED', 'HIDDEN')
+    
+        <!-- 모든 파라미터에서 "inquiry." 접두사를 제거합니다. -->
         <if test="searchValue != null and searchValue != ''">
             <choose>
                 <when test="searchKey != null and searchKey != ''">
                     <choose>
-                        <when test="searchKey == 'inqryTtl'">
-                            AND i.inqry_ttl LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
-                        <when test="searchKey == 'inqryCn'">
-                            AND i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
-                        <when test="searchKey == 'wrtrId'">
-                            AND u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
-                        <when test="searchKey == 'inqryId'">
-                            AND i.inqry_id LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
-                        <when test="searchKey == 'prcsStts'">
-                            AND i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%')
-                        </when>
+                        <when test="searchKey == 'inqryTtl'">AND i.inqry_ttl LIKE CONCAT('%', #{searchValue}, '%')</when>
+                        <when test="searchKey == 'inqryCn'">AND i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%')</when>
+                        <when test="searchKey == 'wrtrId'">AND u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%')</when>
+                        <when test="searchKey == 'inqryId'">AND i.inqry_id LIKE CONCAT('%', #{searchValue}, '%')</when>
+                        <when test="searchKey == 'prcsStts'">AND i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%')</when>
                     </choose>
                 </when>
                 <otherwise>
-                    AND (
-                        i.inqry_ttl LIKE CONCAT('%', #{searchValue}, '%') OR
-                        i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%') OR
-                        u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%') OR
-                        i.inqry_id LIKE CONCAT('%', #{searchValue}, '%') OR
-                        i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%')
-                        )
+                    AND ( i.inqry_ttl LIKE CONCAT('%', #{searchValue}, '%') OR i.inqry_cn LIKE CONCAT('%', #{searchValue}, '%') OR u.user_ncnm LIKE CONCAT('%', #{searchValue}, '%') OR i.inqry_id LIKE CONCAT('%', #{searchValue}, '%') OR i.prcs_stts LIKE CONCAT('%', #{searchValue}, '%') )
                 </otherwise>
             </choose>
         </if>
         <if test="filterConditions != null and filterConditions.size() > 0">
             AND i.prcs_stts IN
-            <foreach collection="filterConditions" item="status" open="(" separator="," close=")">
-                #{status}
-            </foreach>
+            <foreach collection="filterConditions" item="status" open="(" separator="," close=")">#{status}</foreach>
         </if>
-        <if test="startDate != null and endDate != null">
-            AND i.reg_ymd BETWEEN #{startDate} AND #{endDate}
+        <if test="startDate != null">
+            AND i.reg_ymd >= #{startDate}
         </if>
-    </select>
+        <if test="endDate != null">
+            AND #{endDate} > i.reg_ymd
+        </if>
+</select>
 
     <select id="getSellerInquiryList" resultMap="inquiryListResultMap">
-        SELECT
-            i.inqry_id,
-            i.inqry_type_cd,
-            i.inqry_ttl,
-            i.prvt_yn,
-            i.prcs_stts,
-            i.reg_ymd,
-            u.user_ncnm,
-            (SELECT COUNT(*) FROM answer a WHERE a.inqry_id = i.inqry_id) AS answer_count
-        FROM
-            inquiries i
-        LEFT JOIN
-            users u ON u.user_no = i.wrtr_id
-        WHERE
-            i.inqry_store_id = #{param1.inqryStoreId}
-            AND i.prcs_stts NOT IN ('DELETED', 'HIDDEN')
-            
-            <!-- 전체 검색 조건 -->
-            <if test="param1.searchValue != null and param1.searchValue != ''">
-                <choose>
-                    <when test="param1.searchKey != null and param1.searchKey != ''">
-                        <choose>
-                            <when test="param1.searchKey == 'inqryTtl'">
-                                AND i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%')
-                            </when>
-                            <when test="param1.searchKey == 'inqryCn'">
-                                AND i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%')
-                            </when>
-                            <when test="param1.searchKey == 'wrtrId'">
-                                AND u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%')
-                            </when>
-                            <when test="param1.searchKey == 'inqryId'">
-                                AND i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%')
-                            </when>
-                            <when test="param1.searchKey == 'prcsStts'">
-                                AND i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
-                            </when>
-                        </choose>
-                    </when>
-                    <otherwise>
-                        AND (
-                            i.inqry_ttl LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                            i.inqry_cn LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                            u.user_ncnm LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                            i.inqry_id LIKE CONCAT('%', #{param1.searchValue}, '%') OR
-                            i.prcs_stts LIKE CONCAT('%', #{param1.searchValue}, '%')
-                        )
-                    </otherwise>
-                </choose>
-            </if>
-
-            <!-- 처리 상태 필터 조건 -->
-            <if test="param1.filterConditions != null and param1.filterConditions.size() > 0">
-                AND i.prcs_stts IN
-                <foreach collection="param1.filterConditions" item="status" open="(" separator="," close=")">
-                    #{status}
-                </foreach>
-            </if>
-            
-            <!-- 기간 필터 조건 -->
-            <if test="param1.startDate != null and param1.endDate != null">
-                AND i.reg_ymd BETWEEN #{param1.startDate} AND #{param1.endDate}
-            </if>
+    SELECT
+        i.inqry_id,
+        i.inqry_type_cd,
+        i.inqry_ttl,
+        i.prvt_yn,
+        i.prcs_stts,
+        i.reg_ymd,
+        u.user_ncnm,
+        (SELECT COUNT(*) FROM answer a WHERE a.inqry_id = i.inqry_id) AS answer_count
+    FROM
+        inquiries i
+    LEFT JOIN
+        users u ON u.user_no = i.wrtr_id
+    WHERE
+        i.inqry_store_id = #{inquiry.inqryStoreId}
+        AND i.prcs_stts NOT IN ('DELETED', 'HIDDEN')
         
-        <!-- 정렬 조건 -->
-        ORDER BY
+        <!-- 전체 검색 조건 (param1 -> inquiry) -->
+        <if test="inquiry.searchValue != null and inquiry.searchValue != ''">
             <choose>
-                <when test="param1.sortKey == 'inqryId'">
-                    i.inqry_id
-                </when>
-                <when test="param1.sortKey == 'regYmd'">
-                    i.reg_ymd
+                <when test="inquiry.searchKey != null and inquiry.searchKey != ''">
+                    <choose>
+                        <when test="inquiry.searchKey == 'inqryTtl'">AND i.inqry_ttl LIKE CONCAT('%', #{inquiry.searchValue}, '%')</when>
+                        <when test="inquiry.searchKey == 'inqryCn'">AND i.inqry_cn LIKE CONCAT('%', #{inquiry.searchValue}, '%')</when>
+                        <when test="inquiry.searchKey == 'wrtrId'">AND u.user_ncnm LIKE CONCAT('%', #{inquiry.searchValue}, '%')</when>
+                        <when test="inquiry.searchKey == 'inqryId'">AND i.inqry_id LIKE CONCAT('%', #{inquiry.searchValue}, '%')</when>
+                        <when test="inquiry.searchKey == 'prcsStts'">AND i.prcs_stts LIKE CONCAT('%', #{inquiry.searchValue}, '%')</when>
+                    </choose>
                 </when>
                 <otherwise>
-                    i.reg_ymd
+                    AND (i.inqry_ttl LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR i.inqry_cn LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR u.user_ncnm LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR i.inqry_id LIKE CONCAT('%', #{inquiry.searchValue}, '%') OR i.prcs_stts LIKE CONCAT('%', #{inquiry.searchValue}, '%'))
                 </otherwise>
             </choose>
-            <if test="param1.sortOrder != null and param1.sortOrder != ''">
-                ${param1.sortOrder}
-            </if>
-            <if test="param1.sortOrder == null or param1.sortOrder == ''">
-                DESC
-            </if>
-            
-        <!-- 페이징 처리 -->
-        LIMIT #{param2}, #{param3}
-    </select>
+        </if>
+
+        <!-- 처리 상태 필터 조건 (param1 -> inquiry) -->
+        <if test="inquiry.filterConditions != null and inquiry.filterConditions.size() > 0">
+            AND i.prcs_stts IN
+            <foreach collection="inquiry.filterConditions" item="status" open="(" separator="," close=")">#{status}</foreach>
+        </if>
+        
+        <!-- 기간 필터 조건 (날짜 문제 최종 해결) -->
+        <if test="inquiry.startDate != null">
+            AND i.reg_ymd >= #{inquiry.startDate}
+        </if>
+        <if test="inquiry.endDate != null">
+            AND #{inquiry.endDate} > i.reg_ymd
+        </if>
+    
+    <!-- 정렬 조건 (param1 -> inquiry) -->
+    ORDER BY
+        <choose>
+            <when test="inquiry.sortKey == 'inqryId'">i.inqry_id</when>
+            <when test="inquiry.sortKey == 'regYmd'">i.reg_ymd</when>
+            <otherwise>i.reg_ymd</otherwise>
+        </choose>
+        <if test="inquiry.sortOrder != null and inquiry.sortOrder != ''">${inquiry.sortOrder}</if>
+        <if test="inquiry.sortOrder == null or inquiry.sortOrder == ''">DESC</if>
+        
+    <!-- 페이징 처리 (param2, param3 -> limitStart, pageSize) -->
+    LIMIT #{limitStart}, #{pageSize}
+</select>
 
     <select id="getSellerInquiryByStoreId" parameterType="String" resultMap="inquiryResultMap">
         SELECT

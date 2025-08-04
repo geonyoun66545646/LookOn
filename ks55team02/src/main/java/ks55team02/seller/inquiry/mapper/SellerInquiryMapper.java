@@ -10,12 +10,12 @@ import ks55team02.common.domain.inquiry.InquiryAnswerHistory; // 추가
 
 @Mapper
 public interface SellerInquiryMapper {
-
-    int getSellerInquiryCnt(Inquiry inquiry);
-        
-    List<Inquiry> getSellerInquiryList(@Param("param1") Inquiry inquiry,
-            @Param("param2") int limitStart,
-            @Param("param3") int pageSize);
+    
+	int getSellerInquiryCnt(Inquiry inquiry);
+    
+    List<Inquiry> getSellerInquiryList(@Param("inquiry") Inquiry inquiry,
+                                       @Param("limitStart") int limitStart,
+                                       @Param("pageSize") int pageSize);
     
     Inquiry getSellerInquiryByStoreId(String inqryId);
 
