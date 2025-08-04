@@ -53,5 +53,12 @@ public interface PremiumAddMapper {
     PremiumAddDTO getPlanById(String planId);
     int modifySubscriptionPlan(PremiumAddDTO modifiedPlan);
     
+    /**
+     * 특정 구독 플랜 ID에 해당하는 모든 결제 내역을 삭제합니다.
+     * @param sbscrPlanId 삭제할 구독 플랜 ID
+     * @return 삭제된 행의 수
+     */
+    int deleteSubscriptionPaymentsByPlanId(String sbscrPlanId);
+    
     
 }

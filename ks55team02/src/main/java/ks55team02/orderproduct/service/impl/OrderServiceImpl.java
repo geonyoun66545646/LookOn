@@ -41,12 +41,13 @@ public class OrderServiceImpl implements OrderService{
         }
 
         // 2. 주문 기본 정보 조회
-        OrderDTO orderInfo = orderMapper.getCombinedOrderDetailsByOrderId(latestOrderId);
+        OrderDTO orderInfo = orderMapper.getCombinedOrderDetailsByOrderId(latestOrderId);     
         
         // 3. 주문 상품 목록 조회
         List<Map<String, Object>> orderedProducts = orderMapper.getOrderedProductsByOrderId(latestOrderId);
 
-
+        System.out.println("--- Ordered Products Size: " + orderedProducts.size() + " ---");
+        
         // [디버깅 로그] 이 로그에서 orderedProducts가 정상적인 데이터로 찍히는지 확인
         System.out.println("--- OrderServiceImpl 최종 데이터 확인 ---");
         System.out.println("주문 상품 목록 (orderedProducts): " + orderedProducts);

@@ -87,7 +87,7 @@
             o.ordr_no = #{ordrNo}
     </select>
     
-    <select id="getOrderedProductsByOrderId" parameterType="String" resultMap="orderResultMap">
+    <select id="getOrderedProductsByOrderId" parameterType="String" resultType="java.util.HashMap">
         SELECT
             COALESCE(p.gds_nm, '상품 정보 없음')    AS NAME,
             oi.ordr_qntty                       AS QUANTITY,
