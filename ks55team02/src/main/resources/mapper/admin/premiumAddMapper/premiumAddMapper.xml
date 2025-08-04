@@ -74,11 +74,17 @@
             sbscr_plan_mdfcn_dt = NOW() <!-- 수정 일시를 DB에서 자동 설정 -->
         WHERE sbscr_plan_id = #{sbscrPlanId}
     </update>
-
+    
+    <delete id="deleteSubscriptionPaymentsByPlanId">
+	    DELETE FROM subscription_payments
+	    WHERE sbscr_plan_id = #{sbscrPlanId}
+	</delete>
+	
     <delete id="deleteSubscriptionPlan">
         DELETE FROM subscription_plans
         WHERE sbscr_plan_id = #{sbscrPlanId}
     </delete>
+
     
     <!-- 구독 플랜 조회 -->
 	<select id="getPlanById" parameterType="string" resultMap="premiumAddresultMap">
