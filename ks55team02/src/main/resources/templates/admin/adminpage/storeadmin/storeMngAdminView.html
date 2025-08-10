@@ -149,12 +149,7 @@
                                     <input class="form-check-input member-check" type="checkbox" th:value="${store.storeId}">
                                 </td>
                                 <td class="ellipsis text" th:text="${store.storeId}" th:title="${store.storeId}"></td>
-                                <td>
-								    <a class="text" 
-								       th:href="@{/customer/products/list(brand=${store.storeId})}" 
-								       th:text="${store.storeConm}"
-								       target="_blank">
-								    </a>
+                                <td  class="text" th:text="${store.storeConm}">								  					   
 								</td>
                                    	<td class="ellipsis text text-left" th:text="${store.storeIntroCn}" th:title="${store.storeIntroCn}"></td>
                                 <td th:text="${store.sellerUserNm}"></td>
