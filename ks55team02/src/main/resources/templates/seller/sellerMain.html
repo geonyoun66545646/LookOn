@@ -1,273 +1,256 @@
+```html
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{seller/layout/layoutSeller}">
-	
+
 	<head>
-	
+
 		<meta name="description" content="한국스마트정보교육원 ksmybatis" />
 		<link rel="stylesheet" th:href="@{/maincss/assets/customsellercss/layoutSeller.css}">
 	</head>
-	
-	<!-- 추가할 js file -->
+
 	<th:block layout:fragment="jsFile">
 	</th:block>
-	
-	<!-- 추가할 script -->
+
 	<th:block layout:fragment="jsScript">
 	</th:block>
-	
+
 	<th:block layout:fragment="contents">
-    <div>
-        <h2 class="content-title card-title" th:text="${store.storeConm} + '님 스토어 관리'">스토어 관리</h2>
-    </div>
-    <div class ="intro-head">
-        <!-- 1. 로고 영역 -->
-        <!-- 2. 스토어 소개 영역 -->
- <div class="row cn-top">
-        <!-- 1. 로고 영역 -->
-        <div class="col-xl-2 col-lg-3 ">
-             <!-- ✅ 3. h-100 클래스 제거, CSS로 높이 제어 -->
-             <div class="card mb-4 intro">
-                <!-- 로고 수정을 위한 숨겨진 form (기능을 위해 다시 추가) -->
-                <form id="logoUpdateForm" th:action="@{/seller/store/update/logo}" method="post" enctype="multipart/form-data">
-                    <input type="file" id="logoFileInput" name="logoFile" accept="image/*" style="display: none;"/>
-                </form>
-                
-                <!-- 로고 이미지를 감싸는 클릭 가능한 컨테이너 (CSS 클래스 적용) -->
-                <div id="logoImageContainer" class="store-logo card-body p-0" style="cursor: pointer;" title="클릭하여 로고 변경">
-                    <!-- ✅ 4. store.logo 객체를 사용하여 올바른 이미지 경로 표시 (기능을 위해 수정) -->
-                    <img th:if="${store.logo != null and store.logo.imgAddr != null}"
-                         th:src="@{${store.logo.imgAddr}}"
-                         alt="상점 로고" />
-                    <img th:unless="${store.logo != null and store.logo.imgAddr != null}"
-                         th:src="@{/admincss/assets/imgs/stores/img-1.jpg}"
-                         alt="기본 로고" />
-                </div>
-            </div>
-        </div>
+		<div>
+			<h2 class="content-title card-title" th:text="${store.storeConm} + '님 스토어 관리'">스토어 관리</h2>
+		</div>
+		<div class ="intro-head">
+			<div class="row cn-top">
+				<div class="col-xl-2 col-lg-3 ">
+					<div class="card mb-4 intro">
+						<form id="logoUpdateForm" th:action="@{/seller/store/update/logo}" method="post" enctype="multipart/form-data">
+							<input type="file" id="logoFileInput" name="logoFile" accept="image/*" style="display: none;"/>
+						</form>
 
-        <!-- 2. 스토어 소개 영역 -->
-        <div class="col-xl-10 col-lg-9">
-             <!-- ✅ 3. h-100 클래스 제거 -->
-            <div class="card mb-4">
-                <article class="card-body intro">
-                    <!-- ✅ 5. 소개 수정 기능 UI (버튼, 폼) 다시 추가 -->
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="card-title mb-0">스토어 소개</h3>
-                        <button id="editIntroBtn" class="btn btn-sm btn-light">수정</button>
-                    </div>
-                    
-                    <div>
-                        <!-- 보기 모드 -->
-                        <div id="introView">
-                            <p class="intro-text" th:text="${store.storeIntroCn}"></p>
-                        </div>
-                        <!-- 편집 모드 (숨김) -->
-                        <div id="introEdit" style="display: none;">
-                            <form th:action="@{/seller/store/update/intro}" method="post">
-                                <textarea name="storeIntroCn" class="form-control" rows="5" th:text="${store.storeIntroCn}" required></textarea>
-                                <div class="mt-2 text-end">
-                                    <button type="button" id="cancelEditBtn" class="btn btn-sm btn-secondary">취소</button>
-                                    <button type="submit" class="btn btn-sm btn-primary">저장</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    
-                    <canvas id="myChart" height="120px"></canvas>
-                </article>
-            </div>
-            </div>
-        </div>
-        </div>
-                	<div class="row">
-               			<div class="col-lg-6">
-					    <div class="card card-body mb-4">
-					        <article class="icontext sub-box">
-					        <div class="row">
-					        <div class="col-lg-2">
-					            <span class="icon icon-sm rounded-circle bg-primary-light" th:text="${sbscrPrchsNocs * 30} + '일'"></span>
-					            </div>
-					            <div class="col-lg-10">
-					            <div class="text">
-					                <div th:if="${hasSubscription}">
-					                    <h5 class="mb-1 card-title text-start">구독 상태:</h5>
-					                    <span class="d-block text-end pe-3" th:text="${earliestSubscriptionStartDate}"></span>
-					                    <span class="d-block text-end pe-3" th:text="${latestSubscriptionEndDate}"></span>
-					                </div>
-					                <div th:unless="${hasSubscription}">
-					                    <p class="mb-0">현재 구독 기록이 없습니다.</p>
-					                </div>
-					            </div>
-					            </div>
-					            </div>
-					        </article>
-					    </div>
+						<div id="logoImageContainer" class="store-logo card-body p-0" style="cursor: pointer;" title="클릭하여 로고 변경">
+							<img th:if="${store.logo != null and store.logo.imgAddr != null}"
+								th:src="@{${store.logo.imgAddr}}"
+								alt="상점 로고" />
+							<img th:unless="${store.logo != null and store.logo.imgAddr != null}"
+								th:src="@{/admincss/assets/imgs/stores/img-1.jpg}"
+								alt="기본 로고" />
+						</div>
 					</div>
-                    <div class="col-lg-6">
-					    <div class="card card-body mb-4">
-					        <article class="icontext sub-box">
-					        <div class="row">
-					        <div class="col-lg-2">
-					            <span class="icon icon-sm rounded-circle bg-primary-light"><i class="text-primary material-icons md-monetization_on"></i></span>
-					            </div>
-					            <div class="col-lg-10">
-					            <div class="text">
-					                    <h4 class="mb-1 card-title text-start">총 판매 금액</h4>
-					                    <span class="d-block text-end pe-3 pt-3" th:text="${#numbers.formatDecimal(storeSettle, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
-					            </div>
-					            </div>
-					            </div>
-					        </article>
-					    </div>
+				</div>
+
+				<div class="col-xl-10 col-lg-9">
+					<div class="card mb-4">
+						<article class="card-body intro">
+							<div class="d-flex justify-content-between align-items-center mb-3">
+								<h3 class="card-title mb-0">스토어 소개</h3>
+								<button id="editIntroBtn" class="btn btn-sm btn-light">수정</button>
+							</div>
+							<div>
+								<div id="introView">
+									<p class="intro-text" th:text="${store.storeIntroCn}"></p>
+								</div>
+								<div id="introEdit" style="display: none;">
+									<form th:action="@{/seller/store/update/intro}" method="post">
+										<textarea name="storeIntroCn" class="form-control" rows="5" th:text="${store.storeIntroCn}" required></textarea>
+										<div class="mt-2 text-end">
+											<button type="button" id="cancelEditBtn" class="btn btn-sm btn-secondary">취소</button>
+											<button type="submit" class="btn btn-sm btn-primary">저장</button>
+										</div>
+									</form>
+								</div>
+							</div>
+
+							<canvas id="myChart" height="120px"></canvas>
+						</article>
 					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-6">
+				<div class="card card-body mb-4">
+					<article class="icontext sub-box">
+						<div class="row">
+							<div class="col-lg-2">
+								<span class="icon icon-sm rounded-circle bg-primary-light" th:text="${sbscrPrchsNocs * 30} + '일'"></span>
+							</div>
+							<div class="col-lg-10">
+								<div class="text">
+									<div th:if="${hasSubscription}">
+										<h5 class="mb-1 card-title text-start">구독 상태:</h5>
+										<span class="d-block text-end pe-3" th:text="${earliestSubscriptionStartDate}"></span>
+										<span class="d-block text-end pe-3" th:text="${latestSubscriptionEndDate}"></span>
+									</div>
+									<div th:unless="${hasSubscription}">
+										<p class="mb-0">현재 구독 기록이 없습니다.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</article>
+				</div>
+			</div>
+			<div class="col-lg-6">
+				<div class="card card-body mb-4">
+					<article class="icontext sub-box">
+						<div class="row">
+							<div class="col-lg-2">
+								<span class="icon icon-sm rounded-circle bg-primary-light"><i class="text-primary material-icons md-monetization_on"></i></span>
+							</div>
+							<div class="col-lg-10">
+								<div class="text">
+									<h4 class="mb-1 card-title text-start">총 판매 금액</h4>
+									<span class="d-block text-end pe-3 pt-3" th:text="${#numbers.formatDecimal(storeSettle, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+								</div>
+							</div>
+						</div>
+					</article>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-6">
+				<div class="card card-body mb-4">
+					<article class="icontext sub-box">
+						<div class="row">
+							<div class="col-lg-2">
+								<span class="icon icon-sm rounded-circle bg-success-light"><i class="text-success material-icons md-local_shipping"></i></span>
+							</div>
+							<div class="col-lg-10">
+								<div class="text">
+									<h4 class="mb-1 card-title text-start">총 주문 건수</h4>
+									<span class="d-block text-end pe-3 pt-3" th:text="${storeOrdCnt ?: 0 +'개'}"></span>
+								</div>
+							</div>
+						</div>
+					</article>
+				</div>
+			</div>
+
+			<div class="col-lg-6">
+				<div class="card card-body mb-4">
+					<article class="icontext sub-box">
+						<div class="row">
+							<div class="col-lg-2">
+								<span class="icon icon-sm rounded-circle bg-warning-light"><i class="text-warning material-icons md-qr_code"></i></span>
+							</div>
+							<div class="col-lg-10">
+								<div class="text">
+									<h4 class="mb-1 card-title text-start">현재 등록된 상품 수</h4>
+									<span class="d-block text-end pe-3 pt-3" th:text="${storeActGds}"></span>
+								</div>
+							</div>
+						</div>
+					</article>
+				</div>
+			</div>
+		</div>
+		<div class="card mb-4">
+			<header class="card-header">
+				<h4 class="card-title">BEST SELLER</h4>
+				<div class="row align-items-center">
+
+
+				</div>
+			</header>
+			<div class="card-body">
+				<div class="table-responsive">
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th class="text-center">
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" />
+											<label class="form-check-label"></label>
+										</div>
+									</th>
+									<th>상품 번호</th>
+									<th>상품명</th>
+									<th>등록일</th>
+									<th>총 판매 수량</th>
+									<th>활성화 상태</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${#lists.isEmpty(topSellingProduct)}">
+									<td colspan="7" class="text-center">판매된 상품이 없습니다.</td>
+								</tr>
+								<tr th:each="item, stat : ${topSellingProduct}">
+									<td class="text-center">
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" th:id="transactionCheck + ${stat.count}" />
+											<label class="form-check-label" th:for="transactionCheck + ${stat.count}"></label>
+										</div>
+									</td>
+									<td class="fw-bold" th:text="${item.ranking.gdsNo}">#SKXXXX</td>
+									<td th:text="${item.ranking.gdsNm}">상품명</td>
+									<td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd').format(item.ranking.regDt)}">YYYY-MM-DD</td>
+									<td th:text="${item.totalSoldQuantity}">0</td>
+									<td>
+										<span th:classappend="${item.ranking.actvtnYn ? 'badge-soft-success' : 'badge-soft-danger'}" class="badge badge-pill" th:text="${item.ranking.actvtnYn ? '활성화' : '비활성화'}">상태</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
-					<div class="row">
-                    <div class="col-lg-6">
-					    <div class="card card-body mb-4">
-					        <article class="icontext sub-box">
-					        <div class="row">
-					        <div class="col-lg-2">
-					            <span class="icon icon-sm rounded-circle bg-success-light"><i class="text-success material-icons md-local_shipping"></i></span>
-					            </div>
-					            <div class="col-lg-10">
-					            <div class="text">
-					                    <h4 class="mb-1 card-title text-start">총 주문 건수</h4>
-					                    <span class="d-block text-end pe-3 pt-3" th:text="${storeOrdCnt ?: 0 +'개'}"></span>
-					            </div>
-					            </div>
-					            </div>
-					        </article>
-					    </div>
-					</div>
-				
-                   <div class="col-lg-6">
-					    <div class="card card-body mb-4">
-					        <article class="icontext sub-box">
-					        <div class="row">
-					        <div class="col-lg-2">
-					             <span class="icon icon-sm rounded-circle bg-warning-light"><i class="text-warning material-icons md-qr_code"></i></span>
-					            </div>
-					            <div class="col-lg-10">
-					            <div class="text">
-					                    <h4 class="mb-1 card-title text-start">현재 등록된 상품 수</h4>
-					                    <span class="d-block text-end pe-3 pt-3" th:text="${storeActGds}"></span>
-					            </div>
-					            </div>
-					            </div>
-					        </article>
-					    </div>
-					    </div>
-					    	</div>
-                <div class="card mb-4">
-                    <header class="card-header">
-                        <h4 class="card-title">BEST SELLER</h4>
-                        <div class="row align-items-center">
-                           
-                            
-                        </div>
-                    </header>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <div class="table-responsive">
-                      <table class="table table-hover">
-    <thead>
-        <tr>
-            <th class="text-center">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" />
-                    <label class="form-check-label"></label>
-                </div>
-            </th>
-            <th>상품 번호</th>
-            <th>상품명</th>
-            <th>등록일</th>
-            <th>총 판매 수량</th>
-            <th>활성화 상태</th> <th>상세 보기</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr th:if="${#lists.isEmpty(topSellingProduct)}">
-            <td colspan="7" class="text-center">판매된 상품이 없습니다.</td>
-        </tr>
-        <tr th:each="item, stat : ${topSellingProduct}">
-            <td class="text-center">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" th:id="transactionCheck + ${stat.count}" />
-                    <label class="form-check-label" th:for="transactionCheck + ${stat.count}"></label>
-                </div>
-            </td>
-            <td><a href="#" class="fw-bold" th:text="${item.ranking.gdsNo}">#SKXXXX</a></td>
-            <td th:text="${item.ranking.gdsNm}">상품명</td>
-            <td th:text="${T(java.time.format.DateTimeFormatter).ofPattern('yyyy-MM-dd').format(item.ranking.regDt)}">YYYY-MM-DD</td>
-            <td th:text="${item.totalSoldQuantity}">0</td>
-            <td>
-                <span th:classappend="${item.ranking.actvtnYn ? 'badge-soft-success' : 'badge-soft-danger'}" class="badge badge-pill" th:text="${item.ranking.actvtnYn ? '활성화' : '비활성화'}">상태</span>
-            </td>
-            <td>
-                <a th:href="@{/seller/product/detail(gdsNo=${item.ranking.gdsNo})}" class="btn btn-xs"> View details</a>
-            </td>
-        </tr>
-    </tbody>
-</table>
-                    </div>
-                </div>
-                </div>
-            
-		    </div>
+				</div>
+			</div>
+		</div>
 
 	</th:block>
 	<th:block layout:fragment="jsScript">
-	 <script>
-        // 페이지의 모든 HTML 요소가 로드된 후 스크립트를 실행합니다.
-        document.addEventListener('DOMContentLoaded', function () {
+		<script>
+			// 페이지의 모든 HTML 요소가 로드된 후 스크립트를 실행합니다.
+			document.addEventListener('DOMContentLoaded', function () {
 
-            // --- 로고 수정 관련 스크립트 ---
-            const logoImageContainer = document.getElementById('logoImageContainer');
-            const logoFileInput = document.getElementById('logoFileInput');
-            const logoUpdateForm = document.getElementById('logoUpdateForm');
+				// --- 로고 수정 관련 스크립트 ---
+				const logoImageContainer = document.getElementById('logoImageContainer');
+				const logoFileInput = document.getElementById('logoFileInput');
+				const logoUpdateForm = document.getElementById('logoUpdateForm');
 
-            // 로고 이미지 컨테이너를 클릭하면 숨겨진 파일 입력(input) 창을 클릭합니다.
-            if (logoImageContainer) {
-                logoImageContainer.addEventListener('click', () => {
-                    logoFileInput.click();
-                });
-            }
+				// 로고 이미지 컨테이너를 클릭하면 숨겨진 파일 입력(input) 창을 클릭합니다.
+				if (logoImageContainer) {
+					logoImageContainer.addEventListener('click', () => {
+						logoFileInput.click();
+					});
+				}
 
-            // 파일 입력 창에서 파일이 선택되면(change), 자동으로 폼(form)을 제출합니다.
-            if (logoFileInput) {
-                logoFileInput.addEventListener('change', () => {
-                    if (logoFileInput.files.length > 0) {
-                        logoUpdateForm.submit();
-                    }
-                });
-            }
+				// 파일 입력 창에서 파일이 선택되면(change), 자동으로 폼(form)을 제출합니다.
+				if (logoFileInput) {
+					logoFileInput.addEventListener('change', () => {
+						if (logoFileInput.files.length > 0) {
+							logoUpdateForm.submit();
+						}
+					});
+				}
 
 
-            // --- 상점 소개 수정 관련 스크립트 ---
-            const editIntroBtn = document.getElementById('editIntroBtn');
-            const introViewDiv = document.getElementById('introView');
-            const introEditDiv = document.getElementById('introEdit');
-            const cancelEditBtn = document.getElementById('cancelEditBtn');
+				// --- 상점 소개 수정 관련 스크립트 ---
+				const editIntroBtn = document.getElementById('editIntroBtn');
+				const introViewDiv = document.getElementById('introView');
+				const introEditDiv = document.getElementById('introEdit');
+				const cancelEditBtn = document.getElementById('cancelEditBtn');
 
-            // '수정' 버튼 클릭 시: 보기 모드를 숨기고, 편집 모드를 보여줍니다.
-            if (editIntroBtn) {
-                editIntroBtn.addEventListener('click', () => {
-                    introViewDiv.style.display = 'none';
-                    introEditDiv.style.display = 'block';
-                });
-            }
-            
-            // '취소' 버튼 클릭 시: 편집 모드를 숨기고, 다시 보기 모드를 보여줍니다.
-            if (cancelEditBtn) {
-                cancelEditBtn.addEventListener('click', () => {
-                    introViewDiv.style.display = 'block';
-                    introEditDiv.style.display = 'none';
-                });
-            }
-        });
-    </script>
+				// '수정' 버튼 클릭 시: 보기 모드를 숨기고, 편집 모드를 보여줍니다.
+				if (editIntroBtn) {
+					editIntroBtn.addEventListener('click', () => {
+						introViewDiv.style.display = 'none';
+						introEditDiv.style.display = 'block';
+					});
+				}
+
+				// '취소' 버튼 클릭 시: 편집 모드를 숨기고, 다시 보기 모드를 보여줍니다.
+				if (cancelEditBtn) {
+					cancelEditBtn.addEventListener('click', () => {
+						introViewDiv.style.display = 'block';
+						introEditDiv.style.display = 'none';
+					});
+				}
+			});
+		</script>
 	</th:block>
-	
+
 </html>
+```
